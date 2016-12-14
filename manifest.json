@@ -1,0 +1,45 @@
+{
+  "name": "FoxxMC",
+  "version": "1.0.0-rc.1",
+  "license": "Apache 2",
+  "description": "This is Model-Controller microframework like Rails (but without View) for building rich API servers.",
+  "author": "Denis Trayzhon",
+  "thumbnail": "assets/fox_logo.png",
+
+  "engines": {
+    "arangodb": "^3.0.0"
+  },
+
+  "main": "index.js",
+  "defaultDocument": "index.html",
+
+  "contributors": [
+    { "name": "Evgeni Biryukov" },
+    { "name": "Igor Kostyakov" },
+    { "name": "Sergey Zagorodnykh" }
+  ],
+
+  "scripts": {
+    "setup": "scripts/setup.js",
+    "teardown": "scripts/teardown.js",
+    "migrate": "scripts/migrate.js",
+    "rollback": "scripts/rollback.js",
+    "reset_admin": "scripts/reset_admin.js",
+    "delayed_job": "scripts/delayed_job.js",
+    "touch_queue": "scripts/touch_queue.js",
+    "send_signal": "scripts/send_signal.js"
+  },
+
+  "node_modules": [
+    "moment"
+  ],
+
+  "configuration": {
+  },
+
+  "files": {
+    "/": "public"
+  },
+
+  "lib": "dist"
+}
