@@ -1,0 +1,10 @@
+{
+  "files": [
+    {
+      "from": "migration.coffee.hbs",
+      "to": "migrations/{{migration_id}}_{{addonPrefix}}_{{name}}.coffee"
+    }
+  ],
+  "dependencies": [],
+  "description" : "Simple migration"
+}

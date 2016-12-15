@@ -1,0 +1,40 @@
+{
+  "files": [
+    {
+      "from": "api_index.coffee.hbs",
+      "to": "api/index.coffee"
+    },{
+      "from": "api_router.coffee.hbs",
+      "to": "api/router.coffee"
+    },{
+      "from": "coffeelint.json.hbs",
+      "to": "coffeelint.json"
+    },{
+      "from": "Copyright.hbs",
+      "to": "Copyright"
+    },{
+      "from": "gitignore.hbs",
+      "to": ".gitignore"
+    },{
+      "from": "LICENSE.hbs",
+      "to": "LICENSE"
+    },{
+      "from": "gulpfile.coffee.hbs",
+      "to": "gulpfile.coffee"
+    },{
+      "from": "manifest.json.hbs",
+      "to": "manifest.json"
+    },{
+      "from": "package.json.hbs",
+      "to": "package.json"
+    },{
+      "from": "Readme.md.hbs",
+      "to": "Readme.md"
+    },{
+      "from": "index.js.hbs",
+      "to": "index.js"
+    }
+  ],
+  "dependencies": [],
+  "description" : "New application"
+}

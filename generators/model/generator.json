@@ -1,0 +1,10 @@
+{
+  "files": [
+    {
+      "from": "model.coffee.hbs",
+      "to": "api/models/{{name}}.coffee"
+    }
+  ],
+  "dependencies": [],
+  "description" : "Simple model"
+}

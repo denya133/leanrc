@@ -1,0 +1,9 @@
+_             = require 'lodash'
+joi           = require 'joi'
+
+class {{#camelize}}{{name}}{{/camelize}} extends FoxxMC::Model
+  @attr 'title',        joi.string().empty(null).empty('').default(null)
+  @attr 'description',  joi.string().empty(null).empty('').default(null)
+
+
+module.exports = {{#camelize}}{{name}}{{/camelize}}.initialize()

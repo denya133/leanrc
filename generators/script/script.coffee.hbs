@@ -1,0 +1,38 @@
+_             = require 'lodash'
+joi           = require 'joi'
+inflect       = require('i')()
+{ db }        = require '@arangodb'
+queues        = require '@arangodb/foxx/queues'
+{runJob}        = require 'FoxxMC'
+{classes}       = require 'FoxxMC'
+
+
+dataSchema =  joi.object()
+
+###
+{
+
+}
+###
+
+runJob
+  context: module.context
+  command: (rawData, jobId) ->
+    {value:data} = dataSchema.validate rawData
+
+    {read, write} = {{addonPrefix}}::Class.getLocksFor '<some class>.<methodName>'
+
+    db._executeTransaction
+      collections:
+        read: read
+        write: write
+        allowImplicit: no
+      action: ->
+        {{addonPrefix}}::Class.<methodName>
+        #<some logic>
+        return
+
+    queues._updateQueueDelay()
+
+
+module.exports = yes
