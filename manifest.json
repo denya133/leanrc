@@ -19,6 +19,16 @@
     { "name": "Sergey Zagorodnykh" }
   ],
 
+  "keywords": [
+    "ArangoDB",
+    "Foxx",
+    "API",
+    "MVC",
+    "Rails",
+    "highload",
+    "distributed system"
+  ],
+
   "scripts": {
     "setup": "scripts/setup.js",
     "teardown": "scripts/teardown.js",
@@ -31,7 +41,9 @@
   },
 
   "node_modules": [
-    "moment"
+    "moment",
+    "lower-case",
+    "FoxxMC"
   ],
 
   "configuration": {
