@@ -4,6 +4,6 @@ coffee = require 'gulp-coffee'
 
 # task 'compile-coffee'
 gulp.task 'compile_coffee', ()->
-  gulp.src './src/**/*.coffee' # path to your file
+  gulp.src './api/**/*.coffee' # path to your file
   .pipe coffee()
   .pipe gulp.dest './dist'

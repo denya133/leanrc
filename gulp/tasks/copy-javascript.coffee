@@ -19,6 +19,6 @@ copyFiles = (originDir, destinationDir, mask = '**/*.js') ->
     return
 
 gulp.task 'copy_javascript', ()->
-  rootAssets = join ROOT, 'src'
+  rootAssets = join ROOT, 'api'
   publicDir = './dist'
   copyFiles rootAssets, publicDir
