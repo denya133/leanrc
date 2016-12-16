@@ -35,12 +35,10 @@ UNAUTHORIZED      = status 'unauthorized'
 
   ```
     Router    = require './lib/router'
-    classes   = require './lib/classes'
 
     module.context.use require './lib/sessions'
 
     class ApplicationRouter extends Router
-      @classes: classes
       @map ()->
         # @root ''
         @post '/auth/signin', to: 'auth#signin'
@@ -102,7 +100,6 @@ UNAUTHORIZED      = status 'unauthorized'
 ###
 
 class Router extends CoreObject
-  @classes: {}
   @_path: '/'
   @_name: ''
   @_module: null
@@ -119,9 +116,9 @@ class Router extends CoreObject
 
   @createFoxxRouter: (method, path, controller, action)->
     router = FoxxRouter()
-    # console.log 'GGGGGGGGGGGGGGGG @classes', Object.keys @classes
+    # console.log 'GGGGGGGGGGGGGGGG classes', Object.keys classes
     controllerName = inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
-    Controller = @classes[controllerName]
+    Controller = classes[controllerName]
     # console.log '$$$$$$$$$$$$$$$$$ inflect.camelize inflect.underscore "#{controller}_controller"', inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
     unless Controller?
       throw new Error "controller `#{controller}` is not exist"
@@ -131,7 +128,7 @@ class Router extends CoreObject
           data = Controller.new(req: req, res: res)[action]? []...
         else
           # t1 = Date.now()
-          {read, write} = Controller.getLocksFor "#{Controller.name}::#{action}", {in: @classes}, null
+          {read, write} = Controller.getLocksFor "#{Controller.name}::#{action}"
           # console.log '$$$$$$$$$$$$$$$$$LLLLLLLLLLLlllllllllllllllllll read, write', (Date.now() - t1), read, write
           data = db._executeTransaction
             collections:
@@ -261,9 +258,7 @@ class Router extends CoreObject
     else
       "#{name}/"
     @_resources ?= []
-    classes = @classes
     @_resources.push class ResourceRouter extends Router
-      @classes: classes
       @_path: full_path
       @_name: "#{parent_name}#{_name}"
       @_module: _module
@@ -294,10 +289,8 @@ class Router extends CoreObject
     else
       "#{name}/"
     @_resources ?= []
-    classes = @classes
     if lambda?.constructor is Function
       @_resources.push class NamespaceRouter extends Router
-        @classes: classes
         @_path: "#{parent_path}#{_path}"
         @_name: "#{parent_name}#{_name}"
         @_except: 'all'

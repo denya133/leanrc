@@ -275,7 +275,7 @@ catch
       console.log '%%%%%%%%%%%%%%%%%%% recordHasBeenChanged data', data
       queues  = require '@arangodb/foxx/queues'
       {db}    = require '@arangodb'
-      {cleanCallback} = require './clean_config'
+      {cleanCallback} = require './cleanConfig'
       mount = module.context.mount
 
       queues.get('signals').push(
@@ -529,7 +529,6 @@ class CoreObject
       unless /[.]/.test signal
         throw new Error 'signal must be with dot (for example `billing.pay-order`)'
       [macro_signal] = signal.split '.'
-      classes = require './classes'
       for own className, classObject of classes
         do (className, classObject)->
           subscribers = []
@@ -568,7 +567,7 @@ class CoreObject
     read: ['_queues'], write: ['_jobs']
   , (data, options = {})->
     queues  = require '@arangodb/foxx/queues'
-    {cleanCallback} = require './clean_config'
+    {cleanCallback} = require './cleanConfig'
 
     script =
       mount: module.context.mount
@@ -638,7 +637,7 @@ class CoreObject
         collections.write.push collectionName
     collections
 
-  @getLocksFor: (keys, {in:classes}, ..., processedMethods = [])->
+  @getLocksFor: (keys, ..., processedMethods = [])->
     unless Array.isArray keys
       keys = [keys]
     self = @
@@ -704,7 +703,7 @@ class CoreObject
                   if subscribers.length > 0
                     subscribers.forEach ({methodName, opts})=>
                       if opts.invoke is yes
-                        __collections = OtherAbstractClass.getLocksFor "#{_className}.#{methodName}", {in: classes}, processedMethods
+                        __collections = OtherAbstractClass.getLocksFor "#{_className}.#{methodName}", processedMethods
                         collections = @mergeLocks collections, __collections
             return
           if /.*[.].*/.test _key
@@ -713,7 +712,7 @@ class CoreObject
             [_className, _instanceMethodName] = _key.split '::'
           _className = AbstractClass.name if _className is ''
           OtherAbstractClass = classes[_className]
-          __collections = OtherAbstractClass.getLocksFor _key, {in: classes}, processedMethods
+          __collections = OtherAbstractClass.getLocksFor _key, processedMethods
           collections = @mergeLocks collections, __collections
 
       # console.log '$%$%$%$%$% collections666', self.name, keys, collections

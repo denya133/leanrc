@@ -110,7 +110,7 @@ class Tomato extends Model
       console.log '%%%%%%%%%%%%%%%%%%% recordHasBeenChanged data', data
       queues  = require '@arangodb/foxx/queues'
       {db}    = require '@arangodb'
-      {cleanCallback} = require './clean_config'
+      {cleanCallback} = require './cleanConfig'
       mount = module.context.mount
 
       queues.get('signals').push(
@@ -404,12 +404,12 @@ class Model extends CoreObject
     console.log 'dfdfdf 666'
     # return
 
-  @getLocksFor: (keys, {in:classes}, ..., processedMethods = [])->
+  @getLocksFor: (keys, ..., processedMethods = [])->
     unless Array.isArray keys
       keys = [keys]
     hash = crypto.sha1 'Model|' + String keys
     @locks["#{@name}|#{hash}"] ?= do =>
-      collections = @super('getLocksFor') Model, keys, {in: classes}, processedMethods
+      collections = @super('getLocksFor') Model, keys, processedMethods
 
       for own key, value of @["_#{@name}_edges"] ? {}
         do ({through:[edge]} = value)->
@@ -468,7 +468,7 @@ class Model extends CoreObject
                         __key = "#{_className}.#{methodName}"
                         unless __key in  processedMethods
                           processedMethods.push __key
-                          __collections = OtherAbstractClass.getLocksFor __key, {in: classes}, processedMethods
+                          __collections = OtherAbstractClass.getLocksFor __key, processedMethods
                           collections = @mergeLocks collections, __collections
             return
           if /.*[.].*/.test _key
@@ -481,7 +481,7 @@ class Model extends CoreObject
             __key = "#{_className}::#{_methodName}"
           unless __key in  processedMethods
             OtherAbstractClass = classes[_className]
-            __collections = OtherAbstractClass.getLocksFor __key, {in: classes}, processedMethods
+            __collections = OtherAbstractClass.getLocksFor __key, processedMethods
             collections = @mergeLocks collections, __collections
 
 
@@ -524,7 +524,7 @@ class Model extends CoreObject
     # console.log '%%%%%%%%%%%%%%%%%%% recordHasBeenChanged data', data
     queues  = require '@arangodb/foxx/queues'
     {db}    = require '@arangodb'
-    {cleanCallback} = require './clean_config'
+    {cleanCallback} = require './cleanConfig'
     mount = module.context.mount
 
     queues.get('signals').push(
