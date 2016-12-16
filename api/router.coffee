@@ -1,13 +1,8 @@
-{
-  Router
-  classes
-  sessions
-} = require 'FoxxMC'
 
-module.context.use sessions
 
-class ApplicationRouter extends Router
-  @classes: classes
+module.context.use FoxxMC::Utils.sessions
+
+class ApplicationRouter extends FoxxMC::Router
   @map ()->
 
 
