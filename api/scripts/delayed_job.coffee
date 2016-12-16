@@ -3,8 +3,9 @@ joi           = require 'joi'
 inflect       = require('i')()
 { db }        = require '@arangodb'
 queues        = require '@arangodb/foxx/queues'
-runJob        = require '../lib/run_job'
-classes       = require '../lib/classes'
+require 'FoxxMC'
+
+FoxxMC::Utils.defineClasses "#{__dirname}/.."
 
 
 dataSchema =  joi.object(
@@ -20,7 +21,7 @@ dataSchema =  joi.object(
 }
 ###
 
-runJob
+FoxxMC::Utils.runJob
   context: module.context
   command: (rawData, jobId) ->
     {value:data} = dataSchema.validate rawData
@@ -30,7 +31,7 @@ runJob
       ['.find', "::#{data.methodName}"]
     else
       ".#{data.methodName}"
-    {read, write} = Class.getLocksFor methodNameForLocks, {in: classes}, null
+    {read, write} = Class.getLocksFor methodNameForLocks
 
     db._executeTransaction
       collections:
@@ -45,7 +46,6 @@ runJob
             methodName
             args
           }       = params
-          classes = require '../lib/classes'
         ) ->
           LocalClass = classes[className]
           if id?

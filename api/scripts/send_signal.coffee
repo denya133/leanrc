@@ -1,7 +1,7 @@
 joi       = require 'joi'
 request   = require '@arangodb/request'
 util      = require 'util'
-runJob    = require '../lib/run_job'
+require 'FoxxMC'
 
 {streamServer} = module.context.configuration
 
@@ -23,7 +23,7 @@ dataSchema =  joi.object(
 ).required()
 
 response = {}
-runJob
+FoxxMC::Utils.runJob
   context: module.context
   command: (rawData, jobId) ->
     {value:data} = dataSchema.validate rawData

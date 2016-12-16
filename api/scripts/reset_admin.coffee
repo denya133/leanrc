@@ -1,6 +1,5 @@
 Referral    = require '../models/referral'
 User        = require '../models/user'
-auth        = require '../lib/auth'
 
 {
   adminEmail
@@ -43,7 +42,7 @@ do ()->
     verified: yes
     verificationEmailSent: yes
   user._owner = 'admin'
-  user.authData = auth.create adminPassword
+  user.authData = FoxxMC::Utils.auth.create adminPassword
 
   if users.exists 'admin'
     users.replace 'admin', user

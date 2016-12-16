@@ -1,10 +1,11 @@
 _         = require 'lodash'
 joi       = require 'joi'
 fs        = require 'fs'
+require 'FoxxMC'
 
 { db }    = require '@arangodb'
 
-classes   = require '../lib/classes'
+FoxxMC::Utils.defineClasses "#{__dirname}/.."
 
 dataSchema =  joi.object(
   until:     joi.string().optional()
