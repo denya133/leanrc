@@ -1,13 +1,17 @@
 require('supererror');
 var _package          = require('./package.json');
-changeCase            = require('change-case');
+var changeCase        = require('change-case');
+require('FoxxMC');
+
+var Module = FoxxMC.prototype.Utils.defineClasses(__dirname + "/dist");
 
 var appConfig = {
   name: _package.foxxmc_addon.name,
   prefix: _package.foxxmc_addon.prefix,
   Prefix: changeCase.pascalCase(_package.foxxmc_addon.prefix),
   version: _package.version,
-  short_version: _package.version.replace(/[.]\d$/, '')
+  short_version: _package.version.replace(/[.]\d$/, ''),
+  Module: Module
 };
 
 module.exports = appConfig;

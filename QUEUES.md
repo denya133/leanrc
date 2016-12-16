@@ -20,10 +20,10 @@
 
 ```coffee
 assert = require 'assert'
+require 'FoxxMC'
+FoxxMC::Utils.defineClasses "#{__dirname}/.."
 
-runJob = require '../lib/run_job'
-
-runJob
+FoxxMC::Utils.runJob
   command: (params, jobId) ->
     console.log 'Test Failure params', JSON.stringify params
     console.log 'Test Failure jobId:', jobId

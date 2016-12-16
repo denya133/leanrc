@@ -1,3 +1,4 @@
-ApplicationRouter = require './router'
 
-new ApplicationRouter()
+
+App = require '../index'
+App.Module.initialize()
