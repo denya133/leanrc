@@ -21,6 +21,7 @@ folders = [
 
 gulp.task 'generate_indexes', (cb)->
   _path = join ROOT, 'api'
+  _addonConfig = require "#{ROOT}/index.js"
   folders.forEach (subfolder)->
     pathToModules = join _path, subfolder
     index_file = normalize join _path, subfolder, 'index.coffee'
