@@ -3,7 +3,7 @@ inflect       = require('i')()
 FoxxRouter    = require '@arangodb/foxx/router'
 {db}          = require '@arangodb'
 queues        = require '@arangodb/foxx/queues'
-CoreObject    = require './coreObject'
+CoreObject    = require './CoreObject'
 
 status        = require 'statuses'
 { errors }    = require '@arangodb'

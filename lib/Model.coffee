@@ -6,9 +6,9 @@ crypto        = require '@arangodb/crypto'
 inflect       = require('i')()
 uuid          = require './uuid'
 extend        = require './extend'
-Cursor        = require './cursor'
-Query         = require './query'
-CoreObject    = require './coreObject'
+Cursor        = require './Cursor'
+Query         = require './Query'
+CoreObject    = require './CoreObject'
 
 SIMPLE_TYPES  = ['string', 'number', 'boolean', 'date', 'object']
 

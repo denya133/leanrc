@@ -1,4 +1,5 @@
 
 
-App = require '../index'
-App.Module.use()
+require 'FoxxMC'
+Module = require '../index'
+Module.use()

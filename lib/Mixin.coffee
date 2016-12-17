@@ -1,4 +1,4 @@
-CoreObject  = require './coreObject'
+CoreObject  = require './CoreObject'
 
 ###
   ````

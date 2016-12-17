@@ -46,7 +46,7 @@
     "FoxxMC"
   ],
 
-  "foxxmcAddon": {
+  "foxxmcModule": {
     "name": "foxxmc-test",
     "prefix": "test"
   },

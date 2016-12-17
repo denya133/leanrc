@@ -17,6 +17,7 @@ gulp.task 'create_package', ()->
       'dist/**/*'
       'public/**/*'
       'LICENSE'
+      'index.js'
       'manifest.json'
       'README.md'
     ], base: './', cwd: join ROOT # path to your file

@@ -1,7 +1,7 @@
 _           = require 'lodash'
 joi         = require 'joi'
 inflect     = require('i')()
-CoreObject  = require './coreObject'
+CoreObject  = require './CoreObject'
 extend      = require './extend'
 crypto      = require '@arangodb/crypto'
 

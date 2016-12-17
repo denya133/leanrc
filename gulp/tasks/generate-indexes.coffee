@@ -21,12 +21,16 @@ folders = [
 
 gulp.task 'generate_indexes', (cb)->
   _path = join ROOT, 'api'
-  {prefix} = require("#{ROOT}/manifest.json").foxxmcAddon
+  {prefix} = require("#{ROOT}/manifest.json").foxxmcModule
   Prefix = changeCase.pascalCase prefix
   folders.forEach (subfolder)->
     pathToModules = join _path, subfolder
     index_file = normalize join _path, subfolder, 'index.coffee'
     var_name = pluralize subfolder, 10
+    if subfolder is 'models'
+      suffix = ''
+    else
+      suffix = pluralize subfolder, 1
     # file_content = "
     #   \nglobal['#{Prefix}'] ?= class #{Prefix}
     #   \nmodule.exports = #{var_name} = {}
@@ -38,7 +42,6 @@ gulp.task 'generate_indexes', (cb)->
     glob.sync join pathToModules, '**/*.coffee'
       .forEach (file)->
         unless (_name = basename file, '.coffee') is 'index'
-          suffix = pluralize subfolder, 1
           Name = changeCase.pascalCase "#{_name}_#{suffix}"
           # file_content += "
           #   \n#{var_name}['#{Name}'] = require './#{_name}'

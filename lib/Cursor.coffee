@@ -1,4 +1,4 @@
-CoreObject    = require './coreObject'
+CoreObject    = require './CoreObject'
 
 class Cursor extends CoreObject
   _cursor: null
