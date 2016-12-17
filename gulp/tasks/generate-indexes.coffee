@@ -21,19 +21,35 @@ folders = [
 
 gulp.task 'generate_indexes', (cb)->
   _path = join ROOT, 'api'
-  _addonConfig = require "#{ROOT}/index.js"
+  {prefix} = require("#{ROOT}/manifest.json").foxxmcAddon
+  Prefix = changeCase.pascalCase prefix
   folders.forEach (subfolder)->
     pathToModules = join _path, subfolder
     index_file = normalize join _path, subfolder, 'index.coffee'
     var_name = pluralize subfolder, 10
-    file_content = "module.exports = #{var_name} = {}"
+    # file_content = "
+    #   \nglobal['#{Prefix}'] ?= class #{Prefix}
+    #   \nmodule.exports = #{var_name} = {}
+    # "
+    # file_content = "
+    #   \nglobal['#{Prefix}'] ?= class #{Prefix}
+    # "
+    file_content = ""
     glob.sync join pathToModules, '**/*.coffee'
       .forEach (file)->
         unless (_name = basename file, '.coffee') is 'index'
           suffix = pluralize subfolder, 1
-          prefix = "#{_addonConfig.prefix}_"
-          name = changeCase.pascalCase "#{prefix}#{_name}_#{suffix}"
-          file_content += "\n#{var_name}['#{name}'] = require './#{_name}'"
+          Name = changeCase.pascalCase "#{_name}_#{suffix}"
+          # file_content += "
+          #   \n#{var_name}['#{Name}'] = require './#{_name}'
+          #   \nglobal['#{Prefix}']::#{Name} =
+          # "
+          # file_content += "
+          #   \nglobal['#{Prefix}']::#{Name} = require './#{_name}'
+          # "
+          file_content += "
+            \n#{Prefix}::#{Name} = require './#{_name}'
+          "
     file_content += '\n'
     fs.writeFileSync index_file, file_content
   cb()

@@ -13,8 +13,8 @@ module.exports = function(Handlebars) {
   Handlebars.registerHelper('addonPrefix', (function() {
     return function(options) {
       var current_path = process.cwd();
-      var _package = require(path.join(current_path, 'package.json'));
-      return changeCase.pascalCase(_package.foxxmc_addon.prefix);
+      var _manifest = require(path.join(current_path, 'manifest.json'));
+      return changeCase.pascalCase(_manifest.foxxmcAddon.prefix);
     };
   })());
 };

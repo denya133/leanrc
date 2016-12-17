@@ -1,4 +1,5 @@
 _                     = require 'lodash'
+inflect               = require('i')()
 # Promise               = require 'promise'
 # pluralize             = require 'pluralize'
 # glob                  = require 'glob'
@@ -18,6 +19,20 @@ folders = [
 ]
 
 defineClasses = (path, options={})->
+  manifest = require "#{path}/../manifest.json"
+  {prefix} = manifest.foxxmcAddon
+  Prefix = inflect.classify prefix
+  global["#{Prefix}"] = eval "(
+    var #{Prefix};
+    #{Prefix} = (function() {
+      function #{Prefix}() {}
+      return #{Prefix};
+    })();
+  )()"
+  extend global["#{Prefix}"], _.omit manifest, ['name']
+  global["#{Prefix}"].use = ->
+    new global["#{Prefix}"]::ApplicationRouter()
+
   _path = "#{path}/api/"
   _addonConfig = require "#{path}/index.js"
 
@@ -149,6 +164,6 @@ defineClasses = (path, options={})->
   _addonConfig.configure = extend _addonConfigure, _configure, _addonConfigure(path)
 
 
-  return
+  return global["#{Prefix}"]
 
 module.exports = defineClasses

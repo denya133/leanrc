@@ -21,7 +21,8 @@
 ```coffee
 assert = require 'assert'
 require 'FoxxMC'
-FoxxMC::Utils.defineClasses "#{__dirname}/.."
+
+require '../index'
 
 FoxxMC::Utils.runJob
   command: (params, jobId) ->

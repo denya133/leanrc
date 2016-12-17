@@ -1,4 +1,4 @@
 
 
 App = require '../index'
-App.Module.initialize()
+App.Module.use()

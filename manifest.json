@@ -46,6 +46,11 @@
     "FoxxMC"
   ],
 
+  "foxxmcAddon": {
+    "name": "foxxmc-test",
+    "prefix": "test"
+  },
+
   "configuration": {
   },
 

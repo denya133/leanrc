@@ -5,7 +5,7 @@ require 'FoxxMC'
 
 { db }    = require '@arangodb'
 
-FoxxMC::Utils.defineClasses "#{__dirname}/.."
+require '../index'
 
 dataSchema =  joi.object(
   until:     joi.string().optional()
