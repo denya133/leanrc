@@ -38,7 +38,9 @@ gulp.task 'generate_indexes', (cb)->
     # file_content = "
     #   \nglobal['#{Prefix}'] ?= class #{Prefix}
     # "
-    file_content = ""
+    file_content = "
+      \nmodule.exports = ->
+    "
     glob.sync join pathToModules, '**/*.coffee'
       .forEach (file)->
         unless basename(file, '.coffee') is 'index'
@@ -55,7 +57,7 @@ gulp.task 'generate_indexes', (cb)->
           #   \nglobal['#{Prefix}']::#{Name} = require './#{_name}'
           # "
           file_content += "
-            \n#{Prefix}::#{Name} = require '#{file}'
+            \n  #{Prefix}::#{Name} = require '#{file}'
           "
     file_content += '\n'
     fs.writeFileSync index_file, file_content

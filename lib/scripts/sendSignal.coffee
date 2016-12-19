@@ -24,7 +24,7 @@ dataSchema =  joi.object(
 ).required()
 
 runScript = ({ROOT}={})->
-  defineClasses ROOT + "dist"
+  defineClasses "#{ROOT}dist", no
   response = {}
 
   runJob

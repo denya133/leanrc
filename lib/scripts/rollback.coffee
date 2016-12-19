@@ -21,7 +21,7 @@ dataSchema =  joi.object(
 {value:data} = dataSchema.validate rawData
 
 runScript = ({ROOT}={})->
-  defineClasses ROOT + "dist"
+  defineClasses "#{ROOT}dist", no
   rollback = (steps)->
     error = null
     migrations = module.context.collection 'migrations'

@@ -110,7 +110,7 @@ class Tomato extends Model
       console.log '%%%%%%%%%%%%%%%%%%% recordHasBeenChanged data', data
       queues  = require '@arangodb/foxx/queues'
       {db}    = require '@arangodb'
-      {cleanCallback} = require './cleanConfig'
+      {cleanCallback} = require './utils/cleanConfig'
       mount = module.context.mount
 
       queues.get('signals').push(
@@ -404,7 +404,7 @@ class Model extends CoreObject
     console.log 'dfdfdf 666'
     # return
 
-  @getLocksFor: (keys, ..., processedMethods = [])->
+  @getLocksFor: (keys, processedMethods = [])->
     unless Array.isArray keys
       keys = [keys]
     hash = crypto.sha1 'Model|' + String keys
@@ -464,7 +464,7 @@ class Model extends CoreObject
             [_moduleName, __className, __methodName] = _key.split '::'
             _key = "#{__className}::#{__methodName}"
           unless _moduleName?
-            _moduleName = @moduleName
+            _moduleName = @moduleName()
 
           if /.*[#].*/.test _key
             [..., _signal] = _key.split '#'
@@ -536,7 +536,7 @@ class Model extends CoreObject
     # console.log '%%%%%%%%%%%%%%%%%%% recordHasBeenChanged data', data
     queues  = require '@arangodb/foxx/queues'
     {db}    = require '@arangodb'
-    {cleanCallback} = require './cleanConfig'
+    {cleanCallback} = require './utils/cleanConfig'
     mount = module.context.mount
 
     queues.get('signals').push(

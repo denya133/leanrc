@@ -22,7 +22,7 @@ dataSchema =  joi.object(
 ###
 
 runScript = ({ROOT}={})->
-  defineClasses ROOT + "dist"
+  defineClasses "#{ROOT}dist", no
   runJob
     context: module.context
     command: (rawData, jobId) ->

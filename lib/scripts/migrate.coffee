@@ -22,7 +22,7 @@ dataSchema =  joi.object(
 
 
 runScript = ({ROOT}={})->
-  defineClasses ROOT + "dist"
+  defineClasses "#{ROOT}dist", no
   error = null
   migrations = module.context.collection 'migrations'
   migrationsDir = fs.join ROOT, 'compiled_migrations'

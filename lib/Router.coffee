@@ -116,10 +116,10 @@ class Router extends CoreObject
 
   @createFoxxRouter: (method, path, controller, action)->
     router = FoxxRouter()
-    # console.log 'GGGGGGGGGGGGGGGG classes', Object.keys classes
+    # console.log 'GGGGGGGGGGGGGGGG createFoxxRouter', @_rootPath, @moduleName()
     controllerName = inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
-    moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
-    Controller = classes[moduleName]::[controllerName]
+    # moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+    Controller = classes[@moduleName()]::[controllerName]
 
     # console.log '$$$$$$$$$$$$$$$$$ inflect.camelize inflect.underscore "#{controller}_controller"', inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
     unless Controller?
@@ -147,9 +147,10 @@ class Router extends CoreObject
                   res
                 }       = params
               ) ->
+                # console.log '????????????????/ classes[moduleName]::[controllerName].new', moduleName, controllerName, classes[moduleName], classes[moduleName]::, classes[moduleName]::[controllerName]
                 classes[moduleName]::[controllerName].new(req: req, res: res)[action]? []...
             params:
-              moduleName: moduleName
+              moduleName: @moduleName()
               controllerName: controllerName
               action: action
               req: req

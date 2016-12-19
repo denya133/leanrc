@@ -306,7 +306,7 @@ class Controller extends CoreObject
     @isValid()
     {value:data} = @constructor.clientSchema().validate body
     patchData = data["#{inflect.underscore @Model.name}"]
-    patchData.ownerId = currentUser._key
+    patchData.ownerId = currentUser?._key ? null
     patchData
 
   beforeList: ()->

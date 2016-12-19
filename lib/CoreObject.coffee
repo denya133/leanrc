@@ -1,6 +1,7 @@
 _             = require 'lodash'
 extend        = require './utils/extend'
 crypto        = require '@arangodb/crypto'
+inflect       = require('i')()
 
 ###
   Chains
@@ -275,7 +276,7 @@ catch
       console.log '%%%%%%%%%%%%%%%%%%% recordHasBeenChanged data', data
       queues  = require '@arangodb/foxx/queues'
       {db}    = require '@arangodb'
-      {cleanCallback} = require './cleanConfig'
+      {cleanCallback} = require './utils/cleanConfig'
       mount = module.context.mount
 
       queues.get('signals').push(
@@ -420,9 +421,8 @@ class CoreObject
   @defineClassProperty: (name, definition)->
     Object.defineProperty @, name, definition
 
-  @defineClassProperty 'moduleName',
-    get: ()->
-      inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+  @moduleName: ()->
+    inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
 
   @_functor: (methods, collections, ..., lambda)->
     if arguments.length is 0
@@ -533,7 +533,7 @@ class CoreObject
       unless /[.]/.test signal
         throw new Error 'signal must be with dot (for example `billing.pay-order`)'
       [macro_signal] = signal.split '.'
-      for own className, classObject of classes[@moduleName]::
+      for own className, classObject of classes[@moduleName()]::
         do (className, classObject)->
           subscribers = []
           subscribers = subscribers.concat classObject["_#{className}_subs"]?[signal] ? []
@@ -571,7 +571,7 @@ class CoreObject
     read: ['_queues'], write: ['_jobs']
   , (data, options = {})->
     queues  = require '@arangodb/foxx/queues'
-    {cleanCallback} = require './cleanConfig'
+    {cleanCallback} = require './utils/cleanConfig'
 
     script =
       mount: module.context.mount
@@ -642,7 +642,7 @@ class CoreObject
         collections.write.push collectionName
     collections
 
-  @getLocksFor: (keys, ..., processedMethods = [])->
+  @getLocksFor: (keys, processedMethods = [])->
     unless Array.isArray keys
       keys = [keys]
     self = @
@@ -658,7 +658,7 @@ class CoreObject
           [moduleName, __className, __methodName] = key.split '::'
           key = "#{__className}::#{__methodName}"
         unless moduleName?
-          moduleName = @moduleName
+          moduleName = @moduleName()
         if /.*[#].*/.test key
           [..., signal] = key.split '#'
           [macro_signal] = signal.split '.'
@@ -695,6 +695,7 @@ class CoreObject
         else if /.*[:][:].*/.test key
           [className, instanceMethodName] = key.split '::'
           className = self.name if className is ''
+          # console.log '????????????/ moduleName', moduleName, classes[moduleName]
           AbstractClass = classes[moduleName]::[className]
 
           unless "#{className}::#{instanceMethodName}" in processedMethods
@@ -718,7 +719,7 @@ class CoreObject
             [_moduleName, __className, __methodName] = _key.split '::'
             _key = "#{__className}::#{__methodName}"
           unless _moduleName?
-            _moduleName = @moduleName
+            _moduleName = @moduleName()
 
           if /.*[#].*/.test _key
             [..., _signal] = _key.split '#'
