@@ -420,6 +420,10 @@ class CoreObject
   @defineClassProperty: (name, definition)->
     Object.defineProperty @, name, definition
 
+  @defineClassProperty 'moduleName',
+    get: ()->
+      inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+
   @_functor: (methods, collections, ..., lambda)->
     if arguments.length is 0
       throw new Error 'lambda argument is required'
@@ -529,8 +533,7 @@ class CoreObject
       unless /[.]/.test signal
         throw new Error 'signal must be with dot (for example `billing.pay-order`)'
       [macro_signal] = signal.split '.'
-      moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
-      for own className, classObject of classes[moduleName]::
+      for own className, classObject of classes[@moduleName]::
         do (className, classObject)->
           subscribers = []
           subscribers = subscribers.concat classObject["_#{className}_subs"]?[signal] ? []
@@ -602,7 +605,8 @@ class CoreObject
         if methodName isnt 'delay' and _.isFunction value
           obj[methodName] = (args...)->
             data =
-              className: self.name
+              moduleName: self.moduleName
+              className:  self.name
               methodName: methodName
               args: args
             self.delayJob data, opts
@@ -654,7 +658,7 @@ class CoreObject
           [moduleName, __className, __methodName] = key.split '::'
           key = "#{__className}::#{__methodName}"
         unless moduleName?
-          moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+          moduleName = @moduleName
         if /.*[#].*/.test key
           [..., signal] = key.split '#'
           [macro_signal] = signal.split '.'
@@ -714,7 +718,7 @@ class CoreObject
             [_moduleName, __className, __methodName] = _key.split '::'
             _key = "#{__className}::#{__methodName}"
           unless _moduleName?
-            _moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+            _moduleName = @moduleName
 
           if /.*[#].*/.test _key
             [..., _signal] = _key.split '#'

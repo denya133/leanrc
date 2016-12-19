@@ -464,7 +464,7 @@ class Model extends CoreObject
             [_moduleName, __className, __methodName] = _key.split '::'
             _key = "#{__className}::#{__methodName}"
           unless _moduleName?
-            _moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+            _moduleName = @moduleName
 
           if /.*[#].*/.test _key
             [..., _signal] = _key.split '#'

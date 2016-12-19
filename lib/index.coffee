@@ -8,14 +8,24 @@ class FoxxMC
   Router:           require './Router'
 
   Utils:
-    cleanConfig:    require './cleanConfig'
-    runJob:         require './runJob'
-    sendEmail:      require './sendEmail'
-    uuid:           require './uuid'
-    extend:         require './extend'
-    defineClasses:  require './defineClasses'
-    sessions:       require './sessions'
-    auth:           require './auth'
+    cleanConfig:    require './utils/cleanConfig'
+    runJob:         require './utils/runJob'
+    sendEmail:      require './utils/sendEmail'
+    uuid:           require './utils/uuid'
+    extend:         require './utils/extend'
+    defineClasses:  require './utils/defineClasses'
+    sessions:       require './utils/sessions'
+    auth:           require './utils/auth'
+
+  Scripts:
+    delayedJob:     require './scripts/delayedJob'
+    migrate:        require './scripts/migrate'
+    resetAdmin:     require './scripts/resetAdmin'
+    rollback:       require './scripts/rollback'
+    sendSignal:     require './scripts/sendSignal'
+    setup:          require './scripts/setup'
+    teardown:       require './scripts/teardown'
+    touchQueue:     require './scripts/touchQueue'
 
 
 module.exports = global['FoxxMC'] = FoxxMC
