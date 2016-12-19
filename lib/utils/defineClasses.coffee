@@ -35,8 +35,6 @@ defineClasses = (path, reDefine = yes)->
 
   getClassesFor = (subfolder)->
     require(fs.join path, subfolder, 'index')()
-    # console.log '??????????/ getClassesFor', fs.join(path, subfolder, 'index'), Prefix, global["#{Prefix}"]::
-    # console.log '??????????/ getClassesFor 222', require '/var/lib/arangodb3-apps/_db/test_foxxmc/test/APP/dist/mixins/index'
     return
 
   initializeModule = (addonPath, cb)->
@@ -72,20 +70,8 @@ defineClasses = (path, reDefine = yes)->
     folders.forEach (subfolder)->
       getClassesFor subfolder
     global["#{Prefix}"]::ApplicationRouter = require fs.join path, 'router'
-    # console.log ">>>>>>>>>>>1111", global["#{Prefix}"]::
-    global['classes'] ?= {}
+    global['classes'] = {}
     global['classes']["#{Prefix}"] = global["#{Prefix}"]
-  # global['classes']["#{Prefix}"] = eval "(
-  #   function() {
-  #     function #{Prefix}() {}
-  #     return #{Prefix};
-  # })();"
-  # global['classes']["#{Prefix}"] = extend global['classes']["#{Prefix}"], _.omit manifest, ['name']
-  # global['classes']["#{Prefix}"].use = ->
-  #   new @::ApplicationRouter()
-  # for own className, classObject of global["#{Prefix}"]::
-  #   global['classes']["#{Prefix}"]::[className] = classObject
-  # console.log ">>>>>>>>>>>222", global["#{Prefix}"]::, global['classes']["#{Prefix}"]::
   return global["#{Prefix}"]
 
 module.exports = defineClasses
