@@ -41,8 +41,12 @@ gulp.task 'generate_indexes', (cb)->
     file_content = ""
     glob.sync join pathToModules, '**/*.coffee'
       .forEach (file)->
-        unless (_name = basename file, '.coffee') is 'index'
-          Name = changeCase.pascalCase "#{_name}_#{suffix}"
+        unless basename(file, '.coffee') is 'index'
+          file = file.replace '.coffee', ''
+            .replace "#{pathToModules}", '.'
+          name = file.replace "./", ''
+            .replace /[/]/g, '_'
+          Name = changeCase.pascalCase "#{name}_#{suffix}"
           # file_content += "
           #   \n#{var_name}['#{Name}'] = require './#{_name}'
           #   \nglobal['#{Prefix}']::#{Name} =
@@ -51,7 +55,7 @@ gulp.task 'generate_indexes', (cb)->
           #   \nglobal['#{Prefix}']::#{Name} = require './#{_name}'
           # "
           file_content += "
-            \n#{Prefix}::#{Name} = require './#{_name}'
+            \n#{Prefix}::#{Name} = require '#{file}'
           "
     file_content += '\n'
     fs.writeFileSync index_file, file_content
