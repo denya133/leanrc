@@ -457,19 +457,31 @@ class Model extends CoreObject
 
       if methods.length > 0
         methods.forEach (_key)=>
+          _moduleName = null
+          if /.*[:][:].*/.test(_key) and /.*[.].*/.test _key
+            [_moduleName, _key] = _key.split '::'
+          if _key.split('::').length is 3
+            [_moduleName, __className, __methodName] = _key.split '::'
+            _key = "#{__className}::#{__methodName}"
+          unless _moduleName?
+            _moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+
           if /.*[#].*/.test _key
             [..., _signal] = _key.split '#'
-            for own _className, OtherAbstractClass of classes
+            [_macro_signal] = _signal.split '.'
+            for own _className, OtherAbstractClass of classes[_moduleName]::
               do (_className, OtherAbstractClass)=>
-                if (subscribers = OtherAbstractClass["_#{_className}_subs"]?[_signal])?
-                  if subscribers.length > 0
-                    subscribers.forEach ({methodName, opts})=>
-                      if opts.invoke is yes
-                        __key = "#{_className}.#{methodName}"
-                        unless __key in  processedMethods
-                          processedMethods.push __key
-                          __collections = OtherAbstractClass.getLocksFor __key, processedMethods
-                          collections = @mergeLocks collections, __collections
+                subscribers = []
+                subscribers = subscribers.concat OtherAbstractClass["_#{className}_subs"]?[_signal] ? []
+                subscribers = subscribers.concat OtherAbstractClass["_#{className}_subs"]?["#{_macro_signal}.*"] ? []
+                if subscribers.length > 0
+                  subscribers.forEach ({methodName, opts})=>
+                    if opts.invoke is yes
+                      __key = "#{_className}.#{methodName}"
+                      unless __key in  processedMethods
+                        processedMethods.push __key
+                        __collections = OtherAbstractClass.getLocksFor __key, processedMethods
+                        collections = @mergeLocks collections, __collections
             return
           if /.*[.].*/.test _key
             [_className, _methodName] = _key.split '.'
@@ -480,7 +492,7 @@ class Model extends CoreObject
             _className = @name if _className is ''
             __key = "#{_className}::#{_methodName}"
           unless __key in  processedMethods
-            OtherAbstractClass = classes[_className]
+            OtherAbstractClass = classes[_moduleName]::[_className]
             __collections = OtherAbstractClass.getLocksFor __key, processedMethods
             collections = @mergeLocks collections, __collections
 

@@ -529,7 +529,8 @@ class CoreObject
       unless /[.]/.test signal
         throw new Error 'signal must be with dot (for example `billing.pay-order`)'
       [macro_signal] = signal.split '.'
-      for own className, classObject of classes
+      moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+      for own className, classObject of classes[moduleName]::
         do (className, classObject)->
           subscribers = []
           subscribers = subscribers.concat classObject["_#{className}_subs"]?[signal] ? []
@@ -646,20 +647,31 @@ class CoreObject
       collections = {read:[], write:[]}
       keys.forEach (key) =>
         methods = null
+        moduleName = null
+        if /.*[:][:].*/.test(key) and /.*[.].*/.test key
+          [moduleName, key] = key.split '::'
+        if key.split('::').length is 3
+          [moduleName, __className, __methodName] = key.split '::'
+          key = "#{__className}::#{__methodName}"
+        unless moduleName?
+          moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
         if /.*[#].*/.test key
           [..., signal] = key.split '#'
-          for own className, AbstractClass of classes
+          [macro_signal] = signal.split '.'
+          for own className, AbstractClass of classes[moduleName]::
             do (className, AbstractClass)->
-              if (subscribers = AbstractClass["_#{className}_subs"]?[signal])?
-                if subscribers.length > 0
-                  subscribers.forEach ({methodName, opts})->
-                    if opts.invoke is yes
-                      (methods ?= []).push "#{className}.#{methodName}"
+              subscribers = []
+              subscribers = subscribers.concat AbstractClass["_#{className}_subs"]?[signal] ? []
+              subscribers = subscribers.concat AbstractClass["_#{className}_subs"]?["#{macro_signal}.*"] ? []
+              if subscribers.length > 0
+                subscribers.forEach ({methodName, opts})->
+                  if opts.invoke is yes
+                    (methods ?= []).push "#{className}.#{methodName}"
 
         else if /.*[.].*/.test key
           [className, methodName] = key.split '.'
           className = self.name if className is ''
-          AbstractClass = classes[className]
+          AbstractClass = classes[moduleName]::[className]
 
           unless "#{className}.#{methodName}" in processedMethods
             processedMethods.push "#{className}.#{methodName}"
@@ -679,7 +691,7 @@ class CoreObject
         else if /.*[:][:].*/.test key
           [className, instanceMethodName] = key.split '::'
           className = self.name if className is ''
-          AbstractClass = classes[className]
+          AbstractClass = classes[moduleName]::[className]
 
           unless "#{className}::#{instanceMethodName}" in processedMethods
             processedMethods.push "#{className}::#{instanceMethodName}"
@@ -695,23 +707,35 @@ class CoreObject
             methods = extend [], methods, AbstractClass::["_#{instanceMethodName}Methods"]?([]...) ? []
 
         methods?.forEach (_key)=>
+          _moduleName = null
+          if /.*[:][:].*/.test(_key) and /.*[.].*/.test _key
+            [_moduleName, _key] = _key.split '::'
+          if _key.split('::').length is 3
+            [_moduleName, __className, __methodName] = _key.split '::'
+            _key = "#{__className}::#{__methodName}"
+          unless _moduleName?
+            _moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+
           if /.*[#].*/.test _key
             [..., _signal] = _key.split '#'
-            for own _className, OtherAbstractClass of classes
+            [_macro_signal] = _signal.split '.'
+            for own _className, OtherAbstractClass of classes[_moduleName]::
               do (_className, OtherAbstractClass)=>
-                if (subscribers = OtherAbstractClass["_#{_className}_subs"]?[_signal])?
-                  if subscribers.length > 0
-                    subscribers.forEach ({methodName, opts})=>
-                      if opts.invoke is yes
-                        __collections = OtherAbstractClass.getLocksFor "#{_className}.#{methodName}", processedMethods
-                        collections = @mergeLocks collections, __collections
+                subscribers = []
+                subscribers = subscribers.concat OtherAbstractClass["_#{className}_subs"]?[_signal] ? []
+                subscribers = subscribers.concat OtherAbstractClass["_#{className}_subs"]?["#{_macro_signal}.*"] ? []
+                if subscribers.length > 0
+                  subscribers.forEach ({methodName, opts})=>
+                    if opts.invoke is yes
+                      __collections = OtherAbstractClass.getLocksFor "#{_className}.#{methodName}", processedMethods
+                      collections = @mergeLocks collections, __collections
             return
           if /.*[.].*/.test _key
             [_className, _methodName] = _key.split '.'
           else if /.*[:][:].*/.test _key
             [_className, _instanceMethodName] = _key.split '::'
           _className = AbstractClass.name if _className is ''
-          OtherAbstractClass = classes[_className]
+          OtherAbstractClass = classes[_moduleName]::[_className]
           __collections = OtherAbstractClass.getLocksFor _key, processedMethods
           collections = @mergeLocks collections, __collections
 

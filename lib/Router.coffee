@@ -118,7 +118,9 @@ class Router extends CoreObject
     router = FoxxRouter()
     # console.log 'GGGGGGGGGGGGGGGG classes', Object.keys classes
     controllerName = inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
-    Controller = classes[controllerName]
+    moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+    Controller = classes[moduleName]::[controllerName]
+
     # console.log '$$$$$$$$$$$$$$$$$ inflect.camelize inflect.underscore "#{controller}_controller"', inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
     unless Controller?
       throw new Error "controller `#{controller}` is not exist"
@@ -138,16 +140,17 @@ class Router extends CoreObject
             action: (params)->
               do (
                 {
-                  controller
+                  moduleName
+                  controllerName
                   action
                   req
                   res
                 }       = params
-                Controller = require "../controllers/#{controller.replace /[/]$/g, ''}"
               ) ->
-                Controller.new(req: req, res: res)[action]? []...
+                classes[moduleName]::[controllerName].new(req: req, res: res)[action]? []...
             params:
-              controller: controller
+              moduleName: moduleName
+              controllerName: controllerName
               action: action
               req: req
               res: res
@@ -231,6 +234,7 @@ class Router extends CoreObject
     @defineMethod @_routes, 'delete', path, opts
 
   @resource: (name, opts = null, lambda = null)->
+    _rootPath = @_rootPath
     if opts?.constructor is Function
       lambda = opts
       opts = {}
@@ -259,6 +263,7 @@ class Router extends CoreObject
       "#{name}/"
     @_resources ?= []
     @_resources.push class ResourceRouter extends Router
+      @_rootPath: _rootPath
       @_path: full_path
       @_name: "#{parent_name}#{_name}"
       @_module: _module
@@ -269,6 +274,7 @@ class Router extends CoreObject
       @map lambda
 
   @namespace: (name, opts = null, lambda = null)->
+    _rootPath = @_rootPath
     if opts?.constructor is Function
       lambda = opts
       opts = {}
@@ -291,6 +297,7 @@ class Router extends CoreObject
     @_resources ?= []
     if lambda?.constructor is Function
       @_resources.push class NamespaceRouter extends Router
+        @_rootPath: _rootPath
         @_path: "#{parent_path}#{_path}"
         @_name: "#{parent_name}#{_name}"
         @_except: 'all'

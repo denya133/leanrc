@@ -67,6 +67,8 @@ defineClasses = (path)->
   folders.forEach (subfolder)->
     getClassesFor subfolder
   global["#{Prefix}"]::ApplicationRouter = require fs.join path, 'router'
+  global['classes'] ?= {}
+  global['classes']["#{Prefix}"] = global["#{Prefix}"]
 
   return global["#{Prefix}"]
 
