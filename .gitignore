@@ -9,4 +9,6 @@ package.zip
 
 dist
 
+compiled_migrations
+
 public

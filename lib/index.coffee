@@ -20,11 +20,8 @@ class FoxxMC
   Scripts:
     delayedJob:     require './scripts/delayedJob'
     migrate:        require './scripts/migrate'
-    resetAdmin:     require './scripts/resetAdmin'
     rollback:       require './scripts/rollback'
     sendSignal:     require './scripts/sendSignal'
-    setup:          require './scripts/setup'
-    teardown:       require './scripts/teardown'
     touchQueue:     require './scripts/touchQueue'
 
 

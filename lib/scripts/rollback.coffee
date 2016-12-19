@@ -25,7 +25,7 @@ runScript = ({ROOT}={})->
   rollback = (steps)->
     error = null
     migrations = module.context.collection 'migrations'
-    migrationsDir = fs.join ROOT, 'migrations'
+    migrationsDir = fs.join ROOT, 'compiled_migrations'
     query = "
       FOR doc
       IN #{module.context.collectionPrefix}migrations

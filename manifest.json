@@ -4,7 +4,7 @@
   "license": "Apache 2",
   "description": "This is Model-Controller microframework like Rails (but without View) for building rich API servers.",
   "author": "Denis Trayzhon",
-  "thumbnail": "assets/fox_logo.png",
+  "thumbnail": "public/fox_logo.png",
 
   "engines": {
     "arangodb": "^3.0.0"

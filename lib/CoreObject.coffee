@@ -1,5 +1,5 @@
 _             = require 'lodash'
-extend        = require './extend'
+extend        = require './utils/extend'
 crypto        = require '@arangodb/crypto'
 
 ###

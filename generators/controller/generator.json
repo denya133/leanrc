@@ -6,7 +6,6 @@
     }
   ],
   "dependencies": [
-    {"type": "model"},
     {"type": "mixin"}
   ],
   "description" : "Simple controller"

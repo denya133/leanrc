@@ -1,0 +1,42 @@
+{ db } = require '@arangodb'
+
+migration =
+  up: ->
+    qualifiedName = module.context.collectionName '{{pluralName}}'
+    unless db._collection qualifiedName
+      db._createDocumentCollection qualifiedName, waitForSync: yes
+
+    db._collection(qualifiedName).ensureIndex
+      type: 'hash'
+      fields: ['_type']
+    db._collection(qualifiedName).ensureIndex
+      type: 'hash'
+      fields: ['createdAt']
+    db._collection(qualifiedName).ensureIndex
+      type: 'skiplist'
+      fields: ['createdAt']
+    db._collection(qualifiedName).ensureIndex
+      type: 'hash'
+      fields: ['updatedAt']
+    db._collection(qualifiedName).ensureIndex
+      type: 'skiplist'
+      fields: ['updatedAt']
+    db._collection(qualifiedName).ensureIndex
+      type: 'hash'
+      fields: ['isHidden']
+    db._collection(qualifiedName).ensureIndex
+      type: 'skiplist'
+      fields: ['isHidden']
+
+    db._collection(qualifiedName).ensureIndex
+      type: 'hash'
+      fields: ['_owner']
+
+    return
+  down: ->
+    qualifiedName = module.context.collectionName '{{pluralName}}'
+    if db._collection qualifiedName
+      db._drop qualifiedName
+    return
+
+module.exports = migration

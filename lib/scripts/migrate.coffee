@@ -25,7 +25,7 @@ runScript = ({ROOT}={})->
   defineClasses ROOT + "dist"
   error = null
   migrations = module.context.collection 'migrations'
-  migrationsDir = fs.join ROOT, 'migrations'
+  migrationsDir = fs.join ROOT, 'compiled_migrations'
   migrationNames = _.orderBy fs.list(migrationsDir).map (i)-> i.replace '.js', ''
   query = "
     FOR doc

@@ -2,7 +2,7 @@
 
 migration =
   up: ->
-    {read, write} = {{addonPrefix}}::SomeModel.getLocksFor '.create'
+    {read, write} = {{addonPrefix}}::SomeModel.getLocksFor '.someMethod'
     db._executeTransaction
       collections:
         read: read
@@ -14,7 +14,7 @@ migration =
         return
     return
   down: ->
-    {read, write} = {{addonPrefix}}::SomeModel.getLocksFor '.create'
+    {read, write} = {{addonPrefix}}::SomeModel.getLocksFor '.someMethod'
     db._executeTransaction
       collections:
         read: read

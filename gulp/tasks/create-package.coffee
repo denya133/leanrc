@@ -16,6 +16,7 @@ gulp.task 'create_package', ()->
     gulp.src [
       'dist/**/*'
       'public/**/*'
+      'compiled_migrations/*'
       'LICENSE'
       'index.js'
       'manifest.json'

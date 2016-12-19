@@ -2,7 +2,7 @@
   "files": [
     {
       "from": "migration.coffee.hbs",
-      "to": "migrations/{{migration_id}}_{{addonPrefix}}_{{name}}.coffee"
+      "to": "migrations/{{migration_id}}_{{name}}.coffee"
     }
   ],
   "dependencies": [],
