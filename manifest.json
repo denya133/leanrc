@@ -34,7 +34,6 @@
     "teardown": "scripts/teardown.js",
     "migrate": "scripts/migrate.js",
     "rollback": "scripts/rollback.js",
-    "reset_admin": "scripts/reset_admin.js",
     "delayed_job": "scripts/delayedJob.js",
     "touch_queue": "scripts/touchQueue.js",
     "send_signal": "scripts/sendSignal.js"

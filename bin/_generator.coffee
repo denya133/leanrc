@@ -11,13 +11,13 @@ copySync = (foxxmcRoot, rootPath, folder)->
 
 readme_dirs = [
   'api'
-  'migrations'
 ]
 
 init_copy_dirs = [
   'gulp'
   'assets'
   'api/scripts'
+  'migrations'
   # 'servers' # cteation in init generator
 ]
 

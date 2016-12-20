@@ -4,7 +4,7 @@
   "license": "Apache 2",
   "description": "FoxxMC application for <description>",
   "author": "<author name>",
-  "thumbnail": "assets/fox_logo.png",
+  "thumbnail": "public/fox_logo.png",
 
   "engines": {
     "arangodb": "^3.0.0"
@@ -22,7 +22,6 @@
     "teardown": "scripts/teardown.js",
     "migrate": "scripts/migrate.js",
     "rollback": "scripts/rollback.js",
-    "reset_admin": "scripts/reset_admin.js",
     "delayed_job": "scripts/delayedJob.js",
     "touch_queue": "scripts/touchQueue.js",
     "send_signal": "scripts/sendSignal.js"
@@ -40,6 +39,11 @@
   },
 
   "configuration": {
+    "streamServer": {
+      "description": "URL for stream server (used for objects changes notifications)",
+      "type": "string",
+      "default": "http://127.0.0.1:3000/"
+    }
   },
 
   "files": {
