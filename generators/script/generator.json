@@ -1,0 +1,10 @@
+{
+  "files": [
+    {
+      "from": "script.coffee.hbs",
+      "to": "api/scripts/{{name}}.coffee"
+    }
+  ],
+  "dependencies": [],
+  "description" : "Simple script"
+}

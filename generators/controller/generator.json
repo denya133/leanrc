@@ -1,0 +1,12 @@
+{
+  "files": [
+    {
+      "from": "controller.coffee.hbs",
+      "to": "api/controllers/{{pluralName}}.coffee"
+    }
+  ],
+  "dependencies": [
+    {"type": "mixin"}
+  ],
+  "description" : "Simple controller"
+}

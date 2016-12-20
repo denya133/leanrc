@@ -1,0 +1,14 @@
+api/controllers/index.coffee
+api/models/index.coffee
+api/mixins/index.coffee
+api/utils/index.coffee
+
+node_modules
+
+package.zip
+
+dist
+
+compiled_migrations
+
+public

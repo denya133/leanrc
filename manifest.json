@@ -1,0 +1,66 @@
+{
+  "name": "FoxxMC",
+  "version": "1.0.0-rc.1",
+  "license": "Apache 2",
+  "description": "This is Model-Controller microframework like Rails (but without View) for building rich API servers.",
+  "author": "Denis Trayzhon",
+  "thumbnail": "public/fox_logo.png",
+
+  "engines": {
+    "arangodb": "^3.0.0"
+  },
+
+  "main": "index.js",
+  "defaultDocument": "index.html",
+
+  "contributors": [
+    { "name": "Evgeni Biryukov" },
+    { "name": "Igor Kostyakov" },
+    { "name": "Sergey Zagorodnykh" }
+  ],
+
+  "keywords": [
+    "ArangoDB",
+    "Foxx",
+    "API",
+    "MVC",
+    "Rails",
+    "highload",
+    "distributed system"
+  ],
+
+  "scripts": {
+    "setup": "scripts/setup.js",
+    "teardown": "scripts/teardown.js",
+    "migrate": "scripts/migrate.js",
+    "rollback": "scripts/rollback.js",
+    "delayed_job": "scripts/delayedJob.js",
+    "touch_queue": "scripts/touchQueue.js",
+    "send_signal": "scripts/sendSignal.js"
+  },
+
+  "node_modules": [
+    "moment",
+    "lower-case",
+    "FoxxMC"
+  ],
+
+  "foxxmcModule": {
+    "name": "foxxmc-test",
+    "prefix": "test"
+  },
+
+  "configuration": {
+    "streamServer": {
+      "description": "URL for stream server (used for objects changes notifications)",
+      "type": "string",
+      "default": "http://127.0.0.1:3000/"
+    }
+  },
+
+  "files": {
+    "/": "public"
+  },
+
+  "lib": "dist"
+}

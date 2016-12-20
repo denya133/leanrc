@@ -1,0 +1,10 @@
+{
+  "files": [
+    {
+      "from": "mixin.coffee.hbs",
+      "to": "api/mixins/{{pluralName}}.coffee"
+    }
+  ],
+  "dependencies": [],
+  "description" : "Simple mixin"
+}

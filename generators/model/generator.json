@@ -1,0 +1,13 @@
+{
+  "files": [
+    {
+      "from": "model.coffee.hbs",
+      "to": "api/models/{{name}}.coffee"
+    }
+  ],
+  "dependencies": [
+    {"type": "controller"},
+    {"type": "migration_at_model_creating"}
+  ],
+  "description" : "Simple model"
+}
