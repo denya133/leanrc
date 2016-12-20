@@ -598,7 +598,7 @@ class Model extends CoreObject
     {
       attr, refKey, type, model,
       definition, bindings, valuable, valuableAs,
-      sortable, groupable, filterable, collections,
+      sortable, groupable, filterable, collections, methods,
       serializeFromClient, serializeForClient
     } = opts
     unless definition? and type? and model?
@@ -629,6 +629,7 @@ class Model extends CoreObject
     unless @["_#{@name}_props"][name]
       @["_#{@name}_props"][name] = opts
       @::["#{name}Collections"] = collections
+      @::["#{name}Methods"] = methods
       switch type
         when 'item'
           @defineProperty name,
@@ -777,6 +778,8 @@ class Model extends CoreObject
         LIMIT 0, 1
         RETURN #{opts.model}_item
       )[0]"
+    unless opts.model in SIMPLE_TYPES
+      opts.methods = ["#{inflect.classify opts.model}.find"]
     @prop name, opts
     return
 
@@ -1190,12 +1193,12 @@ class Model extends CoreObject
     return yes
 
   # ------------ Default attributes definitions ---------
-  @attr '_key',         joi.string().empty(null).default(uuid.v4, 'uuid.v4() by default')
+  @attr '_key',         joi.string().empty(null).empty('').default(uuid.v4, 'uuid.v4() by default')
   @attr '_rev',         joi.number().empty(null).optional()
-  @attr '_type',        joi.string().empty(null)
+  @attr '_type',        joi.string().empty(null).empty('').optional()
   @attr 'isHidden',     joi.boolean().empty(null).default(no, 'Visible by default')
-  @attr 'createdAt',    joi.date().empty(null).default((()-> new Date().toISOString()), 'Datetime of creating')
-  @attr 'updatedAt',    joi.date().empty(null).default((()-> new Date().toISOString()), 'Datetime of updating')
+  @attr 'createdAt',    joi.date().empty(null).empty('').default((()-> new Date().toISOString()), 'Datetime of creating')
+  @attr 'updatedAt',    joi.date().empty(null).empty('').default((()-> new Date().toISOString()), 'Datetime of updating')
 
   @prop 'id',
     type: 'item'
