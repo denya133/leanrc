@@ -23,7 +23,7 @@
     "distributed system"
   ],
   "bin": {
-    "foxy": "./bin/foxxmc.coffee"
+    "fox": "./bin/foxxmc.coffee"
   },
   "scripts": {
     "postinstall": "coffee --compile --output ./dist ./lib",

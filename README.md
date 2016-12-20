@@ -8,10 +8,73 @@ framework.
 
 It is based on ArangoDB Foxx framework.
 
+## For install as global package
+```
+sudo npm i -g git+https://<username>:<password>@bitbucket.org/webbasis/foxxmc.git#1.0.0-rc.1
+```
 
-ВНИМАНИЕ:
-Скачать сервер ArangoDB можно с официального сайта:
+## For creation new empty app
+```
+mkdir <app_name>
+cd <app_name>
+fox init <app_name>
+```
+
+## For start in development
+```
+cd <app_name>
+fox watch
+```
+
+## For build production distrib
+```
+cd <app_name>
+fox build
+```
+
+## Generators usage (in <app_name> folder)
+```
+fox generate model tomato
+fox g controller cucumber
+fox g mixin entry
+```
+
+## Available generators:
+* controller
+* mixin
+* migration
+* model
+* script
+
+
+## Usefull command in console for creation ssh agent
+```
+eval `ssh-agent -s`
+ssh-add ~/.ssh/id_rsa
+
+```
+
+## Additional packages
+```
+sudo aptitude install redis-server graphicsmagick
+sudo npm install -g n
+sudo n 4.4.7
+sudo apt-get install mc
+sudo apt-get install git
+sudo aptitude install make
+sudo aptitude install gcc g++
+sudo npm i -g gulp
+sudo npm i -g scaffolt
+sudo npm i -g forever
+sudo npm i -g coffee-script
+```
+
+
+## Скачать сервер ArangoDB можно с официального сайта:
+
 https://www.arangodb.com/download/ubuntu/
+
+## For development
 
 Для однотипности ведения процесса разработки надо одинаково настраивать ArangoDB
 на локальных компьютерах.
@@ -31,7 +94,7 @@ https://www.arangodb.com/download/ubuntu/
 Для того, чтобы собрать дистрибутив, чтобы деплоить на продакшен:
 `gulp build`
 
-# !!! Для file and socket.io стриминга в режиме development
+## !!! Для file and socket.io стриминга в режиме development
 надо запускать:
 ```
 cd ~/repositories/stream-server;
@@ -39,7 +102,7 @@ gulp web_start
 
 ```
 
-# !!! Для работы с ембером в режиме development | В браузере эмбер должен быть открыт на http://127.0.0.1:4200/
+## !!! Для работы с ембером в режиме development | В браузере эмбер должен быть открыт на http://127.0.0.1:4200/
 `sudo nano /etc/arangodb3/arangod.conf`
 и добавляем в конце файла
 ```
@@ -52,7 +115,7 @@ trusted-origin = *
 trusted-origin = http://127.0.0.1:4200
 ```
 
-# !!! Для работы с ембером на production
+## !!! Для работы с ембером на production
 `sudo nano /etc/arangodb3/arangod.conf`
 и добавляем в конце файла
 ```
@@ -61,7 +124,7 @@ trusted-origin = http://<домен на котором запущен сайт>
 ```
 
 
-# Для импорта дампа с продакшена в битбакет надо залить дамп
+## Для импорта дампа с продакшена в битбакет надо залить дамп
 
 с именем `<YYYYMMDD>.<имя базы данных>.tar.gz`
 
