@@ -10,7 +10,7 @@ It is based on ArangoDB Foxx framework.
 
 ## For install as global package
 ```
-sudo npm i -g git+ssh://git@bitbucket.org/webbasis/foxxmc.git#1.0.0-rc.1
+sudo npm i -g git+ssh://git@bitbucket.org/webbasis/foxxmc.git#1.0.0-rc.2
 ```
 
 ## For creation new empty app
