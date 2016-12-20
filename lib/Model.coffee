@@ -1193,7 +1193,7 @@ class Model extends CoreObject
     return yes
 
   # ------------ Default attributes definitions ---------
-  @attr '_key',         joi.string().empty(null).empty('').default(uuid.v4, 'uuid.v4() by default')
+  @attr '_key',         joi.string().empty(null).default(uuid.v4, 'uuid.v4() by default')
   @attr '_rev',         joi.number().empty(null).optional()
   @attr '_type',        joi.string().empty(null).empty('').optional()
   @attr 'isHidden',     joi.boolean().empty(null).default(no, 'Visible by default')
