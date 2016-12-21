@@ -1,8 +1,6 @@
 require 'supererror'
 gulp              = require 'gulp'
 symlink           = require 'gulp-symlink'
-# fs                = require 'fs-extra'
-# gcopy             = require 'gulp-copy'
 { join }          = require 'path'
 { node_modules }  = require '../../manifest'
 

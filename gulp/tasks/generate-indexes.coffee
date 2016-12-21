@@ -1,13 +1,14 @@
 require 'supererror'
 gulp              = require 'gulp'
 fs                = require 'fs-extra'
-glob                  = require 'glob'
-pluralize             = require 'pluralize'
-changeCase            = require 'change-case'
-# gcopy             = require 'gulp-copy'
-{ join }          = require 'path'
-{basename}            = require 'path'
-{normalize}            = require 'path'
+glob              = require 'glob'
+pluralize         = require 'pluralize'
+changeCase        = require 'change-case'
+{
+  join
+  basename
+  normalize
+}                 = require 'path'
 
 ROOT = join __dirname, '../..'
 
@@ -30,13 +31,6 @@ gulp.task 'generate_indexes', (cb)->
       suffix = ''
     else
       suffix = pluralize subfolder, 1
-    # file_content = "
-    #   \nglobal['#{Prefix}'] ?= class #{Prefix}
-    #   \nmodule.exports = #{var_name} = {}
-    # "
-    # file_content = "
-    #   \nglobal['#{Prefix}'] ?= class #{Prefix}
-    # "
     file_content = "
       \nmodule.exports = ->
     "
@@ -48,13 +42,6 @@ gulp.task 'generate_indexes', (cb)->
           name = file.replace "./", ''
             .replace /[/]/g, '_'
           Name = changeCase.pascalCase "#{name}_#{suffix}"
-          # file_content += "
-          #   \n#{var_name}['#{Name}'] = require './#{_name}'
-          #   \nglobal['#{Prefix}']::#{Name} =
-          # "
-          # file_content += "
-          #   \nglobal['#{Prefix}']::#{Name} = require './#{_name}'
-          # "
           file_content += "
             \n  #{Prefix}::#{Name} = require '#{file}'
           "

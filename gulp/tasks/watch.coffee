@@ -1,6 +1,6 @@
 # including plugins
-gulp = require 'gulp'
-runSequence       = require 'run-sequence'
+gulp          = require 'gulp'
+runSequence   = require 'run-sequence'
 
 # task 'watch'
 gulp.task 'watch', (cb)->
@@ -9,5 +9,3 @@ gulp.task 'watch', (cb)->
   , 'copy_javascript', 'symlink_node_modules', ()->
     gulp.watch ['./api/**/*.coffee', './api/**/*.js', './migrations/*.coffee'], ['compile_coffee', 'copy_javascript']
     .on 'end', cb
-    # gulp.watch ['./api/*.coffee'], ['compile_coffee']
-    # gulp.watch ['./api/*.js'], ['copy_javascript']
