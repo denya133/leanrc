@@ -1119,6 +1119,13 @@ class Model extends CoreObject
     record = @new _attributes, currentUser
     record.save()
 
+  @createFromBatch: @method ->
+    ['.new', '::save']
+  , (attributes, currentUser=null)->
+    _attributes = @serializeFromBatch attributes
+    record = @new _attributes, currentUser
+    record.save()
+
   # помечает как удаленный
   @delete: @method ['.find', '::delete'], (id, currentUser=null)->
     record = @find id, currentUser
@@ -1378,7 +1385,7 @@ class Model extends CoreObject
       '_to'
     ]
 
-  @serializeFromClient: (obj)->
+  @serializeFromBatch: (obj)->
     res = _.omit obj, ['_id', '_rev', 'rev', 'type', '_type', '_owner', '_from', '_to']
     res._type = inflect.underscore @name
     for own prop, prop_opts of @properties()
@@ -1392,6 +1399,9 @@ class Model extends CoreObject
     for own comp, comp_opts of @computeds()
       do (comp)-> delete res[comp]
     res
+
+  @serializeFromClient: (obj) ->
+    @serializeFromBatch obj
 
   serializeForClient: (opts)->
     snapshot = {}
