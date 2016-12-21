@@ -762,9 +762,10 @@ class Model extends CoreObject
         serializeForClient: opts.serializeForClient
     opts.type = 'item'
     opts.model ?= inflect.singularize inflect.underscore name
+    opts.collection ?= inflect.pluralize inflect.underscore opts.model
     unless opts.through
       opts.definition ?= "(#{qb.for("#{opts.model}_item")
-        .in(@collectionNameInDB inflect.pluralize inflect.underscore opts.model)
+        .in(@collectionNameInDB opts.collection)
         .filter(qb.eq qb.ref("doc.#{opts.attr}"), qb.ref("#{opts.model}_item.#{opts.refKey}"))
         .limit(1)
         .return(qb.ref "#{opts.model}_item")
@@ -788,6 +789,7 @@ class Model extends CoreObject
     opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
     opts.type = 'array'
     opts.model ?= inflect.singularize inflect.underscore name
+    opts.collection ?= inflect.pluralize inflect.underscore opts.model
     unless opts.through
       if opts.refKey is '_key'
         opts.bindings = docKey: 'docKey'
@@ -796,7 +798,7 @@ class Model extends CoreObject
         opts.bindings = docId: 'docId'
         binding = '@docId'
       opts.definition ?= "#{qb.for("#{opts.model}_array")
-        .in(@collectionNameInDB inflect.pluralize inflect.underscore opts.model)
+        .in(@collectionNameInDB opts.collection)
         .filter(qb.eq qb.expr(binding), qb.ref("#{opts.model}_array.#{opts.inverse}"))
         .return(qb.ref "#{opts.model}_array")
         .toAQL()}
@@ -1195,10 +1197,10 @@ class Model extends CoreObject
   # ------------ Default attributes definitions ---------
   @attr '_key',         joi.string().empty(null).default(uuid.v4, 'uuid.v4() by default')
   @attr '_rev',         joi.number().empty(null).optional()
-  @attr '_type',        joi.string().empty(null).empty('').optional()
+  @attr '_type',        joi.string().empty(null).optional()
   @attr 'isHidden',     joi.boolean().empty(null).default(no, 'Visible by default')
-  @attr 'createdAt',    joi.date().empty(null).empty('').default((()-> new Date().toISOString()), 'Datetime of creating')
-  @attr 'updatedAt',    joi.date().empty(null).empty('').default((()-> new Date().toISOString()), 'Datetime of updating')
+  @attr 'createdAt',    joi.date().empty(null).default((()-> new Date().toISOString()), 'Datetime of creating')
+  @attr 'updatedAt',    joi.date().empty(null).default((()-> new Date().toISOString()), 'Datetime of updating')
 
   @prop 'id',
     type: 'item'
