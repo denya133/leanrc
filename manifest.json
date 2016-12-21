@@ -1,6 +1,6 @@
 {
   "name": "FoxxMC",
-  "version": "1.0.0-rc.5",
+  "version": "v1.0.0-rc.5",
   "license": "Apache 2",
   "description": "This is Model-Controller microframework like Rails (but without View) for building rich API servers.",
   "author": "Denis Trayzhon",
