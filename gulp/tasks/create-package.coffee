@@ -1,7 +1,7 @@
 # including plugins
-gulp  = require 'gulp'
-zip   = require 'gulp-zip'
-{ join } = require 'path'
+gulp              = require 'gulp'
+zip               = require 'gulp-zip'
+{ join }          = require 'path'
 { node_modules }  = require '../../manifest'
 
 ROOT = join __dirname, '../..'
