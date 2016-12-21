@@ -4,6 +4,7 @@ api/mixins/index.coffee
 api/utils/index.coffee
 
 node_modules
+npm-debug.log
 
 package.zip
 
