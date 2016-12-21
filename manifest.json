@@ -45,11 +45,6 @@
     "FoxxMC"
   ],
 
-  "foxxmcModule": {
-    "name": "foxxmc-test",
-    "prefix": "test"
-  },
-
   "configuration": {
     "streamServer": {
       "description": "URL for stream server (used for objects changes notifications)",
