@@ -13,7 +13,6 @@ ROOT = join __dirname, '../..'
 
 folders = [
   'mixins'
-  'utils'
   'models'
   'controllers'
 ]

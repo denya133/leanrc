@@ -5,7 +5,6 @@ extend                = require './extend'
 
 folders = [
   'mixins'
-  'utils'
   'models'
   'controllers'
 ]
@@ -24,6 +23,7 @@ defineClasses = (path, reDefine = yes)->
     extend global["#{Prefix}"], _.omit manifest, ['name']
     global["#{Prefix}"].use = ->
       new @::ApplicationRouter()
+    global["#{Prefix}"]::Utils = {}
 
   getModulesPathes = ()->
     pathToModules = fs.join "#{path}/node_modules"
@@ -36,6 +36,12 @@ defineClasses = (path, reDefine = yes)->
   getClassesFor = (subfolder)->
     require(fs.join path, subfolder, 'index')()
     return
+
+  getUtils = ->
+    utilsDir = fs.join path, 'utils'
+    fs.list(utilsDir).forEach (path)->
+      name = path.replace '.js', ''
+      global["#{Prefix}"]::Utils[name] = require fs.join utilsDir, name
 
   initializeModule = (addonPath, cb)->
     module.exports addonPath
@@ -67,6 +73,7 @@ defineClasses = (path, reDefine = yes)->
   recursionModulesInitializing getModulesPathes(), 0
 
   if reDefine or not global["#{Prefix}"]?
+    getUtils()
     folders.forEach (subfolder)->
       getClassesFor subfolder
     global["#{Prefix}"]::ApplicationRouter = require fs.join path, 'router'
