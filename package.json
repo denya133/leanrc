@@ -1,7 +1,7 @@
 {
   "name": "FoxxMC",
   "description": "This is Model-Controller microframework like Rails (but without View) for building rich API servers.",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "main": "dist/index.js",
   "private": true,
   "author": {
