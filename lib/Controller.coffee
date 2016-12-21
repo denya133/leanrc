@@ -290,7 +290,7 @@ class Controller extends CoreObject
   isValid: ()->
     unless @Model?
       # console.log '%#$%#%@#$@#$@#$@#$@#$@#$@#$'
-      throw new Error '@Model is required properties'
+      throw new Error "@Model is required properties for #{@constructor.name}"
       return
     else
       return

@@ -24,6 +24,8 @@ defineClasses = (path, reDefine = yes)->
     global["#{Prefix}"].use = ->
       new @::ApplicationRouter()
     global["#{Prefix}"]::Utils = {}
+    global['classes'] ?= {}
+    global['classes']["#{Prefix}"] = global["#{Prefix}"]
 
   getModulesPathes = ()->
     pathToModules = fs.join "#{path}/node_modules"
@@ -42,6 +44,8 @@ defineClasses = (path, reDefine = yes)->
     fs.list(utilsDir).forEach (path)->
       name = path.replace '.js', ''
       global["#{Prefix}"]::Utils[name] = require fs.join utilsDir, name
+      return
+    return
 
   initializeModule = (addonPath, cb)->
     module.exports addonPath
@@ -76,9 +80,8 @@ defineClasses = (path, reDefine = yes)->
     getUtils()
     folders.forEach (subfolder)->
       getClassesFor subfolder
+      return
     global["#{Prefix}"]::ApplicationRouter = require fs.join path, 'router'
-    global['classes'] = {}
-    global['classes']["#{Prefix}"] = global["#{Prefix}"]
   return global["#{Prefix}"]
 
 module.exports = defineClasses
