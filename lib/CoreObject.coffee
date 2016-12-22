@@ -1116,26 +1116,24 @@ class CoreObject
     return
 
   @resetParentSuper: (_mixin)->
-    if _mixin.__super__.constructor.name is 'Mixin'
-      __mixin = eval "(
-        function() {
-          function #{_mixin.name}() {}
-          return #{_mixin.name};
-      })();"
-      for own k, v of _mixin.constructor
-        __mixin[k] = v unless __mixin[k]
-      for own _k, _v of _mixin when _k not in @__keywords
-        __mixin::[_k] = _v unless __mixin::[_k]
+    __mixin = eval "(
+      function() {
+        function #{_mixin.name}() {
+          #{_mixin.name}.__super__.constructor.apply(this, arguments);
+        }
+        return #{_mixin.name};
+    })();"
+    for own k, v of _mixin.constructor
+      __mixin[k] = v unless __mixin[k]
+    for own _k, _v of _mixin when _k not in @__keywords
+      __mixin::[_k] = _v unless __mixin::[_k]
 
-      for own k, v of @.__super__.constructor when k isnt 'including'
-        __mixin[k] = v unless __mixin[k]
-      for own _k, _v of @.__super__ when _k not in @__keywords
-        __mixin::[_k] = _v unless __mixin::[_k]
-      __mixin::constructor.__super__ = @.__super__
-    else
-      for own __k, __v of _mixin.__super__ when __k not in @__keywords
-        _mixin::[__k] = __v unless _mixin::[__k]
-      @resetParentSuper _mixin.__super__.constructor
+    for own k, v of @.__super__.constructor when k isnt 'including'
+      __mixin[k] = v unless __mixin[k]
+    for own _k, _v of @.__super__ when _k not in @__keywords
+      __mixin::[_k] = _v unless __mixin::[_k]
+    __mixin::constructor.__super__ = @.__super__
+    return __mixin
 
   @include: (mixins...)->
     if Array.isArray mixins[0]
@@ -1145,16 +1143,17 @@ class CoreObject
         throw new Error 'Supplied mixin was not found'
       if mixin.constructor isnt Function
         throw new Error 'Supplied mixin must be a class'
+      if mixin.__super__.constructor.name isnt 'Mixin'
+        throw new Error 'Supplied mixin must be a subclass of FoxxMC::Mixin'
 
-      if @.__super__?
-        @resetParentSuper(mixin)
+      __mixin = @resetParentSuper mixin
 
-      @.__super__ = mixin::
+      @.__super__ = __mixin::
 
-      @defineClassDescriptors mixin
-      @defineInstanceDescriptors mixin::
+      @defineClassDescriptors __mixin
+      @defineInstanceDescriptors __mixin::
 
-      mixin.including?.apply @
+      __mixin.including?.apply @
     @
 
   @before_all_events: (name)->
