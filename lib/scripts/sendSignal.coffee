@@ -23,12 +23,12 @@ dataSchema =  joi.object(
   record_id:    joi.string().required()
 ).required()
 
-runScript = ({ROOT}={})->
+runScript = ({ROOT, context}={})->
   defineClasses "#{ROOT}dist", no
   response = {}
 
   runJob
-    context: module.context
+    context: context ? module.context
     command: (rawData, jobId) ->
       {value:data} = dataSchema.validate rawData
 

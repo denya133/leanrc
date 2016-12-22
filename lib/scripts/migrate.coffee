@@ -21,15 +21,16 @@ dataSchema =  joi.object(
 {value:data} = dataSchema.validate rawData
 
 
-runScript = ({ROOT}={})->
+runScript = ({ROOT, context}={})->
   defineClasses "#{ROOT}dist", no
+  context ?= module.context
   error = null
-  migrations = module.context.collection 'migrations'
+  migrations = context.collection 'migrations'
   migrationsDir = fs.join ROOT, 'compiled_migrations'
   migrationNames = _.orderBy fs.list(migrationsDir).map (i)-> i.replace '.js', ''
   query = "
     FOR doc
-    IN #{module.context.collectionPrefix}migrations
+    IN #{context.collectionPrefix}migrations
     FILTER doc.name == @migrationName
     RETURN doc
   "

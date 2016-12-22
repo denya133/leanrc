@@ -20,15 +20,16 @@ dataSchema =  joi.object(
 [rawData, jobId] = module.context.argv
 {value:data} = dataSchema.validate rawData
 
-runScript = ({ROOT}={})->
+runScript = ({ROOT, context}={})->
   defineClasses "#{ROOT}dist", no
   rollback = (steps)->
     error = null
-    migrations = module.context.collection 'migrations'
+    context ?= module.context
+    migrations = context.collection 'migrations'
     migrationsDir = fs.join ROOT, 'compiled_migrations'
     query = "
       FOR doc
-      IN #{module.context.collectionPrefix}migrations
+      IN #{context.collectionPrefix}migrations
       SORT doc.name DESC
       LIMIT 0, @limit
       RETURN doc.name

@@ -21,10 +21,10 @@ dataSchema =  joi.object(
 }
 ###
 
-runScript = ({ROOT}={})->
+runScript = ({ROOT, context}={})->
   defineClasses "#{ROOT}dist", no
   runJob
-    context: module.context
+    context: context ? module.context
     command: (rawData, jobId) ->
       {value:data} = dataSchema.validate rawData
 
