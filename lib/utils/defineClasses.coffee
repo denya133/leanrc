@@ -14,18 +14,6 @@ defineClasses = (path, reDefine = yes)->
   manifest = require "#{path}/../manifest.json"
   {prefix} = manifest.foxxmcModule
   Prefix = inflect.classify prefix
-  if reDefine or not global["#{Prefix}"]?
-    global["#{Prefix}"] = eval "(
-      function() {
-        function #{Prefix}() {}
-        return #{Prefix};
-    })();"
-    extend global["#{Prefix}"], _.omit manifest, ['name']
-    global["#{Prefix}"].use = ->
-      new @::ApplicationRouter()
-    global["#{Prefix}"]::Utils = {}
-    global['classes'] ?= {}
-    global['classes']["#{Prefix}"] = global["#{Prefix}"]
 
   getModulesPathes = ()->
     pathToModules = fs.join "#{path}/node_modules"
@@ -76,7 +64,19 @@ defineClasses = (path, reDefine = yes)->
   # здесь надо проинициализоировать все аддоны, от которых зависит это приложение/аддон
   recursionModulesInitializing getModulesPathes(), 0
 
-  if reDefine or not global["#{Prefix}"]?
+  if reDefine or not global["#{Prefix}"]? or not global['classes']?["#{Prefix}"]?
+    global["#{Prefix}"] = eval "(
+      function() {
+        function #{Prefix}() {}
+        return #{Prefix};
+    })();"
+    extend global["#{Prefix}"], _.omit manifest, ['name']
+    global["#{Prefix}"].use = ->
+      new @::ApplicationRouter()
+    global["#{Prefix}"]::Utils = {}
+    global['classes'] ?= {}
+    global['classes']["#{Prefix}"] = global["#{Prefix}"]
+
     getUtils()
     folders.forEach (subfolder)->
       getClassesFor subfolder
