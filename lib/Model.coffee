@@ -562,7 +562,7 @@ class Model extends CoreObject
     for own key, value of @constructor["_#{@constructor.name}_edges"] ? {}
       do (key, {model, through:[edge]}=value)=>
         if oldObject[key] isnt newObject[key]
-          RelatedModel = require "../models/#{model}"
+          RelatedModel = require "#{@constructor._rootPath}dist/models/#{model}"
           if oldObject[key]?
             relatedObject = RelatedModel.find oldObject[key]
             db[@constructor.collectionNameInDB edge].removeByExample
@@ -604,9 +604,9 @@ class Model extends CoreObject
     unless definition? and type? and model?
       return throw new Error '`definition`, `type` and `model` options is required'
     if valuable?
-      schema = ()->
+      schema = ()=>
         unless model in SIMPLE_TYPES
-          ModelClass = require "../models/#{model}"
+          ModelClass = require "#{@_rootPath}dist/models/#{model}"
         return if model in ['string', 'boolean', 'number']
           joi[model]().empty(null).optional()
         else if model is 'date'
@@ -636,7 +636,7 @@ class Model extends CoreObject
             get: ()->
               ModelClass = null
               unless model in SIMPLE_TYPES
-                ModelClass = require "../models/#{model}"
+                ModelClass = require "#{@constructor._rootPath}dist/models/#{model}"
               if (item = @["__#{name}"])?
                 if model in SIMPLE_TYPES
                   return serializeForClient item
@@ -680,7 +680,7 @@ class Model extends CoreObject
             get: ()->
               ModelClass = null
               unless model in SIMPLE_TYPES
-                ModelClass = require "../models/#{model}"
+                ModelClass = require "#{@constructor._rootPath}dist/models/#{model}"
                 _bindings = extend {}, bindings
                 if _bindings.docKey is 'docKey'
                   _bindings.docKey = @_key
@@ -705,9 +705,9 @@ class Model extends CoreObject
     if not lambda? or not type?
       return throw new Error '`lambda` and `type` options is required'
     if valuable?
-      schema = ()->
+      schema = ()=>
         unless model in SIMPLE_TYPES
-          ModelClass = require "../models/#{model}"
+          ModelClass = require "#{@_rootPath}dist/models/#{model}"
         return if model in ['string', 'boolean', 'number']
           joi[model]().empty(null).optional()
         else if model is 'date'
@@ -1008,7 +1008,7 @@ class Model extends CoreObject
     if attributes._type is inflect.underscore @name
       @super('new') arguments
     else
-      ModelClass = require "../models/#{attributes._type}"
+      ModelClass = require "#{@_rootPath}dist/models/#{attributes._type}"
       ModelClass?.new(attributes, currentUser) ? @super('new') arguments
 
   # возвращает все доступные для определения в документе атрибуты
