@@ -365,19 +365,9 @@ class Controller extends CoreObject
     encryptedApiKey = crypto.sha512 apiKey
     crypto.constantEquals encryptedApiKey, key
 
-  checkSession: @method ['User.find'], (args...) ->
-    User = require '../models/user'
-    if @_checkHeader @req
-      @req.session =
-        uid: 'admin'
-    unless @req.session?.uid?
-      @res.throw UNAUTHORIZED
-      return
-    currentUser = User.find @req.session.uid
-    unless currentUser?.verified
-      @res.throw UNAUTHORIZED
-      return
-    @req.currentUser = currentUser
+  checkSession: (args...) ->
+    # Must be implemented CheckSessionMixin and inclede in all controllers
+    @req.currentUser = {}
     args
 
   checkOwner: @method [], ->

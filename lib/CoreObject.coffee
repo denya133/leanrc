@@ -1116,12 +1116,22 @@ class CoreObject
     return
 
   @resetParentSuper: (_mixin)->
-    if not _mixin.__super__? or _mixin.__super__.constructor.name is 'Mixin'
+    if _mixin.__super__.constructor.name is 'Mixin'
+      __mixin = eval "(
+        function() {
+          function #{_mixin.name}() {}
+          return #{_mixin.name};
+      })();"
+      for own k, v of _mixin.constructor
+        __mixin[k] = v unless __mixin[k]
+      for own _k, _v of _mixin when _k not in @__keywords
+        __mixin::[_k] = _v unless __mixin::[_k]
+
       for own k, v of @.__super__.constructor when k isnt 'including'
-        _mixin[k] = v unless _mixin[k]
+        __mixin[k] = v unless __mixin[k]
       for own _k, _v of @.__super__ when _k not in @__keywords
-        _mixin::[_k] = _v unless _mixin::[_k]
-      _mixin::constructor.__super__ = @.__super__
+        __mixin::[_k] = _v unless __mixin::[_k]
+      __mixin::constructor.__super__ = @.__super__
     else
       for own __k, __v of _mixin.__super__ when __k not in @__keywords
         _mixin::[__k] = __v unless _mixin::[__k]
