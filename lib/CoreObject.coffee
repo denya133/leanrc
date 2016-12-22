@@ -359,7 +359,7 @@ class CoreObject
   @["_#{@name}_chains"] = []
 
   @chains: (chains)->
-    @["_#{@name}_chains"] ?= [].concat @.__super__.constructor["_#{@.__super__.constructor.name}_chains"] ? []
+    @["_#{@name}_chains"] ?= []
     chains = [chains] if chains.constructor is String
     @["_#{@name}_chains"] = @["_#{@name}_chains"].concat chains
 
@@ -372,10 +372,10 @@ class CoreObject
 
   @_chains: (AbstractClass = null)->
     AbstractClass ?= @
-    if (chains = AbstractClass["_#{AbstractClass.name}_chains"])?
-      return chains
-    else
+    fromSuper = if AbstractClass.__super__?
       @_chains AbstractClass.__super__.constructor
+    _.uniq [].concat(fromSuper ? [])
+      .concat(AbstractClass["_#{AbstractClass.name}_chains"] ? [])
 
 
   @_currentSM: 'default'
@@ -529,7 +529,7 @@ class CoreObject
     @constructor.pub arguments...
 
   @pub: @method ['.delay'], (opts)->
-    (signal, args...)->
+    (signal, args...)=>
       unless /[.]/.test signal
         throw new Error 'signal must be with dot (for example `billing.pay-order`)'
       [macro_signal] = signal.split '.'
@@ -869,7 +869,7 @@ class CoreObject
 
 
   @initialHook: (method, options = {})->
-    @["_#{@name}_initialHooks"] ?= [].concat @.__super__.constructor["_#{@.__super__.constructor.name}_initialHooks"] ? []
+    @["_#{@name}_initialHooks"] ?= []
     if options.only
       @["_#{@name}_initialHooks"].push method: method, type: 'only', actions: options.only
       return
@@ -881,7 +881,7 @@ class CoreObject
       return
 
   @beforeHook: (method, options = {})->
-    @["_#{@name}_beforeHooks"] ?= [].concat @.__super__.constructor["_#{@.__super__.constructor.name}_beforeHooks"] ? []
+    @["_#{@name}_beforeHooks"] ?= []
     if options.only
       @["_#{@name}_beforeHooks"].push method: method, type: 'only', actions: options.only
       return
@@ -893,7 +893,7 @@ class CoreObject
       return
 
   @afterHook: (method, options = {})->
-    @["_#{@name}_afterHooks"] ?= [].concat @.__super__.constructor["_#{@.__super__.constructor.name}_afterHooks"] ? []
+    @["_#{@name}_afterHooks"] ?= []
     if options.only
       @["_#{@name}_afterHooks"].push method: method, type: 'only', actions: options.only
       return
@@ -905,7 +905,7 @@ class CoreObject
       return
 
   @finallyHook: (method, options = {})->
-    @["_#{@name}_finallyHooks"] ?= [].concat @.__super__.constructor["_#{@.__super__.constructor.name}_finallyHooks"] ? []
+    @["_#{@name}_finallyHooks"] ?= []
     if options.only
       @["_#{@name}_finallyHooks"].push method: method, type: 'only', actions: options.only
       return
@@ -917,7 +917,7 @@ class CoreObject
       return
 
   @errorHook: (method, options = {})->
-    @["_#{@name}_errorHooks"] ?= [].concat @.__super__.constructor["_#{@.__super__.constructor.name}_errorHooks"] ? []
+    @["_#{@name}_errorHooks"] ?= []
     if options.only
       @["_#{@name}_errorHooks"].push method: method, type: 'only', actions: options.only
       return
@@ -930,38 +930,38 @@ class CoreObject
 
   @initialHooks: (AbstractClass = null)->
     AbstractClass ?= @
-    if (initialHooks = AbstractClass["_#{AbstractClass.name}_initialHooks"])?
-      return initialHooks
-    else
+    fromSuper = if AbstractClass.__super__?
       @initialHooks AbstractClass.__super__.constructor
+    _.uniq [].concat(fromSuper ? [])
+      .concat(AbstractClass["_#{AbstractClass.name}_initialHooks"] ? [])
 
   @beforeHooks: (AbstractClass = null)->
     AbstractClass ?= @
-    if (beforeHooks = AbstractClass["_#{AbstractClass.name}_beforeHooks"])?
-      return beforeHooks
-    else
+    fromSuper = if AbstractClass.__super__?
       @beforeHooks AbstractClass.__super__.constructor
+    _.uniq [].concat(fromSuper ? [])
+      .concat(AbstractClass["_#{AbstractClass.name}_beforeHooks"] ? [])
 
   @afterHooks: (AbstractClass = null)->
     AbstractClass ?= @
-    if (afterHooks = AbstractClass["_#{AbstractClass.name}_afterHooks"])?
-      return afterHooks
-    else
+    fromSuper = if AbstractClass.__super__?
       @afterHooks AbstractClass.__super__.constructor
+    _.uniq [].concat(fromSuper ? [])
+      .concat(AbstractClass["_#{AbstractClass.name}_afterHooks"] ? [])
 
   @finallyHooks: (AbstractClass = null)->
     AbstractClass ?= @
-    if (finallyHooks = AbstractClass["_#{AbstractClass.name}_finallyHooks"])?
-      return finallyHooks
-    else
+    fromSuper = if AbstractClass.__super__?
       @finallyHooks AbstractClass.__super__.constructor
+    _.uniq [].concat(fromSuper ? [])
+      .concat(AbstractClass["_#{AbstractClass.name}_finallyHooks"] ? [])
 
   @errorHooks: (AbstractClass = null)->
     AbstractClass ?= @
-    if (errorHooks = AbstractClass["_#{AbstractClass.name}_errorHooks"])?
-      return errorHooks
-    else
+    fromSuper = if AbstractClass.__super__?
       @errorHooks AbstractClass.__super__.constructor
+    _.uniq [].concat(fromSuper ? [])
+      .concat(AbstractClass["_#{AbstractClass.name}_errorHooks"] ? [])
 
   initialAction: (action, data...)->
     # console.log 'DFASDFASDFffffffffffff9898 _beforeHooks'
@@ -1123,10 +1123,10 @@ class CoreObject
         }
         return #{_mixin.name};
     })();"
-    for own k, v of _mixin.constructor
-      __mixin[k] = v unless __mixin[k]
-    for own _k, _v of _mixin when _k not in @__keywords
-      __mixin::[_k] = _v unless __mixin::[_k]
+    for own k, v of _mixin
+      __mixin[k] = v
+    for own _k, _v of _mixin.prototype when _k not in @__keywords
+      __mixin::[_k] = _v
 
     for own k, v of @.__super__.constructor when k isnt 'including'
       __mixin[k] = v unless __mixin[k]
