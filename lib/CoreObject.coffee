@@ -605,7 +605,7 @@ class CoreObject
         if methodName isnt 'delay' and _.isFunction value
           obj[methodName] = (args...)->
             data =
-              moduleName: self.moduleName
+              moduleName: self.moduleName()
               className:  self.name
               methodName: methodName
               args: args

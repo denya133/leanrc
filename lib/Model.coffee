@@ -1272,6 +1272,7 @@ class Model extends CoreObject
         if methodName isnt 'delay' and _.isFunction value
           obj[methodName] = (args...)->
             data =
+              moduleName: self.constructor.moduleName()
               className: self.constructor.name
               id: self.id
               methodName: methodName
