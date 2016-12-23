@@ -1371,7 +1371,10 @@ class Model extends CoreObject
     snapshot = {}
     attributes = _.omit @constructor.attributes(), ['_rev']
     for own attr, v of attributes
-      snapshot[attr] = @[attr] ? null
+      if attr is '_key'
+        snapshot[attr] = @[attr] if @[attr]?
+      else
+        snapshot[attr] = @[attr] ? null
     snapshot
 
   _forClient: (obj)->
