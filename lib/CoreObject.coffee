@@ -1134,6 +1134,14 @@ class CoreObject
     __mixin::constructor.__super__ = @.__super__
     return __mixin
 
+    # tmp = class extends @__super__
+    # reserved_words = Object.keys CoreObject
+    # for own k, v of _mixin when k not in reserved_words
+    #   tmp[k] = v
+    # for own _k, _v of _mixin.prototype when _k not in @__keywords
+    #   tmp::[_k] = _v
+    # return tmp
+
   @include: (mixins...)->
     if Array.isArray mixins[0]
       mixins = mixins[0]
