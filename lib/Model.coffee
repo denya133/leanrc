@@ -376,12 +376,18 @@ class Model extends CoreObject
     else
       @_customFilters AbstractClass.__super__.constructor
 
+  @_parentClassesNames: (AbstractClass = null)->
+    AbstractClass ?= @
+    fromSuper = if AbstractClass.__super__?
+      @_parentClassesNames AbstractClass.__super__.constructor
+    _.uniq [].concat(fromSuper ? [])
+      .concat [AbstractClass.name]
+
   @collectionName: ()->
     # console.log '!!!!!!!!!!!!$$$$$$$$$$$$$$ @collectionName', @name, @__super__?.constructor?.name
-    if @__super__.constructor.name is 'Model'
-      inflect.pluralize inflect.underscore @name
-    else
-      @__super__.constructor.collectionName.apply @__super__.constructor, arguments
+    firstClassName = _.first _.remove @_parentClassesNames(), (name)->
+      not (/Mixin$/.test(name) or name in ['CoreObject', 'Model'])
+    inflect.pluralize inflect.underscore firstClassName
 
   @collectionNameInDB: (name = null)->
     # console.log '!!!!!!!!!!!!$$$$$$$$$$$$$$ @collectionNameInDB', @name, name, @__super__?.constructor?.name
