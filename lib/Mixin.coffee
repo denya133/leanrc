@@ -48,20 +48,6 @@ CoreObject  = require './CoreObject'
       #  console.log 'after super @hh() in Kkk.hh'
 
 
-    class Lll extends Kkk
-      @ll: 6
-      oo: ()->
-        this.k()
-      k: ()->
-        console.log 'before super k() in Lll::k'
-        super
-        console.log 'after super k() in Lll::k'
-      @hh: ()->
-        console.log 'before super @hh() in Lll.hh'
-        super
-        console.log 'after super @hh() in Lll.hh'
-
-
     class Iii extends Mixin
       @including: ()->
         @attr 'jhj'
@@ -83,7 +69,7 @@ CoreObject  = require './CoreObject'
         Aaa
         Ccc
       ]
-      @include Jjj, Lll
+      @include Jjj, Kkk
       @include Iii
       @include Formattable('Bbb', 'yy')
       k: ()->
