@@ -517,8 +517,6 @@ class CoreObject
         return
     Class
 
-  @collectionName: ()->
-
   publish: @method ['::pub'], ->
     @pub arguments...
 
@@ -1123,7 +1121,8 @@ class CoreObject
         }
         return #{_mixin.name};
     })();"
-    for own k, v of _mixin
+    reserved_words = Object.keys CoreObject
+    for own k, v of _mixin when k not in reserved_words
       __mixin[k] = v
     for own _k, _v of _mixin.prototype when _k not in @__keywords
       __mixin::[_k] = _v
