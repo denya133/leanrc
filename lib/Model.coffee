@@ -358,30 +358,37 @@ class Model extends CoreObject
   @["_#{@name}_customFilters"] = {}
 
   @schema:        ()->
-    joi.object @["_#{@name}_attrs"]
+    joi.object @_attrs()
 
   @customFilters: (statement)->
     if statement.constructor is Object
       config = statement
     else if statement.constructor is Function
       config = statement.apply @, []
-    @["_#{@name}_customFilters"] ?= extend {}, @.__super__.constructor["_#{@.__super__.constructor.name}_customFilters"] ? {}
+    @["_#{@name}_customFilters"] ?= {}
     @["_#{@name}_customFilters"] = extend {}, @["_#{@name}_customFilters"], config
     return
 
   @_customFilters: (AbstractClass = null)->
     AbstractClass ?= @
-    if (customFilters = AbstractClass["_#{AbstractClass.name}_customFilters"])?
-      return customFilters
-    else
+    fromSuper = if AbstractClass.__super__?
       @_customFilters AbstractClass.__super__.constructor
+    extend {}
+    , (fromSuper ? {})
+    , (AbstractClass["_#{AbstractClass.name}_customFilters"] ? {})
+
+  @_parentClassesNames: (AbstractClass = null)->
+    AbstractClass ?= @
+    fromSuper = if AbstractClass.__super__?
+      @_parentClassesNames AbstractClass.__super__.constructor
+    _.uniq [].concat(fromSuper ? [])
+      .concat [AbstractClass.name]
 
   @collectionName: ()->
     # console.log '!!!!!!!!!!!!$$$$$$$$$$$$$$ @collectionName', @name, @__super__?.constructor?.name
-    if @__super__.constructor.name is 'Model'
-      inflect.pluralize inflect.underscore @name
-    else
-      @__super__.constructor.collectionName.apply @__super__.constructor, arguments
+    firstClassName = _.first _.remove @_parentClassesNames(), (name)->
+      not (/Mixin$/.test(name) or name in ['CoreObject', 'Model'])
+    inflect.pluralize inflect.underscore firstClassName
 
   @collectionNameInDB: (name = null)->
     # console.log '!!!!!!!!!!!!$$$$$$$$$$$$$$ @collectionNameInDB', @name, name, @__super__?.constructor?.name
@@ -411,7 +418,7 @@ class Model extends CoreObject
     @locks["#{@name}|#{hash}"] ?= do =>
       collections = @super('getLocksFor') Model, keys, processedMethods
 
-      for own key, value of @["_#{@name}_edges"] ? {}
+      for own key, value of @_edges()
         do ({through:[edge]} = value)->
           collectionName = module.context.collectionName edge
           unless collectionName in collections.write
@@ -421,7 +428,7 @@ class Model extends CoreObject
 
       methods = []
 
-      for own key, value of @["_#{@name}_props"] ? {}
+      for own key, value of @_props()
         if value.serializable? or value.valuable?
           do ({model, collections:_collections} = value)->
             unless model in SIMPLE_TYPES
@@ -441,7 +448,7 @@ class Model extends CoreObject
                 collectionName = module.context.collectionName item
                 collections.read.push collectionName unless collectionName in collections.read
 
-      for own key, value of @["_#{@name}_comps"] ? {}
+      for own key, value of @_comps()
         if value.serializable? or value.valuable?
           do (key, value)=>
             _collections = @::["#{key}Collections"]? []...
@@ -559,7 +566,7 @@ class Model extends CoreObject
     oldObject = @_old
     newObject = @
     # console.log '$$$$$$$$$$$$$$$ updateEdges', oldObject, newObject
-    for own key, value of @constructor["_#{@constructor.name}_edges"] ? {}
+    for own key, value of @constructor._edges()
       do (key, {model, through:[edge]}=value)=>
         if oldObject[key] isnt newObject[key]
           RelatedModel = require "#{@constructor._rootPath}dist/models/#{model}"
@@ -581,13 +588,57 @@ class Model extends CoreObject
 
   @attr: (name, scheme, opts={})->
     {valuable, sortable, groupable, filterable} = opts
-    @["_#{@name}_attrs"] ?= extend {}, @.__super__.constructor["_#{@.__super__.constructor.name}_attrs"]
-    @["_#{@name}_edges"] ?= extend {}, @.__super__.constructor["_#{@.__super__.constructor.name}_edges"]
+    @["_#{@name}_attrs"] ?= {}
+    @["_#{@name}_edges"] ?= {}
     unless @["_#{@name}_attrs"][name]
       @["_#{@name}_attrs"][name] = scheme
       @["_#{@name}_edges"][name] = opts if opts.through
     else
       throw new Error "attr `#{name}` has been defined previously"
+
+  @__attrs: {}
+  @_attrs: (AbstractClass = null)->
+    AbstractClass ?= @
+    fromSuper = if AbstractClass.__super__?
+      @_attrs AbstractClass.__super__.constructor
+    @__attrs[AbstractClass.name] ?= do ->
+      extend {}
+      , (fromSuper ? {})
+      , (AbstractClass["_#{AbstractClass.name}_attrs"] ? {})
+    @__attrs[AbstractClass.name]
+
+  @__edges: {}
+  @_edges: (AbstractClass = null)->
+    AbstractClass ?= @
+    fromSuper = if AbstractClass.__super__?
+      @_edges AbstractClass.__super__.constructor
+    @__edges[AbstractClass.name] ?= do ->
+      extend {}
+      , (fromSuper ? {})
+      , (AbstractClass["_#{AbstractClass.name}_edges"] ? {})
+    @__edges[AbstractClass.name]
+
+  @__props: {}
+  @_props: (AbstractClass = null)->
+    AbstractClass ?= @
+    fromSuper = if AbstractClass.__super__?
+      @_props AbstractClass.__super__.constructor
+    @__props[AbstractClass.name] ?= do ->
+      extend {}
+      , (fromSuper ? {})
+      , (AbstractClass["_#{AbstractClass.name}_props"] ? {})
+    @__props[AbstractClass.name]
+
+  @__comps: {}
+  @_comps: (AbstractClass = null)->
+    AbstractClass ?= @
+    fromSuper = if AbstractClass.__super__?
+      @_comps AbstractClass.__super__.constructor
+    @__comps[AbstractClass.name] ?= do ->
+      extend {}
+      , (fromSuper ? {})
+      , (AbstractClass["_#{AbstractClass.name}_comps"] ? {})
+    @__comps[AbstractClass.name]
 
   @property: ->
     @prop arguments...
@@ -624,7 +675,7 @@ class Model extends CoreObject
     else
       schema = ()-> {}
     opts.schema ?= schema
-    @["_#{@name}_props"] ?= extend {}, @.__super__.constructor["_#{@.__super__.constructor.name}_props"]
+    @["_#{@name}_props"] ?= {}
     model ?= inflect.singularize inflect.underscore name
     unless @["_#{@name}_props"][name]
       @["_#{@name}_props"][name] = opts
@@ -725,7 +776,7 @@ class Model extends CoreObject
     else
       schema = ()-> {}
     opts.schema ?= schema
-    @["_#{@name}_comps"] ?= extend {}, @.__super__.constructor["_#{@.__super__.constructor.name}_comps"]
+    @["_#{@name}_comps"] ?= {}
     unless @["_#{@name}_comps"][name]
       @["_#{@name}_comps"][name] = opts
       empty_result = switch type
@@ -1013,14 +1064,11 @@ class Model extends CoreObject
 
   # возвращает все доступные для определения в документе атрибуты
   @attributes:  ->
-    @["_#{@name}_attrs"] ?= extend {}, @.__super__.constructor["_#{@.__super__.constructor.name}_attrs"]
-    @["_#{@name}_attrs"]
+    @_attrs()
   @properties:  ->
-    @["_#{@name}_props"] ?= extend {}, @.__super__.constructor["_#{@.__super__.constructor.name}_props"]
-    @["_#{@name}_props"]
+    @_props()
   @computeds:   ->
-    @["_#{@name}_comps"] ?= extend {}, @.__super__.constructor["_#{@.__super__.constructor.name}_comps"]
-    @["_#{@name}_comps"]
+    @_comps()
   @serializableAttributes: ()->
     @["_#{@name}_serializableAttributes"] ?= _.omit extend(
       {}

@@ -544,7 +544,7 @@ class CoreObject
                 classObject.delay(opts)[methodName]? args...
 
   @sub: (signal, args...)->
-    @["_#{@name}_subs"] ?= extend {}, @.__super__.constructor["_#{@.__super__.constructor.name}_subs"]
+    @["_#{@name}_subs"] ?= {}
     @["_#{@name}_subs"][signal] ?= []
     [methods, collections, ..., lambda] = args
     if args.length is 3
@@ -553,7 +553,7 @@ class CoreObject
     else
       opts = {}
     if _.isFunction lambda
-      nextIndex = _.flatten(_.values(@["_#{@name}_subs"])).length
+      nextIndex = _.flatten(_.values(@_subs())).length
       methodName = "subFunctionIn#{@name}_#{nextIndex}"
       @classMethod methodName, args...
     else
@@ -561,6 +561,14 @@ class CoreObject
     @["_#{@name}_subs"][signal].push
       methodName: methodName
       opts: opts
+
+  @_subs: (AbstractClass = null)->
+    AbstractClass ?= @
+    fromSuper = if AbstractClass.__super__?
+      @_subs AbstractClass.__super__.constructor
+    extend {}
+    , (fromSuper ? {})
+    , (AbstractClass["_#{AbstractClass.name}_subs"] ? {})
 
   @subscribe: ->
     @sub arguments...

@@ -788,10 +788,10 @@ class Query extends CoreObject
     valuables = Object.keys(@Model.properties()).filter (prop)=> @Model.properties()[prop].valuable?
     @includes.params = _.uniq @includes.params.concat valuables
     @includes.params.forEach (prop)=>
-      if @Model["_#{@Model.name}_props"]?[prop]? and @Model["_#{@Model.name}_props"][prop].type is 'item'
-        query = query.let prop, qb.expr @Model["_#{@Model.name}_props"][prop].definition
-        if @Model["_#{@Model.name}_props"][prop].bindings?
-          _.merge bindings, @Model["_#{@Model.name}_props"][prop].bindings
+      if @Model._props()?[prop]? and @Model._props()[prop].type is 'item'
+        query = query.let prop, qb.expr @Model._props()[prop].definition
+        if @Model._props()[prop].bindings?
+          _.merge bindings, @Model._props()[prop].bindings
     @let.beforeWhereParams.forEach ({definition, bindings:_bindings})->
       console.log '????????????????????^^^^^^^^^^^666 _bindings', _bindings
       if _bindings?
