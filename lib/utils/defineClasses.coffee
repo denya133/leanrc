@@ -1,5 +1,4 @@
 _                     = require 'lodash'
-inflect               = require('i')()
 fs                    = require 'fs'
 extend                = require './extend'
 
@@ -9,7 +8,12 @@ folders = [
   'controllers'
 ]
 
-defineClasses = (path, reDefine = yes)->
+defineClasses = (
+  path,
+  reDefine = yes,
+  {inflect}={}
+)->
+  inflect ?= require('i')()
 
   manifest = require "#{path}/../manifest.json"
   {prefix} = manifest.foxxmcModule
