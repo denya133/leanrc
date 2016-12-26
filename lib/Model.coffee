@@ -691,6 +691,8 @@ class Model extends CoreObject
               if (item = @["__#{name}"])?
                 if model in SIMPLE_TYPES
                   return serializeForClient item
+                if @[refKey ? '_key'] is item[refKey ? '_key']
+                 return @
                 ModelClass.new item
               else if @["__#{name}"] is undefined
                 _snapshot = @getSnapshot()
@@ -710,6 +712,8 @@ class Model extends CoreObject
                 @["__#{name}"] = item
                 if model in SIMPLE_TYPES
                   return serializeForClient item
+                if @[refKey ? '_key'] is item[refKey ? '_key']
+                 return @
                 ModelClass.new item
               else
                 null
