@@ -46,10 +46,40 @@
   ],
 
   "configuration": {
+    "secret": {
+      "description": "Secret key for encoding and decoding tokens.",
+      "type": "string",
+      "default": "secret"
+    },
+    "apiKey": {
+      "description": "Secret key allowing interactions between servers",
+      "type": "string",
+      "default": "4k=3a!%95!Kr2rN+gt8J^Zx7#qHtcqUUyCtx=d_%%XAzfGpeh822Wh34T7ngZ"
+    },
     "streamServer": {
       "description": "URL for stream server (used for objects changes notifications)",
       "type": "string",
       "default": "http://127.0.0.1:3000/"
+    },
+    "mailApikey": {
+      "description": "API_KEY for mailer.",
+      "type": "string",
+      "default": "19e343784112156561333a1b716a05dab85cf1a2"
+    },
+    "mailBcc": {
+      "description": "BCC param for mailer. (Only one email now)",
+      "type": "string",
+      "default": "denya@saifas.com"
+    },
+    "mailTitle": {
+      "description": "Name in `from` params for mailer.",
+      "type": "string",
+      "default": "FoxxMC"
+    },
+    "mailFrom": {
+      "description": "Email in `from` params for mailer.",
+      "type": "string",
+      "default": "no-reply@foxxmc.com"
     }
   },
 
