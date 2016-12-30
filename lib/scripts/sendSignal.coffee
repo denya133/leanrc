@@ -23,7 +23,7 @@ dataSchema =  joi.object(
   record_id:    joi.string().required()
 ).required()
 
-runScript = ({ROOT, context}={})->
+FoxxMC::Scripts.sendSignal = ({ROOT, context}={})->
   defineClasses "#{ROOT}dist", no
   response = {}
 
@@ -59,4 +59,4 @@ runScript = ({ROOT, context}={})->
   #   throw new Error 'Server sent an empty response with status ' + response.statusCode
   response.body
 
-module.exports = runScript
+module.exports = FoxxMC::Scripts.sendSignal

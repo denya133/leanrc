@@ -8,7 +8,7 @@ folders = [
   'controllers'
 ]
 
-defineClasses = (
+FoxxMC::Utils.defineClasses = (
   path,
   reDefine = yes,
   {inflect}={}
@@ -88,4 +88,4 @@ defineClasses = (
     global["#{Prefix}"]::ApplicationRouter = require fs.join path, 'router'
   return global["#{Prefix}"]
 
-module.exports = defineClasses
+module.exports = FoxxMC::Utils.defineClasses

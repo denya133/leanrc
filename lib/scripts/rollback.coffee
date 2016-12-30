@@ -20,7 +20,7 @@ dataSchema =  joi.object(
 [rawData, jobId] = module.context.argv
 {value:data} = dataSchema.validate rawData
 
-runScript = ({ROOT, context}={})->
+FoxxMC::Scripts.rollback = ({ROOT, context}={})->
   defineClasses "#{ROOT}dist", no
   rollback = (steps)->
     error = null
@@ -54,4 +54,4 @@ runScript = ({ROOT, context}={})->
 
   result
 
-module.exports = runScript
+module.exports = FoxxMC::Scripts.rollback

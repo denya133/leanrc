@@ -1,7 +1,7 @@
 Queues = require '@arangodb/foxx/queues'
 { db } = require '@arangodb'
 
-module.exports = (cfg) ->
+module.exports = FoxxMC::Utils.runJob = (cfg) ->
   do (
     {
       command = ->

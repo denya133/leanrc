@@ -21,7 +21,7 @@ dataSchema =  joi.object(
 }
 ###
 
-runScript = ({ROOT, context}={})->
+FoxxMC::Scripts.delayedJob = ({ROOT, context}={})->
   defineClasses "#{ROOT}dist", no
   runJob
     context: context ? module.context
@@ -68,4 +68,4 @@ runScript = ({ROOT, context}={})->
       queues._updateQueueDelay()
 
 
-module.exports = runScript
+module.exports = FoxxMC::Scripts.delayedJob

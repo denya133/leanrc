@@ -20,7 +20,7 @@ isError = (errors = [], range = []) ->
   errors.some (error) ->
     left <= +error.code <= right or left <= error.code <= right
 
-sendEmail = (params = {}) ->
+FoxxMC::Utils.sendEmail = (params = {}) ->
   do (
     {
       to
@@ -89,4 +89,4 @@ sendEmail = (params = {}) ->
 
     response.body
 
-module.exports = sendEmail
+module.exports = FoxxMC::Utils.sendEmail

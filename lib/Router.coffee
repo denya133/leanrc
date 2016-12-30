@@ -99,7 +99,7 @@ UNAUTHORIZED      = status 'unauthorized'
   ```
 ###
 
-class Router extends CoreObject
+class FoxxMC::Router extends CoreObject
   @_path: '/'
   @_name: ''
   @_module: null
@@ -375,4 +375,4 @@ class Router extends CoreObject
 
     return
 
-module.exports = Router.initialize()
+module.exports = FoxxMC::Router.initialize()

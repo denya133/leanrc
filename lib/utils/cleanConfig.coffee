@@ -15,6 +15,6 @@ cleanConfig = (successMessage = 'Job success:', failureMessage = 'Job failure:')
   success: cleanCallback successMessage
   failure: cleanCallback failureMessage
 
-module.exports =
+module.exports = FoxxMC::Utils.cleanConfig =
   cleanCallback: cleanCallback
   cleanConfig: cleanConfig

@@ -21,7 +21,7 @@ dataSchema =  joi.object(
 {value:data} = dataSchema.validate rawData
 
 
-runScript = ({ROOT, context}={})->
+FoxxMC::Scripts.migrate = ({ROOT, context}={})->
   defineClasses "#{ROOT}dist", no
   context ?= module.context
   error = null
@@ -53,4 +53,4 @@ runScript = ({ROOT, context}={})->
   return error ? yes
 
 
-module.exports = runScript
+module.exports = FoxxMC::Scripts.migrate

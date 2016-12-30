@@ -1,6 +1,6 @@
 CoreObject    = require './CoreObject'
 
-class Cursor extends CoreObject
+class FoxxMC::Cursor extends CoreObject
   _cursor: null
   Model: null
 
@@ -136,4 +136,4 @@ class Cursor extends CoreObject
       @dispose()
       throw err
 
-module.exports = Cursor.initialize()
+module.exports = FoxxMC::Cursor.initialize()

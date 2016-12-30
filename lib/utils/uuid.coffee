@@ -1,6 +1,6 @@
 crypto = require '@arangodb/crypto'
 
-uuid =
+FoxxMC::Utils.uuid =
   v4: ()->
     'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace /[xy]/g, (c)->
       r = Number(crypto.genRandomNumbers 16) %% 16
@@ -8,4 +8,4 @@ uuid =
       v.toString 16
 
 
-module.exports = uuid
+module.exports = FoxxMC::Utils.uuid

@@ -350,7 +350,7 @@ catch
 ###
 
 
-class CoreObject
+class FoxxMC::CoreObject
   @["_#{@name}_initialHooks"] = []
   @["_#{@name}_beforeHooks"] = []
   @["_#{@name}_afterHooks"] = []
@@ -1322,4 +1322,4 @@ class CoreObject
     return
 
 
-module.exports = CoreObject.initialize()
+module.exports = FoxxMC::CoreObject.initialize()

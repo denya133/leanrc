@@ -1,5 +1,5 @@
 createAuth = require '@arangodb/foxx/auth'
-auth = createAuth()
+FoxxMC::Utils.auth = createAuth()
 
 
-module.exports = auth
+module.exports = FoxxMC::Utils.auth

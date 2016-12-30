@@ -97,7 +97,7 @@ FORBIDDEN         = status 'forbidden'
   # их логика работы довольно проста для понимания
 ###
 
-class Controller extends CoreObject
+class FoxxMC::Controller extends CoreObject
   Model: null
 
   @swaggerDefinition: (action, lambda)->
@@ -454,4 +454,5 @@ class Controller extends CoreObject
     @isValid()
     @Model.delete key, currentUser
 
-module.exports = Controller.initialize()
+
+module.exports = FoxxMC::Controller.initialize()

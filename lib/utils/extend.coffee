@@ -6,7 +6,7 @@ customizer = (objValue, srcValue)->
     objValue.concat srcValue
 
 
-extend = ()->
+FoxxMC::Utils.extend = ()->
   target = _.head arguments
   if _.isArray target
     others = _.tail arguments
@@ -17,4 +17,4 @@ extend = ()->
     _.mergeWith args...
 
 
-module.exports = extend
+module.exports = FoxxMC::Utils.extend

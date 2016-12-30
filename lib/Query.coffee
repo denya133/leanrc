@@ -73,7 +73,7 @@ normalizedOperators = [
   '{!~}' # does not contain
 ]
 
-class Query extends CoreObject
+class FoxxMC::Query extends CoreObject
   @operatorMap:
     # equal ids
     '{>[]}': (field, values)->
@@ -1008,7 +1008,7 @@ class Query extends CoreObject
         console.log '%#$%EFFSDF$%#$%SDAF$#$!!!!!'
         result
 
-module.exports = Query.initialize()
+module.exports = FoxxMC::Query.initialize()
 
 # query users { "email": "denya@saifas.com" }
 

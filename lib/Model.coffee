@@ -354,7 +354,7 @@ class Tomato extends Model
 
 ###
 
-class Model extends CoreObject
+class FoxxMC::Model extends CoreObject
   @["_#{@name}_customFilters"] = {}
 
   @schema:        ()->
@@ -1582,4 +1582,4 @@ class Model extends CoreObject
     @_resetAttributes attributes
     @save()
 
-module.exports = Model.initialize()
+module.exports = FoxxMC::Model.initialize()

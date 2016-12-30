@@ -88,6 +88,6 @@ CoreObject  = require './CoreObject'
   ```
 ###
 
-class Mixin extends CoreObject
+class FoxxMC::Mixin extends CoreObject
 
-module.exports = Mixin.initialize()
+module.exports = FoxxMC::Mixin.initialize()

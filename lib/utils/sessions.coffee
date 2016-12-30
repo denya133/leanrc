@@ -3,7 +3,7 @@ cookieTransport     = require '@arangodb/foxx/sessions/transports/cookie'
 
 {secret} = module.context.configuration
 
-sessions = if module.context.collectionPrefix is 'internal_'
+FoxxMC::Utils.sessions = if module.context.collectionPrefix is 'internal_'
   (req, res, next)->
     next()
     return
@@ -22,4 +22,4 @@ else
   # autoCreate: yes
 
 
-module.exports = sessions
+module.exports = FoxxMC::Utils.sessions
