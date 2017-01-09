@@ -4,7 +4,7 @@ module.context.use FoxxMC::Utils.sessions
 
 class {{#camelize}}{{name}}{{/camelize}}::ApplicationRouter extends FoxxMC::Router
   @_rootPath: "#{__dirname}/../"
-  @map ()->
+  @map ->
 
 
 module.exports = {{#camelize}}{{name}}{{/camelize}}::ApplicationRouter.initialize()

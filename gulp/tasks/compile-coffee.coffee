@@ -14,4 +14,4 @@ gulp.task 'compile_coffee', ->
     .on 'end', ->
       gulp.src './index.coffee'
       .pipe coffee()
-      .pipe gulp.dest './index.js'
+      .pipe gulp.dest './'
