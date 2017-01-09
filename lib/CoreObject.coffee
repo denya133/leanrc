@@ -422,7 +422,7 @@ class FoxxMC::CoreObject
     Object.defineProperty @, name, definition
 
   @moduleName: ()->
-    inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+    inflect.camelize require("#{@_rootPath}manifest.json").foxxmcModule.prefix
 
   @_functor: (methods, collections, ..., lambda)->
     if arguments.length is 0
