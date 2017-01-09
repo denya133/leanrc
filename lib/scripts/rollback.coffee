@@ -2,7 +2,6 @@ _             = require 'lodash'
 joi           = require 'joi'
 fs            = require 'fs'
 runJob        = require '../utils/runJob'
-defineClasses = require '../utils/defineClasses'
 
 { db }        = require '@arangodb'
 
@@ -21,7 +20,7 @@ dataSchema =  joi.object(
 {value:data} = dataSchema.validate rawData
 
 FoxxMC::Scripts.rollback = ({ROOT, context}={})->
-  defineClasses "#{ROOT}dist", no
+  require "#{ROOT}index"
   rollback = (steps)->
     error = null
     context ?= module.context

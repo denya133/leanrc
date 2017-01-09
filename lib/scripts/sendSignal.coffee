@@ -2,7 +2,6 @@ joi           = require 'joi'
 request       = require '@arangodb/request'
 util          = require 'util'
 runJob        = require '../utils/runJob'
-defineClasses = require '../utils/defineClasses'
 
 {streamServer} = module.context.configuration
 
@@ -24,7 +23,7 @@ dataSchema =  joi.object(
 ).required()
 
 FoxxMC::Scripts.sendSignal = ({ROOT, context}={})->
-  defineClasses "#{ROOT}dist", no
+  require "#{ROOT}index"
   response = {}
 
   runJob

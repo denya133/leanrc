@@ -4,7 +4,6 @@ inflect       = require('i')()
 { db }        = require '@arangodb'
 queues        = require '@arangodb/foxx/queues'
 runJob        = require '../utils/runJob'
-defineClasses = require '../utils/defineClasses'
 
 
 dataSchema =  joi.object(
@@ -22,7 +21,7 @@ dataSchema =  joi.object(
 ###
 
 FoxxMC::Scripts.delayedJob = ({ROOT, context}={})->
-  defineClasses "#{ROOT}dist", no
+  require "#{ROOT}index"
   runJob
     context: context ? module.context
     command: (rawData, jobId) ->

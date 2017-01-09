@@ -2,7 +2,6 @@ _             = require 'lodash'
 joi           = require 'joi'
 fs            = require 'fs'
 runJob        = require '../utils/runJob'
-defineClasses = require '../utils/defineClasses'
 
 { db }        = require '@arangodb'
 
@@ -22,7 +21,7 @@ dataSchema =  joi.object(
 
 
 FoxxMC::Scripts.migrate = ({ROOT, context}={})->
-  defineClasses "#{ROOT}dist", no
+  require "#{ROOT}index"
   context ?= module.context
   error = null
   migrations = context.collection 'migrations'
