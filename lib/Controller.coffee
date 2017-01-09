@@ -103,6 +103,9 @@ class FoxxMC::Controller extends CoreObject
   @swaggerDefinition: (action, lambda)->
     @["_swaggerDefFor_#{action}"] = lambda
 
+  @keyName: ->
+    inflect.singularize inflect.underscore @name.replace 'Controller', ''
+
   @swaggerDefinition 'list', (endpoint)->
     @isValid()
     endpoint
@@ -125,7 +128,7 @@ class FoxxMC::Controller extends CoreObject
   @swaggerDefinition 'detail', (endpoint)->
     @isValid()
     endpoint
-      .pathParam    inflect.singularize inflect.underscore(@name), @keySchema
+      .pathParam    @keyName(), @keySchema
       .response     @clientSchema(), "
         The #{inflect.singularize inflect.underscore @::Model.name}.
       "
@@ -164,7 +167,7 @@ class FoxxMC::Controller extends CoreObject
 
   @swaggerDefinition 'update', (endpoint)->
     @isValid()
-    endpoint.pathParam inflect.singularize inflect.underscore(@name), @keySchema
+    endpoint.pathParam @keyName(), @keySchema
       .body         @clientSchema().required(), "
         The data to replace the
         #{inflect.singularize inflect.underscore @::Model.name} with.
@@ -186,7 +189,7 @@ class FoxxMC::Controller extends CoreObject
 
   @swaggerDefinition 'patch', (endpoint)->
     @isValid()
-    endpoint.pathParam inflect.singularize inflect.underscore(@name), @keySchema
+    endpoint.pathParam @keyName(), @keySchema
       .body         @clientSchema().description("
         The data to update the
         #{inflect.singularize inflect.underscore @::Model.name} with.
@@ -207,7 +210,7 @@ class FoxxMC::Controller extends CoreObject
 
   @swaggerDefinition 'delete', (endpoint)->
     @isValid()
-    endpoint.pathParam inflect.singularize inflect.underscore(@name), @keySchema
+    endpoint.pathParam @keyName(), @keySchema
       .error        HTTP_NOT_FOUND
       .error        UNAUTHORIZED
       .response     null
@@ -218,9 +221,6 @@ class FoxxMC::Controller extends CoreObject
         Deletes the #{inflect.singularize inflect.underscore @::Model.name}
         from the database.
       "
-
-  @keyName: ->
-    inflect.singularize inflect.underscore @name.replace 'Controller', ''
   @keySchema:     joi.string().required().description 'The key of the objects.'
   @querySchema:   joi.string().empty('{}').optional().default '{}', '
     The query for finding objects.
