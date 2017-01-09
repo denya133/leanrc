@@ -200,7 +200,7 @@ class FoxxMC::Router extends CoreObject
 
     path = switch at ? @_at
       when 'member'
-        "#{@_path}:#{inflect.singularize inflect.underscore controller}/#{path}"
+        "#{@_path}:#{inflect.singularize inflect.underscore controller.replace(/[/]/g, '_').replace /[_]$/g, ''}/#{path}"
       when 'collection'
         "#{@_path}#{path}"
       else
@@ -250,7 +250,8 @@ class FoxxMC::Router extends CoreObject
       "#{name}/"
     full_path = switch at ? @_at
       when 'member'
-        "#{@_path}:#{inflect.singularize inflect.underscore name}/#{_path}"
+        [..., previously, empty] = @_path.split '/'
+        "#{@_path}:#{inflect.singularize inflect.underscore previously}/#{_path}"
       when 'collection'
         "#{@_path}#{_path}"
       else
@@ -351,7 +352,7 @@ class FoxxMC::Router extends CoreObject
       if only?
         only.forEach (action)=>
           _path = paths[action]
-          _path ?= inflect.singularize inflect.underscore(controller ? name)
+          _path ?= ':' + inflect.singularize inflect.underscore (controller ? name).replace(/[/]/g, '_').replace /[_]$/g, ''
           @constructor.defineMethod @_routes, methods[action], _path,
             action: action
             controller: controller ? name
@@ -360,14 +361,14 @@ class FoxxMC::Router extends CoreObject
           do (action, method)=>
             if not except.includes('all') and not except.includes action
               _path = paths[action]
-              _path ?= inflect.singularize inflect.underscore(controller ? name)
+              _path ?= ':' + inflect.singularize inflect.underscore (controller ? name).replace(/[/]/g, '_').replace /[_]$/g, ''
               @constructor.defineMethod @_routes, method, _path,
                 action: action
                 controller: controller ? name
       else if via?
         via.forEach (action)=>
           _path = paths[action]
-          _path ?= inflect.singularize inflect.underscore(controller ? name)
+          _path ?= ':' + inflect.singularize inflect.underscore (controller ? name).replace(/[/]/g, '_').replace /[_]$/g, ''
           if action is 'all'
             for own action, method of methods
               do (action, method)=>
@@ -382,7 +383,7 @@ class FoxxMC::Router extends CoreObject
         for own action, method of methods
           do (action, method)=>
             _path = paths[action]
-            _path ?= inflect.singularize inflect.underscore(controller ? name)
+            _path ?= ':' + inflect.singularize inflect.underscore (controller ? name).replace(/[/]/g, '_').replace /[_]$/g, ''
             @constructor.defineMethod @_routes, method, _path,
               action: action
               controller: controller ? name
