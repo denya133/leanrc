@@ -662,6 +662,10 @@ class FoxxMC::Model extends CoreObject
           joi[model]().empty(null).optional()
         else if model is 'date'
           joi.string().empty(null).optional()
+        else if type is 'item' and model is 'object'
+          joi.object().empty(null).optional()
+        else if type is 'array' and model is 'object'
+          joi.array().items joi.object().empty(null).optional()
         else if type is 'item' and not /.*[.].*/.test valuable
           ModelClass.schema()
         else if type is 'item' and /.*[.].*/.test valuable
@@ -767,6 +771,10 @@ class FoxxMC::Model extends CoreObject
           joi[model]().empty(null).optional()
         else if model is 'date'
           joi.string().empty(null).optional()
+        else if type is 'item' and model is 'object'
+          joi.object().empty(null).optional()
+        else if type is 'array' and model is 'object'
+          joi.array().items joi.object().empty(null).optional()
         else if type is 'item' and not /.*[.].*/.test valuable
           ModelClass.schema()
         else if type is 'item' and /.*[.].*/.test valuable
