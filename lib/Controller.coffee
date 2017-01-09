@@ -219,6 +219,8 @@ class FoxxMC::Controller extends CoreObject
         from the database.
       "
 
+  @keyName: ->
+    inflect.singularize inflect.underscore @name.replace 'Controller', ''
   @keySchema:     joi.string().required().description 'The key of the objects.'
   @querySchema:   joi.string().empty('{}').optional().default '{}', '
     The query for finding objects.
@@ -332,7 +334,7 @@ class FoxxMC::Controller extends CoreObject
     [query, currentUser]
 
   beforeDetail: ()->
-    [@req.pathParams[inflect.singularize inflect.underscore(@constructor.name)], @req.currentUser]
+    [@req.pathParams[@constructor.keyName()], @req.currentUser]
 
   beforeCreate: ()->
     [@req.body, @req.currentUser]
@@ -340,11 +342,11 @@ class FoxxMC::Controller extends CoreObject
   beforeUpdate: ()->
     body = extend {}, @req.body,
       "#{inflect.underscore @Model.name}":
-        id: @req.pathParams[inflect.singularize inflect.underscore(@constructor.name)]
-    [@req.pathParams[inflect.singularize inflect.underscore(@constructor.name)], body, @req.currentUser]
+        id: @req.pathParams[@constructor.keyName()]
+    [@req.pathParams[@constructor.keyName()], body, @req.currentUser]
 
   beforeDelete: ()->
-    [@req.pathParams[inflect.singularize inflect.underscore(@constructor.name)], @req.currentUser]
+    [@req.pathParams[@constructor.keyName()], @req.currentUser]
 
   afterCreate: (data)->
     data
@@ -380,7 +382,7 @@ class FoxxMC::Controller extends CoreObject
       return
     if @req.currentUser.isAdmin
       return args
-    unless (key = @req.pathParams[inflect.singularize inflect.underscore(@constructor.name)])?
+    unless (key = @req.pathParams[@constructor.keyName()])?
       return args
     doc = @Model.find key, @req.currentUser
     unless doc?
