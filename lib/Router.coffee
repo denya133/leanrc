@@ -200,7 +200,7 @@ class FoxxMC::Router extends CoreObject
 
     path = switch at ? @_at
       when 'member'
-        "#{@_path}:key/#{path}"
+        "#{@_path}:#{inflect.singularize inflect.underscore controller}/#{path}"
       when 'collection'
         "#{@_path}#{path}"
       else
@@ -250,7 +250,7 @@ class FoxxMC::Router extends CoreObject
       "#{name}/"
     full_path = switch at ? @_at
       when 'member'
-        "#{@_path}:key/#{_path}"
+        "#{@_path}:#{inflect.singularize inflect.underscore name}/#{_path}"
       when 'collection'
         "#{@_path}#{_path}"
       else
@@ -339,39 +339,58 @@ class FoxxMC::Router extends CoreObject
 
     paths =
       list: ''
-      detail: ':key'
+      detail: null
       create: ''
-      patch: ':key'
-      update: ':key'
-      delete: ':key'
+      patch: null
+      update: null
+      delete: null
 
     @_routes = @_routes.concat @constructor._routes if @constructor._routes?
 
     if name? and name isnt ''
       if only?
         only.forEach (action)=>
-          @constructor.defineMethod @_routes, methods[action], paths[action], action: action, controller: controller ? name
+          _path = paths[action]
+          _path ?= inflect.singularize inflect.underscore(controller ? name)
+          @constructor.defineMethod @_routes, methods[action], _path,
+            action: action
+            controller: controller ? name
       else if except?
         for own action, method of methods
           do (action, method)=>
             if not except.includes('all') and not except.includes action
-              @constructor.defineMethod @_routes, method, paths[action], action: action, controller: controller ? name
+              _path = paths[action]
+              _path ?= inflect.singularize inflect.underscore(controller ? name)
+              @constructor.defineMethod @_routes, method, _path,
+                action: action
+                controller: controller ? name
       else if via?
         via.forEach (action)=>
+          _path = paths[action]
+          _path ?= inflect.singularize inflect.underscore(controller ? name)
           if action is 'all'
             for own action, method of methods
               do (action, method)=>
-                @constructor.defineMethod @_routes, method, paths[action], action: action, controller: controller ? name
+                @constructor.defineMethod @_routes, method, _path,
+                  action: action
+                  controller: controller ? name
           else
-            @constructor.defineMethod @_routes, methods[action], paths[action], action: action, controller: controller ? name
+            @constructor.defineMethod @_routes, methods[action], _path,
+              action: action
+              controller: controller ? name
       else
         for own action, method of methods
           do (action, method)=>
-            @constructor.defineMethod @_routes, method, paths[action], action: action, controller: controller ? name
+            _path = paths[action]
+            _path ?= inflect.singularize inflect.underscore(controller ? name)
+            @constructor.defineMethod @_routes, method, _path,
+              action: action
+              controller: controller ? name
 
     @constructor._resources?.forEach (ResourceRouter)=>
       resourceRouter = new ResourceRouter()
-      @_routes = @_routes.concat resourceRouter._routes if resourceRouter._routes?
+      if resourceRouter._routes?
+        @_routes = @_routes.concat resourceRouter._routes
 
     return
 
