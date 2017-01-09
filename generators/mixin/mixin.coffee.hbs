@@ -1,7 +1,7 @@
 
 
-class {{#camelize}}{{pluralName}}{{/camelize}}Mixin extends FoxxMC::Mixin
+class {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Mixin extends FoxxMC::Mixin
   @_rootPath: "#{__dirname}/../../"
 
 
-module.exports = {{#camelize}}{{pluralName}}{{/camelize}}Mixin.initialize()
+module.exports = {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Mixin.initialize()

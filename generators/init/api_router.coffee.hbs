@@ -2,9 +2,9 @@
 
 module.context.use FoxxMC::Utils.sessions
 
-class ApplicationRouter extends FoxxMC::Router
+class {{#camelize}}{{name}}{{/camelize}}::ApplicationRouter extends FoxxMC::Router
   @_rootPath: "#{__dirname}/../"
   @map ()->
 
 
-module.exports = ApplicationRouter.initialize()
+module.exports = {{#camelize}}{{name}}{{/camelize}}::ApplicationRouter.initialize()

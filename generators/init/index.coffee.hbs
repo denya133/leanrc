@@ -1,0 +1,80 @@
+_             = require 'lodash'
+fs            = require 'fs'
+folders       = [
+  'utils'
+  'mixins'
+  'models'
+  'controllers'
+]
+moduleFolder  = fs.join __dirname, 'dist'
+manifest      = require fs.join __dirname, 'manifest.json'
+
+
+getModulesPathes = ()->
+  pathToModules = fs.join moduleFolder, 'node_modules'
+  fs.listTree pathToModules
+    .filter (i)->
+      /^foxxmc\-/.test i
+    .map (i)->
+      fs.join pathToModules, i
+
+getClassesFor = (subfolder)->
+  subfolderDir = fs.join moduleFolder, subfolder
+
+  _files = _.chain fs.listTree subfolderDir
+    .filter (i) -> fs.isFile fs.join subfolderDir, i
+    .map (i) -> i.replace /\.js$/, ''
+    .orderBy()
+    .value()
+  for _file in _files
+    require fs.join subfolderDir, _file
+
+initializeModule = (addonPath, cb)->
+  module.exports addonPath
+  cb()
+
+recursionModulesInitializing = (addonsPathes, index)->
+  if addonsPathes[index]?
+    addonPath = addonsPathes[index].replace '/index.js', ''
+    Module = require addonsPathes[index]
+
+    if Module.initialize? and _.isFunction Module.initialize
+      Module.initialize ()->
+        index += 1
+        if addonsPathes[index]?
+          return recursionModulesInitializing addonsPathes, index
+        else
+          return
+    else
+      initializeModule addonPath, ()->
+        index += 1
+        if addonsPathes[index]?
+          return recursionModulesInitializing addonsPathes, index
+        else
+          return
+  else
+    return
+
+unless global['{{#camelize}}{{name}}{{/camelize}}']? and global['classes']?['{{#camelize}}{{name}}{{/camelize}}']?
+  global['{{#camelize}}{{name}}{{/camelize}}'] = class {{#camelize}}{{name}}{{/camelize}}
+    Utils: {}
+    Scripts: {}
+    @use = ->
+      new @::ApplicationRouter()
+
+  FoxxMC::Utils.extend {{#camelize}}{{name}}{{/camelize}}, _.omit manifest, ['name']
+
+  global['classes'] ?= {}
+  global['classes']['{{#camelize}}{{name}}{{/camelize}}'] = {{#camelize}}{{name}}{{/camelize}}
+
+
+  # здесь надо проинициализоировать все аддоны, от которых зависит это приложение/аддон
+  recursionModulesInitializing getModulesPathes(), 0
+
+  folders.forEach (subfolder)->
+    getClassesFor subfolder
+    return
+  require fs.join moduleFolder, 'router'
+
+
+module.exports = {{#camelize}}{{name}}{{/camelize}}

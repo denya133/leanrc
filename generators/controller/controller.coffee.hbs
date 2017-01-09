@@ -1,6 +1,6 @@
 
 
-class {{#camelize}}{{pluralName}}{{/camelize}}Controller extends FoxxMC::Controller
+class {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Controller extends FoxxMC::Controller
   @_rootPath: "#{__dirname}/../../"
   Model: {{addonPrefix}}::{{#camelize}}{{name}}{{/camelize}}
 
@@ -8,4 +8,4 @@ class {{#camelize}}{{pluralName}}{{/camelize}}Controller extends FoxxMC::Control
   @initialHook 'checkOwner', only: ['update', 'delete']
 
 
-module.exports = {{#camelize}}{{pluralName}}{{/camelize}}Controller.initialize()
+module.exports = {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Controller.initialize()

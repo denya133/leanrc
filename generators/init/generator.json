@@ -31,8 +31,8 @@
       "from": "Readme.md.hbs",
       "to": "Readme.md"
     },{
-      "from": "index.js.hbs",
-      "to": "index.js"
+      "from": "index.coffee.hbs",
+      "to": "index.coffee"
     }
   ],
   "dependencies": [],
