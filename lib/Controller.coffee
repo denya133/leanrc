@@ -269,7 +269,16 @@ class FoxxMC::Controller extends CoreObject
   @finallyHook 'deleteDecorator', only: ['delete']
   @finallyHook 'listDecorator', only: ['list']
 
-  @action: ->
+  @actions: (AbstractClass = null)->
+    AbstractClass ?= @
+    fromSuper = if AbstractClass.__super__?
+      @actions AbstractClass.__super__.constructor
+    _.uniq [].concat(fromSuper ? [])
+      .concat(AbstractClass["_#{AbstractClass.name}_actions"] ? [])
+
+  @action: (name)->
+    @["_#{@name}_actions"] ?= []
+    @["_#{@name}_actions"].push name
     @instanceMethod arguments...
 
   # ------------- Instanse methods ----------

@@ -393,6 +393,44 @@ class FoxxMC::Router extends CoreObject
       if resourceRouter._routes?
         @_routes = @_routes.concat resourceRouter._routes
 
+    #########################
+    router = FoxxRouter()
+    Mapping = {}
+    @_routes.forEach (item)->
+      Mapping[item.controller] ?= []
+      Mapping[item.controller].push item.action
+    allSections = Object.keys Mapping
+    availableSections = []
+    availableSections.push
+      oid: 'system'
+      actions: ['adminnistrator']
+    availableSections.push
+      oid: 'moderator'
+      actions: allSections
+    availableSections = availableSections.concat allSections.map (section)->
+        oid: section
+        actions: Mapping[section]
+    router.get '/sections', (req, res)->
+      res.send {availableSections}
+    router.get '/sections/:section', (req, res)->
+      switch req.pathParams.section
+        when 'system'
+          availableSection =
+            oid: 'system'
+            actions: ['adminnistrator']
+        when 'moderator'
+          availableSection =
+            oid: 'moderator'
+            actions: allSections
+        else
+          availableSection =
+            oid: req.pathParams.section
+            actions: Mapping[req.pathParams.section]
+      res.send {availableSection}
+
+    module.context.use router
+    #########################
+
     return
 
 module.exports = FoxxMC::Router.initialize()
