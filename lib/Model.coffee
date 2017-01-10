@@ -1450,7 +1450,7 @@ class FoxxMC::Model extends CoreObject
     ]
 
   @serializeFromBatch: (obj)->
-    res = _.omit obj, ['_id', '_rev', 'rev', 'type', '_type', '_owner', '_from', '_to']
+    res = _.omit obj, ['_id', '_rev', 'rev', 'type', '_type', '_owner', '_space', '_from', '_to']
     res._type = inflect.underscore @name
     for own prop, prop_opts of @properties()
       unless (serializableName = prop_opts.valuableAs)?
