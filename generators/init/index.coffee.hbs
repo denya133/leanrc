@@ -1,5 +1,7 @@
 _             = require 'lodash'
+inflect       = require('i')()
 fs            = require 'fs'
+FoxxRouter    = require '@arangodb/foxx/router'
 folders       = [
   'utils'
   'mixins'
@@ -59,7 +61,52 @@ class {{#camelize}}{{name}}{{/camelize}}
   Utils: {}
   Scripts: {}
   @use = ->
-    new @::ApplicationRouter()
+    applicationRouter = new @::ApplicationRouter()
+    #########################
+    router = FoxxRouter()
+    Mapping = {}
+    applicationRouter._routes.forEach (item)->
+      controllerName = inflect.camelize inflect.underscore "#{item.controller.replace /[/]/g, '_'}Controller"
+      Mapping[controllerName] ?= []
+      Mapping[controllerName].push item.action unless _.includes Mapping[controllerName], item.action
+    allSections = Object.keys Mapping
+    availableSections = []
+    availableSections.push
+      id: 'system'
+      module: '{{#camelize}}{{name}}{{/camelize}}'
+      actions: ['administrator']
+    availableSections.push
+      id: 'moderator'
+      module: '{{#camelize}}{{name}}{{/camelize}}'
+      actions: allSections
+    availableSections = availableSections.concat allSections.map (section)->
+      id: section
+      module: '{{#camelize}}{{name}}{{/camelize}}'
+      actions: Mapping[section]
+    router.get '/sections', (req, res)->
+      res.send {availableSections}
+    router.get '/sections/:section', (req, res)->
+      switch req.pathParams.section
+        when 'system'
+          availableSection =
+            id: 'system'
+            module: '{{#camelize}}{{name}}{{/camelize}}'
+            actions: ['administrator']
+        when 'moderator'
+          availableSection =
+            id: 'moderator'
+            module: '{{#camelize}}{{name}}{{/camelize}}'
+            actions: allSections
+        else
+          availableSection =
+            id: req.pathParams.section
+            module: '{{#camelize}}{{name}}{{/camelize}}'
+            actions: Mapping[req.pathParams.section]
+      res.send {availableSection}
+
+    module.context.use router
+    #########################
+    applicationRouter
 global['{{#camelize}}{{name}}{{/camelize}}'] = {{#camelize}}{{name}}{{/camelize}}
 
 FoxxMC::Utils.extend {{#camelize}}{{name}}{{/camelize}}, _.omit manifest, ['name']
