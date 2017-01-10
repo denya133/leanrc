@@ -977,7 +977,10 @@ class FoxxMC::CoreObject
           if _data?.constructor isnt Array
             _data = [_data]
           if @[method]?
-            @[method] _data...
+            @[method].chainName = action
+            res = @[method] _data...
+            delete @[method].chainName
+            res
           else
             _data
       else if type is 'only' and action in actions
@@ -985,7 +988,10 @@ class FoxxMC::CoreObject
           if _data?.constructor isnt Array
             _data = [_data]
           if @[method]?
-            @[method] _data...
+            @[method].chainName = action
+            res = @[method] _data...
+            delete @[method].chainName
+            res
           else
             _data
       else if type is 'except' and action not in actions
@@ -993,7 +999,10 @@ class FoxxMC::CoreObject
           if _data?.constructor isnt Array
             _data = [_data]
           if @[method]?
-            @[method] _data...
+            @[method].chainName = action
+            res = @[method] _data...
+            delete @[method].chainName
+            res
           else
             _data
       return
@@ -1007,7 +1016,10 @@ class FoxxMC::CoreObject
           if _data?.constructor isnt Array
             _data = [_data]
           if @[method]?
-            @[method] _data...
+            @[method].chainName = action
+            res = @[method] _data...
+            delete @[method].chainName
+            res
           else
             _data
       else if type is 'only' and action in actions
@@ -1015,7 +1027,10 @@ class FoxxMC::CoreObject
           if _data?.constructor isnt Array
             _data = [_data]
           if @[method]?
-            @[method] _data...
+            @[method].chainName = action
+            res = @[method] _data...
+            delete @[method].chainName
+            res
           else
             _data
       else if type is 'except' and action not in actions
@@ -1023,7 +1038,10 @@ class FoxxMC::CoreObject
           if _data?.constructor isnt Array
             _data = [_data]
           if @[method]?
-            @[method] _data...
+            @[method].chainName = action
+            res = @[method] _data...
+            delete @[method].chainName
+            res
           else
             _data
       return
@@ -1035,19 +1053,28 @@ class FoxxMC::CoreObject
       if type is 'all'
         data = do (_data=data)=>
           if @[method]?
-            @[method] _data
+            @[method].chainName = action
+            res = @[method] _data
+            delete @[method].chainName
+            res
           else
             _data
       else if type is 'only' and action in actions
         data = do (_data=data)=>
           if @[method]?
-            @[method] _data
+            @[method].chainName = action
+            res = @[method] _data
+            delete @[method].chainName
+            res
           else
             _data
       else if type is 'except' and action not in actions
         data = do (_data=data)=>
           if @[method]?
-            @[method] _data
+            @[method].chainName = action
+            res = @[method] _data
+            delete @[method].chainName
+            res
           else
             _data
       return
@@ -1060,19 +1087,28 @@ class FoxxMC::CoreObject
       if type is 'all'
         data = do (_data=data)=>
           if @[method]?
-            @[method] _data
+            @[method].chainName = action
+            res = @[method] _data
+            delete @[method].chainName
+            res
           else
             _data
       else if type is 'only' and action in actions
         data = do (_data=data)=>
           if @[method]?
-            @[method] _data
+            @[method].chainName = action
+            res = @[method] _data
+            delete @[method].chainName
+            res
           else
             _data
       else if type is 'except' and action not in actions
         data = do (_data=data)=>
           if @[method]?
-            @[method] _data
+            @[method].chainName = action
+            res = @[method] _data
+            delete @[method].chainName
+            res
           else
             _data
       return
@@ -1085,19 +1121,28 @@ class FoxxMC::CoreObject
       if type is 'all'
         err = do (_err=err)=>
           if @[method]?
-            @[method] _err
+            @[method].chainName = action
+            res = @[method] _err
+            delete @[method].chainName
+            res
           else
             _err
       else if type is 'only' and action in actions
         err = do (_err=err)=>
           if @[method]?
-            @[method] _err
+            @[method].chainName = action
+            res = @[method] _err
+            delete @[method].chainName
+            res
           else
             _err
       else if type is 'except' and action not in actions
         err = do (_err=err)=>
           if @[method]?
-            @[method] _err
+            @[method].chainName = action
+            res = @[method] _err
+            delete @[method].chainName
+            res
           else
             _err
       return
