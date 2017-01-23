@@ -15,6 +15,7 @@ readme_dirs = [
 
 init_copy_dirs = [
   'gulp'
+  'rules'
   'assets'
   'api/scripts'
   'migrations'
