@@ -33,6 +33,9 @@
     },{
       "from": "index.coffee.hbs",
       "to": "index.coffee"
+    },{
+      "from": "CoffeeScriptCodeGuidelines.pdf",
+      "to": "CoffeeScriptCodeGuidelines.pdf"
     }
   ],
   "dependencies": [],
