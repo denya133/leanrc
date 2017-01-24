@@ -12,13 +12,13 @@ moduleFolder  = fs.join __dirname, 'dist'
 manifest      = require fs.join __dirname, 'manifest.json'
 
 
-getModulesPathes = ()->
-  pathToModules = fs.join moduleFolder, 'node_modules'
-  fs.listTree pathToModules
-    .filter (i)->
-      /^foxxmc\-/.test i
-    .map (i)->
-      fs.join pathToModules, i
+# getModulesPathes = ()->
+#   pathToModules = fs.join moduleFolder, 'node_modules'
+#   fs.listTree pathToModules
+#     .filter (i)->
+#       /^foxxmc\-/.test i
+#     .map (i)->
+#       fs.join pathToModules, i
 
 getClassesFor = (subfolder)->
   subfolderDir = fs.join moduleFolder, subfolder
@@ -31,31 +31,31 @@ getClassesFor = (subfolder)->
   for _file in _files
     require fs.join subfolderDir, _file
 
-initializeModule = (addonPath, cb)->
-  module.exports addonPath
-  cb()
+# initializeModule = (addonPath, cb)->
+#   module.exports addonPath
+#   cb()
 
-recursionModulesInitializing = (addonsPathes, index)->
-  if addonsPathes[index]?
-    addonPath = addonsPathes[index].replace '/index.js', ''
-    Module = require addonsPathes[index]
-
-    if Module.initialize? and _.isFunction Module.initialize
-      Module.initialize ()->
-        index += 1
-        if addonsPathes[index]?
-          return recursionModulesInitializing addonsPathes, index
-        else
-          return
-    else
-      initializeModule addonPath, ()->
-        index += 1
-        if addonsPathes[index]?
-          return recursionModulesInitializing addonsPathes, index
-        else
-          return
-  else
-    return
+# recursionModulesInitializing = (addonsPathes, index)->
+#   if addonsPathes[index]?
+#     addonPath = addonsPathes[index].replace '/index.js', ''
+#     Module = require addonsPathes[index]
+#
+#     if Module.initialize? and _.isFunction Module.initialize
+#       Module.initialize ()->
+#         index += 1
+#         if addonsPathes[index]?
+#           return recursionModulesInitializing addonsPathes, index
+#         else
+#           return
+#     else
+#       initializeModule addonPath, ()->
+#         index += 1
+#         if addonsPathes[index]?
+#           return recursionModulesInitializing addonsPathes, index
+#         else
+#           return
+#   else
+#     return
 
 class {{#camelize}}{{name}}{{/camelize}}
   Utils: {}
@@ -115,8 +115,8 @@ global['classes'] ?= {}
 global['classes']['{{#camelize}}{{name}}{{/camelize}}'] = {{#camelize}}{{name}}{{/camelize}}
 
 
-# здесь надо проинициализоировать все аддоны, от которых зависит это приложение/аддон
-recursionModulesInitializing getModulesPathes(), 0
+# # здесь надо проинициализоировать все аддоны, от которых зависит это приложение/аддон
+# recursionModulesInitializing getModulesPathes(), 0
 
 folders.forEach (subfolder)->
   getClassesFor subfolder
