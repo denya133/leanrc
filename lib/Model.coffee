@@ -1100,7 +1100,7 @@ class FoxxMC::Model extends CoreObject
             _key = key
           result[_key] = value.schema() if value.serializable? or value.valuable?
         , {}
-    ), ['_key', '_rev', '_type', '_owner', '_from', '_to']
+    ), ['_key', '_rev', '_type', '_owner', '_space', '_from', '_to']
     @["_#{@name}_serializableAttributes"]
 
   # возвращает 1 объект
@@ -1444,6 +1444,7 @@ class FoxxMC::Model extends CoreObject
       '_key'
       '_type'
       '_owner'
+      '_space'
       '_rev'
       '_from'
       '_to'
