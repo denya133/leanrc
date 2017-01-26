@@ -23,13 +23,6 @@ getClassesFor = (subfolder)->
   for _file in _files
     require fs.join subfolderDir, _file
 
-modulesInitializing = ->
-  if manifest.dependencies?
-    for own dependencyName, dependencyDefinition of manifest.dependencies
-      do ({name, version}=dependencyDefinition)->
-        module.context.dependencies[dependencyName]
-        return
-  return
 
 class {{#camelize}}{{name}}{{/camelize}}
   Utils: {}
@@ -93,9 +86,6 @@ folders.forEach (subfolder)->
   getClassesFor subfolder
   return
 require fs.join moduleFolder, 'router'
-
-# # здесь надо проинициализоировать все аддоны, от которых зависит это приложение/аддон
-modulesInitializing()
 
 
 module.exports = {{#camelize}}{{name}}{{/camelize}}
