@@ -255,19 +255,21 @@ class FoxxMC::Controller extends CoreObject
   # ------------ Default definitions ---------
   @chains ['list', 'detail', 'create', 'update', 'delete']
 
-  @beforeHook 'beforeList', only: ['list']
-  @beforeHook 'beforeDetail', only: ['detail']
-  @beforeHook 'beforeCreate', only: ['create']
-  @beforeHook 'beforeUpdate', only: ['update']
-  @beforeHook 'beforeDelete', only: ['delete']
+  @beforeHook 'beforeList',       only: ['list']
+  @beforeHook 'beforeDetail',     only: ['detail']
+  @beforeHook 'beforeCreate',     only: ['create']
+  @beforeHook 'permitBody',       only: ['create', 'update']
+  @beforeHook 'setOwnerId',       only: ['create']
+  @beforeHook 'beforeUpdate',     only: ['update']
+  @beforeHook 'beforeDelete',     only: ['delete']
 
-  @afterHook 'afterCreate', only: ['create']
-  @afterHook 'afterUpdate', only: ['update']
-  @afterHook 'afterDelete', only: ['delete']
+  @afterHook 'afterCreate',       only: ['create']
+  @afterHook 'afterUpdate',       only: ['update']
+  @afterHook 'afterDelete',       only: ['delete']
 
-  @finallyHook 'itemDecorator', only: ['detail', 'create', 'update']
+  @finallyHook 'itemDecorator',   only: ['detail', 'create', 'update']
   @finallyHook 'deleteDecorator', only: ['delete']
-  @finallyHook 'listDecorator', only: ['list']
+  @finallyHook 'listDecorator',   only: ['list']
 
   @actions: (AbstractClass = null)->
     AbstractClass ?= @
@@ -313,12 +315,16 @@ class FoxxMC::Controller extends CoreObject
     return
 
   # здесь как в рельсах должно быть joi описание для валидации при create и update
-  permit: (body, currentUser)->
+  permitBody: (body, currentUser)->
     @isValid()
     {value:data} = @constructor.clientSchema().validate body
     patchData = data["#{inflect.underscore @Model.name}"]
-    patchData.ownerId = currentUser?._key ? null
-    patchData
+    [patchData, currentUser]
+
+  setOwnerId: (body, currentUser)->
+    @isValid()
+    body.ownerId = currentUser?._key ? null
+    [body, currentUser]
 
   beforeList: ()->
     { currentUser } = @req
@@ -449,14 +455,14 @@ class FoxxMC::Controller extends CoreObject
     ["#{@Model.name}.create"]
   , (patchData, currentUser=null) ->
     @isValid()
-    @Model.create @permit(patchData, currentUser), currentUser
+    @Model.create patchData, currentUser
 
   @action 'update', ->
     @isValid()
     ["#{@Model.name}.update"]
   , (key, patchData, currentUser=null) ->
     @isValid()
-    @Model.update key, @permit(patchData, currentUser), currentUser
+    @Model.update key, patchData, currentUser
 
   @action 'delete', ->
     @isValid()
