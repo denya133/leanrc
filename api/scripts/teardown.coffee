@@ -1,5 +1,4 @@
 { db }  = require '@arangodb'
-Module = require '../../index'
 
 
 collections = [
@@ -10,7 +9,7 @@ collections = [
 ]
 
 collections.forEach (localName)->
-  qualifiedName = Module.context.collectionName localName
+  qualifiedName = module.context.collectionName localName
   if db._collection qualifiedName
     db._drop qualifiedName
 

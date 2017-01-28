@@ -1,9 +1,8 @@
 { db } = require '@arangodb'
-Module = require '../../index'
 
 
 do ->
-  qualifiedName = Module.context.collectionName 'migrations'
+  qualifiedName = module.context.collectionName 'migrations'
   unless db._collection qualifiedName
     db._createDocumentCollection qualifiedName, waitForSync: yes
 
