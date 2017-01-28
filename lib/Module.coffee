@@ -45,19 +45,19 @@ class FoxxMC::Module extends CoreObject
     return
 
   @initialize: ->
-    self = super
-    global[self.name] = self
+    super
+    global[@name] = @
 
-    extend self, _.omit self.context.manifest, ['name']
+    extend @, _.omit @context.manifest, ['name']
 
     global['classes'] ?= {}
-    global['classes'][self.name] = self
-    self.initializeModules()
+    global['classes'][@name] = @
+    @initializeModules()
 
-    FOLDERS.forEach (subfolder)->
-      self.getClassesFor subfolder
-    require fs.join self.context.basePath, 'dist', 'router'
-    self
+    FOLDERS.forEach (subfolder)=>
+      @getClassesFor subfolder
+    require fs.join @context.basePath, 'dist', 'router'
+    @
 
   @use: ->
     applicationRouter = new @::ApplicationRouter()
