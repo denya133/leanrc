@@ -569,6 +569,7 @@ module.exports = (FoxxMC)->
         [moduleName, modelName] = aName.split '::'
         console.log 'LLLLLLLLLLLLLLL iiiiii', aName, moduleName, modelName, classes[moduleName]::[modelName], inflect.singularize inflect.underscore modelName
         return [classes[moduleName]::[modelName], inflect.singularize inflect.underscore modelName]
+      console.log 'LLLLLLLLLLLLLLL iiiiii ----', @moduleName(), inflect.camelize inflect.underscore aName
       [classes[@moduleName()]::[inflect.camelize inflect.underscore aName], aName]
 
     findModelByName: (aName)->
