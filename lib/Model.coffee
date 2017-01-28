@@ -546,7 +546,7 @@ module.exports = (FoxxMC)->
       # console.log '%%%%%%%%%%%%%%%%%%% recordHasBeenChanged data', data
       queues  = require '@arangodb/foxx/queues'
       {db}    = require '@arangodb'
-      {cleanCallback} = require './utils/cleanConfig'
+      {cleanCallback} = require('./utils/cleanConfig') FoxxMC
       mount = @Module.context.mount
 
       queues.get('signals').push(
