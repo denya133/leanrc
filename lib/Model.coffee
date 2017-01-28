@@ -582,8 +582,6 @@ module.exports = (FoxxMC)->
       modelName = inflect.singularize inflect.underscore vModel
       unless (ModelClass = classes[moduleName]::[vModel])?
         ModelClass = require fs.join classes[moduleName].context.basePath, 'dist', 'models', modelName
-      # console.log 'LLLLLLLLLLLLLLL iiiiii 111', fs.join classes[moduleName].context.basePath, 'dist', 'models', modelName
-      # console.log 'LLLLLLLLLLLLLLL iiiiii', aName, moduleName, vModel, ModelClass, modelName
       [ModelClass, modelName]
 
     findModelByName: (aName)->
@@ -862,7 +860,7 @@ module.exports = (FoxxMC)->
       opts.type = 'item'
       opts.model ?= inflect.singularize inflect.underscore name
       [vFullModelName, vModel] = @parseModelName opts.model
-      console.log '?????????????? in belongsTo', vFullModelName, vModel
+      # console.log '?????????????? in belongsTo', vFullModelName, vModel
       opts.collection ?= inflect.pluralize inflect.underscore vModel
       unless opts.through
         opts.definition ?= "(#{qb.for("#{vModel}_item")
