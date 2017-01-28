@@ -3,6 +3,7 @@ request       = require '@arangodb/request'
 util          = require 'util'
 runJob        = require '../utils/runJob'
 
+
 {streamServer} = module.context.configuration
 
 # For test
@@ -22,40 +23,41 @@ dataSchema =  joi.object(
   record_id:    joi.string().required()
 ).required()
 
-FoxxMC::Scripts.sendSignal = ({ROOT, context}={})->
-  require "#{ROOT}index"
-  response = {}
+module.exports = (FoxxMC)->
+  FoxxMC::Scripts.sendSignal = ({ROOT, context}={})->
+    require "#{ROOT}index"
+    response = {}
 
-  runJob
-    context: context ? module.context
-    command: (rawData, jobId) ->
-      {value:data} = dataSchema.validate rawData
+    runJob
+      context: context ? module.context
+      command: (rawData, jobId) ->
+        {value:data} = dataSchema.validate rawData
 
-      payload = {}
-      {
-        signal    :payload.signal
-        modelName :payload.modelName
-        record_id :payload.record_id
-      } = data
+        payload = {}
+        {
+          signal    :payload.signal
+          modelName :payload.modelName
+          record_id :payload.record_id
+        } = data
 
-      response = request.post "#{streamServer}_stream/#{data.db}/#{data.mount}/signals",
-        body: JSON.stringify payload
-        headers:
-          'accept': 'application/json'
-          'Content-Type': 'application/json'
+        response = request.post "#{streamServer}_stream/#{data.db}/#{data.mount}/signals",
+          body: JSON.stringify payload
+          headers:
+            'accept': 'application/json'
+            'Content-Type': 'application/json'
 
-  # чтобы не накапливались не законченные джобы о доставке сигнала.
-  # if response.body
-  #   console.log 'response.body', response.body
-  #   response.body = JSON.parse response.body
-  #   if response.statusCode // 100 isnt 2
-  #     throw new Error util.format(
-  #       'Server returned HTTP status %s with message: %s'
-  #       response.statusCode
-  #       response.body.message
-  #     )
-  # else if response.statusCode // 100 isnt 2
-  #   throw new Error 'Server sent an empty response with status ' + response.statusCode
-  response.body
+    # чтобы не накапливались не законченные джобы о доставке сигнала.
+    # if response.body
+    #   console.log 'response.body', response.body
+    #   response.body = JSON.parse response.body
+    #   if response.statusCode // 100 isnt 2
+    #     throw new Error util.format(
+    #       'Server returned HTTP status %s with message: %s'
+    #       response.statusCode
+    #       response.body.message
+    #     )
+    # else if response.statusCode // 100 isnt 2
+    #   throw new Error 'Server sent an empty response with status ' + response.statusCode
+    response.body
 
-module.exports = FoxxMC::Scripts.sendSignal
+  FoxxMC::Scripts.sendSignal

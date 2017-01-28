@@ -2,7 +2,7 @@ _         = require 'lodash'
 fs        = require 'fs'
 
 
-global['FoxxMC'] = class FoxxMC
+class FoxxMC
   Utils: {}
   Scripts: {}
 
@@ -13,7 +13,7 @@ files = _.chain fs.listTree __dirname
   .orderBy()
   .value()
 for file in files
-  require fs.join __dirname, file
+  require(fs.join __dirname, file) FoxxMC
 
 
 module.exports = FoxxMC

@@ -3,6 +3,7 @@ extend        = require './utils/extend'
 crypto        = require '@arangodb/crypto'
 inflect       = require('i')()
 
+
 ###
   Chains
   ```
@@ -349,1028 +350,1028 @@ catch
 
 ###
 
+module.exports = (FoxxMC)->
+  class FoxxMC::CoreObject
+    @Module: null # must be defined in child classes
+    @["_#{@name}_initialHooks"] = []
+    @["_#{@name}_beforeHooks"] = []
+    @["_#{@name}_afterHooks"] = []
+    @["_#{@name}_finallyHooks"] = []
+    @["_#{@name}_errorHooks"] = []
+    @["_#{@name}_chains"] = []
 
-class FoxxMC::CoreObject
-  @Module: null # must be defined in child classes
-  @["_#{@name}_initialHooks"] = []
-  @["_#{@name}_beforeHooks"] = []
-  @["_#{@name}_afterHooks"] = []
-  @["_#{@name}_finallyHooks"] = []
-  @["_#{@name}_errorHooks"] = []
-  @["_#{@name}_chains"] = []
+    @chains: (chains)->
+      @["_#{@name}_chains"] ?= []
+      chains = [chains] if chains.constructor is String
+      @["_#{@name}_chains"] = @["_#{@name}_chains"].concat chains
 
-  @chains: (chains)->
-    @["_#{@name}_chains"] ?= []
-    chains = [chains] if chains.constructor is String
-    @["_#{@name}_chains"] = @["_#{@name}_chains"].concat chains
+      chains.forEach (methodName)=>
+        @::["_#{methodName}Collections"] = ()->
+          @collectionsInChain methodName
+        @::["_#{methodName}Methods"] = ()->
+          @methodsInChain methodName
+      return
 
-    chains.forEach (methodName)=>
-      @::["_#{methodName}Collections"] = ()->
-        @collectionsInChain methodName
-      @::["_#{methodName}Methods"] = ()->
-        @methodsInChain methodName
-    return
-
-  @_chains: (AbstractClass = null)->
-    AbstractClass ?= @
-    fromSuper = if AbstractClass.__super__?
-      @_chains AbstractClass.__super__.constructor
-    _.uniq [].concat(fromSuper ? [])
-      .concat(AbstractClass["_#{AbstractClass.name}_chains"] ? [])
+    @_chains: (AbstractClass = null)->
+      AbstractClass ?= @
+      fromSuper = if AbstractClass.__super__?
+        @_chains AbstractClass.__super__.constructor
+      _.uniq [].concat(fromSuper ? [])
+        .concat(AbstractClass["_#{AbstractClass.name}_chains"] ? [])
 
 
-  @_currentSM: 'default'
-  @_currentEvent: null
+    @_currentSM: 'default'
+    @_currentEvent: null
 
-  @super: (methodName)->
-    if arguments.length is 0
-      return @__super__?.constructor
-    (Class, args...)=>
+    @super: (methodName)->
+      if arguments.length is 0
+        return @__super__?.constructor
+      (Class, args...)=>
+        if arguments.length is 1
+          [args] = arguments
+          Class = args.callee?.class ? @
+        else
+          unless _.isFunction Class
+            throw new Error 'First argument must be <Class> or arguments'
+        method = Class.__super__?.constructor[methodName]
+        method?.apply @, args
+
+    super: (methodName)->
+      if arguments.length is 0
+        return @constructor.__super__
+      (Class, args...)=>
+        if arguments.length is 1
+          [args] = arguments
+          Class = args.callee?.class ? @constructor
+        else
+          unless _.isFunction Class
+            throw new Error 'First argument must be <Class> or arguments'
+        method = Class.__super__?[methodName]
+        method?.apply @, args
+
+    @new: (attributes, currentUser=null)->
+      # console.log '!!!!???/', @, JSON.stringify attributes
+      Model = @
+      new Model attributes, currentUser
+
+    save: ()->
+      @
+
+    @defineProperty: (name, definition)->
+      Object.defineProperty @::, name, definition
+
+    @defineClassProperty: (name, definition)->
+      Object.defineProperty @, name, definition
+
+    # @defineProperty 'Module', ->
+    #   @constructor.Module
+    CoreObject::__defineGetter__ 'Module', ->
+      @constructor.Module
+
+    @moduleName: ->
+      @Module.name
+
+    @_functor: (methods, collections, ..., lambda)->
+      if arguments.length is 0
+        throw new Error 'lambda argument is required'
       if arguments.length is 1
-        [args] = arguments
-        Class = args.callee?.class ? @
+        _methods = null
+        _collections = null
+      else if arguments.length is 2
+        if _.isFunction methods
+          _methods = methods
+        else
+          _methods = -> methods
+        _collections = null
       else
-        unless _.isFunction Class
-          throw new Error 'First argument must be <Class> or arguments'
-      method = Class.__super__?.constructor[methodName]
-      method?.apply @, args
+        if _.isFunction methods
+          _methods = methods
+        else
+          _methods = -> methods
+        if _.isFunction collections
+          _collections = collections
+        else
+          _collections = -> collections
 
-  super: (methodName)->
-    if arguments.length is 0
-      return @constructor.__super__
-    (Class, args...)=>
+      lambda.class = @
+
+      (context, methodName)->
+        context["#{methodName}Methods"] = _methods if _methods?
+        context["#{methodName}Collections"] = _collections if _collections?
+        context[methodName] = lambda
+
+    @method: (methods, collections, ..., lambda)->
+      if arguments.length is 0
+        throw new Error 'lambda argument is required'
       if arguments.length is 1
-        [args] = arguments
-        Class = args.callee?.class ? @constructor
+        _methods = null
+        _collections = null
+      else if arguments.length is 2
+        if _.isFunction methods
+          _methods = methods
+        else
+          _methods = -> methods
+        _collections = null
       else
-        unless _.isFunction Class
-          throw new Error 'First argument must be <Class> or arguments'
-      method = Class.__super__?[methodName]
-      method?.apply @, args
+        if _.isFunction methods
+          _methods = methods
+        else
+          _methods = -> methods
+        if _.isFunction collections
+          _collections = collections
+        else
+          _collections = -> collections
 
-  @new: (attributes, currentUser=null)->
-    # console.log '!!!!???/', @, JSON.stringify attributes
-    Model = @
-    new Model attributes, currentUser
+      lambda.class = @
+      lambda.methods = _methods if _methods?
+      lambda.collections = _collections if _collections?
+      lambda.locks = (__methods = [], __collections = {})->
+        _lambda = arguments.callee.lambda
+        _lambda.methods = if _.isFunction __methods
+          __methods
+        else
+          -> __methods
+        _lambda.collections = if _.isFunction __collections
+          __collections
+        else
+          -> __collections
+        _lambda
+      lambda.locks.lambda = lambda
 
-  save: ()->
-    @
+      lambda
 
-  @defineProperty: (name, definition)->
-    Object.defineProperty @::, name, definition
+    @instanceMethod: (methodName, args...)->
+      @_functor(args...) @::, methodName
 
-  @defineClassProperty: (name, definition)->
-    Object.defineProperty @, name, definition
+    @classMethod: (methodName, args...)->
+      @_functor(args...) @, methodName
 
-  # @defineProperty 'Module', ->
-  #   @constructor.Module
-  CoreObject::__defineGetter__ 'Module', ->
-    @constructor.Module
+    @initialize: (Class)->
+      Class ?= @
+      for own methodName, method of Class
+        do (_methodName=methodName, _method=method)->
+          if _.isFunction(_method)
+            {methods, collections} = _method
+            Class["#{methodName}Methods"] = methods if methods?
+            Class["#{methodName}Collections"] = collections if collections?
+          return
+      for methodName, method of Class::
+        do (_methodName=methodName, _method=method)->
+          if _.isFunction(_method)
+            {methods, collections} = _method
+            Class::["#{methodName}Methods"] = methods if methods?
+            Class::["#{methodName}Collections"] = collections if collections?
+          return
+      Class
 
-  @moduleName: ->
-    @Module.name
+    publish: @method ['::pub'], ->
+      @pub arguments...
 
-  @_functor: (methods, collections, ..., lambda)->
-    if arguments.length is 0
-      throw new Error 'lambda argument is required'
-    if arguments.length is 1
-      _methods = null
-      _collections = null
-    else if arguments.length is 2
-      if _.isFunction methods
-        _methods = methods
+    @publish: @method ['.pub'], ->
+      @pub arguments...
+
+    pub: @method ['.pub'], ->
+      @constructor.pub arguments...
+
+    @pub: @method ['.delay'], (opts)->
+      (signal, args...)=>
+        unless /[.]/.test signal
+          throw new Error 'signal must be with dot (for example `billing.pay-order`)'
+        [macro_signal] = signal.split '.'
+        for own className, classObject of classes[@moduleName()]::
+          do (className, classObject)->
+            subscribers = []
+            subscribers = subscribers.concat classObject["_#{className}_subs"]?[signal] ? []
+            subscribers = subscribers.concat classObject["_#{className}_subs"]?["#{macro_signal}.*"] ? []
+            if subscribers.length > 0
+              subscribers.forEach ({methodName, opts:_opts})->
+                if _opts.invoke is yes
+                  classObject[methodName]?.apply classObject, args
+                else
+                  classObject.delay(opts)[methodName]? args...
+
+    @sub: (signal, args...)->
+      @["_#{@name}_subs"] ?= {}
+      @["_#{@name}_subs"][signal] ?= []
+      [methods, collections, ..., lambda] = args
+      if args.length is 3
+        opts = invoke: collections.invoke
+        delete collections.invoke
       else
-        _methods = -> methods
-      _collections = null
-    else
-      if _.isFunction methods
-        _methods = methods
+        opts = {}
+      if _.isFunction lambda
+        nextIndex = _.flatten(_.values(@_subs())).length
+        methodName = "subFunctionIn#{@name}_#{nextIndex}"
+        @classMethod methodName, args...
       else
-        _methods = -> methods
-      if _.isFunction collections
-        _collections = collections
-      else
-        _collections = -> collections
+        methodName = lambda
+      @["_#{@name}_subs"][signal].push
+        methodName: methodName
+        opts: opts
 
-    lambda.class = @
+    @_subs: (AbstractClass = null)->
+      AbstractClass ?= @
+      fromSuper = if AbstractClass.__super__?
+        @_subs AbstractClass.__super__.constructor
+      extend {}
+      , (fromSuper ? {})
+      , (AbstractClass["_#{AbstractClass.name}_subs"] ? {})
 
-    (context, methodName)->
-      context["#{methodName}Methods"] = _methods if _methods?
-      context["#{methodName}Collections"] = _collections if _collections?
-      context[methodName] = lambda
+    @subscribe: ->
+      @sub arguments...
 
-  @method: (methods, collections, ..., lambda)->
-    if arguments.length is 0
-      throw new Error 'lambda argument is required'
-    if arguments.length is 1
-      _methods = null
-      _collections = null
-    else if arguments.length is 2
-      if _.isFunction methods
-        _methods = methods
-      else
-        _methods = -> methods
-      _collections = null
-    else
-      if _.isFunction methods
-        _methods = methods
-      else
-        _methods = -> methods
-      if _.isFunction collections
-        _collections = collections
-      else
-        _collections = -> collections
+    @delayJob: @method [], ->
+      read: ['_queues'], write: ['_jobs']
+    , (data, options = {})->
+      queues  = require '@arangodb/foxx/queues'
+      {cleanCallback} = require './utils/cleanConfig'
 
-    lambda.class = @
-    lambda.methods = _methods if _methods?
-    lambda.collections = _collections if _collections?
-    lambda.locks = (__methods = [], __collections = {})->
-      _lambda = arguments.callee.lambda
-      _lambda.methods = if _.isFunction __methods
-        __methods
-      else
-        -> __methods
-      _lambda.collections = if _.isFunction __collections
-        __collections
-      else
-        -> __collections
-      _lambda
-    lambda.locks.lambda = lambda
+      script =
+        mount: @Module.context.mount
+        name: 'delayed_job'
+      script.backOff = options.backOff if options.backOff?
+      script.maxFailures = options.maxFailures if options.maxFailures?
+      script.schema = options.schema if options.schema?
+      script.preprocess = options.preprocess if options.preprocess?
+      script.repeatTimes = options.repeatTimes if options.repeatTimes?
+      script.repeatUntil = options.repeatUntil if options.repeatUntil?
+      script.repeatDelay = options.repeatDelay if options.repeatDelay?
 
-    lambda
+      opts =
+        success: cleanCallback "success: `delayed_job`"
+        failure: cleanCallback "failure: `delayed_job`"
+      opts.delayUntil = options.delayUntil if options.delayUntil?
+      opts.maxFailures = options.maxFailures if options.maxFailures?
+      opts.repeatTimes = options.repeatTimes if options.repeatTimes?
+      opts.repeatUntil = options.repeatUntil if options.repeatUntil?
+      opts.repeatDelay = options.repeatDelay if options.repeatDelay?
 
-  @instanceMethod: (methodName, args...)->
-    @_functor(args...) @::, methodName
+      console.log '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$123450000', opts
+      queues.get(options.queue ? 'delayed_jobs').push script, data, opts
+      return
 
-  @classMethod: (methodName, args...)->
-    @_functor(args...) @, methodName
+    @delay: @method ['.delayJob'], (opts = null)->
+      self = @
+      obj = {}
+      for key, value of @
+        do (methodName=key, value)->
+          if methodName isnt 'delay' and _.isFunction value
+            obj[methodName] = (args...)->
+              data =
+                moduleName: self.moduleName()
+                className:  self.name
+                methodName: methodName
+                args: args
+              self.delayJob data, opts
+      obj
 
-  @initialize: (Class)->
-    Class ?= @
-    for own methodName, method of Class
-      do (_methodName=methodName, _method=method)->
-        if _.isFunction(_method)
-          {methods, collections} = _method
-          Class["#{methodName}Methods"] = methods if methods?
-          Class["#{methodName}Collections"] = collections if collections?
-        return
-    for methodName, method of Class::
-      do (_methodName=methodName, _method=method)->
-        if _.isFunction(_method)
-          {methods, collections} = _method
-          Class::["#{methodName}Methods"] = methods if methods?
-          Class::["#{methodName}Collections"] = collections if collections?
-        return
-    Class
+    @locks: {}
 
-  publish: @method ['::pub'], ->
-    @pub arguments...
+    @_mergeLocks: (collections, otherCollections)->
+      (otherCollections.read ? []).forEach (name)=>
+        if new RegExp('^[_].*').test name
+          collectionName = name
+        else
+          collectionName = @Module.context.collectionName name
+        unless collectionName in collections.read
+          collections.read.push collectionName
 
-  @publish: @method ['.pub'], ->
-    @pub arguments...
-
-  pub: @method ['.pub'], ->
-    @constructor.pub arguments...
-
-  @pub: @method ['.delay'], (opts)->
-    (signal, args...)=>
-      unless /[.]/.test signal
-        throw new Error 'signal must be with dot (for example `billing.pay-order`)'
-      [macro_signal] = signal.split '.'
-      for own className, classObject of classes[@moduleName()]::
-        do (className, classObject)->
-          subscribers = []
-          subscribers = subscribers.concat classObject["_#{className}_subs"]?[signal] ? []
-          subscribers = subscribers.concat classObject["_#{className}_subs"]?["#{macro_signal}.*"] ? []
-          if subscribers.length > 0
-            subscribers.forEach ({methodName, opts:_opts})->
-              if _opts.invoke is yes
-                classObject[methodName]?.apply classObject, args
-              else
-                classObject.delay(opts)[methodName]? args...
-
-  @sub: (signal, args...)->
-    @["_#{@name}_subs"] ?= {}
-    @["_#{@name}_subs"][signal] ?= []
-    [methods, collections, ..., lambda] = args
-    if args.length is 3
-      opts = invoke: collections.invoke
-      delete collections.invoke
-    else
-      opts = {}
-    if _.isFunction lambda
-      nextIndex = _.flatten(_.values(@_subs())).length
-      methodName = "subFunctionIn#{@name}_#{nextIndex}"
-      @classMethod methodName, args...
-    else
-      methodName = lambda
-    @["_#{@name}_subs"][signal].push
-      methodName: methodName
-      opts: opts
-
-  @_subs: (AbstractClass = null)->
-    AbstractClass ?= @
-    fromSuper = if AbstractClass.__super__?
-      @_subs AbstractClass.__super__.constructor
-    extend {}
-    , (fromSuper ? {})
-    , (AbstractClass["_#{AbstractClass.name}_subs"] ? {})
-
-  @subscribe: ->
-    @sub arguments...
-
-  @delayJob: @method [], ->
-    read: ['_queues'], write: ['_jobs']
-  , (data, options = {})->
-    queues  = require '@arangodb/foxx/queues'
-    {cleanCallback} = require './utils/cleanConfig'
-
-    script =
-      mount: @Module.context.mount
-      name: 'delayed_job'
-    script.backOff = options.backOff if options.backOff?
-    script.maxFailures = options.maxFailures if options.maxFailures?
-    script.schema = options.schema if options.schema?
-    script.preprocess = options.preprocess if options.preprocess?
-    script.repeatTimes = options.repeatTimes if options.repeatTimes?
-    script.repeatUntil = options.repeatUntil if options.repeatUntil?
-    script.repeatDelay = options.repeatDelay if options.repeatDelay?
-
-    opts =
-      success: cleanCallback "success: `delayed_job`"
-      failure: cleanCallback "failure: `delayed_job`"
-    opts.delayUntil = options.delayUntil if options.delayUntil?
-    opts.maxFailures = options.maxFailures if options.maxFailures?
-    opts.repeatTimes = options.repeatTimes if options.repeatTimes?
-    opts.repeatUntil = options.repeatUntil if options.repeatUntil?
-    opts.repeatDelay = options.repeatDelay if options.repeatDelay?
-
-    console.log '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$123450000', opts
-    queues.get(options.queue ? 'delayed_jobs').push script, data, opts
-    return
-
-  @delay: @method ['.delayJob'], (opts = null)->
-    self = @
-    obj = {}
-    for key, value of @
-      do (methodName=key, value)->
-        if methodName isnt 'delay' and _.isFunction value
-          obj[methodName] = (args...)->
-            data =
-              moduleName: self.moduleName()
-              className:  self.name
-              methodName: methodName
-              args: args
-            self.delayJob data, opts
-    obj
-
-  @locks: {}
-
-  @_mergeLocks: (collections, otherCollections)->
-    (otherCollections.read ? []).forEach (name)=>
-      if new RegExp('^[_].*').test name
-        collectionName = name
-      else
-        collectionName = @Module.context.collectionName name
-      unless collectionName in collections.read
-        collections.read.push collectionName
-
-    (otherCollections.write ? []).forEach (name)=>
-      if new RegExp('^[_].*').test name
-        collectionName = name
-      else
-        collectionName = @Module.context.collectionName name
-      unless collectionName in collections.write
-        collections.write.push collectionName
-    collections
-
-  @mergeLocks: (collections, otherCollections)->
-    (otherCollections.read ? []).forEach (collectionName)->
-      unless collectionName in collections.read
-        collections.read.push collectionName
-
-    (otherCollections.write ? []).forEach (collectionName)->
-      unless collectionName in collections.write
-        collections.write.push collectionName
-    collections
-
-  @getLocksFor: (keys, processedMethods = [])->
-    unless Array.isArray keys
-      keys = [keys]
-    self = @
-    hash = crypto.sha1 String keys
-    @locks["#{@name}|#{hash}"] ?= do =>
-      collections = {read:[], write:[]}
-      keys.forEach (key) =>
-        methods = null
-        moduleName = null
-        if /.*[:][:].*/.test(key) and /.*[.].*/.test key
-          [moduleName, key] = key.split '::'
-        if key.split('::').length is 3
-          [moduleName, __className, __methodName] = key.split '::'
-          key = "#{__className}::#{__methodName}"
-        unless moduleName?
-          moduleName = @moduleName()
-        if /.*[#].*/.test key
-          [..., signal] = key.split '#'
-          [macro_signal] = signal.split '.'
-          for own className, AbstractClass of classes[moduleName]::
-            do (className, AbstractClass)->
-              subscribers = []
-              subscribers = subscribers.concat AbstractClass["_#{className}_subs"]?[signal] ? []
-              subscribers = subscribers.concat AbstractClass["_#{className}_subs"]?["#{macro_signal}.*"] ? []
-              if subscribers.length > 0
-                subscribers.forEach ({methodName, opts})->
-                  if opts.invoke is yes
-                    (methods ?= []).push "#{className}.#{methodName}"
-
-        else if /.*[.].*/.test key
-          [className, methodName] = key.split '.'
-          className = self.name if className is ''
-          AbstractClass = classes[moduleName]::[className]
-
-          unless "#{className}.#{methodName}" in processedMethods
-            processedMethods.push "#{className}.#{methodName}"
-
-            _collections = AbstractClass["#{methodName}Collections"]? []...
-            _collections ?= AbstractClass["#{methodName}Collections"] ? {}
-            _collections = extend {}, _collections, AbstractClass["_#{methodName}Collections"]?([]...) ? {}
-
-            collections = @_mergeLocks collections, _collections
-
-            methods = AbstractClass["#{methodName}Methods"]? []...
-            methods ?= AbstractClass["#{methodName}Methods"] ? []
-            methods = extend [], methods, AbstractClass["_#{methodName}Methods"]?([]...) ? []
-
-            # console.log '$%$%$%$%$% collections666.', collections, methods
-
-        else if /.*[:][:].*/.test key
-          [className, instanceMethodName] = key.split '::'
-          className = self.name if className is ''
-          # console.log '????????????/ moduleName', moduleName, classes[moduleName]
-          AbstractClass = classes[moduleName]::[className]
-
-          unless "#{className}::#{instanceMethodName}" in processedMethods
-            processedMethods.push "#{className}::#{instanceMethodName}"
-
-            _collections = AbstractClass::["#{instanceMethodName}Collections"]? []...
-            _collections ?= AbstractClass::["#{instanceMethodName}Collections"] ? {}
-            _collections = extend {}, _collections, AbstractClass::["_#{instanceMethodName}Collections"]?([]...) ? {}
-
-            collections = @_mergeLocks collections, _collections
-
-            methods = AbstractClass::["#{instanceMethodName}Methods"]? []...
-            methods ?= AbstractClass::["#{instanceMethodName}Methods"] ? []
-            methods = extend [], methods, AbstractClass::["_#{instanceMethodName}Methods"]?([]...) ? []
-
-        methods?.forEach (_key)=>
-          _moduleName = null
-          if /.*[:][:].*/.test(_key) and /.*[.].*/.test _key
-            [_moduleName, _key] = _key.split '::'
-          if _key.split('::').length is 3
-            [_moduleName, __className, __methodName] = _key.split '::'
-            _key = "#{__className}::#{__methodName}"
-          unless _moduleName?
-            _moduleName = @moduleName()
-
-          if /.*[#].*/.test _key
-            [..., _signal] = _key.split '#'
-            [_macro_signal] = _signal.split '.'
-            for own _className, OtherAbstractClass of classes[_moduleName]::
-              do (_className, OtherAbstractClass)=>
-                subscribers = []
-                subscribers = subscribers.concat OtherAbstractClass["_#{className}_subs"]?[_signal] ? []
-                subscribers = subscribers.concat OtherAbstractClass["_#{className}_subs"]?["#{_macro_signal}.*"] ? []
-                if subscribers.length > 0
-                  subscribers.forEach ({methodName, opts})=>
-                    if opts.invoke is yes
-                      __collections = OtherAbstractClass.getLocksFor "#{_className}.#{methodName}", processedMethods
-                      collections = @mergeLocks collections, __collections
-            return
-          if /.*[.].*/.test _key
-            [_className, _methodName] = _key.split '.'
-          else if /.*[:][:].*/.test _key
-            [_className, _instanceMethodName] = _key.split '::'
-          _className = AbstractClass.name if _className is ''
-          OtherAbstractClass = classes[_moduleName]::[_className]
-          __collections = OtherAbstractClass.getLocksFor _key, processedMethods
-          collections = @mergeLocks collections, __collections
-
-      # console.log '$%$%$%$%$% collections666', self.name, keys, collections
+      (otherCollections.write ? []).forEach (name)=>
+        if new RegExp('^[_].*').test name
+          collectionName = name
+        else
+          collectionName = @Module.context.collectionName name
+        unless collectionName in collections.write
+          collections.write.push collectionName
       collections
 
-  constructor: ()->
-    if @constructor.chains.constructor is Function
-      chains = @constructor._chains()
-      if chains? and chains.constructor is Array
-        # console.log 'DFASDFASDFffffffffffff9898 chains', chains
-        chains.forEach (methodName)=>
-          @["_#{methodName}"] = @[methodName]
-          @[methodName] = ()->
-            @callAsChain methodName, arguments...
-    return
+    @mergeLocks: (collections, otherCollections)->
+      (otherCollections.read ? []).forEach (collectionName)->
+        unless collectionName in collections.read
+          collections.read.push collectionName
 
-  callAsChain: (methodName, args...) ->
-    try
-      initialData = @initialAction methodName, args...
-      if initialData?.constructor isnt Array
-        initialData = [initialData]
-      data = @beforeAction methodName, initialData...
-      if data?.constructor isnt Array
-        data = [data]
-      result = @["_#{methodName}"]? data...
-      afterResult = @afterAction methodName, result
-      @finallyAction methodName, afterResult
-    catch err
-      @errorInAction methodName, err
-      throw err
+      (otherCollections.write ? []).forEach (collectionName)->
+        unless collectionName in collections.write
+          collections.write.push collectionName
+      collections
 
-  collectionsInChain: (methodName)->
-    obj = read: [], write: []
-    updateObj = (_method)=>
-      if @[_method]? and @[_method].constructor is Function
-        {read, write} = @[_method]()
-        if read?
-          if read.constructor is String
-            read = [read]
-          obj.read = _.uniq obj.read.concat read
-        if write?
-          if write.constructor is String
-            write = [write]
-          obj.write = _.uniq obj.write.concat write
-      return
-    @constructor.initialHooks().forEach ({method, type, actions})->
-      if type is 'all'
-        updateObj "#{method}Collections"
-      else if type is 'only' and methodName in actions
-        updateObj "#{method}Collections"
-      else if type is 'except' and methodName not in actions
-        updateObj "#{method}Collections"
-      return
-    @constructor.beforeHooks().forEach ({method, type, actions})->
-      if type is 'all'
-        updateObj "#{method}Collections"
-      else if type is 'only' and methodName in actions
-        updateObj "#{method}Collections"
-      else if type is 'except' and methodName not in actions
-        updateObj "#{method}Collections"
-      return
-    # updateObj "_#{method}Collections"
-    @constructor.afterHooks().forEach ({method, type, actions})->
-      if type is 'all'
-        updateObj "#{method}Collections"
-      else if type is 'only' and methodName in actions
-        updateObj "#{method}Collections"
-      else if type is 'except' and methodName not in actions
-        updateObj "#{method}Collections"
-      return
-    @constructor.finallyHooks().forEach ({method, type, actions})->
-      if type is 'all'
-        updateObj "#{method}Collections"
-      else if type is 'only' and methodName in actions
-        updateObj "#{method}Collections"
-      else if type is 'except' and methodName not in actions
-        updateObj "#{method}Collections"
-      return
-    obj
+    @getLocksFor: (keys, processedMethods = [])->
+      unless Array.isArray keys
+        keys = [keys]
+      self = @
+      hash = crypto.sha1 String keys
+      @locks["#{@name}|#{hash}"] ?= do =>
+        collections = {read:[], write:[]}
+        keys.forEach (key) =>
+          methods = null
+          moduleName = null
+          if /.*[:][:].*/.test(key) and /.*[.].*/.test key
+            [moduleName, key] = key.split '::'
+          if key.split('::').length is 3
+            [moduleName, __className, __methodName] = key.split '::'
+            key = "#{__className}::#{__methodName}"
+          unless moduleName?
+            moduleName = @moduleName()
+          if /.*[#].*/.test key
+            [..., signal] = key.split '#'
+            [macro_signal] = signal.split '.'
+            for own className, AbstractClass of classes[moduleName]::
+              do (className, AbstractClass)->
+                subscribers = []
+                subscribers = subscribers.concat AbstractClass["_#{className}_subs"]?[signal] ? []
+                subscribers = subscribers.concat AbstractClass["_#{className}_subs"]?["#{macro_signal}.*"] ? []
+                if subscribers.length > 0
+                  subscribers.forEach ({methodName, opts})->
+                    if opts.invoke is yes
+                      (methods ?= []).push "#{className}.#{methodName}"
 
-  methodsInChain: (methodName)->
-    array = []
-    updateArray = (_method)=>
-      if @[_method]? and @[_method].constructor is Function
-        _array = @[_method]()
-        if _array?.constructor isnt Array
-          _array = [_array]
-        array = _.uniq array.concat _array
-      return
-    @constructor.initialHooks().forEach ({method, type, actions})=>
-      if type is 'all'
-        updateArray "#{method}Methods"
-      else if type is 'only' and methodName in actions
-        updateArray "#{method}Methods"
-      else if type is 'except' and methodName not in actions
-        updateArray "#{method}Methods"
-      return
-    @constructor.beforeHooks().forEach ({method, type, actions})=>
-      if type is 'all'
-        updateArray "#{method}Methods"
-      else if type is 'only' and methodName in actions
-        updateArray "#{method}Methods"
-      else if type is 'except' and methodName not in actions
-        updateArray "#{method}Methods"
-      return
-    # updateArray "_#{method}Methods"
-    @constructor.afterHooks().forEach ({method, type, actions})=>
-      if type is 'all'
-        updateArray "#{method}Methods"
-      else if type is 'only' and methodName in actions
-        updateArray "#{method}Methods"
-      else if type is 'except' and methodName not in actions
-        updateArray "#{method}Methods"
-      return
-    @constructor.finallyHooks().forEach ({method, type, actions})=>
-      if type is 'all'
-        updateArray "#{method}Methods"
-      else if type is 'only' and methodName in actions
-        updateArray "#{method}Methods"
-      else if type is 'except' and methodName not in actions
-        updateArray "#{method}Methods"
-      return
-    # console.log '%%%%%%%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@ methodsInChain', array
-    array
+          else if /.*[.].*/.test key
+            [className, methodName] = key.split '.'
+            className = self.name if className is ''
+            AbstractClass = classes[moduleName]::[className]
 
+            unless "#{className}.#{methodName}" in processedMethods
+              processedMethods.push "#{className}.#{methodName}"
 
-  @initialHook: (method, options = {})->
-    @["_#{@name}_initialHooks"] ?= []
-    if options.only
-      @["_#{@name}_initialHooks"].push method: method, type: 'only', actions: options.only
-      return
-    else if options.except
-      @["_#{@name}_initialHooks"].push method: method, type: 'except', actions: options.except
-      return
-    else
-      @["_#{@name}_initialHooks"].push method: method, type: 'all'
+              _collections = AbstractClass["#{methodName}Collections"]? []...
+              _collections ?= AbstractClass["#{methodName}Collections"] ? {}
+              _collections = extend {}, _collections, AbstractClass["_#{methodName}Collections"]?([]...) ? {}
+
+              collections = @_mergeLocks collections, _collections
+
+              methods = AbstractClass["#{methodName}Methods"]? []...
+              methods ?= AbstractClass["#{methodName}Methods"] ? []
+              methods = extend [], methods, AbstractClass["_#{methodName}Methods"]?([]...) ? []
+
+              # console.log '$%$%$%$%$% collections666.', collections, methods
+
+          else if /.*[:][:].*/.test key
+            [className, instanceMethodName] = key.split '::'
+            className = self.name if className is ''
+            # console.log '????????????/ moduleName', moduleName, classes[moduleName]
+            AbstractClass = classes[moduleName]::[className]
+
+            unless "#{className}::#{instanceMethodName}" in processedMethods
+              processedMethods.push "#{className}::#{instanceMethodName}"
+
+              _collections = AbstractClass::["#{instanceMethodName}Collections"]? []...
+              _collections ?= AbstractClass::["#{instanceMethodName}Collections"] ? {}
+              _collections = extend {}, _collections, AbstractClass::["_#{instanceMethodName}Collections"]?([]...) ? {}
+
+              collections = @_mergeLocks collections, _collections
+
+              methods = AbstractClass::["#{instanceMethodName}Methods"]? []...
+              methods ?= AbstractClass::["#{instanceMethodName}Methods"] ? []
+              methods = extend [], methods, AbstractClass::["_#{instanceMethodName}Methods"]?([]...) ? []
+
+          methods?.forEach (_key)=>
+            _moduleName = null
+            if /.*[:][:].*/.test(_key) and /.*[.].*/.test _key
+              [_moduleName, _key] = _key.split '::'
+            if _key.split('::').length is 3
+              [_moduleName, __className, __methodName] = _key.split '::'
+              _key = "#{__className}::#{__methodName}"
+            unless _moduleName?
+              _moduleName = @moduleName()
+
+            if /.*[#].*/.test _key
+              [..., _signal] = _key.split '#'
+              [_macro_signal] = _signal.split '.'
+              for own _className, OtherAbstractClass of classes[_moduleName]::
+                do (_className, OtherAbstractClass)=>
+                  subscribers = []
+                  subscribers = subscribers.concat OtherAbstractClass["_#{className}_subs"]?[_signal] ? []
+                  subscribers = subscribers.concat OtherAbstractClass["_#{className}_subs"]?["#{_macro_signal}.*"] ? []
+                  if subscribers.length > 0
+                    subscribers.forEach ({methodName, opts})=>
+                      if opts.invoke is yes
+                        __collections = OtherAbstractClass.getLocksFor "#{_className}.#{methodName}", processedMethods
+                        collections = @mergeLocks collections, __collections
+              return
+            if /.*[.].*/.test _key
+              [_className, _methodName] = _key.split '.'
+            else if /.*[:][:].*/.test _key
+              [_className, _instanceMethodName] = _key.split '::'
+            _className = AbstractClass.name if _className is ''
+            OtherAbstractClass = classes[_moduleName]::[_className]
+            __collections = OtherAbstractClass.getLocksFor _key, processedMethods
+            collections = @mergeLocks collections, __collections
+
+        # console.log '$%$%$%$%$% collections666', self.name, keys, collections
+        collections
+
+    constructor: ()->
+      if @constructor.chains.constructor is Function
+        chains = @constructor._chains()
+        if chains? and chains.constructor is Array
+          # console.log 'DFASDFASDFffffffffffff9898 chains', chains
+          chains.forEach (methodName)=>
+            @["_#{methodName}"] = @[methodName]
+            @[methodName] = ()->
+              @callAsChain methodName, arguments...
       return
 
-  @beforeHook: (method, options = {})->
-    @["_#{@name}_beforeHooks"] ?= []
-    if options.only
-      @["_#{@name}_beforeHooks"].push method: method, type: 'only', actions: options.only
-      return
-    else if options.except
-      @["_#{@name}_beforeHooks"].push method: method, type: 'except', actions: options.except
-      return
-    else
-      @["_#{@name}_beforeHooks"].push method: method, type: 'all'
-      return
-
-  @afterHook: (method, options = {})->
-    @["_#{@name}_afterHooks"] ?= []
-    if options.only
-      @["_#{@name}_afterHooks"].push method: method, type: 'only', actions: options.only
-      return
-    else if options.except
-      @["_#{@name}_afterHooks"].push method: method, type: 'except', actions: options.except
-      return
-    else
-      @["_#{@name}_afterHooks"].push method: method, type: 'all'
-      return
-
-  @finallyHook: (method, options = {})->
-    @["_#{@name}_finallyHooks"] ?= []
-    if options.only
-      @["_#{@name}_finallyHooks"].push method: method, type: 'only', actions: options.only
-      return
-    else if options.except
-      @["_#{@name}_finallyHooks"].push method: method, type: 'except', actions: options.except
-      return
-    else
-      @["_#{@name}_finallyHooks"].push method: method, type: 'all'
-      return
-
-  @errorHook: (method, options = {})->
-    @["_#{@name}_errorHooks"] ?= []
-    if options.only
-      @["_#{@name}_errorHooks"].push method: method, type: 'only', actions: options.only
-      return
-    else if options.except
-      @["_#{@name}_errorHooks"].push method: method, type: 'except', actions: options.except
-      return
-    else
-      @["_#{@name}_errorHooks"].push method: method, type: 'all'
-      return
-
-  @initialHooks: (AbstractClass = null)->
-    AbstractClass ?= @
-    fromSuper = if AbstractClass.__super__?
-      @initialHooks AbstractClass.__super__.constructor
-    _.uniq [].concat(fromSuper ? [])
-      .concat(AbstractClass["_#{AbstractClass.name}_initialHooks"] ? [])
-
-  @beforeHooks: (AbstractClass = null)->
-    AbstractClass ?= @
-    fromSuper = if AbstractClass.__super__?
-      @beforeHooks AbstractClass.__super__.constructor
-    _.uniq [].concat(fromSuper ? [])
-      .concat(AbstractClass["_#{AbstractClass.name}_beforeHooks"] ? [])
-
-  @afterHooks: (AbstractClass = null)->
-    AbstractClass ?= @
-    fromSuper = if AbstractClass.__super__?
-      @afterHooks AbstractClass.__super__.constructor
-    _.uniq [].concat(fromSuper ? [])
-      .concat(AbstractClass["_#{AbstractClass.name}_afterHooks"] ? [])
-
-  @finallyHooks: (AbstractClass = null)->
-    AbstractClass ?= @
-    fromSuper = if AbstractClass.__super__?
-      @finallyHooks AbstractClass.__super__.constructor
-    _.uniq [].concat(fromSuper ? [])
-      .concat(AbstractClass["_#{AbstractClass.name}_finallyHooks"] ? [])
-
-  @errorHooks: (AbstractClass = null)->
-    AbstractClass ?= @
-    fromSuper = if AbstractClass.__super__?
-      @errorHooks AbstractClass.__super__.constructor
-    _.uniq [].concat(fromSuper ? [])
-      .concat(AbstractClass["_#{AbstractClass.name}_errorHooks"] ? [])
-
-  initialAction: (action, data...)->
-    # console.log 'DFASDFASDFffffffffffff9898 _beforeHooks'
-    @constructor.initialHooks().forEach ({method, type, actions})=>
-      if type is 'all'
-        data = do (_data=data)=>
-          if _data?.constructor isnt Array
-            _data = [_data]
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data...
-            delete @[method].chainName
-            res
-          else
-            _data
-      else if type is 'only' and action in actions
-        data = do (_data=data)=>
-          if _data?.constructor isnt Array
-            _data = [_data]
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data...
-            delete @[method].chainName
-            res
-          else
-            _data
-      else if type is 'except' and action not in actions
-        data = do (_data=data)=>
-          if _data?.constructor isnt Array
-            _data = [_data]
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data...
-            delete @[method].chainName
-            res
-          else
-            _data
-      return
-    data
-
-  beforeAction: (action, data...)->
-    # console.log 'DFASDFASDFffffffffffff9898 _beforeHooks'
-    @constructor.beforeHooks().forEach ({method, type, actions})=>
-      if type is 'all'
-        data = do (_data=data)=>
-          if _data?.constructor isnt Array
-            _data = [_data]
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data...
-            delete @[method].chainName
-            res
-          else
-            _data
-      else if type is 'only' and action in actions
-        data = do (_data=data)=>
-          if _data?.constructor isnt Array
-            _data = [_data]
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data...
-            delete @[method].chainName
-            res
-          else
-            _data
-      else if type is 'except' and action not in actions
-        data = do (_data=data)=>
-          if _data?.constructor isnt Array
-            _data = [_data]
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data...
-            delete @[method].chainName
-            res
-          else
-            _data
-      return
-    data
-
-  afterAction: (action, data)->
-    # console.log 'DFASDFASDFffffffffffff9898 _afterHooks', action, data
-    @constructor.afterHooks().forEach ({method, type, actions})=>
-      if type is 'all'
-        data = do (_data=data)=>
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data
-            delete @[method].chainName
-            res
-          else
-            _data
-      else if type is 'only' and action in actions
-        data = do (_data=data)=>
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data
-            delete @[method].chainName
-            res
-          else
-            _data
-      else if type is 'except' and action not in actions
-        data = do (_data=data)=>
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data
-            delete @[method].chainName
-            res
-          else
-            _data
-      return
-    # console.log 'DFASDFASDFffffffffffff9898============ _afterHooks', action, data
-    data
-
-  finallyAction: (action, data)->
-    # console.log 'DFASDFASDFffffffffffff9898 _finallyHooks', action, data
-    @constructor.finallyHooks().forEach ({method, type, actions})=>
-      if type is 'all'
-        data = do (_data=data)=>
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data
-            delete @[method].chainName
-            res
-          else
-            _data
-      else if type is 'only' and action in actions
-        data = do (_data=data)=>
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data
-            delete @[method].chainName
-            res
-          else
-            _data
-      else if type is 'except' and action not in actions
-        data = do (_data=data)=>
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _data
-            delete @[method].chainName
-            res
-          else
-            _data
-      return
-    # console.log 'DFASDFASDFffffffffffff9898===== _finallyHooks', action, data
-    data
-
-  errorInAction: (action, err)->
-    # console.log 'DFASDFASDFffffffffffff9898 errorInAction'
-    @constructor.errorHooks().forEach ({method, type, actions})=>
-      if type is 'all'
-        err = do (_err=err)=>
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _err
-            delete @[method].chainName
-            res
-          else
-            _err
-      else if type is 'only' and action in actions
-        err = do (_err=err)=>
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _err
-            delete @[method].chainName
-            res
-          else
-            _err
-      else if type is 'except' and action not in actions
-        err = do (_err=err)=>
-          if @[method]?
-            @[method].chainName = action
-            res = @[method] _err
-            delete @[method].chainName
-            res
-          else
-            _err
-      return
-    err
-
-  @__keywords: ['constructor', 'prototype', '__super__']
-
-  @defineInstanceDescriptors: (definitions)->
-    for own methodName, funct of definitions when methodName not in @__keywords
-      @.__super__[methodName] = funct
-
-      if not @::hasOwnProperty methodName
-        @::[methodName] = funct
-    return
-
-  @defineClassDescriptors: (definitions)->
-    for own methodName, funct of definitions when methodName not in @__keywords
-      @.__super__.constructor[methodName] = funct
-
-      if not @hasOwnProperty methodName
-        @[methodName] = funct
-    return
-
-  @resetParentSuper: (_mixin)->
-    __mixin = eval "(
-      function() {
-        function #{_mixin.name}() {
-          #{_mixin.name}.__super__.constructor.apply(this, arguments);
-        }
-        return #{_mixin.name};
-    })();"
-    reserved_words = Object.keys CoreObject
-    for own k, v of _mixin when k not in reserved_words
-      __mixin[k] = v
-    for own _k, _v of _mixin.prototype when _k not in @__keywords
-      __mixin::[_k] = _v
-
-    for own k, v of @.__super__.constructor when k isnt 'including'
-      __mixin[k] = v unless __mixin[k]
-    for own _k, _v of @.__super__ when _k not in @__keywords
-      __mixin::[_k] = _v unless __mixin::[_k]
-    __mixin::constructor.__super__ = @.__super__
-    return __mixin
-
-    # tmp = class extends @__super__
-    # reserved_words = Object.keys CoreObject
-    # for own k, v of _mixin when k not in reserved_words
-    #   tmp[k] = v
-    # for own _k, _v of _mixin.prototype when _k not in @__keywords
-    #   tmp::[_k] = _v
-    # return tmp
-
-  @include: (mixins...)->
-    if Array.isArray mixins[0]
-      mixins = mixins[0]
-    mixins.forEach (mixin)=>
-      if not mixin
-        throw new Error 'Supplied mixin was not found'
-      if mixin.constructor isnt Function
-        throw new Error 'Supplied mixin must be a class'
-      if mixin.__super__.constructor.name isnt 'Mixin'
-        throw new Error 'Supplied mixin must be a subclass of FoxxMC::Mixin'
-
-      __mixin = @resetParentSuper mixin
-
-      @.__super__ = __mixin::
-
-      @defineClassDescriptors __mixin
-      @defineInstanceDescriptors __mixin::
-
-      __mixin.including?.apply @
-    @
-
-  @before_all_events: (name)->
-    @["before_all_events_#{@_currentSM}"] = name
-  @after_all_transitions: (name)->
-    @["after_all_transitions_#{@_currentSM}"] = name
-  @after_all_events: (name)->
-    @["after_all_events_#{@_currentSM}"] = name
-  @error_on_all_events: (name)->
-    @["error_on_all_events_#{@_currentSM}"] = name
-
-  @state: (name, {before_exit, exit, before_enter, enter, after_exit, after_enter, initial, attr}={})->
-    if initial
-      attr ?= 'state'
-      attr = "#{@_currentSM}_#{attr}" if @_currentSM isnt 'default'
-      @["_#{@_currentSM}_state_attr"] = attr
-      @::[attr] = name
-    if before_exit
-      @["before_exit_#{@_currentSM}_#{name}"] = before_exit
-    if exit
-      @["exit_#{@_currentSM}_#{name}"] = exit
-    if before_enter
-      @["before_enter_#{@_currentSM}_#{name}"] = before_enter
-    if enter
-      @["enter_#{@_currentSM}_#{name}"] = enter
-    if after_exit
-      @["after_exit_#{@_currentSM}_#{name}"] = after_exit
-    if after_enter
-      @["after_enter_#{@_currentSM}_#{name}"] = after_enter
-    return
-
-  @event: (name, {before, guard, if:if_cond, unless:unless_cond, success, after, error}={}, cb)->
-    @_currentEvent = name
-    cb.apply @, []
-    @_currentEvent = null
-    _currentSM = @_currentSM
-    @::["_#{_currentSM}_#{name}Methods"] = ()->
-      _.uniq(
-        _.compact [
-          @constructor["before_all_events_#{_currentSM}"] ? null
-          before ? null
-          guard ? null
-          if_cond ? null
-          unless_cond ? null
-          success ? null
-          after ? null
-          @constructor["after_all_events_#{_currentSM}"] ? null
-          error ? null
-          @constructor["error_on_all_events_#{_currentSM}"] ? null
-        ]
-          .map (methodName)->
-            "::#{methodName}"
-          .concat @constructor["transitions_#{_currentSM}_#{name}"].map (transition)->
-            "::#{transition}"
-      )
-    @::["_#{_currentSM}_#{name}"] = (args...)->
+    callAsChain: (methodName, args...) ->
       try
-        @[@constructor["before_all_events_#{_currentSM}"]]? []...
-        @[before]? []...
-        if not guard || (guard && @[guard] []...) || (if_cond && @[if_cond] []...) || (unless_cond && not @[unless_cond] []...)
-          @constructor["transitions_#{_currentSM}_#{name}"].forEach (transition)=>
-            @[transition]? args...
-            return
-          @[success]? []...
-          @[after]? []...
-          @[@constructor["after_all_events_#{_currentSM}"]]? []...
+        initialData = @initialAction methodName, args...
+        if initialData?.constructor isnt Array
+          initialData = [initialData]
+        data = @beforeAction methodName, initialData...
+        if data?.constructor isnt Array
+          data = [data]
+        result = @["_#{methodName}"]? data...
+        afterResult = @afterAction methodName, result
+        @finallyAction methodName, afterResult
       catch err
-        @[error]? [err]...
-        @[@constructor["error_on_all_events_#{_currentSM}"]]? [err]...
-      return
-    @::["#{name}Methods"] ?= ()->
-      @constructor._smNames.map (smName)-> "::_#{smName}_#{name}"
-    @::[name] ?= (args...) ->
-      @constructor._smNames.forEach (smName)=>
-        @["_#{smName}_#{name}"]? args...
-    return
+        @errorInAction methodName, err
+        throw err
 
-  @transition: (_from, to, {guard, if:if_cond, unless:unless_cond, after, success}={})->
-    constructor = @
-    _currentSM = @_currentSM
-    _currentEvent = @_currentEvent
-    @["transitions_#{_currentSM}_#{_currentEvent}"] ?= []
-    if _from.constructor isnt Array
-      _from = [_from]
-    if to.constructor isnt String
-      throw new Error 'transition `new_state` must be a string'
+    collectionsInChain: (methodName)->
+      obj = read: [], write: []
+      updateObj = (_method)=>
+        if @[_method]? and @[_method].constructor is Function
+          {read, write} = @[_method]()
+          if read?
+            if read.constructor is String
+              read = [read]
+            obj.read = _.uniq obj.read.concat read
+          if write?
+            if write.constructor is String
+              write = [write]
+            obj.write = _.uniq obj.write.concat write
+        return
+      @constructor.initialHooks().forEach ({method, type, actions})->
+        if type is 'all'
+          updateObj "#{method}Collections"
+        else if type is 'only' and methodName in actions
+          updateObj "#{method}Collections"
+        else if type is 'except' and methodName not in actions
+          updateObj "#{method}Collections"
+        return
+      @constructor.beforeHooks().forEach ({method, type, actions})->
+        if type is 'all'
+          updateObj "#{method}Collections"
+        else if type is 'only' and methodName in actions
+          updateObj "#{method}Collections"
+        else if type is 'except' and methodName not in actions
+          updateObj "#{method}Collections"
+        return
+      # updateObj "_#{method}Collections"
+      @constructor.afterHooks().forEach ({method, type, actions})->
+        if type is 'all'
+          updateObj "#{method}Collections"
+        else if type is 'only' and methodName in actions
+          updateObj "#{method}Collections"
+        else if type is 'except' and methodName not in actions
+          updateObj "#{method}Collections"
+        return
+      @constructor.finallyHooks().forEach ({method, type, actions})->
+        if type is 'all'
+          updateObj "#{method}Collections"
+        else if type is 'only' and methodName in actions
+          updateObj "#{method}Collections"
+        else if type is 'except' and methodName not in actions
+          updateObj "#{method}Collections"
+        return
+      obj
 
-    name = "transition_#{_currentSM}_#{_currentEvent}|#{_from.join ','}|#{to}"
+    methodsInChain: (methodName)->
+      array = []
+      updateArray = (_method)=>
+        if @[_method]? and @[_method].constructor is Function
+          _array = @[_method]()
+          if _array?.constructor isnt Array
+            _array = [_array]
+          array = _.uniq array.concat _array
+        return
+      @constructor.initialHooks().forEach ({method, type, actions})=>
+        if type is 'all'
+          updateArray "#{method}Methods"
+        else if type is 'only' and methodName in actions
+          updateArray "#{method}Methods"
+        else if type is 'except' and methodName not in actions
+          updateArray "#{method}Methods"
+        return
+      @constructor.beforeHooks().forEach ({method, type, actions})=>
+        if type is 'all'
+          updateArray "#{method}Methods"
+        else if type is 'only' and methodName in actions
+          updateArray "#{method}Methods"
+        else if type is 'except' and methodName not in actions
+          updateArray "#{method}Methods"
+        return
+      # updateArray "_#{method}Methods"
+      @constructor.afterHooks().forEach ({method, type, actions})=>
+        if type is 'all'
+          updateArray "#{method}Methods"
+        else if type is 'only' and methodName in actions
+          updateArray "#{method}Methods"
+        else if type is 'except' and methodName not in actions
+          updateArray "#{method}Methods"
+        return
+      @constructor.finallyHooks().forEach ({method, type, actions})=>
+        if type is 'all'
+          updateArray "#{method}Methods"
+        else if type is 'only' and methodName in actions
+          updateArray "#{method}Methods"
+        else if type is 'except' and methodName not in actions
+          updateArray "#{method}Methods"
+        return
+      # console.log '%%%%%%%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@@@@@@@@@@@@@ methodsInChain', array
+      array
 
-    @::["#{name}Methods"] = ()->
-      state_attr = @constructor["_#{_currentSM}_state_attr"]
-      state_attr ?= if _currentSM is 'default'
-        'state'
+
+    @initialHook: (method, options = {})->
+      @["_#{@name}_initialHooks"] ?= []
+      if options.only
+        @["_#{@name}_initialHooks"].push method: method, type: 'only', actions: options.only
+        return
+      else if options.except
+        @["_#{@name}_initialHooks"].push method: method, type: 'except', actions: options.except
+        return
       else
-        "#{_currentSM}_state"
-      from = @[state_attr]
-      _.uniq(
-        _.compact [
-          guard ? null
-          if_cond ? null
-          unless_cond ? null
-          @constructor["before_exit_#{_currentSM}_#{from}"]? null
-          @constructor["exit_#{_currentSM}_#{from}"] ? null
-          @constructor["after_all_transitions_#{_currentSM}"] ? null
-          @constructor["before_enter_#{_currentSM}_#{to}"] ? null
-          @constructor["enter_#{_currentSM}_#{to}"] ? null
-          success ? null
-          after ? null
-          @constructor["after_exit_#{_currentSM}_#{from}"] ? null
-          @constructor["after_enter_#{_currentSM}_#{to}"] ? null
-        ]
-          .map (methodName)->
-            "::#{methodName}"
-      )
+        @["_#{@name}_initialHooks"].push method: method, type: 'all'
+        return
 
-    @::[name] = (args...)->
-      state_attr = @constructor["_#{_currentSM}_state_attr"]
-      state_attr ?= if _currentSM is 'default'
-        'state'
+    @beforeHook: (method, options = {})->
+      @["_#{@name}_beforeHooks"] ?= []
+      if options.only
+        @["_#{@name}_beforeHooks"].push method: method, type: 'only', actions: options.only
+        return
+      else if options.except
+        @["_#{@name}_beforeHooks"].push method: method, type: 'except', actions: options.except
+        return
       else
-        "#{_currentSM}_state"
-      unless @[state_attr] in _from
-        throw new Error "current `state` is #{@[state_attr]} and is not includes in `[#{_from.join ','}]`"
-      from = @[state_attr]
-      if not guard || (guard && @[guard] []...) || (if_cond && @[if_cond] []...) || (unless_cond && not @[unless_cond] []...)
-        @[@constructor["before_exit_#{_currentSM}_#{from}"]]? []...
-        @[@constructor["exit_#{_currentSM}_#{from}"]]? []...
-        @[state_attr] = to
-        @[@constructor["after_all_transitions_#{_currentSM}"]]? []...
-        @[@constructor["before_enter_#{_currentSM}_#{to}"]]? []...
-        @[@constructor["enter_#{_currentSM}_#{to}"]]? []...
-        @[after]? args...
-        @save?()
-        @[success]? []...
-        @[@constructor["after_exit_#{_currentSM}_#{from}"]]? []...
-        @[@constructor["after_enter_#{_currentSM}_#{to}"]]? []...
+        @["_#{@name}_beforeHooks"].push method: method, type: 'all'
+        return
+
+    @afterHook: (method, options = {})->
+      @["_#{@name}_afterHooks"] ?= []
+      if options.only
+        @["_#{@name}_afterHooks"].push method: method, type: 'only', actions: options.only
+        return
+      else if options.except
+        @["_#{@name}_afterHooks"].push method: method, type: 'except', actions: options.except
+        return
+      else
+        @["_#{@name}_afterHooks"].push method: method, type: 'all'
+        return
+
+    @finallyHook: (method, options = {})->
+      @["_#{@name}_finallyHooks"] ?= []
+      if options.only
+        @["_#{@name}_finallyHooks"].push method: method, type: 'only', actions: options.only
+        return
+      else if options.except
+        @["_#{@name}_finallyHooks"].push method: method, type: 'except', actions: options.except
+        return
+      else
+        @["_#{@name}_finallyHooks"].push method: method, type: 'all'
+        return
+
+    @errorHook: (method, options = {})->
+      @["_#{@name}_errorHooks"] ?= []
+      if options.only
+        @["_#{@name}_errorHooks"].push method: method, type: 'only', actions: options.only
+        return
+      else if options.except
+        @["_#{@name}_errorHooks"].push method: method, type: 'except', actions: options.except
+        return
+      else
+        @["_#{@name}_errorHooks"].push method: method, type: 'all'
+        return
+
+    @initialHooks: (AbstractClass = null)->
+      AbstractClass ?= @
+      fromSuper = if AbstractClass.__super__?
+        @initialHooks AbstractClass.__super__.constructor
+      _.uniq [].concat(fromSuper ? [])
+        .concat(AbstractClass["_#{AbstractClass.name}_initialHooks"] ? [])
+
+    @beforeHooks: (AbstractClass = null)->
+      AbstractClass ?= @
+      fromSuper = if AbstractClass.__super__?
+        @beforeHooks AbstractClass.__super__.constructor
+      _.uniq [].concat(fromSuper ? [])
+        .concat(AbstractClass["_#{AbstractClass.name}_beforeHooks"] ? [])
+
+    @afterHooks: (AbstractClass = null)->
+      AbstractClass ?= @
+      fromSuper = if AbstractClass.__super__?
+        @afterHooks AbstractClass.__super__.constructor
+      _.uniq [].concat(fromSuper ? [])
+        .concat(AbstractClass["_#{AbstractClass.name}_afterHooks"] ? [])
+
+    @finallyHooks: (AbstractClass = null)->
+      AbstractClass ?= @
+      fromSuper = if AbstractClass.__super__?
+        @finallyHooks AbstractClass.__super__.constructor
+      _.uniq [].concat(fromSuper ? [])
+        .concat(AbstractClass["_#{AbstractClass.name}_finallyHooks"] ? [])
+
+    @errorHooks: (AbstractClass = null)->
+      AbstractClass ?= @
+      fromSuper = if AbstractClass.__super__?
+        @errorHooks AbstractClass.__super__.constructor
+      _.uniq [].concat(fromSuper ? [])
+        .concat(AbstractClass["_#{AbstractClass.name}_errorHooks"] ? [])
+
+    initialAction: (action, data...)->
+      # console.log 'DFASDFASDFffffffffffff9898 _beforeHooks'
+      @constructor.initialHooks().forEach ({method, type, actions})=>
+        if type is 'all'
+          data = do (_data=data)=>
+            if _data?.constructor isnt Array
+              _data = [_data]
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data...
+              delete @[method].chainName
+              res
+            else
+              _data
+        else if type is 'only' and action in actions
+          data = do (_data=data)=>
+            if _data?.constructor isnt Array
+              _data = [_data]
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data...
+              delete @[method].chainName
+              res
+            else
+              _data
+        else if type is 'except' and action not in actions
+          data = do (_data=data)=>
+            if _data?.constructor isnt Array
+              _data = [_data]
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data...
+              delete @[method].chainName
+              res
+            else
+              _data
+        return
+      data
+
+    beforeAction: (action, data...)->
+      # console.log 'DFASDFASDFffffffffffff9898 _beforeHooks'
+      @constructor.beforeHooks().forEach ({method, type, actions})=>
+        if type is 'all'
+          data = do (_data=data)=>
+            if _data?.constructor isnt Array
+              _data = [_data]
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data...
+              delete @[method].chainName
+              res
+            else
+              _data
+        else if type is 'only' and action in actions
+          data = do (_data=data)=>
+            if _data?.constructor isnt Array
+              _data = [_data]
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data...
+              delete @[method].chainName
+              res
+            else
+              _data
+        else if type is 'except' and action not in actions
+          data = do (_data=data)=>
+            if _data?.constructor isnt Array
+              _data = [_data]
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data...
+              delete @[method].chainName
+              res
+            else
+              _data
+        return
+      data
+
+    afterAction: (action, data)->
+      # console.log 'DFASDFASDFffffffffffff9898 _afterHooks', action, data
+      @constructor.afterHooks().forEach ({method, type, actions})=>
+        if type is 'all'
+          data = do (_data=data)=>
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data
+              delete @[method].chainName
+              res
+            else
+              _data
+        else if type is 'only' and action in actions
+          data = do (_data=data)=>
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data
+              delete @[method].chainName
+              res
+            else
+              _data
+        else if type is 'except' and action not in actions
+          data = do (_data=data)=>
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data
+              delete @[method].chainName
+              res
+            else
+              _data
+        return
+      # console.log 'DFASDFASDFffffffffffff9898============ _afterHooks', action, data
+      data
+
+    finallyAction: (action, data)->
+      # console.log 'DFASDFASDFffffffffffff9898 _finallyHooks', action, data
+      @constructor.finallyHooks().forEach ({method, type, actions})=>
+        if type is 'all'
+          data = do (_data=data)=>
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data
+              delete @[method].chainName
+              res
+            else
+              _data
+        else if type is 'only' and action in actions
+          data = do (_data=data)=>
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data
+              delete @[method].chainName
+              res
+            else
+              _data
+        else if type is 'except' and action not in actions
+          data = do (_data=data)=>
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _data
+              delete @[method].chainName
+              res
+            else
+              _data
+        return
+      # console.log 'DFASDFASDFffffffffffff9898===== _finallyHooks', action, data
+      data
+
+    errorInAction: (action, err)->
+      # console.log 'DFASDFASDFffffffffffff9898 errorInAction'
+      @constructor.errorHooks().forEach ({method, type, actions})=>
+        if type is 'all'
+          err = do (_err=err)=>
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _err
+              delete @[method].chainName
+              res
+            else
+              _err
+        else if type is 'only' and action in actions
+          err = do (_err=err)=>
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _err
+              delete @[method].chainName
+              res
+            else
+              _err
+        else if type is 'except' and action not in actions
+          err = do (_err=err)=>
+            if @[method]?
+              @[method].chainName = action
+              res = @[method] _err
+              delete @[method].chainName
+              res
+            else
+              _err
+        return
+      err
+
+    @__keywords: ['constructor', 'prototype', '__super__']
+
+    @defineInstanceDescriptors: (definitions)->
+      for own methodName, funct of definitions when methodName not in @__keywords
+        @.__super__[methodName] = funct
+
+        if not @::hasOwnProperty methodName
+          @::[methodName] = funct
       return
 
-    @["transitions_#{_currentSM}_#{_currentEvent}"].push name
-    return
+    @defineClassDescriptors: (definitions)->
+      for own methodName, funct of definitions when methodName not in @__keywords
+        @.__super__.constructor[methodName] = funct
 
-  @StateMachine: (name, config)->
-    unless config
-      config = name
-      name = 'default'
-    @_currentSM = name
-    @_smNames ?= []
-    @_smNames.push name
-    config.apply @, []
-    @_currentSM = 'default'
-    return
+        if not @hasOwnProperty methodName
+          @[methodName] = funct
+      return
+
+    @resetParentSuper: (_mixin)->
+      __mixin = eval "(
+        function() {
+          function #{_mixin.name}() {
+            #{_mixin.name}.__super__.constructor.apply(this, arguments);
+          }
+          return #{_mixin.name};
+      })();"
+      reserved_words = Object.keys CoreObject
+      for own k, v of _mixin when k not in reserved_words
+        __mixin[k] = v
+      for own _k, _v of _mixin.prototype when _k not in @__keywords
+        __mixin::[_k] = _v
+
+      for own k, v of @.__super__.constructor when k isnt 'including'
+        __mixin[k] = v unless __mixin[k]
+      for own _k, _v of @.__super__ when _k not in @__keywords
+        __mixin::[_k] = _v unless __mixin::[_k]
+      __mixin::constructor.__super__ = @.__super__
+      return __mixin
+
+      # tmp = class extends @__super__
+      # reserved_words = Object.keys CoreObject
+      # for own k, v of _mixin when k not in reserved_words
+      #   tmp[k] = v
+      # for own _k, _v of _mixin.prototype when _k not in @__keywords
+      #   tmp::[_k] = _v
+      # return tmp
+
+    @include: (mixins...)->
+      if Array.isArray mixins[0]
+        mixins = mixins[0]
+      mixins.forEach (mixin)=>
+        if not mixin
+          throw new Error 'Supplied mixin was not found'
+        if mixin.constructor isnt Function
+          throw new Error 'Supplied mixin must be a class'
+        if mixin.__super__.constructor.name isnt 'Mixin'
+          throw new Error 'Supplied mixin must be a subclass of FoxxMC::Mixin'
+
+        __mixin = @resetParentSuper mixin
+
+        @.__super__ = __mixin::
+
+        @defineClassDescriptors __mixin
+        @defineInstanceDescriptors __mixin::
+
+        __mixin.including?.apply @
+      @
+
+    @before_all_events: (name)->
+      @["before_all_events_#{@_currentSM}"] = name
+    @after_all_transitions: (name)->
+      @["after_all_transitions_#{@_currentSM}"] = name
+    @after_all_events: (name)->
+      @["after_all_events_#{@_currentSM}"] = name
+    @error_on_all_events: (name)->
+      @["error_on_all_events_#{@_currentSM}"] = name
+
+    @state: (name, {before_exit, exit, before_enter, enter, after_exit, after_enter, initial, attr}={})->
+      if initial
+        attr ?= 'state'
+        attr = "#{@_currentSM}_#{attr}" if @_currentSM isnt 'default'
+        @["_#{@_currentSM}_state_attr"] = attr
+        @::[attr] = name
+      if before_exit
+        @["before_exit_#{@_currentSM}_#{name}"] = before_exit
+      if exit
+        @["exit_#{@_currentSM}_#{name}"] = exit
+      if before_enter
+        @["before_enter_#{@_currentSM}_#{name}"] = before_enter
+      if enter
+        @["enter_#{@_currentSM}_#{name}"] = enter
+      if after_exit
+        @["after_exit_#{@_currentSM}_#{name}"] = after_exit
+      if after_enter
+        @["after_enter_#{@_currentSM}_#{name}"] = after_enter
+      return
+
+    @event: (name, {before, guard, if:if_cond, unless:unless_cond, success, after, error}={}, cb)->
+      @_currentEvent = name
+      cb.apply @, []
+      @_currentEvent = null
+      _currentSM = @_currentSM
+      @::["_#{_currentSM}_#{name}Methods"] = ()->
+        _.uniq(
+          _.compact [
+            @constructor["before_all_events_#{_currentSM}"] ? null
+            before ? null
+            guard ? null
+            if_cond ? null
+            unless_cond ? null
+            success ? null
+            after ? null
+            @constructor["after_all_events_#{_currentSM}"] ? null
+            error ? null
+            @constructor["error_on_all_events_#{_currentSM}"] ? null
+          ]
+            .map (methodName)->
+              "::#{methodName}"
+            .concat @constructor["transitions_#{_currentSM}_#{name}"].map (transition)->
+              "::#{transition}"
+        )
+      @::["_#{_currentSM}_#{name}"] = (args...)->
+        try
+          @[@constructor["before_all_events_#{_currentSM}"]]? []...
+          @[before]? []...
+          if not guard || (guard && @[guard] []...) || (if_cond && @[if_cond] []...) || (unless_cond && not @[unless_cond] []...)
+            @constructor["transitions_#{_currentSM}_#{name}"].forEach (transition)=>
+              @[transition]? args...
+              return
+            @[success]? []...
+            @[after]? []...
+            @[@constructor["after_all_events_#{_currentSM}"]]? []...
+        catch err
+          @[error]? [err]...
+          @[@constructor["error_on_all_events_#{_currentSM}"]]? [err]...
+        return
+      @::["#{name}Methods"] ?= ()->
+        @constructor._smNames.map (smName)-> "::_#{smName}_#{name}"
+      @::[name] ?= (args...) ->
+        @constructor._smNames.forEach (smName)=>
+          @["_#{smName}_#{name}"]? args...
+      return
+
+    @transition: (_from, to, {guard, if:if_cond, unless:unless_cond, after, success}={})->
+      constructor = @
+      _currentSM = @_currentSM
+      _currentEvent = @_currentEvent
+      @["transitions_#{_currentSM}_#{_currentEvent}"] ?= []
+      if _from.constructor isnt Array
+        _from = [_from]
+      if to.constructor isnt String
+        throw new Error 'transition `new_state` must be a string'
+
+      name = "transition_#{_currentSM}_#{_currentEvent}|#{_from.join ','}|#{to}"
+
+      @::["#{name}Methods"] = ()->
+        state_attr = @constructor["_#{_currentSM}_state_attr"]
+        state_attr ?= if _currentSM is 'default'
+          'state'
+        else
+          "#{_currentSM}_state"
+        from = @[state_attr]
+        _.uniq(
+          _.compact [
+            guard ? null
+            if_cond ? null
+            unless_cond ? null
+            @constructor["before_exit_#{_currentSM}_#{from}"]? null
+            @constructor["exit_#{_currentSM}_#{from}"] ? null
+            @constructor["after_all_transitions_#{_currentSM}"] ? null
+            @constructor["before_enter_#{_currentSM}_#{to}"] ? null
+            @constructor["enter_#{_currentSM}_#{to}"] ? null
+            success ? null
+            after ? null
+            @constructor["after_exit_#{_currentSM}_#{from}"] ? null
+            @constructor["after_enter_#{_currentSM}_#{to}"] ? null
+          ]
+            .map (methodName)->
+              "::#{methodName}"
+        )
+
+      @::[name] = (args...)->
+        state_attr = @constructor["_#{_currentSM}_state_attr"]
+        state_attr ?= if _currentSM is 'default'
+          'state'
+        else
+          "#{_currentSM}_state"
+        unless @[state_attr] in _from
+          throw new Error "current `state` is #{@[state_attr]} and is not includes in `[#{_from.join ','}]`"
+        from = @[state_attr]
+        if not guard || (guard && @[guard] []...) || (if_cond && @[if_cond] []...) || (unless_cond && not @[unless_cond] []...)
+          @[@constructor["before_exit_#{_currentSM}_#{from}"]]? []...
+          @[@constructor["exit_#{_currentSM}_#{from}"]]? []...
+          @[state_attr] = to
+          @[@constructor["after_all_transitions_#{_currentSM}"]]? []...
+          @[@constructor["before_enter_#{_currentSM}_#{to}"]]? []...
+          @[@constructor["enter_#{_currentSM}_#{to}"]]? []...
+          @[after]? args...
+          @save?()
+          @[success]? []...
+          @[@constructor["after_exit_#{_currentSM}_#{from}"]]? []...
+          @[@constructor["after_enter_#{_currentSM}_#{to}"]]? []...
+        return
+
+      @["transitions_#{_currentSM}_#{_currentEvent}"].push name
+      return
+
+    @StateMachine: (name, config)->
+      unless config
+        config = name
+        name = 'default'
+      @_currentSM = name
+      @_smNames ?= []
+      @_smNames.push name
+      config.apply @, []
+      @_currentSM = 'default'
+      return
 
 
-module.exports = FoxxMC::CoreObject.initialize()
+  FoxxMC::CoreObject.initialize()
