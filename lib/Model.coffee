@@ -565,25 +565,32 @@ module.exports = (FoxxMC)->
       )
       return
 
+    @parseModelName: (aName)->
+      if /.*[:][:].*/.test(aName)
+        [moduleName, vModel] = aName.split '::'
+      else
+        [moduleName, vModel] = [@moduleName(), inflect.camelize inflect.underscore aName]
+      modelName = inflect.singularize inflect.underscore vModel
+      ["#{moduleName}::#{vModel}", modelName]
+
     @findModelByName: (aName)->
       if /.*[:][:].*/.test(aName)
         [moduleName, vModel] = aName.split '::'
-        # console.log 'LLLLLLLLLLLLLLL iiiiii', aName, moduleName, modelName, classes[moduleName]::[modelName], inflect.singularize inflect.underscore modelName
-        # return [classes[moduleName]::[modelName], inflect.singularize inflect.underscore modelName]
       else
         [moduleName, vModel] = [@moduleName(), inflect.camelize inflect.underscore aName]
 
       modelName = inflect.singularize inflect.underscore vModel
       unless (ModelClass = classes[moduleName]::[vModel])?
         ModelClass = require fs.join classes[moduleName].context.basePath, 'dist', 'models', modelName
-      console.log 'LLLLLLLLLLLLLLL iiiiii 111', fs.join classes[moduleName].context.basePath, 'dist', 'models', modelName
-      console.log 'LLLLLLLLLLLLLLL iiiiii', aName, moduleName, vModel, ModelClass, modelName
+      # console.log 'LLLLLLLLLLLLLLL iiiiii 111', fs.join classes[moduleName].context.basePath, 'dist', 'models', modelName
+      # console.log 'LLLLLLLLLLLLLLL iiiiii', aName, moduleName, vModel, ModelClass, modelName
       [ModelClass, modelName]
-      # console.log 'LLLLLLLLLLLLLLL iiiiii ----', @moduleName(), classes[@moduleName()], inflect.camelize(inflect.underscore aName), classes[@moduleName()]::[inflect.camelize inflect.underscore aName]?
-      # [classes[@moduleName()]::[inflect.camelize inflect.underscore aName], aName]
 
     findModelByName: (aName)->
       @constructor.findModelByName aName
+
+    parseModelName: (aName)->
+      @constructor.parseModelName aName
 
     updateEdges: (data)->
       oldObject = @_old
@@ -854,8 +861,8 @@ module.exports = (FoxxMC)->
           serializeForClient: opts.serializeForClient
       opts.type = 'item'
       opts.model ?= inflect.singularize inflect.underscore name
-      [ModelClass, vModel] = @findModelByName opts.model
-      console.log '?????????????? in belongsTo', ModelClass, vModel
+      [vFullModelName, vModel] = @parseModelName opts.model
+      console.log '?????????????? in belongsTo', vFullModelName, vModel
       opts.collection ?= inflect.pluralize inflect.underscore vModel
       unless opts.through
         opts.definition ?= "(#{qb.for("#{vModel}_item")
@@ -874,7 +881,7 @@ module.exports = (FoxxMC)->
           RETURN #{vModel}_item
         )[0]"
       unless opts.model in SIMPLE_TYPES
-        opts.methods = ["#{ModelClass.Module.name}::#{ModelClass.name}.find"]
+        opts.methods = ["#{vFullModelName}.find"]
       @prop name, opts
       return
 
@@ -883,7 +890,7 @@ module.exports = (FoxxMC)->
       opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
       opts.type = 'array'
       opts.model ?= inflect.singularize inflect.underscore name
-      [ModelClass, vModel] = @findModelByName opts.model
+      [vFullModelName, vModel] = @parseModelName opts.model
       opts.collection ?= inflect.pluralize inflect.underscore vModel
       unless opts.through
         if opts.refKey is '_key'
@@ -914,9 +921,11 @@ module.exports = (FoxxMC)->
       opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
       opts.type = 'item'
       opts.model ?= inflect.singularize inflect.underscore name
-      [ModelClass, vModel] = @findModelByName opts.model
+      [vFullModelName, vModel] = @parseModelName opts.model
+      [moduleName] = vFullModelName.split '::'
+      vCollectionName = "#{inflect.underscore moduleName}_#{inflect.pluralize vModel}"
       opts.definition ?= "(#{qb.for("#{vModel}_item")
-        .in(ModelClass.collectionNameInDB())
+        .in(vCollectionName)
         .filter(qb.eq qb.ref("doc.#{opts.refKey}"), qb.ref("#{vModel}_item.#{opts.inverse}"))
         .limit(1)
         .return(qb.ref "#{vModel}_item")
