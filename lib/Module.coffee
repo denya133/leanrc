@@ -39,7 +39,7 @@ class FoxxMC::Module extends CoreObject
   @initializeModules: ->
     if @context.manifest.dependencies?
       for own dependencyName, dependencyDefinition of @context.manifest.dependencies
-        do ({name, version}=dependencyDefinition)->
+        do ({name, version}=dependencyDefinition)=>
           @context.dependencies[dependencyName]
           return
     return
