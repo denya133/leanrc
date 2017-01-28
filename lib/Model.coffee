@@ -565,6 +565,7 @@ class FoxxMC::Model extends CoreObject
   @findModelByName: (aName)->
     if /.*[:][:].*/.test(aName)
       [moduleName, modelName] = aName.split '::'
+      console.log 'LLLLLLLLLLLLLLL iiiiii', aName, moduleName, modelName, classes[moduleName]::[modelName], inflect.singularize inflect.underscore modelName
       return [classes[moduleName]::[modelName], inflect.singularize inflect.underscore modelName]
     [classes[@moduleName()]::[inflect.camelize inflect.underscore aName], aName]
 
