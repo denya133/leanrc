@@ -576,6 +576,7 @@ module.exports = (FoxxMC)->
       modelName = inflect.singularize inflect.underscore vModel
       unless (ModelClass = classes[moduleName]::[vModel])?
         ModelClass = require fs.join classes[moduleName].context.basePath, 'dist', 'models', modelName
+      console.log 'LLLLLLLLLLLLLLL iiiiii 111', fs.join classes[moduleName].context.basePath, 'dist', 'models', modelName
       console.log 'LLLLLLLLLLLLLLL iiiiii', aName, moduleName, vModel, ModelClass, modelName
       [ModelClass, modelName]
       # console.log 'LLLLLLLLLLLLLLL iiiiii ----', @moduleName(), classes[@moduleName()], inflect.camelize(inflect.underscore aName), classes[@moduleName()]::[inflect.camelize inflect.underscore aName]?
