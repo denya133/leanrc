@@ -1,7 +1,8 @@
-CoreObject    = require './CoreObject'
 
 
 module.exports = (FoxxMC)->
+  CoreObject    = require('./CoreObject') FoxxMC
+
   class FoxxMC::Cursor extends CoreObject
     _cursor: null
     Model: null

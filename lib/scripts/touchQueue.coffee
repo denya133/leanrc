@@ -1,8 +1,9 @@
 queues        = require '@arangodb/foxx/queues'
-runJob        = require '../utils/runJob'
 
 
 module.exports = (FoxxMC)->
+  runJob        = require('../utils/runJob') FoxxMC
+
   FoxxMC::Scripts.touchQueue = ({ROOT, context}={})->
     runJob
       context: context ? module.context

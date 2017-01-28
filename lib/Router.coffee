@@ -3,7 +3,6 @@ inflect       = require('i')()
 FoxxRouter    = require '@arangodb/foxx/router'
 {db}          = require '@arangodb'
 queues        = require '@arangodb/foxx/queues'
-CoreObject    = require './CoreObject'
 
 
 status        = require 'statuses'
@@ -101,6 +100,8 @@ UNAUTHORIZED      = status 'unauthorized'
 ###
 
 module.exports = (FoxxMC)->
+  CoreObject    = require('./CoreObject') FoxxMC
+
   class FoxxMC::Router extends CoreObject
     @_path: '/'
     @_name: ''

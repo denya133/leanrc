@@ -2,8 +2,6 @@ _             = require 'lodash'
 joi           = require 'joi'
 { db }        = require '@arangodb'
 qb            = require 'aqb'
-CoreObject    = require './CoreObject'
-Cursor        = require './Cursor'
 lowerCase     = require 'lower-case'
 moment        = require 'moment'
 
@@ -75,6 +73,9 @@ normalizedOperators = [
 ]
 
 module.exports = (FoxxMC)->
+  CoreObject    = require('./CoreObject') FoxxMC
+  Cursor        = require('./Cursor') FoxxMC
+
   class FoxxMC::Query extends CoreObject
     @operatorMap:
       # equal ids

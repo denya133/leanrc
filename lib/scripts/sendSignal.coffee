@@ -1,7 +1,6 @@
 joi           = require 'joi'
 request       = require '@arangodb/request'
 util          = require 'util'
-runJob        = require '../utils/runJob'
 
 
 {streamServer} = module.context.configuration
@@ -24,6 +23,8 @@ dataSchema =  joi.object(
 ).required()
 
 module.exports = (FoxxMC)->
+  runJob        = require('../utils/runJob') FoxxMC
+
   FoxxMC::Scripts.sendSignal = ({ROOT, context}={})->
     require "#{ROOT}index"
     response = {}

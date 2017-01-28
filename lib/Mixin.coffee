@@ -1,4 +1,3 @@
-CoreObject  = require './CoreObject'
 
 
 ###
@@ -89,6 +88,8 @@ CoreObject  = require './CoreObject'
   ```
 ###
 module.exports = (FoxxMC)->
+  CoreObject  = require('./CoreObject') FoxxMC
+
   class FoxxMC::Mixin extends CoreObject
 
-FoxxMC::Mixin.initialize()
+  FoxxMC::Mixin.initialize()

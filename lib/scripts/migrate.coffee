@@ -1,7 +1,6 @@
 _             = require 'lodash'
 joi           = require 'joi'
 fs            = require 'fs'
-runJob        = require '../utils/runJob'
 
 
 { db }        = require '@arangodb'
@@ -21,6 +20,8 @@ dataSchema =  joi.object(
 {value:data} = dataSchema.validate rawData
 
 module.exports = (FoxxMC)->
+  runJob        = require('../utils/runJob') FoxxMC
+
   FoxxMC::Scripts.migrate = ({ROOT, context}={})->
     require "#{ROOT}index"
     context ?= module.context

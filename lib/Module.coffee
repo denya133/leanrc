@@ -2,8 +2,6 @@ _             = require 'lodash'
 inflect       = require('i')()
 fs            = require 'fs'
 FoxxRouter    = require '@arangodb/foxx/router'
-CoreObject    = require './CoreObject'
-extend        = require './utils/extend'
 
 
 FOLDERS       = [
@@ -19,6 +17,9 @@ FOLDERS       = [
 ###
 
 module.exports = (FoxxMC)->
+  CoreObject    = require('./CoreObject') FoxxMC
+  extend        = require('./utils/extend') FoxxMC
+
   class FoxxMC::Module extends CoreObject
     Utils:      null # must be defined as {} in child classes
     Scripts:    null # must be defined as {} in child classes

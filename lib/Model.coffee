@@ -4,11 +4,6 @@ joi           = require 'joi'
 qb            = require 'aqb'
 crypto        = require '@arangodb/crypto'
 inflect       = require('i')()
-uuid          = require './utils/uuid'
-extend        = require './utils/extend'
-Cursor        = require './Cursor'
-Query         = require './Query'
-CoreObject    = require './CoreObject'
 
 
 SIMPLE_TYPES  = ['string', 'number', 'boolean', 'date', 'object']
@@ -355,6 +350,12 @@ class Tomato extends Model
 
 ###
 module.exports = (FoxxMC)->
+  uuid          = require('./utils/uuid') FoxxMC
+  extend        = require('./utils/extend') FoxxMC
+  Cursor        = require('./Cursor') FoxxMC
+  Query         = require('./Query') FoxxMC
+  CoreObject    = require('./CoreObject') FoxxMC
+
   class FoxxMC::Model extends CoreObject
     @["_#{@name}_customFilters"] = {}
 

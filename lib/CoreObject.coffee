@@ -1,5 +1,4 @@
 _             = require 'lodash'
-extend        = require './utils/extend'
 crypto        = require '@arangodb/crypto'
 inflect       = require('i')()
 
@@ -351,6 +350,8 @@ catch
 ###
 
 module.exports = (FoxxMC)->
+  extend        = require('./utils/extend') FoxxMC
+
   class FoxxMC::CoreObject
     @Module: null # must be defined in child classes
     @["_#{@name}_initialHooks"] = []

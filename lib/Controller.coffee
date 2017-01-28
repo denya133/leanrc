@@ -1,8 +1,6 @@
 _           = require 'lodash'
 joi         = require 'joi'
 inflect     = require('i')()
-CoreObject  = require './CoreObject'
-extend      = require './utils/extend'
 crypto      = require '@arangodb/crypto'
 
 
@@ -96,6 +94,9 @@ FORBIDDEN         = status 'forbidden'
   # их логика работы довольно проста для понимания
 ###
 module.exports = (FoxxMC)->
+  CoreObject  = require('./CoreObject') FoxxMC
+  extend      = require('./utils/extend') FoxxMC
+
   class FoxxMC::Controller extends CoreObject
     Model: null
 

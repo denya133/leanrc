@@ -3,7 +3,6 @@ joi           = require 'joi'
 inflect       = require('i')()
 { db }        = require '@arangodb'
 queues        = require '@arangodb/foxx/queues'
-runJob        = require '../utils/runJob'
 
 
 dataSchema =  joi.object(
@@ -20,6 +19,8 @@ dataSchema =  joi.object(
 }
 ###
 module.exports = (FoxxMC)->
+  runJob        = require('../utils/runJob') FoxxMC
+
   FoxxMC::Scripts.delayedJob = ({ROOT, context}={})->
     require "#{ROOT}index"
     runJob
