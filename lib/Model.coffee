@@ -565,8 +565,8 @@ class FoxxMC::Model extends CoreObject
   @findModelByName: (aName)->
     if /.*[:][:].*/.test(aName)
       [moduleName, modelName] = key.split '::'
-      return classes[moduleName]::[modelName]
-    classes[@moduleName()]::[inflect.camelize inflect.underscore aName]
+      return [classes[moduleName]::[modelName], inflect.singularize inflect.underscore modelName]
+    [classes[@moduleName()]::[inflect.camelize inflect.underscore aName], aName]
 
   findModelByName: (aName)->
     @constructor.findModelByName aName
@@ -578,7 +578,7 @@ class FoxxMC::Model extends CoreObject
     for own key, value of @constructor._edges()
       do (key, {model, through:[edge]}=value)=>
         if oldObject[key] isnt newObject[key]
-          RelatedModel = @findModelByName model
+          [RelatedModel] = @findModelByName model
           if oldObject[key]?
             relatedObject = RelatedModel.find oldObject[key]
             db[@constructor.collectionNameInDB edge].removeByExample
@@ -666,14 +666,16 @@ class FoxxMC::Model extends CoreObject
     if valuable?
       schema = ()=>
         unless model in SIMPLE_TYPES
-          ModelClass = @findModelByName model
-        return if model in ['string', 'boolean', 'number']
-          joi[model]().empty(null).optional()
-        else if model is 'date'
+          [ModelClass, vModel] = @findModelByName model
+        else
+          vModel = model
+        return if vModel in ['string', 'boolean', 'number']
+          joi[vModel]().empty(null).optional()
+        else if vModel is 'date'
           joi.string().empty(null).optional()
-        else if type is 'item' and model is 'object'
+        else if type is 'item' and vModel is 'object'
           joi.object().empty(null).optional()
-        else if type is 'array' and model is 'object'
+        else if type is 'array' and vModel is 'object'
           joi.array().items joi.object().empty(null).optional()
         else if type is 'item' and not /.*[.].*/.test valuable
           ModelClass.schema()
@@ -700,9 +702,11 @@ class FoxxMC::Model extends CoreObject
             get: ()->
               ModelClass = null
               unless model in SIMPLE_TYPES
-                ModelClass = @findModelByName model
+                [ModelClass, vModel] = @findModelByName model
+              else
+                vModel = model
               if (item = @["__#{name}"])?
-                if model in SIMPLE_TYPES
+                if vModel in SIMPLE_TYPES
                   return serializeForClient item
                 if @[refKey ? '_key'] is item[refKey ? '_key']
                  return @
@@ -723,7 +727,7 @@ class FoxxMC::Model extends CoreObject
                   .currentUser @currentUser
                   .next()
                 @["__#{name}"] = item
-                if model in SIMPLE_TYPES
+                if vModel in SIMPLE_TYPES
                   return serializeForClient item
                 if @[refKey ? '_key'] is item[refKey ? '_key']
                  return @
@@ -748,7 +752,7 @@ class FoxxMC::Model extends CoreObject
             get: ()->
               ModelClass = null
               unless model in SIMPLE_TYPES
-                ModelClass = @findModelByName model
+                [ModelClass] = @findModelByName model
                 _bindings = extend {}, bindings
                 if _bindings.docKey is 'docKey'
                   _bindings.docKey = @_key
@@ -775,14 +779,16 @@ class FoxxMC::Model extends CoreObject
     if valuable?
       schema = ()=>
         unless model in SIMPLE_TYPES
-          ModelClass = @findModelByName model
-        return if model in ['string', 'boolean', 'number']
-          joi[model]().empty(null).optional()
-        else if model is 'date'
+          [ModelClass, vModel] = @findModelByName model
+        else
+          vModel = model
+        return if vModel in ['string', 'boolean', 'number']
+          joi[vModel]().empty(null).optional()
+        else if vModel is 'date'
           joi.string().empty(null).optional()
-        else if type is 'item' and model is 'object'
+        else if type is 'item' and vModel is 'object'
           joi.object().empty(null).optional()
-        else if type is 'array' and model is 'object'
+        else if type is 'array' and vModel is 'object'
           joi.array().items joi.object().empty(null).optional()
         else if type is 'item' and not /.*[.].*/.test valuable
           ModelClass.schema()
@@ -834,25 +840,26 @@ class FoxxMC::Model extends CoreObject
         serializeForClient: opts.serializeForClient
     opts.type = 'item'
     opts.model ?= inflect.singularize inflect.underscore name
-    opts.collection ?= inflect.pluralize inflect.underscore opts.model
+    [ModelClass, vModel] = @findModelByName opts.model
+    opts.collection ?= inflect.pluralize inflect.underscore vModel
     unless opts.through
-      opts.definition ?= "(#{qb.for("#{opts.model}_item")
+      opts.definition ?= "(#{qb.for("#{vModel}_item")
         .in(@collectionNameInDB opts.collection)
-        .filter(qb.eq qb.ref("doc.#{opts.attr}"), qb.ref("#{opts.model}_item.#{opts.refKey}"))
+        .filter(qb.eq qb.ref("doc.#{opts.attr}"), qb.ref("#{vModel}_item.#{opts.refKey}"))
         .limit(1)
-        .return(qb.ref "#{opts.model}_item")
+        .return(qb.ref "#{vModel}_item")
         .toAQL()})[0]
       "
     else
       opts.definition ?= "(
-        FOR #{opts.model}_item
+        FOR #{vModel}_item
         IN 1..1
         #{opts.through[1].as} doc._id #{@collectionNameInDB opts.through[0]}
         LIMIT 0, 1
-        RETURN #{opts.model}_item
+        RETURN #{vModel}_item
       )[0]"
     unless opts.model in SIMPLE_TYPES
-      opts.methods = ["#{inflect.classify opts.model}.find"]
+      opts.methods = ["#{ModelClass.Module.name}::#{ModelClass.name}.find"]
     @prop name, opts
     return
 
@@ -861,7 +868,8 @@ class FoxxMC::Model extends CoreObject
     opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
     opts.type = 'array'
     opts.model ?= inflect.singularize inflect.underscore name
-    opts.collection ?= inflect.pluralize inflect.underscore opts.model
+    [ModelClass, vModel] = @findModelByName opts.model
+    opts.collection ?= inflect.pluralize inflect.underscore vModel
     unless opts.through
       if opts.refKey is '_key'
         opts.bindings = docKey: 'docKey'
@@ -869,19 +877,19 @@ class FoxxMC::Model extends CoreObject
       else
         opts.bindings = docId: 'docId'
         binding = '@docId'
-      opts.definition ?= "#{qb.for("#{opts.model}_array")
+      opts.definition ?= "#{qb.for("#{vModel}_array")
         .in(@collectionNameInDB opts.collection)
-        .filter(qb.eq qb.expr(binding), qb.ref("#{opts.model}_array.#{opts.inverse}"))
-        .return(qb.ref "#{opts.model}_array")
+        .filter(qb.eq qb.expr(binding), qb.ref("#{vModel}_array.#{opts.inverse}"))
+        .return(qb.ref "#{vModel}_array")
         .toAQL()}
       "
     else
       opts.bindings = docId: '@docId'
       opts.definition ?= "
-        FOR #{opts.model}_array
+        FOR #{vModel}_array
         IN 1..1
         #{opts.through[1].as} @docId #{@collectionNameInDB opts.through[0]}
-        RETURN #{opts.model}_array
+        RETURN #{vModel}_array
       "
     @prop name, opts
     return
@@ -891,11 +899,12 @@ class FoxxMC::Model extends CoreObject
     opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
     opts.type = 'item'
     opts.model ?= inflect.singularize inflect.underscore name
-    opts.definition ?= "(#{qb.for("#{opts.model}_item")
-      .in(@collectionNameInDB inflect.pluralize inflect.underscore opts.model)
-      .filter(qb.eq qb.ref("doc.#{opts.refKey}"), qb.ref("#{opts.model}_item.#{opts.inverse}"))
+    [ModelClass, vModel] = @findModelByName opts.model
+    opts.definition ?= "(#{qb.for("#{vModel}_item")
+      .in(ModelClass.collectionNameInDB())
+      .filter(qb.eq qb.ref("doc.#{opts.refKey}"), qb.ref("#{vModel}_item.#{opts.inverse}"))
       .limit(1)
-      .return(qb.ref "#{opts.model}_item")
+      .return(qb.ref "#{vModel}_item")
       .toAQL()})[0]
     "
     @prop name, opts
@@ -1080,7 +1089,7 @@ class FoxxMC::Model extends CoreObject
     if attributes._type is "#{@moduleName()}::#{@name}"
       @super('new') arguments
     else
-      ModelClass = @findModelByName attributes._type
+      [ModelClass] = @findModelByName attributes._type
       ModelClass?.new(attributes, currentUser) ? @super('new') arguments
 
   # возвращает все доступные для определения в документе атрибуты
