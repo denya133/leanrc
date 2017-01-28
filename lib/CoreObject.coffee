@@ -422,7 +422,9 @@ class FoxxMC::CoreObject
   @defineClassProperty: (name, definition)->
     Object.defineProperty @, name, definition
 
-  @defineProperty 'Module', ->
+  # @defineProperty 'Module', ->
+  #   @constructor.Module
+  CoreObject::__defineGetter__ 'Module', ->
     @constructor.Module
 
   @moduleName: ->
