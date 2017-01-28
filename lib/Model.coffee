@@ -841,6 +841,7 @@ class FoxxMC::Model extends CoreObject
     opts.type = 'item'
     opts.model ?= inflect.singularize inflect.underscore name
     [ModelClass, vModel] = @findModelByName opts.model
+    console.log '?????????????? in belongsTo', ModelClass, ModelClass.name, vModel
     opts.collection ?= inflect.pluralize inflect.underscore vModel
     unless opts.through
       opts.definition ?= "(#{qb.for("#{vModel}_item")
