@@ -2,7 +2,7 @@ _             = require 'lodash'
 joi           = require 'joi'
 
 class {{addonPrefix}}::{{#camelize}}{{name}}{{/camelize}} extends FoxxMC::Model
-  @_rootPath: "#{__dirname}/../../"
+  @Module: {{addonPrefix}}
   @attr 'title',        joi.string().empty(null).empty('').default(null)
   @attr 'description',  joi.string().empty(null).empty('').default(null)
 

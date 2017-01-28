@@ -7,7 +7,7 @@ module.exports = function(Handlebars) {
     return function(options) {
       var current_path = process.cwd();
       var _manifest = require(path.join(current_path, 'manifest.json'));
-      return changeCase.pascalCase(_manifest.foxxmcModule.prefix);
+      return changeCase.pascalCase(_manifest.name.replace('foxxmc-', ''));
     };
   })());
 };

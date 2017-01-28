@@ -116,9 +116,8 @@ class FoxxMC::Router extends CoreObject
 
   @createFoxxRouter: (method, path, controller, action)->
     router = FoxxRouter()
-    # console.log 'GGGGGGGGGGGGGGGG createFoxxRouter', @_rootPath, @moduleName()
+    # console.log 'GGGGGGGGGGGGGGGG createFoxxRouter', @moduleName()
     controllerName = inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
-    # moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
     Controller = classes[@moduleName()]::[controllerName]
 
     # console.log '$$$$$$$$$$$$$$$$$ inflect.camelize inflect.underscore "#{controller}_controller"', inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
@@ -179,7 +178,7 @@ class FoxxMC::Router extends CoreObject
     # console.log '$$$$$$$$$$$$$ !!!! endpoint', endpoint, method, path, controller, action
     Controller["_swaggerDefFor_#{action}"]? [endpoint]...
 
-    module.context.use router
+    @Module.context.use router
 
   @defineMethod: (container, method, path, {to, at, controller, action}={})->
     unless path?
@@ -235,7 +234,7 @@ class FoxxMC::Router extends CoreObject
     @defineMethod @_routes, 'delete', path, opts
 
   @resource: (name, opts = null, lambda = null)->
-    _rootPath = @_rootPath
+    vModule = @Module
     if opts?.constructor is Function
       lambda = opts
       opts = {}
@@ -265,7 +264,7 @@ class FoxxMC::Router extends CoreObject
       "#{name}/"
     @_resources ?= []
     @_resources.push class ResourceRouter extends Router
-      @_rootPath: _rootPath
+      @Module: vModule
       @_path: full_path
       @_name: "#{parent_name}#{_name}"
       @_module: _module
@@ -276,7 +275,7 @@ class FoxxMC::Router extends CoreObject
       @map lambda
 
   @namespace: (name, opts = null, lambda = null)->
-    _rootPath = @_rootPath
+    vModule = @Module
     if opts?.constructor is Function
       lambda = opts
       opts = {}
@@ -299,7 +298,7 @@ class FoxxMC::Router extends CoreObject
     @_resources ?= []
     if lambda?.constructor is Function
       @_resources.push class NamespaceRouter extends Router
-        @_rootPath: _rootPath
+        @Module: vModule
         @_path: "#{parent_path}#{_path}"
         @_name: "#{parent_name}#{_name}"
         @_except: 'all'

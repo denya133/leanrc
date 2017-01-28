@@ -18,8 +18,6 @@ HTTP_CONFLICT     = status 'conflict'
 UNAUTHORIZED      = status 'unauthorized'
 FORBIDDEN         = status 'forbidden'
 
-{ apiKey }        = module.context.configuration
-
 ###
   ````
     Controller = require '../lib/controller'
@@ -373,6 +371,7 @@ class FoxxMC::Controller extends CoreObject
     data
 
   _checkHeader: (req) ->
+    { apiKey }        = @Module.context.configuration
     {
       authorization: authHeader
     } = req.headers

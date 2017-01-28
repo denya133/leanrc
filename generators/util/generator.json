@@ -1,0 +1,10 @@
+{
+  "files": [
+    {
+      "from": "util.coffee.hbs",
+      "to": "api/utils/{{pluralName}}.coffee"
+    }
+  ],
+  "dependencies": [],
+  "description" : "Simple util"
+}

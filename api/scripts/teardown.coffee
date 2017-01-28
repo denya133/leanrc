@@ -1,15 +1,18 @@
 { db }  = require '@arangodb'
+Module = require '../../index'
 
 
 collections = [
   ## documentCollections
   'migrations'
-  'sessions'
 
   ## edgeCollections
 ]
 
 collections.forEach (localName)->
-  qualifiedName = module.context.collectionName localName
+  qualifiedName = Module.context.collectionName localName
   if db._collection qualifiedName
     db._drop qualifiedName
+
+
+module.exports = yes

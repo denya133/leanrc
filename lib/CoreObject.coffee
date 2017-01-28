@@ -351,6 +351,7 @@ catch
 
 
 class FoxxMC::CoreObject
+  @Module: null # must be defined in child classes
   @["_#{@name}_initialHooks"] = []
   @["_#{@name}_beforeHooks"] = []
   @["_#{@name}_afterHooks"] = []
@@ -421,8 +422,11 @@ class FoxxMC::CoreObject
   @defineClassProperty: (name, definition)->
     Object.defineProperty @, name, definition
 
-  @moduleName: ()->
-    inflect.camelize require("#{@_rootPath}manifest.json").foxxmcModule.prefix
+  @defineProperty 'Module', ->
+    @constructor.Module
+
+  @moduleName: ->
+    @Module.name
 
   @_functor: (methods, collections, ..., lambda)->
     if arguments.length is 0
@@ -580,7 +584,7 @@ class FoxxMC::CoreObject
     {cleanCallback} = require './utils/cleanConfig'
 
     script =
-      mount: module.context.mount
+      mount: @Module.context.mount
       name: 'delayed_job'
     script.backOff = options.backOff if options.backOff?
     script.maxFailures = options.maxFailures if options.maxFailures?
@@ -621,19 +625,19 @@ class FoxxMC::CoreObject
   @locks: {}
 
   @_mergeLocks: (collections, otherCollections)->
-    (otherCollections.read ? []).forEach (name)->
+    (otherCollections.read ? []).forEach (name)=>
       if new RegExp('^[_].*').test name
         collectionName = name
       else
-        collectionName = module.context.collectionName name
+        collectionName = @Module.context.collectionName name
       unless collectionName in collections.read
         collections.read.push collectionName
 
-    (otherCollections.write ? []).forEach (name)->
+    (otherCollections.write ? []).forEach (name)=>
       if new RegExp('^[_].*').test name
         collectionName = name
       else
-        collectionName = module.context.collectionName name
+        collectionName = @Module.context.collectionName name
       unless collectionName in collections.write
         collections.write.push collectionName
     collections

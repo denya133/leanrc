@@ -1,9 +1,9 @@
 
 
-module.context.use Basis::SessionsUtil.middleware
+{{#camelize}}{{name}}{{/camelize}}.context.use Basis::SessionsUtil.middleware
 
 class {{#camelize}}{{name}}{{/camelize}}::ApplicationRouter extends FoxxMC::Router
-  @_rootPath: "#{__dirname}/../"
+  @Module: {{#camelize}}{{name}}{{/camelize}}
   @map ->
 
 

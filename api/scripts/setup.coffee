@@ -1,7 +1,9 @@
 { db } = require '@arangodb'
+Module = require '../../index'
+
 
 do ->
-  qualifiedName = module.context.collectionName 'migrations'
+  qualifiedName = Module.context.collectionName 'migrations'
   unless db._collection qualifiedName
     db._createDocumentCollection qualifiedName, waitForSync: yes
 
@@ -9,10 +11,5 @@ do ->
     type: 'skiplist'
     fields: ['name']
 
-do ->
-  qualifiedName = module.context.collectionName 'sessions'
-  unless db._collection qualifiedName
-    db._createDocumentCollection qualifiedName, waitForSync: yes
-  return
 
 module.exports = yes

@@ -1,7 +1,7 @@
 
 
 class {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Controller extends FoxxMC::Controller
-  @_rootPath: "#{__dirname}/../../"
+  @Module: {{addonPrefix}}
   Model: {{addonPrefix}}::{{#camelize}}{{name}}{{/camelize}}
 
   @initialHook 'checkSession'

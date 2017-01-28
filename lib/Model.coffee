@@ -392,10 +392,10 @@ class FoxxMC::Model extends CoreObject
 
   @collectionNameInDB: (name = null)->
     # console.log '!!!!!!!!!!!!$$$$$$$$$$$$$$ @collectionNameInDB', @name, name, @__super__?.constructor?.name
-    module.context.collectionName name ? @collectionName()
+    @Module.context.collectionName name ? @collectionName()
 
   @collectionPrefix: ()->
-    module.context.collectionPrefix
+    @Module.context.collectionPrefix
 
   constructor: (snapshot, currentUser=null) ->
     console.log 'Init of Model', snapshot
@@ -419,8 +419,8 @@ class FoxxMC::Model extends CoreObject
       collections = @super('getLocksFor') Model, keys, processedMethods
 
       for own key, value of @_edges()
-        do ({through:[edge]} = value)->
-          collectionName = module.context.collectionName edge
+        do ({through:[edge]} = value)=>
+          collectionName = @Module.context.collectionName edge
           unless collectionName in collections.write
             collections.write.push collectionName
           unless collectionName in collections.read
@@ -430,10 +430,10 @@ class FoxxMC::Model extends CoreObject
 
       for own key, value of @_props()
         if value.serializable? or value.valuable?
-          do ({model, collections:_collections} = value)->
+          do ({model, collections:_collections} = value)=>
             unless model in SIMPLE_TYPES
               methods.push "#{inflect.classify model}.find" if value.valuable?
-              collectionName = module.context.collectionName inflect.pluralize inflect.underscore model
+              collectionName = @Module.context.collectionName inflect.pluralize inflect.underscore model
               collections.read.push collectionName unless collectionName in collections.read
             if _collections?
               if _collections.constructor is Array
@@ -444,8 +444,8 @@ class FoxxMC::Model extends CoreObject
                 items = _collections.read
               else if _collections.constructor is Object and _collections.read.constructor is String
                 items = [_collections.read]
-              items.forEach (item)->
-                collectionName = module.context.collectionName item
+              items.forEach (item)=>
+                collectionName = @Module.context.collectionName item
                 collections.read.push collectionName unless collectionName in collections.read
 
       for own key, value of @_comps()
@@ -544,7 +544,7 @@ class FoxxMC::Model extends CoreObject
     queues  = require '@arangodb/foxx/queues'
     {db}    = require '@arangodb'
     {cleanCallback} = require './utils/cleanConfig'
-    mount = module.context.mount
+    mount = @Module.context.mount
 
     queues.get('signals').push(
       {mount: mount, name: 'send_signal'}
@@ -562,6 +562,15 @@ class FoxxMC::Model extends CoreObject
     )
     return
 
+  @findModelByName: (aName)->
+    if /.*[:][:].*/.test(aName)
+      [moduleName, modelName] = key.split '::'
+      return classes[moduleName]::[modelName]
+    classes[@moduleName()]::[inflect.camelize inflect.underscore aName]
+
+  findModelByName: (aName)->
+    @constructor.findModelByName aName
+
   updateEdges: (data)->
     oldObject = @_old
     newObject = @
@@ -569,7 +578,7 @@ class FoxxMC::Model extends CoreObject
     for own key, value of @constructor._edges()
       do (key, {model, through:[edge]}=value)=>
         if oldObject[key] isnt newObject[key]
-          RelatedModel = require "#{@constructor._rootPath}dist/models/#{model}"
+          RelatedModel = @findModelByName model
           if oldObject[key]?
             relatedObject = RelatedModel.find oldObject[key]
             db[@constructor.collectionNameInDB edge].removeByExample
@@ -580,7 +589,7 @@ class FoxxMC::Model extends CoreObject
             db[@constructor.collectionNameInDB edge].save
               _from:  newObject._id
               _to:    relatedObject._id
-              _type:  edge
+              _type:  "#{@moduleName()}::#{inflect.camelize edge}" # edge
     return data
 
   @attribute: ->
@@ -657,7 +666,7 @@ class FoxxMC::Model extends CoreObject
     if valuable?
       schema = ()=>
         unless model in SIMPLE_TYPES
-          ModelClass = require "#{@_rootPath}dist/models/#{model}"
+          ModelClass = @findModelByName model
         return if model in ['string', 'boolean', 'number']
           joi[model]().empty(null).optional()
         else if model is 'date'
@@ -691,7 +700,7 @@ class FoxxMC::Model extends CoreObject
             get: ()->
               ModelClass = null
               unless model in SIMPLE_TYPES
-                ModelClass = require "#{@constructor._rootPath}dist/models/#{model}"
+                ModelClass = @findModelByName model
               if (item = @["__#{name}"])?
                 if model in SIMPLE_TYPES
                   return serializeForClient item
@@ -739,7 +748,7 @@ class FoxxMC::Model extends CoreObject
             get: ()->
               ModelClass = null
               unless model in SIMPLE_TYPES
-                ModelClass = require "#{@constructor._rootPath}dist/models/#{model}"
+                ModelClass = @findModelByName model
                 _bindings = extend {}, bindings
                 if _bindings.docKey is 'docKey'
                   _bindings.docKey = @_key
@@ -766,7 +775,7 @@ class FoxxMC::Model extends CoreObject
     if valuable?
       schema = ()=>
         unless model in SIMPLE_TYPES
-          ModelClass = require "#{@_rootPath}dist/models/#{model}"
+          ModelClass = @findModelByName model
         return if model in ['string', 'boolean', 'number']
           joi[model]().empty(null).optional()
         else if model is 'date'
@@ -1068,10 +1077,10 @@ class FoxxMC::Model extends CoreObject
       .select 'doc'
 
   @new: @method (attributes, currentUser=null)->
-    if attributes._type is inflect.underscore @name
+    if attributes._type is "#{@moduleName()}::#{@name}"
       @super('new') arguments
     else
-      ModelClass = require "#{@_rootPath}dist/models/#{attributes._type}"
+      ModelClass = @findModelByName attributes._type
       ModelClass?.new(attributes, currentUser) ? @super('new') arguments
 
   # возвращает все доступные для определения в документе атрибуты
@@ -1452,7 +1461,7 @@ class FoxxMC::Model extends CoreObject
 
   @serializeFromBatch: (obj)->
     res = _.omit obj, ['_id', '_rev', 'rev', 'type', '_type', '_owner', '_space', '_from', '_to']
-    res._type = inflect.underscore @name
+    res._type = "#{@moduleName()}::#{@name}" #inflect.underscore @name
     for own prop, prop_opts of @properties()
       unless (serializableName = prop_opts.valuableAs)?
         serializableName = prop
