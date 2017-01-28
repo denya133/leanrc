@@ -4,6 +4,7 @@ joi           = require 'joi'
 qb            = require 'aqb'
 crypto        = require '@arangodb/crypto'
 inflect       = require('i')()
+fs            = require 'fs'
 
 
 SIMPLE_TYPES  = ['string', 'number', 'boolean', 'date', 'object']
@@ -566,11 +567,19 @@ module.exports = (FoxxMC)->
 
     @findModelByName: (aName)->
       if /.*[:][:].*/.test(aName)
-        [moduleName, modelName] = aName.split '::'
-        console.log 'LLLLLLLLLLLLLLL iiiiii', aName, moduleName, modelName, classes[moduleName]::[modelName], inflect.singularize inflect.underscore modelName
-        return [classes[moduleName]::[modelName], inflect.singularize inflect.underscore modelName]
-      console.log 'LLLLLLLLLLLLLLL iiiiii ----', @moduleName(), classes[@moduleName()], inflect.camelize(inflect.underscore aName), classes[@moduleName()]::[inflect.camelize inflect.underscore aName]?
-      [classes[@moduleName()]::[inflect.camelize inflect.underscore aName], aName]
+        [moduleName, vModel] = aName.split '::'
+        # console.log 'LLLLLLLLLLLLLLL iiiiii', aName, moduleName, modelName, classes[moduleName]::[modelName], inflect.singularize inflect.underscore modelName
+        # return [classes[moduleName]::[modelName], inflect.singularize inflect.underscore modelName]
+      else
+        [moduleName, vModel] = [@moduleName(), inflect.camelize inflect.underscore aName]
+
+      modelName = inflect.singularize inflect.underscore vModel
+      unless (ModelClass = classes[moduleName]::[vModel])?
+        ModelClass = require fs.join classes[moduleName].context.basePath, 'dist', 'models', modelName
+      console.log 'LLLLLLLLLLLLLLL iiiiii', aName, moduleName, vModel, ModelClass, modelName
+      [ModelClass, modelName]
+      # console.log 'LLLLLLLLLLLLLLL iiiiii ----', @moduleName(), classes[@moduleName()], inflect.camelize(inflect.underscore aName), classes[@moduleName()]::[inflect.camelize inflect.underscore aName]?
+      # [classes[@moduleName()]::[inflect.camelize inflect.underscore aName], aName]
 
     findModelByName: (aName)->
       @constructor.findModelByName aName
