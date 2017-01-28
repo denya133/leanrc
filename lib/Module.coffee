@@ -45,9 +45,10 @@ class FoxxMC::Module extends CoreObject
     return
 
   @initialize: ->
+    console.log '??????????????>>>> Module.initialize 111', @, @name, @context
     super
     global[@name] = @
-
+    console.log '??????????????>>>> Module.initialize 222', @, @name, @context
     extend @, _.omit @context.manifest, ['name']
 
     global['classes'] ?= {}
