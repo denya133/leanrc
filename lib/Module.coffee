@@ -98,7 +98,7 @@ FoxxMC::Module.initialize = ->
   Module.super('initialize') arguments
   global[@name] = @
   console.log '??????????????>>>> Module.initialize 222', @, @name, @context
-  extend @, _.omit @context.manifest, ['name']
+  # extend @, _.omit @context.manifest, ['name']
 
   global['classes'] ?= {}
   global['classes'][@name] = @
