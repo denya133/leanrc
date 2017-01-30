@@ -276,7 +276,7 @@ catch
       console.log '%%%%%%%%%%%%%%%%%%% recordHasBeenChanged data', data
       queues  = require '@arangodb/foxx/queues'
       {db}    = require '@arangodb'
-      {cleanCallback} = require './utils/cleanConfig'
+      {cleanCallback} = require('./utils/cleanConfig') FoxxMC
       mount = module.context.mount
 
       queues.get('signals').push(
@@ -585,7 +585,7 @@ module.exports = (FoxxMC)->
       read: ['_queues'], write: ['_jobs']
     , (data, options = {})->
       queues  = require '@arangodb/foxx/queues'
-      {cleanCallback} = require './utils/cleanConfig'
+      {cleanCallback} = require('./utils/cleanConfig') FoxxMC
 
       script =
         mount: @Module.context.mount
