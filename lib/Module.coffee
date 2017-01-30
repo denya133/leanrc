@@ -1,6 +1,7 @@
 _             = require 'lodash'
 inflect       = require('i')()
 fs            = require 'fs'
+semver        = require 'semver'
 FoxxRouter    = require '@arangodb/foxx/router'
 
 
@@ -43,7 +44,13 @@ module.exports = (FoxxMC)->
       if @context.manifest.dependencies?
         for own dependencyName, dependencyDefinition of @context.manifest.dependencies
           do ({name, version}=dependencyDefinition)=>
-            @context.dependencies[dependencyName]
+            vModule = @context.dependencies[dependencyName]
+            unless semver.satisfies vModule.context.manifest.version, version
+              throw new Error "
+                Dependent module #{vModule.name} not compatible.
+                This module required version #{version} but #{vModule.name} version is #{vModule.context.manifest.version}.
+              "
+              return
             return
       return
 
