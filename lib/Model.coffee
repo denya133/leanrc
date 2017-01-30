@@ -565,9 +565,6 @@ module.exports = (FoxxMC)->
       )
       return
 
-    # recordHasBeenChanged: ->
-    #   return
-
     @parseModelName: (aName)->
       if /.*[:][:].*/.test(aName)
         [moduleName, vModel] = aName.split '::'
