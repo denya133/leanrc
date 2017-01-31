@@ -255,6 +255,8 @@ module.exports = (FoxxMC)->
     # ------------ Default definitions ---------
     @chains ['list', 'detail', 'create', 'update', 'delete']
 
+    @initialHook 'initializeDependencies'
+
     @beforeHook 'beforeList',       only: ['list']
     @beforeHook 'beforeDetail',     only: ['detail']
     @beforeHook 'beforeCreate',     only: ['create']
@@ -313,6 +315,10 @@ module.exports = (FoxxMC)->
       # console.log 'Init of Controller'
       super arguments...
       return
+
+    initializeDependencies: (args...)->
+      @constructor.Module.initializeModules()
+      args
 
     # здесь как в рельсах должно быть joi описание для валидации при create и update
     permitBody: (body, currentUser)->
