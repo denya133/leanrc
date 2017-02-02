@@ -124,8 +124,9 @@ module.exports = (FoxxMC)->
         Retrieves the permitted_section by its key.
       "
       router.get '/version', (req, res)=>
-        res.send @context.manifest.version
-      .response     joi.string(), "
+        {version} = @context.manifest
+        res.send {version}
+      .response     joi.object(version: joi.string()), "
         Version of this service in semver format.
       "
       .summary      "
