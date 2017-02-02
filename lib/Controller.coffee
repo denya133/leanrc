@@ -262,6 +262,7 @@ module.exports = (FoxxMC)->
     @beforeHook 'beforeCreate',     only: ['create']
     @beforeHook 'permitBody',       only: ['create', 'update']
     @beforeHook 'setOwnerId',       only: ['create']
+    @beforeHook 'protectOwnerId',   only: ['update']
     @beforeHook 'beforeUpdate',     only: ['update']
     @beforeHook 'beforeDelete',     only: ['delete']
 
@@ -331,6 +332,11 @@ module.exports = (FoxxMC)->
       @isValid()
       body.ownerId = currentUser?._key ? null
       [body, currentUser]
+
+    protectOwnerId: (body, currentUser)->
+      @isValid()
+      _body = _.omit body, ['ownerId']
+      [_body, currentUser]
 
     beforeList: ()->
       { currentUser } = @req
