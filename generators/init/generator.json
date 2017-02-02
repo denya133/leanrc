@@ -28,8 +28,8 @@
       "from": "package.json.hbs",
       "to": "package.json"
     },{
-      "from": "Readme.md.hbs",
-      "to": "Readme.md"
+      "from": "README.md.hbs",
+      "to": "README.md"
     },{
       "from": "index.coffee.hbs",
       "to": "index.coffee"
