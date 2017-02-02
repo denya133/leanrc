@@ -852,7 +852,7 @@ module.exports = (FoxxMC)->
           type: 'item'
           model: 'string'
           attr: opts.attr
-          schema: schema
+          schema: -> schema
           definition: "(doc.#{opts.attr})"
           valuable: "#{name}Id"
           filterable: "#{name}Id"
