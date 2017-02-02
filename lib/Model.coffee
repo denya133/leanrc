@@ -113,7 +113,6 @@ class Tomato extends Model
       queues.get('signals').push(
         {mount: mount, name: 'send_signal'}
         {
-          mount:      mount.replace '/', ''
           db:         db._name()
           signal:     signal
           modelName:  data._type
@@ -552,7 +551,6 @@ module.exports = (FoxxMC)->
       queues.get('signals').push(
         {mount: mount, name: 'send_signal'}
         {
-          mount:      mount.replace '/', ''
           db:         db._name()
           signal:     signal
           modelName:  data._type

@@ -7,7 +7,6 @@ util          = require 'util'
 
 # For test
 # {
-#   "mount": "api",
 #   "db": "<db name>",
 #   "signal": "updateObject",
 #   "modelName": "user",
@@ -15,7 +14,6 @@ util          = require 'util'
 # }
 
 dataSchema =  joi.object(
-  mount:        joi.string().required()
   db:           joi.string().required()
   signal:       joi.string().required()
   modelName:    joi.string().required()
@@ -41,7 +39,7 @@ module.exports = (FoxxMC)->
           record_id :payload.record_id
         } = data
 
-        response = request.post "#{streamServer}_stream/#{data.db}/#{data.mount}/signals",
+        response = request.post "#{streamServer}_stream/#{data.db}/stream/signals",
           body: JSON.stringify payload
           headers:
             'accept': 'application/json'
