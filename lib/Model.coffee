@@ -608,7 +608,7 @@ module.exports = (FoxxMC)->
               db[@constructor.collectionNameInDB edge].save
                 _from:  newObject._id
                 _to:    relatedObject._id
-                _type:  "#{@moduleName()}::#{inflect.camelize edge}" # edge
+                _type:  "#{@constructor.moduleName()}::#{inflect.camelize edge}" # edge
       return data
 
     @attribute: ->
