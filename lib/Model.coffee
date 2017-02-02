@@ -614,12 +614,12 @@ module.exports = (FoxxMC)->
     @attribute: ->
       @attr arguments...
 
-    @attr: (name, scheme, opts={})->
+    @attr: (name, schema, opts={})->
       {valuable, sortable, groupable, filterable} = opts
       @["_#{@name}_attrs"] ?= {}
       @["_#{@name}_edges"] ?= {}
       unless @["_#{@name}_attrs"][name]
-        @["_#{@name}_attrs"][name] = scheme
+        @["_#{@name}_attrs"][name] = schema
         @["_#{@name}_edges"][name] = opts if opts.through
       else
         throw new Error "attr `#{name}` has been defined previously"
@@ -843,15 +843,16 @@ module.exports = (FoxxMC)->
         throw new Error "comp `#{name}` has been defined previously"
       return
 
-    @belongsTo: (name, scheme, opts = {})->
+    @belongsTo: (name, schema, opts = {})->
       opts.attr ?= "#{name}Id"
       opts.refKey ?= '_key'
-      @attr opts.attr, scheme, opts
+      @attr opts.attr, schema, opts
       if opts.attr isnt "#{name}Id"
         @prop "#{name}Id",
           type: 'item'
           model: 'string'
           attr: opts.attr
+          schema: schema
           definition: "(doc.#{opts.attr})"
           valuable: "#{name}Id"
           filterable: "#{name}Id"
