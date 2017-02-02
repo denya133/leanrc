@@ -76,9 +76,9 @@ module.exports = (FoxxMC)->
         id: section
         module: @name
         actions: Mapping[section]
-      router.get '/sections', (req, res)->
+      router.get '/permitted_sections', (req, res)->
         res.send {availableSections}
-      router.get '/sections/:section', (req, res)=>
+      router.get '/permitted_sections/:section', (req, res)=>
         switch req.pathParams.section
           when 'system'
             availableSection =
@@ -96,6 +96,8 @@ module.exports = (FoxxMC)->
               module: @name
               actions: Mapping[req.pathParams.section]
         res.send {availableSection}
+      router.get '/version', (req, res)=>
+        res.send @context.manifest.version
 
       @context.use router
 
