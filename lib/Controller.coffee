@@ -260,11 +260,13 @@ module.exports = (FoxxMC)->
     @beforeHook 'beforeList',       only: ['list']
     @beforeHook 'beforeDetail',     only: ['detail']
     @beforeHook 'beforeCreate',     only: ['create']
-    @beforeHook 'permitBody',       only: ['create', 'update']
-    @beforeHook 'setOwnerId',       only: ['create']
-    @beforeHook 'protectOwnerId',   only: ['update']
     @beforeHook 'beforeUpdate',     only: ['update']
     @beforeHook 'beforeDelete',     only: ['delete']
+
+    @beforeHook 'permitBodyForCreate', only: ['create']
+    @beforeHook 'permitBodyForUpdate', only: ['update']
+    @beforeHook 'setOwnerId',       only: ['create']
+    @beforeHook 'protectOwnerId',   only: ['update']
 
     @afterHook 'afterCreate',       only: ['create']
     @afterHook 'afterUpdate',       only: ['update']
@@ -321,22 +323,27 @@ module.exports = (FoxxMC)->
       @constructor.Module.initializeModules()
       args
 
-    # здесь как в рельсах должно быть joi описание для валидации при create и update
-    permitBody: (body, currentUser)->
+    permitBodyForCreate: (body, currentUser)->
       @isValid()
       {value:data} = @constructor.clientSchema().validate body
       patchData = data["#{inflect.underscore @Model.name}"]
       [patchData, currentUser]
+
+    permitBodyForUpdate: (id, body, currentUser)->
+      @isValid()
+      {value:data} = @constructor.clientSchema().validate body
+      patchData = data["#{inflect.underscore @Model.name}"]
+      [id, patchData, currentUser]
 
     setOwnerId: (body, currentUser)->
       @isValid()
       body.ownerId = currentUser?._key ? null
       [body, currentUser]
 
-    protectOwnerId: (body, currentUser)->
+    protectOwnerId: (id, body, currentUser)->
       @isValid()
       _body = _.omit body, ['ownerId']
-      [_body, currentUser]
+      [id, _body, currentUser]
 
     beforeList: ()->
       { currentUser } = @req
