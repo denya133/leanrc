@@ -1,4 +1,5 @@
 _             = require 'lodash'
+joi           = require 'joi'
 inflect       = require('i')()
 fs            = require 'fs'
 semver        = require 'semver'
@@ -76,8 +77,25 @@ module.exports = (FoxxMC)->
         id: section
         module: @name
         actions: Mapping[section]
+      sectionSchema = joi.object
+        id:       joi.string()
+        module:   joi.string()
+        actions:  joi.array().items(joi.string())
+      sectionsSchemaForArray = joi.object
+        availableSections: joi.array().items sectionSchema
+      sectionsSchemaForItem = joi.object
+        availableSection: sectionSchema
       router.get '/permitted_sections', (req, res)->
         res.send {availableSections}
+      .response     sectionsSchemaForArray, "
+        The permitted_sections.
+      "
+      .summary      "
+        List of permitted_sections
+      "
+      .description  "
+        Retrieves a list of permitted_sections.
+      "
       router.get '/permitted_sections/:section', (req, res)=>
         switch req.pathParams.section
           when 'system'
@@ -96,8 +114,26 @@ module.exports = (FoxxMC)->
               module: @name
               actions: Mapping[req.pathParams.section]
         res.send {availableSection}
+      .response     sectionsSchemaForItem, "
+        The permitted_section.
+      "
+      .summary      "
+        Fetch the permitted_section
+      "
+      .description  "
+        Retrieves the permitted_section by its key.
+      "
       router.get '/version', (req, res)=>
         res.send @context.manifest.version
+      .response     joi.string(), "
+        Version of this service in semver format.
+      "
+      .summary      "
+        Semver version of this service
+      "
+      .description  "
+        Version may will be checked other services for still compatible
+      "
 
       @context.use router
 
