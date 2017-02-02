@@ -1,4 +1,4 @@
-require 'FoxxMC'
+FoxxMC      = require 'FoxxMC'
 
 
 FoxxMC::Scripts.delayedJob
