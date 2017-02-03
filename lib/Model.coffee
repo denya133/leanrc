@@ -539,29 +539,7 @@ module.exports = (FoxxMC)->
       @recordHasBeenChanged 'deletedObject', data
       data
 
-    recordHasBeenChanged: @method []
-    , {read: ['_queues'], write: ['_jobs']}
-    , (signal, data)->
-      # console.log '%%%%%%%%%%%%%%%%%%% recordHasBeenChanged data', data
-      queues  = require '@arangodb/foxx/queues'
-      {db}    = require '@arangodb'
-      {cleanCallback} = require('./utils/cleanConfig') FoxxMC
-      mount = @Module.context.mount
-
-      queues.get('signals').push(
-        {mount: mount, name: 'send_signal'}
-        {
-          db:         db._name()
-          signal:     signal
-          modelName:  data._type
-          record_id:  data._key
-        }
-        {
-          success: cleanCallback "success: `send_signal`"
-          failure: cleanCallback "failure: `send_signal`"
-        }
-      )
-      return
+    recordHasBeenChanged: ->
 
     @parseModelName: (aName)->
       if /.*[:][:].*/.test(aName)

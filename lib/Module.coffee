@@ -44,14 +44,16 @@ module.exports = (FoxxMC)->
     @initializeModules: ->
       if @context.manifest.dependencies?
         for own dependencyName, dependencyDefinition of @context.manifest.dependencies
-          do ({name, version}=dependencyDefinition)=>
-            vModule = @context.dependencies[dependencyName]
-            unless semver.satisfies vModule.context.manifest.version, version
-              throw new Error "
-                Dependent module #{vModule.name} not compatible.
-                This module required version #{version} but #{vModule.name} version is #{vModule.context.manifest.version}.
-              "
-              return
+          do ({name, version, outside}=dependencyDefinition)=>
+            outside ?= no
+            unless outside
+              vModule = @context.dependencies[dependencyName]
+              unless semver.satisfies vModule.context.manifest.version, version
+                throw new Error "
+                  Dependent module #{vModule.name} not compatible.
+                  This module required version #{version} but #{vModule.name} version is #{vModule.context.manifest.version}.
+                "
+                return
             return
       return
 
