@@ -16,6 +16,7 @@ HTTP_NOT_FOUND    = status 'not found'
 HTTP_CONFLICT     = status 'conflict'
 UNAUTHORIZED      = status 'unauthorized'
 FORBIDDEN         = status 'forbidden'
+UPGRADE_REQUIRED  = status 'upgrade required'
 
 ###
   ````
@@ -109,6 +110,9 @@ module.exports = (FoxxMC)->
     @swaggerDefinition 'list', (endpoint)->
       @isValid()
       endpoint
+        .pathParam   'v', joi.string().required(), "
+          The version of api endpoint in format `vx.x`
+        "
         .queryParam   'query', @querySchema, "
           The query for finding
           #{inflect.pluralize inflect.underscore @::Model.name}.
@@ -117,6 +121,7 @@ module.exports = (FoxxMC)->
           The #{inflect.pluralize inflect.underscore @::Model.name}.
         "
         .error        UNAUTHORIZED
+        .error        UPGRADE_REQUIRED
         .summary      "
           List of filtered #{inflect.pluralize inflect.underscore @::Model.name}
         "
@@ -128,12 +133,16 @@ module.exports = (FoxxMC)->
     @swaggerDefinition 'detail', (endpoint)->
       @isValid()
       endpoint
+        .pathParam   'v', joi.string().required(), "
+          The version of api endpoint in format `vx.x`
+        "
         .pathParam    @keyName(), @keySchema
         .response     @clientSchema(), "
           The #{inflect.singularize inflect.underscore @::Model.name}.
         "
         .error        HTTP_NOT_FOUND
         .error        UNAUTHORIZED
+        .error        UPGRADE_REQUIRED
         .summary      "
           Fetch the #{inflect.singularize inflect.underscore @::Model.name}
         "
@@ -145,6 +154,9 @@ module.exports = (FoxxMC)->
     @swaggerDefinition 'create', (endpoint)->
       @isValid()
       endpoint
+        .pathParam   'v', joi.string().required(), "
+          The version of api endpoint in format `vx.x`
+        "
         .body @clientSchema().required(), "
           The #{inflect.singularize inflect.underscore @::Model.name} to create.
         "
@@ -156,6 +168,7 @@ module.exports = (FoxxMC)->
           exists.
         "
         .error        UNAUTHORIZED
+        .error        UPGRADE_REQUIRED
         .summary      "
           Create a new #{inflect.singularize inflect.underscore @::Model.name}
         "
@@ -167,7 +180,11 @@ module.exports = (FoxxMC)->
 
     @swaggerDefinition 'update', (endpoint)->
       @isValid()
-      endpoint.pathParam @keyName(), @keySchema
+      endpoint
+        .pathParam   'v', joi.string().required(), "
+          The version of api endpoint in format `vx.x`
+        "
+        .pathParam @keyName(), @keySchema
         .body         @clientSchema().required(), "
           The data to replace the
           #{inflect.singularize inflect.underscore @::Model.name} with.
@@ -178,6 +195,7 @@ module.exports = (FoxxMC)->
         .error        HTTP_NOT_FOUND
         .error        HTTP_CONFLICT
         .error        UNAUTHORIZED
+        .error        UPGRADE_REQUIRED
         .summary      "
           Replace the #{inflect.singularize inflect.underscore @::Model.name}
         "
@@ -189,7 +207,11 @@ module.exports = (FoxxMC)->
 
     @swaggerDefinition 'patch', (endpoint)->
       @isValid()
-      endpoint.pathParam @keyName(), @keySchema
+      endpoint
+        .pathParam   'v', joi.string().required(), "
+          The version of api endpoint in format `vx.x`
+        "
+        .pathParam @keyName(), @keySchema
         .body         @clientSchema().description("
           The data to update the
           #{inflect.singularize inflect.underscore @::Model.name} with.
@@ -200,6 +222,7 @@ module.exports = (FoxxMC)->
         .error        HTTP_NOT_FOUND
         .error        HTTP_CONFLICT
         .error        UNAUTHORIZED
+        .error        UPGRADE_REQUIRED
         .summary      "
           Update the #{inflect.singularize inflect.underscore @::Model.name}
         "
@@ -210,9 +233,14 @@ module.exports = (FoxxMC)->
 
     @swaggerDefinition 'delete', (endpoint)->
       @isValid()
-      endpoint.pathParam @keyName(), @keySchema
+      endpoint
+        .pathParam   'v', joi.string().required(), "
+          The version of api endpoint in format `vx.x`
+        "
+        .pathParam @keyName(), @keySchema
         .error        HTTP_NOT_FOUND
         .error        UNAUTHORIZED
+        .error        UPGRADE_REQUIRED
         .response     null
         .summary      "
           Remove the #{inflect.singularize inflect.underscore @::Model.name}
@@ -256,6 +284,7 @@ module.exports = (FoxxMC)->
     @chains ['list', 'detail', 'create', 'update', 'delete']
 
     @initialHook 'initializeDependencies'
+    @initialHook 'checkApiVersion'
 
     @beforeHook 'beforeList',       only: ['list']
     @beforeHook 'beforeDetail',     only: ['detail']
@@ -322,6 +351,17 @@ module.exports = (FoxxMC)->
 
     initializeDependencies: (args...)->
       @constructor.Module.initializeModules()
+      args
+
+    checkApiVersion: (args...)->
+      vVersion = @req.pathParams.v
+      vCurrentVersion = @constructor.Module.context.manifest.version
+      sendError = =>
+        @res.throw UPGRADE_REQUIRED, "Upgrade: v#{vCurrentVersion}"
+      unless /[v]\d{1,}[.]\d{1,}/.test vVersion
+        sendError()
+      unless new RegExp(vVersion).test "v#{vCurrentVersion}"
+        sendError()
       args
 
     permitBodyForCreate: (body, currentUser)->

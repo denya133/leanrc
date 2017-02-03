@@ -6,6 +6,7 @@ FoxxMC        = require 'FoxxMC'
 class {{#camelize}}{{name}}{{/camelize}}::ApplicationRouter extends FoxxMC::Router
   @Module: {{#camelize}}{{name}}{{/camelize}}
   @map ->
+    @namespace 'version', module: '', prefix: ':v', ->
 
 
 module.exports = {{#camelize}}{{name}}{{/camelize}}::ApplicationRouter.initialize()
