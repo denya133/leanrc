@@ -356,9 +356,10 @@ module.exports = (FoxxMC)->
     checkApiVersion: (args...)->
       vVersion = @req.pathParams.v
       vCurrentVersion = @constructor.Module.context.manifest.version
+      [vNeedVersion] = vCurrentVersion.match /^\d{1,}[.]\d{1,}/
       sendError = =>
-        @res.throw UPGRADE_REQUIRED, "Upgrade: v#{vCurrentVersion}"
-      unless /[v]\d{1,}[.]\d{1,}/.test vVersion
+        @res.throw UPGRADE_REQUIRED, "Upgrade: v#{vNeedVersion}"
+      unless /^[v]\d{1,}[.]\d{1,}/.test vVersion
         sendError()
       unless new RegExp(vVersion).test "v#{vCurrentVersion}"
         sendError()
