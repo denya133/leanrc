@@ -44,9 +44,9 @@ module.exports = (FoxxMC)->
     @initializeModules: ->
       if @context.manifest.dependencies?
         for own dependencyName, dependencyDefinition of @context.manifest.dependencies
-          do ({name, version, outside}=dependencyDefinition)=>
-            outside ?= no
-            unless outside
+          do ({name, version, required}=dependencyDefinition)=>
+            required ?= no
+            if required
               vModule = @context.dependencies[dependencyName]
               unless semver.satisfies vModule.context.manifest.version, version
                 throw new Error "
