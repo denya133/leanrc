@@ -72,26 +72,26 @@ class Tomato extends Model
     valuable: 'cats[*].title' # если вычисляемое свойство содержит массив, то в valuable можно указать либо массив целиком `cats`, либо деструктуризацию `cats[*].title` - что эквивалентно cats.mapBy 'title'
     attr: 'categoryId'
 
-  @collectionName: ()-> 'cucumbers' # задаем явным образом если модель должна работать с абсолютно другой коллекцией в базе данных - не зависящей от имени модели.
+  @collectionName: -> 'cucumbers' # задаем явным образом если модель должна работать с абсолютно другой коллекцией в базе данных - не зависящей от имени модели.
 
   # если в методе экземпляра класса идет работа с коллекцией в базе данных (чтение, запись), то надо сделать описание этого, для механизма конструирующего локи на базе для транцикции
   ```
-    afterCreateMethods: ()-> ['::recordHasBeenChanged'] # т.к. внутри afterCreate метода экземпляра идет работа с @recordHasBeenChanged методом тоже экземпляра этого же класса
-    afterCreateCollections: ()->
+    afterCreateMethods: -> ['::recordHasBeenChanged'] # т.к. внутри afterCreate метода экземпляра идет работа с @recordHasBeenChanged методом тоже экземпляра этого же класса
+    afterCreateCollections: ->
       {}
     afterCreate: (data)->
       @recordHasBeenChanged 'createdObject', data
       data
 
     @createMethods: ['.new', '::save'] # '.new' - т.к. вызывается метод класса, '::save' - т.к. вызывается метод экземпляра класса
-    @createCollections: ()-> # может быть ничего не указано, если непосредственно внутри метода нет работы с конкретной коллекцией
+    @createCollections: -> # может быть ничего не указано, если непосредственно внутри метода нет работы с конкретной коллекцией
       {}
     @create: (attributes)->
       record = @new attributes
       record.save()
 
-    @resetAttrMethods: ()-> ['Account.new', 'TransactionsController::save'] # перед '.' или '::' в полной записи может идти имя класса, если оно отличается от текущего
-    @resetAttrCollections: ()->
+    @resetAttrMethods: -> ['Account.new', 'TransactionsController::save'] # перед '.' или '::' в полной записи может идти имя класса, если оно отличается от текущего
+    @resetAttrCollections: ->
       {}
     @resetAttr: (attributes)->
       record = Account.new attributes
@@ -100,8 +100,8 @@ class Tomato extends Model
         transaction.some_attr += 1
         transaction.save()
 
-    recordHasBeenChangedMethods: ()-> [] # может быть ничего не указано, если методы других классов или инстансов классов не вызываются
-    recordHasBeenChangedCollections: ()-> # указываем '_queues' лок на чтение и '_jobs' лок на запись, тк. queues.get('signals').push внутри работает с этими коллекциями.
+    recordHasBeenChangedMethods: -> [] # может быть ничего не указано, если методы других классов или инстансов классов не вызываются
+    recordHasBeenChangedCollections: -> # указываем '_queues' лок на чтение и '_jobs' лок на запись, тк. queues.get('signals').push внутри работает с этими коллекциями.
       read: ['_queues'], write: ['_jobs']
     recordHasBeenChanged: (signal, data)->
       console.log '%%%%%%%%%%%%%%%%%%% recordHasBeenChanged data', data
@@ -136,12 +136,12 @@ class Tomato extends Model
 
     @chains ['verify', 'count'] # если в модели унаследованной от Model надо объявить цепи для методов
 
-    constructor: () -> # именно в конструкторе надо через методы beforeHook и afterHook объявить методы инстанса класса, которые будут использованы в качестве звеньев цепей
+    constructor: -> # именно в конструкторе надо через методы beforeHook и afterHook объявить методы инстанса класса, которые будут использованы в качестве звеньев цепей
       super
 
-    beforeVerify: ()->
+    beforeVerify: ->
 
-    beforeCount: ()->
+    beforeCount: ->
 
     afterVerify: (data)->
       data
@@ -151,7 +151,7 @@ class Tomato extends Model
   ```
 
   # так же в модели можно задефайнить машину состояний - управляющий код для ее работы реализован в CoreObject
-  @StateMachine 'default', ()->
+  @StateMachine 'default', ->
     <...>
 
   # Со всеми остальными методами класса и методами экземпляра класса Model лучше ознакомитсья самостоятельно ниже по коду
@@ -159,9 +159,9 @@ class Tomato extends Model
 
   # Помимо прочего в модели можно указать кастомные фильтры, которые могут быть применены, при запросах из браузера на произвольную фильтрацию
   ```
-    @customFilters ()->
+    @customFilters ->
       _pack_valid:
-        '{=}': ()=>
+        '{=}': =>
           date_now = new Date().toISOString()
           condition: "
             (doc._type != 'adz' || doc._type == 'adz' && doc.packId IN (
@@ -359,7 +359,7 @@ module.exports = (FoxxMC)->
   class FoxxMC::Model extends CoreObject
     @["_#{@name}_customFilters"] = {}
 
-    @schema:        ()->
+    @schema:        ->
       joi.object @_attrs()
 
     @customFilters: (statement)->
@@ -386,7 +386,7 @@ module.exports = (FoxxMC)->
       _.uniq [].concat(fromSuper ? [])
         .concat [AbstractClass.name]
 
-    @collectionName: ()->
+    @collectionName: ->
       # console.log '!!!!!!!!!!!!$$$$$$$$$$$$$$ @collectionName', @name, @__super__?.constructor?.name
       firstClassName = _.first _.remove @_parentClassesNames(), (name)->
         not (/Mixin$/.test(name) or name in ['CoreObject', 'Model'])
@@ -396,7 +396,7 @@ module.exports = (FoxxMC)->
       # console.log '!!!!!!!!!!!!$$$$$$$$$$$$$$ @collectionNameInDB', @name, name, @__super__?.constructor?.name
       @Module.context.collectionName name ? @collectionName()
 
-    @collectionPrefix: ()->
+    @collectionPrefix: ->
       @Module.context.collectionPrefix
 
     constructor: (snapshot, currentUser=null) ->
@@ -509,19 +509,19 @@ module.exports = (FoxxMC)->
         # console.log '$%$%$%$%$% collections666******', collections
         collections
 
-    beforeSave: ()->
+    beforeSave: ->
 
     afterSave: (data)->
       data
 
-    beforeCreate: ()->
+    beforeCreate: ->
 
-    beforeUpdate: ()->
+    beforeUpdate: ->
       @updatedAt = new Date().toISOString()
       # console.log '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ beforeUpdate'
-      return @
+      return
 
-    beforeDelete: ()->
+    beforeDelete: ->
       @isHidden = yes
       @updatedAt = new Date().toISOString()
       return
@@ -659,7 +659,7 @@ module.exports = (FoxxMC)->
       unless definition? and type? and model?
         return throw new Error '`definition`, `type` and `model` options is required'
       if valuable?
-        schema = ()=>
+        schema = =>
           unless model in SIMPLE_TYPES
             [ModelClass, vModel] = @findModelByName model
           else
@@ -683,7 +683,7 @@ module.exports = (FoxxMC)->
             [..., prop_name] = valuable.split '.'
             joi.array().items ModelClass.attributes()[prop_name]
       else
-        schema = ()-> {}
+        schema = -> {}
       opts.schema ?= schema
       @["_#{@name}_props"] ?= {}
       model ?= inflect.singularize inflect.underscore name
@@ -694,7 +694,7 @@ module.exports = (FoxxMC)->
         switch type
           when 'item'
             @defineProperty name,
-              get: ()->
+              get: ->
                 ModelClass = null
                 unless model in SIMPLE_TYPES
                   [ModelClass, vModel] = @findModelByName model
@@ -744,7 +744,7 @@ module.exports = (FoxxMC)->
                     null
           when 'array'
             @defineProperty name,
-              get: ()->
+              get: ->
                 ModelClass = null
                 unless model in SIMPLE_TYPES
                   [ModelClass] = @findModelByName model
@@ -772,7 +772,7 @@ module.exports = (FoxxMC)->
       if not lambda? or not type?
         return throw new Error '`lambda` and `type` options is required'
       if valuable?
-        schema = ()=>
+        schema = =>
           unless model in SIMPLE_TYPES
             [ModelClass, vModel] = @findModelByName model
           else
@@ -796,7 +796,7 @@ module.exports = (FoxxMC)->
             [..., prop_name] = valuable.split '.'
             joi.array().items ModelClass.attributes()[prop_name]
       else
-        schema = ()-> {}
+        schema = -> {}
       opts.schema ?= schema
       @["_#{@name}_comps"] ?= {}
       unless @["_#{@name}_comps"][name]
@@ -811,7 +811,7 @@ module.exports = (FoxxMC)->
         @::["#{name}Methods"] = methods if methods?
         @::["#{name}Collections"] = collections if collections?
         @defineProperty name,
-          get: ()->
+          get: ->
             result = @["__#{name}"]
             result ?= @["__#{name}"] = lambda.apply(@, []) ? empty_result
             result
@@ -1098,7 +1098,7 @@ module.exports = (FoxxMC)->
       @_props()
     @computeds:   ->
       @_comps()
-    @serializableAttributes: ()->
+    @serializableAttributes: ->
       @["_#{@name}_serializableAttributes"] ?= _.omit extend(
         {}
       ,
@@ -1278,8 +1278,8 @@ module.exports = (FoxxMC)->
     @attr '_rev',         joi.number().empty(null).optional()
     @attr '_type',        joi.string().empty(null).optional()
     @attr 'isHidden',     joi.boolean().empty(null).default(no, 'Visible by default')
-    @attr 'createdAt',    joi.date().empty(null).default((()-> new Date().toISOString()), 'Datetime of creating')
-    @attr 'updatedAt',    joi.date().empty(null).default((()-> new Date().toISOString()), 'Datetime of updating')
+    @attr 'createdAt',    joi.date().empty(null).default((-> new Date().toISOString()), 'Datetime of creating')
+    @attr 'updatedAt',    joi.date().empty(null).default((-> new Date().toISOString()), 'Datetime of updating')
 
     @prop 'id',
       type: 'item'
@@ -1365,10 +1365,10 @@ module.exports = (FoxxMC)->
       db._query(query).next()
 
     # клонирует документ (поверхностная копия без автоматического сохранения в базу)
-    clone: ()->
+    clone: ->
 
     # клонирует документ (поверхностная копия с автоматическим сохранением в базу)
-    copy: ()->
+    copy: ->
 
     create: @method ['::isNew'], ->
       write: [@constructor.collectionName()]
@@ -1386,7 +1386,7 @@ module.exports = (FoxxMC)->
       return @
 
     # клонирует документ (глубокая копия с автоматическим сохранением в базу - т.е. копируются так же и связи)
-    deep_copy: ()->
+    deep_copy: ->
 
     decrement: @method ['::save'], (attribute, step = 1)->
       if @[attribute]?.constructor isnt Number
@@ -1396,7 +1396,7 @@ module.exports = (FoxxMC)->
 
     delete: @method ['::isNew'], ->
       read: [@constructor.collectionName()], write: [@constructor.collectionName()]
-    ,()->
+    ,->
       if @isNew()
         throw new Error 'Document is not exist in collection'
       query = qb.update qb _key: @_key
@@ -1412,7 +1412,7 @@ module.exports = (FoxxMC)->
     # реально удаляет объект в базе данных (не безопасный метод, т.к. могут остаться зависимости.)
     destroy: @method ['::isNew'], ->
       read: [@constructor.collectionName()], write: [@constructor.collectionName()]
-    , ()->
+    , ->
 
     increment: @method ['::save'], (attribute, step = 1)->
       if @[attribute]?.constructor isnt Number
@@ -1422,7 +1422,7 @@ module.exports = (FoxxMC)->
 
     isNew: @method [], ->
       read: [@constructor.collectionName()]
-    , ()->
+    , ->
       {db} = require '@arangodb'
       not @_key? or not db[@constructor.collectionNameInDB()].exists @_key
 
@@ -1439,7 +1439,7 @@ module.exports = (FoxxMC)->
       @_resetAttributes doc
       return @
 
-    getSnapshot: ()->
+    getSnapshot: ->
       snapshot = {}
       attributes = _.omit @constructor.attributes(), ['_rev']
       for own attr, v of attributes
@@ -1544,7 +1544,7 @@ module.exports = (FoxxMC)->
                 snapshot[serializableName] = @[comp].map (i)-> i.serializeForClient(opts)
       @_forClient snapshot, opts
 
-    validate: ()->
+    validate: ->
       console.log 'DDDDDDDDDDD @constructor.schema()', @getSnapshot()
       {value:snapshot} = @constructor.schema().validate @getSnapshot()
       # console.log 'DDDD snapshot', snapshot
@@ -1553,7 +1553,7 @@ module.exports = (FoxxMC)->
           @[k] = v
       return @
 
-    save: @method ['::validate', '::isNew', '::create', '::update'], ()->
+    save: @method ['::validate', '::isNew', '::create', '::update'], ->
       @validate()
       if @isNew()
         @create()
@@ -1568,13 +1568,13 @@ module.exports = (FoxxMC)->
       @save()
 
     # обновляет значения в timestamp атрибутах
-    touch: @method ['::save'], ()->
+    touch: @method ['::save'], ->
       @updatedAt = new Date().toISOString()
       @save()
 
     update: @method ['::isNew'], ->
       read: [@constructor.collectionName()], write: [@constructor.collectionName()]
-    , ()->
+    , ->
       # console.log 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000', @_key
       if @isNew()
         throw new Error 'Document does not exist in collection'

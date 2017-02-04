@@ -23,26 +23,26 @@ UPGRADE_REQUIRED  = status 'upgrade required'
     Controller = require '../lib/controller'
     class TomatosController extends Controller
       Model: Tomato
-      constructor: ()->
+      constructor: ->
         super arguments...
 
-      updateMethods: ()-> ["#{@Model.name}.update"] # если внутри функции update вызывается метод класса то в формате '<имя класса в камелкейсе>.<имя метода класса>'
-      updateCollections: ()-> {}
-      update: ()->
+      updateMethods: -> ["#{@Model.name}.update"] # если внутри функции update вызывается метод класса то в формате '<имя класса в камелкейсе>.<имя метода класса>'
+      updateCollections: -> {}
+      update: ->
         tomato = @Model.update arguments...
         console.log 'kkk', tomato
         tomato
 
     class CucumbersController extends Controller
       Model: Cucumber
-      constructor: ()->
+      constructor: ->
         super arguments...
         @tomato = new TomatosController()
 
-      updateMethods: ()-> ['TomatosController::update'] # если внутри функции update вызывается метод экземпляра класса то в формате '<имя класса в камелкейсе>::<имя метода экземпляра класса>'
-      updateCollections: ()->
+      updateMethods: -> ['TomatosController::update'] # если внутри функции update вызывается метод экземпляра класса то в формате '<имя класса в камелкейсе>::<имя метода экземпляра класса>'
+      updateCollections: ->
         {}
-      update: ()->
+      update: ->
         @tomato.update()
         console.log 'jjj'
 
@@ -100,6 +100,11 @@ module.exports = (FoxxMC)->
 
   class FoxxMC::Controller extends CoreObject
     Model: null
+    query: null
+    body: null
+    recordId: null
+    patchData: null
+    currentUser: null
 
     @swaggerDefinition: (action, lambda)->
       @["_swaggerDefFor_#{action}"] = lambda
@@ -254,15 +259,15 @@ module.exports = (FoxxMC)->
       The query for finding objects.
     '
 
-    @schema: ()->
+    @schema: ->
       @isValid()
       joi.object @::Model.serializableAttributes()
 
-    @clientSchema: ()->
+    @clientSchema: ->
       @isValid()
       joi.object "#{inflect.underscore @::Model.name}": @schema()
 
-    @clientSchemaForArray: ()->
+    @clientSchemaForArray: ->
       @isValid()
       joi.object "#{inflect.pluralize inflect.underscore @::Model.name}": joi.array().items @schema()
 
@@ -292,8 +297,7 @@ module.exports = (FoxxMC)->
     @beforeHook 'beforeUpdate',     only: ['update']
     @beforeHook 'beforeDelete',     only: ['delete']
 
-    @beforeHook 'permitBodyForCreate', only: ['create']
-    @beforeHook 'permitBodyForUpdate', only: ['update']
+    @beforeHook 'permitBody',       only: ['create', 'update']
     @beforeHook 'setOwnerId',       only: ['create']
     @beforeHook 'protectOwnerId',   only: ['update']
     @beforeHook 'protectSpaceId',   only: ['update']
@@ -332,10 +336,10 @@ module.exports = (FoxxMC)->
       result = @constructor.itemsForClient data, meta
       result
 
-    @isValid: ()->
+    @isValid: ->
       @::isValid()
 
-    isValid: ()->
+    isValid: ->
       unless @Model?
         # console.log '%#$%#%@#$@#$@#$@#$@#$@#$@#$'
         throw new Error "@Model is required properties for #{@constructor.name}"
@@ -365,34 +369,28 @@ module.exports = (FoxxMC)->
         sendError()
       args
 
-    permitBodyForCreate: (body, currentUser)->
+    permitBody: ->
       @isValid()
-      {value:data} = @constructor.clientSchema().validate body
-      patchData = data["#{inflect.underscore @Model.name}"]
-      [patchData, currentUser]
+      {value:data} = @constructor.clientSchema().validate @body
+      @patchData = data["#{inflect.underscore @Model.name}"]
+      return
 
-    permitBodyForUpdate: (id, body, currentUser)->
+    setOwnerId: ->
       @isValid()
-      {value:data} = @constructor.clientSchema().validate body
-      patchData = data["#{inflect.underscore @Model.name}"]
-      [id, patchData, currentUser]
+      @body.ownerId = @currentUser?._key ? null
+      return
 
-    setOwnerId: (body, currentUser)->
+    protectOwnerId: ->
       @isValid()
-      body.ownerId = currentUser?._key ? null
-      [body, currentUser]
+      @body = _.omit @body, ['ownerId']
+      return
 
-    protectOwnerId: (id, body, currentUser)->
+    protectSpaceId: ->
       @isValid()
-      _body = _.omit body, ['ownerId']
-      [id, _body, currentUser]
+      @body = _.omit @body, ['spaceId']
+      return
 
-    protectSpaceId: (id, body, currentUser)->
-      @isValid()
-      _body = _.omit body, ['spaceId']
-      [id, _body, currentUser]
-
-    beforeList: ()->
+    beforeList: ->
       { currentUser } = @req
       query = JSON.parse @req.queryParams['query']
       limit = Number query.limit
@@ -406,28 +404,40 @@ module.exports = (FoxxMC)->
       query.offset = switch
         when skip < 0, isNaN skip then 0
         else skip
-      [query, currentUser]
+      {@query, @currentUser} = {query, currentUser}
+      return
 
     beforeLimitedList: (query = {}) ->
       { currentUser } = @req
       if currentUser? and not currentUser.isAdmin
         query.ownerId = currentUser._key
-      [query, currentUser]
+      {@query, @currentUser} = {query, currentUser}
+      return
 
-    beforeDetail: ()->
-      [@req.pathParams[@constructor.keyName()], @req.currentUser]
+    beforeDetail: ->
+      { currentUser } = @req
+      recordId = @req.pathParams[@constructor.keyName()]
+      {@recordId, @currentUser} = {recordId, currentUser}
+      return
 
-    beforeCreate: ()->
-      [@req.body, @req.currentUser]
+    beforeCreate: ->
+      {@body, @currentUser} = @req
+      return
 
-    beforeUpdate: ()->
+    beforeUpdate: ->
+      { currentUser } = @req
+      recordId = @req.pathParams[@constructor.keyName()]
       body = extend {}, @req.body,
         "#{inflect.underscore @Model.name}":
-          id: @req.pathParams[@constructor.keyName()]
-      [@req.pathParams[@constructor.keyName()], body, @req.currentUser]
+          id: recordId
+      {@recordId, @body, @currentUser} = {recordId, body, currentUser}
+      return
 
-    beforeDelete: ()->
-      [@req.pathParams[@constructor.keyName()], @req.currentUser]
+    beforeDelete: ->
+      { currentUser } = @req
+      recordId = @req.pathParams[@constructor.keyName()]
+      {@recordId, @currentUser} = {recordId, currentUser}
+      return
 
     afterCreate: (data)->
       data
@@ -449,7 +459,7 @@ module.exports = (FoxxMC)->
       encryptedApiKey = crypto.sha512 apiKey
       crypto.constantEquals encryptedApiKey, key
 
-    checkSession: (args...) ->
+    checkSession: (args...)->
       # Must be implemented CheckSessionMixin and inclede in all controllers
       @req.currentUser = {}
       args
@@ -488,8 +498,8 @@ module.exports = (FoxxMC)->
     @action 'list', ->
       @isValid()
       ["#{@Model.name}.query"]
-    , (query, currentUser=null) ->
-      cursor = @Model.query query, currentUser
+    , ->
+      cursor = @Model.query @query, @currentUser
         .exec()
       return {
         meta:
@@ -503,40 +513,30 @@ module.exports = (FoxxMC)->
     @action 'detail', ->
       @isValid()
       ["#{@Model.name}.find"]
-    , (key, currentUser=null) ->
+    , ->
       @isValid()
-      # qb            = require 'aqb'
-      record = @Model.find key, currentUser
-      # console.log 'DDDDDDDDDDDDDDddd !!!!!!!!!!!!!!!!! @Model.find_by_aql', JSON.stringify @Model.find_by_aql('for doc in api_account_kinds sort doc.createdAt limit 0, 2 return doc').reduce ((initialValue, record)-> initialValue.push record._key; return initialValue), [] #('doc.isHidden == false') #'doc.isHidden == true'
-      # console.log 'DDDDDDDDDDDDDDddd !!!!!!!!!!!!!!!!! @Model.count', JSON.stringify @Model.where(qb.eq qb.ref('doc.isHidden'), qb no).count()#('doc.isHidden == false') #'doc.isHidden == true'
-      # console.log 'DDDDDDDDDDDDDDddd !!!!!!!!!!!!!!!!! @Model.select', JSON.stringify @Model.group(isHidden: 'doc.isHidden').having('isHidden == @isHidden', isHidden: no).select(qb.ref 'isHidden').toArray()#('doc.isHidden == false') #'doc.isHidden == true'
-      # record = @Model.includes 'operations'
-      #   .where _key: key
-      #   .exec()
-      #   .toArray()[0]
-      # console.log '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%KKKKKKKKKKKKKKKKKKKKKKKKKk', record.serializeForClient()
-      record
+      @Model.find @recordId, @currentUser
 
     @action 'create', ->
       @isValid()
       ["#{@Model.name}.create"]
-    , (patchData, currentUser=null) ->
+    , ->
       @isValid()
-      @Model.create patchData, currentUser
+      @Model.create @patchData, @currentUser
 
     @action 'update', ->
       @isValid()
       ["#{@Model.name}.update"]
-    , (key, patchData, currentUser=null) ->
+    , ->
       @isValid()
-      @Model.update key, patchData, currentUser
+      @Model.update @recordId, @patchData, @currentUser
 
     @action 'delete', ->
       @isValid()
       ["#{@Model.name}.delete"]
-    , (key, currentUser=null) ->
+    , ->
       @isValid()
-      @Model.delete key, currentUser
+      @Model.delete @recordId, @currentUser
 
 
   FoxxMC::Controller.initialize()

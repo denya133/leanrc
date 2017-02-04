@@ -14,12 +14,12 @@ inflect       = require('i')()
 
     @chains ['verify', 'count'] # если в классе, унаследованном от Model, Controller, CoreObject надо объявить цепи для методов
 
-    constructor: () -> # именно в конструкторе надо через методы beforeHook и afterHook объявить методы инстанса класса, которые будут использованы в качестве звеньев цепей
+    constructor: -> # именно в конструкторе надо через методы beforeHook и afterHook объявить методы инстанса класса, которые будут использованы в качестве звеньев цепей
       super
 
-    beforeVerify: ()->
+    beforeVerify: ->
 
-    beforeCount: ()->
+    beforeCount: ->
 
     afterVerify: (data)->
       data
@@ -32,22 +32,22 @@ inflect       = require('i')()
 ###
   ````
     class Aaa extends Mixin
-      k: ()->
+      k: ->
         console.trace()
         console.log '^^Aaa::k', @yy
-      @hh: ()->
+      @hh: ->
         console.log '^^Aaa.hh'
 
 
     class Ccc extends Mixin
       @jk: 6
       yy: 90
-      @kl: ()->
-      @hh: ()->
+      @kl: ->
+      @hh: ->
         console.log 'before super @hh() in Ccc.hh'
         super
         console.log 'after super @hh() in Ccc.hh'
-      k: ()->
+      k: ->
         console.log 'before super k() in Ccc::k'
         super
         console.log 'after super k() in Ccc::k'
@@ -55,9 +55,9 @@ inflect       = require('i')()
 
     class Jjj extends Mixin
       @ll: 6
-      oo: ()->
+      oo: ->
         this.k()
-      #k: ()->
+      #k: ->
       #  console.log 'before super k() in Jjj::k'
       #  super
       #  console.log 'after super k() in Jjj::k'
@@ -65,13 +65,13 @@ inflect       = require('i')()
 
     class Kkk extends Mixin
       @ll: 6
-      oo: ()->
+      oo: ->
         this.k()
-      k: ()->
+      k: ->
         console.log 'before super k() in Kkk::k', @yy
         super
         console.log 'after super k() in Kkk::k'
-      #@hh: ()->
+      #@hh: ->
       #  console.log 'before super @hh() in Kkk.hh'
       #  super
       #  console.log 'after super @hh() in Kkk.hh'
@@ -79,20 +79,20 @@ inflect       = require('i')()
 
     class Lll extends Kkk
       @ll: 6
-      oo: ()->
+      oo: ->
         this.k()
-      k: ()->
+      k: ->
         console.log 'before super k() in Lll::k'
         super
         console.log 'after super k() in Lll::k'
-      @hh: ()->
+      @hh: ->
         console.log 'before super @hh() in Lll.hh'
         super
         console.log 'after super @hh() in Lll.hh'
 
 
     class Iii extends Mixin
-      @including: ()->
+      @including: ->
         @attr 'jhj'
 
     # Parameterized mixin
@@ -116,11 +116,11 @@ inflect       = require('i')()
       @include Jjj, Lll
       @include Iii
       @include Formattable('Bbb', 'yy')
-      k: ()->
+      k: ->
         console.log 'before super k() in Bbb::k'
         super
         console.log 'after super k() in Bbb::k'
-      @hh: ()->
+      @hh: ->
         console.log 'before super @hh() in Bbb.hh'
         super
         console.log 'after super @hh() in Bbb.hh'
@@ -137,7 +137,7 @@ inflect       = require('i')()
   https://github.com/aasm/aasm
 
 class Tomato extends CoreObject
-  @StateMachine 'default', ()->
+  @StateMachine 'default', ->
     @before_all_events 'before_all_events'
     @after_all_transitions 'after_all_transitions'
     @after_all_events 'after_all_events'
@@ -156,7 +156,7 @@ class Tomato extends CoreObject
       before: 'before_run'
       after: 'after_run'
       error: 'error_on_run'
-     , ()=>
+     , =>
         @transition ['first', 'second'], 'third',
           guard: 'check_something_condition'
           after: 'after_first_second_to_third'
@@ -167,25 +167,25 @@ class Tomato extends CoreObject
           unless: 'check_third_condition'
           after: 'after_sleeping_to_running'
 
-  check_something_condition: ()->
+  check_something_condition: ->
     console.log '!!!???? check_something_condition'
     yes
-  check_third_condition: ()->
+  check_third_condition: ->
     console.log '!!!???? check_third_condition'
     yes
-  before_exit_from_sleeping: ()->
+  before_exit_from_sleeping: ->
     console.log 'DFSDFSD before_exit_from_sleeping'
-  before_exit_from_first: ()->
+  before_exit_from_first: ->
     console.log 'DFSDFSD before_exit_from_first'
-  after_exit_from_sleeping: ()->
+  after_exit_from_sleeping: ->
     console.log 'DFSDFSD after_exit_from_sleeping'
-  after_exit_from_first: ()->
+  after_exit_from_first: ->
     console.log 'DFSDFSD after_exit_from_first'
-  before_enter_to_running: ()->
+  before_enter_to_running: ->
     console.log 'DFSDFSD before_enter_to_running'
-  before_run: ()->
+  before_run: ->
     console.log 'DFSDFSD before_run'
-  after_run: ()->
+  after_run: ->
     console.log 'DFSDFSD after_run'
   after_first_second_to_third: (first_arg, second_arg)->
     console.log first_arg, second_arg # => {key: 'value'}, 125
@@ -196,18 +196,18 @@ class Tomato extends CoreObject
   after_sleeping_to_running: (first_arg, second_arg)->
     console.log first_arg, second_arg # => {key: 'value'}, 125
     console.log 'DFSDFSD after_sleeping_to_running'
-  after_running_to_sleeping: ()->
+  after_running_to_sleeping: ->
     console.log 'DFSDFSD after_running_to_sleeping'
 
-  before_all_events: ()->
+  before_all_events: ->
     console.log 'DFSDFSD before_all_events'
-  after_all_transitions: ()->
+  after_all_transitions: ->
     console.log 'DFSDFSD after_all_transitions'
-  after_all_events: ()->
+  after_all_events: ->
     console.log 'DFSDFSD after_all_events'
   error_on_all_events: (err)->
     console.log 'DFSDFSD error_on_all_events', err, err.stack
-  error_on_run: ()->
+  error_on_run: ->
     console.log 'DFSDFSD error_on_run'
 
 tomato = new Tomato()
@@ -245,22 +245,22 @@ catch
 ###
   # если в методе экземпляра класса идет работа с коллекцией в базе данных (чтение, запись), то надо сделать описание этого, для механизма конструирующего локи на базе для транцикции
   ```
-    afterCreateMethods: ()-> ['::recordHasBeenChanged'] # т.к. внутри afterCreate метода экземпляра идет работа с @recordHasBeenChanged методом тоже экземпляра этого же класса
-    afterCreateCollections: ()->
+    afterCreateMethods: -> ['::recordHasBeenChanged'] # т.к. внутри afterCreate метода экземпляра идет работа с @recordHasBeenChanged методом тоже экземпляра этого же класса
+    afterCreateCollections: ->
       {}
     afterCreate: (data)->
       @recordHasBeenChanged 'createdObject', data
       data
 
     @createMethods: ['.new', '::save'] # '.new' - т.к. вызывается метод класса, '::save' - т.к. вызывается метод экземпляра класса
-    @createCollections: ()-> # может быть ничего не указано, если непосредственно внутри метода нет работы с конкретной коллекцией
+    @createCollections: -> # может быть ничего не указано, если непосредственно внутри метода нет работы с конкретной коллекцией
       {}
     @create: (attributes)->
       record = @new attributes
       record.save()
 
-    @resetAttrMethods: ()-> ['Account.new', 'TransactionsController::save'] # перед '.' или '::' в полной записи может идти имя класса, если оно отличается от текущего
-    @resetAttrCollections: ()->
+    @resetAttrMethods: -> ['Account.new', 'TransactionsController::save'] # перед '.' или '::' в полной записи может идти имя класса, если оно отличается от текущего
+    @resetAttrCollections: ->
       {}
     @resetAttr: (attributes)->
       record = Account.new attributes
@@ -269,8 +269,8 @@ catch
         transaction.some_attr += 1
         transaction.save()
 
-    recordHasBeenChangedMethods: ()-> [] # может быть ничего не указано, если методы других классов или инстансов классов не вызываются
-    recordHasBeenChangedCollections: ()-> # указываем '_queues' лок на чтение и '_jobs' лок на запись, тк. queues.get('signals').push внутри работает с этими коллекциями.
+    recordHasBeenChangedMethods: -> [] # может быть ничего не указано, если методы других классов или инстансов классов не вызываются
+    recordHasBeenChangedCollections: -> # указываем '_queues' лок на чтение и '_jobs' лок на запись, тк. queues.get('signals').push внутри работает с этими коллекциями.
       read: ['_queues'], write: ['_jobs']
     recordHasBeenChanged: (signal, data)->
       console.log '%%%%%%%%%%%%%%%%%%% recordHasBeenChanged data', data
@@ -367,9 +367,9 @@ module.exports = (FoxxMC)->
       @["_#{@name}_chains"] = @["_#{@name}_chains"].concat chains
 
       chains.forEach (methodName)=>
-        @::["_#{methodName}Collections"] = ()->
+        @::["_#{methodName}Collections"] = ->
           @collectionsInChain methodName
-        @::["_#{methodName}Methods"] = ()->
+        @::["_#{methodName}Methods"] = ->
           @methodsInChain methodName
       return
 
@@ -415,7 +415,7 @@ module.exports = (FoxxMC)->
       Model = @
       new Model attributes, currentUser
 
-    save: ()->
+    save: ->
       @
 
     @defineProperty: (name, definition)->
@@ -761,14 +761,14 @@ module.exports = (FoxxMC)->
         # console.log '$%$%$%$%$% collections666', self.name, keys, collections
         collections
 
-    constructor: ()->
+    constructor: ->
       if @constructor.chains.constructor is Function
         chains = @constructor._chains()
         if chains? and chains.constructor is Array
           # console.log 'DFASDFASDFffffffffffff9898 chains', chains
           chains.forEach (methodName)=>
             @["_#{methodName}"] = @[methodName]
-            @[methodName] = ()->
+            @[methodName] = ->
               @callAsChain methodName, arguments...
       return
 
@@ -1258,7 +1258,7 @@ module.exports = (FoxxMC)->
       cb.apply @, []
       @_currentEvent = null
       _currentSM = @_currentSM
-      @::["_#{_currentSM}_#{name}Methods"] = ()->
+      @::["_#{_currentSM}_#{name}Methods"] = ->
         _.uniq(
           _.compact [
             @constructor["before_all_events_#{_currentSM}"] ? null
@@ -1292,7 +1292,7 @@ module.exports = (FoxxMC)->
           @[error]? [err]...
           @[@constructor["error_on_all_events_#{_currentSM}"]]? [err]...
         return
-      @::["#{name}Methods"] ?= ()->
+      @::["#{name}Methods"] ?= ->
         @constructor._smNames.map (smName)-> "::_#{smName}_#{name}"
       @::[name] ?= (args...) ->
         @constructor._smNames.forEach (smName)=>
@@ -1311,7 +1311,7 @@ module.exports = (FoxxMC)->
 
       name = "transition_#{_currentSM}_#{_currentEvent}|#{_from.join ','}|#{to}"
 
-      @::["#{name}Methods"] = ()->
+      @::["#{name}Methods"] = ->
         state_attr = @constructor["_#{_currentSM}_state_attr"]
         state_attr ?= if _currentSM is 'default'
           'state'
