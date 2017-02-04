@@ -1157,15 +1157,10 @@ module.exports = (FoxxMC)->
 
     # возвращает 1 объект
     @find_by: @method [], (-> read: [@collectionName()]), (conditions, currentUser=null)->
-      result = @where conditions
+      @where conditions
         .limit 1
         .select 'doc'
         .toArray()[0]
-      console.log '$$$$$$$$$$$$ result', result
-      if result?
-        @new result, currentUser
-      else
-        result
 
     @forEach: @method [], (-> read: [@collectionName()]), (lambda, currentUser = null)->
       @all(currentUser).forEach lambda
