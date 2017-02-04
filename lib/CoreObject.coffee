@@ -138,77 +138,77 @@ inflect       = require('i')()
 
 class Tomato extends CoreObject
   @StateMachine 'default', ->
-    @before_all_events 'before_all_events'
-    @after_all_transitions 'after_all_transitions'
-    @after_all_events 'after_all_events'
-    @error_on_all_events 'error_on_all_events'
+    @beforeAllEvents 'beforeAllEvents'
+    @afterAllTransitions 'afterAllTransitions'
+    @afterAllEvents 'afterAllEvents'
+    @errorOnAllEvents 'errorOnAllEvents'
     @state 'first',
       initial: yes
-      before_exit: 'before_exit_from_first'
-      after_exit: 'after_exit_from_first'
+      beforeExit: 'beforeExitFromFirst'
+      afterExit: 'afterExitFromFirst'
     @state 'sleeping',
-      before_exit: 'before_exit_from_sleeping'
-      after_exit: 'after_exit_from_sleeping'
+      beforeExit: 'beforeExitFromSleeping'
+      afterExit: 'afterExitFromSleeping'
     @state 'running',
-      before_enter: 'before_enter_to_running'
-      after_enter: 'after_enter_from_running'
+      beforeEnter: 'beforeEnterToRunning'
+      afterEnter: 'afterEnterFromRunning'
     @event 'run',
-      before: 'before_run'
-      after: 'after_run'
-      error: 'error_on_run'
+      before: 'beforeRun'
+      after: 'afterRun'
+      error: 'errorOnRun'
      , =>
         @transition ['first', 'second'], 'third',
-          guard: 'check_something_condition'
-          after: 'after_first_second_to_third'
+          guard: 'checkSomethingCondition'
+          after: 'afterFirstSecondToThird'
         @transition 'third', 'running',
-          if: 'check_third_condition'
-          after: 'after_third_to_running'
-        @transition ['first', 'third', 'sleeping', 'running'], 'super_running',
-          unless: 'check_third_condition'
-          after: 'after_sleeping_to_running'
+          if: 'checkThirdCondition'
+          after: 'afterThirdToRunning'
+        @transition ['first', 'third', 'sleeping', 'running'], 'superRunning',
+          unless: 'checkThirdCondition'
+          after: 'afterSleepingToRunning'
 
-  check_something_condition: ->
-    console.log '!!!???? check_something_condition'
+  checkSomethingCondition: ->
+    console.log '!!!???? checkSomethingCondition'
     yes
-  check_third_condition: ->
-    console.log '!!!???? check_third_condition'
+  checkThirdCondition: ->
+    console.log '!!!???? checkThirdCondition'
     yes
-  before_exit_from_sleeping: ->
-    console.log 'DFSDFSD before_exit_from_sleeping'
-  before_exit_from_first: ->
-    console.log 'DFSDFSD before_exit_from_first'
-  after_exit_from_sleeping: ->
-    console.log 'DFSDFSD after_exit_from_sleeping'
-  after_exit_from_first: ->
-    console.log 'DFSDFSD after_exit_from_first'
-  before_enter_to_running: ->
-    console.log 'DFSDFSD before_enter_to_running'
-  before_run: ->
-    console.log 'DFSDFSD before_run'
-  after_run: ->
-    console.log 'DFSDFSD after_run'
-  after_first_second_to_third: (first_arg, second_arg)->
-    console.log first_arg, second_arg # => {key: 'value'}, 125
-    console.log 'DFSDFSD after_first_second_to_third'
-  after_third_to_running: (first_arg, second_arg)->
-    console.log first_arg, second_arg # => {key: 'value'}, 125
-    console.log 'DFSDFSD after_third_to_running'
-  after_sleeping_to_running: (first_arg, second_arg)->
-    console.log first_arg, second_arg # => {key: 'value'}, 125
-    console.log 'DFSDFSD after_sleeping_to_running'
-  after_running_to_sleeping: ->
-    console.log 'DFSDFSD after_running_to_sleeping'
+  beforeExitFromSleeping: ->
+    console.log 'DFSDFSD beforeExitFromSleeping'
+  beforeExitFromFirst: ->
+    console.log 'DFSDFSD beforeExitFromFirst'
+  afterExitFromSleeping: ->
+    console.log 'DFSDFSD afterExitFromSleeping'
+  afterExitFromFirst: ->
+    console.log 'DFSDFSD afterExitFromFirst'
+  beforeEnterToRunning: ->
+    console.log 'DFSDFSD beforeEnterToRunning'
+  beforeRun: ->
+    console.log 'DFSDFSD beforeRun'
+  afterRun: ->
+    console.log 'DFSDFSD afterRun'
+  afterFirstSecondToThird: (firstArg, secondArg)->
+    console.log firstArg, secondArg # => {key: 'value'}, 125
+    console.log 'DFSDFSD afterFirstSecondToThird'
+  afterThirdToRunning: (firstArg, secondArg)->
+    console.log firstArg, secondArg # => {key: 'value'}, 125
+    console.log 'DFSDFSD afterThirdToRunning'
+  afterSleepingToRunning: (firstArg, secondArg)->
+    console.log firstArg, secondArg # => {key: 'value'}, 125
+    console.log 'DFSDFSD afterSleepingToRunning'
+  afterRunningToSleeping: ->
+    console.log 'DFSDFSD afterRunningToSleeping'
 
-  before_all_events: ->
-    console.log 'DFSDFSD before_all_events'
-  after_all_transitions: ->
-    console.log 'DFSDFSD after_all_transitions'
-  after_all_events: ->
-    console.log 'DFSDFSD after_all_events'
-  error_on_all_events: (err)->
-    console.log 'DFSDFSD error_on_all_events', err, err.stack
-  error_on_run: ->
-    console.log 'DFSDFSD error_on_run'
+  beforeAllEvents: ->
+    console.log 'DFSDFSD beforeAllEvents'
+  afterAllTransitions: ->
+    console.log 'DFSDFSD afterAllTransitions'
+  afterAllEvents: ->
+    console.log 'DFSDFSD afterAllEvents'
+  errorOnAllEvents: (err)->
+    console.log 'DFSDFSD errorOnAllEvents', err, err.stack
+  errorOnRun: ->
+    console.log 'DFSDFSD errorOnRun'
 
 tomato = new Tomato()
 tomato.run({key: 'value'}, 125) # можно передать как аргументы какие нибудь данные, они будут переданы внутырь коллбеков указанных на транзишенах в ключах :after
@@ -219,27 +219,27 @@ console.log 'tomato.state', tomato.state
 StateMachine flow
 
 try
-  event           before_all_events
+  event           beforeAllEvents
   event           before
   event           guard
     transition      guard
-    old_state       before_exit
+    old_state       beforeExit
     old_state       exit
     ...update state...
-                    after_all_transitions
+                    afterAllTransitions
     transition      after
-    new_state       before_enter
+    new_state       beforeEnter
     new_state       enter
     ...save state...
     transition      success             # if persist successful
-    old_state       after_exit
-    new_state       after_enter
+    old_state       afterExit
+    new_state       afterEnter
   event           success             # if persist successful
   event           after
-  event           after_all_events
+  event           afterAllEvents
 catch
   event           error
-  event           error_on_all_events
+  event           errorOnAllEvents
 ###
 
 ###
@@ -1224,36 +1224,36 @@ module.exports = (FoxxMC)->
         __mixin.including?.apply @
       @
 
-    @before_all_events: (name)->
-      @["before_all_events_#{@_currentSM}"] = name
-    @after_all_transitions: (name)->
-      @["after_all_transitions_#{@_currentSM}"] = name
-    @after_all_events: (name)->
-      @["after_all_events_#{@_currentSM}"] = name
-    @error_on_all_events: (name)->
-      @["error_on_all_events_#{@_currentSM}"] = name
+    @beforeAllEvents: (name)->
+      @["beforeAllEvents_#{@_currentSM}"] = name
+    @afterAllTransitions: (name)->
+      @["afterAllTransitions_#{@_currentSM}"] = name
+    @afterAllEvents: (name)->
+      @["afterAllEvents_#{@_currentSM}"] = name
+    @errorOnAllEvents: (name)->
+      @["errorOnAllEvents_#{@_currentSM}"] = name
 
-    @state: (name, {before_exit, exit, before_enter, enter, after_exit, after_enter, initial, attr}={})->
+    @state: (name, {beforeExit, exit, beforeEnter, enter, afterExit, afterEnter, initial, attr}={})->
       if initial
         attr ?= 'state'
         attr = "#{@_currentSM}_#{attr}" if @_currentSM isnt 'default'
         @["_#{@_currentSM}_state_attr"] = attr
         @::[attr] = name
-      if before_exit
-        @["before_exit_#{@_currentSM}_#{name}"] = before_exit
+      if beforeExit
+        @["beforeExit_#{@_currentSM}_#{name}"] = beforeExit
       if exit
         @["exit_#{@_currentSM}_#{name}"] = exit
-      if before_enter
-        @["before_enter_#{@_currentSM}_#{name}"] = before_enter
+      if beforeEnter
+        @["beforeEnter_#{@_currentSM}_#{name}"] = beforeEnter
       if enter
         @["enter_#{@_currentSM}_#{name}"] = enter
-      if after_exit
-        @["after_exit_#{@_currentSM}_#{name}"] = after_exit
-      if after_enter
-        @["after_enter_#{@_currentSM}_#{name}"] = after_enter
+      if afterExit
+        @["afterExit_#{@_currentSM}_#{name}"] = afterExit
+      if afterEnter
+        @["afterEnter_#{@_currentSM}_#{name}"] = afterEnter
       return
 
-    @event: (name, {before, guard, if:if_cond, unless:unless_cond, success, after, error}={}, cb)->
+    @event: (name, {before, guard, if:ifCond, unless:unlessCond, success, after, error}={}, cb)->
       @_currentEvent = name
       cb.apply @, []
       @_currentEvent = null
@@ -1261,16 +1261,16 @@ module.exports = (FoxxMC)->
       @::["_#{_currentSM}_#{name}Methods"] = ->
         _.uniq(
           _.compact [
-            @constructor["before_all_events_#{_currentSM}"] ? null
+            @constructor["beforeAllEvents_#{_currentSM}"] ? null
             before ? null
             guard ? null
-            if_cond ? null
-            unless_cond ? null
+            ifCond ? null
+            unlessCond ? null
             success ? null
             after ? null
-            @constructor["after_all_events_#{_currentSM}"] ? null
+            @constructor["afterAllEvents_#{_currentSM}"] ? null
             error ? null
-            @constructor["error_on_all_events_#{_currentSM}"] ? null
+            @constructor["errorOnAllEvents_#{_currentSM}"] ? null
           ]
             .map (methodName)->
               "::#{methodName}"
@@ -1279,18 +1279,18 @@ module.exports = (FoxxMC)->
         )
       @::["_#{_currentSM}_#{name}"] = (args...)->
         try
-          @[@constructor["before_all_events_#{_currentSM}"]]? []...
+          @[@constructor["beforeAllEvents_#{_currentSM}"]]? []...
           @[before]? []...
-          if not guard || (guard && @[guard] []...) || (if_cond && @[if_cond] []...) || (unless_cond && not @[unless_cond] []...)
+          if not guard || (guard && @[guard] []...) || (ifCond && @[ifCond] []...) || (unlessCond && not @[unlessCond] []...)
             @constructor["transitions_#{_currentSM}_#{name}"].forEach (transition)=>
               @[transition]? args...
               return
             @[success]? []...
             @[after]? []...
-            @[@constructor["after_all_events_#{_currentSM}"]]? []...
+            @[@constructor["afterAllEvents_#{_currentSM}"]]? []...
         catch err
           @[error]? [err]...
-          @[@constructor["error_on_all_events_#{_currentSM}"]]? [err]...
+          @[@constructor["errorOnAllEvents_#{_currentSM}"]]? [err]...
         return
       @::["#{name}Methods"] ?= ->
         @constructor._smNames.map (smName)-> "::_#{smName}_#{name}"
@@ -1299,7 +1299,7 @@ module.exports = (FoxxMC)->
           @["_#{smName}_#{name}"]? args...
       return
 
-    @transition: (_from, to, {guard, if:if_cond, unless:unless_cond, after, success}={})->
+    @transition: (_from, to, {guard, if:ifCond, unless:unlessCond, after, success}={})->
       constructor = @
       _currentSM = @_currentSM
       _currentEvent = @_currentEvent
@@ -1321,17 +1321,17 @@ module.exports = (FoxxMC)->
         _.uniq(
           _.compact [
             guard ? null
-            if_cond ? null
-            unless_cond ? null
-            @constructor["before_exit_#{_currentSM}_#{from}"]? null
+            ifCond ? null
+            unlessCond ? null
+            @constructor["beforeExit_#{_currentSM}_#{from}"]? null
             @constructor["exit_#{_currentSM}_#{from}"] ? null
-            @constructor["after_all_transitions_#{_currentSM}"] ? null
-            @constructor["before_enter_#{_currentSM}_#{to}"] ? null
+            @constructor["afterAllTransitions_#{_currentSM}"] ? null
+            @constructor["beforeEnter_#{_currentSM}_#{to}"] ? null
             @constructor["enter_#{_currentSM}_#{to}"] ? null
             success ? null
             after ? null
-            @constructor["after_exit_#{_currentSM}_#{from}"] ? null
-            @constructor["after_enter_#{_currentSM}_#{to}"] ? null
+            @constructor["afterExit_#{_currentSM}_#{from}"] ? null
+            @constructor["afterEnter_#{_currentSM}_#{to}"] ? null
           ]
             .map (methodName)->
               "::#{methodName}"
@@ -1346,18 +1346,18 @@ module.exports = (FoxxMC)->
         unless @[state_attr] in _from
           throw new Error "current `state` is #{@[state_attr]} and is not includes in `[#{_from.join ','}]`"
         from = @[state_attr]
-        if not guard || (guard && @[guard] []...) || (if_cond && @[if_cond] []...) || (unless_cond && not @[unless_cond] []...)
-          @[@constructor["before_exit_#{_currentSM}_#{from}"]]? []...
+        if not guard || (guard && @[guard] []...) || (ifCond && @[ifCond] []...) || (unlessCond && not @[unlessCond] []...)
+          @[@constructor["beforeExit_#{_currentSM}_#{from}"]]? []...
           @[@constructor["exit_#{_currentSM}_#{from}"]]? []...
           @[state_attr] = to
-          @[@constructor["after_all_transitions_#{_currentSM}"]]? []...
-          @[@constructor["before_enter_#{_currentSM}_#{to}"]]? []...
+          @[@constructor["afterAllTransitions_#{_currentSM}"]]? []...
+          @[@constructor["beforeEnter_#{_currentSM}_#{to}"]]? []...
           @[@constructor["enter_#{_currentSM}_#{to}"]]? []...
           @[after]? args...
           @save?()
           @[success]? []...
-          @[@constructor["after_exit_#{_currentSM}_#{from}"]]? []...
-          @[@constructor["after_enter_#{_currentSM}_#{to}"]]? []...
+          @[@constructor["afterExit_#{_currentSM}_#{from}"]]? []...
+          @[@constructor["afterEnter_#{_currentSM}_#{to}"]]? []...
         return
 
       @["transitions_#{_currentSM}_#{_currentEvent}"].push name

@@ -295,20 +295,20 @@ class Tomato extends Model
     @find
     @first
     @last
-    @find_by
+    @findBy
     @forEach
     @map
     @reduce
-    @find_by_aql
+    @findByAql
 
     @create
     @delete
     @destroy # пока не реализован
-    @delete_all
-    @destroy_all # пока не реализован
+    @deleteAll
+    @destroyAll # пока не реализован
     @exists
     @update
-    @update_all
+    @updateAll
 
   # Список методов экземпляра класса
     beforeSave
@@ -330,7 +330,7 @@ class Tomato extends Model
     clone # пока не реализован
     copy # пока не реализован
     create
-    deep_copy # пока не реализован
+    deepCopy # пока не реализован
     decrement
     delete
     destroy # пока не реализован
@@ -345,8 +345,8 @@ class Tomato extends Model
     toggle
     touch
     update
-    update_attribute
-    update_attributes
+    updateAttribute
+    updateAttributes
 
 ###
 module.exports = (FoxxMC)->
@@ -1156,7 +1156,7 @@ module.exports = (FoxxMC)->
           @new item, currentUser
 
     # возвращает 1 объект
-    @find_by: @method [], (-> read: [@collectionName()]), (conditions, currentUser=null)->
+    @findBy: @method [], (-> read: [@collectionName()]), (conditions, currentUser=null)->
       @where conditions
         .limit 1
         .select 'doc'
@@ -1174,7 +1174,7 @@ module.exports = (FoxxMC)->
 
     # @find_in_batches: (lambda)->
 
-    @find_by_aql: @method (query, bindings, currentUser=null)->
+    @findByAql: @method (query, bindings, currentUser=null)->
       result = db._query arguments...
       new Cursor(@).currentUser(currentUser).setCursor result
 
@@ -1209,7 +1209,7 @@ module.exports = (FoxxMC)->
       record.destroy()
 
     # помечает как удаленные несколько за раз ! conditions must be qbValue
-    @delete_all: @method [], ->
+    @deleteAll: @method [], ->
       read: [@collectionName()], write: [@collectionName()]
     , (conditions)->
       if conditions.constructor is String
@@ -1233,7 +1233,7 @@ module.exports = (FoxxMC)->
       return yes
 
     # реально удаляет несколько за раз (не безопасный метод, т.к. могут остаться зависимости.)
-    @destroy_all: (conditions)->
+    @destroyAll: (conditions)->
       # в итераторе (курсоре) будем каждый документ вернувшийся после фильтрации сериализовывать и вызывать на объекте метод .destroy()
 
     # проверяет есть ли по этому условию объекты в базе
@@ -1243,15 +1243,15 @@ module.exports = (FoxxMC)->
         .hasNext()
 
     # обновляет в документе, найденном по id, некоторые атрибуты
-    @update: @method ['.find', '::update_attributes'], (id, attributes, currentUser=null)->
+    @update: @method ['.find', '::updateAttributes'], (id, attributes, currentUser=null)->
       # console.log 'LLLLLLLLLLLLLllllllllllllllllllll', id, attributes
       record = @find id, currentUser
       # console.log 'LLLLLLLLLLLLLllllllllllllllllllll1111111'
       _attributes = @serializeFromClient attributes
-      record.update_attributes _attributes
+      record.updateAttributes _attributes
 
     # обновляет в документах, найденных по условию, некоторые атрибуты
-    @update_all: @method [], ->
+    @updateAll: @method [], ->
       read: [@collectionName()], write: [@collectionName()]
     , (conditions, attributes)->
       if conditions.constructor is String
@@ -1386,7 +1386,7 @@ module.exports = (FoxxMC)->
       return @
 
     # клонирует документ (глубокая копия с автоматическим сохранением в базу - т.е. копируются так же и связи)
-    deep_copy: ->
+    deepCopy: ->
 
     decrement: @method ['::save'], (attribute, step = 1)->
       if @[attribute]?.constructor isnt Number
@@ -1594,12 +1594,12 @@ module.exports = (FoxxMC)->
       return @
 
     # сетим значение в атрибут и вызываем save()
-    update_attribute: @method ['::save'], (name, value)->
+    updateAttribute: @method ['::save'], (name, value)->
       @[name] = value
       @save()
 
     # сетим несколько значений в атрибуты, вызываем валидацию а затем save()
-    update_attributes: @method ['::save'], (attributes)->
+    updateAttributes: @method ['::save'], (attributes)->
       @_resetAttributes attributes
       @save()
 
