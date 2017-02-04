@@ -18,7 +18,7 @@ copyFiles = (originDir, destinationDir, mask = '**/*') ->
       .on 'end', resolve
     return
 
-gulp.task 'compile_assets', ()->
+gulp.task 'compile_assets', ->
   rootAssets = join ROOT, 'assets'
   publicDir = './public'
   copyFiles rootAssets, publicDir

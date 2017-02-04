@@ -5,8 +5,8 @@ runSequence   = require 'run-sequence'
 # task 'watch'
 gulp.task 'watch', (cb)->
   runSequence ['remove_dist', 'remove_public']
-  , 'compile_assets', 'compile_coffee'
-  , 'copy_javascript', 'symlink_node_modules', ()->
+  , 'compile_documentation', 'compile_coffee'
+  , 'copy_javascript', 'symlink_node_modules', ->
     gulp.watch [
       './api/**/*.coffee'
       './api/**/*.js'

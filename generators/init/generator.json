@@ -16,6 +16,9 @@
       "from": "gitignore.hbs",
       "to": ".gitignore"
     },{
+      "from": "codoopts.hbs",
+      "to": ".codoopts"
+    },{
       "from": "LICENSE.hbs",
       "to": "LICENSE"
     },{
