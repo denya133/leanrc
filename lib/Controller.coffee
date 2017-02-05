@@ -354,6 +354,7 @@ module.exports = (FoxxMC)->
       return
 
     initializeDependencies: (args...)->
+      console.log '???? test @Module', @Module
       @constructor.Module.initializeModules()
       args
 
