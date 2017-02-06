@@ -5,6 +5,7 @@ FoxxMC        = require 'FoxxMC'
 
 class {{addonPrefix}}::{{#camelize}}{{name}}{{/camelize}} extends FoxxMC::Model
   @Module: {{addonPrefix}}
+  @include Basis::ModelsMixin
   @include Basis::SendSignalsMixin
 
   @attr 'title',        joi.string().empty(null).empty('').default(null)
