@@ -3,6 +3,10 @@ FoxxMC        = require 'FoxxMC'
 
 class {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Controller extends FoxxMC::Controller
   @Module: {{addonPrefix}}
+  @include Basis::ControllersMixin
+  @include Basis::CheckSessionsMixin
+
+  # @property [{{addonPrefix}}::{{#camelize}}{{name}}{{/camelize}}] {{#camelize}}{{name}}{{/camelize}} model class
   Model: {{addonPrefix}}::{{#camelize}}{{name}}{{/camelize}}
 
   @initialHook 'checkSession'
