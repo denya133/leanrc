@@ -1,6 +1,14 @@
 Folder for FoxxMC components such as:
+* `adapters`,
+* `components`,
 * `controllers`,
-* `models`,
+* `initializers`,
+* `interfaces`,
 * `mixins`,
+* `models`,
+* `resources`,
 * `scripts`,
+* `serializers`,
+* `services`,
+* `transforms`,
 * `utils`
