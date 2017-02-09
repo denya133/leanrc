@@ -1,4 +1,4 @@
-CoreObject  = require './CoreObject'
+
 
 ###
   ````
@@ -87,7 +87,9 @@ CoreObject  = require './CoreObject'
     console.log 'Bbb', String(b), Bbb.__super__
   ```
 ###
+module.exports = (FoxxMC)->
+  CoreObject  = require('./CoreObject') FoxxMC
 
-class Mixin extends CoreObject
+  class FoxxMC::Mixin extends CoreObject
 
-module.exports = Mixin.initialize()
+  FoxxMC::Mixin.initialize()

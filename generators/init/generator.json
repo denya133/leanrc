@@ -16,6 +16,9 @@
       "from": "gitignore.hbs",
       "to": ".gitignore"
     },{
+      "from": "codoopts.hbs",
+      "to": ".codoopts"
+    },{
       "from": "LICENSE.hbs",
       "to": "LICENSE"
     },{
@@ -28,11 +31,11 @@
       "from": "package.json.hbs",
       "to": "package.json"
     },{
-      "from": "Readme.md.hbs",
-      "to": "Readme.md"
+      "from": "README.md.hbs",
+      "to": "README.md"
     },{
-      "from": "index.js.hbs",
-      "to": "index.js"
+      "from": "index.coffee.hbs",
+      "to": "index.coffee"
     }
   ],
   "dependencies": [],

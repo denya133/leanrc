@@ -3,7 +3,7 @@ inflect       = require('i')()
 FoxxRouter    = require '@arangodb/foxx/router'
 {db}          = require '@arangodb'
 queues        = require '@arangodb/foxx/queues'
-CoreObject    = require './CoreObject'
+
 
 status        = require 'statuses'
 { errors }    = require '@arangodb'
@@ -99,280 +99,302 @@ UNAUTHORIZED      = status 'unauthorized'
   ```
 ###
 
-class Router extends CoreObject
-  @_path: '/'
-  @_name: ''
-  @_module: null
-  @_only: null
-  @_via: null
-  @_except: null
-  @_at: null
-  @_controller: null
+module.exports = (FoxxMC)->
+  CoreObject    = require('./CoreObject') FoxxMC
 
-  @map: (lambda = ()->)->
-    lambda.apply @, []
+  class FoxxMC::Router extends CoreObject
+    @_path: '/'
+    @_name: ''
+    @_module: null
+    @_only: null
+    @_via: null
+    @_except: null
+    @_at: null
+    @_controller: null
 
-  @root: ({to, at, controller, action})->
+    @map: (lambda = ()->)->
+      lambda.apply @, []
 
-  @createFoxxRouter: (method, path, controller, action)->
-    router = FoxxRouter()
-    # console.log 'GGGGGGGGGGGGGGGG createFoxxRouter', @_rootPath, @moduleName()
-    controllerName = inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
-    # moduleName = inflect.classify require("#{@_rootPath}manifest.json").foxxmcModule.prefix
-    Controller = classes[@moduleName()]::[controllerName]
+    @root: ({to, at, controller, action})->
 
-    # console.log '$$$$$$$$$$$$$$$$$ inflect.camelize inflect.underscore "#{controller}_controller"', inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
-    unless Controller?
-      throw new Error "controller `#{controller}` is not exist"
-    endpoint = router[method]? [path, (req, res)=>
-      try
-        if method is 'get'
-          data = Controller.new(req: req, res: res)[action]? []...
+    @createFoxxRouter: (method, path, controller, action)->
+      router = FoxxRouter()
+      # console.log 'GGGGGGGGGGGGGGGG createFoxxRouter', @moduleName()
+      controllerName = inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
+      Controller = classes[@moduleName()]::[controllerName]
+
+      # console.log '$$$$$$$$$$$$$$$$$ inflect.camelize inflect.underscore "#{controller}_controller"', inflect.camelize inflect.underscore "#{controller.replace /[/]/g, '_'}Controller"
+      unless Controller?
+        throw new Error "controller `#{controller}` is not exist"
+      endpoint = router[method]? [path, (req, res)=>
+        try
+          if method is 'get'
+            data = Controller.new(req: req, res: res)[action]? []...
+          else
+            # t1 = Date.now()
+            {read, write} = Controller.getLocksFor "#{Controller.name}::#{action}"
+            # console.log '$$$$$$$$$$$$$$$$$LLLLLLLLLLLlllllllllllllllllll read, write', (Date.now() - t1), read, write
+            data = db._executeTransaction
+              collections:
+                read: read
+                write: write
+                allowImplicit: no
+              action: (params)->
+                do (
+                  {
+                    moduleName
+                    controllerName
+                    action
+                    req
+                    res
+                  }       = params
+                ) ->
+                  # console.log '????????????????/ classes[moduleName]::[controllerName].new', moduleName, controllerName, classes[moduleName], classes[moduleName]::, classes[moduleName]::[controllerName]
+                  classes[moduleName]::[controllerName].new(req: req, res: res)[action]? []...
+              params:
+                moduleName: @moduleName()
+                controllerName: controllerName
+                action: action
+                req: req
+                res: res
+
+          queues._updateQueueDelay()
+        catch e
+          console.log '???????????????????!!', JSON.stringify e
+          if e.isArangoError and e.errorNum is ARANGO_NOT_FOUND
+            res.throw HTTP_NOT_FOUND, e.message
+            return
+          if e.isArangoError and e.errorNum is ARANGO_CONFLICT
+            res.throw HTTP_CONFLICT, e.message
+            return
+          else if e.statusCode?
+            console.error e.message, e.stack
+            res.throw e.statusCode, e.message
+          else
+            console.error 'kkkkkkkk', e.message, e.stack
+            res.throw 500, e.message, e.stack
+            return
+        # console.log '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ data', data.constructor
+        if data?.constructor?.name isnt 'SyntheticResponse'
+          res.send data
+      , action]...
+      # console.log '$$$$$$$$$$$$$ !!!! endpoint', endpoint, method, path, controller, action
+      Controller["_swaggerDefFor_#{action}"]? [endpoint]...
+
+      @Module.context.use router
+
+    @defineMethod: (container, method, path, {to, at, controller, action}={})->
+      unless path?
+        throw new Error 'path is required'
+      path = path.replace /^[/]/, ''
+      if to?
+        unless /[#]/.test to
+          throw new Error '`to` must be in format `<controller>#<action>`'
+        [controller, action] = to.split '#'
+      if not controller? and (_controller = @_controller) isnt ''
+        controller = _controller
+      if not controller? and (_name = @_name) isnt ''
+        controller = _name
+      unless controller?
+        throw new Error 'options `to` or `controller` must be defined'
+      unless action?
+        action = path
+
+      path = switch at ? @_at
+        when 'member'
+          "#{@_path}:#{inflect.singularize inflect.underscore controller.replace(/[/]/g, '_').replace /[_]$/g, ''}/#{path}"
+        when 'collection'
+          "#{@_path}#{path}"
         else
-          # t1 = Date.now()
-          {read, write} = Controller.getLocksFor "#{Controller.name}::#{action}"
-          # console.log '$$$$$$$$$$$$$$$$$LLLLLLLLLLLlllllllllllllllllll read, write', (Date.now() - t1), read, write
-          data = db._executeTransaction
-            collections:
-              read: read
-              write: write
-              allowImplicit: no
-            action: (params)->
-              do (
-                {
-                  moduleName
-                  controllerName
-                  action
-                  req
-                  res
-                }       = params
-              ) ->
-                # console.log '????????????????/ classes[moduleName]::[controllerName].new', moduleName, controllerName, classes[moduleName], classes[moduleName]::, classes[moduleName]::[controllerName]
-                classes[moduleName]::[controllerName].new(req: req, res: res)[action]? []...
-            params:
-              moduleName: @moduleName()
-              controllerName: controllerName
-              action: action
-              req: req
-              res: res
+          "#{@_path}#{path}"
 
-        queues._updateQueueDelay()
-      catch e
-        console.log '???????????????????!!', JSON.stringify e
-        if e.isArangoError and e.errorNum is ARANGO_NOT_FOUND
-          res.throw HTTP_NOT_FOUND, e.message
-          return
-        if e.isArangoError and e.errorNum is ARANGO_CONFLICT
-          res.throw HTTP_CONFLICT, e.message
-          return
-        else if e.statusCode?
-          console.error e.message, e.stack
-          res.throw e.statusCode, e.message
+      container.push
+        method: method
+        path: path
+        controller: controller
+        action: action
+      @createFoxxRouter method, path, controller, action
+      return
+
+    @get: (path, opts)->
+      @_routes ?= []
+      @defineMethod @_routes, 'get', path, opts
+
+    @post: (path, opts)->
+      @_routes ?= []
+      @defineMethod @_routes, 'post', path, opts
+
+    @put: (path, opts)->
+      @_routes ?= []
+      @defineMethod @_routes, 'put', path, opts
+
+    @patch: (path, opts)->
+      @_routes ?= []
+      @defineMethod @_routes, 'patch', path, opts
+
+    @delete: (path, opts)->
+      @_routes ?= []
+      @defineMethod @_routes, 'delete', path, opts
+
+    @resource: (name, opts = null, lambda = null)->
+      vModule = @Module
+      if opts?.constructor is Function
+        lambda = opts
+        opts = {}
+      opts = {} unless opts?
+      {path, module:_module, only, via, except, at, controller} = opts
+      path = path?.replace /^[/]/, ''
+      _path = if path? and path isnt ''
+        "#{path}/"
+      else if path? and path is ''
+        ''
+      else
+        "#{name}/"
+      full_path = switch at ? @_at
+        when 'member'
+          [..., previously, empty] = @_path.split '/'
+          "#{@_path}:#{inflect.singularize inflect.underscore previously}/#{_path}"
+        when 'collection'
+          "#{@_path}#{_path}"
         else
-          console.error 'kkkkkkkk', e.message, e.stack
-          res.throw 500, e.message, e.stack
-          return
-      # console.log '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ data', data.constructor
-      if data?.constructor?.name isnt 'SyntheticResponse'
-        res.send data
-    , action]...
-    # console.log '$$$$$$$$$$$$$ !!!! endpoint', endpoint, method, path, controller, action
-    Controller["_swaggerDefFor_#{action}"]? [endpoint]...
-
-    module.context.use router
-
-  @defineMethod: (container, method, path, {to, at, controller, action}={})->
-    unless path?
-      throw new Error 'path is required'
-    path = path.replace /^[/]/, ''
-    if to?
-      unless /[#]/.test to
-        throw new Error '`to` must be in format `<controller>#<action>`'
-      [controller, action] = to.split '#'
-    if not controller? and (_controller = @_controller) isnt ''
-      controller = _controller
-    if not controller? and (_name = @_name) isnt ''
-      controller = _name
-    unless controller?
-      throw new Error 'options `to` or `controller` must be defined'
-    unless action?
-      action = path
-
-    path = switch at ? @_at
-      when 'member'
-        "#{@_path}:key/#{path}"
-      when 'collection'
-        "#{@_path}#{path}"
+          "#{@_path}#{_path}"
+      parent_name = @_name
+      _name = if _module? and _module isnt ''
+        "#{_module}/"
+      else if _module? and _module is ''
+        ''
       else
-        "#{@_path}#{path}"
-
-    container.push
-      method: method
-      path: path
-      controller: controller
-      action: action
-    @createFoxxRouter method, path, controller, action
-    return
-
-  @get: (path, opts)->
-    @_routes ?= []
-    @defineMethod @_routes, 'get', path, opts
-
-  @post: (path, opts)->
-    @_routes ?= []
-    @defineMethod @_routes, 'post', path, opts
-
-  @put: (path, opts)->
-    @_routes ?= []
-    @defineMethod @_routes, 'put', path, opts
-
-  @patch: (path, opts)->
-    @_routes ?= []
-    @defineMethod @_routes, 'patch', path, opts
-
-  @delete: (path, opts)->
-    @_routes ?= []
-    @defineMethod @_routes, 'delete', path, opts
-
-  @resource: (name, opts = null, lambda = null)->
-    _rootPath = @_rootPath
-    if opts?.constructor is Function
-      lambda = opts
-      opts = {}
-    opts = {} unless opts?
-    {path, module:_module, only, via, except, at, controller} = opts
-    path = path?.replace /^[/]/, ''
-    _path = if path? and path isnt ''
-      "#{path}/"
-    else if path? and path is ''
-      ''
-    else
-      "#{name}/"
-    full_path = switch at ? @_at
-      when 'member'
-        "#{@_path}:key/#{_path}"
-      when 'collection'
-        "#{@_path}#{_path}"
-      else
-        "#{@_path}#{_path}"
-    parent_name = @_name
-    _name = if _module? and _module isnt ''
-      "#{_module}/"
-    else if _module? and _module is ''
-      ''
-    else
-      "#{name}/"
-    @_resources ?= []
-    @_resources.push class ResourceRouter extends Router
-      @_rootPath: _rootPath
-      @_path: full_path
-      @_name: "#{parent_name}#{_name}"
-      @_module: _module
-      @_only: only
-      @_via: via
-      @_except: except
-      @_controller: controller
-      @map lambda
-
-  @namespace: (name, opts = null, lambda = null)->
-    _rootPath = @_rootPath
-    if opts?.constructor is Function
-      lambda = opts
-      opts = {}
-    opts = {} unless opts?
-    {module:_module, prefix, at} = opts
-    parent_path = @_path
-    _path = if prefix? and prefix isnt ''
-      "#{prefix}/"
-    else if prefix? and prefix is ''
-      ''
-    else
-      "#{name}/"
-    parent_name = @_name
-    _name = if _module? and _module isnt ''
-      "#{_module}/"
-    else if _module? and _module is ''
-      ''
-    else
-      "#{name}/"
-    @_resources ?= []
-    if lambda?.constructor is Function
-      @_resources.push class NamespaceRouter extends Router
-        @_rootPath: _rootPath
-        @_path: "#{parent_path}#{_path}"
+        "#{name}/"
+      @_resources ?= []
+      @_resources.push class ResourceRouter extends Router
+        @Module: vModule
+        @_path: full_path
         @_name: "#{parent_name}#{_name}"
-        @_except: 'all'
-        @_at: at
+        @_module: _module
+        @_only: only
+        @_via: via
+        @_except: except
+        @_controller: controller
         @map lambda
 
-  @member: (lambda)->
-    @namespace null, module: '', prefix: '', at: 'member', lambda
-
-  @collection: (lambda = ()->)->
-    @namespace null, module: '', prefix: '', at: 'collection', lambda
-
-  constructor: ()->
-    @_routes ?= []
-    @_resources ?= []
-
-    {
-      _name:name
-      _only:only
-      _via:via
-      _except:except
-      _controller:controller
-    } = @constructor
-    if only?.constructor is String
-      only = [only]
-    if via?.constructor is String
-      via = [via]
-    if except?.constructor is String
-      except = [except]
-
-    methods =
-      list: 'get'
-      detail: 'get'
-      create: 'post'
-      patch: 'patch'
-      update: 'put'
-      delete: 'delete'
-
-    paths =
-      list: ''
-      detail: ':key'
-      create: ''
-      patch: ':key'
-      update: ':key'
-      delete: ':key'
-
-    @_routes = @_routes.concat @constructor._routes if @constructor._routes?
-
-    if name? and name isnt ''
-      if only?
-        only.forEach (action)=>
-          @constructor.defineMethod @_routes, methods[action], paths[action], action: action, controller: controller ? name
-      else if except?
-        for own action, method of methods
-          do (action, method)=>
-            if not except.includes('all') and not except.includes action
-              @constructor.defineMethod @_routes, method, paths[action], action: action, controller: controller ? name
-      else if via?
-        via.forEach (action)=>
-          if action is 'all'
-            for own action, method of methods
-              do (action, method)=>
-                @constructor.defineMethod @_routes, method, paths[action], action: action, controller: controller ? name
-          else
-            @constructor.defineMethod @_routes, methods[action], paths[action], action: action, controller: controller ? name
+    @namespace: (name, opts = null, lambda = null)->
+      vModule = @Module
+      if opts?.constructor is Function
+        lambda = opts
+        opts = {}
+      opts = {} unless opts?
+      {module:_module, prefix, at} = opts
+      parent_path = @_path
+      _path = if prefix? and prefix isnt ''
+        "#{prefix}/"
+      else if prefix? and prefix is ''
+        ''
       else
-        for own action, method of methods
-          do (action, method)=>
-            @constructor.defineMethod @_routes, method, paths[action], action: action, controller: controller ? name
+        "#{name}/"
+      parent_name = @_name
+      _name = if _module? and _module isnt ''
+        "#{_module}/"
+      else if _module? and _module is ''
+        ''
+      else
+        "#{name}/"
+      @_resources ?= []
+      if lambda?.constructor is Function
+        @_resources.push class NamespaceRouter extends Router
+          @Module: vModule
+          @_path: "#{parent_path}#{_path}"
+          @_name: "#{parent_name}#{_name}"
+          @_except: 'all'
+          @_at: at
+          @map lambda
 
-    @constructor._resources?.forEach (ResourceRouter)=>
-      resourceRouter = new ResourceRouter()
-      @_routes = @_routes.concat resourceRouter._routes if resourceRouter._routes?
+    @member: (lambda)->
+      @namespace null, module: '', prefix: '', at: 'member', lambda
 
-    return
+    @collection: (lambda = ()->)->
+      @namespace null, module: '', prefix: '', at: 'collection', lambda
 
-module.exports = Router.initialize()
+    constructor: ()->
+      @_routes ?= []
+      @_resources ?= []
+
+      {
+        _name:name
+        _only:only
+        _via:via
+        _except:except
+        _controller:controller
+      } = @constructor
+      if only?.constructor is String
+        only = [only]
+      if via?.constructor is String
+        via = [via]
+      if except?.constructor is String
+        except = [except]
+
+      methods =
+        list: 'get'
+        detail: 'get'
+        create: 'post'
+        patch: 'patch'
+        update: 'put'
+        delete: 'delete'
+
+      paths =
+        list: ''
+        detail: null
+        create: ''
+        patch: null
+        update: null
+        delete: null
+
+      @_routes = @_routes.concat @constructor._routes if @constructor._routes?
+
+      if name? and name isnt ''
+        if only?
+          only.forEach (action)=>
+            _path = paths[action]
+            _path ?= ':' + inflect.singularize inflect.underscore (controller ? name).replace(/[/]/g, '_').replace /[_]$/g, ''
+            @constructor.defineMethod @_routes, methods[action], _path,
+              action: action
+              controller: controller ? name
+        else if except?
+          for own action, method of methods
+            do (action, method)=>
+              if not except.includes('all') and not except.includes action
+                _path = paths[action]
+                _path ?= ':' + inflect.singularize inflect.underscore (controller ? name).replace(/[/]/g, '_').replace /[_]$/g, ''
+                @constructor.defineMethod @_routes, method, _path,
+                  action: action
+                  controller: controller ? name
+        else if via?
+          via.forEach (action)=>
+            _path = paths[action]
+            _path ?= ':' + inflect.singularize inflect.underscore (controller ? name).replace(/[/]/g, '_').replace /[_]$/g, ''
+            if action is 'all'
+              for own action, method of methods
+                do (action, method)=>
+                  @constructor.defineMethod @_routes, method, _path,
+                    action: action
+                    controller: controller ? name
+            else
+              @constructor.defineMethod @_routes, methods[action], _path,
+                action: action
+                controller: controller ? name
+        else
+          for own action, method of methods
+            do (action, method)=>
+              _path = paths[action]
+              _path ?= ':' + inflect.singularize inflect.underscore (controller ? name).replace(/[/]/g, '_').replace /[_]$/g, ''
+              @constructor.defineMethod @_routes, method, _path,
+                action: action
+                controller: controller ? name
+
+      @constructor._resources?.forEach (ResourceRouter)=>
+        resourceRouter = new ResourceRouter()
+        if resourceRouter._routes?
+          @_routes = @_routes.concat resourceRouter._routes
+
+      return
+
+  FoxxMC::Router.initialize()

@@ -1,7 +1,7 @@
+FoxxMC        = require 'FoxxMC'
 
 
-class {{#camelize}}{{pluralName}}{{/camelize}}Mixin extends FoxxMC::Mixin
-  @_rootPath: "#{__dirname}/../../"
+class {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Mixin extends FoxxMC::Mixin
 
 
-module.exports = {{#camelize}}{{pluralName}}{{/camelize}}Mixin.initialize()
+module.exports = {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Mixin.initialize()

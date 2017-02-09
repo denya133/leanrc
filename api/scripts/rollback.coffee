@@ -1,4 +1,4 @@
-require 'FoxxMC'
+FoxxMC      = require 'FoxxMC'
 
 
 result = FoxxMC::Scripts.rollback

@@ -2,7 +2,7 @@
 
 migration =
   up: ->
-    qualifiedName = module.context.collectionName '{{pluralName}}'
+    qualifiedName = {{addonPrefix}}.context.collectionName '{{pluralName}}'
     unless db._collection qualifiedName
       db._createDocumentCollection qualifiedName, waitForSync: yes
 
@@ -34,7 +34,7 @@ migration =
 
     return
   down: ->
-    qualifiedName = module.context.collectionName '{{pluralName}}'
+    qualifiedName = {{addonPrefix}}.context.collectionName '{{pluralName}}'
     if db._collection qualifiedName
       db._drop qualifiedName
     return

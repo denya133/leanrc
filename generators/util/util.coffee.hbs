@@ -1,0 +1,8 @@
+FoxxMC        = require 'FoxxMC'
+
+
+class {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Util extends FoxxMC::CoreObject
+  @Module: {{addonPrefix}}
+
+
+module.exports = {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Util.initialize()

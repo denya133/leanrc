@@ -1,10 +1,12 @@
+FoxxMC        = require 'FoxxMC'
 
 
-module.context.use FoxxMC::Utils.sessions
+{{#camelize}}{{name}}{{/camelize}}.context.use Basis::SessionsUtil.middleware
 
-class ApplicationRouter extends FoxxMC::Router
-  @_rootPath: "#{__dirname}/../"
-  @map ()->
+class {{#camelize}}{{name}}{{/camelize}}::ApplicationRouter extends FoxxMC::Router
+  @Module: {{#camelize}}{{name}}{{/camelize}}
+  @map ->
+    @namespace 'version', module: '', prefix: ':v', ->
 
 
-module.exports = ApplicationRouter.initialize()
+module.exports = {{#camelize}}{{name}}{{/camelize}}::ApplicationRouter.initialize()

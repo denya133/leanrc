@@ -1,10 +1,15 @@
 _             = require 'lodash'
 joi           = require 'joi'
+FoxxMC        = require 'FoxxMC'
 
-class {{#camelize}}{{name}}{{/camelize}} extends FoxxMC::Model
-  @_rootPath: "#{__dirname}/../../"
+
+class {{addonPrefix}}::{{#camelize}}{{name}}{{/camelize}} extends FoxxMC::Model
+  @Module: {{addonPrefix}}
+  @include Basis::ModelsMixin
+  @include Basis::SendSignalsMixin
+
   @attr 'title',        joi.string().empty(null).empty('').default(null)
   @attr 'description',  joi.string().empty(null).empty('').default(null)
 
 
-module.exports = {{#camelize}}{{name}}{{/camelize}}.initialize()
+module.exports = {{addonPrefix}}::{{#camelize}}{{name}}{{/camelize}}.initialize()

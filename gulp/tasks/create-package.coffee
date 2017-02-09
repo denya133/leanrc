@@ -2,13 +2,13 @@
 gulp              = require 'gulp'
 zip               = require 'gulp-zip'
 { join }          = require 'path'
-{ node_modules }  = require '../../manifest'
+{ foxxmcDependencies }  = require '../../package.json'
 
 ROOT = join __dirname, '../..'
 
 # task 'create_package'
 gulp.task 'create_package', ()->
-  gulp.src node_modules.map((name)->
+  gulp.src foxxmcDependencies.map((name)->
     "node_modules/#{name}/**/*"
   ), base: './', cwd: join ROOT
   .pipe gulp.dest './dist'

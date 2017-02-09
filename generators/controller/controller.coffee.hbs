@@ -1,11 +1,16 @@
+FoxxMC        = require 'FoxxMC'
 
 
-class {{#camelize}}{{pluralName}}{{/camelize}}Controller extends FoxxMC::Controller
-  @_rootPath: "#{__dirname}/../../"
+class {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Controller extends FoxxMC::Controller
+  @Module: {{addonPrefix}}
+  @include Basis::ControllersMixin
+  @include Basis::CheckSessionsMixin
+
+  # @property [{{addonPrefix}}::{{#camelize}}{{name}}{{/camelize}}] {{#camelize}}{{name}}{{/camelize}} model class
   Model: {{addonPrefix}}::{{#camelize}}{{name}}{{/camelize}}
 
   @initialHook 'checkSession'
   @initialHook 'checkOwner', only: ['update', 'delete']
 
 
-module.exports = {{#camelize}}{{pluralName}}{{/camelize}}Controller.initialize()
+module.exports = {{addonPrefix}}::{{#camelize}}{{pluralName}}{{/camelize}}Controller.initialize()
