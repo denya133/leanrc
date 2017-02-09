@@ -1,7 +1,15 @@
+# При старте приложения надо проверять согласованность всех интерфейсов
+
 class CoreObject
 
 
 class Interface extends CoreObject
+  # метод, чтобы объявить виртуальный (скорее всего) метод, если не указан тип, значит это виртуальный атрибут, т.к. если бы это была виртуальная функция, то тип был бы явно указан Function
+  @virtual: (typeDefinition)->
+
+  # метод чтобы объявить атрибут или метод класса
+  @static: (typeDefinition, params, returnValue)->
+
   # методы с такими же названиями будут объявлены в CoreObject
   # но реализоация у них будет другая. В Interface эти методы должны в специальные проперти положить результаты их вызовов при формировании классов-интерфейсов, однако реализация этих методов в CoreObject будет дефайнить реальные атрибуты и методы инстанса и самого класса. (своего рода перегрузка)
   @public: (typeDefinition, params, returnValue)->
@@ -12,8 +20,7 @@ class Interface extends CoreObject
       functionArguments = params
       return {key, Type, functionArguments, returnValue}
     else
-      defaultValue = params
-      return {key, Type, defaultValue}
+      return {key, Type}
 
   @protected: (typeDefinition, params, returnValue)->
     # like public but outter objects does not get data or call methods
@@ -35,8 +42,8 @@ class Interface extends CoreObject
 
 class CucumberInterface extends Interface
 
-  @public color:              String,   'default'
-  @public length:             Number,   90
+  @public color:              String
+  @public length:             Number
   @public culculateSomeText:  Function, [String, String], -> null
   @protected processingColor: Function, [String],         -> String
 
