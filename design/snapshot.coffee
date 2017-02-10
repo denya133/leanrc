@@ -16,5 +16,5 @@ class SnapshotInterface extends Interface
   @public hasMany: Function, [keyName, options], -> [Array, NULL]
   @public serialize: Function, [options], -> Object
 
-class Snapshot extends Service
+class Snapshot extends CoreObject
   @implements SnapshotInterface

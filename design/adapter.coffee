@@ -1,5 +1,5 @@
 class AdapterInterface extends Interface
-  @public defaultSerializer: SerializerInterface
+  @public defaultSerializer: String
   @public createRecord: Function, [store, type, snapshot],            -> data #
   @public deleteRecord: Function, [store, type, snapshot],            -> data #
   @public findAll:      Function, [store, type, snapshotRecordArray], -> data #

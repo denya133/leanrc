@@ -7,5 +7,5 @@ class SerializerInterface extends Interface
   @public normalizeResponse: Function, [store, primaryModelClass, payload, id, requestType], -> Object
   @public serialize: Function, [snapshot, options], -> Object
 
-class Serializer extends Service
+class Serializer extends CoreObject
   @implements SerializerInterface
