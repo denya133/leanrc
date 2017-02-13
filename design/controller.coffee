@@ -1,6 +1,9 @@
 {SELF, NULL, JoiSchema} = FoxxMC::Constants
 
+# получение каких либо данных или вызовы методов, которые должны изменять какие либо данные должны быть адресованы к @[ipoResource] - через указатель, т.к. это private проперти
+
 class FoxxMC::ControllerInterface extends FoxxMC::Interface
+  @private resource: ResourceInterface # setted by constructor()
   @private query: Object
   @private body: Object
   @private recordId: String
