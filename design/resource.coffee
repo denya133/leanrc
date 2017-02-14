@@ -1,6 +1,7 @@
-{SELF, NILL, ANY} = FoxxMC::Constants
+{SELF, NILL, ANY, CLASS} = FoxxMC::Constants
 
 class CrudMixinInterface extends Interface
+  @private @static Model: CLASS
   @private record: [NILL, ANY]
   @private records: [NILL, Array]
 
@@ -21,9 +22,20 @@ class CrudMixinInterface extends Interface
   @public afterUpdate: Function, [ANY], -> ANY
   @public afterDelete: Function, [ANY], -> ANY
 
+class CrudMixin extends Mixin
+  @implements CrudMixinInterface
+
 class ResourceInterface extends Interface
-  @include CrudMixinInterface
   @private controller: ControllerInterface # setted by constructor()
 
 class Resource extends CoreObject
   @implements ResourceInterface
+
+# example in usage
+###
+```coffee
+class CucumberResource extends Resource
+  @include CrudMixin
+  @Model: Cucumber
+```
+###
