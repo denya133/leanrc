@@ -12,6 +12,9 @@ class RouterInterface extends Interface
   @private _at: String
   @private _controller: String
 
+  # must be defined by including mixin or direct definition
+  @public @virtual createNativeRoute: Function, [String, String, String, String], -> NILL
+
   @public map: Function, [lambda], -> SELF
   @public root: Function, [Object], -> NILL
   @public defineMethod: Function, [Array, String, String, Object], -> NILL
@@ -29,3 +32,24 @@ class RouterInterface extends Interface
 
 class Router extends CoreObject
   @implements RouterInterface
+
+
+# example in use
+###
+```coffee
+  Test.context.use Basis::SessionsUtil.middleware
+
+  class Test::ApplicationRouter extends FoxxMC::Router
+    @include FoxxRouterMixin
+    @Module: Test
+    @map ->
+      @namespace 'version', module: '', prefix: ':v', ->
+        @resource 'invitations', except: 'delete', ->
+          @post 'confirm', at: 'collection'
+          @member ->
+            @post 'sendInvite'
+            @resource 'descendants', only: 'list', ->
+              @get 'count', at: 'collection'
+  module.exports = Test::ApplicationRouter.initialize()
+```
+###

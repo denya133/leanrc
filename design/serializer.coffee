@@ -9,3 +9,13 @@ class SerializerInterface extends Interface
 
 class Serializer extends CoreObject
   @implements SerializerInterface
+
+
+# example in use
+###
+```coffee
+  class Test::ApplicationSerializer extends ArangodbSerializer
+    @Module: Test
+  module.exports = Test::ApplicationSerializer.initialize()
+```
+###

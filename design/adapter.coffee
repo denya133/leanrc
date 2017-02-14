@@ -25,3 +25,13 @@ class AdapterInterface extends Interface
 
 class Adapter extends CoreObject
   @implements AdapterInterface
+
+
+# example in use
+###
+```coffee
+  class Test::ApplicationAdapter extends ArangodbAdapter
+    @Module: Test
+  module.exports = Test::ApplicationAdapter.initialize()
+```
+###
