@@ -1,6 +1,6 @@
 _ = require 'lodash'
 
-{Null, Undefined} = FoxxMC::Utils
+{NILL, Undefined} = FoxxMC::Utils
 
 # Virtual Interface
 class FoxxMC::TransformInterface extends FoxxMC::Interface
@@ -14,7 +14,7 @@ class FoxxMC::Transform extends FoxxMC::CoreObject
   serialize: (deserialized, options)->
 
 class FoxxMC::TransformOptionsInterface extends FoxxMC::Interface
-  @public allowNull:   Boolean
+  @public allowNILL:   Boolean
 
 # Generic Interface
 FoxxMC::GenericTransformInterface = (Type)->
@@ -23,91 +23,91 @@ FoxxMC::GenericTransformInterface = (Type)->
     @public serialize:   Function, [Type], -> Type
 
 class BooleanTransformInterface extends FoxxMC::Interface
-  @public deserialize: Function, [[Boolean, Null, Undefined, String, Number], FoxxMC::TransformOptionsInterface], -> [Boolean, Null]
-  @public serialize:   Function, [[Boolean, Null, Undefined], FoxxMC::TransformOptionsInterface], -> [Boolean, Null]
+  @public deserialize: Function, [[Boolean, NILL, Undefined, String, Number], FoxxMC::TransformOptionsInterface], -> [Boolean, NILL]
+  @public serialize:   Function, [[Boolean, NILL, Undefined], FoxxMC::TransformOptionsInterface], -> [Boolean, NILL]
 
 class FoxxMC::BooleanTransform extends FoxxMC::Transform
   @implements BooleanTransformInterface
   deserialize: (serialized, options)->
     type = typeof serialized
 
-    if not serialized? and options.allowNull is yes
-      return null
+    if not serialized? and options.allowNILL is yes
+      return NILL
 
     if type is "boolean"
       return serialized
     else if type is "string"
-      return serialized.match(/^true$|^t$|^1$/i) isnt null
+      return serialized.match(/^true$|^t$|^1$/i) isnt NILL
     else if type is "number"
       return serialized is 1
     else
       return no
   serialize: (deserialized, options)->
-    if not deserialized? and options.allowNull is yes
-      return null
+    if not deserialized? and options.allowNILL is yes
+      return NILL
 
     return Boolean deserialized
 
 class FoxxMC::NumberTransformInterface extends FoxxMC::Interface
   @public deserialize: Function, [
-    [Number, Null, Undefined, String, Boolean, Date]
+    [Number, NILL, Undefined, String, Boolean, Date]
     FoxxMC::TransformOptionsInterface
-  ], -> [Number, Null]
+  ], -> [Number, NILL]
   @public serialize:   Function, [
-    [Number, Null, Undefined, String, Boolean, Date]
+    [Number, NILL, Undefined, String, Boolean, Date]
     FoxxMC::TransformOptionsInterface
-  ], -> [Number, Null]
+  ], -> [Number, NILL]
 
 class FoxxMC::NumberTransform extends FoxxMC::Transform
   @implements FoxxMC::NumberTransformInterface
   deserialize: (serialized)->
     if _.isEmpty serialized
-      return null
+      return NILL
     else
       transformed = Number serialized
-      return if _.isNumber(transformed) then transformed else null
+      return if _.isNumber(transformed) then transformed else NILL
 
   serialize: (deserialized)->
     if _.isEmpty deserialized
-      return null
+      return NILL
     else
       transformed = Number deserialized
-      return if _.isNumber(transformed) then transformed else null
+      return if _.isNumber(transformed) then transformed else NILL
 
 class FoxxMC::StringTransformInterface extends FoxxMC::Interface
   @public deserialize: Function, [
-    [String, Null, Undefined, Number, Boolean, Date]
+    [String, NILL, Undefined, Number, Boolean, Date]
     FoxxMC::TransformOptionsInterface
-  ], -> [String, Null]
+  ], -> [String, NILL]
   @public serialize:   Function, [
-    [String, Null, Undefined, Number, Boolean, Date
-  ], -> [String, Null]
+    [String, NILL, Undefined, Number, Boolean, Date
+  ], -> [String, NILL]
 
 class FoxxMC::StringTransform extends FoxxMC::Transform
   @implements FoxxMC::StringTransformInterface
   deserialize: (serialized)->
-    if _.isNil(serialized) then null else String serialized
+    if _.isNil(serialized) then NILL else String serialized
 
   serialize: (deserialized)->
-    if _.isNil(deserialized) then null else String deserialized
+    if _.isNil(deserialized) then NILL else String deserialized
 
 class FoxxMC::DateTransformInterface extends FoxxMC::Interface
   @public deserialize: Function, [
-    [Date, Null, Undefined, String, Boolean, Number]
+    [Date, NILL, Undefined, String, Boolean, Number]
     FoxxMC::TransformOptionsInterface
-  ], -> [Date, Null]
+  ], -> [Date, NILL]
   @public serialize:   Function, [
-    [Date, Null, Undefined, String, Boolean, Number]
+    [Date, NILL, Undefined, String, Boolean, Number]
     FoxxMC::TransformOptionsInterface
-  ], -> [Date, Null]
+  ], -> [Date, NILL]
 
 class FoxxMC::DateTransform extends FoxxMC::Transform
   @implements FoxxMC::DateTransformInterface
   deserialize: (serialized)->
-    if _.isNil(serialized) then null else Date serialized
+    if _.isNil(serialized) then NILL else Date serialized
 
   serialize: (deserialized)->
     if deserialized instanceof Date and not _.isNaN deserialized
       return deserialized.toISOString()
     else
-      return null
+      return NILL

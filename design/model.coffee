@@ -1,14 +1,14 @@
-{SELF, NULL, ANY} = FoxxMC::Constants
+{SELF, NILL, ANY} = FoxxMC::Constants
 
 # Не декларировал методы которые находятся в Cursor и в Query потому что работа с квери будет вестись через стор (чтобы была единая точка в которой происходит создание всех объектов)
 
 class ModelInterface extends Interface
   @public @static schema: JoiSchema
-  @public @static customFilters: Function, [statement], -> NULL
+  @public @static customFilters: Function, [statement], -> NILL
   @private @static _customFilters: Function, [], -> Object
   @private @static _parentClassesNames: Function, [], -> Array
   @public @static collectionName: Function, [], -> String #adb
-  @public @static collectionNameInDB: Function, [[String, NULL]], -> String #adb
+  @public @static collectionNameInDB: Function, [[String, NILL]], -> String #adb
   @public @static collectionPrefix: Function, [], -> String #adb
   @public @static getLocksFor: Function, [[String, Array], Array], ->Object #adb
 
@@ -30,17 +30,17 @@ class ModelInterface extends Interface
   @private @static _comps: Function, [], -> Object
   @public @static computeds: Function, [], -> Object
 
-  @public @static attribute: Function, [name, schema, Object], -> NULL
-  @public @static attr: Function, [name, schema, Object], -> NULL
-  @public @static property: Function, [name, Object], -> NULL
-  @public @static prop: Function, [name, Object], -> NULL
-  @public @static computed: Function, [name, methods, collections, opts, lambda], -> NULL
-  @public @static comp: Function, [name, methods, collections, opts, lambda], -> NULL
-  @public @static belongsTo: Function, [name, schema, opts], -> NULL
-  @public @static hasMany: Function, [name, opts], -> NULL
-  @public @static hasOne: Function, [name, opts], -> NULL
+  @public @static attribute: Function, [name, schema, Object], -> NILL
+  @public @static attr: Function, [name, schema, Object], -> NILL
+  @public @static property: Function, [name, Object], -> NILL
+  @public @static prop: Function, [name, Object], -> NILL
+  @public @static computed: Function, [name, methods, collections, opts, lambda], -> NILL
+  @public @static comp: Function, [name, methods, collections, opts, lambda], -> NILL
+  @public @static belongsTo: Function, [name, schema, opts], -> NILL
+  @public @static hasMany: Function, [name, opts], -> NILL
+  @public @static hasOne: Function, [name, opts], -> NILL
 
-  @public @static validate: Function, [attribute, options], -> NULL
+  @public @static validate: Function, [attribute, options], -> NILL
 
   @public @static new: Function, [attributes], -> ModelInterface
 
@@ -57,24 +57,24 @@ class ModelInterface extends Interface
   @public type: String
 
   @public validate: Function, [], -> SELF
-  @public beforeValidate: Function, [], -> NULL
-  @public afterValidate: Function, [], -> NULL
+  @public beforeValidate: Function, [], -> NILL
+  @public afterValidate: Function, [], -> NILL
   @public save: Function, [], -> SELF
-  @public beforeSave: Function, [], -> NULL
+  @public beforeSave: Function, [], -> NILL
   @public afterSave: Function, [ANY], -> ANY # any type
   @public create: Function, [], -> SELF
-  @public beforeCreate: Function, [], -> NULL
+  @public beforeCreate: Function, [], -> NILL
   @public afterCreate: Function, [ANY], -> ANY # any type
   @public update: Function, [], -> SELF
-  @public beforeUpdate: Function, [], -> NULL
+  @public beforeUpdate: Function, [], -> NILL
   @public afterUpdate: Function, [ANY], -> ANY # any type
   @public delete: Function, [], -> SELF
-  @public beforeDelete: Function, [], -> NULL
+  @public beforeDelete: Function, [], -> NILL
   @public afterDelete: Function, [ANY], -> ANY # any type
   @public destroy: Function, [], -> SELF
-  @public beforeDestroy: Function, [], -> NULL
-  @public afterDestroy: Function, [], -> NULL
-  @public recordHasBeenChanged: Function, [], -> NULL
+  @public beforeDestroy: Function, [], -> NILL
+  @public afterDestroy: Function, [], -> NILL
+  @public recordHasBeenChanged: Function, [], -> NILL
   @public updateEdges: Function, [ANY], -> ANY # any type
 
   @public delay: Function, [Object], -> Object

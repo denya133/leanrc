@@ -1,8 +1,8 @@
-{SELF, NULL, ANY} = FoxxMC::Constants
+{SELF, NILL, ANY} = FoxxMC::Constants
 
 class CrudMixinInterface extends Interface
-  @private record: [NULL, ANY]
-  @private records: [NULL, Array]
+  @private record: [NILL, ANY]
+  @private records: [NILL, Array]
 
   @public list: Function, [Object], -> Array
   @public detail: Function, [String], -> ANY
@@ -10,11 +10,11 @@ class CrudMixinInterface extends Interface
   @public update: Function, [String, Object], -> ANY
   @public delete: Function, [String], -> ANY
 
-  @public beforeList: Function, [], -> NULL
-  @public beforeDetail: Function, [], -> NULL
-  @public beforeCreate: Function, [], -> NULL
-  @public beforeUpdate: Function, [], -> NULL
-  @public beforeDelete: Function, [], -> NULL
+  @public beforeList: Function, [], -> NILL
+  @public beforeDetail: Function, [], -> NILL
+  @public beforeCreate: Function, [], -> NILL
+  @public beforeUpdate: Function, [], -> NILL
+  @public beforeDelete: Function, [], -> NILL
   @public afterList: Function, [ANY], -> ANY
   @public afterDetail: Function, [ANY], -> ANY
   @public afterCreate: Function, [ANY], -> ANY

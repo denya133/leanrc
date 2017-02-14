@@ -1,4 +1,4 @@
-{SELF, NULL, ANY} = FoxxMC::Constants
+{SELF, NILL, ANY} = FoxxMC::Constants
 
 class ServiceInterface extends Interface
   @public @static isServiceFactory: Boolean

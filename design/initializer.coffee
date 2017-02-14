@@ -1,10 +1,10 @@
-{SELF, NULL, ANY} = FoxxMC::Constants
+{SELF, NILL, ANY} = FoxxMC::Constants
 
 class InitializerInterface extends Interface
   @public name: String
-  @public before: [String, NULL]
-  @public after: [String, NULL, Array]
-  @public initialize: Function, [ApplicationInterface], -> NULL
+  @public before: [String, NILL]
+  @public after: [String, NILL, Array]
+  @public initialize: Function, [ApplicationInterface], -> NILL
 
 class Initializer extends CoreObject
   @implements InitializerInterface

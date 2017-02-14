@@ -44,7 +44,7 @@ class CucumberInterface extends Interface
 
   @public color:              String
   @public length:             Number
-  @public culculateSomeText:  Function, [String, String], -> null
+  @public culculateSomeText:  Function, [String, String], -> NILL
   @protected processingColor: Function, [String],         -> String
 
 

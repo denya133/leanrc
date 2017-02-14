@@ -1,4 +1,4 @@
-{SELF, NULL} = FoxxMC::Constants
+{SELF, NILL} = FoxxMC::Constants
 
 class ModuleInterface extends  CoreObject
   @public @virtual 'Utils'
@@ -6,8 +6,8 @@ class ModuleInterface extends  CoreObject
   @public @static @virtual 'context'
   @public @static Module: SELF
 
-  @private @static getClassesFor: Function, [String], -> NULL
-  @private @static initializeModules: Function, [], -> NULL
+  @private @static getClassesFor: Function, [String], -> NILL
+  @private @static initializeModules: Function, [], -> NILL
 
   @public @static use: Function, [], -> FoxxMC::RouterInterface
   @public @static initialize: Function, [], -> SELF

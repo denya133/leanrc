@@ -1,4 +1,4 @@
-{SELF, NULL, ANY} = FoxxMC::Constants
+{SELF, NILL, ANY} = FoxxMC::Constants
 
 class ContainerProxyMixinInterface extends Interface
   @public lookup: Function, [fullName, options], -> ANY

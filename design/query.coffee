@@ -1,4 +1,4 @@
-{SELF, NULL} = FoxxMC::Constants
+{SELF, NILL} = FoxxMC::Constants
 
 # Здесь задекларировано как сейчас этот класс выглядит
 # возможно большая часть этого останется и перейдет в финальный вариант
@@ -39,14 +39,14 @@ class FoxxMC::QueryInterface extends FoxxMC::Interface
   @public from: Function, [collectionName], -> SELF
   @public joins: Function, [definitions], -> SELF
   @public for: Function, [definitions], -> FoxxMC::QueryInInterface
-  @public where: Function, [conditions, [bindings, NULL]], -> SELF
-  @public filter: Function, [conditions, [bindings, NULL]], -> SELF
-  @public let: Function, [definition, [bindings, NULL]], -> SELF
+  @public where: Function, [conditions, [bindings, NILL]], -> SELF
+  @public filter: Function, [conditions, [bindings, NILL]], -> SELF
+  @public let: Function, [definition, [bindings, NILL]], -> SELF
   @public group: Function, [definition], -> SELF
   @public collect: Function, [definition], -> SELF
   @public aggregate: Function, [definition], -> SELF
   @public into: Function, [variable], -> SELF
-  @public having: Function, [conditions, [bindings, NULL]], -> SELF
+  @public having: Function, [conditions, [bindings, NILL]], -> SELF
   @public sort: Function, [definition], -> SELF
   @public limit: Function, [definition], -> SELF
   @public distinct: Function, [], -> SELF

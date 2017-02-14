@@ -1,4 +1,4 @@
-{SELF, NULL, ANY} = FoxxMC::Constants
+{SELF, NILL, ANY} = FoxxMC::Constants
 
 class SerializerInterface extends Interface
   @public store: StoreInterface

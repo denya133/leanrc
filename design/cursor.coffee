@@ -1,4 +1,4 @@
-{SELF, NULL} = FoxxMC::Constants
+{SELF, NILL} = FoxxMC::Constants
 
 # под вопросом: будет ли курсор отдавать инстансы модели, или простые объекты
 
@@ -11,13 +11,13 @@ class CursorInterface extends Interface
   @public toArray: Function, [], -> Object
   @public next: Function, [], -> Object
   @public hasNext: Function, [], -> Boolean
-  @public dispose: Function, [], -> NULL
+  @public dispose: Function, [], -> NILL
   @public total: Function, [], -> Number
   @public limit: Function, [], -> Number
   @public offset: Function, [], -> Number
   @public count: Function, [], -> Number
   @public length: Function, [], -> Number
-  @public forEach: Function, [lambda], -> NULL
+  @public forEach: Function, [lambda], -> NILL
   @public map: Function, [lambda], -> Array
   @public filter: Function, [lambda], -> Array
   @public find: Function, [lambda], -> Object

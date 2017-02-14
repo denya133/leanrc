@@ -1,28 +1,39 @@
-{SELF, NULL} = FoxxMC::Constants
+{SELF, NILL, ANY} = FoxxMC::Constants
 
 class StoreInterface extends Interface
-  @public adapter: String
-  @public adapterFor: Function, [String], -> AdapterInterface
-  @public createRecord: Function, [modelName, Object], -> ModelInterface
-  @public deleteRecord: Function, [ModelInterface], -> NULL
-  @public filter: Function, [modelName, query, filter], -> CursorInterface
-  @public findAll: Function, [modelName, options], -> CursorInterface
-  @public findRecord: Function, [modelName, id, options], -> ModelInterface
-  @public getReference: Function, [type, id], -> InternalModelInterface
-  @public hasRecordForId: Function, [modelName, id], -> Boolean # true if loaded
-  @public modelFor: Function, [modelName], -> ModelClass
-  @public normalize: Function, [modelName, payload], -> Object
-  #This method returns a filtered array that contains all of the known records for a given type in the store.
-  @public peekAll: Function, [modelName], -> Array
-  # Get a record by a given type and ID without triggering a fetch.
-  @public peekRecord: Function, [modelName, id], -> [ModelInterface, NULL]
-  @public push: Function, [[Object, Array]], ->[ModelInterface, CursorInterface]
-  @public pushPayload: Function, [modelName, inputPayload], -> NULL
-  @public query: Function, [modelName, query], -> CursorInterface
-  @public queryRecord: Function, [modelName, query], -> ModelInterface
+  @public defaultAdapter: String # adapter type by default ['-arangodb', '-mongodb', '-rest', '-json-api']
+  @public adapterFor: Function, [modelName], -> AdapterInterface
   @public serializerFor: Function, [modelName], -> SerializerInterface
-  @public unloadAll: Function, [modelName], -> NULL
-  @public unloadRecord: Function, [ModelInterface], -> NULL
+  @public modelFor: Function, [modelName], -> ModelClass
+
+  @public create: Function, [modelName, Object], -> ModelInterface
+  @public createDirectly: Function, [modelName, Object], -> ModelInterface
+  @public delete: Function, [modelName, String], -> ModelInterface
+  @public deleteBy: Function, [modelName, QueryObjectInterface], -> ModelInterface
+  @public destroy: Function, [modelName, String], -> NILL
+  @public destroyBy: Function, [modelName, QueryObjectInterface], -> NILL
+  @public find: Function, [modelName, String], -> ModelInterface
+  @public findBy: Function, [modelName, QueryObjectInterface], -> ModelInterface
+  @public filter: Function, [modelName, QueryObjectInterface], -> CursorInterface
+  @public update: Function, [modelName, String, Object], -> ModelInterface
+  @public updateBy: Function, [modelName, QueryObjectInterface, Object], -> ModelInterface
+  @public query: Function, [modelName, QueryObjectInterface], -> ANY
+  @public forEach: Function, [modelName, Function], -> NILL
+  @public map: Function, [modelName, Function], -> CursorInterface
+  @public reduce: Function, [modelName, Function, ANY], -> ANY
+  @public sortBy: Function, [modelName, Object], -> CursorInterface
+  @public groupBy: Function, [modelName, Object], -> ANY
+  @public includes: Function, [modelName, String], -> Boolean
+  @public exists: Function, [modelName, QueryObjectInterface], -> Boolean
+  @public length: Function, [modelName], -> Number
+  @public pushInto: Function, [modelName, [Array, Object]], -> Boolean
+  @public push: Function, [Object], -> Boolean # when keys are modelNames
+
+  @public getInternalModel: Function, [type, id], -> InternalModelInterface
+
+  # normalize converts a json payload into the normalized form that push expects.
+  @public normalize: Function, [modelName, Object], -> Object # eq. serializeFromClient
+  @public serialize: Function, [modelName, String], -> Object # eq. serializeForClient
 
 class Store extends Service
   @implements StoreInterface

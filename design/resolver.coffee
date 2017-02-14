@@ -1,4 +1,4 @@
-{SELF, NULL, ANY} = FoxxMC::Constants
+{SELF, NILL, ANY} = FoxxMC::Constants
 
 class ResolvedSpecInterface extends Interface
   @public fullName: String
@@ -13,7 +13,7 @@ class ResolverInterface extends Interface
   @public namespace: ApplicationInterface
   @protected lookupDescription: Function, [fullName], -> String
   @protected parseName: Function, [fullName], -> ResolvedSpecInterface
-  @protected useRouterNaming: Function, [ResolvedSpecInterface], -> NULL
+  @protected useRouterNaming: Function, [ResolvedSpecInterface], -> NILL
   @public resolve: Function, [fullName], -> Object # may be class (factory)
   @protected resolveController: Function, [ResolvedSpecInterface], -> Object # may be class (factory)
   @protected resolveMixin: Function, [ResolvedSpecInterface], -> Object # may be class (factory)

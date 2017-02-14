@@ -1,4 +1,4 @@
-{SELF, NULL, ANY} = FoxxMC::Constants
+{SELF, NILL, ANY} = FoxxMC::Constants
 
 # В InternalModel будут скрываться внутрение механизмы, в то время как Model будет внутри себя иметь ссылку на InternalModel-объект, выступая в качестве Proxy (т.к. все методы InternalModel она будет зеркально отображать на своем интерфейсе без добавления дополнительной функциональности)
 
@@ -12,7 +12,7 @@ class InternalModelInterface extends Interface
   @public recordReference: Function, [], -> Object
   @public references: Function, [snapshot, options], -> Object
   @public record: Function, [], -> Object
-  @public deleteRecord: Function, [], -> NULL
+  @public deleteRecord: Function, [], -> NILL
   # ... здесь еще много всяко-рзных методов.
 
 class InternalModel extends CoreObject
