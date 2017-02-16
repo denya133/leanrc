@@ -20,3 +20,12 @@ module.exports = (FoxxMC)->
 
 
   FoxxMC::Serializer.initialize()
+
+# example in use
+###
+```coffee
+  class Test::ApplicationSerializer extends ArangodbSerializer
+    @Module: Test
+  module.exports = Test::ApplicationSerializer.initialize()
+```
+###
