@@ -5,7 +5,7 @@ module.exports = (FoxxMC)->
 
   class FoxxMC::BooleanTransform extends Transform
     @implements BooleanTransformInterface
-    deserialize: (serialized, options)->
+    @instanceMethod 'deserialize', (serialized, options)->
       type = typeof serialized
 
       if not serialized? and options.allowNull is yes
@@ -19,7 +19,7 @@ module.exports = (FoxxMC)->
         return serialized is 1
       else
         return no
-    serialize: (deserialized, options)->
+    @instanceMethod 'serialize', (deserialized, options)->
       if not deserialized? and options.allowNull is yes
         return null
 

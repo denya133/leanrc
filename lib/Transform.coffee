@@ -5,7 +5,7 @@ module.exports = (FoxxMC)->
   # Virtual class. serialize and deserialize declared as `virtual` in interface
   class FoxxMC::Transform extends CoreObject
     @implements TransformInterface
-    deserialize: ->
-    serialize: ->
+    @instanceMethod 'deserialize', ->
+    @instanceMethod 'serialize', ->
 
   FoxxMC::Transform.initialize()

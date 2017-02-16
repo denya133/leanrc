@@ -7,10 +7,10 @@ module.exports = (FoxxMC)->
 
   class FoxxMC::StringTransform extends Transform
     @implements StringTransformInterface
-    deserialize: (serialized)->
+    @instanceMethod 'deserialize', (serialized)->
       if _.isNil(serialized) then null else Date serialized
 
-    serialize: (deserialized)->
+    @instanceMethod 'serialize', (deserialized)->
       if deserialized instanceof Date and not _.isNaN deserialized
         return deserialized.toISOString()
       else

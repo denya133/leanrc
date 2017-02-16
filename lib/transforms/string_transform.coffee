@@ -7,10 +7,10 @@ module.exports = (FoxxMC)->
 
   class FoxxMC::StringTransform extends Transform
     @implements StringTransformInterface
-    deserialize: (serialized)->
+    @instanceMethod 'deserialize', (serialized)->
       if _.isNil(serialized) then null else String serialized
 
-    serialize: (deserialized)->
+    @instanceMethod 'serialize', (deserialized)->
       if _.isNil(deserialized) then null else String deserialized
 
   FoxxMC::StringTransform.initialize()

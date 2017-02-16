@@ -7,14 +7,14 @@ module.exports = (FoxxMC)->
 
   class FoxxMC::NumberTransform extends Transform
     @implements NumberTransformInterface
-    deserialize: (serialized)->
+    @instanceMethod 'deserialize', (serialized)->
       if _.isEmpty serialized
         return null
       else
         transformed = Number serialized
         return if _.isNumber(transformed) then transformed else null
 
-    serialize: (deserialized)->
+    @instanceMethod 'serialize', (deserialized)->
       if _.isEmpty deserialized
         return null
       else
