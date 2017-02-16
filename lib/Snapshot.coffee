@@ -6,7 +6,7 @@ module.exports = (FoxxMC)->
   InternalModelInterface  = require('../interfaces/internal_model') FoxxMC
   SnapshotInterface = require('./interfaces/snapshot') FoxxMC
   {SELF, NILL, ANY, CLASS} = require('./Constants') FoxxMC
-  # Virtual class. serialize and deserialize declared as `virtual` in interface
+
   class FoxxMC::Snapshot extends CoreObject
     @implements SnapshotInterface
     ipoAttributes         = Symbol 'attributes'
