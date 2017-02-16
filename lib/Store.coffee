@@ -1,6 +1,31 @@
-{SELF, NILL, ANY} = FoxxMC::Constants
 
-class StoreInterface extends Interface
+
+module.exports = (FoxxMC)->
+  Service  = require('./Service') FoxxMC
+  # ModelInterface  = require('../interfaces/model') FoxxMC
+  # InternalModelInterface  = require('../interfaces/internal_model') FoxxMC
+  StoreInterface = require('./interfaces/Store') FoxxMC
+  {SELF, NILL, ANY, CLASS} = require('./Constants') FoxxMC
+
+  class FoxxMC::Store extends Service
+    @implements StoreInterface
+
+    # public
+    @defineAccessor String, 'defaultAdapter', '-default'
+
+    @instanceMethod 'serialize', (modelName, id, options)->
+      # eq. serializeForClient
+      snapshot = @getInternalModel(modelName, id).createSnapshot()
+      snapshot.serialize options
+
+    @instanceMethod 'normalize', (modelName, payload)->
+      # eq. serializeFromClient
+      assert "You need to pass a model name to the store's normalize method", not _.isEmpty modelName
+      assert "Passing classes to store methods has been removed. Please pass a dasherized string instead of #{FoxxMC::Utils.inspect(modelName)}", typeof modelName is 'string'
+      serializer = @serializerFor modelName
+      model = @modelFor modelName
+      serializer.normalize model, payload
+
   @public defaultAdapter: String # adapter type by default ['-arangodb', '-mongodb', '-rest', '-json-api']
   @public adapterFor: Function, [modelName], -> AdapterInterface
   @public serializerFor: Function, [modelName], -> SerializerInterface
@@ -33,7 +58,4 @@ class StoreInterface extends Interface
 
   # normalize converts a json payload into the normalized form that push expects.
   @public normalize: Function, [modelName, Object], -> Object # eq. serializeFromClient
-  @public serialize: Function, [modelName, String], -> Object # eq. serializeForClient
-
-class Store extends Service
-  @implements StoreInterface
+  # @public serialize: Function, [modelName, String], -> Object
