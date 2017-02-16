@@ -453,10 +453,8 @@ module.exports = (FoxxMC)->
         method = Class.__super__?[methodName]
         method?.apply @, args
 
-    @new: (attributes, currentUser=null)->
-      # console.log '!!!!???/', @, JSON.stringify attributes
-      Model = @
-      new Model attributes, currentUser
+    @new: (args...)->
+      new @ args...
 
     save: ->
       @
