@@ -21,6 +21,21 @@ module.exports = (FoxxMC)->
     @public modelFor: Function
     , [modelName: String]
     , -> return: CLASS
+    @private modelFactoryFor: Function
+    , [modelName: String]
+    , -> return: CLASS
+    @private modelForMixin: Function
+    , [modelName: String]
+    , -> return: CLASS
+
+    @private generateId: Function
+    ,
+      [
+        modelName: String
+      ,
+        data: Object
+      ]
+    , -> return: String
 
     @public create: Function
     ,
@@ -204,6 +219,15 @@ module.exports = (FoxxMC)->
       ]
     , -> return: InternalModelInterface
 
+    @private internalModelForId: Function
+    ,
+      [
+        modelName: String
+      ,
+        id: String
+      ]
+    , -> return: InternalModelInterface
+
     # normalize converts a json payload into the normalized form that push expects.
     @public normalize: Function
     ,
@@ -213,6 +237,7 @@ module.exports = (FoxxMC)->
         payload: Object
       ]
     , -> return: Object # eq. serializeFromClient
+
     @public serialize: Function
     ,
       [
@@ -223,5 +248,23 @@ module.exports = (FoxxMC)->
         options: Object
       ]
     , -> return: Object # eq. serializeForClient
+
+    @public unload: Function # need for remove object in memory
+    ,
+      [
+        modelName: String
+      ,
+        id: String
+      ]
+    , -> return: NILL
+
+    @public unloadBy: Function # need for remove objects in memory
+    ,
+      [
+        modelName: String
+      ,
+        query: QueryInterface
+      ]
+    , -> return: NILL
 
   FoxxMC::StoreInterface.initialize()
