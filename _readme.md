@@ -1,7 +1,12 @@
-foxxmc-{{name}}
-===
+FoxxMC
+================================
 
-### FoxxMC application for <description>
+FoxxMC is Model-Controller microframework like Rails (but without View)
+and easy way to create APIs and simple web applications from
+within ArangoDB. It is inspired by Rails, the classy Ruby web
+framework.
+
+It is based on ArangoDB Foxx framework.
 
 ## For install as global package
 ```
@@ -64,7 +69,8 @@ sudo npm i -g forever
 sudo npm i -g coffee-script
 ```
 
-## Скачать сервер ArangoDB можно с официального сайта
+
+## Скачать сервер ArangoDB можно с официального сайта:
 
 https://www.arangodb.com/download/ubuntu/
 
@@ -81,6 +87,12 @@ https://www.arangodb.com/download/ubuntu/
 
 Вместо него создаем символьную ссылку
 `sudo ln -s ~/repositories/<имя приложения>/ /var/lib/arangodb3-apps/_db/<имя базы данных>/api/APP`
+
+Для автоматического релоада кода находясь в папке репозитория:
+`gulp watch`
+
+Для того, чтобы собрать дистрибутив, чтобы деплоить на продакшен:
+`gulp build`
 
 ## !!! Для file and socket.io стриминга в режиме development
 надо запускать:
@@ -110,6 +122,7 @@ trusted-origin = http://127.0.0.1:4200
 [http]
 trusted-origin = http://<домен на котором запущен сайт>
 ```
+
 
 ## Для импорта дампа с продакшена в битбакет надо залить дамп
 

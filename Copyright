@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// FoxxMC: This is microframework like Rails (but without View) for building rich API servers
-/// Copyright (C) 2016-2017 SAIFAS, Russia
+/// LeanRC is a lightweight framework for creating applications based upon the classic Model-View-Controller design meta-pattern.
+/// Copyright (C) 2016-2017 SAIFAS LLC, Russia
 ///
 /// This program is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as published

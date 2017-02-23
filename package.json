@@ -1,6 +1,6 @@
 {
-  "name": "FoxxMC",
-  "description": "This is Model-Controller microframework like Rails (but without View) for building rich API servers.",
+  "name": "LeanRC",
+  "description": "LeanRC is a lightweight framework for creating applications based upon the classic Model-View-Controller design meta-pattern",
   "version": "2.0.0-rc.19",
   "main": "dist/index.js",
   "private": true,
@@ -23,9 +23,6 @@
     "highload",
     "distributed system"
   ],
-  "bin": {
-    "fox": "./bin/foxxmc.coffee"
-  },
   "scripts": {
     "postinstall": "coffee --compile --output ./dist ./lib",
     "test": ""
@@ -55,7 +52,7 @@
     "supererror": "0.7.1"
   },
   "devDependencies": {
-    "FoxxMC": "file:./",
+    "LeanRC": "file:./",
     "coffee-script": "1.12.1",
     "gulp": "3.9.1",
     "gulp-concat": "2.6.0",
