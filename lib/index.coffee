@@ -7,10 +7,10 @@ class LeanRC
   # Scripts: {}
 
   require('./interfaces/NotificationInterface') LeanRC # done
-  require('./interfaces/NotifierInterface') LeanRC
+  require('./interfaces/NotifierInterface') LeanRC # done
   require('./interfaces/ObserverInterface') LeanRC # done
   require('./interfaces/CommandInterface') LeanRC
-  require('./interfaces/MediatorInterface') LeanRC
+  require('./interfaces/MediatorInterface') LeanRC # done
   require('./interfaces/ProxyInterface') LeanRC
   require('./interfaces/ControllerInterface') LeanRC
   require('./interfaces/ModelInterface') LeanRC
@@ -18,10 +18,10 @@ class LeanRC
   require('./interfaces/FacadeInterface') LeanRC
 
   require('./patterns/observer/Notification') LeanRC # done
-  require('./patterns/observer/Notifier') LeanRC
+  require('./patterns/observer/Notifier') LeanRC # done
   require('./patterns/observer/Observer') LeanRC # done
   require('./patterns/proxy/Proxy') LeanRC
-  require('./patterns/mediator/Mediator') LeanRC
+  require('./patterns/mediator/Mediator') LeanRC # done
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
   require('./patterns/facade/Facade') LeanRC

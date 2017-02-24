@@ -3,14 +3,14 @@ RC = require 'RC'
 module.exports = (LeanRC)->
   class LeanRC::MediatorInterface extends RC::Interface
     @include LeanRC::NotifierInterface
-    
-    @public getMediatorName: Function,
+
+    @public @virtual getMediatorName: Function,
       args: []
       return: String
-    @public getViewComponent: Function,
+    @public @virtual getViewComponent: Function,
       args: []
       return: RC::Constants.ANY
-    @public setViewComponent: Function,
+    @public @virtual setViewComponent: Function,
       args: [RC::Constants.ANY]
       return: RC::Constants.NILL
     @public @virtual listNotificationInterests: Function,

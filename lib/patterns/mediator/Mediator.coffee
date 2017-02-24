@@ -4,26 +4,25 @@ module.exports = (LeanRC)->
   class LeanRC::Mediator extends LeanRC::Notifier
     @implements LeanRC::MediatorInterface
 
-    @public @static NAME: String,
-      get: -> @name
+    ipsMediatorName = @private mediatorName: String
+    ipoViewComponent = @private viewComponent: RC::Constants.ANY
 
     @public getMediatorName: Function,
-      default: -> @mediatorName
+      default: -> @[ipsMediatorName]
 
     @public getViewComponent: Function,
-      default: -> @viewComponent
+      default: -> @[ipoViewComponent]
 
     @public setViewComponent: Function,
-      default: (viewComponent)->
-        @viewComponent = viewComponent
+      default: (aoViewComponent)->
+        @[ipoViewComponent] = aoViewComponent
         return
 
     @public listNotificationInterests: Function,
       default: -> []
 
     @public handleNotification: Function,
-      default: (notification)->
-        return
+      default: -> return
 
     @public onRegister: Function,
       default: -> return
@@ -31,16 +30,11 @@ module.exports = (LeanRC)->
     @public onRemove: Function,
       default: -> return
 
-
-    @private mediatorName: String
-    @private viewComponent: RC::Constants.ANY
-
-    constructor: (mediatorName, viewComponent)->
+    constructor: (asMediatorName, aoViewComponent)->
       @super arguments...
 
-      @mediatorName = mediatorName ? Mediator.NAME
-      @viewComponent = viewComponent
-
+      @[ipsMediatorName] = asMediatorName ? @constructor.name
+      @[ipoViewComponent] = aoViewComponent
 
 
   return LeanRC::Mediator.initialize()
