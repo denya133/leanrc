@@ -13,16 +13,16 @@ module.exports = (LeanRC)->
         @[ipsName]
 
     @public setBody: Function,
-      default: (body)->
-        @[ipoBody] = body
+      default: (aoBody)->
+        @[ipoBody] = aoBody
         return
 
     @public getBody: Function,
       default: -> @[ipoBody]
 
     @public setType: Function,
-      default: (type)->
-        @[ipsType] = type
+      default: (asType)->
+        @[ipsType] = asType
         return
 
     @public getType: Function,
@@ -36,10 +36,10 @@ module.exports = (LeanRC)->
           Type: #{if @getType()? then @getType() else 'null'}
         """
 
-    constructor: (name, body, type)->
-      @[ipsName] = name
-      @[ipoBody] = body
-      @[ipsType] = type
+    constructor: (asName, aoBody, asType)->
+      @[ipsName] = asName
+      @[ipoBody] = aoBody
+      @[ipsType] = asType
 
 
 

@@ -2,22 +2,22 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::ObserverInterface extends RC::Interface
-    @public setNotifyMethod: Function,
+    @public @virtual setNotifyMethod: Function,
       args: [Function]
       return: RC::Constants.NILL
-    @public setNotifyContext: Function,
-      args: [Object]
+    @public @virtual setNotifyContext: Function,
+      args: [RC::Constants.ANY]
       return: RC::Constants.NILL
-    @public getNotifyMethod: Function,
+    @public @virtual getNotifyMethod: Function,
       args: []
       return: Function
-    @public getNotifyContext: Function,
+    @public @virtual getNotifyContext: Function,
       args: []
-      return: Object
-    @public compareNotifyContext: Function,
-      args: [Object]
+      return: RC::Constants.ANY
+    @public @virtual compareNotifyContext: Function,
+      args: [RC::Constants.ANY]
       return: Boolean
-    @public notifyObserver: Function,
+    @public @virtual notifyObserver: Function,
       args: [LeanRC::NotificationInterface]
       return: RC::Constants.NILL
 

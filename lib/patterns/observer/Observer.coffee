@@ -4,40 +4,37 @@ module.exports = (LeanRC)->
   class LeanRC::Observer extends RC::CoreObject
     @implements LeanRC::ObserverInterface
 
+    ipoNotify = @private notify: RC::Constants.ANY
+    ipoContext = @private context: RC::Constants.ANY
+
     @public setNotifyMethod: Function,
-      default: (notifyMethod)->
-        @notify = notifyMethod
+      default: (amNotifyMethod)->
+        @[ipoNotify] = amNotifyMethod
         return
 
     @public setNotifyContext: Function,
-      default: (notifyContext)->
-        @context = notifyContext
+      default: (aoNotifyContext)->
+        @[ipoContext] = aoNotifyContext
         return
 
     @public getNotifyMethod: Function,
-      default: -> @notify
+      default: -> @[ipoNotify]
 
     @public getNotifyContext: Function,
-      default: -> @context
+      default: -> @[ipoContext]
 
     @public compareNotifyContext: Function,
       default: (object)->
-        object is @context
+        object is @[ipoContext]
 
     @public notifyObserver: Function,
       default: (notification)->
         @getNotifyMethod().call @getNotifyContext(), notification
         return
 
-
-    @private notify: Function,
-      args: RC::Constants.ANY
-      return: RC::Constants.ANY
-    @private context: RC::Constants.ANY
-
-    constructor: (notifyMethod, notifyContext)->
-      @setNotifyMethod notifyMethod
-      @setNotifyContext notifyContext
+    constructor: (amNotifyMethod, aoNotifyContext)->
+      @setNotifyMethod amNotifyMethod
+      @setNotifyContext aoNotifyContext
 
 
 
