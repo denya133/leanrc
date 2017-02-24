@@ -7,19 +7,19 @@ module.exports = (LeanRC)->
       return: String
     @public setBody: Function,
       args: [Object]
-      return RC::Constants.NILL
+      return: RC::Constants.NILL
     @public getBody: Function,
       args: []
-      return RC::Constants.ANY
+      return: RC::Constants.ANY
     @public setType: Function,
       args: [String]
-      return RC::Constants.NILL
+      return: RC::Constants.NILL
     @public getType: Function,
       args: []
-      return String
+      return: String
     @public toString: Function,
       args: []
-      return String
+      return: String
 
 
   return LeanRC::NotificationInterface.initialize()
