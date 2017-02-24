@@ -4,7 +4,7 @@ module.exports = (LeanRC)->
   class LeanRC::View extends RC::CoreObject
     @implements LeanRC::ViewInterface
 
-    @public @static MULTITON_MSG: String,
+    @private @static MULTITON_MSG: String,
       default: "View instance for this multiton key already constructed!"
 
     @public @static getInstance: Function,

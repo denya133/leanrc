@@ -4,8 +4,8 @@ module.exports = (LeanRC)->
   class LeanRC::Notifier extends RC::CoreObject
     @implements LeanRC::NotifierInterface
 
-    @public @static MULTITON_MSG: String,
-      default: "Model instance for this multiton key already constructed!"
+    @private @static MULTITON_MSG: String,
+      default: "multitonKey for this Notifier not yet initialized!"
 
     @public sendNotification: Function,
       default: (name, body, type)->

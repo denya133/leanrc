@@ -21,7 +21,7 @@ module.exports = (LeanRC)->
     @public onRegister: Function,
       default: ->
         return
-        
+
     @public onRemove: Function,
       default: ->
         return
@@ -31,7 +31,7 @@ module.exports = (LeanRC)->
     @private data: RC::Constants.ANY
 
     constructor: (proxyName, data)->
-      @super('constructor') arguments
+      @super arguments...
 
       @proxyName = proxyName ? Proxy.NAME
 

@@ -4,7 +4,7 @@ module.exports = (LeanRC)->
   class LeanRC::Facade extends RC::CoreObject
     @implements LeanRC::FacadeInterface
 
-    @public @static MULTITON_MSG: String,
+    @private @static MULTITON_MSG: String,
       default: "Facade instance for this multiton key already constructed!"
 
     @public registerCommand: Function,
@@ -101,7 +101,7 @@ module.exports = (LeanRC)->
           @controller = LeanRC::Controller.getInstance @multitonKey
         return
 
-    @protected initializeController: Function,
+    @protected initializeView: Function,
       default: ->
         unless @view?
           @view = LeanRC::View.getInstance @multitonKey

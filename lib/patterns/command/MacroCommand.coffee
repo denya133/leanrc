@@ -30,7 +30,7 @@ module.exports = (LeanRC)->
         return
 
     constructor: ->
-      @super('constructor') arguments
+      @super arguments...
 
       @subCommands = []
       @initializeMacroCommand()

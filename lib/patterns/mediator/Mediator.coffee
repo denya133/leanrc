@@ -21,14 +21,14 @@ module.exports = (LeanRC)->
     @public listNotificationInterests: Function,
       default: -> []
 
-    @public @virtual handleNotification: Function,
+    @public handleNotification: Function,
       default: (notification)->
         return
 
-    @public @virtual onRegister: Function,
+    @public onRegister: Function,
       default: -> return
 
-    @public @virtual onRemove: Function,
+    @public onRemove: Function,
       default: -> return
 
 
@@ -36,7 +36,7 @@ module.exports = (LeanRC)->
     @private viewComponent: RC::Constants.ANY
 
     constructor: (mediatorName, viewComponent)->
-      @super('constructor') arguments
+      @super arguments...
 
       @mediatorName = mediatorName ? Mediator.NAME
       @viewComponent = viewComponent
