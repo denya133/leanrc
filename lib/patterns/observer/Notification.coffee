@@ -4,25 +4,29 @@ module.exports = (LeanRC)->
   class LeanRC::Notification extends RC::CoreObject
     @implements LeanRC::NotificationInterface
 
+    ipsName = @private name: String
+    ipoBody = @private body: RC::Constants.ANY
+    ipsType = @private type: String
+
     @public getName: Function,
       default: ->
-        @name
+        @[ipsName]
 
     @public setBody: Function,
       default: (body)->
-        @body = body
+        @[ipoBody] = body
         return
 
     @public getBody: Function,
-      default: -> @body
+      default: -> @[ipoBody]
 
     @public setType: Function,
       default: (type)->
-        @type = type
+        @[ipsType] = type
         return
 
     @public getType: Function,
-      default: -> @type
+      default: -> @[ipsType]
 
     @public toString: Function,
       default: ->
@@ -32,15 +36,10 @@ module.exports = (LeanRC)->
           Type: #{if @getType()? then @getType() else 'null'}
         """
 
-
-    @private name: String
-    @private body: RC::Constants.ANY
-    @private type: String
-
     constructor: (name, body, type)->
-      @name = name
-      @body = body
-      @type = type
+      @[ipsName] = name
+      @[ipoBody] = body
+      @[ipsType] = type
 
 
 

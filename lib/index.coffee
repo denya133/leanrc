@@ -17,7 +17,7 @@ class LeanRC
   require('./interfaces/ViewInterface') LeanRC
   require('./interfaces/FacadeInterface') LeanRC
 
-  require('./patterns/observer/Notification') LeanRC
+  require('./patterns/observer/Notification') LeanRC # done
   require('./patterns/observer/Notifier') LeanRC
   require('./patterns/observer/Observer') LeanRC
   require('./patterns/proxy/Proxy') LeanRC

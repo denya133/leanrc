@@ -2,22 +2,22 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::NotificationInterface extends RC::Interface
-    @public getName: Function,
+    @public @virtual getName: Function,
       args: []
       return: String
-    @public setBody: Function,
+    @public @virtual setBody: Function,
       args: [Object]
       return: RC::Constants.NILL
-    @public getBody: Function,
+    @public @virtual getBody: Function,
       args: []
       return: RC::Constants.ANY
-    @public setType: Function,
+    @public @virtual setType: Function,
       args: [String]
       return: RC::Constants.NILL
-    @public getType: Function,
+    @public @virtual getType: Function,
       args: []
       return: String
-    @public toString: Function,
+    @public @virtual toString: Function,
       args: []
       return: String
 
