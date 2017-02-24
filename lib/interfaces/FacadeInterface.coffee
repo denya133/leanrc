@@ -18,26 +18,26 @@ module.exports = (LeanRC)->
       args: [LeanRC::ProxyInterface]
       return: RC::Constants.NILL
     @public retrieveProxy: Function,
-      args: [Sting]
+      args: [String]
       return: LeanRC::ProxyInterface
     @public removeProxy: Function,
-      args: [Sting]
+      args: [String]
       return: LeanRC::ProxyInterface
     @public hasProxy: Function,
-      args: [Sting]
+      args: [String]
       return: Boolean
 
     @public registerMediator: Function,
       args: [LeanRC::MediatorInterface]
       return: RC::Constants.NILL
     @public retrieveMediator: Function,
-      args: [Sting]
+      args: [String]
       return: LeanRC::MediatorInterface
     @public removeMediator: Function,
-      args: [Sting]
+      args: [String]
       return: LeanRC::MediatorInterface
     @public hasMediator: Function,
-      args: [Sting]
+      args: [String]
       return: Boolean
 
     @public notifyObservers: Function,
