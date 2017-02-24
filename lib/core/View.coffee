@@ -64,7 +64,7 @@ module.exports = (LeanRC)->
         # Get Notification interests, if any.
         interests = aMediator.listNotificationInterests() ? []
         if interests.length > 0
-          observer = Observer.new aMediator.handleNotification, aMediator
+          observer = LeanRC::Observer.new aMediator.handleNotification, aMediator
           for interest in interests
             do (interest)=>
               @registerObserver interest, observer
