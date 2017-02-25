@@ -4,28 +4,27 @@ module.exports = (LeanRC)->
   class LeanRC::ViewInterface extends RC::Interface
     @Module: LeanRC
 
-    @public registerObserver: Function,
+    @public @virtual registerObserver: Function,
       args: [String, LeanRC::ObserverInterface]
       return: RC::Constants.NILL
-    @public removeObserver: Function,
+    @public @virtual removeObserver: Function,
       args: [String, RC::Constants.ANY]
       return: RC::Constants.NILL
-    @public notifyObservers: Function,
+    @public @virtual notifyObservers: Function,
       args: [LeanRC::NotificationInterface]
       return: RC::Constants.NILL
-    @public registerMediator: Function,
+    @public @virtual registerMediator: Function,
       args: [LeanRC::MediatorInterface]
       return: RC::Constants.NILL
-    @public retrieveMediator: Function,
+    @public @virtual retrieveMediator: Function,
       args: [String]
       return: LeanRC::MediatorInterface
-    @public removeMediator: Function,
+    @public @virtual removeMediator: Function,
       args: [String]
       return: LeanRC::MediatorInterface
-    @public hasMediator: Function,
+    @public @virtual hasMediator: Function,
       args: [String]
       return: Boolean
-
 
 
   return LeanRC::ViewInterface.initialize()

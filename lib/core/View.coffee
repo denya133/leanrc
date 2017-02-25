@@ -6,125 +6,123 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @private @static MULTITON_MSG: String,
+    @public @static MULTITON_MSG: String,
       default: "View instance for this multiton key already constructed!"
 
+    iphMediatorMap = @private mediatorMap: Object
+    iphObserverMap = @private observerMap: Object
+    ipsMultitonKey = @protected multitonKey: String
+    cphInstanceMap = @private @static instanceMap: Object,
+      default: {}
+
     @public @static getInstance: Function,
-      default: (key)->
-        unless View.instanceMap[key]
-          View.instanceMap[key] = LeanRC::View.new key
-        View.instanceMap[key]
+      default: (asKey)->
+        unless View[cphInstanceMap][asKey]
+          View[cphInstanceMap][asKey] = LeanRC::View.new asKey
+        View[cphInstanceMap][asKey]
 
     @public @static removeView: Function,
-      default: (key)->
-        delete View.instanceMap[key]
+      default: (asKey)->
+        delete View[cphInstanceMap][asKey]
         return
 
     @public registerObserver: Function,
-      default: (aNotificationName, aObserver)->
-        observers = @observerMap[aNotificationName]
-        if observers
-          observers.push aObserver
+      default: (asNotificationName, aoObserver)->
+        vlObservers = @[iphObserverMap][asNotificationName]
+        if vlObservers
+          vlObservers.push aoObserver
         else
-          @observerMap[aNotificationName] = [aObserver]
+          @[iphObserverMap][asNotificationName] = [aoObserver]
         return
 
     @public removeObserver: Function,
-      default: (aNotificationName, aNotifyContext)->
-        observers = @observerMap[aNotificationName]
-        for observer, index in observers
-          do (observer)->
-            if observer.compareNotifyContext aNotifyContext
-              observers.splice index, 1
+      default: (asNotificationName, aoNotifyContext)->
+        vlObservers = @[iphObserverMap][asNotificationName]
+        for voObserver, i in vlObservers
+          do (voObserver)->
+            if voObserver.compareNotifyContext aoNotifyContext
+              vlObservers.splice i, 1
               break
-        if observers.length is 0
-          delete @observerMap[notificationName]
+        if vlObservers.length is 0
+          delete @[iphObserverMap][asNotificationName]
         return
 
     @public notifyObservers: Function,
-      default: (aNotification)->
-        notificationName = aNotification.getName()
-        observers = @observerMap[notificationName]
-        if observers
-          newObservers = observersRef.slice(0)
-          for observer in newObservers
-            do (observer)->
-              observer.notifyObserver aNotification
+      default: (aoNotification)->
+        vsNotificationName = aoNotification.getName()
+        vlObservers = @[iphObserverMap][vsNotificationName]
+        if vlObservers
+          vlNewObservers = vlObservers.slice(0)
+          for voObserver in vlNewObservers
+            do (voObserver)->
+              voObserver.notifyObserver aoNotification
         return
 
     @public registerMediator: Function,
-      default: (aMediator)->
-        name = aMediator.getMediatorName()
+      default: (aoMediator)->
+        vsName = aoMediator.getMediatorName()
         # Do not allow re-registration (you must removeMediator first).
-        if @mediatorMap[name]
+        if @[iphMediatorMap][vsName]
           return
-        aMediator.initializeNotifier @multitonKey
+        aoMediator.initializeNotifier @[ipsMultitonKey]
 
         # Register the Mediator for retrieval by name.
-        @mediatorMap[name] = aMediator
+        @[iphMediatorMap][vsName] = aoMediator
 
         # Get Notification interests, if any.
-        interests = aMediator.listNotificationInterests() ? []
-        if interests.length > 0
-          observer = LeanRC::Observer.new aMediator.handleNotification, aMediator
-          for interest in interests
-            do (interest)=>
-              @registerObserver interest, observer
+        vlInterests = aoMediator.listNotificationInterests() ? []
+        if vlInterests.length > 0
+          voObserver = LeanRC::Observer.new aoMediator.handleNotification, aoMediator
+          for vsInterest in vlInterests
+            do (vsInterest)=>
+              @registerObserver vsInterest, voObserver
         # Alert the mediator that it has been registered.
-        aMediator.onRegister()
+        aoMediator.onRegister()
         return
 
     @public retrieveMediator: Function,
-      default: (mediatorName)->
-        @mediatorMap[mediatorName] ? null
+      default: (asMediatorName)->
+        @[iphMediatorMap][asMediatorName] ? null
 
     @public removeMediator: Function,
-      default: (mediatorName)->
-        mediator = @mediatorMap[mediatorName]
-        unless mediator
+      default: (asMediatorName)->
+        voMediator = @[iphMediatorMap][asMediatorName]
+        unless voMediator
           return null
 
         # Get Notification interests, if any.
-        interests = mediator.listNotificationInterests()
+        vlInterests = voMediator.listNotificationInterests()
 
         # For every notification this mediator is interested in...
-        for interest in interests
-          do (interest)=>
-            @removeObserver interest, mediator
+        for vsInterest in vlInterests
+          do (vsInterest)=>
+            @removeObserver vsInterest, voMediator
 
         # remove the mediator from the map
-        delete @mediatorMap[mediatorName]
+        delete @[iphMediatorMap][asMediatorName]
 
         # Alert the mediator that it has been removed
-        mediator.onRemove()
+        voMediator.onRemove()
 
-        return mediator
+        return voMediator
 
     @public hasMediator: Function,
-      default: (mediatorName)->
-        @mediatorMap[mediatorName]?
+      default: (asMediatorName)->
+        @[iphMediatorMap][asMediatorName]?
 
-    @private mediatorMap: Object
-    @private observerMap: Object
-    @private multitonKey: String
-    @private @static instanceMap: Object,
-      default: {}
-
-
-    constructor: (key)->
-      if View.instanceMap[key]
-        throw Error View.MULTITON_MSG
-      View.instanceMap[key] = @
-      @multitonKey = key
-      @mediatorMap = {}
-      @observerMap = {}
-      @initializeView()
-      return
-
-    @protected initializeView: Function,
+    @public initializeView: Function,
       args: []
       return: RC::Constants.NILL
       default: ->
+
+    constructor: (asKey)->
+      if View[cphInstanceMap][asKey]
+        throw Error View.MULTITON_MSG
+      View[cphInstanceMap][asKey] = @
+      @[ipsMultitonKey] = asKey
+      @[iphMediatorMap] = {}
+      @[iphObserverMap] = {}
+      @initializeView()
 
 
   return LeanRC::View.initialize()
