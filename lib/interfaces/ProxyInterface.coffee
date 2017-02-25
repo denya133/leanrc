@@ -4,19 +4,19 @@ module.exports = (LeanRC)->
   class LeanRC::ProxyInterface extends RC::Interface
     @include LeanRC::NotifierInterface
 
-    @public getProxyName: Function,
+    @public @virtual getProxyName: Function,
       args: []
       return: String
-    @public setData: Function,
+    @public @virtual setData: Function,
       args: [RC::Constants.ANY]
       return: RC::Constants.NILL
-    @public getData: Function,
+    @public @virtual getData: Function,
       args: []
       return: RC::Constants.ANY
-    @public onRegister: Function,
+    @public @virtual onRegister: Function,
       args: []
       return: RC::Constants.NILL
-    @public onRemove: Function,
+    @public @virtual onRemove: Function,
       args: []
       return: RC::Constants.NILL
 
