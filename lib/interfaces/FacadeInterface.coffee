@@ -6,46 +6,45 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public registerCommand: Function,
+    @public @virtual registerCommand: Function,
       args: [String, RC::Class]
       return: RC::Constants.NILL
-    @public removeCommand: Function,
+    @public @virtual removeCommand: Function,
       args: [String]
       return: RC::Constants.NILL
-    @public hasCommand: Function,
+    @public @virtual hasCommand: Function,
       args: [String]
       return: Boolean
 
-    @public registerProxy: Function,
+    @public @virtual registerProxy: Function,
       args: [LeanRC::ProxyInterface]
       return: RC::Constants.NILL
-    @public retrieveProxy: Function,
+    @public @virtual retrieveProxy: Function,
       args: [String]
       return: LeanRC::ProxyInterface
-    @public removeProxy: Function,
+    @public @virtual removeProxy: Function,
       args: [String]
       return: LeanRC::ProxyInterface
-    @public hasProxy: Function,
+    @public @virtual hasProxy: Function,
       args: [String]
       return: Boolean
 
-    @public registerMediator: Function,
+    @public @virtual registerMediator: Function,
       args: [LeanRC::MediatorInterface]
       return: RC::Constants.NILL
-    @public retrieveMediator: Function,
+    @public @virtual retrieveMediator: Function,
       args: [String]
       return: LeanRC::MediatorInterface
-    @public removeMediator: Function,
+    @public @virtual removeMediator: Function,
       args: [String]
       return: LeanRC::MediatorInterface
-    @public hasMediator: Function,
+    @public @virtual hasMediator: Function,
       args: [String]
       return: Boolean
 
-    @public notifyObservers: Function,
+    @public @virtual notifyObservers: Function,
       args: [LeanRC::NotificationInterface]
       return: RC::Constants.NILL
-
 
 
   return LeanRC::FacadeInterface.initialize()

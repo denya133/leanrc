@@ -6,115 +6,114 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @private @static MULTITON_MSG: String,
+    @public @static MULTITON_MSG: String,
       default: "Facade instance for this multiton key already constructed!"
 
+    ipoModel        = @private model: LeanRC::ModelInterface
+    ipoView         = @private view: LeanRC::ViewInterface
+    ipoController   = @private controller: LeanRC::ControllerInterface
+    ipsMultitonKey  = @protected multitonKey: String
+    cphInstanceMap  = @private @static instanceMap: Object,
+      default: {}
+
+    ipmInitializeModel = @protected initializeModel: Function,
+      default: ->
+        unless @[ipoModel]?
+          @[ipoModel] = LeanRC::Model.getInstance @[ipsMultitonKey]
+
+    ipmInitializeController = @protected initializeController: Function,
+      default: ->
+        unless @[ipoController]?
+          @[ipoController] = LeanRC::Controller.getInstance @[ipsMultitonKey]
+        return
+
+    ipmInitializeView = @protected initializeView: Function,
+      default: ->
+        unless @[ipoView]?
+          @[ipoView] = LeanRC::View.getInstance @[ipsMultitonKey]
+        return
+
+    ipmInitializeFacade = @protected initializeFacade: Function,
+      default: ->
+        @[ipmInitializeModel]()
+        @[ipmInitializeController]()
+        @[ipmInitializeView]()
+        return
+
     @public registerCommand: Function,
-      default: (notificationName, aCommand)->
-        @controller.registerCommand notificationName, aCommand
+      default: (asNotificationName, aCommand)->
+        @[ipoController].registerCommand asNotificationName, aCommand
         return
 
     @public removeCommand: Function,
-      default: (notificationName)->
-        @controller.removeCommand notificationName
+      default: (asNotificationName)->
+        @[ipoController].removeCommand asNotificationName
         return
 
     @public hasCommand: Function,
-      default: (notificationName)->
-        @controller.hasCommand notificationName
+      default: (asNotificationName)->
+        @[ipoController].hasCommand asNotificationName
 
     @public registerProxy: Function,
-      default: (proxy)->
-        @model.registerProxy proxy
+      default: (aoProxy)->
+        @[ipoModel].registerProxy aoProxy
         return
 
     @public retrieveProxy: Function,
-      default: (proxyName)->
-        @model.retrieveProxy proxyName
+      default: (asProxyName)->
+        @[ipoModel].retrieveProxy asProxyName
 
     @public removeProxy: Function,
-      default: (proxyName)->
-        @model.removeProxy proxyName
+      default: (asProxyName)->
+        @[ipoModel].removeProxy asProxyName
 
     @public hasProxy: Function,
-      default: (proxyName)->
-        @model.hasProxy proxyName
+      default: (asProxyName)->
+        @[ipoModel].hasProxy asProxyName
 
     @public registerMediator: Function,
-      default: (mediator)->
-        if @view
-          @view.registerMediator mediator
+      default: (aoMediator)->
+        if @[ipoView]
+          @[ipoView].registerMediator aoMediator
         return
 
     @public retrieveMediator: Function,
-      default: (mediatorName)->
-        if @view
-          @view.retrieveMediator mediatorName
+      default: (asMediatorName)->
+        if @[ipoView]
+          @[ipoView].retrieveMediator asMediatorName
 
     @public removeMediator: Function,
-      default: (mediatorName)->
-        if @view
-          @view.removeMediator mediatorName
+      default: (asMediatorName)->
+        if @[ipoView]
+          @[ipoView].removeMediator asMediatorName
 
     @public hasMediator: Function,
-      default: (mediatorName)->
-        if @view
-          @view.hasMediator mediatorName
+      default: (asMediatorName)->
+        if @[ipoView]
+          @[ipoView].hasMediator asMediatorName
 
     @public notifyObservers: Function,
-      default: (notification)->
-        if @view
-          @view.notifyObservers notification
+      default: (aoNotification)->
+        if @[ipoView]
+          @[ipoView].notifyObservers aoNotification
         return
 
     @public sendNotification: Function,
-      default: (name, body, type)->
-        @notifyObservers LeanRC::Notification.new name, body, type
+      default: (asName, asBody, asType)->
+        @notifyObservers LeanRC::Notification.new asName, asBody, asType
         return
 
     @public initializeNotifier: Function,
-      default: (key)->
-        @multitonKey = key
+      default: (asKey)->
+        @[ipsMultitonKey] = asKey
         return
 
-
-    @private model: LeanRC::ModelInterface
-    @private view: LeanRC::ViewInterface
-    @private controller: LeanRC::ControllerInterface
-    @private multitonKey: String
-    @private @static instanceMap: Object,
-      default: {}
-
-    @protected initializeFacade: Function,
-      default: ->
-        @initializeModel()
-        @initializeController()
-        @initializeView()
-        return
-
-    @protected initializeModel: Function,
-      default: ->
-        unless @model?
-          @model = LeanRC::Model.getInstance @multitonKey
-
-    @protected initializeController: Function,
-      default: ->
-        unless @controller?
-          @controller = LeanRC::Controller.getInstance @multitonKey
-        return
-
-    @protected initializeView: Function,
-      default: ->
-        unless @view?
-          @view = LeanRC::View.getInstance @multitonKey
-        return
-
-    constructor: (key)->
-      if Facade.instanceMap[key]
+    constructor: (asKey)->
+      if Facade[cphInstanceMap][asKey]
         throw new Error Facade.MULTITON_MSG
-      @initializeNotifier key
-      Facade.instanceMap[key] = @
-      @initializeFacade()
+      @initializeNotifier asKey
+      Facade[cphInstanceMap][asKey] = @
+      @[ipmInitializeFacade]()
 
 
   return LeanRC::Facade.initialize()
