@@ -4,62 +4,62 @@ module.exports = (LeanRC)->
   class LeanRC::Model extends RC::CoreObject
     @implements LeanRC::ModelInterface
 
-    @private @static MULTITON_MSG: String,
+    @public @static MULTITON_MSG: String,
       default: "Model instance for this multiton key already constructed!"
 
+    iphProxyMap     = @private proxyMap: Object
+    ipsMultitonKey  = @protected multitonKey: String
+    cphInstanceMap  = @private @static instanceMap: Object,
+      default: {}
+
     @public @static getInstance: Function,
-      default: (key)->
-        unless Model.instanceMap[key]
-          Model.instanceMap[key] = LeanRC::Model.new key
-        Model.instanceMap[key]
+      default: (asKey)->
+        unless Model[cphInstanceMap][asKey]
+          Model[cphInstanceMap][asKey] = LeanRC::Model.new asKey
+        Model[cphInstanceMap][asKey]
 
     @public @static removeModel: Function,
-      default: (key)->
-        delete Model.instanceMap[key]
+      default: (asKey)->
+        delete Model[cphInstanceMap][asKey]
         return
 
     @public registerProxy: Function,
-      default: (proxy)->
-        proxy.initializeNotifier @multitonKey
-        @proxyMap[proxy.getProxyName()] = proxy
-        proxy.onRegister()
+      default: (aoProxy)->
+        aoProxy.initializeNotifier @[ipsMultitonKey]
+        @[iphProxyMap][aoProxy.getProxyName()] = aoProxy
+        aoProxy.onRegister()
         return
 
     @public removeProxy: Function,
-      default: (proxyName)->
-        proxy = @proxyMap[proxyName]
-        if proxy
-          delete @proxyMap[proxyName]
-          proxy.onRemove()
-        return proxy
+      default: (asProxyName)->
+        voProxy = @[iphProxyMap][asProxyName]
+        if voProxy
+          delete @[iphProxyMap][asProxyName]
+          voProxy.onRemove()
+        return voProxy
 
     @public retrieveProxy: Function,
-      default: (proxyName)->
-        @proxyMap[proxyName] ? null
+      default: (asProxyName)->
+        @[iphProxyMap][asProxyName] ? null
 
     @public hasProxy: Function,
-      default: (proxyName)->
-        @proxyMap[proxyName]?
+      default: (asProxyName)->
+        @[iphProxyMap][asProxyName]?
 
-    constructor: (key)->
-      if Model.instanceMap[key]
+    @public initializeModel: Function,
+      args: []
+      return: RC::Constants.NILL
+      default: ->
+
+    constructor: (asKey)->
+      if Model[cphInstanceMap][asKey]
         throw new Error Model.MULTITON_MSG
-      Model.instanceMap[key] = @
-      @multitonKey = key
-      @proxyMap = {}
+      Model[cphInstanceMap][asKey] = @
+      @[ipsMultitonKey] = asKey
+      @[iphProxyMap] = {}
 
       @initializeModel()
       return
 
-
-    @private proxyMap: Object
-    @private multitonKey: String
-    @private @static instanceMap: Object,
-      default: {}
-
-    @protected initializeModel: Function,
-      args: []
-      return: RC::Constants.NILL
-      default: ->
 
   return LeanRC::Model.initialize()
