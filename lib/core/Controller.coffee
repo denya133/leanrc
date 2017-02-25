@@ -9,66 +9,64 @@ module.exports = (LeanRC)->
     @public @static MULTITON_MSG: String,
       default: "Controller instance for this multiton key already constructed!"
 
+    ipoView         = @private view: LeanRC::ViewInterface
+    iphCommandMap   = @private commandMap: Object
+    ipsMultitonKey  = @protected multitonKey: String
+    cphInstanceMap  = @private @static instanceMap: Object,
+      default: {}
+
     @public @static getInstance: String,
-      default: (key)->
-        unless Controller.instanceMap[key]
-          Controller.instanceMap[key] = LeanRC::Controller.new key
-        Controller.instanceMap[key]
+      default: (asKey)->
+        unless Controller[cphInstanceMap][asKey]
+          Controller[cphInstanceMap][asKey] = LeanRC::Controller.new asKey
+        Controller[cphInstanceMap][asKey]
 
     @public @static removeController: String,
       args: [String]
       return: RC::Constants.NILL
-      default: (key)->
-        delete Controller.instanceMap[key]
+      default: (asKey)->
+        delete Controller[cphInstanceMap][asKey]
 
     @public executeCommand: Function,
-      default: (aNotification)->
-        vCommand = @commandMap[aNotification.getName()]
+      default: (aoNotification)->
+        vCommand = @[iphCommandMap][aoNotification.getName()]
         if vCommand?
           voCommand = vCommand.new()
-          voCommand.initializeNotifier @multitonKey
-          voCommand.execute aNotification
+          voCommand.initializeNotifier @[ipsMultitonKey]
+          voCommand.execute aoNotification
         return
 
     @public registerCommand: Function,
-      default: (aNotificationName, aCommand)->
-        unless @commandMap[aNotificationName]
-          @view.registerObserver aNotificationName, LeanRC::Observer.new(@executeCommand, @)
-          @commandMap[aNotificationName] = aCommand
+      default: (asNotificationName, aCommand)->
+        unless @[iphCommandMap][asNotificationName]
+          @[ipoView].registerObserver asNotificationName, LeanRC::Observer.new(@executeCommand, @)
+          @[iphCommandMap][asNotificationName] = aCommand
         return
 
     @public hasCommand: Function,
-      default: (aNotificationName)->
-        @commandMap[aNotificationName]?
+      default: (asNotificationName)->
+        @[iphCommandMap][asNotificationName]?
 
     @public removeCommand: Function,
-      default: (aNotificationName)->
-        if @hasCommand(aNotificationName)
-          @view.removeObserver aNotificationName, @
-          delete @commandMap[aNotificationName]
+      default: (asNotificationName)->
+        if @hasCommand(asNotificationName)
+          @[ipoView].removeObserver asNotificationName, @
+          delete @[iphCommandMap][asNotificationName]
         return
 
-    @private view: LeanRC::ViewInterface
-    @private commandMap: Object
-    @private multitonKey: String
-    @private @static instanceMap: Object,
-      default: {}
-
-    constructor: (key)->
-      if Controller.instanceMap[key]
-        throw new Error Controller.MULTITON_MSG
-      Controller.instanceMap[key] = @
-      @multitonKey = key
-      @commandMap = {}
-      @initializeController()
-
-    @protected initializeController: Function,
+    @public initializeController: Function,
       args: []
       return: RC::Constants.NILL
       default: ->
-        @view = LeanRC::View.getInstance @multitonKey
+        @[ipoView] = LeanRC::View.getInstance @[ipsMultitonKey]
 
-
+    constructor: (asKey)->
+      if Controller[cphInstanceMap][asKey]
+        throw new Error Controller.MULTITON_MSG
+      Controller[cphInstanceMap][asKey] = @
+      @[ipsMultitonKey] = asKey
+      @[iphCommandMap] = {}
+      @initializeController()
 
 
   return LeanRC::Controller.initialize()
