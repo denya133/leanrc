@@ -2,8 +2,9 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::ControllerInterface extends RC::Interface
+    @inheritProtected()
     @Module: LeanRC
-    
+
     @public @virtual executeCommand: Function,
       args: [LeanRC::NotificationInterface]
       return: RC::Constants.NILL

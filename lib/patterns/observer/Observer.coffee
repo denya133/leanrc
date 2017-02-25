@@ -2,6 +2,7 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::Observer extends RC::CoreObject
+    @inheritProtected()
     @implements LeanRC::ObserverInterface
 
     @Module: LeanRC

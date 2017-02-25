@@ -4,6 +4,7 @@ RC = require 'RC'
 
 
 class LeanRC extends RC::Module
+  @inheritProtected()
   # Utils: {}
   # Scripts: {}
 

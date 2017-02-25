@@ -2,6 +2,7 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::Facade extends RC::CoreObject
+    @inheritProtected()
     @implements LeanRC::FacadeInterface
 
     @Module: LeanRC

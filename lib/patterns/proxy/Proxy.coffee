@@ -2,6 +2,7 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::Proxy extends LeanRC::Notifier
+    @inheritProtected()
     @implements LeanRC::ProxyInterface
 
     @Module: LeanRC

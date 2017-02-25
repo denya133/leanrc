@@ -2,6 +2,7 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::MacroCommand extends LeanRC::Notifier
+    @inheritProtected()
     @implements LeanRC::CommandInterface
 
     @Module: LeanRC

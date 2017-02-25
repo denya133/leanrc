@@ -2,6 +2,7 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::Notifier extends RC::CoreObject
+    @inheritProtected()
     @implements LeanRC::NotifierInterface
 
     @Module: LeanRC
