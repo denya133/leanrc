@@ -4,6 +4,8 @@ module.exports = (LeanRC)->
   class LeanRC::Facade extends RC::CoreObject
     @implements LeanRC::FacadeInterface
 
+    @Module: LeanRC
+
     @private @static MULTITON_MSG: String,
       default: "Facade instance for this multiton key already constructed!"
 

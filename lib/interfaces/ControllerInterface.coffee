@@ -2,16 +2,18 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::ControllerInterface extends RC::Interface
-    @public executeCommand: Function,
+    @Module: LeanRC
+    
+    @public @virtual executeCommand: Function,
       args: [LeanRC::NotificationInterface]
       return: RC::Constants.NILL
-    @public registerCommand: Function,
+    @public @virtual registerCommand: Function,
       args: [String, RC::Class]
       return: RC::Constants.NILL
-    @public hasCommand: Function,
+    @public @virtual hasCommand: Function,
       args: [String]
       return: Boolean
-    @public removeCommand: Function,
+    @public @virtual removeCommand: Function,
       args: [String]
       return: RC::Constants.NILL
 

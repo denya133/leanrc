@@ -4,6 +4,8 @@ module.exports = (LeanRC)->
   class LeanRC::Notification extends RC::CoreObject
     @implements LeanRC::NotificationInterface
 
+    @Module: LeanRC
+
     ipsName = @private name: String
     ipoBody = @private body: RC::Constants.ANY
     ipsType = @private type: String

@@ -4,6 +4,8 @@ module.exports = (LeanRC)->
   class LeanRC::Notifier extends RC::CoreObject
     @implements LeanRC::NotifierInterface
 
+    @Module: LeanRC
+
     @public @static MULTITON_MSG: String,
       default: "multitonKey for this Notifier not yet initialized!"
 

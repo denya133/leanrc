@@ -4,6 +4,8 @@ module.exports = (LeanRC)->
   class LeanRC::MacroCommand extends LeanRC::Notifier
     @implements LeanRC::CommandInterface
 
+    @Module: LeanRC
+
     iplSubCommands = @private subCommands: Array
 
     @public execute: Function,

@@ -4,6 +4,8 @@ module.exports = (LeanRC)->
   class LeanRC::Observer extends RC::CoreObject
     @implements LeanRC::ObserverInterface
 
+    @Module: LeanRC
+
     ipoNotify = @private notify: RC::Constants.ANY
     ipoContext = @private context: RC::Constants.ANY
 

@@ -2,6 +2,8 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::NotificationInterface extends RC::Interface
+    @Module: LeanRC
+
     @public @virtual getName: Function,
       args: []
       return: String

@@ -4,6 +4,8 @@ module.exports = (LeanRC)->
   class LeanRC::FacadeInterface extends RC::Interface
     @include LeanRC::NotifierInterface
 
+    @Module: LeanRC
+
     @public registerCommand: Function,
       args: [String, RC::Class]
       return: RC::Constants.NILL

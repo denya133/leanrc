@@ -2,6 +2,8 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::ObserverInterface extends RC::Interface
+    @Module: LeanRC
+
     @public @virtual setNotifyMethod: Function,
       args: [Function]
       return: RC::Constants.NILL

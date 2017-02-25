@@ -2,6 +2,8 @@ RC = require 'RC'
 
 module.exports = (LeanRC)->
   class LeanRC::ViewInterface extends RC::Interface
+    @Module: LeanRC
+
     @public registerObserver: Function,
       args: [String, LeanRC::ObserverInterface]
       return: RC::Constants.NILL

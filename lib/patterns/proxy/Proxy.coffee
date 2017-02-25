@@ -4,6 +4,8 @@ module.exports = (LeanRC)->
   class LeanRC::Proxy extends LeanRC::Notifier
     @implements LeanRC::ProxyInterface
 
+    @Module: LeanRC
+
     ipsProxyName = @private proxyName: String
     ipoData = @private data: RC::Constants.ANY
 

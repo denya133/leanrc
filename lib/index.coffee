@@ -1,8 +1,9 @@
 # _         = require 'lodash'
 # fs        = require 'fs'
+RC = require 'RC'
 
 
-class LeanRC
+class LeanRC extends RC::Module
   # Utils: {}
   # Scripts: {}
 
@@ -33,4 +34,4 @@ class LeanRC
 
 
 
-module.exports = LeanRC
+module.exports = LeanRC.initialize()

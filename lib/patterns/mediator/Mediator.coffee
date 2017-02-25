@@ -4,6 +4,8 @@ module.exports = (LeanRC)->
   class LeanRC::Mediator extends LeanRC::Notifier
     @implements LeanRC::MediatorInterface
 
+    @Module: LeanRC
+
     ipsMediatorName = @private mediatorName: String
     ipoViewComponent = @private viewComponent: RC::Constants.ANY
 

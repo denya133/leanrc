@@ -4,6 +4,8 @@ module.exports = (LeanRC)->
   class LeanRC::MediatorInterface extends RC::Interface
     @include LeanRC::NotifierInterface
 
+    @Module: LeanRC
+
     @public @virtual getMediatorName: Function,
       args: []
       return: String

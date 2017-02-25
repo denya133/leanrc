@@ -4,6 +4,8 @@ module.exports = (LeanRC)->
   class LeanRC::Model extends RC::CoreObject
     @implements LeanRC::ModelInterface
 
+    @Module: LeanRC
+
     @public @static MULTITON_MSG: String,
       default: "Model instance for this multiton key already constructed!"
 
