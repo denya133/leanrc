@@ -5,8 +5,7 @@ module.exports = (LeanRC)->
     @implements LeanRC::CommandInterface
 
     @public execute: Function,
-      default: (notification)->
-
+      default: ->
 
 
   return LeanRC::SimpleCommand.initialize()

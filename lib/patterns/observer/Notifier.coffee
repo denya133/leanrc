@@ -7,7 +7,7 @@ module.exports = (LeanRC)->
     @public @static MULTITON_MSG: String,
       default: "multitonKey for this Notifier not yet initialized!"
 
-    ipsMultitonKey = @private multitonKey: String
+    ipsMultitonKey = @protected multitonKey: String
     ipmFacade = @private facade: LeanRC::FacadeInterface,
       get: ->
         unless @[ipsMultitonKey]?

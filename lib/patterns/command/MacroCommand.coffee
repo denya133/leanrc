@@ -4,38 +4,36 @@ module.exports = (LeanRC)->
   class LeanRC::MacroCommand extends LeanRC::Notifier
     @implements LeanRC::CommandInterface
 
+    iplSubCommands = @private subCommands: Array
+
     @public execute: Function,
-      default: (notification)->
-        subCommands = @subCommands.slice 0
-        for vCommand in subCommands
+      default: (aoNotification)->
+        vlSubCommands = @[iplSubCommands].slice 0
+        for vCommand in vlSubCommands
           do (vCommand)=>
-            command = vCommand.new()
-            command.initializeNotifier @multitonKey
-            command.execute notification
-        @subCommands.slice 0
+            voCommand = vCommand.new()
+            voCommand.initializeNotifier @[Symbol.for 'multitonKey']
+            voCommand.execute aoNotification
+        @[iplSubCommands].slice 0
         return
 
-
-    @private subCommands: Array
-    @protected initializeMacroCommand: Function,
+    @public initializeMacroCommand: Function,
       args: []
       return: RC::Constants.NILL
       default: ->
 
-    @protected addSubCommand: Function,
+    @public addSubCommand: Function,
       args: [RC::Class]
       return: RC::Constants.NILL
       default: (aClass)->
-        @subCommands.push aClass
+        @[iplSubCommands].push aClass
         return
 
     constructor: ->
       @super arguments...
 
-      @subCommands = []
+      @[iplSubCommands] = []
       @initializeMacroCommand()
-
-
 
 
   return LeanRC::MacroCommand.initialize()

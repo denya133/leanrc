@@ -11,8 +11,8 @@ module.exports = (LeanRC)->
       default: -> @[ipsProxyName]
 
     @public setData: Function,
-      default: (data)->
-        @[ipoData] = data
+      default: (ahData)->
+        @[ipoData] = ahData
         return
 
     @public getData: Function,
@@ -24,13 +24,13 @@ module.exports = (LeanRC)->
     @public onRemove: Function,
       default: -> return
 
-    constructor: (proxyName, data)->
+    constructor: (asProxyName, ahData)->
       @super arguments...
 
-      @[ipsProxyName] = proxyName ? @constructor.name
+      @[ipsProxyName] = asProxyName ? @constructor.name
 
-      if data?
-        @setData data
+      if ahData?
+        @setData ahData
 
 
   return LeanRC::Proxy.initialize()
