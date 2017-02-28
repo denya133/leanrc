@@ -6,6 +6,7 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
+    # надо определиться с этими двумя пунктами, так ли их объявлять?
     @public @static @virtual delegate: RC::Class
     @public @static @virtual serializer: RC::Class
 

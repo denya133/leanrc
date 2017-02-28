@@ -11,6 +11,7 @@ module.exports = (LeanRC)->
 
     @public @virtual collection: LeanRC::CollectionInterface
 
+    # под вопросом ??????
     # @public @static schema: JoiSchema
     # @public @static customFilters: Function, [statement], -> NILL
     # @private @static _customFilters: Function, [], -> Object
@@ -26,45 +27,7 @@ module.exports = (LeanRC)->
     @public findModelByName: Function, [String], -> Array
     @public parseModelName: Function, [String], -> Array
 
-    @private @static __attrs: Object
-    @private @static _attrs: Function, [], -> Object
-    @public @static attributes: Function, [], -> Object
-    @private @static __edges: Object
-    @private @static _edges: Function, [], -> Object
-    @public @static edges: Function, [], -> Object
-    @private @static __props: Object
-    @private @static _props: Function, [], -> Object
-    @public @static properties: Function, [], -> Object
-    @private @static __comps: Object
-    @private @static _comps: Function, [], -> Object
-    @public @static computeds: Function, [], -> Object
 
-    @public @static attribute: Function, [name, schema, Object], -> NILL
-    @public @static attr: Function, [name, schema, Object], -> NILL
-    @public @static property: Function, [name, Object], -> NILL
-    @public @static prop: Function, [name, Object], -> NILL
-    @public @static computed: Function, [name, methods, collections, opts, lambda], -> NILL
-    @public @static comp: Function, [name, methods, collections, opts, lambda], -> NILL
-    @public @static belongsTo: Function, [name, schema, opts], -> NILL
-    @public @static hasMany: Function, [name, opts], -> NILL
-    @public @static hasOne: Function, [name, opts], -> NILL
-
-    # @public @static validate: Function, [attribute, options], -> NILL
-
-    @public @static new: Function, [attributes], -> ModelInterface
-
-    # под вопросом ?????? возможно надо засунуть в сериалайзер
-    @public @static serializableAttributes: Function, [], -> Object
-
-    # @public _key: String
-    # @public _rev: String
-    # @public _type: String
-    # @public isHidden: Boolean
-    # @public createdAt: Date
-    # @public updatedAt: Date
-    # @public id: String
-    # @public rev: String
-    # @public type: String
 
     # под вопросом ??????
     @public validate: Function, [], -> SELF
@@ -88,36 +51,78 @@ module.exports = (LeanRC)->
     @public recordHasBeenChanged: Function, [], -> NILL
     @public updateEdges: Function, [ANY], -> ANY # any type
 
-    @public attributes: Function, [], -> Array
 
-    # @public clone: Function, [], -> ModelInterface
-    # @public copy: Function, [], -> ModelInterface
-    # @public deepCopy: Function, [], -> ModelInterface
-    # @public decrement: Function, [attribute, step], -> ModelInterface
-    # @public increment: Function, [attribute, step], -> ModelInterface
-    # @public toggle: Function, [attribute], -> ModelInterface
-    # @public touch: Function, [], -> ModelInterface
-    # @public updateAttribute: Function, [name, value], -> ModelInterface
-    # @public updateAttributes: Function, [attributes], -> ModelInterface
-    # @public isNew: Function, [], -> Boolean
+
+    # под вопросом ??????
     @private _resetAttributes: Function, [Object], -> ModelInterface
-    # @public reload: Function, [], -> ModelInterface
     @public getSnapshot: Function, [], -> Object
     @private _forClient: Function, [Object], -> Object
 
     # под вопросом ?????? # возможно надо это определять в сериалайзере
+    @public @static serializableAttributes: Function, [], -> Object
     @public @static serializeFromBatch: Function, [Object], -> Object
     @public @static serializeFromClient: Function, [Object], -> Object
     @public serializeForClient: Function, [Object], -> Object
 
 
 
+    # @private @static __attrs: Object
+    # @private @static _attrs: Function, [], -> Object
+    @public @static @virtual attributes: Function,
+      args: []
+      return: Object
+    # @private @static __edges: Object
+    # @private @static _edges: Function, [], -> Object
+    @public @static @virtual edges: Function,
+      args: []
+      return: Object
+    # @private @static __props: Object
+    # @private @static _props: Function, [], -> Object
+    @public @static @virtual properties: Function,
+      args: []
+      return: Object
+    # @private @static __comps: Object
+    # @private @static _comps: Function, [], -> Object
+    @public @static @virtual computeds: Function,
+      args: []
+      return: Object
 
-
-
+    @public @static @virtual attribute: Function,
+      args: [String, Object, Object] #name, schema, Object
+      return: RC::Constants.NILL
+    @public @static @virtual attr: Function,
+      args: [String, Object, Object] #name, schema, Object
+      return: RC::Constants.NILL
+    @public @static @virtual property: Function,
+      args: [String, Object] #name, Object
+      return: RC::Constants.NILL
+    @public @static @virtual prop: Function,
+      args: [String, Object] #name, Object
+      return: RC::Constants.NILL
+    @public @static @virtual computed: Function,
+      args: [String, Object, Function] #name, opts, lambda
+      return: RC::Constants.NILL
+    @public @static @virtual comp: Function,
+      args: [String, Object, Function] #name, opts, lambda
+      return: RC::Constants.NILL
+    @public @static @virtual belongsTo: Function,
+      args: [String, Object, Object] # name, schema, opts
+      return: RC::Constants.NILL
+    @public @static @virtual hasMany: Function,
+      args: [String, Object] #name, opts
+      return: RC::Constants.NILL
+    @public @static @virtual hasOne: Function,
+      args: [String, Object] #name, opts
+      return: RC::Constants.NILL
+    @public @static @virtual new: Function,
+      args: [Object] #attributes
+      return: LeanRC::RecordInterface
     @public @static @virtual inverseFor: Function,
       args: [String]
       return: Object # Cucumber.inverseFor 'tomato' #-> {type: App::Tomato, name: 'cucumbers', kind: 'hasMany'}
+    @public @static @virtual validate: Function, # из рельсов, но что внутри делать пока не понятно.
+      args: [String, Object] #attribute, options
+      return: RC::Constants.NILL
 
     @public @virtual _key: String
     @public @virtual _rev: String
@@ -129,6 +134,9 @@ module.exports = (LeanRC)->
     @public @virtual rev: String
     @public @virtual type: String
 
+    @public @virtual attributes: Function, # метод должен вернуть список атрибутов данного рекорда.
+      args: []
+      return: Array
     @public @virtual clone: Function,
       args: []
       return: LeanRC::RecordInterface
