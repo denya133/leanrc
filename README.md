@@ -13,15 +13,13 @@ ssh-add ~/.ssh/id_rsa
 
 ## Additional packages
 ```
-sudo aptitude install redis-server graphicsmagick
-sudo npm install -g n
-sudo n 4.4.7
-sudo apt-get install mc
-sudo apt-get install git
-sudo aptitude install make
-sudo aptitude install gcc g++
-sudo npm i -g gulp
-sudo npm i -g scaffolt
-sudo npm i -g forever
-sudo npm i -g coffee-script
+$ sudo aptitude install redis-server graphicsmagick mc git build-essential
+$ sudo npm install -g n
+$ sudo n 6.10
+$ npm install -g gulp coffee-script mocha gulp scaffolt forever
+```
+
+## Testing
+```
+$ npm test
 ```
