@@ -11,6 +11,9 @@ module.exports = (LeanRC)->
 
     @public @virtual collection: LeanRC::CollectionInterface
 
+    # объявлю пока здесь, чтобы не забыть
+    @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для фнкционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
+
     # под вопросом ??????
     # @public @static schema: JoiSchema
     # @public @static customFilters: Function, [statement], -> NILL
