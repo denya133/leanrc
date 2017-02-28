@@ -8,16 +8,16 @@ class LeanRC extends RC::Module
   # Utils: {}
   # Scripts: {}
 
-  require('./interfaces/NotificationInterface') LeanRC # done
-  require('./interfaces/NotifierInterface') LeanRC # done
-  require('./interfaces/ObserverInterface') LeanRC # done
-  require('./interfaces/CommandInterface') LeanRC
-  require('./interfaces/MediatorInterface') LeanRC # done
-  require('./interfaces/ProxyInterface') LeanRC
-  require('./interfaces/ControllerInterface') LeanRC
-  require('./interfaces/ModelInterface') LeanRC
-  require('./interfaces/ViewInterface') LeanRC
-  require('./interfaces/FacadeInterface') LeanRC
+  require('./interfaces/patterns/NotificationInterface') LeanRC # done
+  require('./interfaces/patterns/NotifierInterface') LeanRC # done
+  require('./interfaces/patterns/ObserverInterface') LeanRC # done
+  require('./interfaces/patterns/CommandInterface') LeanRC
+  require('./interfaces/patterns/MediatorInterface') LeanRC # done
+  require('./interfaces/patterns/ProxyInterface') LeanRC
+  require('./interfaces/core/ControllerInterface') LeanRC
+  require('./interfaces/core/ModelInterface') LeanRC
+  require('./interfaces/core/ViewInterface') LeanRC
+  require('./interfaces/patterns/FacadeInterface') LeanRC
 
   require('./patterns/observer/Notification') LeanRC # done
   require('./patterns/observer/Notifier') LeanRC # done
