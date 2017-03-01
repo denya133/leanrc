@@ -30,7 +30,7 @@ module.exports = (LeanRC)->
     @public registerObserver: Function,
       default: (asNotificationName, aoObserver)->
         vlObservers = @[iphObserverMap][asNotificationName]
-        if vlObservers
+        if vlObservers?
           vlObservers.push aoObserver
         else
           @[iphObserverMap][asNotificationName] = [aoObserver]
@@ -38,7 +38,7 @@ module.exports = (LeanRC)->
 
     @public removeObserver: Function,
       default: (asNotificationName, aoNotifyContext)->
-        vlObservers = @[iphObserverMap][asNotificationName]
+        vlObservers = @[iphObserverMap][asNotificationName] ? []
         for voObserver, i in vlObservers
           break  if do (voObserver)->
             if voObserver.compareNotifyContext aoNotifyContext
@@ -53,8 +53,8 @@ module.exports = (LeanRC)->
       default: (aoNotification)->
         vsNotificationName = aoNotification.getName()
         vlObservers = @[iphObserverMap][vsNotificationName]
-        if vlObservers
-          vlNewObservers = vlObservers.slice(0)
+        if vlObservers?
+          vlNewObservers = vlObservers[..]
           for voObserver in vlNewObservers
             do (voObserver)->
               voObserver.notifyObserver aoNotification
