@@ -40,10 +40,11 @@ module.exports = (LeanRC)->
       default: (asNotificationName, aoNotifyContext)->
         vlObservers = @[iphObserverMap][asNotificationName]
         for voObserver, i in vlObservers
-          do (voObserver)->
+          break  if do (voObserver)->
             if voObserver.compareNotifyContext aoNotifyContext
-              vlObservers.splice i, 1
-              break
+              vlObservers[i..i] = []
+              return yes
+            return no
         if vlObservers.length is 0
           delete @[iphObserverMap][asNotificationName]
         return
