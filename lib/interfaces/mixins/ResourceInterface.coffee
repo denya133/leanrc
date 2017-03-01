@@ -30,19 +30,19 @@ module.exports = (LeanRC)->
 
 
     @public @virtual list: Function,
-      args: [Object] # req объект, чтобы из него получить все необходимое
+      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
     @public @virtual detail: Function,
-      args: [Object] # req объект, чтобы из него получить все необходимое
+      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
     @public @virtual create: Function,
-      args: [Object] # req объект, чтобы из него получить все необходимое
+      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
     @public @virtual update: Function,
-      args: [Object] # req объект, чтобы из него получить все необходимое
+      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
     @public @virtual delete: Function,
-      args: [Object] # req объект, чтобы из него получить все необходимое
+      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
 
 
