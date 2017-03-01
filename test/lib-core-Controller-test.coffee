@@ -26,14 +26,11 @@ describe 'Controller', ->
     it 'should register new command', ->
       expect ->
         controller = Controller.getInstance 'TEST'
-        spy = sinon.spy()
-        spy.reset()
         class TestCommand extends SimpleCommand
           @inheritProtected()
           @public execute: Function,
-            default: spy
+            default: ->
         controller.registerCommand 'TEST_COMMAND', TestCommand
-        assert not spy.called
         assert controller.hasCommand 'TEST_COMMAND'
         return
       .to.not.throw Error
@@ -51,5 +48,19 @@ describe 'Controller', ->
         controller.registerCommand notification.getName(), TestCommand
         controller.executeCommand notification
         assert spy.called
+        return
+      .to.not.throw Error
+  describe '#removeCommand', ->
+    it 'should remove command if present', ->
+      expect ->
+        controller = Controller.getInstance 'TEST'
+        class TestCommand extends SimpleCommand
+          @inheritProtected()
+          @public execute: Function,
+            default: ->
+        controller.removeCommand 'TEST_COMMAND'
+        controller.removeCommand 'TEST_COMMAND1'
+        assert not controller.hasCommand 'TEST_COMMAND'
+        assert not controller.hasCommand 'TEST_COMMAND1'
         return
       .to.not.throw Error
