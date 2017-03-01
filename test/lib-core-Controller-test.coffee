@@ -10,3 +10,12 @@ describe 'Controller', ->
         unless controller instanceof Controller
           throw new Error 'The `controller` is not an instance of Controller'
       .to.not.throw Error
+  describe '.removeController', ->
+    it 'should get new instance of Controller, remove it and get new one', ->
+      expect ->
+        controller = Controller.getInstance 'TEST'
+        Controller.removeController 'TEST'
+        newController = Controller.getInstance 'TEST'
+        if controller is newController
+          throw new Error 'Controller instance didn\'t renewed'
+      .to.not.throw Error
