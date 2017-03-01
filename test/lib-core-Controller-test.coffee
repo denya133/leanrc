@@ -1,6 +1,9 @@
 { expect, assert } = require 'chai'
+sinon = require 'sinon'
 LeanRC = require '../lib'
 Controller = LeanRC::Controller
+SimpleCommand = LeanRC::SimpleCommand
+Notification = LeanRC::Notification
 
 describe 'Controller', ->
   describe '.getInstance', ->
@@ -18,4 +21,35 @@ describe 'Controller', ->
         newController = Controller.getInstance 'TEST'
         if controller is newController
           throw new Error 'Controller instance didn\'t renewed'
+      .to.not.throw Error
+  describe '#registerCommand', ->
+    it 'should register new command', ->
+      expect ->
+        controller = Controller.getInstance 'TEST'
+        spy = sinon.spy()
+        spy.reset()
+        class TestCommand extends SimpleCommand
+          @inheritProtected()
+          @public execute: Function,
+            default: spy
+        controller.registerCommand 'TEST_COMMAND', TestCommand
+        assert not spy.called
+        assert controller.hasCommand 'TEST_COMMAND'
+        return
+      .to.not.throw Error
+  describe '#executeCommand', ->
+    it 'should register new command and call it', ->
+      expect ->
+        controller = Controller.getInstance 'TEST'
+        spy = sinon.spy()
+        spy.reset()
+        class TestCommand extends SimpleCommand
+          @inheritProtected()
+          @public execute: Function,
+            default: spy
+        notification = new Notification 'TEST_COMMAND1'
+        controller.registerCommand notification.getName(), TestCommand
+        controller.executeCommand notification
+        assert spy.called
+        return
       .to.not.throw Error
