@@ -19,8 +19,7 @@ module.exports = (LeanRC)->
 
     @public sendNotification: Function,
       default: (asName, aoBody, asType)->
-        if @[ipmFacade]
-          @[ipmFacade].sendNotification asName, aoBody, asType
+        @[ipmFacade]?.sendNotification asName, aoBody, asType
         return
 
     @public initializeNotifier: Function,

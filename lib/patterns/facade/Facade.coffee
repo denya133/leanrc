@@ -41,6 +41,12 @@ module.exports = (LeanRC)->
         @[ipmInitializeView]()
         return
 
+    @public @static getInstance: Function,
+      default: (asKey)->
+        unless Facade[cphInstanceMap][asKey]?
+          Facade[cphInstanceMap][asKey] = LeanRC::Facade.new asKey
+        Facade[cphInstanceMap][asKey]
+
     @public registerCommand: Function,
       default: (asNotificationName, aCommand)->
         @[ipoController].registerCommand asNotificationName, aCommand
