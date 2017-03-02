@@ -1,4 +1,5 @@
 _ = require 'lodash'
+RC = require 'RC'
 
 
 module.exports = (LeanRC)->

@@ -1,3 +1,4 @@
+RC = require 'RC'
 
 
 module.exports = (LeanRC)->
