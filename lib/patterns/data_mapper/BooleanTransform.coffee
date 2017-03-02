@@ -1,28 +1,34 @@
 
-module.exports = (FoxxMC)->
-  Transform  = require('./Transform') FoxxMC
-  BooleanTransformInterface  = require('../interfaces/boolean_transform') FoxxMC
 
-  class FoxxMC::BooleanTransform extends Transform
-    @implements BooleanTransformInterface
-    @instanceMethod 'deserialize', (serialized, options)->
-      type = typeof serialized
+module.exports = (LeanRC)->
+  class LeanRC::BooleanTransform extends RC::CoreObject
+    @inheritProtected()
+    @implements LeanRC::TransformInterface
 
-      if not serialized? and options.allowNull is yes
-        return null
+    @Module: LeanRC
 
-      if type is "boolean"
-        return serialized
-      else if type is "string"
-        return serialized.match(/^true$|^t$|^1$/i) isnt null
-      else if type is "number"
-        return serialized is 1
-      else
-        return no
-    @instanceMethod 'serialize', (deserialized, options)->
-      if not deserialized? and options.allowNull is yes
-        return null
+    @public deserialize: Function,
+      default: (serialized, options)->
+        type = typeof serialized
 
-      return Boolean deserialized
+        if not serialized? and options.allowNull is yes
+          return null
 
-  FoxxMC::BooleanTransform.initialize()
+        if type is "boolean"
+          return serialized
+        else if type is "string"
+          return serialized.match(/^true$|^t$|^1$/i) isnt null
+        else if type is "number"
+          return serialized is 1
+        else
+          return no
+
+    @public serialize: Function,
+      default: (deserialized, options)->
+        if not deserialized? and options.allowNull is yes
+          return null
+
+        return Boolean deserialized
+
+
+  return LeanRC::BooleanTransform.initialize()

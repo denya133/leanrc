@@ -1,12 +1,23 @@
 
-module.exports = (FoxxMC)->
-  CoreObject  = require('./CoreObject') FoxxMC
-  TransformInterface = require('./interfaces/transform') FoxxMC
-  
-  # Virtual class. serialize and deserialize declared as `virtual` in interface
-  class FoxxMC::Transform extends CoreObject
-    @implements TransformInterface
-    @instanceMethod 'deserialize', ->
-    @instanceMethod 'serialize', ->
 
-  FoxxMC::Transform.initialize()
+module.exports = (LeanRC)->
+  class LeanRC::Transform extends RC::CoreObject
+    @inheritProtected()
+    @implements LeanRC::TransformInterface
+
+    @Module: LeanRC
+
+    @public deserialize: Function,
+      default: (serialized)->
+        unless serialized?
+          return null
+        serialized
+
+    @public serialize: Function,
+      default: (deserialized)->
+        unless deserialized?
+          return null
+        deserialized
+
+
+  return LeanRC::Transform.initialize()

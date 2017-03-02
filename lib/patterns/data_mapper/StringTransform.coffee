@@ -1,16 +1,20 @@
 _ = require 'lodash'
 
 
-module.exports = (FoxxMC)->
-  Transform  = require('./Transform') FoxxMC
-  StringTransformInterface  = require('../interfaces/string_transform') FoxxMC
+module.exports = (LeanRC)->
+  class LeanRC::StringTransform extends RC::CoreObject
+    @inheritProtected()
+    @implements LeanRC::TransformInterface
 
-  class FoxxMC::StringTransform extends Transform
-    @implements StringTransformInterface
-    @instanceMethod 'deserialize', (serialized)->
-      if _.isNil(serialized) then null else String serialized
+    @Module: LeanRC
 
-    @instanceMethod 'serialize', (deserialized)->
-      if _.isNil(deserialized) then null else String deserialized
+    @public deserialize: Function,
+      default: (serialized)->
+        if _.isNil(serialized) then null else String serialized
 
-  FoxxMC::StringTransform.initialize()
+    @public serialize: Function,
+      default: (deserialized)->
+        if _.isNil(deserialized) then null else String deserialized
+
+
+  return LeanRC::StringTransform.initialize()

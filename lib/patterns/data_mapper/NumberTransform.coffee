@@ -1,24 +1,28 @@
 _ = require 'lodash'
 
 
-module.exports = (FoxxMC)->
-  Transform  = require('./Transform') FoxxMC
-  NumberTransformInterface  = require('../interfaces/number_transform') FoxxMC
+module.exports = (LeanRC)->
+  class LeanRC::NumberTransform extends RC::CoreObject
+    @inheritProtected()
+    @implements LeanRC::TransformInterface
 
-  class FoxxMC::NumberTransform extends Transform
-    @implements NumberTransformInterface
-    @instanceMethod 'deserialize', (serialized)->
-      if _.isEmpty serialized
-        return null
-      else
-        transformed = Number serialized
-        return if _.isNumber(transformed) then transformed else null
+    @Module: LeanRC
 
-    @instanceMethod 'serialize', (deserialized)->
-      if _.isEmpty deserialized
-        return null
-      else
-        transformed = Number deserialized
-        return if _.isNumber(transformed) then transformed else null
+    @public deserialize: Function,
+      default: (serialized)->
+        if _.isEmpty serialized
+          return null
+        else
+          transformed = Number serialized
+          return if _.isNumber(transformed) then transformed else null
 
-  FoxxMC::NumberTransform.initialize()
+    @public serialize: Function,
+      default: (deserialized)->
+        if _.isEmpty deserialized
+          return null
+        else
+          transformed = Number deserialized
+          return if _.isNumber(transformed) then transformed else null
+
+
+  return LeanRC::NumberTransform.initialize()

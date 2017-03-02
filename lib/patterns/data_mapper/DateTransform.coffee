@@ -1,19 +1,23 @@
 _ = require 'lodash'
 
 
-module.exports = (FoxxMC)->
-  Transform  = require('./Transform') FoxxMC
-  StringTransformInterface  = require('../interfaces/string_transform') FoxxMC
+module.exports = (LeanRC)->
+  class LeanRC::DateTransform extends RC::CoreObject
+    @inheritProtected()
+    @implements LeanRC::TransformInterface
 
-  class FoxxMC::StringTransform extends Transform
-    @implements StringTransformInterface
-    @instanceMethod 'deserialize', (serialized)->
-      if _.isNil(serialized) then null else Date serialized
+    @Module: LeanRC
 
-    @instanceMethod 'serialize', (deserialized)->
-      if deserialized instanceof Date and not _.isNaN deserialized
-        return deserialized.toISOString()
-      else
-        return null
+    @public deserialize: Function,
+      default: (serialized)->
+        if _.isNil(serialized) then null else Date serialized
 
-  FoxxMC::StringTransform.initialize()
+    @public serialize: Function,
+      default: (deserialized)->
+        if deserialized instanceof Date and not _.isNaN deserialized
+          return deserialized.toISOString()
+        else
+          return null
+
+
+  return LeanRC::DateTransform.initialize()
