@@ -104,6 +104,6 @@ describe 'View', ->
         onRegister.reset()
         view.removeMediator 'TEST_MEDIATOR'
         assert onRemove.called, 'Mediator onRemove hook not called'
-        retrievedMediator = view.retrieveMediator 'TEST_MEDIATOR'
-        assert not retrievedMediator?, 'Mediator didn\'t removed'
+        hasMediator = view.hasMediator 'TEST_MEDIATOR'
+        assert not hasMediator, 'Mediator didn\'t removed'
       .to.not.throw Error
