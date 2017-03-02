@@ -64,3 +64,14 @@ describe 'Controller', ->
         assert not controller.hasCommand 'TEST_COMMAND1'
         return
       .to.not.throw Error
+  describe '#hasCommand', ->
+    it 'should register new command', ->
+      expect ->
+        controller = Controller.getInstance 'TEST6'
+        class TestCommand extends SimpleCommand
+          @inheritProtected()
+        controller.registerCommand 'TEST_COMMAND', TestCommand
+        assert controller.hasCommand 'TEST_COMMAND'
+        assert not controller.hasCommand 'TEST_COMMAND_ABSENT'
+        return
+      .to.not.throw Error
