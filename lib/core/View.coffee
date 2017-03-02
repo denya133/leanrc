@@ -64,7 +64,7 @@ module.exports = (LeanRC)->
       default: (aoMediator)->
         vsName = aoMediator.getMediatorName()
         # Do not allow re-registration (you must removeMediator first).
-        if @[iphMediatorMap][vsName]
+        if @[iphMediatorMap][vsName]?
           return
         aoMediator.initializeNotifier @[ipsMultitonKey]
 
@@ -89,7 +89,7 @@ module.exports = (LeanRC)->
     @public removeMediator: Function,
       default: (asMediatorName)->
         voMediator = @[iphMediatorMap][asMediatorName]
-        unless voMediator
+        unless voMediator?
           return null
 
         # Get Notification interests, if any.

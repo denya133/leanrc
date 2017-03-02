@@ -4,6 +4,7 @@ LeanRC = require '../lib'
 View = LeanRC::View
 Notification = LeanRC::Notification
 Observer = LeanRC::Observer
+Mediator = LeanRC::Mediator
 
 describe 'View', ->
   describe '.getInstance', ->
@@ -29,8 +30,8 @@ describe 'View', ->
         notifyMethod = sinon.spy()
         notifyMethod.reset()
         context = {}
-        observer = new Observer notifyMethod, context
-        notification = new Notification 'TEST_VIEW'
+        observer = Observer.new notifyMethod, context
+        notification = Notification.new 'TEST_VIEW'
         view.registerObserver notification.getName(), observer
         view.notifyObservers notification
         assert notifyMethod.called, 'Observer is not registered'
@@ -42,10 +43,32 @@ describe 'View', ->
         notifyMethod = sinon.spy()
         notifyMethod.reset()
         context = {}
-        observer = new Observer notifyMethod, context
-        notification = new Notification 'TEST_VIEW'
+        observer = Observer.new notifyMethod, context
+        notification = Notification.new 'TEST_VIEW'
         view.registerObserver notification.getName(), observer
         view.removeObserver notification.getName(), observer.getNotifyContext()
         view.notifyObservers notification
         assert not notifyMethod.called, 'Observer is not removed'
+      .to.not.throw Error
+  describe '#registerMediator', ->
+    it 'should register new mediator', ->
+      expect ->
+        view = View.getInstance 'TEST'
+        onRegister = sinon.spy()
+        handleNotification = sinon.spy()
+        viewComponent = {}
+        class TestMediator extends Mediator
+          @inheritProtected()
+          @public listNotificationInterests: Function,
+            default: -> [ 'TEST_LIST' ]
+          @public handleNotification: Function,
+            default: handleNotification
+          @public onRegister: Function,
+            default: onRegister
+        mediator = TestMediator.new 'TEST_MEDIATOR', viewComponent
+        view.registerMediator mediator
+        assert onRegister.called, 'Mediator is not registered'
+        onRegister.reset()
+        view.notifyObservers Notification.new 'TEST_LIST'
+        assert handleNotification.called, 'Mediator cannot subscribe interests'
       .to.not.throw Error
