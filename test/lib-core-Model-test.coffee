@@ -2,6 +2,7 @@
 sinon = require 'sinon'
 LeanRC = require '../lib'
 Model = LeanRC::Model
+Proxy = LeanRC::Proxy
 
 describe 'Model', ->
   describe '.getInstance', ->
@@ -19,4 +20,45 @@ describe 'Model', ->
         Model.removeModel 'TEST2'
         newModel = Model.getInstance 'TEST2'
         assert model isnt newModel, 'Model instance didn\'t renewed'
+      .to.not.throw Error
+  describe '#registerProxy', ->
+    it 'should create new proxy and regiter it', ->
+      expect ->
+        model = Model.getInstance 'TEST3'
+        onRegister = sinon.spy()
+        class TestProxy extends Proxy
+          @inheritProtected()
+          @public onRegister: Function,
+            default: onRegister
+        proxyData = { data: 'data' }
+        testProxy = TestProxy.new 'TEST_PROXY', proxyData
+        model.registerProxy testProxy
+        assert onRegister.called, 'Proxy is not registered'
+        onRegister.reset()
+        hasProxy = model.hasProxy 'TEST_PROXY'
+        assert hasProxy, 'Proxy is not registered'
+      .to.not.throw Error
+  describe '#removeProxy', ->
+    it 'should create new proxy and regiter it, after that remove it', ->
+      expect ->
+        model = Model.getInstance 'TEST4'
+        onRegister = sinon.spy()
+        onRemove = sinon.spy()
+        class TestProxy extends Proxy
+          @inheritProtected()
+          @public onRegister: Function,
+            default: onRegister
+          @public onRemove: Function,
+            default: onRemove
+        proxyData = { data: 'data' }
+        testProxy = TestProxy.new 'TEST_PROXY2', proxyData
+        model.registerProxy testProxy
+        assert onRegister.called, 'Proxy is not registered'
+        hasProxy = model.hasProxy 'TEST_PROXY2'
+        assert hasProxy, 'Proxy is not registered'
+        onRegister.reset()
+        model.removeProxy 'TEST_PROXY2'
+        assert onRemove.called, 'Proxy is still registered'
+        hasNoProxy = not model.hasProxy 'TEST_PROXY2'
+        assert hasNoProxy, 'Proxy is still registered'
       .to.not.throw Error
