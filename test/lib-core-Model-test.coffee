@@ -77,3 +77,17 @@ describe 'Model', ->
         hasNoAbsentProxy = not retrievedAbsentProxy?
         assert hasNoAbsentProxy, 'Absent proxy can be retrieved'
       .to.not.throw Error
+  describe '#hasProxy', ->
+    it 'should retrieve registred proxy', ->
+      expect ->
+        model = Model.getInstance 'TEST6'
+        class TestProxy extends Proxy
+          @inheritProtected()
+        proxyData = { data: 'data' }
+        testProxy = TestProxy.new 'TEST_PROXY', proxyData
+        model.registerProxy testProxy
+        hasProxy = model.hasProxy 'TEST_PROXY'
+        assert hasProxy, 'Proxy is absent'
+        hasNoAbsentProxy = not model.hasProxy 'TEST_PROXY_ABSENT'
+        assert hasNoAbsentProxy, 'Absent proxy is accessible'
+      .to.not.throw Error

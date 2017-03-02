@@ -107,3 +107,17 @@ describe 'View', ->
         hasMediator = view.hasMediator 'TEST_MEDIATOR'
         assert not hasMediator, 'Mediator didn\'t removed'
       .to.not.throw Error
+  describe '#hasMediator', ->
+    it 'should retrieve registred proxy', ->
+      expect ->
+        view = View.getInstance 'TEST8'
+        class TestMediator extends Mediator
+          @inheritProtected()
+        viewComponent = {}
+        mediator = TestMediator.new 'TEST_MEDIATOR', viewComponent
+        view.registerMediator mediator
+        hasMediator = view.hasMediator 'TEST_MEDIATOR'
+        assert hasMediator, 'Proxy is absent'
+        hasNoAbsentsMediator = not view.hasMediator 'TEST_MEDIATOR_ABSENT'
+        assert hasNoAbsentsMediator, 'Absent proxy is accessible'
+      .to.not.throw Error
