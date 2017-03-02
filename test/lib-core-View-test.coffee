@@ -85,3 +85,25 @@ describe 'View', ->
         retrievedAbsentMediator = view.retrieveMediator 'TEST_MEDIATOR_ABSENT'
         assert not retrievedAbsentMediator?, 'Retrieve absent mediator'
       .to.not.throw Error
+  describe '#removeMediator', ->
+    it 'should remove mediator', ->
+      expect ->
+        view = View.getInstance 'TEST7'
+        onRegister = sinon.spy()
+        onRemove = sinon.spy()
+        viewComponent = {}
+        class TestMediator extends Mediator
+          @inheritProtected()
+          @public onRegister: Function,
+            default: onRegister
+          @public onRemove: Function,
+            default: onRemove
+        mediator = TestMediator.new 'TEST_MEDIATOR', viewComponent
+        view.registerMediator mediator
+        assert onRegister.called, 'Mediator is not registered'
+        onRegister.reset()
+        view.removeMediator 'TEST_MEDIATOR'
+        assert onRemove.called, 'Mediator onRemove hook not called'
+        retrievedMediator = view.retrieveMediator 'TEST_MEDIATOR'
+        assert not retrievedMediator?, 'Mediator didn\'t removed'
+      .to.not.throw Error
