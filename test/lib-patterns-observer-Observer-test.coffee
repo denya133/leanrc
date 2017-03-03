@@ -3,7 +3,6 @@ sinon = require 'sinon'
 LeanRC = require '../lib'
 Notification = LeanRC::Notification
 Observer = LeanRC::Observer
-Facade = LeanRC::Facade
 
 describe 'Observer', ->
   describe '.new', ->
