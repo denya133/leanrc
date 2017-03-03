@@ -1,6 +1,6 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
-LeanRC = require '../lib'
+LeanRC = require.main.require 'lib'
 View = LeanRC::View
 Notification = LeanRC::Notification
 Observer = LeanRC::Observer

@@ -2,3 +2,12 @@
 --reporter spec
 --check-leaks
 --growl
+test/
+test/lib/
+test/lib/core/
+test/lib/patterns/
+test/lib/patterns/command/
+test/lib/patterns/facade/
+test/lib/patterns/mediator/
+test/lib/patterns/observer/
+test/lib/patterns/proxy/
