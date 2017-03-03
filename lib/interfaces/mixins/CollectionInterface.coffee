@@ -94,6 +94,12 @@ module.exports = (LeanRC)->
     @public @virtual unloadBy: Function,
       args: [Object] # но возможно надо указать LeanRC::QueryInterface
       return: RC::Constants.NILL
+    @public @virtual parseQuery: Function, # описание того как стандартный (query object) преобразовать в конкретный запрос к конкретной базе данных
+      args: [Object] # но возможно надо указать LeanRC::QueryInterface
+      return: RC::Constants.ANY
+    @public @virtual executeQuery: Function,
+      args: [[Object, String], Object] # query, options
+      return: RC::Constants.ANY
 
 
   return LeanRC::CollectionInterface.initialize()
