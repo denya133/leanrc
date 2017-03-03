@@ -49,6 +49,12 @@ module.exports = (LeanRC)->
     @public @virtual query: Function,
       args: [Object] # но возможно надо указать LeanRC::QueryInterface
       return: RC::Constants.ANY
+    @public @virtual copy: Function,
+      args: [String] # record id
+      return: LeanRC::RecordInterface
+    @public @virtual deepCopy: Function,
+      args: [String] # record id
+      return: LeanRC::RecordInterface
     @public @virtual forEach: Function,
       args: [Function]
       return: RC::Constants.NILL
