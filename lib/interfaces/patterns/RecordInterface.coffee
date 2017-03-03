@@ -12,7 +12,7 @@ module.exports = (LeanRC)->
     @public @virtual collection: LeanRC::CollectionInterface
 
     # объявлю пока здесь, чтобы не забыть
-    @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для фнкционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
+    @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
 
     # под вопросом ??????
     # @public @static schema: JoiSchema
@@ -34,23 +34,27 @@ module.exports = (LeanRC)->
 
     # под вопросом ??????
     @public validate: Function, [], -> SELF
-    @public beforeValidate: Function, [], -> NILL
-    @public afterValidate: Function, [], -> NILL
+    # @public beforeValidate: Function, [], -> NILL
+    # @public afterValidate: Function, [], -> NILL
     @public save: Function, [], -> SELF
-    @public beforeSave: Function, [], -> NILL
-    @public afterSave: Function, [ANY], -> ANY # any type
+    # @public beforeSave: Function, [], -> NILL
+    # @public afterSave: Function, [ANY], -> ANY # any type
     @public create: Function, [], -> SELF
-    @public beforeCreate: Function, [], -> NILL
-    @public afterCreate: Function, [ANY], -> ANY # any type
+    # @public beforeCreate: Function, [], -> NILL
+    # @public afterCreate: Function, [ANY], -> ANY # any type
     @public update: Function, [], -> SELF
-    @public beforeUpdate: Function, [], -> NILL
-    @public afterUpdate: Function, [ANY], -> ANY # any type
+    # @public beforeUpdate: Function, [], -> NILL
+    # @public afterUpdate: Function, [ANY], -> ANY # any type
     @public delete: Function, [], -> SELF
-    @public beforeDelete: Function, [], -> NILL
-    @public afterDelete: Function, [ANY], -> ANY # any type
+    # @public beforeDelete: Function, [], -> NILL
+    # @public afterDelete: Function, [ANY], -> ANY # any type
     @public destroy: Function, [], -> SELF
-    @public beforeDestroy: Function, [], -> NILL
-    @public afterDestroy: Function, [], -> NILL
+    # @public beforeDestroy: Function, [], -> NILL
+    # @public afterDestroy: Function, [], -> NILL
+
+    # здесь не декларируются before/after хуки, потому что их использование относится сугубо к реализации, но не к спецификации интерфейса как такового.
+
+    # под вопросом ????
     @public recordHasBeenChanged: Function, [], -> NILL
     @public updateEdges: Function, [ANY], -> ANY # any type
 

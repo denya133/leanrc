@@ -14,6 +14,8 @@ module.exports = (LeanRC)->
     @Module: LeanRC
 
     @public @virtual Collection: RC::Class # like Model in FoxxMC::Controller
+
+    # под вопросом
     @public @virtual query: Object
     @public @virtual body: Object
     @public @virtual recordId: String
@@ -28,6 +30,10 @@ module.exports = (LeanRC)->
       args: [Object, Object] # nameDefinition, config
       return: String
 
+
+    @public @virtual permitBody: Function, # через эту функцию должен пропускаться payload пришедший от браузера
+      args: []
+      return: RC::Constants.NILL
 
     @public @virtual list: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
@@ -45,5 +51,6 @@ module.exports = (LeanRC)->
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
 
+    # здесь не декларируются before/after хуки, потому что их использование относится сугубо к реализации, но не к спецификации интерфейса как такового.
 
   return LeanRC::ResourceInterface.initialize()

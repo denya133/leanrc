@@ -76,15 +76,12 @@ module.exports = (LeanRC)->
     @public @virtual push: Function,
       args: [[Array, Object]]
       return: Boolean
-    @public @virtual getRecord: Function,
-      args: [String]
-      return: LeanRC::RecordInterface
     @public @virtual normalize: Function,
       args: [Object] # payload
-      return: Object # eq. serializeFromClient
+      return: Object # нормализация данных из базы
     @public @virtual serialize: Function,
       args: [String, Object] # id, options
-      return: Object # eq. serializeForClient
+      return: Object # сериализация рекорда для отправки в базу
     @public @virtual unload: Function,
       args: [String] # id
       return: RC::Constants.NILL
