@@ -11,13 +11,13 @@ module.exports = (LeanRC)->
 
     @public execute: Function,
       default: (aoNotification)->
-        vlSubCommands = @[iplSubCommands].slice 0
+        vlSubCommands = @[iplSubCommands][..]
         for vCommand in vlSubCommands
           do (vCommand)=>
             voCommand = vCommand.new()
             voCommand.initializeNotifier @[Symbol.for 'multitonKey']
             voCommand.execute aoNotification
-        @[iplSubCommands].slice 0
+        @[iplSubCommands][..]
         return
 
     @public initializeMacroCommand: Function,
