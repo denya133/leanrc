@@ -5,9 +5,6 @@ Notification = LeanRC::Notification
 Observer = LeanRC::Observer
 Facade = LeanRC::Facade
 
-NOTIFIER_NAME = 'NOTIFIER_NAME'
-NOTIFICATION_NAME = 'TEST_NOTIFICATION'
-
 describe 'Observer', ->
   describe '.new', ->
     it 'should create new observer', ->
