@@ -34,7 +34,7 @@
   },
   "scripts": {
     "postinstall": "coffee --compile --output ./dist ./lib",
-    "test": "mocha --compilers coffee:coffee-script/register"
+    "test": "mocha"
   },
   "config": {
     "precommit": {
