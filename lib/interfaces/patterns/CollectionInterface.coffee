@@ -6,9 +6,32 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
+    # под вопросом ???? - вообще говоря прокси должен посылать к ядру сигнал
+    @public recordHasBeenChanged: Function, [], -> NILL
+
+    # в классе Proxy от которого будет наследоваться конкретный класс Collection есть метод onRegister в котором можно прописать подключение (или регистрацию) классов Рекорда и Сериализатора
+
     # надо определиться с этими двумя пунктами, так ли их объявлять?
     @public @static @virtual delegate: RC::Class
     @public @static @virtual serializer: RC::Class
+    @public @static @virtual collectionName: Function,
+      args: []
+      return: String
+    @public @static @virtual collectionPrefix: Function,
+      args: []
+      return: String
+    @public @static @virtual collectionFullName: Function,
+      args: []
+      return: String
+    @public @static @virtual setCustomFilters: Function,
+      args: [Object]
+      return: RC::Constants.NILL
+    @public @static @virtual customFilters: Function, # возвращает установленные кастомные фильтры с учетом наследования
+      args: []
+      return: Object
+    @public @static @virtual parentClassNames: Function,
+      args: []
+      return: Array
 
     @public @virtual generateId: Function,
       args: []

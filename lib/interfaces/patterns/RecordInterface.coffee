@@ -15,14 +15,8 @@ module.exports = (LeanRC)->
     @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
 
     # под вопросом ??????
-    # @public @static schema: JoiSchema
-    # @public @static customFilters: Function, [statement], -> NILL
-    # @private @static _customFilters: Function, [], -> Object
-    # @private @static _parentClassesNames: Function, [], -> Array
-    # @public @static collectionName: Function, [], -> String #adb
-    # @public @static collectionNameInDB: Function, [[String, NILL]], -> String #adb
-    # @public @static collectionPrefix: Function, [], -> String #adb
-    # @public @static getLocksFor: Function, [[String, Array], Array], ->Object #adb
+    # @public @static schema: JoiSchema # это используется в медиаторе на входе и выходе, поэтому это надо объявить там.
+
 
     # под вопросом ??????
     @public @static parseModelName: Function, [String], -> Array
@@ -32,46 +26,30 @@ module.exports = (LeanRC)->
 
 
 
-    # под вопросом ??????
-    @public validate: Function, [], -> SELF
-    # @public beforeValidate: Function, [], -> NILL
-    # @public afterValidate: Function, [], -> NILL
-    @public save: Function, [], -> SELF
-    # @public beforeSave: Function, [], -> NILL
-    # @public afterSave: Function, [ANY], -> ANY # any type
-    @public create: Function, [], -> SELF
-    # @public beforeCreate: Function, [], -> NILL
-    # @public afterCreate: Function, [ANY], -> ANY # any type
-    @public update: Function, [], -> SELF
-    # @public beforeUpdate: Function, [], -> NILL
-    # @public afterUpdate: Function, [ANY], -> ANY # any type
-    @public delete: Function, [], -> SELF
-    # @public beforeDelete: Function, [], -> NILL
-    # @public afterDelete: Function, [ANY], -> ANY # any type
-    @public destroy: Function, [], -> SELF
-    # @public beforeDestroy: Function, [], -> NILL
-    # @public afterDestroy: Function, [], -> NILL
-
     # здесь не декларируются before/after хуки, потому что их использование относится сугубо к реализации, но не к спецификации интерфейса как такового.
 
-    # под вопросом ????
-    @public recordHasBeenChanged: Function, [], -> NILL
+
+
+    # под вопросом ??????
     @public updateEdges: Function, [ANY], -> ANY # any type
 
 
 
-    # под вопросом ??????
-    @private _resetAttributes: Function, [Object], -> ModelInterface
+    # под вопросом ?????? # возможно надо это определять в сериалайзере
     @public getSnapshot: Function, [], -> Object
     @private _forClient: Function, [Object], -> Object
-
-    # под вопросом ?????? # возможно надо это определять в сериалайзере
     @public @static serializableAttributes: Function, [], -> Object
     @public @static serializeFromBatch: Function, [Object], -> Object
     @public @static serializeFromClient: Function, [Object], -> Object
     @public serializeForClient: Function, [Object], -> Object
 
 
+
+
+
+    @public @static @virtual parentClassNames: Function,
+      args: [[RC::Class, RC::Constants.NILL]]
+      return: Array
 
     # @private @static __attrs: Object
     # @private @static _attrs: Function, [], -> Object
@@ -127,7 +105,7 @@ module.exports = (LeanRC)->
     @public @static @virtual inverseFor: Function,
       args: [String]
       return: Object # Cucumber.inverseFor 'tomato' #-> {type: App::Tomato, name: 'cucumbers', kind: 'hasMany'}
-    @public @static @virtual validate: Function, # из рельсов, но что внутри делать пока не понятно.
+    @public @static @virtual validate: Function, # что внутри делать не понятно.
       args: [String, Object] #attribute, options
       return: RC::Constants.NILL
 
@@ -140,6 +118,37 @@ module.exports = (LeanRC)->
     @public @virtual id: String
     @public @virtual rev: String
     @public @virtual type: String
+
+    @public @virtual validate: Function,
+      args: []
+      return: RecordInterface
+    # @public beforeValidate: Function, [], -> NILL
+    # @public afterValidate: Function, [], -> NILL
+    @public @virtual save: Function,
+      args: []
+      return: RecordInterface
+    # @public beforeSave: Function, [], -> NILL
+    # @public afterSave: Function, [ANY], -> ANY # any type
+    @public @virtual create: Function,
+      args: []
+      return: RecordInterface
+    # @public beforeCreate: Function, [], -> NILL
+    # @public afterCreate: Function, [ANY], -> ANY # any type
+    @public @virtual update: Function,
+      args: []
+      return: RecordInterface
+    # @public beforeUpdate: Function, [], -> NILL
+    # @public afterUpdate: Function, [ANY], -> ANY # any type
+    @public @virtual delete: Function,
+      args: []
+      return: RecordInterface
+    # @public beforeDelete: Function, [], -> NILL
+    # @public afterDelete: Function, [ANY], -> ANY # any type
+    @public @virtual destroy: Function,
+      args: []
+      return: RecordInterface
+    # @public beforeDestroy: Function, [], -> NILL
+    # @public afterDestroy: Function, [], -> NILL
 
     @public @virtual attributes: Function, # метод должен вернуть список атрибутов данного рекорда.
       args: []
