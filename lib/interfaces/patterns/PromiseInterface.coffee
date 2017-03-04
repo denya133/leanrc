@@ -12,73 +12,36 @@ fulfilled: meaning that the operation completed successfully.
 rejected: meaning that the operation failed.
 ###
 
-class PromiseInterface extends Interface
-  @public @static @virtual all: Function
-  ,
-    [
-      iterable: Array
-    ]
-  , ->
-    return: PromiseInterface
-  @public @static @virtual reject: Function
-  ,
-    [
-      reason: Error
-    ]
-  , ->
-    return: PromiseInterface
-  @public @static @virtual resolve: Function
-  ,
-    [
-      value: ANY
-    ]
-  , ->
-    return: PromiseInterface
-  @public @static @virtual race: Function
-  ,
-    [
-      iterable: Array
-    ]
-  , ->
-    return: PromiseInterface
-  @private @static @virtual 'Promise'
-  @private @virtual 'promise'
-  @public @virtual constructor: Function
-  ,
-    [
-      onFulfilled: Function
-    ,
-      onRejected: Function
-    ]
-  , ->
-    return: PromiseInterface
-  @public @virtual catch: Function
-  ,
-    [
-      onRejected: Function
-    ]
-  , ->
-    return: PromiseInterface
-  @public @virtual "then": Function
-  ,
-    [
-      onFulfilled: Function
-    ,
-      onRejected: Function
-    ]
-  , ->
-    return: PromiseInterface
+RC = require 'RC'
 
-class Promise extends CoreObject
-  @implements PromiseInterface
+module.exports = (LeanRC)->
+  class LeanRC::PromiseInterface extends RC::Interface
+    @inheritProtected()
+    @Module: LeanRC
+
+    @public @static @virtual all: Function,
+      args: [Array] # iterable
+      return: PromiseInterface
+
+    @public @static @virtual reject: Function,
+      args: [Error] # reason
+      return: PromiseInterface
+
+    @public @static @virtual resolve: Function,
+      args: [RC::Constants.ANY]
+      return: PromiseInterface
+
+    @public @static @virtual race: Function,
+      args: [Array] # iterable
+      return: PromiseInterface
+
+    @public @virtual catch: Function,
+      args: [Function] # onRejected
+      return: PromiseInterface
+
+    @public @virtual "then": Function,
+      args: [Function, Function] # onFulfilled, onRejected
+      return: PromiseInterface
 
 
-# examle in usage
-###
-  # in api/ folder must be defined promise.coffee file with realy Promise class
-  Test::Promise = Promise # for `nodejs`
-  Test::Promise = require 'arangodb-promise' # for apps running in `arangodb`
-  module.exports = Test::Promise
-###
-
-# realy promise will be wrapped in FoxxMC::Promise which will been used in app code.
+  return LeanRC::PromiseInterface.initialize()
