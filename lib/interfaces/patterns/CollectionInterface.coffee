@@ -11,7 +11,7 @@ module.exports = (LeanRC)->
     @public @static @virtual serializer: RC::Class
 
     @public @virtual generateId: Function,
-      args: [Object]
+      args: []
       return: [String, RC::Constants.NILL]
     @public @virtual create: Function,
       args: [Object]
