@@ -232,5 +232,15 @@ module.exports = (LeanRC)->
       args: []
       return: RC::Constants.NILL
 
+    constructor: (properties) ->
+      super arguments...
+      console.log 'Init of Record', @constructor.name, properties
+
+      for own k, v of properties
+        do (k, v)=>
+          @[k] = v
+
+      console.log 'dfdfdf 666'
+
 
   return LeanRC::Record.initialize()
