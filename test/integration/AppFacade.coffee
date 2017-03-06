@@ -7,7 +7,7 @@ module.exports = (TestApp) ->
 
     vpbIsInitialized = @private isInitialized: Boolean,
       default: no
-    cphInstanceMap  = @private @static instanceMap: Object,
+    cphInstanceMap  = @protected @static instanceMap: Object,
       default: {}
 
     @public startup: Function,
@@ -19,8 +19,9 @@ module.exports = (TestApp) ->
 
     @public @static getInstance: Function,
       default: (asKey)->
-        unless LeanRC::Facade[cphInstanceMap][asKey]?
-          LeanRC::Facade[cphInstanceMap][asKey] = TestApp::AppFacade.new asKey
-        LeanRC::Facade[cphInstanceMap][asKey]
+        vhInstanceMap = LeanRC::Facade[cphInstanceMap]
+        unless vhInstanceMap[asKey]?
+          vhInstanceMap[asKey] = TestApp::AppFacade.new asKey
+        vhInstanceMap[asKey]
 
   TestApp::AppFacade.initialize()

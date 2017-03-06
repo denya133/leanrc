@@ -9,4 +9,5 @@ describe 'ConcreteFacade', ->
     it 'should get new or existing instance of Facade', ->
       expect ->
         app = AppFacade.getInstance 'HELLO_WORLD'
+        app.startup()
       .to.not.throw Error

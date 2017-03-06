@@ -7,6 +7,6 @@ module.exports = (TestApp) ->
 
     @public initializeMacroCommand: Function,
       default: ->
-        console.log 'Hello World'
+        @addSubCommand TestApp::PrepareControllerCommand
 
   TestApp::StartupCommand.initialize()
