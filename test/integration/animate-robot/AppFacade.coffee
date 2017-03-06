@@ -17,6 +17,10 @@ module.exports = (TestApp) ->
           @registerCommand TestApp::AppConstants.STARTUP, TestApp::StartupCommand
           @sendNotification TestApp::AppConstants.STARTUP
 
+    @public finish: Function,
+      default: ->
+        @removeMediator  TestApp::ConsoleComponentMediator.CONSOLE_MEDIATOR
+
     @public @static getInstance: Function,
       default: (asKey)->
         vhInstanceMap = LeanRC::Facade[cphInstanceMap]

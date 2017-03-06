@@ -7,6 +7,9 @@ module.exports = (TestApp) ->
     @inheritProtected()
     @Module: TestApp
 
+    @public @static CONSOLE_MEDIATOR: String,
+      default: 'consoleMediator'
+
     @public listNotificationInterests: Function,
       default: -> [
         TestApp::AppConstants.ROBOT_SPEAKING
