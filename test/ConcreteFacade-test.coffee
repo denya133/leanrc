@@ -10,4 +10,5 @@ describe 'ConcreteFacade', ->
       expect ->
         app = AppFacade.getInstance 'HELLO_WORLD'
         app.startup()
+        TestApp::ConsoleComponent.getInstance().startAnimateRobot()
       .to.not.throw Error

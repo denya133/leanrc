@@ -8,6 +8,8 @@ require('./controller/command/PrepareViewCommand') TestApp
 require('./controller/command/PrepareModelCommand') TestApp
 require('./controller/command/AnimateRobotCommand') TestApp
 
+require('./view/component/ConsoleComponent') TestApp
+
 require('./AppFacade') TestApp
 
 module.exports = TestApp
