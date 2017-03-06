@@ -14,7 +14,7 @@ module.exports = (LeanRC)->
     ipoView         = @private view: LeanRC::ViewInterface
     ipoController   = @private controller: LeanRC::ControllerInterface
     ipsMultitonKey  = @protected multitonKey: String
-    cphInstanceMap  = @private @static instanceMap: Object,
+    cphInstanceMap  = @protected @static instanceMap: Object,
       default: {}
 
     ipmInitializeModel = @protected initializeModel: Function,
@@ -116,7 +116,7 @@ module.exports = (LeanRC)->
         return
 
     constructor: (asKey)->
-      if Facade[cphInstanceMap][asKey]
+      if Facade[cphInstanceMap][asKey]?
         throw new Error Facade.MULTITON_MSG
       @initializeNotifier asKey
       Facade[cphInstanceMap][asKey] = @
