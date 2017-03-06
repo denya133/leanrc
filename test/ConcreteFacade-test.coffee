@@ -3,6 +3,8 @@ sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 TestApp = require './integration/animate-robot'
 AppFacade = TestApp::AppFacade
+RequestApp = require './integration/animate-robot'
+RequestAppFacade = RequestApp::AppFacade
 
 describe 'ConcreteFacade', ->
   describe 'Create AppFacade', ->
@@ -21,4 +23,11 @@ describe 'ConcreteFacade', ->
         consoleComponentSpy = sinon.spy consoleComponent, 'writeMessages'
         consoleComponent.startAnimateRobot()
         assert consoleComponentSpy.called
+      .to.not.throw Error
+  describe 'Create RequestApp::AppFacade', ->
+    it 'should get new or existing instance of Facade', ->
+      expect ->
+        app = RequestAppFacade.getInstance 'HELLO_WORLD3'
+        app.startup()
+        app.finish()
       .to.not.throw Error

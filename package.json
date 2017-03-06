@@ -29,9 +29,6 @@
     "highload",
     "distributed system"
   ],
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
     "postinstall": "coffee --compile --output ./dist ./lib",
     "test": "mocha"
