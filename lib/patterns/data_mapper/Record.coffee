@@ -69,7 +69,7 @@ module.exports = (LeanRC)->
       get: (__attrs)->
         AbstractClass = @
         fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor[ipoAttrs]
+          AbstractClass.__super__.constructor.attributes
         __attrs[AbstractClass.name] ?= do ->
           RC::Utils.extend {}
           , (fromSuper ? {})
@@ -81,7 +81,7 @@ module.exports = (LeanRC)->
       get: (__edges)->
         AbstractClass = @
         fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor[ipoEdges]
+          AbstractClass.__super__.constructor.edges
         __edges[AbstractClass.name] ?= do ->
           RC::Utils.extend {}
           , (fromSuper ? {})
@@ -93,7 +93,7 @@ module.exports = (LeanRC)->
       get: (__props)->
         AbstractClass = @
         fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor[ipoProps]
+          AbstractClass.__super__.constructor.properties
         __props[AbstractClass.name] ?= do ->
           RC::Utils.extend {}
           , (fromSuper ? {})
@@ -105,7 +105,7 @@ module.exports = (LeanRC)->
       get: (__comps)->
         AbstractClass = @
         fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor[ipoComps]
+          AbstractClass.__super__.constructor.computeds
         __comps[AbstractClass.name] ?= do ->
           RC::Utils.extend {}
           , (fromSuper ? {})
