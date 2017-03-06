@@ -6,6 +6,9 @@ module.exports = (TestApp) ->
     @inheritProtected()
     @Module: TestApp
 
+    @public @static ANIMATE_ROBOT_EVENT: String,
+      default: 'animateRobotEvent'
+
     ipoEventEmitter = @private eventEmitter: EventEmitter,
       default: null
     ipoInstance = @private instance: TestApp::ConsoleComponent,
@@ -23,18 +26,18 @@ module.exports = (TestApp) ->
 
     @public startAnimateRobot: Function,
       default: ->
-        console.log 'TODO: start animate robot'
+        @[ipoEventEmitter].emit TestApp::ConsoleComponent.ANIMATE_ROBOT_EVENT
 
     @public subscribeEvent: Function,
       default: (eventName, callback) ->
-        @[ipoEventEmitter]?.on eventName, callback
+        @[ipoEventEmitter].on eventName, callback
 
     @public unsubscribeEvent: Function,
       default: (eventName, callback) ->
         if callback?
-          @[ipoEventEmitter]?.removeListener eventName, callback
+          @[ipoEventEmitter].removeListener eventName, callback
         else
-          @[ipoEventEmitter]?.removeAllListeners eventName
+          @[ipoEventEmitter].removeAllListeners eventName
 
     constructor: ->
       @[ipoEventEmitter] = new EventEmitter

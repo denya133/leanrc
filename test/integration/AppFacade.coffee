@@ -16,7 +16,6 @@ module.exports = (TestApp) ->
           @[vpbIsInitialized] = yes
           @registerCommand TestApp::AppConstants.STARTUP, TestApp::StartupCommand
           @sendNotification TestApp::AppConstants.STARTUP
-          @sendNotification TestApp::AppConstants.ANIMATE_ROBOT
 
     @public @static getInstance: Function,
       default: (asKey)->

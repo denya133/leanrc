@@ -9,6 +9,7 @@ require('./controller/command/PrepareModelCommand') TestApp
 require('./controller/command/AnimateRobotCommand') TestApp
 
 require('./view/component/ConsoleComponent') TestApp
+require('./view/mediator/ConsoleComponentMediator') TestApp
 
 require('./AppFacade') TestApp
 
