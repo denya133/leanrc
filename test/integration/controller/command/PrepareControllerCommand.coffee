@@ -5,10 +5,9 @@ module.exports = (TestApp) ->
     @inheritProtected()
     @Module: TestApp
 
-    ipmFacade = @protected facade: LeanRC::FacadeInterface
-
     @public execute: Function,
       default: ->
-        console.log 'Prepare controller for Hello World'
+        @[Symbol.for 'facade'].registerCommand TestApp::AppConstants.ANIMATE_ROBOT,
+          TestApp::AnimateRobotCommand
 
   TestApp::PrepareControllerCommand.initialize()
