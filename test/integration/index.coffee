@@ -11,6 +11,8 @@ require('./controller/command/AnimateRobotCommand') TestApp
 require('./view/component/ConsoleComponent') TestApp
 require('./view/mediator/ConsoleComponentMediator') TestApp
 
+require('./model/proxy/RobotDataProxy') TestApp
+
 require('./AppFacade') TestApp
 
 module.exports = TestApp

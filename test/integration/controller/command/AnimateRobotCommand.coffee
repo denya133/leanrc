@@ -5,10 +5,9 @@ module.exports = (TestApp) ->
     @inheritProtected()
     @Module: TestApp
 
-    ipmFacade = @protected facade: LeanRC::FacadeInterface
-
     @public execute: Function,
       default: ->
-        console.log 'Animate robot to say "Hallo World"'
+        proxy = @[Symbol.for 'facade'].retrieveProxy TestApp::RobotDataProxy.ROBOT_PROXY
+        proxy.animate()
 
   TestApp::AnimateRobotCommand.initialize()

@@ -5,10 +5,8 @@ module.exports = (TestApp) ->
     @inheritProtected()
     @Module: TestApp
 
-    ipmFacade = @protected facade: LeanRC::FacadeInterface
-
     @public execute: Function,
       default: ->
-        console.log 'Prepare model for Hello World'
+        @[Symbol.for 'facade'].registerProxy TestApp::RobotDataProxy.new TestApp::RobotDataProxy.ROBOT_PROXY, no
 
   TestApp::PrepareModelCommand.initialize()

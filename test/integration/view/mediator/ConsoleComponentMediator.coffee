@@ -7,6 +7,17 @@ module.exports = (TestApp) ->
     @inheritProtected()
     @Module: TestApp
 
+    @public listNotificationInterests: Function,
+      default: -> [
+        TestApp::AppConstants.ROBOT_SPEAKING
+      ]
+
+    @public handleNotification: Function,
+      default: (notification)->
+        switch notification.getName()
+          when TestApp::AppConstants.ROBOT_SPEAKING
+            @getViewComponent()?.writeMessages notification.getBody()
+
     @public onRegister: Function,
       default: ->
         @setViewComponent TestApp::ConsoleComponent.getInstance()
