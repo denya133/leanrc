@@ -8,5 +8,7 @@ module.exports = (TestApp) ->
     @public initializeMacroCommand: Function,
       default: ->
         @addSubCommand TestApp::PrepareControllerCommand
+        @addSubCommand TestApp::PrepareViewCommand
+        @addSubCommand TestApp::PrepareModelCommand
 
   TestApp::StartupCommand.initialize()

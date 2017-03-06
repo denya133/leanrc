@@ -1,7 +1,7 @@
 LeanRC = require.main.require 'lib'
 
 module.exports = (TestApp) ->
-  class TestApp::PrepareControllerCommand extends LeanRC::SimpleCommand
+  class TestApp::PrepareModelCommand extends LeanRC::SimpleCommand
     @inheritProtected()
     @Module: TestApp
 
@@ -9,6 +9,6 @@ module.exports = (TestApp) ->
 
     @public execute: Function,
       default: ->
-        console.log 'Prepare controller for Hello World'
+        console.log 'Prepare model for Hello World'
 
-  TestApp::PrepareControllerCommand.initialize()
+  TestApp::PrepareModelCommand.initialize()
