@@ -108,6 +108,7 @@ module.exports = (LeanRC)->
         $lte: RC::Constants.ANY # <=
         $gt: RC::Constants.ANY # >
         $gte: RC::Constants.ANY # >=
+        $like: String
 
         $in: Array # check value present in array
         $nin: Array # ... not present in array
