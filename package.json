@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "LeanRC": "file:./",
-    "coffee-script": "1.12.1",
+    "coffee-script": "1.12.4",
     "gulp": "3.9.1",
     "gulp-concat": "2.6.0",
     "gulp-copy": "0.0.2",

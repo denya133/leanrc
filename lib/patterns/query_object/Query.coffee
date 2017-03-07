@@ -51,7 +51,7 @@ But it equvalent json
           '@cucumber.price': {$gt: 85}
         ]
        $return: '@cucumber'
-  $join: [
+  $join: $and: [
     '@doc.tomatoId': {$eq: '@tomato._key'}
     '@tomato.active': {$eq: yes}
   ]
@@ -93,47 +93,145 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    # т.к. единообразный интерфейс (формат) объектов-запросов приходящих из браузера и работающих на уровне бизнес логики внутри сервера, то эти методы НЕ нужны.
-    # @private parseQuery: Function, [], -> SELF
-    # @private updateOptions: Function, [], -> SELF
-    # @private updateConditions: Function, [], -> SELF
-    # @private callCustomFilters: Function, [], -> SELF
+    @public @static operatorsMap: Object,
+      default:
+        $and: Array
+        $or: Array
+        $not: Object
+        $nor: Array # not or # !(a||b) === !a && !b
 
-    # @public includes: Function, [definitions], -> SELF # зависимо от объявленных в рекорде пропертей. поэтому требует передачи в квери класса рекорда. Конструирует let объявления
-    # @public from: Function, [collectionName], -> SELF
-    @public join: Function, [definitions], -> SELF # критерии связывания как в SQL JOIN ... ON
-    @public forIn: Function, [definitions], -> Object # {in: ->}
-    # @public where: Function, [conditions, [bindings, NILL]], -> SELF
-    @public filter: Function, [conditions, [bindings, NILL]], -> SELF
-    @public let: Function, [definition, [bindings, NILL]], -> SELF
-    # @public group: Function, [definition], -> SELF
-    @public collect: Function, [definition], -> SELF
-    @public aggregate: Function, [definition], -> SELF
-    @public into: Function, [variable], -> SELF
-    @public having: Function, [conditions, [bindings, NILL]], -> SELF
-    @public sort: Function, [definition], -> SELF
-    @public limit: Function, [definition], -> SELF
-    @public distinct: Function, [], -> SELF
-    # @public select: Function, [fields], -> SELF
-    # надо определить символ, который будет говорить об использовании объявленной переменной (ссылки), чтобы в случае когда должна ретюрниться простая строка, в объявлении просто не было символа. можно заиспользовать '$$'
-    @public return: Function, [], -> SELF # может как в SQL но в объектном виде: {id: '$$doc._key', doc: '$$doc', name: '$$cucumber.name', price: '$$tomato.price', totalOnions: '$$totalOnions', description: 'Some item'}
-    @public pluck: Function, [field], -> SELF
-    @public count: Function, [], -> SELF
-    # @public length: Function, [], -> SELF
-    # @public average: Function, [field], -> SELF
-    @public avg: Function, [field], -> SELF
-    @public min: Function, [field], -> SELF
-    @public max: Function, [field], -> SELF
-    @public sum: Function, [field], -> SELF
-    @public mergeQuery: Function,
-      default: (aoQuery)->
-        @query = LeanRC::QueryObject.new RC::Utils.extend {}, @query, aoQuery
+        $eq: RC::Constants.ANY # ==
+        $ne: RC::Constants.ANY # !=
+        $lt: RC::Constants.ANY # <
+        $lte: RC::Constants.ANY # <=
+        $gt: RC::Constants.ANY # >
+        $gte: RC::Constants.ANY # >=
+
+        $in: Array # check value present in array
+        $nin: Array # ... not present in array
+
+        # field has array of values
+        $all: Array # contains some values
+        $elemMatch: Object # conditions for complex item
+        $size: Number # condition for array length
+
+        $exists: Boolean # condition for check present some value in field
+        $type: String # check value type
+
+        $mod: Array # [divisor, remainder] for example [4,0] делится ли на 4
+        $regex: RegExp # value must be string. ckeck it by RegExp.
+
+        $td: Boolean # this day (today)
+        $ld: Boolean # last day (yesterday)
+        $tw: Boolean # this week
+        $lw: Boolean # last week
+        $tm: Boolean # this month
+        $lm: Boolean # last month
+        $ty: Boolean # this year
+        $ly: Boolean # last year
+
+    @public $forIn: Object
+    @public $join: Object
+    @public $let: Object
+    @public $filter: Object
+    @public $collect: Object
+    @public $aggregate: Object
+    @public $into: Object
+    @public $having: Object
+    @public $sort: Object
+    @public $limit: Number
+    @public $offset: Number
+    @public $avg: String # '@doc.price'
+    @public $sum: String # '@doc.price'
+    @public $min: String # '@doc.price'
+    @public $max: String # '@doc.price'
+    @public $count: Boolean # yes or not present
+    @public $distinct: Boolean # yes or not present
+    @public $return: Object
+
+
+    @public forIn: Function,
+      default: (aoDefinitions)->
+        @$forIn ?= {}
+        @$forIn = RC::Utils.extend {}, @$forIn, aoDefinitions
         return @
-    @public query: QueryObjectInterface
+    @public join: Function, # критерии связывания как в SQL JOIN ... ON
+      default: (aoDefinitions)->
+        @$join = aoDefinitions
+        return @
+    @public filter: Function,
+      default: (aoDefinitions)->
+        @$filter = aoDefinitions
+        return @
+    @public let: Function,
+      default: (aoDefinitions)->
+        @$let ?= {}
+        @$let = RC::Utils.extend {}, @$let, aoDefinitions
+        return @
+    @public collect:
+      default: (aoDefinition)->
+        @$collect = aoDefinition
+        return @
+    @public aggregate:
+      default: (aoDefinition)->
+        @$aggregate = aoDefinition
+        return @
+    @public into: Function,
+      default: (aoDefinition)->
+        @$into = aoDefinition
+        return @
+    @public having: Function,
+      default: (aoDefinition)->
+        @$having = aoDefinition
+        return @
+    @public sort: Function,
+      default: (aoDefinition)->
+        @$sort = aoDefinition
+        return @
+    @public limit: Function,
+      default: (anValue)->
+        @$limit = anValue
+        return @
+    @public offset: Function,
+      default: (anValue)->
+        @$offset = anValue
+        return @
+    @public distinct: Function,
+      default: ->
+        @$distinct = yes
+        return @
+    # надо определить символ, который будет говорить об использовании объявленной переменной (ссылки), чтобы в случае когда должна ретюрниться простая строка, в объявлении просто не было символа. можно заиспользовать '@'
+    @public return: Function, # может как в SQL но в объектном виде: {id: '@doc._key', doc: '@doc', name: '@cucumber.name', price: '@tomato.price', totalOnions: '@totalOnions', description: 'Some item'}
+      default: (aoDefinition)->
+        @$return = aoDefinition
+        return @
+    # @public pluck: Function, [field], -> SELF # филд можно и в ретурне задать
+    @public count: Function,
+      default: ->
+        @$count = yes
+        return @
+    @public avg: Function,
+      default: (asDefinition)->
+        @$avg = asDefinition
+        return @
+    @public min: Function,
+      default: (asDefinition)->
+        @$min = asDefinition
+        return @
+    @public max: Function,
+      default: (asDefinition)->
+        @$max = asDefinition
+        return @
+    @public sum: Function,
+      default: (asDefinition)->
+        @$sum = asDefinition
+        return @
 
-    constructor: ->
+    constructor: (aoQuery)->
       super arguments...
-      @query = LeanRC::QueryObject.new()
+      for own key, value of aoQuery
+        do (key, value)=>
+          @[key] = value
 
 
   return LeanRC::Query.initialize()
