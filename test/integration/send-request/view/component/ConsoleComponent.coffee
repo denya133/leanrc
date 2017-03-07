@@ -6,8 +6,11 @@ module.exports = (RequestApp) ->
     @inheritProtected()
     @Module: RequestApp
 
+    @public @static MESSAGE_WRITTEN: String,
+      default: 'messageWritten'
+
     @public @static SEND_REQUEST_EVENT: String,
-      default: 'animateRobotEvent'
+      default: 'sendRequestEvent'
 
     ipoEventEmitter = @private eventEmitter: EventEmitter,
       default: null
@@ -23,6 +26,7 @@ module.exports = (RequestApp) ->
     @public writeMessages: Function,
       default: (messages...) ->
         console.log messages...
+        @[ipoEventEmitter].emit RequestApp::ConsoleComponent.MESSAGE_WRITTEN
 
     @public sendRequest: Function,
       default: ->
@@ -31,6 +35,10 @@ module.exports = (RequestApp) ->
     @public subscribeEvent: Function,
       default: (eventName, callback) ->
         @[ipoEventEmitter].on eventName, callback
+
+    @public subscribeEventOnce: Function,
+      default: (eventName, callback) ->
+        @[ipoEventEmitter].once eventName, callback
 
     @public unsubscribeEvent: Function,
       default: (eventName, callback) ->

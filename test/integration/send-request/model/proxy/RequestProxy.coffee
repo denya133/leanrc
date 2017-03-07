@@ -1,4 +1,5 @@
 LeanRC = require.main.require 'lib'
+request = require 'request'
 
 module.exports = (RequestApp) ->
   class RequestApp::RequestProxy extends LeanRC::Proxy
@@ -8,10 +9,13 @@ module.exports = (RequestApp) ->
     @public @static REQUEST_PROXY: String,
       default: 'requestProxy'
 
-    @public animate: Function,
-      default: ->
-        @setData yes
-        if @getData()
-          @sendNotification RequestApp::AppConstants.RECEIVE_RESPONSE, 'I am awaken. Hello World'
+    @public request: Function,
+      default: (data) ->
+        request.get '/test/data.json', (err, response, body) =>
+          if err?
+            message = "Error: #{err.message ? err}"
+          else
+            message = JSON.parse(body ? null)?.message ? body
+          @sendNotification RequestApp::AppConstants.RECEIVE_RESPONSE, message
 
   RequestApp::RequestProxy.initialize()

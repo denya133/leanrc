@@ -68,6 +68,7 @@
     "gulp-header": "1.8.8",
     "gulp-symlink": "^2.1.4",
     "gulp-zip": "3.2.0",
+    "request": "^2.80.0",
     "run-sequence": "1.2.2",
     "sinon": "^1.17.7"
   }
