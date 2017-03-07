@@ -12,6 +12,8 @@ cucumber = {id: 123}
 ```
 ###
 
+# надо определить символ, который будет говорить об использовании объявленной переменной (ссылки), чтобы в случае когда должна ретюрниться простая строка, в объявлении просто не было символа. можно заиспользовать '@'
+
 ###
 example
 
@@ -149,7 +151,6 @@ module.exports = (LeanRC)->
     @public $distinct: Boolean # yes or not present
     @public $return: Object
 
-
     @public forIn: Function,
       default: (aoDefinitions)->
         @$forIn ?= {}
@@ -200,12 +201,10 @@ module.exports = (LeanRC)->
       default: ->
         @$distinct = yes
         return @
-    # надо определить символ, который будет говорить об использовании объявленной переменной (ссылки), чтобы в случае когда должна ретюрниться простая строка, в объявлении просто не было символа. можно заиспользовать '@'
-    @public return: Function, # может как в SQL но в объектном виде: {id: '@doc._key', doc: '@doc', name: '@cucumber.name', price: '@tomato.price', totalOnions: '@totalOnions', description: 'Some item'}
+    @public return: Function,
       default: (aoDefinition)->
         @$return = aoDefinition
         return @
-    # @public pluck: Function, [field], -> SELF # филд можно и в ретурне задать
     @public count: Function,
       default: ->
         @$count = yes

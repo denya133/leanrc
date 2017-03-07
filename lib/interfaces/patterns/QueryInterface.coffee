@@ -32,30 +32,18 @@ module.exports = (LeanRC)->
     @public @virtual $distinct: Boolean # yes or not present
     @public @virtual $return: Object
 
-    # @public @virtual includes: Function,
-    #   args: [Array] # definitions
-    #   return: QueryInterface
-    # @public @virtual from: Function,
-    #   args: [String] # collectionName
-    #   return: QueryInterface
     @public @virtual forIn: Function,
       args: [Object] # definitions
       return: QueryInterface
     @public @virtual join: Function,
       args: [Object] # definitions
       return: QueryInterface
-    # @public @virtual where: Function,
-    #   args: [Object, [Object, RC::Constants.NILL]] # conditions, bindings
-    #   return: QueryInterface
     @public @virtual filter: Function,
       args: [Object] # definitions
       return: QueryInterface
     @public @virtual let: Function,
       args: [Object] # definitions
       return: QueryInterface
-    # @public @virtual group: Function,
-    #   args: [Object] # definition
-    #   return: QueryInterface
     @public @virtual collect: Function,
       args: [Object] # definition
       return: QueryInterface
@@ -80,41 +68,24 @@ module.exports = (LeanRC)->
     @public @virtual distinct: Function,
       args: []
       return: QueryInterface
-    # @public @virtual select: Function,
-    #   args: [Array] # fields
-    #   return: QueryInterface
     @public @virtual return: Function,
-      args: [Object]
+      args: [Object] # definition
       return: QueryInterface
-    # @public @virtual pluck: Function,
-    #   args: [String] # field
-    #   return: QueryInterface
     @public @virtual count: Function,
       args: []
       return: QueryInterface
-    # @public @virtual length: Function,
-    #   args: []
-    #   return: QueryInterface
-    # @public @virtual average: Function,
-    #   args: [String] # field
-    #   return: QueryInterface
     @public @virtual avg: Function,
-      args: [String] # field
+      args: [String] # definition
       return: QueryInterface
     @public @virtual min: Function,
-      args: [String] # field
+      args: [String] # definition
       return: QueryInterface
     @public @virtual max: Function,
-      args: [String] # field
+      args: [String] # definition
       return: QueryInterface
     @public @virtual sum: Function,
-      args: [String] # field
+      args: [String] # definition
       return: QueryInterface
-    # @public @virtual mergeQuery: Function,
-    #   args: [Object]
-    #   return: QueryInterface # query object (from browser)
-    # @public @virtual query: QueryObjectInterface # query object for Collection Proxy
-    # возможно есть смысл выровнять принимаемый объект из браузера и выходной объект для Collection Proxy
 
 
   return LeanRC::QueryInterface.initialize()
