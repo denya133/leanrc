@@ -170,11 +170,11 @@ module.exports = (LeanRC)->
         @$let ?= {}
         @$let = RC::Utils.extend {}, @$let, aoDefinitions
         return @
-    @public collect:
+    @public collect: Function,
       default: (aoDefinition)->
         @$collect = aoDefinition
         return @
-    @public aggregate:
+    @public aggregate: Function,
       default: (aoDefinition)->
         @$aggregate = aoDefinition
         return @
