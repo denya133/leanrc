@@ -30,7 +30,7 @@ module.exports = (LeanRC)->
     @public registerObserver: Function,
       default: (asNotificationName, aoObserver)->
         vlObservers = @[iphObserverMap][asNotificationName]
-        if vlObservers
+        if vlObservers?
           vlObservers.push aoObserver
         else
           @[iphObserverMap][asNotificationName] = [aoObserver]
@@ -38,12 +38,13 @@ module.exports = (LeanRC)->
 
     @public removeObserver: Function,
       default: (asNotificationName, aoNotifyContext)->
-        vlObservers = @[iphObserverMap][asNotificationName]
+        vlObservers = @[iphObserverMap][asNotificationName] ? []
         for voObserver, i in vlObservers
-          do (voObserver)->
+          break  if do (voObserver)->
             if voObserver.compareNotifyContext aoNotifyContext
-              vlObservers.splice i, 1
-              break
+              vlObservers[i..i] = []
+              return yes
+            return no
         if vlObservers.length is 0
           delete @[iphObserverMap][asNotificationName]
         return
@@ -52,8 +53,8 @@ module.exports = (LeanRC)->
       default: (aoNotification)->
         vsNotificationName = aoNotification.getName()
         vlObservers = @[iphObserverMap][vsNotificationName]
-        if vlObservers
-          vlNewObservers = vlObservers.slice(0)
+        if vlObservers?
+          vlNewObservers = vlObservers[..]
           for voObserver in vlNewObservers
             do (voObserver)->
               voObserver.notifyObserver aoNotification
@@ -63,7 +64,7 @@ module.exports = (LeanRC)->
       default: (aoMediator)->
         vsName = aoMediator.getMediatorName()
         # Do not allow re-registration (you must removeMediator first).
-        if @[iphMediatorMap][vsName]
+        if @[iphMediatorMap][vsName]?
           return
         aoMediator.initializeNotifier @[ipsMultitonKey]
 
@@ -88,7 +89,7 @@ module.exports = (LeanRC)->
     @public removeMediator: Function,
       default: (asMediatorName)->
         voMediator = @[iphMediatorMap][asMediatorName]
-        unless voMediator
+        unless voMediator?
           return null
 
         # Get Notification interests, if any.

@@ -1,0 +1,13 @@
+--compilers coffee:coffee-script/register
+--reporter spec
+--check-leaks
+--growl
+test/lib/
+test/lib/core/
+test/lib/patterns/
+test/lib/patterns/command/
+test/lib/patterns/facade/
+test/lib/patterns/mediator/
+test/lib/patterns/observer/
+test/lib/patterns/proxy/
+test/

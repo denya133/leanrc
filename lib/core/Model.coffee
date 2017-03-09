@@ -17,7 +17,7 @@ module.exports = (LeanRC)->
 
     @public @static getInstance: Function,
       default: (asKey)->
-        unless Model[cphInstanceMap][asKey]
+        unless Model[cphInstanceMap][asKey]?
           Model[cphInstanceMap][asKey] = LeanRC::Model.new asKey
         Model[cphInstanceMap][asKey]
 

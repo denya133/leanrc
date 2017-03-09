@@ -16,15 +16,17 @@ module.exports = (LeanRC)->
     cphInstanceMap  = @private @static instanceMap: Object,
       default: {}
 
-    @public @static getInstance: String,
+    @public @static getInstance: Function,
+      args: [String]
+      return: RC::Class
       default: (asKey)->
-        unless Controller[cphInstanceMap][asKey]
+        unless Controller[cphInstanceMap][asKey]?
           Controller[cphInstanceMap][asKey] = LeanRC::Controller.new asKey
         Controller[cphInstanceMap][asKey]
 
-    @public @static removeController: String,
+    @public @static removeController: Function,
       args: [String]
-      return: RC::Constants.NILL
+      return: RC::Class
       default: (asKey)->
         delete Controller[cphInstanceMap][asKey]
 
