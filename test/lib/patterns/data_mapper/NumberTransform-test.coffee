@@ -9,7 +9,7 @@ describe 'NumberTransform', ->
       expect ->
         transform = NumberTransform.new()
       .to.not.throw Error
-  describe '.deserialize', ->
+  describe '#deserialize', ->
     it 'should deserialize null value', ->
       expect NumberTransform.new().deserialize null
       .to.be.null
@@ -22,7 +22,7 @@ describe 'NumberTransform', ->
     it 'should deserialize number value', ->
       expect NumberTransform.new().deserialize 1
       .to.equal 1
-  describe '.serialize', ->
+  describe '#serialize', ->
     it 'should serialize null value', ->
       expect NumberTransform.new().serialize null
       .to.be.null

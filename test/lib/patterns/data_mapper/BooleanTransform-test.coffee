@@ -9,7 +9,7 @@ describe 'BooleanTransform', ->
       expect ->
         transform = BooleanTransform.new()
       .to.not.throw Error
-  describe '.deserialize', ->
+  describe '#deserialize', ->
     it 'should deserialize null value', ->
       expect BooleanTransform.new().deserialize null, allowNull: yes
       .to.be.null
@@ -22,7 +22,7 @@ describe 'BooleanTransform', ->
     it 'should deserialize number value', ->
       expect BooleanTransform.new().deserialize 1
       .to.be.true
-  describe '.serialize', ->
+  describe '#serialize', ->
     it 'should serialize null value', ->
       expect BooleanTransform.new().serialize null, allowNull: yes
       .to.be.null
