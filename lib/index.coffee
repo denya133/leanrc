@@ -8,6 +8,7 @@ class LeanRC extends RC::Module
   # Utils: {}
   # Scripts: {}
 
+  require('./interfaces/patterns/TransformInterface') LeanRC # done
   require('./interfaces/patterns/NotificationInterface') LeanRC # done
   require('./interfaces/patterns/NotifierInterface') LeanRC # done
   require('./interfaces/patterns/ObserverInterface') LeanRC # done
@@ -19,6 +20,11 @@ class LeanRC extends RC::Module
   require('./interfaces/core/ViewInterface') LeanRC
   require('./interfaces/patterns/FacadeInterface') LeanRC
 
+  require('./patterns/data_mapper/Transform') LeanRC # done
+  require('./patterns/data_mapper/StringTransform') LeanRC # done
+  require('./patterns/data_mapper/NumberTransform') LeanRC # done
+  require('./patterns/data_mapper/DateTransform') LeanRC # done
+  require('./patterns/data_mapper/BooleanTransform') LeanRC # done
   require('./patterns/observer/Notification') LeanRC # done
   require('./patterns/observer/Notifier') LeanRC # done
   require('./patterns/observer/Observer') LeanRC # done
