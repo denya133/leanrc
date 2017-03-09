@@ -1,6 +1,7 @@
 # здесь должна быть синхронная реализация Промиса. А в ноде будет использоваться нативный класс с тем же интерфейсом.
 # внутри этой реализации надо в приватное свойство положить синхронный промис с предпроверкой (если нативный определен - то должен быть положен нативный)
 
+NativePromise = Promise
 RC = require 'RC'
 
 module.exports = (LeanRC)->
@@ -13,8 +14,8 @@ module.exports = (LeanRC)->
     cpcPromise = @private @static Promise: [Function, RC::Constants.NILL],
       get: ->
         try
-          new Promise (resolve, reject)-> resolve yes
-          return Promise
+          new NativePromise (resolve, reject)-> resolve yes
+          return NativePromise
         catch
           null
 
@@ -95,7 +96,7 @@ module.exports = (LeanRC)->
 
     constructor: (lambda)->
       super arguments...
-      if (vcPromise = @[cpcPromise])?
+      if (vcPromise = LeanRC::Promise[cpcPromise])?
         @[ipoPromise] = new vcPromise lambda
       else
         lambda.apply @, [@onFulfilled, @onRejected]
