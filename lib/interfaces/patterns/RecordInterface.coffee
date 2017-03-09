@@ -11,14 +11,11 @@ module.exports = (LeanRC)->
 
     @public @virtual collection: LeanRC::CollectionInterface
 
-    # объявлю пока здесь, чтобы не забыть
-    @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
-
     # под вопросом ??????
     # @public @static schema: JoiSchema # это используется в медиаторе на входе и выходе, поэтому это надо объявить там.
 
 
-    # под вопросом ??????
+    # под вопросом ?????? возможно надо искать через (из) модуля
     @public @static parseModelName: Function, [String], -> Array
     @public @static findModelByName: Function, [String], -> Array
     @public findModelByName: Function, [String], -> Array
@@ -61,11 +58,6 @@ module.exports = (LeanRC)->
     @public @static @virtual edges: Function,
       args: []
       return: Object
-    # @private @static __props: Object
-    # @private @static _props: Function, [], -> Object
-    @public @static @virtual properties: Function,
-      args: []
-      return: Object
     # @private @static __comps: Object
     # @private @static _comps: Function, [], -> Object
     @public @static @virtual computeds: Function,
@@ -78,33 +70,15 @@ module.exports = (LeanRC)->
     @public @static @virtual attr: Function,
       args: [String, Object, Object] #name, schema, Object
       return: RC::Constants.NILL
-    @public @static @virtual property: Function,
-      args: [String, Object] #name, Object
-      return: RC::Constants.NILL
-    @public @static @virtual prop: Function,
-      args: [String, Object] #name, Object
-      return: RC::Constants.NILL
     @public @static @virtual computed: Function,
       args: [String, Object, Function] #name, opts, lambda
       return: RC::Constants.NILL
     @public @static @virtual comp: Function,
       args: [String, Object, Function] #name, opts, lambda
       return: RC::Constants.NILL
-    @public @static @virtual belongsTo: Function,
-      args: [String, Object, Object] # name, schema, opts
-      return: RC::Constants.NILL
-    @public @static @virtual hasMany: Function,
-      args: [String, Object] #name, opts
-      return: RC::Constants.NILL
-    @public @static @virtual hasOne: Function,
-      args: [String, Object] #name, opts
-      return: RC::Constants.NILL
     @public @static @virtual new: Function,
       args: [Object] #attributes
       return: LeanRC::RecordInterface
-    @public @static @virtual inverseFor: Function,
-      args: [String]
-      return: Object # Cucumber.inverseFor 'tomato' #-> {type: App::Tomato, name: 'cucumbers', kind: 'hasMany'}
     @public @static @virtual validate: Function, # что внутри делать не понятно.
       args: [String, Object] #attribute, options
       return: RC::Constants.NILL
