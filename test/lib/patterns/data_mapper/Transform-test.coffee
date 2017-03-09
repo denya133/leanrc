@@ -12,10 +12,10 @@ describe 'Transform', ->
   describe '.deserialize', ->
     it 'should deserialize null value', ->
       expect Transform.new().deserialize null
-      .to.equal null
+      .to.be.null
     it 'should deserialize boolean value', ->
       expect Transform.new().deserialize yes
-      .to.equal yes
+      .to.be.true
     it 'should deserialize string value', ->
       expect Transform.new().deserialize 'True'
       .to.equal 'True'
@@ -25,10 +25,10 @@ describe 'Transform', ->
   describe '.serialize', ->
     it 'should serialize null value', ->
       expect Transform.new().serialize null
-      .to.equal null
+      .to.be.null
     it 'should serialize boolean value', ->
       expect Transform.new().serialize yes
-      .to.equal yes
+      .to.be.true
     it 'should serialize string value', ->
       expect Transform.new().serialize 'True'
       .to.equal 'True'

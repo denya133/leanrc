@@ -12,26 +12,26 @@ describe 'BooleanTransform', ->
   describe '.deserialize', ->
     it 'should deserialize null value', ->
       expect BooleanTransform.new().deserialize null, allowNull: yes
-      .to.equal null
+      .to.be.null
     it 'should deserialize boolean value', ->
       expect BooleanTransform.new().deserialize yes
-      .to.equal yes
+      .to.be.true
     it 'should deserialize string value', ->
       expect BooleanTransform.new().deserialize 'True'
-      .to.equal yes
+      .to.be.true
     it 'should deserialize number value', ->
       expect BooleanTransform.new().deserialize 1
-      .to.equal yes
+      .to.be.true
   describe '.serialize', ->
     it 'should serialize null value', ->
       expect BooleanTransform.new().serialize null, allowNull: yes
-      .to.equal null
+      .to.be.null
     it 'should serialize boolean value', ->
       expect BooleanTransform.new().serialize yes
-      .to.equal yes
+      .to.be.true
     it 'should serialize string value', ->
       expect BooleanTransform.new().serialize 'True'
-      .to.equal yes
+      .to.be.true
     it 'should serialize number value', ->
       expect BooleanTransform.new().serialize 1
-      .to.equal yes
+      .to.be.true
