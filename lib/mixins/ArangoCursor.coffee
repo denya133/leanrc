@@ -134,6 +134,17 @@ module.exports = (LeanRC)->
           @dispose()
           throw err
 
+    @public first: Function,
+      default: (acRecord = null)->
+        try
+          if @hasNext()
+            @next(acRecord)
+          else
+            null
+        catch err
+          @dispose()
+          throw err
+
     constructor: (acRecord, aoCursor = null)->
       super arguments...
       @[ipcRecord] = acRecord

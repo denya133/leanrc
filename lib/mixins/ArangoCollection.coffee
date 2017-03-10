@@ -21,74 +21,204 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
+    @public delegate: RC::Class # устанавливается при инстанцировании прокси
+    @public serializer: RC::Class # устанавливается при инстанцировании прокси
+
+    @public collectionName: Function,
+      default: ->
+        firstClassName = _.first _.remove @delegate.parentClassNames(), (name)->
+          not (/Mixin$/.test(name) or not (/Interface$/.test(name) or name in ['CoreObject', 'Record'])
+        inflect.pluralize inflect.underscore firstClassName
+
+    @public collectionPrefix: Function,
+      default: -> "#{inflect.underscore @Module.name}_" # может быть вместо @Module заиспользовать @getData().Module
+
+    @public collectionFullName: Function,
+      default: (asName = null)->
+        "#{@collectionPrefix()}#{asName ? @collectionName()}"
+
+    @public customFilters: Object, # возвращает установленные кастомные фильтры с учетом наследования
+      default: {}
+      get: (__customFilters)->
+        AbstractClass = @
+        fromSuper = if AbstractClass.__super__?
+          AbstractClass.__super__.constructor.customFilters
+        __customFilters[AbstractClass.name] ?= do ->
+          RC::Utils.extend {}
+          , (fromSuper ? {})
+          , (AbstractClass["_#{AbstractClass.name}_customFilters"] ? {})
+        __customFilters[AbstractClass.name]
+
+    @public customFilter: Function,
+      default: (asFilterName, aoStatement)->
+        if _.isObject aoStatement
+          config = aoStatement
+        else if _.isFunction aoStatement
+          config = aoStatement.apply @, []
+        @["_#{@name}_customFilters"] ?= {}
+        @["_#{@name}_customFilters"][asFilterName] = config
+        return
+
     @public generateId: Function,
       default: -> return
+
     @public create: Function,
       default: (properties)->
-        return record
+        @delegate.new properties
+
     @public createDirectly: Function,
       default: (properties)->
         return record
+
+    @public insert: Function,
+      default: (properties)->
+        voQuery = LeanRC::Query.new()
+          .insert properties
+          .into @collectionName()
+        return @executeQuery @parseQuery voQuery
+          .first()
+
     @public delete: Function,
       default: (id)->
+        record = @find id
+        record.delete()
         return record
+
     @public deleteBy: Function,
       default: (query)->
+        record = @findBy id
+        record.delete()
         return record
+
     @public destroy: Function,
       default: (id)->
-        return
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .filter '@doc._key': {$eq: id}
+          .remove()
+        return @executeQuery @parseQuery voQuery
+          .first()
+
     @public destroyBy: Function,
       default: (query)->
-        return
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .filter query
+          .remove()
+        return @executeQuery @parseQuery voQuery
+
     @public find: Function,
       default: (id)->
-        return record
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .filter '@doc._key': {$eq: id}
+          .limit 1
+          .return '@doc'
+        voRecord = @executeQuery @parseQuery voQuery
+          .first()
+        return voRecord
+
     @public findBy: Function,
       default: (query)->
-        return record
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .filter query
+          .limit 1
+          .return '@doc'
+        return @executeQuery @parseQuery voQuery
+          .first()
+
     @public filter: Function,
       default: (query)->
-        return records
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .filter query
+          .return '@doc'
+        return @executeQuery @parseQuery voQuery
+
     @public update: Function,
       default: (id, properties)->
-        return record
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .filter '@doc._key': {$eq: id}
+          .update properties
+        return @executeQuery @parseQuery voQuery
+          .first()
+
     @public updateBy: Function,
       default: (query, properties)->
-        return record
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .filter query
+          .update properties
+        return @executeQuery @parseQuery voQuery
+
     @public query: Function,
       default: (query)->
-        return result
+        query = _.pick query, Object.keys(query).filter (key)-> query[key]?
+        voQuery = LeanRC::Query.new query
+        return @executeQuery @parseQuery voQuery
+
     @public copy: Function,
       default: (id)->
         return record
     @public deepCopy: Function,
       default: (id)->
         return record
+
     @public forEach: Function,
       default: (lambda)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .return '@doc'
+        @executeQuery @parseQuery voQuery
+          .forEach lambda
         return
+
     @public map: Function,
       default: (lambda)->
-        return results
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .return '@doc'
+        return @executeQuery @parseQuery voQuery
+          .map lambda
+
     @public reduce: Function,
       default: (lambda, initialValue)->
-        return result
-    @public sortBy: Function,
-      default: (params)->
-        return results
-    @public groupBy: Function,
-      default: (params)->
-        return results
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .return '@doc'
+        return @executeQuery @parseQuery voQuery
+          .reduce lambda, initialValue
+
     @public includes: Function,
       default: (id)->
-        return isInclude
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .filter '@doc._key': {$eq: id}
+          .limit 1
+          .return '@doc'
+        return @executeQuery @parseQuery voQuery
+          .hasNext()
+
     @public exists: Function,
       default: (query)->
-        return isExist
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .filter query
+          .limit 1
+          .return '@doc'
+        return @executeQuery @parseQuery voQuery
+          .hasNext()
+
     @public length: Function, # количество объектов в коллекции
       default: ->
-        return length
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .count()
+        return @executeQuery @parseQuery voQuery
+          .first()
+
     @public push: Function,
       default: (data)->
         return isPushed

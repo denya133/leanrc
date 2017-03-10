@@ -71,5 +71,9 @@ module.exports = (LeanRC)->
       args: [Function, RC::Constants.ANY, [RC::Class. RC::Constants.NILL]]
       return: RC::Constants.ANY
 
+    @public first: Function,
+      args: [[RC::Class. RC::Constants.NILL]]
+      return: RC::Constants.ANY
+
 
   return LeanRC::ArangoCursorInterface.initialize()

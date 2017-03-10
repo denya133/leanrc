@@ -30,6 +30,10 @@ module.exports = (LeanRC)->
     @public @virtual $max: String # '@doc.price'
     @public @virtual $count: Boolean # yes or not present
     @public @virtual $distinct: Boolean # yes or not present
+    @public @virtual $remove: Boolean
+    @public @virtual $insert: Object
+    @public @virtual $update: Object
+    @public @virtual $replace: Object
     @public @virtual $return: Object
 
     @public @virtual forIn: Function,
@@ -69,6 +73,18 @@ module.exports = (LeanRC)->
       args: []
       return: QueryInterface
     @public @virtual return: Function,
+      args: [Object] # definition
+      return: QueryInterface
+    @public @virtual remove: Function,
+      args: [Object] # definition
+      return: QueryInterface
+    @public @virtual insert: Function,
+      args: [Object] # definition
+      return: QueryInterface
+    @public @virtual update: Function,
+      args: [Object] # definition
+      return: QueryInterface
+    @public @virtual replace: Function,
       args: [Object] # definition
       return: QueryInterface
     @public @virtual count: Function,

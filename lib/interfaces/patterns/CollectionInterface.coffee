@@ -12,26 +12,23 @@ module.exports = (LeanRC)->
     # в классе Proxy от которого будет наследоваться конкретный класс Collection есть метод onRegister в котором можно прописать подключение (или регистрацию) классов Рекорда и Сериализатора
 
     # надо определиться с этими двумя пунктами, так ли их объявлять?
-    @public @static @virtual delegate: RC::Class
-    @public @static @virtual serializer: RC::Class
-    @public @static @virtual collectionName: Function,
+    @public @virtual delegate: RC::Class
+    @public @virtual serializer: RC::Class
+    @public @virtual collectionName: Function,
       args: []
       return: String
-    @public @static @virtual collectionPrefix: Function,
+    @public @virtual collectionPrefix: Function,
       args: []
       return: String
-    @public @static @virtual collectionFullName: Function,
-      args: []
+    @public @virtual collectionFullName: Function,
+      args: [[String, RC::Constants.NILL]]
       return: String
-    @public @static @virtual setCustomFilters: Function,
-      args: [Object]
-      return: RC::Constants.NILL
-    @public @static @virtual customFilters: Function, # возвращает установленные кастомные фильтры с учетом наследования
+    @public @virtual customFilters: Function, # возвращает установленные кастомные фильтры с учетом наследования
       args: []
       return: Object
-    @public @static @virtual parentClassNames: Function,
-      args: []
-      return: Array
+    @public @virtual customFilter: Function,
+      args: [String, [Object, Function]]
+      return: RC::Constants.NILL
 
     @public @virtual generateId: Function,
       args: []
@@ -40,6 +37,9 @@ module.exports = (LeanRC)->
       args: [Object]
       return: LeanRC::RecordInterface
     @public @virtual createDirectly: Function,
+      args: [Object]
+      return: LeanRC::RecordInterface
+    @public @virtual insert: Function,
       args: [Object]
       return: LeanRC::RecordInterface
     @public @virtual delete: Function,
@@ -87,12 +87,6 @@ module.exports = (LeanRC)->
     @public @virtual reduce: Function,
       args: [Function, RC::Constants.ANY]
       return: RC::Constants.ANY
-    @public @virtual sortBy: Function,
-      args: [Object]
-      return: Array # но возможно надо указать LeanRC::CursorInterface
-    @public @virtual groupBy: Function,
-      args: [Object]
-      return: Array # но возможно надо указать LeanRC::CursorInterface
     @public @virtual includes: Function,
       args: [String]
       return: Boolean
