@@ -8,6 +8,32 @@ RC = require 'RC'
 # так как рекорд будет работать с простыми структурами данных в памяти, он не зависит от платформы.
 # если ему надо будет взаимодействовать с платформозависимой логикой - он будет делать это через прокси, но не напрямую (как в эмбере со стором)
 
+###
+```coffee
+class App::TomatoRecord extends LeanRC::Record
+  @inheritProtected()
+  @include RC::ChainsMixin
+  @include LeanRC::ArangoRelationsMixin
+
+  @Module: App
+
+  @attr title: String,
+    # возможно есть смысл объявить опшен в RC::CoreObject.public - чтобы при установке в сеттере проходила валидация
+    validate: joi.string() # !!! нужен для сложной валидации данных
+    # transform указывать не надо, т.к. стандартный тип, LeanRC::StringTransform
+
+  @attr nameObj: App::NameObj,
+    validate: joi.object().required().start().end().default({})
+    transform: App::NameObjTransform
+
+  @attr description: String
+
+  @attr registeredAt: Date,
+    validate: joi.date()
+    transform: App::MyDateTransform
+```
+###
+
 module.exports = (LeanRC)->
   class LeanRC::Record extends RC::CoreObject
     @inheritProtected()
@@ -107,15 +133,27 @@ module.exports = (LeanRC)->
         return
 
     @public @static attr: Function,
-      default: (name, schema, opts={})->
-        {valuable, sortable, groupable, filterable} = opts
+      default: (typeDefinition, opts={})->
+        vsAttr = Object.keys(typeDefinition)[0]
+        vcAttrType = typeDefinition[vsAttr]
+        opts.transform ?= switch vcAttrType
+          when String, Date, Number, Boolean
+            LeanRC::["#{vcAttrType.name}Transform"]
+          else
+            LeanRC::Transform
+        opts.schema = opts.validate ? switch vcAttrType
+          when String, Date, Number, Boolean
+            joi[inflect.underscore vcAttrType.name]()
+          else
+            joi.object()
         @["_#{@name}_attrs"] ?= {}
         @["_#{@name}_edges"] ?= {}
-        unless @["_#{@name}_attrs"][name]
-          @["_#{@name}_attrs"][name] = schema
-          @["_#{@name}_edges"][name] = opts if opts.through
+        unless @["_#{@name}_attrs"][vsAttr]
+          @["_#{@name}_attrs"][vsAttr] = opts
+          @["_#{@name}_edges"][vsAttr] = opts if opts.through
         else
-          throw new Error "attr `#{name}` has been defined previously"
+          throw new Error "attr `#{vsAttr}` has been defined previously"
+        @public typeDefinition, opts
         return
 
     @public @static computed: Function,
@@ -147,12 +185,12 @@ module.exports = (LeanRC)->
               ModelClass.schema()
             else if type is 'item' and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
-              ModelClass.attributes()[prop_name]
+              ModelClass.attributes[prop_name]
             else if type is 'array' and not /.*[.].*/.test valuable
               joi.array().items ModelClass.schema()
             else if type is 'array' and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
-              joi.array().items ModelClass.attributes()[prop_name]
+              joi.array().items ModelClass.attributes[prop_name]
         else
           schema = -> {}
         opts.schema ?= schema
@@ -183,17 +221,13 @@ module.exports = (LeanRC)->
           [ModelClass] = @findModelByName aoAttributes._type
           ModelClass?.new(aoAttributes, aoCollection) ? @super arguments...
 
-    # может заиспользовать для объявления joi схем для атрибутов. Чтобы объявления атрибутов разгрузить немного.
-    @public @static validate: Function, # что внутри делать пока не понятно.
-      default: (attribute, options)->
-        return
 
-    @public _key: String
-    @public _rev: String
-    @public _type: String
-    @public isHidden: Boolean, {default: no}
-    @public createdAt: Date
-    @public updatedAt: Date
+    @attribute _key: String
+    @attribute _rev: String
+    @attribute _type: String
+    @attribute isHidden: Boolean, {default: no}
+    @attribute createdAt: Date
+    @attribute updatedAt: Date
 
     # если мы здесь не добавляем конкретный RelationsMixin в котором есть имлементация метода @prop - то как объявить эти атрибуты?
     # или как решение - выпилить эти повторения из рекорда вообще.?
@@ -223,6 +257,7 @@ module.exports = (LeanRC)->
     @beforeHook 'beforeDestroy', only: ['destroy']
     @afterHook 'afterDestroy', only: ['destroy']
 
+    # под вопросом??? т.к. не знаю как лучше: вызывать валидацию рекорда целиком, или вызывать валидацию при установке (изменении) каждого атрибута по отдельности
     @public validate: Function, [], -> RecordInterface
     # @public beforeValidate: Function, [], -> NILL
     # @public afterValidate: Function, [], -> NILL

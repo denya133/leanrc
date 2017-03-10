@@ -79,9 +79,6 @@ module.exports = (LeanRC)->
     @public @static @virtual new: Function,
       args: [Object] #attributes
       return: LeanRC::RecordInterface
-    @public @static @virtual validate: Function, # что внутри делать не понятно.
-      args: [String, Object] #attribute, options
-      return: RC::Constants.NILL
 
     @public @virtual _key: String
     @public @virtual _rev: String

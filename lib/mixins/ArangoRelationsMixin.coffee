@@ -63,12 +63,12 @@ module.exports = (LeanRC)->
               ModelClass.schema()
             else if type is 'item' and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
-              ModelClass.attributes()[prop_name]
+              ModelClass.attributes[prop_name]
             else if type is 'array' and not /.*[.].*/.test valuable
               joi.array().items ModelClass.schema()
             else if type is 'array' and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
-              joi.array().items ModelClass.attributes()[prop_name]
+              joi.array().items ModelClass.attributes[prop_name]
         else
           schema = -> {}
         opts.schema ?= schema
@@ -149,16 +149,16 @@ module.exports = (LeanRC)->
         return
 
     @public @static belongsTo: Function,
-      default: (name, schema, opts={})->
+      default: (name, opts={})->
         opts.attr ?= "#{name}Id"
         opts.refKey ?= '_key'
-        @attr opts.attr, schema, opts
+        @attr opts.attr, opts.schema, opts
         if opts.attr isnt "#{name}Id"
           @prop "#{name}Id",
             type: 'item'
             model: 'string'
             attr: opts.attr
-            schema: -> schema
+            schema: -> opts.schema
             definition: "(doc.#{opts.attr})"
             valuable: "#{name}Id"
             filterable: "#{name}Id"
@@ -241,7 +241,7 @@ module.exports = (LeanRC)->
         @prop name, opts
         return
 
-    # Cucumber.inverseFor 'tomato' #-> {type: App::Tomato, name: 'cucumbers', kind: 'hasMany'}
+    # Cucumber.inverseFor 'tomato' #-> {type: App::Tomato, name: 'cucumbers', kind: 'hasMany'} - в этом ли виде отдавать результат
     @public @static inverseFor: Function,
       default: (asAttrName)->
         vhResult = {}
