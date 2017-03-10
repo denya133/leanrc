@@ -75,3 +75,22 @@ describe 'Promise', ->
           assert.equal test.callCount, 3, 'Wrong count of `test` called'
           done()
       .to.not.throw Error
+  describe '#catch', ->
+    beforeEach cleanNativePromise
+    afterEach restoreNativePromise
+    it 'should call fail immediately', (done) ->
+      expect ->
+        test = sinon.spy ->
+        Promise.new (resolve, reject) ->
+          resolve 'RESOLVE'
+        .then ->
+          throw new Error 'ERROR'
+        .then test
+        .then test
+        .then test
+        .then test
+        .catch (err) ->
+          assert.equal err.message, 'ERROR', 'No error message'
+          assert.isFalse test.called, 'Not every `test` called'
+          done()
+      .to.not.throw Error
