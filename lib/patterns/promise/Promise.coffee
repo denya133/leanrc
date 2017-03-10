@@ -1,7 +1,6 @@
 # здесь должна быть синхронная реализация Промиса. А в ноде будет использоваться нативный класс с тем же интерфейсом.
 # внутри этой реализации надо в приватное свойство положить синхронный промис с предпроверкой (если нативный определен - то должен быть положен нативный)
 
-NativePromise = Promise
 RC = require 'RC'
 
 module.exports = (LeanRC)->
@@ -14,8 +13,8 @@ module.exports = (LeanRC)->
     cpcPromise = @private @static Promise: [Function, RC::Constants.NILL],
       get: ->
         try
-          new NativePromise (resolve, reject)-> resolve yes
-          return NativePromise
+          new global.Promise (resolve, reject)-> resolve yes
+          return global.Promise
         catch
           null
 
@@ -66,12 +65,14 @@ module.exports = (LeanRC)->
 
     @public onFulfilled: Function,
       default: (aoData)->
-        @[ipoData] = aoData
+        unless @[ipoError]? or @[ipoData]?
+          @[ipoData] = aoData
         return
 
     @public onRejected: Function,
       default: (aoError)->
-        @[ipoError] = aoError
+        unless @[ipoError]? or @[ipoData]?
+          @[ipoError] = aoError
         return
 
     @public "then": Function,
@@ -79,13 +80,16 @@ module.exports = (LeanRC)->
         if (voPromise = @[ipoPromise])?
           voPromise.then onFulfilled, onRejected
         else
-          voResult = null
-          voError = null
+          voResult = undefined
+          voError = undefined
           try
-            if @[ipoData]?
+            if @[ipoError]?
+              if onRejected?
+                voResult = onRejected? @[ipoError]
+              else
+                voError = @[ipoError]
+            else
               voResult = onFulfilled? @[ipoData]
-            else if @[ipoError]?
-              voResult = onRejected? @[ipoError]
           catch err
             voError = err
           new LeanRC::Promise (resolve, reject)->
@@ -94,12 +98,15 @@ module.exports = (LeanRC)->
             else
               resolve voResult
 
-    constructor: (lambda)->
+    constructor: (lambda = ->)->
       super arguments...
       if (vcPromise = LeanRC::Promise[cpcPromise])?
         @[ipoPromise] = new vcPromise lambda
       else
-        lambda.apply @, [@onFulfilled, @onRejected]
+        try
+          lambda.apply @, [@onFulfilled.bind(@), @onRejected.bind(@)]
+        catch e
+          @onRejected e
 
 
   return LeanRC::Promise.initialize()
