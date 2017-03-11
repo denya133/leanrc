@@ -141,6 +141,7 @@ module.exports = (LeanRC)->
             LeanRC::["#{vcAttrType.name}Transform"]
           else
             LeanRC::Transform
+        opts.transform = opts.transform.new()
         opts.schema = opts.validate ? switch vcAttrType
           when String, Date, Number, Boolean
             joi[inflect.underscore vcAttrType.name]()
@@ -162,10 +163,12 @@ module.exports = (LeanRC)->
         return
 
     @public @static comp: Function,
-      default: (name, opts, lambda)->
-        {type, model, valuable, valuableAs} = opts
-        model ?= inflect.singularize inflect.underscore name
-        if not lambda? or not type?
+      default: (typeDefinition, opts, lambda)->
+        vsAttr = Object.keys(typeDefinition)[0]
+        vcAttrType = typeDefinition[vsAttr]
+        {type, model, valuable, valuableAs, get} = opts
+        model ?= inflect.singularize inflect.underscore vsAttr
+        if not opts.get? or not type?
           return throw new Error '`lambda` and `type` options is required'
         if valuable?
           schema = =>
@@ -193,24 +196,13 @@ module.exports = (LeanRC)->
               joi.array().items ModelClass.attributes[prop_name]
         else
           schema = -> {}
-        opts.schema ?= schema
+        opts.schema = opts.validate ? schema
         @["_#{@name}_comps"] ?= {}
-        unless @["_#{@name}_comps"][name]
-          @["_#{@name}_comps"][name] = opts
-          empty_result = switch type
-            when 'item'
-              null
-            when 'array'
-              []
-            else
-              throw new Error 'type must be `item` or `array` only'
-          @defineProperty name,
-            get: ->
-              result = @["__#{name}"]
-              result ?= @["__#{name}"] = lambda.apply(@, []) ? empty_result
-              result
+        unless @["_#{@name}_comps"][vsAttr]
+          @["_#{@name}_comps"][vsAttr] = opts
         else
-          throw new Error "comp `#{name}` has been defined previously"
+          throw new Error "comp `#{vsAttr}` has been defined previously"
+        @public typeDefinition, opts
         return
 
     @public @static new: Function,
@@ -231,9 +223,9 @@ module.exports = (LeanRC)->
 
     # если мы здесь не добавляем конкретный RelationsMixin в котором есть имлементация метода @prop - то как объявить эти атрибуты?
     # или как решение - выпилить эти повторения из рекорда вообще.?
-    @public id: String
-    @public rev: String
-    @public type: String
+    @computed id: String, {valuable: 'id', get: -> @_key}
+    @computed rev: String, {valuable: 'rev', get: -> @_rev}
+    @computed type: String, {valuable: 'type', get: -> @_type}
 
     @chains ['validate', 'save', 'create', 'update', 'delete', 'destroy']
 
@@ -276,23 +268,39 @@ module.exports = (LeanRC)->
       default: ->
         unless @isNew()
           throw new Error 'Document is exist in collection'
-        # надо ли использовать @collection.create или другой метод ???
+        @collection.push @
+        return @
 
     # @public beforeCreate: Function, [], -> NILL
     # @public afterCreate: Function, [ANY], -> ANY # any type
-    @public update: Function, [], -> RecordInterface
+    @public update: Function,
+      default: ->
+        if @isNew()
+          throw new Error 'Document does not exist in collection'
+        @collection.patch {'@doc._key': $eq: @id}, @
+        return @
+
     # @public beforeUpdate: Function, [], -> NILL
     # @public afterUpdate: Function, [ANY], -> ANY # any type
+
     @public delete: Function,
       default: ->
         if @isNew()
           throw new Error 'Document is not exist in collection'
+        @isHidden = yes
+        @updatedAt = new Date()
+        @save()
+
     # @public beforeDelete: Function, [], -> NILL
     # @public afterDelete: Function, [ANY], -> ANY # any type
+
     @public destroy: Function,
       default: ->
         if @isNew()
           throw new Error 'Document is not exist in collection'
+        @collection.remove '@doc._key': $eq: @id
+        return
+
     # @public beforeDestroy: Function, [], -> NILL
     # @public afterDestroy: Function, [], -> NILL
 
@@ -301,13 +309,10 @@ module.exports = (LeanRC)->
       return: Array
 
     @public clone: Function,
-      default: -> @
+      default: -> @collection.clone @
 
     @public copy: Function,
-      default: -> @
-
-    @public deepCopy: Function,
-      default: -> @
+      default: -> @collection.copy @
 
     @public decrement: Function,
       default: (asAttribute, step = 1)->

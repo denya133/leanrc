@@ -59,145 +59,160 @@ module.exports = (LeanRC)->
         @["_#{@name}_customFilters"][asFilterName] = config
         return
 
+
     @public generateId: Function,
       default: -> return
 
-    @public create: Function,
+
+    @public build: Function,
       default: (properties)->
         @delegate.new properties
 
-    @public createDirectly: Function,
+    @public create: Function,
       default: (properties)->
-        return record
+        voRecord = @build properties
+        voRecord.save()
 
-    @public insert: Function,
-      default: (properties)->
+    @public push: Function,
+      default: (aoRecord)->
         voQuery = LeanRC::Query.new()
-          .insert properties
+          .insert aoRecord
           .into @collectionName()
-        return @executeQuery @parseQuery voQuery
-          .first()
+        @query voQuery
+        return yes
+
 
     @public delete: Function,
       default: (id)->
-        record = @find id
-        record.delete()
-        return record
+        voRecord = @find id
+        voRecord.delete()
+        return voRecord
 
     @public deleteBy: Function,
       default: (query)->
-        record = @findBy id
-        record.delete()
-        return record
+        @findBy query
+          .forEach (aoRecord)-> aoRecord.delete()
+        return
+
 
     @public destroy: Function,
       default: (id)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
-          .filter '@doc._key': {$eq: id}
-          .remove()
-        return @executeQuery @parseQuery voQuery
-          .first()
+        voRecord = @find id
+        voRecord.destroy()
+        return
 
     @public destroyBy: Function,
       default: (query)->
+        @findBy query
+          .forEach (aoRecord)-> aoRecord.destroy()
+        return
+
+    @public remove: Function,
+      default: (query)->
         voQuery = LeanRC::Query.new()
           .forIn '@doc': @collectionName()
           .filter query
           .remove()
-        return @executeQuery @parseQuery voQuery
+        @query voQuery
+        return yes
+
 
     @public find: Function,
       default: (id)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
-          .filter '@doc._key': {$eq: id}
-          .limit 1
-          .return '@doc'
-        voRecord = @executeQuery @parseQuery voQuery
+        @take '@doc._key': {$eq: id}
           .first()
-        return voRecord
 
     @public findBy: Function,
       default: (query)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
-          .filter query
-          .limit 1
-          .return '@doc'
-        return @executeQuery @parseQuery voQuery
-          .first()
+        @take query
 
-    @public filter: Function,
+    @public take: Function,
       default: (query)->
         voQuery = LeanRC::Query.new()
           .forIn '@doc': @collectionName()
           .filter query
           .return '@doc'
-        return @executeQuery @parseQuery voQuery
+        return @query voQuery
+
 
     @public replace: Function,
       default: (id, properties)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
-          .filter '@doc._key': {$eq: id}
-          .replace properties
-        return @executeQuery @parseQuery voQuery
-          .first()
+        voRecord = @find id
+        voRecord. # ????????????
+        return voRecord
 
     @public replaceBy: Function,
       default: (query, properties)->
+        @findBy query
+          .forEach (aoRecord)-> aoRecord. #??????????????
+        return
+
+    @public override: Function,
+      default: (query, aoRecord)->
         voQuery = LeanRC::Query.new()
           .forIn '@doc': @collectionName()
           .filter query
-          .replace properties
-        return @executeQuery @parseQuery voQuery
+          .replace aoRecord
+        return @query voQuery
+
 
     @public update: Function,
       default: (id, properties)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
-          .filter '@doc._key': {$eq: id}
-          .update properties
-        return @executeQuery @parseQuery voQuery
-          .first()
+        voRecord = @find id
+        voRecord.updateAttributes properties
+        return voRecord
 
     @public updateBy: Function,
       default: (query, properties)->
+        @findBy query
+          .forEach (aoRecord)-> aoRecord.updateAttributes properties
+        return
+
+    @public patch: Function,
+      default: (query, aoRecord)->
         voQuery = LeanRC::Query.new()
           .forIn '@doc': @collectionName()
           .filter query
-          .update properties
-        return @executeQuery @parseQuery voQuery
+          .update aoRecord
+        return @query voQuery
 
-    @public query: Function,
-      default: (query)->
-        query = _.pick query, Object.keys(query).filter (key)-> query[key]?
-        voQuery = LeanRC::Query.new query
-        return @executeQuery @parseQuery voQuery
+
+    @public clone: Function,
+      default: (aoRecord)->
+        voRecord = @delegate.new aoRecord
+        voRecord.id = @generateId()
+        return voRecord
 
     @public copy: Function,
-      default: (id)->
-        return record
-    @public deepCopy: Function,
-      default: (id)->
-        return record
+      default: (aoRecord)->
+        voRecord = @clone aoRecord
+        voRecord.save()
+        return voRecord
+
 
     @public forEach: Function,
       default: (lambda)->
         voQuery = LeanRC::Query.new()
           .forIn '@doc': @collectionName()
           .return '@doc'
-        @executeQuery @parseQuery voQuery
+        @query voQuery
           .forEach lambda
         return
+
+    @public filter: Function,
+      default: (lambda)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .return '@doc'
+        return @query voQuery
+          .filter lambda
 
     @public map: Function,
       default: (lambda)->
         voQuery = LeanRC::Query.new()
           .forIn '@doc': @collectionName()
           .return '@doc'
-        return @executeQuery @parseQuery voQuery
+        return @query voQuery
           .map lambda
 
     @public reduce: Function,
@@ -205,8 +220,9 @@ module.exports = (LeanRC)->
         voQuery = LeanRC::Query.new()
           .forIn '@doc': @collectionName()
           .return '@doc'
-        return @executeQuery @parseQuery voQuery
+        return @query voQuery
           .reduce lambda, initialValue
+
 
     @public includes: Function,
       default: (id)->
@@ -215,7 +231,7 @@ module.exports = (LeanRC)->
           .filter '@doc._key': {$eq: id}
           .limit 1
           .return '@doc'
-        return @executeQuery @parseQuery voQuery
+        return @query voQuery
           .hasNext()
 
     @public exists: Function,
@@ -225,7 +241,7 @@ module.exports = (LeanRC)->
           .filter query
           .limit 1
           .return '@doc'
-        return @executeQuery @parseQuery voQuery
+        return @query voQuery
           .hasNext()
 
     @public length: Function, # количество объектов в коллекции
@@ -233,27 +249,29 @@ module.exports = (LeanRC)->
         voQuery = LeanRC::Query.new()
           .forIn '@doc': @collectionName()
           .count()
-        return @executeQuery @parseQuery voQuery
+        return @query voQuery
           .first()
 
-    @public push: Function,
-      default: (data)->
-        return isPushed
+
     @public normalize: Function,
-      default: (data)->
-        return data
+      default: (ahData)->
+        @serializer.normalize @delegate, ahData
+
     @public serialize: Function,
-      default: (id, options)->
-        return data
-    @public unload: Function,
-      default: (id)->
-        return
-    @public unloadBy: Function,
+      default: (aoRecord, ahOptions)->
+        @serializer.serialize aoRecord, ahOptions
+
+
+    @public query: Function,
       default: (query)->
-        return
+        query = _.pick query, Object.keys(query).filter (key)-> query[key]?
+        voQuery = LeanRC::Query.new query
+        return @executeQuery @parseQuery voQuery
+
     @public parseQuery: Function,
       default: (query)->
         return query
+
     @public executeQuery: Function,
       default: (query, options)->
         return result

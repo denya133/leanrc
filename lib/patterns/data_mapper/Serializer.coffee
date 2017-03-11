@@ -13,11 +13,21 @@ module.exports = (LeanRC)->
     @public collection: LeanRC::CollectionInterface
 
     @public normalize: Function,
-      default: (payload)->
+      default: (acRecord, ahPayload)->
+        vhResult = {}
+        for own asAttrName, ahAttrValue of acRecord.attributes
+          do (asAttrName, {transform} = ahAttrValue)->
+            vhResult[asAttrName] = transform.deserialize ahPayload[asAttrName]
+        acRecord.new vhResult
 
     @public serialize: Function,
-      default: (record, options)->
-
+      default: (aoRecord, options = null)->
+        vcRecord = aoRecord.constructor
+        vhResult = {}
+        for own asAttrName, ahAttrValue of vcRecord.attributes
+          do (asAttrName, {transform} = ahAttrValue)->
+            vhResult[asAttrName] = transform.serialize aoRecord[asAttrName]
+        vhResult
 
 
   return LeanRC::Serializer.initialize()
