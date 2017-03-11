@@ -150,6 +150,10 @@ module.exports = (LeanRC)->
     @public $max: String # '@doc.price'
     @public $count: Boolean # yes or not present
     @public $distinct: Boolean # yes or not present
+    @public $remove: Boolean
+    @public $insert: Object
+    @public $update: Object
+    @public $replace: Object
     @public $return: Object
 
     @public forIn: Function,
@@ -201,6 +205,22 @@ module.exports = (LeanRC)->
     @public distinct: Function,
       default: ->
         @$distinct = yes
+        return @
+    @public remove: Function,
+      default: ->
+        @$remove = yes
+        return @
+    @public insert: Function,
+      default: (aoDefinition)->
+        @$insert = aoDefinition
+        return @
+    @public update: Function,
+      default: (aoDefinition)->
+        @$update = aoDefinition
+        return @
+    @public replace: Function,
+      default: (aoDefinition)->
+        @$replace = aoDefinition
         return @
     @public return: Function,
       default: (aoDefinition)->

@@ -94,6 +94,12 @@ module.exports = (LeanRC)->
     @public filter: Function,
       default: (query)->
         return records
+    @public replace: Function,
+      default: (id, properties)->
+        return record
+    @public replaceBy: Function,
+      default: (query, properties)->
+        return record
     @public update: Function,
       default: (id, properties)->
         return record

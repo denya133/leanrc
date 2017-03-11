@@ -33,60 +33,81 @@ module.exports = (LeanRC)->
     @public @virtual generateId: Function,
       args: []
       return: [String, RC::Constants.NILL]
-    @public @virtual create: Function,
+
+    @public @virtual build: Function, # создает инстанс рекорда
       args: [Object]
       return: LeanRC::RecordInterface
-    @public @virtual createDirectly: Function,
+    @public @virtual create: Function, # создает инстанс рекорда и делает save
       args: [Object]
       return: LeanRC::RecordInterface
-    @public @virtual insert: Function,
+    @public @virtual push: Function, # обращается к БД
       args: [Object]
-      return: LeanRC::RecordInterface
+      return: Boolean
+
     @public @virtual delete: Function,
       args: [String]
       return: LeanRC::RecordInterface
     @public @virtual deleteBy: Function,
-      args: [Object] # но возможно надо указать LeanRC::QueryInterface
-      return: LeanRC::RecordInterface
+      args: [LeanRC::QueryInterface]
+      return: RC::Constants.NILL
+
     @public @virtual destroy: Function,
       args: [String]
       return: RC::Constants.NILL
     @public @virtual destroyBy: Function,
-      args: [Object] # но возможно надо указать LeanRC::QueryInterface
+      args: [LeanRC::QueryInterface]
       return: RC::Constants.NILL
+    @public @virtual remove: Function, # обращается к БД
+      args: [LeanRC::QueryInterface]
+      return: Boolean
+
     @public @virtual find: Function,
       args: [String]
       return: LeanRC::RecordInterface
     @public @virtual findBy: Function,
-      args: [Object] # но возможно надо указать LeanRC::QueryInterface
+      args: [LeanRC::QueryInterface]
+      return: LeanRC::CursorInterface
+    @public @virtual take: Function, # обращается к БД
+      args: [LeanRC::QueryInterface]
+      return: LeanRC::CursorInterface
+
+    @public @virtual replace: Function,
+      args: [String, Object]
       return: LeanRC::RecordInterface
-    @public @virtual filter: Function,
-      args: [Object] # но возможно надо указать LeanRC::QueryInterface
-      return: Array  # но возможно надо указать LeanRC::CursorInterface
+    @public @virtual replaceBy: Function,
+      args: [LeanRC::QueryInterface, Object]
+      return: RC::Constants.NILL
+    @public @virtual override: Function, # обращается к БД
+      args: [LeanRC::QueryInterface, Object]
+      return: Boolean
+
     @public @virtual update: Function,
       args: [String, Object]
       return: LeanRC::RecordInterface
     @public @virtual updateBy: Function,
-      args: [Object, Object] # но возможно надо указать LeanRC::QueryInterface
-      return: LeanRC::RecordInterface
-    @public @virtual query: Function,
-      args: [Object] # но возможно надо указать LeanRC::QueryInterface
-      return: RC::Constants.ANY
+      args: [LeanRC::QueryInterface, Object]
+      return: RC::Constants.NILL
+    @public @virtual patch: Function, # обращается к БД
+      args: [LeanRC::QueryInterface, Object]
+      return: Boolean
+
     @public @virtual copy: Function,
       args: [String] # record id
       return: LeanRC::RecordInterface
-    @public @virtual deepCopy: Function,
-      args: [String] # record id
-      return: LeanRC::RecordInterface
+
     @public @virtual forEach: Function,
       args: [Function]
       return: RC::Constants.NILL
+    @public @virtual filter: Function,
+      args: [Function]
+      return: Array
     @public @virtual map: Function,
       args: [Function]
-      return: Array  # но возможно надо указать LeanRC::CursorInterface
+      return: Array
     @public @virtual reduce: Function,
       args: [Function, RC::Constants.ANY]
       return: RC::Constants.ANY
+
     @public @virtual includes: Function,
       args: [String]
       return: Boolean
@@ -96,26 +117,29 @@ module.exports = (LeanRC)->
     @public @virtual length: Function, # количество объектов в коллекции
       args: []
       return: Number
-    @public @virtual push: Function,
-      args: [[Array, Object]]
-      return: Boolean
+
     @public @virtual normalize: Function,
       args: [Object] # payload
       return: Object # нормализация данных из базы
     @public @virtual serialize: Function,
       args: [String, Object] # id, options
       return: Object # сериализация рекорда для отправки в базу
+
     @public @virtual unload: Function,
       args: [String] # id
       return: RC::Constants.NILL
     @public @virtual unloadBy: Function,
-      args: [Object] # но возможно надо указать LeanRC::QueryInterface
+      args: [LeanRC::QueryInterface]
       return: RC::Constants.NILL
-    @public @virtual parseQuery: Function, # описание того как стандартный (query object) преобразовать в конкретный запрос к конкретной базе данных
-      args: [Object] # но возможно надо указать LeanRC::QueryInterface
+
+    @public @virtual query: Function,
+      args: [[Object, LeanRC::QueryInterface]]
       return: RC::Constants.ANY
+    @public @virtual parseQuery: Function, # описание того как стандартный (query object) преобразовать в конкретный запрос к конкретной базе данных
+      args: [[Object, LeanRC::QueryInterface]]
+      return: [Object, String, LeanRC::QueryInterface]
     @public @virtual executeQuery: Function,
-      args: [[Object, String], Object] # query, options
+      args: [[Object, String, LeanRC::QueryInterface], Object] # query, options
       return: RC::Constants.ANY
 
 

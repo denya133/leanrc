@@ -136,6 +136,23 @@ module.exports = (LeanRC)->
           .return '@doc'
         return @executeQuery @parseQuery voQuery
 
+    @public replace: Function,
+      default: (id, properties)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .filter '@doc._key': {$eq: id}
+          .replace properties
+        return @executeQuery @parseQuery voQuery
+          .first()
+
+    @public replaceBy: Function,
+      default: (query, properties)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionName()
+          .filter query
+          .replace properties
+        return @executeQuery @parseQuery voQuery
+
     @public update: Function,
       default: (id, properties)->
         voQuery = LeanRC::Query.new()
