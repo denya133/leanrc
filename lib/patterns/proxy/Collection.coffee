@@ -1,7 +1,5 @@
-# так как в этом репозитории нельзя давать платформозависимый код,
-# данный класс (миксин) нужен 1 - для примера реализации интерфейса, 2 - так как ориентирован на хранение данных в оперативной памяти - то является платформонезависимым решением, 3 - может быть полезен при написании конкретных программ где данные должны храниться в оперативной памяти.
-
 RC = require 'RC'
+
 
 module.exports = (LeanRC)->
   class LeanRC::Collection extends LeanRC::Proxy
@@ -252,18 +250,13 @@ module.exports = (LeanRC)->
 
 
     @public query: Function,
-      default: (query)->
-        query = _.pick query, Object.keys(query).filter (key)-> query[key]?
-        voQuery = LeanRC::Query.new query
+      default: (aoQuery)->
+        if aoQuery.constructor is LeanRC::Query
+          voQuery = aoQuery
+        else
+          aoQuery = _.pick aoQuery, Object.keys(aoQuery).filter (key)-> aoQuery[key]?
+          voQuery = LeanRC::Query.new aoQuery
         return @executeQuery @parseQuery voQuery
-
-    @public parseQuery: Function,
-      default: (query)->
-        return query
-
-    @public executeQuery: Function,
-      default: (query, options)->
-        return result
 
 
   return LeanRC::Collection.initialize()

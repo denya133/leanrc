@@ -54,11 +54,11 @@ module.exports = (LeanRC)->
     # @public @static schema: JoiSchema # это используется в медиаторе на входе и выходе, поэтому это надо объявить там.
 
 
-    # под вопросом ?????? возможно надо искать через (из) модуля
-    @public @static parseModelName: Function, [String], -> Array
-    @public @static findModelByName: Function, [String], -> Array
-    @public findModelByName: Function, [String], -> Array
-    @public parseModelName: Function, [String], -> Array
+    # # под вопросом ?????? возможно надо искать через (из) модуля
+    # @public @static parseModelName: Function, [String], -> Array
+    # @public @static findModelByName: Function, [String], -> Array
+    # @public findModelByName: Function, [String], -> Array
+    # @public parseModelName: Function, [String], -> Array
 
 
 
@@ -66,18 +66,18 @@ module.exports = (LeanRC)->
 
 
 
-    # под вопросом ??????
-    @public updateEdges: Function, [ANY], -> ANY # any type
+    # # под вопросом ??????
+    # @public updateEdges: Function, [ANY], -> ANY # any type
 
 
 
-    # под вопросом ?????? # возможно надо это определять в сериалайзере
-    @public getSnapshot: Function, [], -> Object
-    @private _forClient: Function, [Object], -> Object
-    @public @static serializableAttributes: Function, [], -> Object
-    @public @static serializeFromBatch: Function, [Object], -> Object
-    @public @static serializeFromClient: Function, [Object], -> Object
-    @public serializeForClient: Function, [Object], -> Object
+    # # под вопросом ?????? # возможно надо это определять в сериалайзере
+    # @public getSnapshot: Function, [], -> Object
+    # @private _forClient: Function, [Object], -> Object
+    # @public @static serializableAttributes: Function, [], -> Object
+    # @public @static serializeFromBatch: Function, [Object], -> Object
+    # @public @static serializeFromClient: Function, [Object], -> Object
+    # @public serializeForClient: Function, [Object], -> Object
 
 
     ############################################################################
