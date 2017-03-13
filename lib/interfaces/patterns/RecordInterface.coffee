@@ -11,8 +11,7 @@ module.exports = (LeanRC)->
 
     @public @virtual collection: LeanRC::CollectionInterface
 
-    # под вопросом ??????
-    # @public @static schema: JoiSchema # это используется в медиаторе на входе и выходе, поэтому это надо объявить там.
+    @public @static @virtual schema: Object
 
 
     # # под вопросом ?????? возможно надо искать через (из) модуля
@@ -65,16 +64,16 @@ module.exports = (LeanRC)->
       return: Object
 
     @public @static @virtual attribute: Function,
-      args: [String, Object, Object] #name, schema, Object
+      args: [Object, Object] #typeDefinition, opts
       return: RC::Constants.NILL
     @public @static @virtual attr: Function,
-      args: [String, Object, Object] #name, schema, Object
+      args: [Object, Object] #typeDefinition, opts
       return: RC::Constants.NILL
     @public @static @virtual computed: Function,
-      args: [String, Object, Function] #name, opts, lambda
+      args: [Object, Object] #typeDefinition, opts
       return: RC::Constants.NILL
     @public @static @virtual comp: Function,
-      args: [String, Object, Function] #name, opts, lambda
+      args: [Object, Object] #typeDefinition, opts
       return: RC::Constants.NILL
     @public @static @virtual new: Function,
       args: [Object] #attributes

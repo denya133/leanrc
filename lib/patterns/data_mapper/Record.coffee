@@ -47,12 +47,19 @@ module.exports = (LeanRC)->
 
     ipoInternalRecord = @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
 
+    @public @static schema: Object,
+      default: {}
+      get: (_data)->
+        _data[@name] ?= do =>
+          vhAttrs = {}
+          for own asAttrName, ahAttrValue of @attributes
+            do (asAttrName, ahAttrValue)=>
+              vhAttrs[asAttrName] = ahAttrValue.validate
+          joi.object vhAttrs
+        _data[@name]
+
 
     ############################################################################
-
-    # под вопросом ??????
-    # @public @static schema: JoiSchema # это используется в медиаторе на входе и выходе, поэтому это надо объявить там.
-
 
     # # под вопросом ?????? возможно надо искать через (из) модуля
     # @public @static parseModelName: Function, [String], -> Array
@@ -142,11 +149,18 @@ module.exports = (LeanRC)->
           else
             LeanRC::Transform
         opts.transform = opts.transform.new()
-        opts.schema = opts.validate ? switch vcAttrType
+        opts.validate ?= switch vcAttrType
           when String, Date, Number, Boolean
             joi[inflect.underscore vcAttrType.name]()
           else
             joi.object()
+        {set} = opts
+        opts.set = (aoData)->
+          {value:voData} = opts.validate.validate aoData
+          if _.isFunction set
+            set.apply @, [voData]
+          else
+            voData
         @["_#{@name}_attrs"] ?= {}
         @["_#{@name}_edges"] ?= {}
         unless @["_#{@name}_attrs"][vsAttr]
@@ -163,13 +177,13 @@ module.exports = (LeanRC)->
         return
 
     @public @static comp: Function,
-      default: (typeDefinition, opts, lambda)->
+      default: (typeDefinition, opts)->
         vsAttr = Object.keys(typeDefinition)[0]
         vcAttrType = typeDefinition[vsAttr]
-        {type, model, valuable, valuableAs, get} = opts
+        {model, valuable, valuableAs, get} = opts
         model ?= inflect.singularize inflect.underscore vsAttr
-        if not opts.get? or not type?
-          return throw new Error '`lambda` and `type` options is required'
+        unless opts.get?
+          return throw new Error '`lambda` options is required'
         if valuable?
           schema = =>
             unless model in SIMPLE_TYPES
@@ -180,23 +194,23 @@ module.exports = (LeanRC)->
               joi[vModel]().empty(null).optional()
             else if vModel is 'date'
               joi.string().empty(null).optional()
-            else if type is 'item' and vModel is 'object'
+            else if vcAttrType isnt Array and vModel is 'object'
               joi.object().empty(null).optional()
-            else if type is 'array' and vModel is 'object'
+            else if vcAttrType is Array and vModel is 'object'
               joi.array().items joi.object().empty(null).optional()
-            else if type is 'item' and not /.*[.].*/.test valuable
+            else if vcAttrType isnt Array and not /.*[.].*/.test valuable
               ModelClass.schema()
-            else if type is 'item' and /.*[.].*/.test valuable
+            else if vcAttrType isnt Array and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
-              ModelClass.attributes[prop_name]
-            else if type is 'array' and not /.*[.].*/.test valuable
+              ModelClass.attributes[prop_name].validate
+            else if vcAttrType is Array and not /.*[.].*/.test valuable
               joi.array().items ModelClass.schema()
-            else if type is 'array' and /.*[.].*/.test valuable
+            else if vcAttrType is Array and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
-              joi.array().items ModelClass.attributes[prop_name]
+              joi.array().items ModelClass.attributes[prop_name].validate
         else
           schema = -> {}
-        opts.schema = opts.validate ? schema
+        opts.validate ?= schema
         @["_#{@name}_comps"] ?= {}
         unless @["_#{@name}_comps"][vsAttr]
           @["_#{@name}_comps"][vsAttr] = opts
