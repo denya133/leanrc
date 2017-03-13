@@ -19,14 +19,13 @@ module.exports = (LeanRC)->
     @public @static properties: Object,
       default: {}
       get: (__props)->
-        AbstractClass = @
-        fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor.properties
-        __props[AbstractClass.name] ?= do ->
+        fromSuper = if @__super__?
+          @__super__.constructor.properties
+        __props[@name] ?= do =>
           RC::Utils.extend {}
           , (fromSuper ? {})
-          , (AbstractClass["_#{AbstractClass.name}_props"] ? {})
-        __props[AbstractClass.name]
+          , (AbstractClass["_#{@name}_props"] ? {})
+        __props[@name]
 
     @public @static property: Function,
       default: ->
@@ -34,17 +33,19 @@ module.exports = (LeanRC)->
         return
 
     @public @static prop: Function,
-      default: (name, opts={})->
+      default: (typeDefinition, opts={})->
+        vsAttr = Object.keys(typeDefinition)[0]
+        vcAttrType = typeDefinition[vsAttr]
         opts.serializeFromClient ?= (value)-> value
         opts.serializeForClient ?= (value)-> value
         {
-          attr, refKey, type, model,
+          attr, refKey, model,
           definition, bindings, valuable, valuableAs,
           sortable, groupable, filterable,
           serializeFromClient, serializeForClient
         } = opts
-        unless definition? and type? and model?
-          return throw new Error '`definition`, `type` and `model` options is required'
+        unless definition? and model?
+          return throw new Error '`definition` and `model` options is required'
         if valuable?
           schema = =>
             unless model in SIMPLE_TYPES
@@ -55,80 +56,30 @@ module.exports = (LeanRC)->
               joi[vModel]().empty(null).optional()
             else if vModel is 'date'
               joi.string().empty(null).optional()
-            else if type is 'item' and vModel is 'object'
+            else if vcAttrType isnt Array and vModel is 'object'
               joi.object().empty(null).optional()
-            else if type is 'array' and vModel is 'object'
+            else if vcAttrType is Array and vModel is 'object'
               joi.array().items joi.object().empty(null).optional()
-            else if type is 'item' and not /.*[.].*/.test valuable
+            else if vcAttrType isnt Array and not /.*[.].*/.test valuable
               ModelClass.schema()
-            else if type is 'item' and /.*[.].*/.test valuable
+            else if vcAttrType isnt Array and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
-              ModelClass.attributes[prop_name]
-            else if type is 'array' and not /.*[.].*/.test valuable
+              ModelClass.attributes[prop_name].validate
+            else if vcAttrType is Array and not /.*[.].*/.test valuable
               joi.array().items ModelClass.schema()
-            else if type is 'array' and /.*[.].*/.test valuable
+            else if vcAttrType is Array and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
-              joi.array().items ModelClass.attributes[prop_name]
+              joi.array().items ModelClass.attributes[prop_name].validate
         else
           schema = -> {}
-        opts.schema ?= schema
+        opts.validate ?= schema
         @["_#{@name}_props"] ?= {}
-        model ?= inflect.singularize inflect.underscore name
-        unless @["_#{@name}_props"][name]
-          @["_#{@name}_props"][name] = opts
-          switch type
-            when 'item'
-              @defineProperty name,
-                get: ->
-                  ModelClass = null
-                  unless model in SIMPLE_TYPES
-                    [ModelClass, vModel] = @findModelByName model
-                  else
-                    vModel = model
-                  if (item = @["__#{name}"])?
-                    if vModel in SIMPLE_TYPES
-                      return serializeForClient item
-                    if @[refKey ? '_key'] is item[refKey ? '_key']
-                     return @
-                    ModelClass.new item
-                  else if @["__#{name}"] is undefined
-                    _snapshot = @getSnapshot()
-                    _snapshot._id = "
-                      #{@constructor.collectionNameInDB()}/#{_snapshot._key}
-                    "
-                    _bindings = extend {}, (bindings ? {}), {doc: _snapshot}
-                    _query = "
-                        LET doc = (RETURN @doc)[0]
-                        RETURN #{definition}
-                      "
-                    console.log '???????????????????????KKKKKKKKKKKKKKKKKKKKKkk _query, _bindings', _query, _bindings
-                    item = new Cursor()
-                      .setCursor db._query _query, _bindings
-                      .currentUser @currentUser
-                      .next()
-                    @["__#{name}"] = item
-                    if vModel in SIMPLE_TYPES
-                      return serializeForClient item
-                    if @[refKey ? '_key'] is item[refKey ? '_key']
-                     return @
-                    ModelClass.new item
-                  else
-                    null
-                set: (value)->
-                  if model in SIMPLE_TYPES
-                    @["__#{name}"] = serializeFromClient value
-                    value
-                  else
-                    if (id = value?[refKey ? '_key'])
-                      @[attr ? "#{name}Id"] = id
-                      @["__#{name}"] = value
-                      value
-                    else
-                      @[attr ? "#{name}Id"] = null
-                      @["__#{name}"] = null
-                      null
-            when 'array'
-              @defineProperty name,
+        model ?= inflect.singularize inflect.underscore vsAttr
+        unless @["_#{@name}_props"][vsAttr]
+          @["_#{@name}_props"][vsAttr] = opts
+          switch vcAttrType
+            when Array
+              @defineProperty vsAttr,
                 get: ->
                   ModelClass = null
                   unless model in SIMPLE_TYPES
@@ -143,35 +94,85 @@ module.exports = (LeanRC)->
                     .setCursor db._query definition, _bindings
                     .currentUser @currentUser
             else
-              throw new Error 'type must be `item` or `array` only'
+              @defineProperty vsAttr,
+                get: ->
+                  ModelClass = null
+                  unless model in SIMPLE_TYPES
+                    [ModelClass, vModel] = @findModelByName model
+                  else
+                    vModel = model
+                  if (item = @["__#{vsAttr}"])?
+                    if vModel in SIMPLE_TYPES
+                      return serializeForClient item
+                    if @[refKey ? '_key'] is item[refKey ? '_key']
+                     return @
+                    ModelClass.new item
+                  else if @["__#{vsAttr}"] is undefined
+                    _snapshot = @getSnapshot()
+                    _snapshot._id = "
+                      #{@constructor.collectionNameInDB()}/#{_snapshot._key}
+                    "
+                    _bindings = extend {}, (bindings ? {}), {doc: _snapshot}
+                    _query = "
+                        LET doc = (RETURN @doc)[0]
+                        RETURN #{definition}
+                      "
+                    console.log '???????????????????????KKKKKKKKKKKKKKKKKKKKKkk _query, _bindings', _query, _bindings
+                    item = new Cursor()
+                      .setCursor db._query _query, _bindings
+                      .currentUser @currentUser
+                      .next()
+                    @["__#{vsAttr}"] = item
+                    if vModel in SIMPLE_TYPES
+                      return serializeForClient item
+                    if @[refKey ? '_key'] is item[refKey ? '_key']
+                     return @
+                    ModelClass.new item
+                  else
+                    null
+                set: (value)->
+                  if model in SIMPLE_TYPES
+                    @["__#{vsAttr}"] = serializeFromClient value
+                    value
+                  else
+                    if (id = value?[refKey ? '_key'])
+                      @[attr ? "#{vsAttr}Id"] = id
+                      @["__#{vsAttr}"] = value
+                      value
+                    else
+                      @[attr ? "#{vsAttr}Id"] = null
+                      @["__#{vsAttr}"] = null
+                      null
         else
-          throw new Error "prop `#{name}` has been defined previously"
+          throw new Error "prop `#{vsAttr}` has been defined previously"
         return
 
     @public @static belongsTo: Function,
-      default: (name, opts={})->
-        opts.attr ?= "#{name}Id"
+      default: (typeDefinition, opts={})->
+        vsAttr = Object.keys(typeDefinition)[0]
+        vcAttrType = typeDefinition[vsAttr] # LeanRC::Record
+        opts.attr ?= "#{vsAttr}Id"
         opts.refKey ?= '_key'
-        @attr opts.attr, opts.schema, opts
-        if opts.attr isnt "#{name}Id"
-          @prop "#{name}Id",
-            type: 'item'
-            model: 'string'
+        @attr "#{opts.attr}": String, opts
+        if opts.attr isnt "#{vsAttr}Id"
+          @prop "#{vsAttr}Id": String,
+            # type: 'item'
+            # model: 'string'
             attr: opts.attr
-            schema: -> opts.schema
+            validate: -> opts.validate
             definition: "(doc.#{opts.attr})"
-            valuable: "#{name}Id"
-            filterable: "#{name}Id"
+            valuable: "#{vsAttr}Id"
+            filterable: "#{vsAttr}Id"
             serializeFromClient: opts.serializeFromClient
             serializeForClient: opts.serializeForClient
-        opts.type = 'item'
-        opts.model ?= inflect.singularize inflect.underscore name
+        # opts.type = 'item'
+        opts.model ?= inflect.singularize inflect.underscore vsAttr
         [vFullModelName, vModel] = @parseModelName opts.model
         # console.log '?????????????? in belongsTo', vFullModelName, vModel
-        opts.collection ?= inflect.pluralize inflect.underscore vModel
+        collection ?= inflect.pluralize inflect.underscore vModel
         unless opts.through
           opts.definition ?= "(#{qb.for("#{vModel}_item")
-            .in(@collectionNameInDB opts.collection)
+            .in(@collectionNameInDB collection)
             .filter(qb.eq qb.ref("doc.#{opts.attr}"), qb.ref("#{vModel}_item.#{opts.refKey}"))
             .limit(1)
             .return(qb.ref "#{vModel}_item")
@@ -185,17 +186,19 @@ module.exports = (LeanRC)->
             LIMIT 0, 1
             RETURN #{vModel}_item
           )[0]"
-        unless opts.model in SIMPLE_TYPES
-          opts.methods = ["#{vFullModelName}.find"]
-        @prop name, opts
+        # unless opts.model in SIMPLE_TYPES
+        #   opts.methods = ["#{vFullModelName}.find"]
+        @prop "#{vsAttr}": vModel, opts
         return
 
     @public @static hasMany: Function,
-      default: (name, opts={})->
+      default: (typeDefinition, opts={})->
+        vsAttr = Object.keys(typeDefinition)[0]
+        vcAttrType = typeDefinition[vsAttr]
         opts.refKey ?= '_key'
         opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
         opts.type = 'array'
-        opts.model ?= inflect.singularize inflect.underscore name
+        opts.model ?= inflect.singularize inflect.underscore vsAttr
         [vFullModelName, vModel] = @parseModelName opts.model
         opts.collection ?= inflect.pluralize inflect.underscore vModel
         unless opts.through
@@ -219,15 +222,17 @@ module.exports = (LeanRC)->
             #{opts.through[1].as} @docId #{@collectionNameInDB opts.through[0]}
             RETURN #{vModel}_array
           "
-        @prop name, opts
+        @prop typeDefinition, opts
         return
 
     @public @static hasOne: Function,
-      default: (name, opts={})->
+      default: (typeDefinition, opts={})->
+        vsAttr = Object.keys(typeDefinition)[0]
+        vcAttrType = typeDefinition[vsAttr] # LeanRC::Record
         opts.refKey ?= '_key'
         opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
-        opts.type = 'item'
-        opts.model ?= inflect.singularize inflect.underscore name
+        # opts.type = 'item'
+        opts.model ?= inflect.singularize inflect.underscore vsAttr
         [vFullModelName, vModel] = @parseModelName opts.model
         [moduleName] = vFullModelName.split '::'
         vCollectionName = "#{inflect.underscore moduleName}_#{inflect.pluralize vModel}"
@@ -238,7 +243,7 @@ module.exports = (LeanRC)->
           .return(qb.ref "#{vModel}_item")
           .toAQL()})[0]
         "
-        @prop name, opts
+        @prop typeDefinition, opts
         return
 
     # Cucumber.inverseFor 'tomato' #-> {type: App::Tomato, name: 'cucumbers', kind: 'hasMany'} - в этом ли виде отдавать результат
