@@ -8,12 +8,9 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public deserialize: Function,
-      default: (serialized, options)->
+    @public @static normalize: Function,
+      default: (serialized)->
         type = typeof serialized
-
-        if not serialized? and options.allowNull is yes
-          return null
 
         if type is "boolean"
           return serialized
@@ -24,12 +21,9 @@ module.exports = (LeanRC)->
         else
           return no
 
-    @public serialize: Function,
-      default: (deserialized, options)->
-        if not deserialized? and options.allowNull is yes
-          return null
-
-        return Boolean deserialized
+    @public @static serialize: Function,
+      default: (deserialized)->
+        Boolean deserialized
 
 
   return LeanRC::BooleanTransform.initialize()

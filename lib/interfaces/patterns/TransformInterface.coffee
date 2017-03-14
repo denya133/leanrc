@@ -9,11 +9,11 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public @virtual deserialize: Function, # virtual declaration of method
-      args: [RC::Constants.ANY, Object] # data, options
+    @public @static @virtual normalize: Function,
+      args: [RC::Constants.ANY] # data
       return: [RC::Constants.ANY, RC::Constants.NILL]
-    @public @virtual serialize:   Function, # virtual declaration of method
-      args: [RC::Constants.ANY, Object] # data, options
+    @public @static @virtual serialize:   Function,
+      args: [RC::Constants.ANY] # data
       return: [RC::Constants.ANY, RC::Constants.NILL]
 
 

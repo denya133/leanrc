@@ -6,6 +6,7 @@ RC = require 'RC'
 module.exports = (LeanRC)->
   class LeanRC::RecordInterface extends RC::Interface
     @inheritProtected()
+    @include LeanRC::TransformInterface
 
     @Module: LeanRC
 
@@ -13,12 +14,17 @@ module.exports = (LeanRC)->
 
     @public @static @virtual schema: Object
 
+    @public @static @virtual parseRecordName: Function,
+      args: [String]
+      return: Array
+
+    @public @virtual parseRecordName: Function,
+      args: [String]
+      return: Array
 
     # # под вопросом ?????? возможно надо искать через (из) модуля
-    # @public @static parseModelName: Function, [String], -> Array
     # @public @static findModelByName: Function, [String], -> Array
     # @public findModelByName: Function, [String], -> Array
-    # @public parseModelName: Function, [String], -> Array
 
 
 

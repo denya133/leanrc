@@ -8,13 +8,13 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public deserialize: Function,
+    @public @static normalize: Function,
       default: (serialized)->
         unless serialized?
           return null
         serialized
 
-    @public serialize: Function,
+    @public @static serialize: Function,
       default: (deserialized)->
         unless deserialized?
           return null

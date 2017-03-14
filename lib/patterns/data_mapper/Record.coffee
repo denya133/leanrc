@@ -19,18 +19,18 @@ class App::TomatoRecord extends LeanRC::Record
 
   @attr title: String,
     # возможно есть смысл объявить опшен в RC::CoreObject.public - чтобы при установке в сеттере проходила валидация
-    validate: joi.string() # !!! нужен для сложной валидации данных
+    validate: -> joi.string() # !!! нужен для сложной валидации данных
     # transform указывать не надо, т.к. стандартный тип, LeanRC::StringTransform
 
   @attr nameObj: App::NameObj,
-    validate: joi.object().required().start().end().default({})
-    transform: App::NameObjTransform
+    validate: -> joi.object().required().start().end().default({})
+    transform: -> App::NameObjTransform # or some record class App::OnionRecord
 
   @attr description: String
 
   @attr registeredAt: Date,
-    validate: joi.date()
-    transform: App::MyDateTransform
+    validate: -> joi.date()
+    transform: -> App::MyDateTransform
 ```
 ###
 
@@ -58,14 +58,23 @@ module.exports = (LeanRC)->
           joi.object vhAttrs
         _data[@name]
 
+    @public @static parseRecordName: Function,
+      default: (asName)->
+        if /.*[:][:].*/.test(asName)
+          [vsModuleName, vsModel] = asName.split '::'
+        else
+          [vsModuleName, vsModel] = [@moduleName(), inflect.camelize inflect.underscore asName]
+        [vsModuleName, vsModel]
+
+    @public parseRecordName: Function,
+      default: -> @constructor.parseRecordName arguments...
+
 
     ############################################################################
 
     # # под вопросом ?????? возможно надо искать через (из) модуля
-    # @public @static parseModelName: Function, [String], -> Array
     # @public @static findModelByName: Function, [String], -> Array
     # @public findModelByName: Function, [String], -> Array
-    # @public parseModelName: Function, [String], -> Array
 
 
 
@@ -145,18 +154,17 @@ module.exports = (LeanRC)->
         vcAttrType = typeDefinition[vsAttr]
         opts.transform ?= switch vcAttrType
           when String, Date, Number, Boolean
-            LeanRC::["#{vcAttrType.name}Transform"]
+            -> LeanRC::["#{vcAttrType.name}Transform"]
           else
-            LeanRC::Transform
-        opts.transform = opts.transform.new()
+            -> LeanRC::Transform
         opts.validate ?= switch vcAttrType
           when String, Date, Number, Boolean
-            joi[inflect.underscore vcAttrType.name]()
+            -> joi[inflect.underscore vcAttrType.name]()
           else
-            joi.object()
+            -> joi.object()
         {set} = opts
         opts.set = (aoData)->
-          {value:voData} = opts.validate.validate aoData
+          {value:voData} = opts.validate().validate aoData
           if _.isFunction set
             set.apply @, [voData]
           else
@@ -185,32 +193,30 @@ module.exports = (LeanRC)->
         unless opts.get?
           return throw new Error '`lambda` options is required'
         if valuable?
-          schema = =>
+          validate = =>
             unless model in SIMPLE_TYPES
-              [ModelClass, vModel] = @findModelByName model
-            else
-              vModel = model
-            return if vModel in ['string', 'boolean', 'number']
-              joi[vModel]().empty(null).optional()
-            else if vModel is 'date'
+              RecordClass = @findModelByName model
+            return if model in ['string', 'boolean', 'number']
+              joi[model]().empty(null).optional()
+            else if model is 'date'
               joi.string().empty(null).optional()
-            else if vcAttrType isnt Array and vModel is 'object'
+            else if vcAttrType isnt Array and model is 'object'
               joi.object().empty(null).optional()
-            else if vcAttrType is Array and vModel is 'object'
+            else if vcAttrType is Array and model is 'object'
               joi.array().items joi.object().empty(null).optional()
             else if vcAttrType isnt Array and not /.*[.].*/.test valuable
-              ModelClass.schema()
+              RecordClass.schema()
             else if vcAttrType isnt Array and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
-              ModelClass.attributes[prop_name].validate
+              RecordClass.attributes[prop_name].validate
             else if vcAttrType is Array and not /.*[.].*/.test valuable
-              joi.array().items ModelClass.schema()
+              joi.array().items RecordClass.schema()
             else if vcAttrType is Array and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
-              joi.array().items ModelClass.attributes[prop_name].validate
+              joi.array().items RecordClass.attributes[prop_name].validate
         else
-          schema = -> {}
-        opts.validate ?= schema
+          validate = -> {}
+        opts.validate ?= validate
         @["_#{@name}_comps"] ?= {}
         unless @["_#{@name}_comps"][vsAttr]
           @["_#{@name}_comps"][vsAttr] = opts
@@ -224,8 +230,8 @@ module.exports = (LeanRC)->
         if aoAttributes._type is "#{@moduleName()}::#{@name}"
           @super arguments...
         else
-          [ModelClass] = @findModelByName aoAttributes._type
-          ModelClass?.new(aoAttributes, aoCollection) ? @super arguments...
+          RecordClass = @findModelByName aoAttributes._type
+          RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
 
 
     @attribute _key: String
@@ -395,6 +401,28 @@ module.exports = (LeanRC)->
           do (vsAttrName, voAttrValue)=>
             @[vsAttrName] = voAttrValue
         return
+
+
+    @public @static normalize: Function,
+      default: (ahPayload)->
+        unless ahPayload?
+          return null
+        vhResult = {}
+        for own asAttrName, ahAttrValue of @attributes
+          do (asAttrName, {transform} = ahAttrValue)->
+            vhResult[asAttrName] = transform().normalize ahPayload[asAttrName]
+        @new vhResult
+
+    @public @static serialize:   Function,
+      default: (aoRecord)->
+        unless aoRecord?
+          return null
+        vhResult = {}
+        for own asAttrName, ahAttrValue of @attributes
+          do (asAttrName, {transform} = ahAttrValue)->
+            vhResult[asAttrName] = transform().serialize aoRecord[asAttrName]
+        vhResult
+
 
     constructor: (aoProperties, aoCollection) ->
       super arguments...
