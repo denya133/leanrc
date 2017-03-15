@@ -171,11 +171,11 @@ module.exports = (LeanRC)->
             voData
         @["_#{@name}_attrs"] ?= {}
         @["_#{@name}_edges"] ?= {}
-        unless @["_#{@name}_attrs"][vsAttr]
+        if @["_#{@name}_attrs"][vsAttr]
+          throw new Error "attr `#{vsAttr}` has been defined previously"
+        else
           @["_#{@name}_attrs"][vsAttr] = opts
           @["_#{@name}_edges"][vsAttr] = opts if opts.through
-        else
-          throw new Error "attr `#{vsAttr}` has been defined previously"
         @public typeDefinition, opts
         return
 
@@ -205,12 +205,12 @@ module.exports = (LeanRC)->
             else if vcAttrType is Array and model is 'object'
               joi.array().items joi.object().empty(null).optional()
             else if vcAttrType isnt Array and not /.*[.].*/.test valuable
-              RecordClass.schema()
+              RecordClass.schema
             else if vcAttrType isnt Array and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
               RecordClass.attributes[prop_name].validate
             else if vcAttrType is Array and not /.*[.].*/.test valuable
-              joi.array().items RecordClass.schema()
+              joi.array().items RecordClass.schema
             else if vcAttrType is Array and /.*[.].*/.test valuable
               [..., prop_name] = valuable.split '.'
               joi.array().items RecordClass.attributes[prop_name].validate
@@ -218,10 +218,10 @@ module.exports = (LeanRC)->
           validate = -> {}
         opts.validate ?= validate
         @["_#{@name}_comps"] ?= {}
-        unless @["_#{@name}_comps"][vsAttr]
-          @["_#{@name}_comps"][vsAttr] = opts
-        else
+        if @["_#{@name}_comps"][vsAttr]
           throw new Error "comp `#{vsAttr}` has been defined previously"
+        else
+          @["_#{@name}_comps"][vsAttr] = opts
         @public typeDefinition, opts
         return
 

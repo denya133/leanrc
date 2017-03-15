@@ -9,15 +9,9 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public @static @virtual properties: Function,
+    @public @static @virtual relations: Function,
       args: []
       return: Object
-    @public @static @virtual property: Function,
-      args: [String, Object] #name, Object
-      return: RC::Constants.NILL
-    @public @static @virtual prop: Function,
-      args: [String, Object] #name, Object
-      return: RC::Constants.NILL
     @public @static @virtual belongsTo: Function,
       args: [String, Object, Object] # name, schema, opts
       return: RC::Constants.NILL
@@ -29,7 +23,7 @@ module.exports = (LeanRC)->
       return: RC::Constants.NILL
     @public @static @virtual inverseFor: Function,
       args: [String]
-      return: Object # Cucumber.inverseFor 'tomato' #-> {type: App::Tomato, name: 'cucumbers', kind: 'hasMany'}
+      return: Object
 
 
   return LeanRC::RelationsMixinInterface.initialize()
