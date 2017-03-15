@@ -187,36 +187,8 @@ module.exports = (LeanRC)->
     @public @static comp: Function,
       default: (typeDefinition, opts)->
         vsAttr = Object.keys(typeDefinition)[0]
-        vcAttrType = typeDefinition[vsAttr]
-        {model, valuable, valuableAs, get} = opts
-        model ?= inflect.singularize inflect.underscore vsAttr
         unless opts.get?
           return throw new Error '`lambda` options is required'
-        if valuable?
-          validate = =>
-            unless model in SIMPLE_TYPES
-              RecordClass = @findModelByName model
-            return if model in ['string', 'boolean', 'number']
-              joi[model]().empty(null).optional()
-            else if model is 'date'
-              joi.string().empty(null).optional()
-            else if vcAttrType isnt Array and model is 'object'
-              joi.object().empty(null).optional()
-            else if vcAttrType is Array and model is 'object'
-              joi.array().items joi.object().empty(null).optional()
-            else if vcAttrType isnt Array and not /.*[.].*/.test valuable
-              RecordClass.schema
-            else if vcAttrType isnt Array and /.*[.].*/.test valuable
-              [..., prop_name] = valuable.split '.'
-              RecordClass.attributes[prop_name].validate
-            else if vcAttrType is Array and not /.*[.].*/.test valuable
-              joi.array().items RecordClass.schema
-            else if vcAttrType is Array and /.*[.].*/.test valuable
-              [..., prop_name] = valuable.split '.'
-              joi.array().items RecordClass.attributes[prop_name].validate
-        else
-          validate = -> {}
-        opts.validate ?= validate
         @["_#{@name}_comps"] ?= {}
         if @["_#{@name}_comps"][vsAttr]
           throw new Error "comp `#{vsAttr}` has been defined previously"
