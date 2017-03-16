@@ -50,6 +50,9 @@ module.exports = (LeanRC)->
     @public getBatchSize: Function,
       default: -> @[ipoCursor].getBatchSize arguments...
 
+    @public close: Function,
+      default: -> @[ipoCursor].dispose()
+
     @public dispose: Function,
       default: -> @[ipoCursor].dispose()
 
