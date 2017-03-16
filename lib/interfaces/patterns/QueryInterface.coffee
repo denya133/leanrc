@@ -19,7 +19,7 @@ module.exports = (LeanRC)->
     @public @virtual $filter: Object
     @public @virtual $collect: Object
     @public @virtual $aggregate: Object
-    @public @virtual $into: Object
+    @public @virtual $into: [String, Object]
     @public @virtual $having: Object
     @public @virtual $sort: Object
     @public @virtual $limit: Number
@@ -34,7 +34,7 @@ module.exports = (LeanRC)->
     @public @virtual $insert: Object
     @public @virtual $update: Object
     @public @virtual $replace: Object
-    @public @virtual $return: Object
+    @public @virtual $return: [String, Object]
 
     @public @virtual forIn: Function,
       args: [Object] # definitions
@@ -76,7 +76,7 @@ module.exports = (LeanRC)->
       args: [Object] # definition
       return: QueryInterface
     @public @virtual remove: Function,
-      args: [Object] # definition
+      args: [[String, Object]] # definition
       return: QueryInterface
     @public @virtual insert: Function,
       args: [Object] # definition

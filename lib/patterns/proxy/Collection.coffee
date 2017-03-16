@@ -64,7 +64,7 @@ module.exports = (LeanRC)->
       default: (aoRecord)->
         voQuery = LeanRC::Query.new()
           .insert aoRecord
-          .into @collectionName()
+          .into @collectionFullName()
         @query voQuery
         return yes
 
@@ -97,7 +97,7 @@ module.exports = (LeanRC)->
     @public remove: Function,
       default: (query)->
         voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
+          .forIn '@doc': @collectionFullName()
           .filter query
           .remove()
         @query voQuery
@@ -116,7 +116,7 @@ module.exports = (LeanRC)->
     @public take: Function,
       default: (query)->
         voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
+          .forIn '@doc': @collectionFullName()
           .filter query
           .return '@doc'
         return @query voQuery
@@ -137,7 +137,7 @@ module.exports = (LeanRC)->
     @public override: Function,
       default: (query, aoRecord)->
         voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
+          .forIn '@doc': @collectionFullName()
           .filter query
           .replace aoRecord
         return @query voQuery
@@ -158,7 +158,7 @@ module.exports = (LeanRC)->
     @public patch: Function,
       default: (query, aoRecord)->
         voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
+          .forIn '@doc': @collectionFullName()
           .filter query
           .update aoRecord
         return @query voQuery
@@ -180,7 +180,7 @@ module.exports = (LeanRC)->
     @public forEach: Function,
       default: (lambda)->
         voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
+          .forIn '@doc': @collectionFullName()
           .return '@doc'
         @query voQuery
           .forEach lambda
@@ -189,7 +189,7 @@ module.exports = (LeanRC)->
     @public filter: Function,
       default: (lambda)->
         voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
+          .forIn '@doc': @collectionFullName()
           .return '@doc'
         return @query voQuery
           .filter lambda
@@ -197,7 +197,7 @@ module.exports = (LeanRC)->
     @public map: Function,
       default: (lambda)->
         voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
+          .forIn '@doc': @collectionFullName()
           .return '@doc'
         return @query voQuery
           .map lambda
@@ -205,7 +205,7 @@ module.exports = (LeanRC)->
     @public reduce: Function,
       default: (lambda, initialValue)->
         voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
+          .forIn '@doc': @collectionFullName()
           .return '@doc'
         return @query voQuery
           .reduce lambda, initialValue
@@ -214,7 +214,7 @@ module.exports = (LeanRC)->
     @public includes: Function,
       default: (id)->
         voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
+          .forIn '@doc': @collectionFullName()
           .filter '@doc._key': {$eq: id}
           .limit 1
           .return '@doc'
@@ -224,7 +224,7 @@ module.exports = (LeanRC)->
     @public exists: Function,
       default: (query)->
         voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
+          .forIn '@doc': @collectionFullName()
           .filter query
           .limit 1
           .return '@doc'
@@ -234,7 +234,7 @@ module.exports = (LeanRC)->
     @public length: Function, # количество объектов в коллекции
       default: ->
         voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionName()
+          .forIn '@doc': @collectionFullName()
           .count()
         return @query voQuery
           .first()
