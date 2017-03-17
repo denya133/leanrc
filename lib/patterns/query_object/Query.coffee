@@ -139,7 +139,7 @@ module.exports = (LeanRC)->
     @public $filter: Object
     @public $collect: Object
     @public $aggregate: Object
-    @public $into: Object
+    @public $into: [String, Object]
     @public $having: Object
     @public $sort: Object
     @public $limit: Number

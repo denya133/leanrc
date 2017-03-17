@@ -40,7 +40,8 @@ module.exports = (LeanRC)->
               if (voFilter = aoQuery.$filter)?
                 # TODO: здесь надо что нибудь придумать потому что внутри aoQuery.$filter может быть добольно сложный объект
               if (voLet = aoQuery.$let)?
-                # TODO: здесь тоже может быть сложный объект
+                for own asRef, aoValue of voLet
+                  voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
               voQuery = (voQuery ? qb).remove aoQuery.$remove
               if aoQuery.$into?
                 voQuery = voQuery.into aoQuery.$into
@@ -60,7 +61,8 @@ module.exports = (LeanRC)->
                 if (voFilter = aoQuery.$filter)?
                   # TODO: здесь надо что нибудь придумать потому что внутри aoQuery.$filter может быть добольно сложный объект
                 if (voLet = aoQuery.$let)?
-                  # TODO: здесь тоже может быть сложный объект
+                  for own asRef, aoValue of voLet
+                    voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
               vhObjectForInsert = @serializer.serialize voRecord
               voQuery = (voQuery ? qb).insert vhObjectForInsert
                 .into aoQuery.$into
