@@ -6,6 +6,7 @@
 _             = require 'lodash'
 { db }        = require '@arangodb'
 qb            = require 'aqb'
+Parser        = require 'mongo-parse' #mongo-parse@2.0.2
 RC            = require 'RC'
 
 # здесь же будем использовать ArangoCursor
@@ -34,6 +35,7 @@ module.exports = (LeanRC)->
                 voQuery = voQuery.filter qb.and vlJoinFilters...
               if (voFilter = aoQuery.$filter)?
                 # TODO: здесь надо что нибудь придумать потому что внутри aoQuery.$filter может быть добольно сложный объект
+                voSubQuery = Parser.parse voFilter # надо засунуть в функцию, т.к. будет рекурсивно вызываться.
               if (voLet = aoQuery.$let)?
                 for own asRef, aoValue of voLet
                   voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
