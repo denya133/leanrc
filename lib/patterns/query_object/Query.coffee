@@ -102,13 +102,13 @@ module.exports = (LeanRC)->
         $not: Object
         $nor: Array # not or # !(a||b) === !a && !b
 
+        # без вложенных условий и операторов - value конечное значение для сравнения
         $eq: RC::Constants.ANY # ==
         $ne: RC::Constants.ANY # !=
         $lt: RC::Constants.ANY # <
         $lte: RC::Constants.ANY # <=
         $gt: RC::Constants.ANY # >
         $gte: RC::Constants.ANY # >=
-        $like: String
 
         $in: Array # check value present in array
         $nin: Array # ... not present in array
@@ -122,8 +122,9 @@ module.exports = (LeanRC)->
         $type: String # check value type
 
         $mod: Array # [divisor, remainder] for example [4,0] делится ли на 4
-        $regex: RegExp # value must be string. ckeck it by RegExp.
+        $regex: [RegExp, String] # value must be string. ckeck it by RegExp.
 
+        $like: String
         $td: Boolean # this day (today)
         $ld: Boolean # last day (yesterday)
         $tw: Boolean # this week
