@@ -77,19 +77,6 @@ module.exports = (LeanRC)->
           qb.eq qb.mod(wrapReference(aoFirst), qb divisor), qb remainder
         $regex: (aoFirst, aoSecond)-> # value must be string. ckeck it by RegExp.
           qb.expr "REGEX_TEST(#{aoFirst.replace '@', ''}, \"#{String aoSecond}\")"
-        $like: (aoFirst, aoSecond)->
-          qb.expr "REGEX_TEST(#{aoFirst.replace '@', ''}, \"#{String aoSecond.replace '%', '.*'}\")"
-
-        # обдумав пришел к мысли что не нужен этот оператор. т.к. если надо для сравнения указать значение хранящееся в каком-то объекте, то в обозначении будет '@objRef.someProp'
-        # $get: (aoFirst, aoSecond)-> qb.ref(aoFirst).get aoSecond # aoFirst.aoSecond
-
-        # т.к. Parser не распарсивает части внутри $lt (и подобных), то такие операторы внутри where (FILTER) применять нельзя (надо до фильтрации объявить все необходимое через .let)
-        # $range: (aoFirst, aoSecond)-> qb.range aoFirst, aoSecond
-        # $add: (args...)-> qb.add args...
-        # $sub: (args...)-> qb.sub args...
-        # $mul: (args...)-> qb.mul args...
-        # $div: (args...)-> qb.div args...
-        # $neg: (aoFirst)-> qb.neg aoFirst
 
         # Datetime Query Operators
         $td: (aoFirst, aoSecond)-> # this day (today)

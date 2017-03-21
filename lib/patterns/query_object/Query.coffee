@@ -124,7 +124,6 @@ module.exports = (LeanRC)->
         $mod: Array # [divisor, remainder] for example [4,0] делится ли на 4
         $regex: [RegExp, String] # value must be string. ckeck it by RegExp.
 
-        $like: String
         $td: Boolean # this day (today)
         $ld: Boolean # last day (yesterday)
         $tw: Boolean # this week
