@@ -205,6 +205,7 @@ module.exports = (LeanRC)->
     @public parseQuery: Function,
       default: (aoQuery)->
         voQuery = null
+        aggUsed = aggPartial = intoUsed = intoPartial = finAggUsed = finAggPartial = null
         if aoQuery.$remove?
           do =>
             if aoQuery.$forIn?
@@ -307,7 +308,23 @@ module.exports = (LeanRC)->
               for own asRef, aoValue of voLet
                 voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
             if (voCollect = aoQuery.$collect)?
+              for own asRef, aoValue of voCollect
+                voQuery = voQuery.collect qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
             if (voAggregate = aoQuery.$aggregate)?
+              vsAggregate = (for own asRef, aoValue of voAggregate
+                do (asRef, aoValue)->
+                  "#{asRef.replace '@', ''} = #{aoValue}"
+              ).join ', '
+              aggUsed = _.escapeRegExp "FILTER {{AGGREGATE #{vsAggregate}}}"
+              if aoQuery.$collect?
+                aggPartial = "AGGREGATE #{vsAggregate}"
+              else
+                aggPartial = "COLLECT AGGREGATE #{vsAggregate}"
+              voQuery = voQuery.filter qb.expr "{{AGGREGATE #{vsAggregate}}}"
+            if (vsInto = aoQuery.$into)?
+              intoUsed = _.escapeRegExp "FILTER {{INTO #{vsInto}}}"
+              intoPartial = "INTO #{vsInto}"
+              query = query.filter qb.expr "{{INTO #{vsInto}}}"
             if (voHaving = aoQuery.$having)?
               voQuery = voQuery.filter @parseFilter Parser.parse voHaving
             if (voSort = aoQuery.$sort)?
@@ -320,22 +337,49 @@ module.exports = (LeanRC)->
               else
                 voQuery = voQuery.limit vnLimit
 
-            if (aoQuery.$avg ? aoQuery.$sum ? aoQuery.$min ? aoQuery.$max ? aoQuery.$count)?
+            if (aoQuery.$count)?
+              voQuery = voQuery.collectWithCountInto 'counter'
+                .return qb.ref('counter').then('counter').else('0')
+            else if (vsSum = aoQuery.$sum)?
+              finAggUsed = "RETURN {{COLLECT AGGREGATE result = SUM\\(TO_NUMBER\\(#{vsSum.replace '@', ''}\\)\\) RETURN result}}"
+              finAggPartial = "COLLECT AGGREGATE result = SUM(TO_NUMBER(#{vsSum.replace '@', ''})) RETURN result"
+              voQuery = voQuery.return qb.expr "{{#{finAggPartial}}}"
+            else if (vsMin = aoQuery.$min)?
+              voQuery = voQuery.sort qb.ref(vsMin.replace '@', '')
+                .limit 1
+                .return qb.ref(vsMin.replace '@', '')
+            else if (vsMax = aoQuery.$max)?
+              voQuery = voQuery.sort qb.ref(vsMax.replace '@', ''), 'DESC'
+                .limit 1
+                .return qb.ref(vsMax.replace '@', '')
+            else if (vsAvg = aoQuery.$avg)?
+              finAggUsed = "RETURN {{COLLECT AGGREGATE result = AVG\\(TO_NUMBER\\(#{vsSum.replace '@', ''}\\)\\) RETURN result}}"
+              finAggPartial = "COLLECT AGGREGATE result = AVG(TO_NUMBER(#{vsSum.replace '@', ''})) RETURN result"
+              voQuery = voQuery.return qb.expr "{{#{finAggPartial}}}"
+            else
+              if aoQuery.$return?
+                voReturn = if _.isString aoQuery.$return
+                  qb.ref aoQuery.$return.replace '@', ''
+                else if _.isObject aoQuery.$return
+                  vhObj = {}
+                  for own key, value of aoQuery.$return
+                    do (key, value)->
+                      vhObj[key] = qb.ref value.replace '@', ''
+                  vhObj
+                if aoQuery.$distinct
+                  voQuery = voQuery.returnDistinct voReturn
+                else
+                  voQuery = voQuery.return voReturn
+        vsQuery = voQuery.toAQL()
 
-            if aoQuery.$return?
-              voReturn = if _.isString aoQuery.$return
-                qb.ref aoQuery.$return.replace '@', ''
-              else if _.isObject aoQuery.$return
-                vhObj = {}
-                for own key, value of aoQuery.$return
-                  do (key, value)->
-                    vhObj[key] = qb.ref value.replace '@', ''
-                vhObj
-              if aoQuery.$distinct
-                voQuery = voQuery.returnDistinct voReturn
-              else
-                voQuery = voQuery.return voReturn
-        return voQuery.toAQL()
+        if aggUsed and new RegExp(aggUsed).test vsQuery
+          vsQuery = vsQuery.replace new RegExp(aggUsed), aggPartial
+        if intoUsed and new RegExp(intoUsed).test vsQuery
+          vsQuery = vsQuery.replace new RegExp(intoUsed), intoPartial
+        if finAggUsed and new RegExp(finAggUsed).test vsQuery
+          vsQuery = vsQuery.replace new RegExp(finAggUsed), finAggPartial
+
+        return vsQuery
 
     @public executeQuery: Function,
       default: (aoQuery, options)->
