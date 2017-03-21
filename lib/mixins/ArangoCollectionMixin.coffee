@@ -382,8 +382,8 @@ module.exports = (LeanRC)->
         return vsQuery
 
     @public executeQuery: Function,
-      default: (aoQuery, options)->
-        voNativeCursor = db._query aoQuery
+      default: (asQuery, options)->
+        voNativeCursor = db._query asQuery
         voCursor = LeanRC::ArangoCursor.new @delegate, voNativeCursor
         return voCursor
 
