@@ -212,7 +212,7 @@ module.exports = (LeanRC)->
       default: (aoNotification)->
         # написать код, который объявит все роуты из @constructor[cplRoutes]
         @constructor[cplRoutes].forEach (aoRouteDefinition)=>
-          @sendNotification 'defineRoute', aoRouteDefinition
+          @sendNotification LeanRC::Constants.DEFINE_ROUTE, aoRouteDefinition
 
         @constructor[cplResources]?.forEach (ResourceRouter)=>
           resourceRouter = ResourceRouter.new()

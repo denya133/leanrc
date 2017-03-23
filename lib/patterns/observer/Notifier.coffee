@@ -11,7 +11,7 @@ module.exports = (LeanRC)->
       default: "multitonKey for this Notifier not yet initialized!"
 
     ipsMultitonKey = @protected multitonKey: String
-    ipoFacade = @protected facade: LeanRC::FacadeInterface,
+    @public facade: LeanRC::FacadeInterface,
       get: ->
         unless @[ipsMultitonKey]?
           throw new Error Notifier.MULTITON_MSG
@@ -19,7 +19,7 @@ module.exports = (LeanRC)->
 
     @public sendNotification: Function,
       default: (asName, aoBody, asType)->
-        @[ipoFacade]?.sendNotification asName, aoBody, asType
+        @facade?.sendNotification asName, aoBody, asType
         return
 
     @public initializeNotifier: Function,

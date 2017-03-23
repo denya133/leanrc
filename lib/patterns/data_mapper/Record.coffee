@@ -245,9 +245,8 @@ module.exports = (LeanRC)->
               return
           get: ->
             vcRecord = opts.transform()
-            ipoFacade = Symbol.for 'facade'
             vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
-            voCollection = @collection[ipoFacade].retrieveProxy vsCollectionName
+            voCollection = @collection.facade.retrieveProxy vsCollectionName
             unless through
               @collection.take "@doc.#{refKey}": @[attr]
                 .first()
@@ -292,9 +291,8 @@ module.exports = (LeanRC)->
         opts.validate = -> joi.array().items opts.transform().schema
         opts.get = ->
           vcRecord = opts.transform()
-          ipoFacade = Symbol.for 'facade'
           vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
-          voCollection = @collection[ipoFacade].retrieveProxy vsCollectionName
+          voCollection = @collection.facade.retrieveProxy vsCollectionName
           unless opts.through
             @collection.take "@doc.#{opts.inverse}": @[opts.refKey]
           else
@@ -337,9 +335,8 @@ module.exports = (LeanRC)->
         opts.validate = -> opts.transform().schema
         opts.get = ->
           vcRecord = opts.transform()
-          ipoFacade = Symbol.for 'facade'
           vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
-          voCollection = @collection[ipoFacade].retrieveProxy vsCollectionName
+          voCollection = @collection.facade.retrieveProxy vsCollectionName
           @collection.take "@doc.#{opts.inverse}": @[opts.refKey]
             .first()
         @computed typeDefinition, opts

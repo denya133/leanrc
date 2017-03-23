@@ -66,17 +66,8 @@ module.exports = (LeanRC)->
     @public execute: Function,
       default: (aoNotification)->
         voBody = aoNotification.getBody()
-        switch aoNotification.getType()
-          when 'list'
-            @list voBody
-          when 'detail'
-            @detail voBody
-          when 'create'
-            @create voBody
-          when 'update'
-            @update voBody
-          when 'delete'
-            @delete voBody
+        voResult = @[aoNotification.getType()]? voBody
+        @sendNotification LeanRC::Constants.RESOURCE_RESULT, voResult, voBody.reverse
 
 
   return LeanRC::Resource.initialize()

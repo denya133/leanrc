@@ -1,0 +1,5 @@
+
+
+module.exports =
+  DEFINE_ROUTE:     'DEFINE_ROUTE'
+  RESOURCE_RESULT:  'RESOURCE_RESULT'

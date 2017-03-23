@@ -7,6 +7,7 @@ class LeanRC extends RC::Module
   @inheritProtected()
   # Utils: {}
   # Scripts: {}
+  Constants:    require './Constants'
 
   require('./interfaces/patterns/TransformInterface') LeanRC # done
   require('./interfaces/patterns/NotificationInterface') LeanRC # done
