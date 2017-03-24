@@ -4,207 +4,63 @@ inflect       = require('i')()
 status        = require 'statuses'
 RC            = require 'RC'
 
-HTTP_NOT_FOUND    = status 'not found'
-HTTP_CONFLICT     = status 'conflict'
-UNAUTHORIZED      = status 'unauthorized'
-FORBIDDEN         = status 'forbidden'
-UPGRADE_REQUIRED  = status 'upgrade required'
+
+# TODO возможно стоит переименовать в Gateway - потому что объединяет несколько эндпоинтов (минимум crud-эндпоинты) (или не Gateway а BaseGateway, CrudGateway)
+# по аналогии с Collection этот Gateway класс может хранить в качестве итемов (делегатов) объекты класса Endpoint
+# возможно Crud эндпоинты можно подмешать миксином к Gateway или к целевым (по необходимости, авось в каких то классах не нужны будут крудовые эндпоинты а там только кастомные)
 
 
 module.exports = (LeanRC)->
-  class LeanRC::Endpoint extends LeanRC::Proxy
+  class LeanRC::Endpoint extends RC::CoreObject
     @inheritProtected()
     @implements LeanRC::EndpointInterface
 
     @Module: LeanRC
 
-    @public @static swaggerDefinition: Function,
-      args: [String, Function]
-      return: RC::Constants.NILL
-      default: (asAction, lambda)->
-        vsAction = inflect.camelize asAction
-        @public "swaggerDefinitionFor#{vsAction}": Function,
-          args: [LeanRC::Endpoint] # над этим надо подумать
-          return: LeanRC::Endpoint # над этим надо подумать
-          default: lambda
-        return
+    @public gateway: LeanRC::GatewayInterface
 
-    @public @static keyName: Function,
-      default: ->
-        inflect.singularize inflect.underscore @name.replace 'Endpoint', ''
+    @public tag: Function,
+      default: (asName)->
+        return @
 
-    @public @static schema: Function,
-      default: ->
-        joi.object @::Model.serializableAttributes()
+    @public header: Function,
+      default: (asName, aoSchema, asDescription)->
+        return @
 
-    @public @static listSchema: Function,
-      default: ->
-        joi.object "#{inflect.pluralize inflect.underscore @::Model.name}": joi.array().items @schema()
+    @public pathParam: Function,
+      default: (asName, aoSchema, asDescription)->
+        return @
 
-    @public @static itemSchema: Function,
-      default: ->
-        joi.object "#{inflect.underscore @::Model.name}": @schema()
+    @public queryParam: Function,
+      default: (asName, aoSchema, asDescription)->
+        return @
 
-    @swaggerDefinition 'list', (endpoint)->
-      endpoint
-        .pathParam   'v', joi.string().required(), "
-          The version of api endpoint in format `vx.x`
-        "
-        .queryParam   'query', @querySchema, "
-          The query for finding
-          #{inflect.pluralize inflect.underscore @::Model.name}.
-        "
-        .response     @listSchema(), "
-          The #{inflect.pluralize inflect.underscore @::Model.name}.
-        "
-        .error        UNAUTHORIZED
-        .error        UPGRADE_REQUIRED
-        .summary      "
-          List of filtered #{inflect.pluralize inflect.underscore @::Model.name}
-        "
-        .description  "
-          Retrieves a list of filtered
-          #{inflect.pluralize inflect.underscore @::Model.name} by using query.
-        "
+    @public body: Function,
+      default: (aoSchema, alMimes, asDescription)->
+        return @
 
-    @swaggerDefinition 'detail', (endpoint)->
-      endpoint
-        .pathParam   'v', joi.string().required(), "
-          The version of api endpoint in format `vx.x`
-        "
-        .pathParam    @keyName(), @keySchema
-        .response     @itemSchema(), "
-          The #{inflect.singularize inflect.underscore @::Model.name}.
-        "
-        .error        HTTP_NOT_FOUND
-        .error        UNAUTHORIZED
-        .error        UPGRADE_REQUIRED
-        .summary      "
-          Fetch the #{inflect.singularize inflect.underscore @::Model.name}
-        "
-        .description  "
-          Retrieves the
-          #{inflect.singularize inflect.underscore @::Model.name} by its key.
-        "
+    @public response: Function,
+      default: (anStatus, aoSchema, alMimes, asDescription)->
+        return @
 
-    @swaggerDefinition 'create', (endpoint)->
-      endpoint
-        .pathParam   'v', joi.string().required(), "
-          The version of api endpoint in format `vx.x`
-        "
-        .body @itemSchema().required(), "
-          The #{inflect.singularize inflect.underscore @::Model.name} to create.
-        "
-        .response     201, @itemSchema(), "
-          The created #{inflect.singularize inflect.underscore @::Model.name}.
-        "
-        .error        HTTP_CONFLICT, "
-          The #{inflect.singularize inflect.underscore @::Model.name} already
-          exists.
-        "
-        .error        UNAUTHORIZED
-        .error        UPGRADE_REQUIRED
-        .summary      "
-          Create a new #{inflect.singularize inflect.underscore @::Model.name}
-        "
-        .description  "
-          Creates a new #{inflect.singularize inflect.underscore @::Model.name}
-          from the request body and
-          returns the saved document.
-        "
+    @public error: Function,
+      default: (anStatus, asDescription)->
+        return @
 
-    @swaggerDefinition 'update', (endpoint)->
-      endpoint
-        .pathParam   'v', joi.string().required(), "
-          The version of api endpoint in format `vx.x`
-        "
-        .pathParam @keyName(), @keySchema
-        .body         @itemSchema().required(), "
-          The data to replace the
-          #{inflect.singularize inflect.underscore @::Model.name} with.
-        "
-        .response     @itemSchema(), "
-          The new #{inflect.singularize inflect.underscore @::Model.name}.
-        "
-        .error        HTTP_NOT_FOUND
-        .error        HTTP_CONFLICT
-        .error        UNAUTHORIZED
-        .error        UPGRADE_REQUIRED
-        .summary      "
-          Replace the #{inflect.singularize inflect.underscore @::Model.name}
-        "
-        .description  "
-          Replaces an existing
-          #{inflect.singularize inflect.underscore @::Model.name} with the
-          request body and returns the new document.
-        "
+    @public summary: Function,
+      default: (asSummary)->
+        return @
 
-    @swaggerDefinition 'patch', (endpoint)->
-      endpoint
-        .pathParam   'v', joi.string().required(), "
-          The version of api endpoint in format `vx.x`
-        "
-        .pathParam @keyName(), @keySchema
-        .body         @itemSchema().description("
-          The data to update the
-          #{inflect.singularize inflect.underscore @::Model.name} with.
-        ").required()
-        .response     @itemSchema(), "
-          The updated #{inflect.singularize inflect.underscore @::Model.name}.
-        "
-        .error        HTTP_NOT_FOUND
-        .error        HTTP_CONFLICT
-        .error        UNAUTHORIZED
-        .error        UPGRADE_REQUIRED
-        .summary      "
-          Update the #{inflect.singularize inflect.underscore @::Model.name}
-        "
-        .description  "
-          Patches the #{inflect.singularize inflect.underscore @::Model.name}
-          with the request body and returns the updated document.
-        "
+    @public description: Function,
+      default: (asDescription)->
+        return @
 
-    @swaggerDefinition 'delete', (endpoint)->
-      endpoint
-        .pathParam   'v', joi.string().required(), "
-          The version of api endpoint in format `vx.x`
-        "
-        .pathParam @keyName(), @keySchema
-        .error        HTTP_NOT_FOUND
-        .error        UNAUTHORIZED
-        .error        UPGRADE_REQUIRED
-        .response     null
-        .summary      "
-          Remove the #{inflect.singularize inflect.underscore @::Model.name}
-        "
-        .description  "
-          Deletes the #{inflect.singularize inflect.underscore @::Model.name}
-          from the database.
-        "
+    @public deprecated: Function,
+      default: (abDeprecated)->
+        return @
 
-    @public @static keySchema: Object,
-      default: joi.string().required().description 'The key of the objects.'
-    @public @static querySchema: Object,
-      default: joi.string().empty('{}').optional().default '{}', '
-      The query for finding objects.
-    '
-
-    @public @static prepareItem: Function,
-      default: (item)->
-        key = opts.singularize ? inflect.singularize inflect.underscore @::Model.name
-        data = @serializeForClient item
-        return "#{key}": data
-
-    @public @static prepareList: Function,
-      default: (items, meta)->
-        key = opts.pluralize ? inflect.pluralize inflect.underscore @::Model.name
-        results = []
-        items.forEach (item) =>
-          results.push @serializeForClient item
-        return "#{key}": results, meta: meta
-
-    @public @static serializeForClient: Function,
-      default: (item)-> item
+    constructor: ({@gateway})->
+      super arguments...
 
 
   return LeanRC::Endpoint.initialize()
