@@ -1,13 +1,4 @@
-_             = require 'lodash'
-joi           = require 'joi'
-inflect       = require('i')()
-status        = require 'statuses'
 RC            = require 'RC'
-
-
-# TODO возможно стоит переименовать в Gateway - потому что объединяет несколько эндпоинтов (минимум crud-эндпоинты) (или не Gateway а BaseGateway, CrudGateway)
-# по аналогии с Collection этот Gateway класс может хранить в качестве итемов (делегатов) объекты класса Endpoint
-# возможно Crud эндпоинты можно подмешать миксином к Gateway или к целевым (по необходимости, авось в каких то классах не нужны будут крудовые эндпоинты а там только кастомные)
 
 
 module.exports = (LeanRC)->
@@ -19,44 +10,72 @@ module.exports = (LeanRC)->
 
     @public gateway: LeanRC::GatewayInterface
 
+    @public tags: Array
+    @public headers: Array
+    @public pathParams: Array
+    @public queryParams: Array
+    @public payload: Object
+    @public responses: Array
+    @public errors: Array
+    @public title: String
+    @public synopsis: String
+    @public isDeprecated: Boolean,
+      default: no
+
     @public tag: Function,
       default: (asName)->
+        @tags ?= []
+        @tags.push asName
         return @
 
     @public header: Function,
-      default: (asName, aoSchema, asDescription)->
+      default: (name, schema, description)->
+        @tags ?= []
+        @tags.push {name, schema, description}
         return @
 
     @public pathParam: Function,
-      default: (asName, aoSchema, asDescription)->
+      default: (name, schema, description)->
+        @tags ?= []
+        @tags.push {name, schema, description}
         return @
 
     @public queryParam: Function,
-      default: (asName, aoSchema, asDescription)->
+      default: (name, schema, description)->
+        @tags ?= []
+        @tags.push {name, schema, description}
         return @
 
     @public body: Function,
-      default: (aoSchema, alMimes, asDescription)->
+      default: (schema, mimes, description)->
+        @payload = {schema, mimes, description}
         return @
 
     @public response: Function,
-      default: (anStatus, aoSchema, alMimes, asDescription)->
+      default: (status, schema, mimes, description)->
+        @tags ?= []
+        @tags.push {status, schema, mimes, description}
         return @
 
     @public error: Function,
-      default: (anStatus, asDescription)->
+      default: (status, description)->
+        @tags ?= []
+        @tags.push {status, description}
         return @
 
     @public summary: Function,
       default: (asSummary)->
+        @title = asSummary
         return @
 
     @public description: Function,
       default: (asDescription)->
+        @synopsis = asDescription
         return @
 
     @public deprecated: Function,
       default: (abDeprecated)->
+        @isDeprecated = abDeprecated
         return @
 
     constructor: ({@gateway})->

@@ -1,12 +1,5 @@
-_             = require 'lodash'
-# joi           = require 'joi'
-inflect       = require('i')()
 RC            = require 'RC'
 
-
-# TODO возможно стоит переименовать в Gateway - потому что объединяет несколько эндпоинтов (минимум crud-эндпоинты) (или не Gateway а BaseGateway, CrudGateway)
-# по аналогии с Collection этот Gateway класс может хранить в качестве итемов (делегатов) объекты класса Endpoint
-# возможно Crud эндпоинты можно подмешать миксином к Gateway или к целевым (по необходимости, авось в каких то классах не нужны будут крудовые эндпоинты а там только кастомные)
 
 ###
 ```coffee
@@ -80,26 +73,6 @@ module.exports = (LeanRC)->
         {endpoints} = @getData()
         @[ipoEndpoints] = RC::Utils.extend {}, (@[ipoEndpoints] ? {}), endpoints
         return
-
-
-    # вдвойне под вопросом, т.к. за сериализацию на уровне вьюхи должен отвечать другой класс
-    # по задумке за эту часть должен отвечать ViewSerializer/Renderer который должен устанавливаться в медиаторе, поэтому здесь эта часть логики не нужна.
-    @public @static prepareItem: Function,
-      default: (item)->
-        key = opts.singularize ? inflect.singularize inflect.underscore @::Model.name
-        data = @serializeForClient item
-        return "#{key}": data
-
-    @public @static prepareList: Function,
-      default: (items, meta)->
-        key = opts.pluralize ? inflect.pluralize inflect.underscore @::Model.name
-        results = []
-        items.forEach (item) =>
-          results.push @serializeForClient item
-        return "#{key}": results, meta: meta
-
-    @public @static serializeForClient: Function,
-      default: (item)-> item
 
 
   return LeanRC::Gateway.initialize()

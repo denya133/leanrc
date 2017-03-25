@@ -142,10 +142,32 @@ module.exports = (ArangoExt)->
               return
         , action]...
 
-        @constructor["_swaggerDefFor_#{action}"]? [voEndpoint]...
-        # TODO: на счет свайгер дифинишенов как минимум дефолтные можно поместить в этом классе,
-        # однако что делать и где объявлять кастомные дефинишены для кастомных экшенов???
-        # вообще говоря надо выяснить как подключать свайгер к экспрессу (koa) чтобы добиться однотипности.
+        voGateway = @facade.retrieveProxy "#{resourceName}Gateway"
+        {
+          headers
+          pathParams
+          queryParams
+          payload
+          responses
+          errors
+          title
+          synopsis
+          isDeprecated
+        } = voGateway.swaggerDefinitionFor action
+          headers.forEach ({name, schema, description})->
+            voEndpoint.header name, schema, description
+          pathParams.forEach ({name, schema, description})->
+            voEndpoint.pathParam name, schema, description
+          queryParams.forEach ({name, schema, description})->
+            voEndpoint.queryParam name, schema, description
+          voEndpoint.body payload.schema, payload.mimes, payload.description
+          responses.forEach ({status, schema, mimes, description})->
+            voEndpoint.response status, schema, mimes, description
+          errors.forEach ({status, description})->
+            voEndpoint.error status, description
+          voEndpoint.summary title
+          voEndpoint.description synopsis
+          voEndpoint.deprecated isDeprecated
 
         # TODO: надо решить что с этим делать??? - т.к. в модуле нет больше контекста.
         # теоретически можно прямо здесь (где платформозависимый код) просто сделать вызов module.context.use voRouter
