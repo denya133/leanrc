@@ -1,14 +1,8 @@
 _             = require 'lodash'
-joi           = require 'joi'
+# joi           = require 'joi'
 inflect       = require('i')()
-status        = require 'statuses'
 RC            = require 'RC'
 
-HTTP_NOT_FOUND    = status 'not found'
-HTTP_CONFLICT     = status 'conflict'
-UNAUTHORIZED      = status 'unauthorized'
-FORBIDDEN         = status 'forbidden'
-UPGRADE_REQUIRED  = status 'upgrade required'
 
 # TODO возможно стоит переименовать в Gateway - потому что объединяет несколько эндпоинтов (минимум crud-эндпоинты) (или не Gateway а BaseGateway, CrudGateway)
 # по аналогии с Collection этот Gateway класс может хранить в качестве итемов (делегатов) объекты класса Endpoint
@@ -28,6 +22,33 @@ module.exports = (App)->
   return App::CrudGateway.initialize()
 ```
 
+```coffee
+module.exports = (App)->
+  App::PrepareModelCommand extends LeanRC::SimpleCommand
+    @public execute: Function,
+      default: ->
+        #...
+        @facade.registerProxy App::CrudGateway.new 'DefaultGateway',
+          entityName: null # какие-то конфиги и что-то опорное для подключения эндов
+        @facade.registerProxy App::CrudGateway.new 'CucumbersGateway',
+          entityName: 'cucumber'
+          schema: App::CucumberRecord.schema
+        @facade.registerProxy App::CrudGateway.new 'TomatosGateway',
+          entityName: 'tomato'
+          schema: App::TomatoRecord.schema
+          endpoints: {
+            changeColor: App::TomatosChangeColorEndpoint.new()
+          }
+        @facade.registerProxy LeanRC::Gateway.new 'AuthGateway',
+          entityName: 'user'
+          endpoints: {
+            signin: App::AuthSigninEndpoint.new()
+            signout: App::AuthSignoutEndpoint.new()
+            whoami: App::AuthWhoamiEndpoint.new()
+          }
+        #...
+        return
+```
 ###
 
 module.exports = (LeanRC)->
@@ -39,12 +60,10 @@ module.exports = (LeanRC)->
 
     ipoEndpoints = @private endpoints: Object
 
-    ipoSchema = @private schema: Object # под вопросом???
-
     @public swaggerDefinition: Function,
       args: [String, Function]
       return: RC::Constants.NILL
-      default: (asAction, lambda)->
+      default: (asAction, lambda = (aoData)-> aoData)->
         voEndpoint = lambda.apply @, [LeanRC::Endpoint.new(gateway: @)]
         @[ipoEndpoints] ?= {}
         @[ipoEndpoints][asAction] = voEndpoint
@@ -55,21 +74,16 @@ module.exports = (LeanRC)->
       return: LeanRC::EndpointInterface
       default: (asAction)-> @[ipoEndpoints]?[asAction]
 
-    # все что ниже под вопросом???
-
-    @public @static schema: Function,
-      default: ->
-        joi.object @::Model.serializableAttributes()
-
-    @public @static listSchema: Function,
-      default: ->
-        joi.object "#{inflect.pluralize inflect.underscore @::Model.name}": joi.array().items @schema()
-
-    @public @static itemSchema: Function,
-      default: ->
-        joi.object "#{inflect.underscore @::Model.name}": @schema()
+    @public onRegister: Function,
+      default: (args...)->
+        @super args...
+        {endpoints} = @getData()
+        @[ipoEndpoints] = RC::Utils.extend {}, (@[ipoEndpoints] ? {}), endpoints
+        return
 
 
+    # вдвойне под вопросом, т.к. за сериализацию на уровне вьюхи должен отвечать другой класс
+    # по задумке за эту часть должен отвечать ViewSerializer/Renderer который должен устанавливаться в медиаторе, поэтому здесь эта часть логики не нужна.
     @public @static prepareItem: Function,
       default: (item)->
         key = opts.singularize ? inflect.singularize inflect.underscore @::Model.name
