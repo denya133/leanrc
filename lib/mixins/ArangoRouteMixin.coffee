@@ -30,6 +30,9 @@ module.exports = (App)->
     @include LeanRC::ArangoRouteMixin
 
     @Module: App
+
+    @public routerName: String,
+      default: 'ApplicationRouter'
   return App::FoxxMediator.initialize()
 ```
 ###
@@ -50,10 +53,11 @@ module.exports = (ArangoExt)->
 
     @Module: ArangoExt
 
+    @public @virtual routerName: String
+
     @public listNotificationInterests: Function,
       default: ->
         [
-          LeanRC::Constants.DEFINE_ROUTE
           LeanRC::Constants.RESOURCE_RESULT
         ]
 
@@ -63,25 +67,24 @@ module.exports = (ArangoExt)->
         voBody = aoNotification.getBody()
         vsType = aoNotification.getType()
         switch vsName
-          case LeanRC::Constants.DEFINE_ROUTE
-            @createNativeRoute voBody
           case LeanRC::Constants.RESOURCE_RESULT
             @getViewComponent().emit vsType, voBody
         return
 
-    @public onRegister: Function,
+    @public onRegister: Function, # навешивают листенеры на @viewComponent
       # в express и koa тут можно создать сервер и положить его приватную перем.
       default: ->
         EventEmitter = require 'events'
         @setViewComponent new EventEmitter()
-        return # обычно навешивают ивент-листенеры на @viewComponent
+        @defineRoutes()
+        return
 
-    @public onRemove: Function,
+    @public onRemove: Function, # удаляют ивент-листенеры на @viewComponent
       default: ->
         voEmitter = @getViewComponent()
         voEmitter.eventNames().forEach (eventName)->
           voEmitter.removeAllListeners eventName
-        return # обычно удаляют ивент-листенеры на @viewComponent
+        return
 
     @public getLocks: Function,
       args: []
@@ -97,6 +100,15 @@ module.exports = (ArangoExt)->
           return # ничего не делаем, если `res.send` уже был вызван ранее
         # здесь надо пропустить данные через ViewSerializer и потом результат отправить на рендеринг, после чего отправить готовый ответ by `res.send`
         # !!! вопрос в том, как это сделать в наиболее удобной форме.
+
+    @public defineRoutes: Function,
+      args: []
+      return: RC::Constants.NILL
+      default: ->
+        voRouter = @facade.retrieveProxy @routerName
+        voRouter.routes.forEach (aoRoute)=>
+          @createNativeRoute aoRoute
+        return
 
     @public createNativeRoute: Function,
       args: [Object]

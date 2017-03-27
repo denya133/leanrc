@@ -26,7 +26,7 @@ RC            = require 'RC'
 
 
 module.exports = (LeanRC)->
-  class LeanRC::Router extends LeanRC::SimpleCommand
+  class LeanRC::Router extends LeanRC::Proxy
     @inheritProtected()
     @implements LeanRC::RouterInterface
 
@@ -208,16 +208,15 @@ module.exports = (LeanRC)->
       default: (lambda = ->)->
         @namespace null, module: '', prefix: '', at: 'collection', lambda
 
-    @public execute: Function,
-      default: (aoNotification)->
-        # написать код, который объявит все роуты из @constructor[cplRoutes]
-        @constructor[cplRoutes].forEach (aoRouteDefinition)=>
-          @sendNotification LeanRC::Constants.DEFINE_ROUTE, aoRouteDefinition
+    @public routes: Array,
+      get: ->
+        vlRoutes = []
+        vlRoutes = vlRoutes.concat @constructor[cplRoutes] ? []
 
         @constructor[cplResources]?.forEach (ResourceRouter)=>
           resourceRouter = ResourceRouter.new()
-          resourceRouter.execute aoNotification
-        return
+          vlRoutes = vlRoutes.concat resourceRouter.routes() ? []
+        return vlRoutes
 
     @public @static initialize: Function,
       default: ->
