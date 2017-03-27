@@ -4,17 +4,17 @@
 # но для хранения и получения данных должна обращаться к ArangoDB коллекциям.
 
 _             = require 'lodash'
-{ db }        = require '@arangodb'
-qb            = require 'aqb'
+# { db }        = require '@arangodb'
+# qb            = require 'aqb'
 Parser        = require 'mongo-parse' #mongo-parse@2.0.2
-moment        = require 'moment'
+# moment        = require 'moment'
 RC            = require 'RC'
 
-# здесь же будем использовать ArangoCursor
+# будем использовать этот миксин для посылки запросов из ноды в арангу например.
 
 
 module.exports = (LeanRC)->
-  class LeanRC::ArangoCollectionMixin extends RC::Mixin
+  class LeanRC::HttpCollectionMixin extends RC::Mixin
     @inheritProtected()
 
     @Module: LeanRC
@@ -383,9 +383,11 @@ module.exports = (LeanRC)->
 
     @public executeQuery: Function,
       default: (asQuery, options)->
+        # здесь надо посылать платформонезависимый http запрос к нужному апи-серверу - например RC::Utils.request - полифил для ноды/аранги
+        # конфиги апи сервера (урл,...) можно взять из @getData() тк. конфиги должны быть переданы при инстанцировании прокси.
         voNativeCursor = db._query asQuery
-        voCursor = LeanRC::ArangoCursor.new @delegate, voNativeCursor
+        voCursor = LeanRC::ArangoCursor.new @delegate, voNativeCursor # вместо этого курсора надо сделать курсор на основе массива.
         return voCursor
 
 
-  return LeanRC::ArangoCollectionMixin.initialize()
+  return LeanRC::HttpCollectionMixin.initialize()

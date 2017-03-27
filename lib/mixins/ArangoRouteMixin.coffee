@@ -100,6 +100,7 @@ module.exports = (ArangoExt)->
       args: []
       return: Object
       default: ->
+        # не учитываются имена коллекций, вызываемые из других сервисов.
         vrCollectionPrefix = new RegExp "^#{module.collectionPrefix}"
         vlCollectionNames = db._collections().reduce (aoCollection, alResults)->
           if vrCollectionPrefix.test aoCollection.name
