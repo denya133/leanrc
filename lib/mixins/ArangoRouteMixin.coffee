@@ -33,6 +33,8 @@ module.exports = (App)->
 
     @public routerName: String,
       default: 'ApplicationRouter'
+    @public jsonRendererName: String,
+      default: 'JsonRenderer'  # or 'ApplicationRenderer'
   return App::FoxxMediator.initialize()
 ```
 ###
@@ -49,11 +51,19 @@ module.exports = (App)->
 module.exports = (ArangoExt)->
   class ArangoExt::ArangoRouteMixin extends RC::Mixin
     @inheritProtected()
-    @implements LeanRC::RouteInterface # или вообще не указывать
+    # @implements LeanRC::RouteInterface # или вообще не указывать
 
     @Module: ArangoExt
 
     @public @virtual routerName: String
+
+    @public responseFormats: Array,
+      get: -> ['json', 'html', 'xml', 'atom']
+
+    @public @virtual jsonRendererName: String
+    @public @virtual htmlRendererName: String
+    @public @virtual xmlRendererName: String
+    @public @virtual atomRendererName: String
 
     @public listNotificationInterests: Function,
       default: ->
@@ -92,14 +102,39 @@ module.exports = (ArangoExt)->
       default: ->
         # вычислить относительно текущего @constructor.Module какие имена коллекций будут задействованы в этом модуле, и передать все эти имена на return
 
+    ipoRenderers = @private renderers: Object
+
+    @public rendererFor: Function,
+      args: [String]
+      return: LeanRC::RendererInterface
+      default: (asFormat)->
+        @[ipoRenderers] ?= {}
+        @[ipoRenderers][asFormat] ?= do (asFormat)=>
+          voRenderer = if @["#{asFormat}RendererName"]?
+            @facade.retrieveProxy @["#{asFormat}RendererName"]
+          voRenderer ?= LeanRC::Renderer.new()
+          voRenderer
+        @[ipoRenderers][asFormat]
+
     @public sendResponse: Function,
-      args: [Object, Object, Object]
+      args: [Object, Object, Object, Object]
       return: RC::Constants.NILL
-      default: (req, res, aoData)->
+      default: (req, res, aoData, {path, resource, action})->
         if aoData?.constructor?.name is 'SyntheticResponse'
           return # ничего не делаем, если `res.send` уже был вызван ранее
-        # здесь надо пропустить данные через ViewSerializer и потом результат отправить на рендеринг, после чего отправить готовый ответ by `res.send`
-        # !!! вопрос в том, как это сделать в наиболее удобной форме.
+        switch (vsFormat = req.accepts @responseFormats)
+          when 'json', 'html', 'xml', 'atom'
+            if @["#{vsFormat}RendererName"]?
+              voRendered = @rendererFor vsFormat
+                .render aoData, {path, resource, action}
+            else
+              res.setHeader 'Content-Type', 'text/plain'
+              voRendered = JSON.stringify aoData
+            res.send voRendered
+          else
+            res.setHeader 'Content-Type', 'text/plain'
+            res.send JSON.stringify aoData
+        return
 
     @public defineRoutes: Function,
       args: []
@@ -120,7 +155,7 @@ module.exports = (ArangoExt)->
         voEndpoint = voRouter[method]? [path, (req, res)=>
           reverse = crypto.genRandomAlphaNumbers 32
           @getViewComponent().once reverse, (voData)=>
-            @sendResponse req, res, voData
+            @sendResponse req, res, voData, {method, path, resource, action}
           try
             if method is 'get'
               @sendNotification resourceName, {req, res, reverse}, action
