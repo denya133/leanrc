@@ -98,9 +98,15 @@ module.exports = (ArangoExt)->
 
     @public getLocks: Function,
       args: []
-      return: Object # {read, write}
+      return: Object
       default: ->
-        # вычислить относительно текущего @constructor.Module какие имена коллекций будут задействованы в этом модуле, и передать все эти имена на return
+        vrCollectionPrefix = new RegExp "^#{module.collectionPrefix}"
+        vlCollectionNames = db._collections().reduce (aoCollection, alResults)->
+          if vrCollectionPrefix.test aoCollection.name
+            alResults.push aoCollection.name
+          alResults
+        , []
+        return read: vlCollectionNames, write: vlCollectionNames
 
     ipoRenderers = @private renderers: Object
 
