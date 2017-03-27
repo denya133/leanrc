@@ -154,20 +154,21 @@ module.exports = (ArangoExt)->
           synopsis
           isDeprecated
         } = voGateway.swaggerDefinitionFor action
-          headers.forEach ({name, schema, description})->
-            voEndpoint.header name, schema, description
-          pathParams.forEach ({name, schema, description})->
-            voEndpoint.pathParam name, schema, description
-          queryParams.forEach ({name, schema, description})->
-            voEndpoint.queryParam name, schema, description
+        headers?.forEach ({name, schema, description})->
+          voEndpoint.header name, schema, description
+        pathParams?.forEach ({name, schema, description})->
+          voEndpoint.pathParam name, schema, description
+        queryParams?.forEach ({name, schema, description})->
+          voEndpoint.queryParam name, schema, description
+        if payload?
           voEndpoint.body payload.schema, payload.mimes, payload.description
-          responses.forEach ({status, schema, mimes, description})->
-            voEndpoint.response status, schema, mimes, description
-          errors.forEach ({status, description})->
-            voEndpoint.error status, description
-          voEndpoint.summary title
-          voEndpoint.description synopsis
-          voEndpoint.deprecated isDeprecated
+        responses?.forEach ({status, schema, mimes, description})->
+          voEndpoint.response status, schema, mimes, description
+        errors?.forEach ({status, description})->
+          voEndpoint.error status, description
+        voEndpoint.summary title            if title?
+        voEndpoint.description synopsis     if synopsis?
+        voEndpoint.deprecated isDeprecated  if isDeprecated?
 
         # TODO: надо решить что с этим делать??? - т.к. в модуле нет больше контекста.
         # теоретически можно прямо здесь (где платформозависимый код) просто сделать вызов module.context.use voRouter
