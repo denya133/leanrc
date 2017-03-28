@@ -24,6 +24,10 @@ module.exports = (LeanRC)->
       default: (asName = null)->
         "#{@collectionPrefix()}#{asName ? @collectionName()}"
 
+    @public recordHasBeenChanged: Function,
+      default: (aoType, aoData)->
+        @facade.sendNotification LeanRC::Constants.RECORD_CHANGED, aoData, aoType
+
     @public customFilters: Object, # возвращает установленные кастомные фильтры с учетом наследования
       default: {}
       get: (__customFilters)->

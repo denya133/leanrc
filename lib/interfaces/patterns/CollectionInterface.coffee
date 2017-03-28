@@ -6,8 +6,9 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    # под вопросом ???? - вообще говоря прокси должен посылать к ядру сигнал
-    @public recordHasBeenChanged: Function, [], -> NILL
+    @public @virtual recordHasBeenChanged: Function,
+      args: [String, Object]
+      return: RC::Constants.NILL
 
     # в классе Proxy от которого будет наследоваться конкретный класс Collection есть метод onRegister в котором можно прописать подключение (или регистрацию) классов Рекорда и Сериализатора
 
