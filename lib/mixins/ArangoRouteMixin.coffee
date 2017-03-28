@@ -68,7 +68,7 @@ module.exports = (ArangoExt)->
     @public listNotificationInterests: Function,
       default: ->
         [
-          LeanRC::Constants.RESOURCE_RESULT
+          LeanRC::Constants.HANDLER_RESULT
         ]
 
     @public handleNotification: Function,
@@ -77,7 +77,7 @@ module.exports = (ArangoExt)->
         voBody = aoNotification.getBody()
         vsType = aoNotification.getType()
         switch vsName
-          case LeanRC::Constants.RESOURCE_RESULT
+          case LeanRC::Constants.HANDLER_RESULT
             @getViewComponent().emit vsType, voBody
         return
 

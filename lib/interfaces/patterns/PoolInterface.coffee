@@ -1,5 +1,5 @@
 # комманда эквивалентная контролеру в рельсах
-# в зависимости от сингала, будет запускаться нужный ресурс CucumbersResource
+# в зависимости от сингала, будет запускаться нужный ресурс CucumbersPool
 # а в зависимости от типа нотификейшена внутри инстанса ресурса
 # будет выполняться нужный экшен (метод) create, update, detail, list, delete
 
@@ -8,7 +8,7 @@
 RC = require 'RC'
 
 module.exports = (LeanRC)->
-  class LeanRC::ResourceInterface extends RC::Interface
+  class LeanRC::PoolInterface extends RC::Interface
     @inheritProtected()
 
     @Module: LeanRC
@@ -55,4 +55,4 @@ module.exports = (LeanRC)->
 
     # input and output декорирующих функций здесь не должно быть. Этим должны заниматься viewSerializers, которые должны объявляться в медиаторах либо в viewComponent's. (может быть их лучше назвать Presenter'ами, потому что рендеринг html перед отправкой в браузер должен осуществляться черезь подобные классы.)
 
-  return LeanRC::ResourceInterface.initialize()
+  return LeanRC::PoolInterface.initialize()

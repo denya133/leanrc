@@ -3,10 +3,10 @@
 RC = require 'RC'
 
 module.exports = (LeanRC)->
-  class LeanRC::Resource extends LeanRC::SimpleCommand
+  class LeanRC::Pool extends LeanRC::SimpleCommand
     @inheritProtected()
     @include RC::ChainsMixin
-    @implements LeanRC::ResourceInterface
+    @implements LeanRC::PoolInterface
 
     @Module: LeanRC
 
@@ -67,7 +67,7 @@ module.exports = (LeanRC)->
       default: (aoNotification)->
         voBody = aoNotification.getBody()
         voResult = @[aoNotification.getType()]? voBody
-        @sendNotification LeanRC::Constants.RESOURCE_RESULT, voResult, voBody.reverse
+        @sendNotification LeanRC::Constants.HANDLER_RESULT, voResult, voBody.reverse
 
 
-  return LeanRC::Resource.initialize()
+  return LeanRC::Pool.initialize()
