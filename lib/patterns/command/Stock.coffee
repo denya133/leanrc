@@ -3,10 +3,10 @@
 RC = require 'RC'
 
 module.exports = (LeanRC)->
-  class LeanRC::Pool extends LeanRC::SimpleCommand
+  class LeanRC::Stock extends LeanRC::SimpleCommand
     @inheritProtected()
     @include RC::ChainsMixin
-    @implements LeanRC::PoolInterface
+    @implements LeanRC::StockInterface
 
     @Module: LeanRC
 
@@ -61,7 +61,6 @@ module.exports = (LeanRC)->
 
     # здесь не декларируются before/after хуки, потому что их использование относится сугубо к реализации, но не к спецификации интерфейса как такового.
 
-    # input and output декорирующих функций здесь не должно быть. Этим должны заниматься viewSerializers, которые должны объявляться в медиаторах либо в viewComponent's. (может быть их лучше назвать Presenter'ами, потому что рендеринг html перед отправкой в браузер должен осуществляться черезь подобные классы.)
 
     @public execute: Function,
       default: (aoNotification)->
@@ -70,4 +69,4 @@ module.exports = (LeanRC)->
         @sendNotification LeanRC::Constants.HANDLER_RESULT, voResult, voBody.reverse
 
 
-  return LeanRC::Pool.initialize()
+  return LeanRC::Stock.initialize()

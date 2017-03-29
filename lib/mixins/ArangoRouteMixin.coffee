@@ -157,7 +157,7 @@ module.exports = (ArangoExt)->
       return: RC::Constants.NILL
       default: ({method, path, resource, action})->
         voRouter = FoxxRouter()
-        resourceName = inflect.camelize inflect.underscore "#{resource.replace /[/]/g, '_'}Resource"
+        resourceName = inflect.camelize inflect.underscore "#{resource.replace /[/]/g, '_'}Stock"
 
         voEndpoint = voRouter[method]? [path, (req, res)=>
           reverse = crypto.genRandomAlphaNumbers 32
@@ -176,7 +176,22 @@ module.exports = (ArangoExt)->
                   write: write
                   allowImplicit: no
                 action: (params)->
-                  params.self.sendNotification params.resourceName, {params.req, params.res, params.reverse}, params.action
+                  currentUserId = params.req.session.uid
+                  {
+                    queryParams
+                    pathPatams
+                    headers
+                    body
+                  } = params.req
+                  voMessage = {
+                    queryParams
+                    pathPatams
+                    currentUserId
+                    headers
+                    body
+                  }
+                  voMessage.reverse = params.reverse
+                  params.self.sendNotification params.resourceName, voMessage, params.action
                 params: {resourceName, action, req, res, reverse, self}
             queues._updateQueueDelay()
           catch err
