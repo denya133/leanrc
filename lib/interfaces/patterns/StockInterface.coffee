@@ -13,14 +13,22 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public @virtual Collection: RC::Class # like Model in FoxxMC::Controller
+    @public @virtual entityName: String
+    @public @virtual keyName: String
+    @public @virtual itemEntityName: String
+    @public @virtual listEntityName: String
+    @public @virtual collectionName: String
+    @public @virtual collection: LeanRC::CollectionInterface
 
-    # под вопросом
-    @public @virtual query: Object
+    @public @virtual queryParams: Object
+    @public @virtual pathPatams: Object
+    @public @virtual currentUserId: String
+    @public @virtual headers: Object
     @public @virtual body: Object
+
+    @public @virtual query: Object
     @public @virtual recordId: String
-    @public @virtual patchData: Object
-    @public @virtual currentUser: RC::Constants.ANY
+    @public @virtual recordBody: Object
 
 
     @public @static @virtual actions: Function,
@@ -30,10 +38,6 @@ module.exports = (LeanRC)->
       args: [Object, Object] # nameDefinition, config
       return: String
 
-
-    @public @virtual permitBody: Function, # через эту функцию должен пропускаться payload пришедший от браузера
-      args: []
-      return: RC::Constants.NILL
 
     @public @virtual list: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
@@ -51,8 +55,5 @@ module.exports = (LeanRC)->
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
 
-    # здесь не декларируются before/after хуки, потому что их использование относится сугубо к реализации, но не к спецификации интерфейса как такового.
-
-    # input and output декорирующих функций здесь не должно быть. Этим должны заниматься viewSerializers, которые должны объявляться в медиаторах либо в viewComponent's. (может быть их лучше назвать Presenter'ами, потому что рендеринг html перед отправкой в браузер должен осуществляться черезь подобные классы.)
 
   return LeanRC::StockInterface.initialize()
