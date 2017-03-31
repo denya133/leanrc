@@ -9,11 +9,11 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public deserialize: Function,
+    @public @static normalize: Function,
       default: (serialized)->
         if _.isNil(serialized) then null else String serialized
 
-    @public serialize: Function,
+    @public @static serialize: Function,
       default: (deserialized)->
         if _.isNil(deserialized) then null else String deserialized
 

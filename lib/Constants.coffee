@@ -1,0 +1,5 @@
+
+
+module.exports =
+  HANDLER_RESULT:  'HANDLER_RESULT'
+  RECORD_CHANGED:  'RECORD_CHANGED'

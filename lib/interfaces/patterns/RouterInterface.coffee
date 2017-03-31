@@ -58,5 +58,7 @@ module.exports = (LeanRC)->
       args: [[Function, RC::Constants.NILL]] # lambda
       return: RC::Constants.ANY
 
+    @public @virtual routes: Array
+
 
   return LeanRC::RouterInterface.initialize()

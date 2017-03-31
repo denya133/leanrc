@@ -6,90 +6,60 @@ RC = require 'RC'
 module.exports = (LeanRC)->
   class LeanRC::RecordInterface extends RC::Interface
     @inheritProtected()
+    @include LeanRC::TransformInterface
 
     @Module: LeanRC
 
     @public @virtual collection: LeanRC::CollectionInterface
 
-    # объявлю пока здесь, чтобы не забыть
-    @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
+    @public @static @virtual schema: Object
 
-    # под вопросом ??????
-    # @public @static schema: JoiSchema # это используется в медиаторе на входе и выходе, поэтому это надо объявить там.
+    @public @static @virtual parseRecordName: Function,
+      args: [String]
+      return: Array
 
+    @public @virtual parseRecordName: Function,
+      args: [String]
+      return: Array
 
-    # под вопросом ??????
-    @public @static parseModelName: Function, [String], -> Array
-    @public @static findModelByName: Function, [String], -> Array
-    @public findModelByName: Function, [String], -> Array
-    @public parseModelName: Function, [String], -> Array
+    # # под вопросом ?????? возможно надо искать через (из) модуля
+    # @public @static findModelByName: Function, [String], -> Array
+    # @public findModelByName: Function, [String], -> Array
 
-
-
-    # здесь не декларируются before/after хуки, потому что их использование относится сугубо к реализации, но не к спецификации интерфейса как такового.
-
-
-
-    # под вопросом ??????
-    @public updateEdges: Function, [ANY], -> ANY # any type
-
-
-
-    # под вопросом ?????? # возможно надо это определять в сериалайзере
-    @public getSnapshot: Function, [], -> Object
-    @private _forClient: Function, [Object], -> Object
-    @public @static serializableAttributes: Function, [], -> Object
-    @public @static serializeFromBatch: Function, [Object], -> Object
-    @public @static serializeFromClient: Function, [Object], -> Object
-    @public serializeForClient: Function, [Object], -> Object
-
-
-
+    # # под вопросом ??????
+    # @public updateEdges: Function, [ANY], -> ANY # any type
 
 
     @public @static @virtual parentClassNames: Function,
       args: [[RC::Class, RC::Constants.NILL]]
       return: Array
 
-    # @private @static __attrs: Object
-    # @private @static _attrs: Function, [], -> Object
     @public @static @virtual attributes: Function,
       args: []
       return: Object
-    # @private @static __edges: Object
-    # @private @static _edges: Function, [], -> Object
     @public @static @virtual edges: Function,
       args: []
       return: Object
-    # @private @static __props: Object
-    # @private @static _props: Function, [], -> Object
-    @public @static @virtual properties: Function,
-      args: []
-      return: Object
-    # @private @static __comps: Object
-    # @private @static _comps: Function, [], -> Object
     @public @static @virtual computeds: Function,
       args: []
       return: Object
 
     @public @static @virtual attribute: Function,
-      args: [String, Object, Object] #name, schema, Object
+      args: [Object, Object] #typeDefinition, opts
       return: RC::Constants.NILL
     @public @static @virtual attr: Function,
-      args: [String, Object, Object] #name, schema, Object
-      return: RC::Constants.NILL
-    @public @static @virtual property: Function,
-      args: [String, Object] #name, Object
-      return: RC::Constants.NILL
-    @public @static @virtual prop: Function,
-      args: [String, Object] #name, Object
+      args: [Object, Object] #typeDefinition, opts
       return: RC::Constants.NILL
     @public @static @virtual computed: Function,
-      args: [String, Object, Function] #name, opts, lambda
+      args: [Object, Object] #typeDefinition, opts
       return: RC::Constants.NILL
     @public @static @virtual comp: Function,
-      args: [String, Object, Function] #name, opts, lambda
+      args: [Object, Object] #typeDefinition, opts
       return: RC::Constants.NILL
+
+    @public @static @virtual relations: Function,
+      args: []
+      return: Object
     @public @static @virtual belongsTo: Function,
       args: [String, Object, Object] # name, schema, opts
       return: RC::Constants.NILL
@@ -99,56 +69,29 @@ module.exports = (LeanRC)->
     @public @static @virtual hasOne: Function,
       args: [String, Object] #name, opts
       return: RC::Constants.NILL
+    @public @static @virtual inverseFor: Function,
+      args: [String]
+      return: Object
+
     @public @static @virtual new: Function,
       args: [Object] #attributes
       return: LeanRC::RecordInterface
-    @public @static @virtual inverseFor: Function,
-      args: [String]
-      return: Object # Cucumber.inverseFor 'tomato' #-> {type: App::Tomato, name: 'cucumbers', kind: 'hasMany'}
-    @public @static @virtual validate: Function, # что внутри делать не понятно.
-      args: [String, Object] #attribute, options
-      return: RC::Constants.NILL
 
-    @public @virtual _key: String
-    @public @virtual _rev: String
-    @public @virtual _type: String
-    @public @virtual isHidden: Boolean
-    @public @virtual createdAt: Date
-    @public @virtual updatedAt: Date
-    @public @virtual id: String
-    @public @virtual rev: String
-    @public @virtual type: String
-
-    @public @virtual validate: Function,
-      args: []
-      return: RecordInterface
-    # @public beforeValidate: Function, [], -> NILL
-    # @public afterValidate: Function, [], -> NILL
     @public @virtual save: Function,
       args: []
       return: RecordInterface
-    # @public beforeSave: Function, [], -> NILL
-    # @public afterSave: Function, [ANY], -> ANY # any type
     @public @virtual create: Function,
       args: []
       return: RecordInterface
-    # @public beforeCreate: Function, [], -> NILL
-    # @public afterCreate: Function, [ANY], -> ANY # any type
     @public @virtual update: Function,
       args: []
       return: RecordInterface
-    # @public beforeUpdate: Function, [], -> NILL
-    # @public afterUpdate: Function, [ANY], -> ANY # any type
     @public @virtual delete: Function,
       args: []
       return: RecordInterface
-    # @public beforeDelete: Function, [], -> NILL
-    # @public afterDelete: Function, [ANY], -> ANY # any type
     @public @virtual destroy: Function,
       args: []
       return: RecordInterface
-    # @public beforeDestroy: Function, [], -> NILL
-    # @public afterDestroy: Function, [], -> NILL
 
     @public @virtual attributes: Function, # метод должен вернуть список атрибутов данного рекорда.
       args: []
@@ -157,9 +100,6 @@ module.exports = (LeanRC)->
       args: []
       return: LeanRC::RecordInterface
     @public @virtual copy: Function,
-      args: []
-      return: LeanRC::RecordInterface
-    @public @virtual deepCopy: Function,
       args: []
       return: LeanRC::RecordInterface
     @public @virtual decrement: Function,

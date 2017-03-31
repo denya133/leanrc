@@ -9,7 +9,7 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public deserialize: Function,
+    @public @static normalize: Function,
       default: (serialized)->
         if _.isNil serialized
           return null
@@ -17,7 +17,7 @@ module.exports = (LeanRC)->
           transformed = Number serialized
           return if _.isNumber(transformed) then transformed else null
 
-    @public serialize: Function,
+    @public @static serialize: Function,
       default: (deserialized)->
         if _.isNil deserialized
           return null

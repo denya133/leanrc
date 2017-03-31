@@ -13,11 +13,11 @@ module.exports = (LeanRC)->
     @public @virtual collection: LeanRC::CollectionInterface
 
     @public @virtual normalize: Function, # virtual declaration of method
-      args: [RC::Constants.ANY] # payload
-      return: [RC::Constants.ANY]
+      args: [RC::Class, RC::Constants.ANY] # payload
+      return: [LeanRC::RecordInterface]
     @public @virtual serialize:   Function, # virtual declaration of method
       args: [LeanRC::RecordInterface, Object] # record, options
-      return: Object
+      return: RC::Constants.ANY
 
 
   return LeanRC::SerializerInterface.initialize()

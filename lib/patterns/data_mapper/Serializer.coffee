@@ -13,11 +13,13 @@ module.exports = (LeanRC)->
     @public collection: LeanRC::CollectionInterface
 
     @public normalize: Function,
-      default: (payload)->
+      default: (acRecord, ahPayload)->
+        acRecord.normalize ahPayload
 
     @public serialize: Function,
-      default: (record, options)->
-
+      default: (aoRecord, options = null)->
+        vcRecord = aoRecord.constructor
+        vcRecord.serialize aoRecord, options
 
 
   return LeanRC::Serializer.initialize()

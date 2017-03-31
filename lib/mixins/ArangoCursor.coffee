@@ -50,6 +50,9 @@ module.exports = (LeanRC)->
     @public getBatchSize: Function,
       default: -> @[ipoCursor].getBatchSize arguments...
 
+    @public close: Function,
+      default: -> @[ipoCursor].dispose()
+
     @public dispose: Function,
       default: -> @[ipoCursor].dispose()
 
@@ -130,6 +133,17 @@ module.exports = (LeanRC)->
           while @hasNext()
             _initialValue = lambda _initialValue, @next(acRecord), index++
           _initialValue
+        catch err
+          @dispose()
+          throw err
+
+    @public first: Function,
+      default: (acRecord = null)->
+        try
+          if @hasNext()
+            @next(acRecord)
+          else
+            null
         catch err
           @dispose()
           throw err

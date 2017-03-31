@@ -102,13 +102,13 @@ module.exports = (LeanRC)->
         $not: Object
         $nor: Array # not or # !(a||b) === !a && !b
 
+        # без вложенных условий и операторов - value конечное значение для сравнения
         $eq: RC::Constants.ANY # ==
         $ne: RC::Constants.ANY # !=
         $lt: RC::Constants.ANY # <
         $lte: RC::Constants.ANY # <=
         $gt: RC::Constants.ANY # >
         $gte: RC::Constants.ANY # >=
-        $like: String
 
         $in: Array # check value present in array
         $nin: Array # ... not present in array
@@ -122,7 +122,7 @@ module.exports = (LeanRC)->
         $type: String # check value type
 
         $mod: Array # [divisor, remainder] for example [4,0] делится ли на 4
-        $regex: RegExp # value must be string. ckeck it by RegExp.
+        $regex: [RegExp, String] # value must be string. ckeck it by RegExp.
 
         $td: Boolean # this day (today)
         $ld: Boolean # last day (yesterday)
@@ -139,7 +139,7 @@ module.exports = (LeanRC)->
     @public $filter: Object
     @public $collect: Object
     @public $aggregate: Object
-    @public $into: Object
+    @public $into: [String, Object]
     @public $having: Object
     @public $sort: Object
     @public $limit: Number
@@ -150,6 +150,10 @@ module.exports = (LeanRC)->
     @public $max: String # '@doc.price'
     @public $count: Boolean # yes or not present
     @public $distinct: Boolean # yes or not present
+    @public $remove: Boolean
+    @public $insert: Object
+    @public $update: Object
+    @public $replace: Object
     @public $return: Object
 
     @public forIn: Function,
@@ -201,6 +205,22 @@ module.exports = (LeanRC)->
     @public distinct: Function,
       default: ->
         @$distinct = yes
+        return @
+    @public remove: Function,
+      default: ->
+        @$remove = yes
+        return @
+    @public insert: Function,
+      default: (aoDefinition)->
+        @$insert = aoDefinition
+        return @
+    @public update: Function,
+      default: (aoDefinition)->
+        @$update = aoDefinition
+        return @
+    @public replace: Function,
+      default: (aoDefinition)->
+        @$replace = aoDefinition
         return @
     @public return: Function,
       default: (aoDefinition)->
