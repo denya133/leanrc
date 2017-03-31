@@ -29,7 +29,10 @@ class LeanRC extends RC::Module
   require('./interfaces/patterns/PipeFittingInterface') LeanRC
   require('./interfaces/patterns/PipeMessageInterface') LeanRC
   require('./interfaces/patterns/RendererInterface') LeanRC
+  # require('./interfaces/patterns/ResourceInterface') LeanRC
   require('./interfaces/patterns/StockInterface') LeanRC
+  require('./interfaces/patterns/RouterInterface') LeanRC
+  # require('./interfaces/patterns/RouteInterface') LeanRC
 
   require('./interfaces/core/ControllerInterface') LeanRC
   require('./interfaces/core/ModelInterface') LeanRC
@@ -54,6 +57,10 @@ class LeanRC extends RC::Module
 
   require('./patterns/proxy/Proxy') LeanRC
   require('./patterns/proxy/Collection') LeanRC
+  require('./patterns/proxy/Gateway') LeanRC
+  require('./patterns/proxy/Renderer') LeanRC
+  require('./patterns/proxy/Resource') LeanRC
+  require('./patterns/proxy/Router') LeanRC
 
   require('./patterns/mediator/Mediator') LeanRC # done
 
