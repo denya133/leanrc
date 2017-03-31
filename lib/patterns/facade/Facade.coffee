@@ -116,6 +116,7 @@ module.exports = (LeanRC)->
         return
 
     constructor: (asKey)->
+      super arguments...
       if Facade[cphInstanceMap][asKey]?
         throw new Error Facade.MULTITON_MSG
       @initializeNotifier asKey

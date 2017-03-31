@@ -36,6 +36,7 @@ module.exports = (LeanRC)->
         return
 
     constructor: (amNotifyMethod, aoNotifyContext)->
+      super arguments...
       @setNotifyMethod amNotifyMethod
       @setNotifyContext aoNotifyContext
 

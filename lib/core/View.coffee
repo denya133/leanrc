@@ -118,6 +118,7 @@ module.exports = (LeanRC)->
       default: ->
 
     constructor: (asKey)->
+      super arguments...
       if View[cphInstanceMap][asKey]
         throw Error View.MULTITON_MSG
       View[cphInstanceMap][asKey] = @

@@ -64,6 +64,7 @@ module.exports = (LeanRC)->
         @[ipoView] = LeanRC::View.getInstance @[ipsMultitonKey]
 
     constructor: (asKey)->
+      super arguments...
       if Controller[cphInstanceMap][asKey]
         throw new Error Controller.MULTITON_MSG
       Controller[cphInstanceMap][asKey] = @

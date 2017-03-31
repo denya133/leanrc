@@ -28,7 +28,7 @@ module.exports = (LeanRC)->
       default: -> return
 
     constructor: (asProxyName, ahData)->
-      @super arguments...
+      super arguments...
 
       @[ipsProxyName] = asProxyName ? @constructor.name
 

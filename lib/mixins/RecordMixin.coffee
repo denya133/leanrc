@@ -1,5 +1,6 @@
 _ = require 'lodash'
 joi = require 'joi'
+inflect = do require 'i'
 
 RC = require 'RC'
 

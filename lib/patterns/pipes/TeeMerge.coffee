@@ -13,6 +13,7 @@ module.exports = (LeanRC)->
         aoInput.connect @
 
     constructor: (input1=null, input2=null)->
+      super arguments...
       if input1?
         @connectInput input1
       if input2?

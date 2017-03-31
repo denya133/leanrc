@@ -1,3 +1,5 @@
+inflect = do require 'i'
+_ = require 'lodash'
 RC = require 'RC'
 
 
