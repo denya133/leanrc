@@ -4,34 +4,29 @@ LeanRC = require.main.require 'lib'
 StringTransform = LeanRC::StringTransform
 
 describe 'StringTransform', ->
-  describe '.new', ->
-    it 'should create new boolean transform', ->
-      expect ->
-        transform = StringTransform.new()
-      .to.not.throw Error
-  describe '#deserialize', ->
-    it 'should deserialize null value', ->
-      expect StringTransform.new().deserialize null
+  describe '.normalize', ->
+    it 'should normalize null value', ->
+      expect StringTransform.normalize null
       .to.be.null
-    it 'should deserialize boolean value', ->
-      expect StringTransform.new().deserialize yes
+    it 'should normalize boolean value', ->
+      expect StringTransform.normalize yes
       .to.equal 'true'
-    it 'should deserialize string value', ->
-      expect StringTransform.new().deserialize 'True'
+    it 'should normalize string value', ->
+      expect StringTransform.normalize 'True'
       .to.equal 'True'
-    it 'should deserialize number value', ->
-      expect StringTransform.new().deserialize 1
+    it 'should normalize number value', ->
+      expect StringTransform.normalize 1
       .to.equal '1'
-  describe '#serialize', ->
+  describe '.serialize', ->
     it 'should serialize null value', ->
-      expect StringTransform.new().serialize null
+      expect StringTransform.serialize null
       .to.be.null
     it 'should serialize boolean value', ->
-      expect StringTransform.new().serialize yes
+      expect StringTransform.serialize yes
       .to.equal 'true'
     it 'should serialize string value', ->
-      expect StringTransform.new().serialize 'True'
+      expect StringTransform.serialize 'True'
       .to.equal 'True'
     it 'should serialize number value', ->
-      expect StringTransform.new().serialize 1
+      expect StringTransform.serialize 1
       .to.equal '1'

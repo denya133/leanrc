@@ -4,42 +4,37 @@ LeanRC = require.main.require 'lib'
 DateTransform = LeanRC::DateTransform
 
 describe 'DateTransform', ->
-  describe '.new', ->
-    it 'should create new boolean transform', ->
-      expect ->
-        transform = DateTransform.new()
-      .to.not.throw Error
-  describe '#deserialize', ->
+  describe '.normalize', ->
     it 'should deserialize null value', ->
-      expect DateTransform.new().deserialize null
+      expect DateTransform.normalize null
       .to.be.null
     it 'should deserialize date value', ->
       date = new Date
-      expect DateTransform.new().deserialize date.toISOString()
+      expect DateTransform.normalize date.toISOString()
       .to.eql date
     it 'should deserialize boolean value', ->
-      expect DateTransform.new().deserialize yes
+      expect DateTransform.normalize yes
       .to.eql new Date 1
     it 'should deserialize string value', ->
-      expect DateTransform.new().deserialize 'True'
+      expect DateTransform.normalize 'True'
       .to.be.NaN
     it 'should deserialize number value', ->
-      expect DateTransform.new().deserialize 1
+      expect DateTransform.normalize 1
       .to.eql new Date 1
-  describe '#serialize', ->
+  describe '.serialize', ->
     it 'should serialize null value', ->
-      expect DateTransform.new().serialize null
+      expect DateTransform.serialize null
       .to.be.null
     it 'should serialize date value', ->
       date = new Date
-      expect DateTransform.new().serialize date
+      expect DateTransform.serialize date
       .to.eql date.toISOString()
     it 'should serialize boolean value', ->
-      expect DateTransform.new().serialize yes
+      expect DateTransform.serialize yes
       .to.be.null
     it 'should serialize string value', ->
-      expect DateTransform.new().serialize 'True'
+      expect DateTransform.serialize 'True'
       .to.be.null
     it 'should serialize number value', ->
-      expect DateTransform.new().serialize 1
+      expect DateTransform.serialize 1
       .to.be.null

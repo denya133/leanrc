@@ -4,34 +4,29 @@ LeanRC = require.main.require 'lib'
 Transform = LeanRC::Transform
 
 describe 'Transform', ->
-  describe '.new', ->
-    it 'should create new boolean transform', ->
-      expect ->
-        transform = Transform.new()
-      .to.not.throw Error
-  describe '#deserialize', ->
-    it 'should deserialize null value', ->
-      expect Transform.new().deserialize null
+  describe '.normalize', ->
+    it 'should normalize null value', ->
+      expect Transform.normalize null
       .to.be.null
-    it 'should deserialize boolean value', ->
-      expect Transform.new().deserialize yes
+    it 'should normalize boolean value', ->
+      expect Transform.normalize yes
       .to.be.true
-    it 'should deserialize string value', ->
-      expect Transform.new().deserialize 'True'
+    it 'should normalize string value', ->
+      expect Transform.normalize 'True'
       .to.equal 'True'
-    it 'should deserialize number value', ->
-      expect Transform.new().deserialize 1
+    it 'should normalize number value', ->
+      expect Transform.normalize 1
       .to.equal 1
-  describe '#serialize', ->
+  describe '.serialize', ->
     it 'should serialize null value', ->
-      expect Transform.new().serialize null
+      expect Transform.serialize null
       .to.be.null
     it 'should serialize boolean value', ->
-      expect Transform.new().serialize yes
+      expect Transform.serialize yes
       .to.be.true
     it 'should serialize string value', ->
-      expect Transform.new().serialize 'True'
+      expect Transform.serialize 'True'
       .to.equal 'True'
     it 'should serialize number value', ->
-      expect Transform.new().serialize 1
+      expect Transform.serialize 1
       .to.equal 1
