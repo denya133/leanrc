@@ -14,7 +14,7 @@ module.exports = (LeanRC)->
     @public collectionName: Function,
       default: ->
         firstClassName = _.first _.remove @delegate.parentClassNames(), (name)->
-          not (/Mixin$/.test(name) or not (/Interface$/.test(name) or name in ['CoreObject', 'Record'])
+          not /Mixin$|Interface$|^CoreObject$|^Record$/.test name
         inflect.pluralize inflect.underscore firstClassName
 
     @public collectionPrefix: Function,
