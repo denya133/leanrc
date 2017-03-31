@@ -60,6 +60,21 @@ class LeanRC extends RC::Module
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
 
+  require('./patterns/gateway/Endpoint') LeanRC
+
+  require('./patterns/pipes/Pipe') LeanRC
+  require('./patterns/pipes/PipeMessage') LeanRC
+  require('./patterns/pipes/PipeListener') LeanRC
+  require('./patterns/pipes/FilterControlMessage') LeanRC
+  require('./patterns/pipes/Filter') LeanRC
+  require('./patterns/pipes/Junction') LeanRC
+  require('./patterns/pipes/JunctionMediator') LeanRC
+  require('./patterns/pipes/QueueControlMessage') LeanRC
+  require('./patterns/pipes/Queue') LeanRC
+  require('./patterns/pipes/TeeMerge') LeanRC
+  require('./patterns/pipes/TeeSplit') LeanRC
+
+
   require('./patterns/facade/Facade') LeanRC
 
   require('./core/View') LeanRC
