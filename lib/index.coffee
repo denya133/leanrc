@@ -66,6 +66,7 @@ class LeanRC extends RC::Module
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
+  require('./patterns/command/Stock') LeanRC
 
   require('./patterns/gateway/Endpoint') LeanRC
 
