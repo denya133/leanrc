@@ -27,7 +27,6 @@ class LeanRC extends RC::Module
   require('./patterns/data_mapper/NumberTransform') LeanRC # done
   require('./patterns/data_mapper/DateTransform') LeanRC # done
   require('./patterns/data_mapper/BooleanTransform') LeanRC # done
-  require('./patterns/promise/Promise') LeanRC # done
   require('./patterns/query_object/Query') LeanRC # done
   require('./patterns/observer/Notification') LeanRC # done
   require('./patterns/observer/Notifier') LeanRC # done

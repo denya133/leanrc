@@ -12,5 +12,4 @@ test/lib/patterns/observer/
 test/lib/patterns/proxy/
 test/lib/patterns/data_mapper/
 test/lib/patterns/query_object/
-test/lib/patterns/promise/
 test/

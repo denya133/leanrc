@@ -45,7 +45,7 @@
     "lodash": "^4.13.1"
   },
   "dependencies": {
-    "RC": "git+ssh://git@bitbucket.org/webbasis/rc.git#v1.0.0-rc.10",
+    "RC": "git+ssh://git@bitbucket.org/webbasis/rc.git#v1.0.0-rc.13",
     "change-case": "3.0.0",
     "commander": "2.9.0",
     "fs-extra": "0.30.0",
