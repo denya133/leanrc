@@ -2,7 +2,6 @@
 --reporter spec
 --check-leaks
 --growl
---full-trace
 test/lib/
 test/lib/core/
 test/lib/patterns/

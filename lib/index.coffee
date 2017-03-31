@@ -21,6 +21,7 @@ class LeanRC extends RC::Module
   require('./interfaces/core/ControllerInterface') LeanRC
   require('./interfaces/core/ModelInterface') LeanRC
   require('./interfaces/core/ViewInterface') LeanRC
+  require('./interfaces/patterns/SerializerInterface') LeanRC
   require('./interfaces/patterns/FacadeInterface') LeanRC
   require('./interfaces/patterns/RecordInterface') LeanRC
   require('./interfaces/patterns/CollectionInterface') LeanRC
@@ -32,6 +33,7 @@ class LeanRC extends RC::Module
   require('./patterns/data_mapper/NumberTransform') LeanRC # done
   require('./patterns/data_mapper/DateTransform') LeanRC # done
   require('./patterns/data_mapper/BooleanTransform') LeanRC # done
+  require('./patterns/data_mapper/Serializer') LeanRC # done
   require('./patterns/data_mapper/Record') LeanRC # done
   require('./patterns/data_mapper/Entry') LeanRC # done
 
