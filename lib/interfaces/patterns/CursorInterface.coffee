@@ -7,56 +7,56 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public setRecord: Function,
+    @public @virtual setRecord: Function,
       args: [RC::Class]
-      return: ArangoCursorInterface
+      return: LeanRC::CursorInterface
 
-    @public toArray: Function,
-      args: [[RC::Class. RC::Constants.NILL]]
+    @public @virtual toArray: Function,
+      args: [[RC::Class, RC::Constants.NILL]]
       return: Array
 
-    @public next: Function,
-      args: [[RC::Class. RC::Constants.NILL]]
+    @public @virtual next: Function,
+      args: [[RC::Class, RC::Constants.NILL]]
       return: RC::Constants.ANY
 
-    @public hasNext: Function,
+    @public @virtual hasNext: Function,
       args: []
       return: Boolean
 
-    @public close: Function,
+    @public @virtual close: Function,
       args: []
       return: RC::Constants.NILL
 
-    @public count: Function,
+    @public @virtual count: Function,
       args: []
       return: Number
 
-    @public forEach: Function,
-      args: [Function, [RC::Class. RC::Constants.NILL]]
+    @public @virtual forEach: Function,
+      args: [Function, [RC::Class, RC::Constants.NILL]]
       return: RC::Constants.NILL
 
-    @public map: Function,
-      args: [Function, [RC::Class. RC::Constants.NILL]]
+    @public @virtual map: Function,
+      args: [Function, [RC::Class, RC::Constants.NILL]]
       return: Array
 
-    @public filter: Function,
-      args: [Function, [RC::Class. RC::Constants.NILL]]
+    @public @virtual filter: Function,
+      args: [Function, [RC::Class, RC::Constants.NILL]]
       return: Array
 
-    @public find: Function,
-      args: [Function, [RC::Class. RC::Constants.NILL]]
+    @public @virtual find: Function,
+      args: [Function, [RC::Class, RC::Constants.NILL]]
       return: RC::Constants.ANY
 
-    @public compact: Function,
-      args: [[RC::Class. RC::Constants.NILL]]
+    @public @virtual compact: Function,
+      args: [[RC::Class, RC::Constants.NILL]]
       return: Array
 
-    @public reduce: Function,
-      args: [Function, RC::Constants.ANY, [RC::Class. RC::Constants.NILL]]
+    @public @virtual reduce: Function,
+      args: [Function, RC::Constants.ANY, [RC::Class, RC::Constants.NILL]]
       return: RC::Constants.ANY
 
-    @public first: Function,
-      args: [[RC::Class. RC::Constants.NILL]]
+    @public @virtual first: Function,
+      args: [[RC::Class, RC::Constants.NILL]]
       return: RC::Constants.ANY
 
 

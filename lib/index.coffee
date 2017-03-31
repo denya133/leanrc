@@ -17,14 +17,23 @@ class LeanRC extends RC::Module
   require('./interfaces/patterns/MediatorInterface') LeanRC # done
   require('./interfaces/patterns/ProxyInterface') LeanRC
   require('./interfaces/patterns/PromiseInterface') LeanRC
-  require('./interfaces/patterns/QueryInterface') LeanRC
-  require('./interfaces/core/ControllerInterface') LeanRC
-  require('./interfaces/core/ModelInterface') LeanRC
-  require('./interfaces/core/ViewInterface') LeanRC
   require('./interfaces/patterns/SerializerInterface') LeanRC
   require('./interfaces/patterns/FacadeInterface') LeanRC
   require('./interfaces/patterns/RecordInterface') LeanRC
   require('./interfaces/patterns/CollectionInterface') LeanRC
+  require('./interfaces/patterns/QueryInterface') LeanRC
+  require('./interfaces/patterns/CursorInterface') LeanRC
+  require('./interfaces/patterns/EndpointInterface') LeanRC
+  require('./interfaces/patterns/GatewayInterface') LeanRC
+  require('./interfaces/patterns/PipeAwareInterface') LeanRC
+  require('./interfaces/patterns/PipeFittingInterface') LeanRC
+  require('./interfaces/patterns/PipeMessageInterface') LeanRC
+  require('./interfaces/patterns/RendererInterface') LeanRC
+  require('./interfaces/patterns/StockInterface') LeanRC
+
+  require('./interfaces/core/ControllerInterface') LeanRC
+  require('./interfaces/core/ModelInterface') LeanRC
+  require('./interfaces/core/ViewInterface') LeanRC
 
   require('./mixins/RecordMixin') LeanRC
 
