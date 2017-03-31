@@ -7,6 +7,6 @@ module.exports = (RequestApp) ->
 
     @public execute: Function,
       default: ->
-        @[Symbol.for 'facade'].registerProxy RequestApp::RequestProxy.new RequestApp::RequestProxy.REQUEST_PROXY, no
+        @facade.registerProxy RequestApp::RequestProxy.new RequestApp::RequestProxy.REQUEST_PROXY, no
 
   RequestApp::PrepareModelCommand.initialize()

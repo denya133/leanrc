@@ -7,7 +7,7 @@ module.exports = (RequestApp) ->
 
     @public execute: Function,
       default: ->
-        @[Symbol.for 'facade'].registerCommand RequestApp::AppConstants.SEND_REQUEST,
+        @facade.registerCommand RequestApp::AppConstants.SEND_REQUEST,
           RequestApp::SendRequestCommand
 
   RequestApp::PrepareControllerCommand.initialize()

@@ -7,6 +7,6 @@ module.exports = (TestApp) ->
 
     @public execute: Function,
       default: ->
-        @[Symbol.for 'facade'].registerMediator TestApp::ConsoleComponentMediator.new TestApp::ConsoleComponentMediator.CONSOLE_MEDIATOR
+        @facade.registerMediator TestApp::ConsoleComponentMediator.new TestApp::ConsoleComponentMediator.CONSOLE_MEDIATOR
 
   TestApp::PrepareViewCommand.initialize()

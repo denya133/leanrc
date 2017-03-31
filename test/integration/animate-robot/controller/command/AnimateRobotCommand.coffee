@@ -7,7 +7,7 @@ module.exports = (TestApp) ->
 
     @public execute: Function,
       default: ->
-        proxy = @[Symbol.for 'facade'].retrieveProxy TestApp::RobotDataProxy.ROBOT_PROXY
+        proxy = @facade.retrieveProxy TestApp::RobotDataProxy.ROBOT_PROXY
         proxy.animate()
 
   TestApp::AnimateRobotCommand.initialize()
