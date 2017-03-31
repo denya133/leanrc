@@ -118,7 +118,7 @@ module.exports = (LeanRC)->
       args: [String, RC::Constants.ANY] #name, value
       return: LeanRC::RecordInterface
     @public @virtual updateAttributes: Function,
-      args; [Object] #attributes
+      args: [Object] #attributes
       return: LeanRC::RecordInterface
     @public @virtual isNew: Function,
       args: []

@@ -1,4 +1,4 @@
-
+_ = require 'lodash'
 
 RC = require 'RC'
 
@@ -367,10 +367,10 @@ module.exports = (LeanRC)->
 
     @public increment: Function,
       default: (asAttribute, step = 1)->
-      unless _.isNumber @[asAttribute]
-        throw new Error "doc.attribute `#{asAttribute}` is not Number"
-      @[asAttribute] += step
-      @save()
+        unless _.isNumber @[asAttribute]
+          throw new Error "doc.attribute `#{asAttribute}` is not Number"
+        @[asAttribute] += step
+        @save()
 
     @public toggle: Function,
       default: (asAttribute)->

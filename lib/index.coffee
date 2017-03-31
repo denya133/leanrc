@@ -22,20 +22,30 @@ class LeanRC extends RC::Module
   require('./interfaces/core/ModelInterface') LeanRC
   require('./interfaces/core/ViewInterface') LeanRC
   require('./interfaces/patterns/FacadeInterface') LeanRC
+  require('./interfaces/patterns/RecordInterface') LeanRC
+
+  require('./mixins/RecordMixin') LeanRC
 
   require('./patterns/data_mapper/Transform') LeanRC # done
   require('./patterns/data_mapper/StringTransform') LeanRC # done
   require('./patterns/data_mapper/NumberTransform') LeanRC # done
   require('./patterns/data_mapper/DateTransform') LeanRC # done
   require('./patterns/data_mapper/BooleanTransform') LeanRC # done
+  require('./patterns/data_mapper/Entry') LeanRC # done
+
   require('./patterns/query_object/Query') LeanRC # done
+
   require('./patterns/observer/Notification') LeanRC # done
   require('./patterns/observer/Notifier') LeanRC # done
   require('./patterns/observer/Observer') LeanRC # done
+
   require('./patterns/proxy/Proxy') LeanRC
+
   require('./patterns/mediator/Mediator') LeanRC # done
+
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
+
   require('./patterns/facade/Facade') LeanRC
 
   require('./core/View') LeanRC
