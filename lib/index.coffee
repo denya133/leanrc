@@ -9,14 +9,13 @@ class LeanRC extends RC::Module
   # Scripts: {}
   Constants:    require './Constants'
 
-  require('./interfaces/patterns/TransformInterface') LeanRC # done
-  require('./interfaces/patterns/NotificationInterface') LeanRC # done
-  require('./interfaces/patterns/NotifierInterface') LeanRC # done
-  require('./interfaces/patterns/ObserverInterface') LeanRC # done
+  require('./interfaces/patterns/TransformInterface') LeanRC
+  require('./interfaces/patterns/NotificationInterface') LeanRC
+  require('./interfaces/patterns/NotifierInterface') LeanRC
+  require('./interfaces/patterns/ObserverInterface') LeanRC
   require('./interfaces/patterns/CommandInterface') LeanRC
-  require('./interfaces/patterns/MediatorInterface') LeanRC # done
+  require('./interfaces/patterns/MediatorInterface') LeanRC
   require('./interfaces/patterns/ProxyInterface') LeanRC
-  require('./interfaces/patterns/PromiseInterface') LeanRC
   require('./interfaces/patterns/SerializerInterface') LeanRC
   require('./interfaces/patterns/FacadeInterface') LeanRC
   require('./interfaces/patterns/RecordInterface') LeanRC
@@ -40,20 +39,20 @@ class LeanRC extends RC::Module
 
   require('./mixins/RecordMixin') LeanRC
 
-  require('./patterns/data_mapper/Transform') LeanRC # done
-  require('./patterns/data_mapper/StringTransform') LeanRC # done
-  require('./patterns/data_mapper/NumberTransform') LeanRC # done
-  require('./patterns/data_mapper/DateTransform') LeanRC # done
-  require('./patterns/data_mapper/BooleanTransform') LeanRC # done
-  require('./patterns/data_mapper/Serializer') LeanRC # done
-  require('./patterns/data_mapper/Record') LeanRC # done
-  require('./patterns/data_mapper/Entry') LeanRC # done
+  require('./patterns/data_mapper/Transform') LeanRC
+  require('./patterns/data_mapper/StringTransform') LeanRC
+  require('./patterns/data_mapper/NumberTransform') LeanRC
+  require('./patterns/data_mapper/DateTransform') LeanRC
+  require('./patterns/data_mapper/BooleanTransform') LeanRC
+  require('./patterns/data_mapper/Serializer') LeanRC
+  require('./patterns/data_mapper/Record') LeanRC
+  require('./patterns/data_mapper/Entry') LeanRC
 
-  require('./patterns/query_object/Query') LeanRC # done
+  require('./patterns/query_object/Query') LeanRC
 
-  require('./patterns/observer/Notification') LeanRC # done
-  require('./patterns/observer/Notifier') LeanRC # done
-  require('./patterns/observer/Observer') LeanRC # done
+  require('./patterns/observer/Notification') LeanRC
+  require('./patterns/observer/Notifier') LeanRC
+  require('./patterns/observer/Observer') LeanRC
 
   require('./patterns/proxy/Proxy') LeanRC
   require('./patterns/proxy/Collection') LeanRC
@@ -62,7 +61,7 @@ class LeanRC extends RC::Module
   require('./patterns/proxy/Resource') LeanRC
   require('./patterns/proxy/Router') LeanRC
 
-  require('./patterns/mediator/Mediator') LeanRC # done
+  require('./patterns/mediator/Mediator') LeanRC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
