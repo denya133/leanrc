@@ -60,20 +60,19 @@ module.exports = (LeanRC)->
       default: (name)->
         if @hasPipe name
           type = @[iplPipeTypesMap][name]
-          pipesList = []
-          switch type
+          pipesList = switch type
             when LeanRC::Junction.INPUT
-              pipesList = @[iplInputPipes]
-              break
+              @[iplInputPipes]
             when LeanRC::Junction.OUTPUT
-              pipesList = @[iplOutputPipes]
-              break
+              @[iplOutputPipes]
+            else
+              []
           for pipe, i in pipesList
             if pipe is name
-              pipesList.splice i, 1
+              pipesList[i..i] = []
               break
-          @[iplPipesMap].splice @[iplPipesMap].indexOf(name), name
-          @[iplPipeTypesMap].splice @[iplPipeTypesMap].indexOf(name), name
+          delete @[iplPipesMap][name]
+          delete @[iplPipeTypesMap][name]
         return
 
     @public retrievePipe: Function,
