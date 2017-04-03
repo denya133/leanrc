@@ -1,10 +1,17 @@
-# надо реализовать в отдельном модуле (npm-пакете) так как является платформозависимым
-# эта реализация должна имплементировать интерфейс CollectionInterface
-# но для хранения и получения данных должна обращаться к Postgres таблицам.
+_             = require 'lodash'
+RC            = require 'RC'
 
+###
+```coffee
+# in application when its need
+
+class MongoCollection extends LeanRC::Collection
+  @include LeanRC::MongoCollectionMixin
+```
+###
 
 module.exports = (LeanRC)->
-  class LeanRC::ArangoCollectionMixin extends RC::Mixin
+  class LeanRC::MongoCollectionMixin extends RC::Mixin
     @inheritProtected()
 
     @Module: LeanRC
@@ -374,8 +381,8 @@ module.exports = (LeanRC)->
     @public executeQuery: Function,
       default: (asQuery, options)->
         voNativeCursor = db._query asQuery
-        voCursor = LeanRC::ArangoCursor.new @delegate, voNativeCursor
+        voCursor = LeanRC::Cursor.new @delegate, voNativeCursor
         return voCursor
 
 
-  return LeanRC::ArangoCollectionMixin.initialize()
+  return LeanRC::MongoCollectionMixin.initialize()
