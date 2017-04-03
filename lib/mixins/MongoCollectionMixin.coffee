@@ -5,16 +5,16 @@ RC            = require 'RC'
 ```coffee
 # in application when its need
 
-class RabbitmqCollection extends LeanRC::Collection
-  @include LeanRC::RabbitmqCollectionMixin
+class MongoCollection extends LeanRC::Collection
+  @include LeanRC::MongoCollectionMixin
 ```
 ###
 
-module.exports = (RabbitmqExtension)->
-  class RabbitmqExtension::RabbitmqCollectionMixin extends RC::Mixin
+module.exports = (MongoStorage)->
+  class MongoStorage::MongoCollectionMixin extends RC::Mixin
     @inheritProtected()
 
-    @Module: RabbitmqExtension
+    @Module: MongoStorage
 
     wrapReference = (value)->
       if _.isString(value) and /^[@]/.test value
@@ -385,4 +385,4 @@ module.exports = (RabbitmqExtension)->
         return voCursor
 
 
-  return RabbitmqExtension::RabbitmqCollectionMixin.initialize()
+  return MongoStorage::MongoCollectionMixin.initialize()
