@@ -34,7 +34,7 @@ module.exports = (LeanRC)->
       default: -> return
 
     constructor: (asMediatorName, aoViewComponent)->
-      @super arguments...
+      super arguments...
 
       @[ipsMediatorName] = asMediatorName ? @constructor.name
       @[ipoViewComponent] = aoViewComponent

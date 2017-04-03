@@ -24,7 +24,7 @@ module.exports = (LeanRC)->
         disconnectedFitting
 
     @public write: Function,
-      default (aoMessage)->
+      default: (aoMessage)->
         return @[ipoOutput].write aoMessage
 
     constructor: (aoOutput)->

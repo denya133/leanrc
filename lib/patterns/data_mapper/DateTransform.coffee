@@ -11,11 +11,11 @@ module.exports = (LeanRC)->
 
     @public @static normalize: Function,
       default: (serialized)->
-        if _.isNil(serialized) then null else Date serialized
+        if _.isNil(serialized) then null else new Date serialized
 
     @public @static serialize: Function,
       default: (deserialized)->
-        if deserialized instanceof Date and not _.isNaN deserialized
+        if _.isDate(deserialized) and not _.isNaN(deserialized)
           return deserialized.toISOString()
         else
           return null

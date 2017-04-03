@@ -1,4 +1,6 @@
-
+_ = require 'lodash'
+joi = require 'joi'
+inflect = do require 'i'
 
 RC = require 'RC'
 
@@ -150,6 +152,7 @@ module.exports = (LeanRC)->
     @public @static relations: Object,
       default: {}
       get: (__relations)->
+        AbstractClass = @
         fromSuper = if @__super__?
           @__super__.constructor.relations
         __relations[@name] ?= do =>
@@ -367,10 +370,10 @@ module.exports = (LeanRC)->
 
     @public increment: Function,
       default: (asAttribute, step = 1)->
-      unless _.isNumber @[asAttribute]
-        throw new Error "doc.attribute `#{asAttribute}` is not Number"
-      @[asAttribute] += step
-      @save()
+        unless _.isNumber @[asAttribute]
+          throw new Error "doc.attribute `#{asAttribute}` is not Number"
+        @[asAttribute] += step
+        @save()
 
     @public toggle: Function,
       default: (asAttribute)->

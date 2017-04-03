@@ -24,6 +24,7 @@ module.exports = (LeanRC)->
         return yes
 
     constructor: (aoContext, amListener)->
+      super arguments...
       @[ipoContext] = aoContext
       @[ipmListener] = amListener
 

@@ -77,7 +77,7 @@ module.exports = (ArangoExt)->
         voBody = aoNotification.getBody()
         vsType = aoNotification.getType()
         switch vsName
-          case LeanRC::Constants.HANDLER_RESULT
+          when LeanRC::Constants.HANDLER_RESULT
             @getViewComponent().emit vsType, voBody
         return
 

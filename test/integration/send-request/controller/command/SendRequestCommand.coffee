@@ -7,7 +7,7 @@ module.exports = (RequestApp) ->
 
     @public execute: Function,
       default: ->
-        proxy = @[Symbol.for 'facade'].retrieveProxy RequestApp::RequestProxy.REQUEST_PROXY
+        proxy = @facade.retrieveProxy RequestApp::RequestProxy.REQUEST_PROXY
         proxy.request {}
 
   RequestApp::SendRequestCommand.initialize()

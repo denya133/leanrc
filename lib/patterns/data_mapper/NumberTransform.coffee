@@ -11,7 +11,7 @@ module.exports = (LeanRC)->
 
     @public @static normalize: Function,
       default: (serialized)->
-        if _.isEmpty serialized
+        if _.isNil serialized
           return null
         else
           transformed = Number serialized
@@ -19,7 +19,7 @@ module.exports = (LeanRC)->
 
     @public @static serialize: Function,
       default: (deserialized)->
-        if _.isEmpty deserialized
+        if _.isNil deserialized
           return null
         else
           transformed = Number deserialized

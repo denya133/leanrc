@@ -7,6 +7,6 @@ module.exports = (TestApp) ->
 
     @public execute: Function,
       default: ->
-        @[Symbol.for 'facade'].registerProxy TestApp::RobotDataProxy.new TestApp::RobotDataProxy.ROBOT_PROXY, no
+        @facade.registerProxy TestApp::RobotDataProxy.new TestApp::RobotDataProxy.ROBOT_PROXY, no
 
   TestApp::PrepareModelCommand.initialize()

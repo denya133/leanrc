@@ -55,6 +55,7 @@ module.exports = (LeanRC)->
       default: ->
 
     constructor: (asKey)->
+      super arguments...
       if Model[cphInstanceMap][asKey]
         throw new Error Model.MULTITON_MSG
       Model[cphInstanceMap][asKey] = @

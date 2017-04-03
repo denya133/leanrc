@@ -40,6 +40,7 @@ module.exports = (LeanRC)->
         """
 
     constructor: (asName, aoBody, asType)->
+      super arguments...
       @[ipsName] = asName
       @[ipoBody] = aoBody
       @[ipsType] = asType

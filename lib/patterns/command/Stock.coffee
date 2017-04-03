@@ -1,3 +1,4 @@
+inflect = do require 'i'
 # по сути здесь надо повторить (скопипастить) код из FoxxMC::Controller
 
 RC = require 'RC'

@@ -1,4 +1,4 @@
-
+joi = require 'joi'
 
 RC = require 'RC'
 

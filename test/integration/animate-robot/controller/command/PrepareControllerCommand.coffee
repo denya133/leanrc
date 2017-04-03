@@ -7,7 +7,7 @@ module.exports = (TestApp) ->
 
     @public execute: Function,
       default: ->
-        @[Symbol.for 'facade'].registerCommand TestApp::AppConstants.ANIMATE_ROBOT,
+        @facade.registerCommand TestApp::AppConstants.ANIMATE_ROBOT,
           TestApp::AnimateRobotCommand
 
   TestApp::PrepareControllerCommand.initialize()

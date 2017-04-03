@@ -1,6 +1,7 @@
 _         = require 'lodash'
 request   = require '@arangodb/request'
 util      = require 'util'
+_         = require 'lodash'
 
 
 {mailApikey}  = module.context.configuration

@@ -33,7 +33,7 @@ module.exports = (LeanRC)->
         return
 
     constructor: ->
-      @super arguments...
+      super arguments...
 
       @[iplSubCommands] = []
       @initializeMacroCommand()
