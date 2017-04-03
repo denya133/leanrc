@@ -52,3 +52,11 @@ describe 'Junction', ->
         assert.isUndefined junction[Symbol.for 'pipeTypesMap']['TEST_OUTPUT'], 'TEST_OUTPUT pipe type not registered'
         assert.notInclude junction[Symbol.for 'outputPipes'], 'TEST_OUTPUT', 'Input pipes do not contain TEST_OUTPUT'
       .to.not.throw Error
+  describe '#retrievePipe', ->
+    it 'should register pipe and get it', ->
+      expect ->
+        junction = Junction.new()
+        inputPipe = Pipe.new()
+        junction.registerPipe 'TEST_INPUT', Junction.INPUT, inputPipe
+        assert.equal junction.retrievePipe('TEST_INPUT'), inputPipe, 'TEST_INPUT pipe not registered'
+      .to.not.throw Error
