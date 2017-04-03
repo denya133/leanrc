@@ -25,12 +25,12 @@ module.exports = (LeanRC)->
 
     @public acceptInputPipe: Function,
       default: (asName, aoPipe)->
-        @[ipoFacade].sendNotification ACCEPT_INPUT_PIPE, aoPipe, asName
+        @facade.sendNotification ACCEPT_INPUT_PIPE, aoPipe, asName
         return
 
     @public acceptOutputPipe: Function,
       default: (asName, aoPipe)->
-        @[ipoFacade].sendNotification ACCEPT_OUTPUT_PIPE, aoPipe, asName
+        @facade.sendNotification ACCEPT_OUTPUT_PIPE, aoPipe, asName
         return
 
     constructor: (aoFacade)->
