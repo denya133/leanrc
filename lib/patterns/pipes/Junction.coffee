@@ -13,8 +13,8 @@ module.exports = (LeanRC)->
 
     iplInputPipes = @protected inputPipes: Array
     iplOutputPipes = @protected outputPipes: Array
-    iplPipesMap = @protected pipesMap: Array
-    iplPipeTypesMap = @protected pipeTypesMap: Array
+    iplPipesMap = @protected pipesMap: Object
+    iplPipeTypesMap = @protected pipeTypesMap: Object
 
 
     @public registerPipe: Function,
@@ -28,10 +28,8 @@ module.exports = (LeanRC)->
           switch type
             when LeanRC::Junction.INPUT
               @[iplInputPipes].push name
-              break
             when LeanRC::Junction.OUTPUT
               @[iplOutputPipes].push name
-              break
             else
               vbSuccess = no
         else
@@ -103,6 +101,13 @@ module.exports = (LeanRC)->
           pipe = @[iplPipesMap][outputPipeName]
           vbSuccess = pipe.write message
         vbSuccess
+
+    constructor: (args...) ->
+      super args...
+      @[iplInputPipes] = []
+      @[iplOutputPipes] = []
+      @[iplPipesMap] = {}
+      @[iplPipeTypesMap] = {}
 
 
   return LeanRC::Junction.initialize()
