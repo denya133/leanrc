@@ -10,6 +10,13 @@ class MongoCollection extends LeanRC::Collection
 ```
 ###
 
+# должен быть заиспользован модуль mongo-native-driver
+# конекшены надо инкапсулировать скорее всего в атрибуте класса
+# конфиги получать из @facade.retriveProxy 'Configuration' или из переменной инстанцирования коллекшена из @getData().configiration
+
+# основную сложность при реализации данного модуля (Миксина) представляет адаптация дерективы $for в сочетании с $join - так как в монге нет понятия JOIN. в этом месте предположительно надо заиспользовать встроенный в монгу Aggregation Framework. Скорее всего через него же надо будет решить и вопрос с дерективами $collect, $aggregate, $avg и другие относящиеся к свертке массива.
+
+# учесть также что в монге будет вестись работа с GridFS, а следовательно надо объявить некоторые методы в MongoCollectionMixin обворачивающих взаимодействие с GridFS.
 module.exports = (MongoStorage)->
   class MongoStorage::MongoCollectionMixin extends RC::Mixin
     @inheritProtected()

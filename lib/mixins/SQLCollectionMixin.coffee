@@ -1,8 +1,12 @@
 # надо реализовать в отдельном модуле (npm-пакете) так как является платформозависимым
 # эта реализация должна имплементировать интерфейс CollectionInterface
 # но для хранения и получения данных должна обращаться к Postgres таблицам.
+# должен быть заиспользован модуль sequelize
+# https://github.com/sequelize/sequelize
+# конекшены надо инкапсулировать скорее всего в атрибуте класса
+# конфиги получать из @facade.retriveProxy 'Configuration' или из переменной инстанцирования коллекшена из @getData().configiration
 
-
+# Это наиболее полно совместимый с Query объектом миксин (после ArangoCollectionMixin) потому что в sql могут быть транслированы все исользуемые в Query дериктивы
 module.exports = (SQLStorage)->
   class SQLStorage::SQLCollectionMixin extends RC::Mixin
     @inheritProtected()

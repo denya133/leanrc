@@ -11,6 +11,12 @@ class MemoryCollection extends LeanRC::Collection
 ```
 ###
 
+# должен быть заиспользован модуль lokijs (npm i --save lokijs)
+# конекшены надо инкапсулировать скорее всего в атрибуте класса
+# конфиги получать из @facade.retriveProxy 'Configuration' или из переменной инстанцирования коллекшена из @getData().configiration
+
+# основную сложность при реализации данного модуля (Миксина) представляет адаптация дерективы $for в сочетании с $join - так как в LokiJS нет понятия JOIN, так же надо будет решить и вопрос с дерективами $collect, $aggregate, $avg и другие относящиеся к свертке массива.
+
 module.exports = (MemoryStorage)->
   class MemoryStorage::MemoryCollectionMixin extends RC::Mixin
     @inheritProtected()
