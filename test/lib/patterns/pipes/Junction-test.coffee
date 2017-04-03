@@ -84,3 +84,17 @@ describe 'Junction', ->
         junction.registerPipe 'TEST_OUTPUT', Junction.OUTPUT, outputPipe
         assert.isTrue junction.hasOutputPipe('TEST_OUTPUT'), 'TEST_OUTPUT pipe not registered'
       .to.not.throw Error
+  describe '#addPipeListener', ->
+    it 'should register input pipe and connect it to listener', ->
+      expect ->
+        context = test: ->
+        spyTest = sinon.spy context, 'test'
+        junction = Junction.new()
+        inputPipe = Pipe.new()
+        junction.registerPipe 'TEST_INPUT', Junction.INPUT, inputPipe
+        junction.addPipeListener 'TEST_INPUT', context, (aoMessage) -> @test aoMessage
+        assert.isTrue junction.hasInputPipe('TEST_INPUT'), 'TEST_INPUT pipe not registered'
+        message = LeanRC::PipeMessage.new  LeanRC::PipeMessage.NORMAL
+        inputPipe.write message
+        assert.isTrue spyTest.calledWith(message), 'Listener did not called on context'
+      .to.not.throw Error
