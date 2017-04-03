@@ -2,12 +2,12 @@
 # здесь должна быть реализация интерфейса RouteInterface работающая с Express фреймворком на платформе nodejs.
 
 
-module.exports = (ArangoExt)->
-  class ArangoExt::ArangoRouteMixin extends RC::Mixin
+module.exports = (ExpressExtension)->
+  class ExpressExtension::ExpressRouteMixin extends RC::Mixin
     @inheritProtected()
     # @implements LeanRC::RouteInterface # или вообще не указывать
 
-    @Module: ArangoExt
+    @Module: ExpressExtension
 
     @public @virtual routerName: String
 
@@ -199,4 +199,4 @@ module.exports = (ArangoExt)->
         return
 
 
-  return ArangoExt::ArangoRouteMixin.initialize()
+  return ExpressExtension::ExpressRouteMixin.initialize()

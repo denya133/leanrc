@@ -3,11 +3,11 @@
 # но для хранения и получения данных должна обращаться к Postgres таблицам.
 
 
-module.exports = (LeanRC)->
-  class LeanRC::ArangoCollectionMixin extends RC::Mixin
+module.exports = (SQLStorage)->
+  class SQLStorage::SQLCollectionMixin extends RC::Mixin
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: SQLStorage
 
     wrapReference = (value)->
       if _.isString(value) and /^[@]/.test value
@@ -374,8 +374,8 @@ module.exports = (LeanRC)->
     @public executeQuery: Function,
       default: (asQuery, options)->
         voNativeCursor = db._query asQuery
-        voCursor = LeanRC::ArangoCursor.new @delegate, voNativeCursor
+        voCursor = LeanRC::Cursor.new @delegate, voNativeCursor
         return voCursor
 
 
-  return LeanRC::ArangoCollectionMixin.initialize()
+  return SQLStorage::SQLCollectionMixin.initialize()

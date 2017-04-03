@@ -10,11 +10,11 @@ class MongoCollection extends LeanRC::Collection
 ```
 ###
 
-module.exports = (LeanRC)->
-  class LeanRC::MongoCollectionMixin extends RC::Mixin
+module.exports = (RabbitmqExtension)->
+  class RabbitmqExtension::RabbitmqCollectionMixin extends RC::Mixin
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: RabbitmqExtension
 
     wrapReference = (value)->
       if _.isString(value) and /^[@]/.test value
@@ -385,4 +385,4 @@ module.exports = (LeanRC)->
         return voCursor
 
 
-  return LeanRC::MongoCollectionMixin.initialize()
+  return RabbitmqExtension::RabbitmqCollectionMixin.initialize()

@@ -11,11 +11,11 @@ class MemoryCollection extends LeanRC::Collection
 ```
 ###
 
-module.exports = (LeanRC)->
-  class LeanRC::MemoryCollectionMixin extends RC::Mixin
+module.exports = (MemoryStorage)->
+  class MemoryStorage::MemoryCollectionMixin extends RC::Mixin
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: MemoryStorage
 
     wrapReference = (value)->
       if _.isString(value) and /^[@]/.test value
@@ -386,4 +386,4 @@ module.exports = (LeanRC)->
         return voCursor
 
 
-  return LeanRC::MemoryCollectionMixin.initialize()
+  return MemoryStorage::MemoryCollectionMixin.initialize()

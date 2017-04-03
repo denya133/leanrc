@@ -10,11 +10,11 @@ class RedisCollection extends LeanRC::Collection
 ```
 ###
 
-module.exports = (LeanRC)->
-  class LeanRC::RedisCollectionMixin extends RC::Mixin
+module.exports = (RedisStorage)->
+  class RedisStorage::RedisCollectionMixin extends RC::Mixin
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: RedisStorage
 
     wrapReference = (value)->
       if _.isString(value) and /^[@]/.test value
@@ -385,4 +385,4 @@ module.exports = (LeanRC)->
         return voCursor
 
 
-  return LeanRC::RedisCollectionMixin.initialize()
+  return RedisStorage::RedisCollectionMixin.initialize()

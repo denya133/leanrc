@@ -2,12 +2,12 @@
 # здесь должна быть реализация интерфейса RouteInterface работающая с Socket.io на платформе nodejs.
 
 
-module.exports = (ArangoExt)->
-  class ArangoExt::ArangoRouteMixin extends RC::Mixin
+module.exports = (SocketioExtension)->
+  class SocketioExtension::SocketioRouteMixin extends RC::Mixin
     @inheritProtected()
     # @implements LeanRC::RouteInterface # или вообще не указывать
 
-    @Module: ArangoExt
+    @Module: SocketioExtension
 
     @public @virtual routerName: String
 
@@ -199,4 +199,4 @@ module.exports = (ArangoExt)->
         return
 
 
-  return ArangoExt::ArangoRouteMixin.initialize()
+  return SocketioExtension::SocketioRouteMixin.initialize()

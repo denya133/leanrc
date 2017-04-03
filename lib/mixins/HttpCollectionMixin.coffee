@@ -1,11 +1,6 @@
-# надо реализовать в отдельном модуле (npm-пакете) так как является платформозависимым
-# эта реализация должна имплементировать методы `parseQuery` и `executeQuery`.
-# последний должен возврашать результат с интерфейсом CursorInterface
-# но для хранения и получения данных должна обращаться к ArangoDB коллекциям.
+# можно реализовать в составе LeanRC, так как внутри для посылки http запросов будем использовать полифил из RC::Utils.request
 
 _             = require 'lodash'
-# { db }        = require '@arangodb'
-# qb            = require 'aqb'
 Parser        = require 'mongo-parse' #mongo-parse@2.0.2
 # moment        = require 'moment'
 RC            = require 'RC'
@@ -386,7 +381,7 @@ module.exports = (LeanRC)->
         # здесь надо посылать платформонезависимый http запрос к нужному апи-серверу - например RC::Utils.request - полифил для ноды/аранги
         # конфиги апи сервера (урл,...) можно взять из @getData() тк. конфиги должны быть переданы при инстанцировании прокси.
         voNativeCursor = db._query asQuery
-        voCursor = LeanRC::ArangoCursor.new @delegate, voNativeCursor # вместо этого курсора надо сделать курсор на основе массива.
+        voCursor = LeanRC::Cursor.new @delegate, voNativeCursor # вместо этого курсора надо сделать курсор на основе массива.
         return voCursor
 
 
