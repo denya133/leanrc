@@ -60,3 +60,27 @@ describe 'Junction', ->
         junction.registerPipe 'TEST_INPUT', Junction.INPUT, inputPipe
         assert.equal junction.retrievePipe('TEST_INPUT'), inputPipe, 'TEST_INPUT pipe not registered'
       .to.not.throw Error
+  describe '#hasPipe', ->
+    it 'should register pipe and test its presence', ->
+      expect ->
+        junction = Junction.new()
+        inputPipe = Pipe.new()
+        junction.registerPipe 'TEST_INPUT', Junction.INPUT, inputPipe
+        assert.isTrue junction.hasPipe('TEST_INPUT'), 'TEST_INPUT pipe not registered'
+      .to.not.throw Error
+  describe '#hasInputPipe', ->
+    it 'should register input pipe and test its presence', ->
+      expect ->
+        junction = Junction.new()
+        inputPipe = Pipe.new()
+        junction.registerPipe 'TEST_INPUT', Junction.INPUT, inputPipe
+        assert.isTrue junction.hasInputPipe('TEST_INPUT'), 'TEST_INPUT pipe not registered'
+      .to.not.throw Error
+  describe '#hasOutputPipe', ->
+    it 'should register output pipe and test its presence', ->
+      expect ->
+        junction = Junction.new()
+        outputPipe = Pipe.new()
+        junction.registerPipe 'TEST_OUTPUT', Junction.OUTPUT, outputPipe
+        assert.isTrue junction.hasOutputPipe('TEST_OUTPUT'), 'TEST_OUTPUT pipe not registered'
+      .to.not.throw Error
