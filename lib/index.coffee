@@ -28,15 +28,19 @@ class LeanRC extends RC::Module
   require('./interfaces/patterns/PipeFittingInterface') LeanRC
   require('./interfaces/patterns/PipeMessageInterface') LeanRC
   require('./interfaces/patterns/RendererInterface') LeanRC
-  # require('./interfaces/patterns/ResourceInterface') LeanRC
+  # require('./interfaces/patterns/ResourceInterface') LeanRC # empty
   require('./interfaces/patterns/StockInterface') LeanRC
   require('./interfaces/patterns/RouterInterface') LeanRC
-  # require('./interfaces/patterns/RouteInterface') LeanRC
+  # require('./interfaces/patterns/RouteInterface') LeanRC # empty
+  require('./interfaces/patterns/SwitchInterface') LeanRC
 
   require('./interfaces/core/ControllerInterface') LeanRC
   require('./interfaces/core/ModelInterface') LeanRC
   require('./interfaces/core/ViewInterface') LeanRC
 
+  # require('./mixins/CrudEndpointsMixin') LeanRC # Arango only? Uses 'statuses'
+  # require('./mixins/HttpCollectionMixin') LeanRC # Node.js only? Uses 'mongo-parse'
+  # require('./mixins/PipesSwitchMixin') LeanRC # empty
   require('./mixins/RecordMixin') LeanRC
 
   require('./patterns/data_mapper/Transform') LeanRC
@@ -62,12 +66,18 @@ class LeanRC extends RC::Module
   require('./patterns/proxy/Router') LeanRC
 
   require('./patterns/mediator/Mediator') LeanRC
+  require('./patterns/mediator/Switch') LeanRC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
   require('./patterns/command/Stock') LeanRC
+  # require('./patterns/command/MigrateCommand') LeanRC # empty
+  # require('./patterns/command/Migration') LeanRC # empty
+  # require('./patterns/command/Rollback') LeanRC # empty
 
   require('./patterns/gateway/Endpoint') LeanRC
+
+  require('./patterns/iterator/Cursor') LeanRC
 
   require('./patterns/pipes/Pipe') LeanRC
   require('./patterns/pipes/PipeMessage') LeanRC
@@ -82,6 +92,7 @@ class LeanRC extends RC::Module
   require('./patterns/pipes/TeeMerge') LeanRC
   require('./patterns/pipes/TeeSplit') LeanRC
 
+  # require('./patterns/renderer/Template') LeanRC # empty
 
   require('./patterns/facade/Facade') LeanRC
   require('./patterns/facade/Application') LeanRC
