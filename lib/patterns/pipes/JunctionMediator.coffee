@@ -36,7 +36,7 @@ module.exports = (LeanRC)->
           when LeanRC::JunctionMediator.ACCEPT_OUTPUT_PIPE
             outputPipeName = aoNotification.getType()
             outputPipe = aoNotification.getBody()
-            @[ipoJunction].registerPipe outputPipeName, Junction.OUTPUT, outputPipe
+            @[ipoJunction].registerPipe outputPipeName, LeanRC::Junction.OUTPUT, outputPipe
           when LeanRC::JunctionMediator.REMOVE_PIPE
             outputPipeName = aoNotification.getType()
             @[ipoJunction].removePipe outputPipeName
