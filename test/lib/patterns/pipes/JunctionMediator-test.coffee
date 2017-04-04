@@ -59,3 +59,20 @@ describe 'JunctionMediator', ->
         junction.sendMessage 'OUTPUT_PIPE', message
         assert.isTrue spyWrite.calledWith(message), 'Pipe::write did not called'
       .to.not.throw Error
+    it 'should handle `LeanRC::JunctionMediator.REMOVE_PIPE` notification', ->
+      expect ->
+        MULTITON_KEY = 'TEST_JUNCTION_3'
+        finalNode = write: ->
+        outputPipe = Pipe.new()
+        junction = Junction.new()
+        spyRemovePipe = sinon.spy junction, 'removePipe'
+        mediator = JunctionMediator.new 'TEST_MEDIATOR', junction
+        mediator.initializeNotifier MULTITON_KEY
+        acceptNotification = Notification.new JunctionMediator.ACCEPT_OUTPUT_PIPE, outputPipe, 'OUTPUT_PIPE'
+        mediator.handleNotification acceptNotification
+        assert.isTrue junction.hasPipe('OUTPUT_PIPE'), 'Pipe not registered'
+        removeNotification = Notification.new JunctionMediator.REMOVE_PIPE, null, 'OUTPUT_PIPE'
+        mediator.handleNotification removeNotification
+        assert.isTrue spyRemovePipe.calledWith('OUTPUT_PIPE'), 'Junction::removePipe did not called'
+        assert.isFalse junction.hasPipe('OUTPUT_PIPE'), 'Pipe not removed'
+      .to.not.throw Error
