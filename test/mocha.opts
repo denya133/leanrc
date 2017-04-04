@@ -7,10 +7,10 @@ test/lib/core/
 test/lib/patterns/
 test/lib/patterns/command/
 test/lib/patterns/facade/
-test/lib/patterns/mediator/
 test/lib/patterns/observer/
 test/lib/patterns/proxy/
 test/lib/patterns/data_mapper/
 test/lib/patterns/query_object/
 test/lib/patterns/pipes/
+test/lib/patterns/mediator/
 test/
