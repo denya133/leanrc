@@ -21,6 +21,7 @@ module.exports = (LeanRC)->
     # @public atomRendererName: String
 
     @public listNotificationInterests: Function,
+      configurable: yes
       default: ->
         [
           LeanRC::Constants.HANDLER_RESULT

@@ -19,3 +19,12 @@ describe 'Switch', ->
           'json', 'html', 'xml', 'atom'
         ], 'Property `responseFormats` returns incorrect values'
       .to.not.throw Error
+  describe '#listNotificationInterests', ->
+    it 'should check handled notifications list', ->
+      expect ->
+        mediatorName = 'TEST_MEDIATOR'
+        pipeSwitch = Switch.new mediatorName
+        assert.deepEqual pipeSwitch.listNotificationInterests(), [
+          LeanRC::Constants.HANDLER_RESULT
+        ], 'Function `listNotificationInterests` returns incorrect values'
+      .to.not.throw Error
