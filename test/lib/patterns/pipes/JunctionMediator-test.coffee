@@ -76,3 +76,15 @@ describe 'JunctionMediator', ->
         assert.isTrue spyRemovePipe.calledWith('OUTPUT_PIPE'), 'Junction::removePipe did not called'
         assert.isFalse junction.hasPipe('OUTPUT_PIPE'), 'Pipe not removed'
       .to.not.throw Error
+  describe '#handlePipeMessage', ->
+    it 'should send notification in handle', ->
+      expect ->
+        MULTITON_KEY = 'TEST_JUNCTION_4'
+        junction = Junction.new()
+        mediator = JunctionMediator.new 'TEST_MEDIATOR', junction
+        mediator.initializeNotifier MULTITON_KEY
+        message = PipeMessage.new PipeMessage.NORMAL
+        spySendNotification = sinon.spy mediator, 'sendNotification'
+        mediator.handlePipeMessage message
+        assert.isTrue spySendNotification.calledWith(PipeMessage.NORMAL, message), 'JunctionMediator::handlePipeMessage did not called'
+      .to.not.throw Error
