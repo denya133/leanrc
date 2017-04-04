@@ -3,6 +3,8 @@ sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 Facade = LeanRC::Facade
 PipeAwareModule = LeanRC::PipeAwareModule
+Pipe = LeanRC::Pipe
+JunctionMediator = LeanRC::JunctionMediator
 
 describe 'PipeAwareModule', ->
   describe '.new', ->
@@ -11,4 +13,14 @@ describe 'PipeAwareModule', ->
         facade = Facade.getInstance 'TEST_PIPE_AWARE_1'
         pipeAwareModule = PipeAwareModule.new facade
         assert.equal pipeAwareModule.facade, facade, 'Facade is incorrect'
+      .to.not.throw Error
+  describe '#acceptInputPipe', ->
+    it 'should send pipe as input pipe into notification', ->
+      expect ->
+        facade = Facade.getInstance 'TEST_PIPE_AWARE_2'
+        pipeAwareModule = PipeAwareModule.new facade
+        pipe = Pipe.new()
+        spyFunction = sinon.spy facade, 'sendNotification'
+        pipeAwareModule.acceptInputPipe 'PIPE_1', pipe
+        assert.isTrue spyFunction.calledWith(JunctionMediator.ACCEPT_INPUT_PIPE, pipe, 'PIPE_1'), 'Notification not sent'
       .to.not.throw Error
