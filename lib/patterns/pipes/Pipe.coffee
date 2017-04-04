@@ -29,7 +29,7 @@ module.exports = (LeanRC)->
 
     constructor: (aoOutput)->
       super arguments...
-      if aoOutput
+      if aoOutput?
         @connect aoOutput
 
 
