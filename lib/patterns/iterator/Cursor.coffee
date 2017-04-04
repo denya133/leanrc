@@ -1,20 +1,20 @@
+# должен имплементировать интерфейс CursorInterface
+# является оберткой над обычным массивом
+
 _  = require 'lodash'
 RC = require 'RC'
 
 module.exports = (LeanRC)->
-  class LeanRC::ArangoCursor extends RC::CoreObject
+  class LeanRC::Cursor extends RC::CoreObject
     @inheritProtected()
-    @implements LeanRC::ArangoCursorInterface
+    @implements LeanRC::CursorInterface
 
     @Module: LeanRC
 
-    ipoCursor = @private _cursor: RC::Constants.ANY
+    ipnCurrentIndex = @private _currentIndex: Number,
+      default: 0
+    iplArray = @private _array: Array
     ipcRecord = @private Record: RC::Class
-
-    @public setCursor: Function,
-      default: (aoCursor)->
-        @[ipoCursor] = aoCursor
-        return @
 
     @public setRecord: Function,
       default: (acRecord)->
@@ -29,7 +29,8 @@ module.exports = (LeanRC)->
     @public next: Function,
       default: (acRecord = null)->
         acRecord ?= @[ipcRecord]
-        data = @[ipoCursor].next()
+        data = @[iplArray][@[ipnCurrentIndex]]
+        @[ipnCurrentIndex]++
         if acRecord?
           if data?
             acRecord.new data
@@ -39,25 +40,17 @@ module.exports = (LeanRC)->
           data
 
     @public hasNext: Function,
-      default: -> @[ipoCursor].hasNext()
-
-    @public getExtra: Function,
-      default: -> @[ipoCursor].getExtra arguments...
-
-    @public setBatchSize: Function,
-      default: -> @[ipoCursor].setBatchSize arguments...
-
-    @public getBatchSize: Function,
-      default: -> @[ipoCursor].getBatchSize arguments...
+      default: -> not _.isNil @[iplArray][@[ipnCurrentIndex]]
 
     @public close: Function,
-      default: -> @[ipoCursor].dispose()
-
-    @public dispose: Function,
-      default: -> @[ipoCursor].dispose()
+      default: ->
+        for item, i in @[iplArray]
+          delete @[iplArray][i]
+        delete @[iplArray]
+        return
 
     @public count: Function,
-      default: -> @[ipoCursor].count arguments...
+      default: -> @[iplArray].length()
 
     @public forEach: Function,
       default: (lambda, acRecord = null)->
@@ -67,7 +60,7 @@ module.exports = (LeanRC)->
             lambda @next(acRecord), index++
           return
         catch err
-          @dispose()
+          @close()
           throw err
 
     @public map: Function,
@@ -77,7 +70,7 @@ module.exports = (LeanRC)->
           while @hasNext()
             lambda @next(acRecord), index++
         catch err
-          @dispose()
+          @close()
           throw err
 
     @public filter: Function,
@@ -91,7 +84,7 @@ module.exports = (LeanRC)->
               records.push record
           records
         catch err
-          @dispose()
+          @close()
           throw err
 
     @public find: Function,
@@ -106,7 +99,7 @@ module.exports = (LeanRC)->
               break
           _record
         catch err
-          @dispose()
+          @close()
           throw err
 
     @public compact: Function,
@@ -116,13 +109,13 @@ module.exports = (LeanRC)->
         records = []
         try
           while @hasNext()
-            rawRecord = @[ipoCursor].next()
-            unless _.isEmpty rawRecord
+            rawRecord = @[iplArray].next()
+            unless _.isNil rawRecord
               record = acRecord.new rawRecord
               records.push record
           records
         catch err
-          @dispose()
+          @close()
           throw err
 
     @public reduce: Function,
@@ -134,7 +127,7 @@ module.exports = (LeanRC)->
             _initialValue = lambda _initialValue, @next(acRecord), index++
           _initialValue
         catch err
-          @dispose()
+          @close()
           throw err
 
     @public first: Function,
@@ -145,13 +138,13 @@ module.exports = (LeanRC)->
           else
             null
         catch err
-          @dispose()
+          @close()
           throw err
 
-    constructor: (acRecord, aoCursor = null)->
+    constructor: (acRecord, alArray = null)->
       super arguments...
       @[ipcRecord] = acRecord
-      @[ipoCursor] = aoCursor
+      @[iplArray] = alArray
 
 
-  return LeanRC::ArangoCursor.initialize()
+  return LeanRC::Cursor.initialize()
