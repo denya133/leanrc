@@ -6,7 +6,7 @@ Parser        = require 'mongo-parse' #mongo-parse@2.0.2
 RC            = require 'RC'
 
 # будем использовать этот миксин для посылки запросов из ноды в арангу например.
-
+# TODO: надо посмотреть как эту задачу решает Ember
 
 module.exports = (LeanRC)->
   class LeanRC::HttpCollectionMixin extends RC::Mixin
@@ -14,188 +14,7 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    wrapReference = (value)->
-      if _.isString(value) and /^[@]/.test value
-        qb.ref value.replace '@', ''
-      else
-        qb value
-
-    @public operatorsMap: Object,
-      default:
-        # Logical Query Operators
-        $and: (args...)-> qb.and args...
-        $or: (args...)-> qb.or args...
-        $not: (args...)-> qb.not args...
-        $nor: (args...)-> qb.not qb.or args... # not or # !(a||b) === !a && !b
-
-        # Comparison Query Operators (aoSecond is NOT sub-query)
-        $eq: (aoFirst, aoSecond)->
-          qb.eq wrapReference(aoFirst), wrapReference(aoSecond) # ==
-        $ne: (aoFirst, aoSecond)->
-          qb.neq wrapReference(aoFirst), wrapReference(aoSecond) # !=
-        $lt: (aoFirst, aoSecond)->
-          qb.lt wrapReference(aoFirst), wrapReference(aoSecond) # <
-        $lte: (aoFirst, aoSecond)->
-          qb.lte wrapReference(aoFirst), wrapReference(aoSecond) # <=
-        $gt: (aoFirst, aoSecond)->
-          qb.gt wrapReference(aoFirst), wrapReference(aoSecond) # >
-        $gte: (aoFirst, aoSecond)->
-          qb.gte wrapReference(aoFirst), wrapReference(aoSecond) # >=
-        $in: (aoFirst, alItems)-> # check value present in array
-          qb.in wrapReference(aoFirst), qb alItems
-        $nin: (aoFirst, alItems)-> # ... not present in array
-          qb.notIn wrapReference(aoFirst), qb alItems
-
-        # Array Query Operators
-        $all: (aoFirst, alItems)-> # contains some values
-          qb.and alItems.map (aoItem)->
-            qb.in wrapReference(aoItem), wrapReference(aoFirst)
-        $elemMatch: (aoFirst, aoSecond)-> # conditions for complex item
-          wrappedReference = aoFirst.replace '@', ''
-          voFilter = qb.and(aoSecond...).toAQL()
-          voFirst = qb.expr "LENGTH(#{wrappedReference}[* FILTER #{voFilter}])"
-          qb.gt voFirst, qb 0
-        $size: (aoFirst, aoSecond)->
-          voFirst = qb.expr "LENGTH(#{aoFirst.replace '@', ''})"
-          qb.eq voFirst, wrapReference(aoSecond) # condition for array length
-
-        # Element Query Operators
-        $exists: (aoFirst, aoSecond)-> # condition for check present some value in field
-          voFirst = qb.expr "HAS(#{aoFirst.replace '@', ''})"
-          qb.eq voFirst, wrapReference(aoSecond)
-        $type: (aoFirst, aoSecond)->
-          voFirst = qb.expr "TYPENAME(#{aoFirst.replace '@', ''})"
-          qb.eq voFirst, wrapReference(aoSecond) # check value type
-
-        # Evaluation Query Operators
-        $mod: (aoFirst, [divisor, remainder])->
-          qb.eq qb.mod(wrapReference(aoFirst), qb divisor), qb remainder
-        $regex: (aoFirst, aoSecond)-> # value must be string. ckeck it by RegExp.
-          qb.expr "REGEX_TEST(#{aoFirst.replace '@', ''}, \"#{String aoSecond}\")"
-
-        # Datetime Query Operators
-        $td: (aoFirst, aoSecond)-> # this day (today)
-          todayStart = moment().startOf 'day'
-          todayEnd = moment().endOf 'day'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), todayStart.toISOString()
-              qb.lt wrapReference(aoFirst), todayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), todayStart.toISOString()
-              qb.lt wrapReference(aoFirst), todayEnd.toISOString()
-            ]...
-        $ld: (aoFirst, aoSecond)-> # last day (yesterday)
-          yesterdayStart = moment().subtract(1, 'days').startOf 'day'
-          yesterdayEnd = moment().subtract(1, 'days').endOf 'day'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), yesterdayStart.toISOString()
-              qb.lt wrapReference(aoFirst), yesterdayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), yesterdayStart.toISOString()
-              qb.lt wrapReference(aoFirst), yesterdayEnd.toISOString()
-            ]...
-        $tw: (aoFirst, aoSecond)-> # this week
-          weekStart = moment().startOf 'week'
-          weekEnd = moment().endOf 'week'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), weekStart.toISOString()
-              qb.lt wrapReference(aoFirst), weekEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), weekStart.toISOString()
-              qb.lt wrapReference(aoFirst), weekEnd.toISOString()
-            ]...
-        $lw: (aoFirst, aoSecond)-> # last week
-          weekStart = moment().subtract(1, 'weeks').startOf 'week'
-          weekEnd = weekStart.clone().endOf 'week'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), weekStart.toISOString()
-              qb.lt wrapReference(aoFirst), weekEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), weekStart.toISOString()
-              qb.lt wrapReference(aoFirst), weekEnd.toISOString()
-            ]...
-        $tm: (aoFirst, aoSecond)-> # this month
-          firstDayStart = moment().startOf 'month'
-          lastDayEnd = moment().endOf 'month'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-        $lm: (aoFirst, aoSecond)-> # last month
-          firstDayStart = moment().subtract(1, 'months').startOf 'month'
-          lastDayEnd = firstDayStart.clone().endOf 'month'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-        $ty: (aoFirst, aoSecond)-> # this year
-          firstDayStart = moment().startOf 'year'
-          lastDayEnd = firstDayStart.clone().endOf 'year'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-        $ly: (aoFirst, aoSecond)-> # last year
-          firstDayStart = moment().subtract(1, 'years').startOf 'year'
-          lastDayEnd = firstDayStart.clone().endOf 'year'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-
-    @public parseFilter: Function,
-      args: [Object]
-      return: RC::Constants.ANY
-      default: ({field, parts, operator, operand, implicitField})->
-        if field? and operator isnt '$elemMatch' and parts.length is 0
-          @operatorsMap[operator] field, operand
-        else if field? and operator is '$elemMatch'
-          if implicitField is yes
-            @operatorsMap[operator] field, parts.map (part)=>
-              part.field = "@CURRENT"
-              @parseFilter part
-          else
-            @operatorsMap[operator] field, parts.map (part)=>
-              part.field = "@CURRENT.#{part.field}"
-              @parseFilter part
-        else
-          @operatorsMap[operator ? '$and'] parts.map @parseFilter.bind @
+    @public method: String
 
     @public parseQuery: Function,
       default: (aoQuery)->
@@ -203,6 +22,10 @@ module.exports = (LeanRC)->
         aggUsed = aggPartial = intoUsed = intoPartial = finAggUsed = finAggPartial = null
         if aoQuery.$remove?
           do =>
+            @method = 'DELETE'
+            # родилась мысль - чтобы это корректно обрабатывать на HTTP уровне, надо чтобы было: (2 возможных варианта решения)
+            # 1. Либо мы конвертируем половину запроса в запрос на list - чтобы отфильтровать все записи, после чего идем циклом по массиву, и на каждом итеме вызываем запрос на DELETE|>/items/:item_id/
+            # 2. Либо создаем отдельный эндпоинт аналогичный list, но этот эндпоинт обрабатывает метод DELETE - т.е. запрос будет DELETE|</items/?query="<some query>"
             if aoQuery.$forIn?
               for own asItemRef, asCollectionFullName of aoQuery.$forIn
                 voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
@@ -224,6 +47,10 @@ module.exports = (LeanRC)->
         else if (voRecord = aoQuery.$insert)?
           do =>
             if aoQuery.$into?
+              @method = 'POST'
+              # вот эту часть от $forIn и до фильтрации с летом - не пойму какой в нее вкладывал смысл - это же всетаки просто вставка новой записи в базу данных.
+              # сейчас придумал один из возможных смыслов - если фильтрация возвращает результат, то вставка происходит, иначе не происходит (аналог условного оператора) - но это надо обсудить.
+              # возможно это полная бессмыслица.
               if aoQuery.$forIn?
                 for own asItemRef, asCollectionFullName of aoQuery.$forIn
                   voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
@@ -245,6 +72,8 @@ module.exports = (LeanRC)->
         else if (voRecord = aoQuery.$update)?
           do =>
             if aoQuery.$into?
+              @method = 'PATCH'
+              # квери параметры надо завернуть в url после ?, а vhObjectForUpdate передать в body
               if aoQuery.$forIn?
                 for own asItemRef, asCollectionFullName of aoQuery.$forIn
                   voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
@@ -267,6 +96,8 @@ module.exports = (LeanRC)->
         else if (voRecord = aoQuery.$replace)?
           do =>
             if aoQuery.$into?
+              @method = 'PUT'
+              # квери параметры надо завернуть в url после ?, а vhObjectForUpdate передать в body
               if aoQuery.$forIn?
                 for own asItemRef, asCollectionFullName of aoQuery.$forIn
                   voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
@@ -288,6 +119,7 @@ module.exports = (LeanRC)->
                 .into aoQuery.$into
         else if aoQuery.$forIn?
           do =>
+            @method = 'GET'
             for own asItemRef, asCollectionFullName of aoQuery.$forIn
               voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
                 .in asCollectionFullName
