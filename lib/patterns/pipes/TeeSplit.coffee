@@ -28,7 +28,7 @@ module.exports = (LeanRC)->
         @[iplOutputs] ?= []
         for aoOutput, i in @[iplOutputs]
           if aoOutput is aoTarget
-            @[iplOutputs].splice i,1
+            @[iplOutputs][i..i] = []
             voRemoved = aoOutput
             break
         voRemoved

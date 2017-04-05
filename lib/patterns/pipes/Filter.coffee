@@ -18,7 +18,8 @@ module.exports = (LeanRC)->
       args: [LeanRC::PipeMessageInterface]
       return: Boolean
       default: (aoMessage)-> # must be instance of FilterControlMessage
-        aoMessage?.getName() is @[ipsName]
+        aoMessage instanceof LeanRC::FilterControlMessage and
+          aoMessage?.getName() is @[ipsName]
 
     ipmApplyFilter = @protected applyFilter: Function,
       args: [LeanRC::PipeMessageInterface]
@@ -33,8 +34,8 @@ module.exports = (LeanRC)->
         return
 
     @public setFilter: Function,
-      default: (amFlter)->
-        @[ipmFilter] = amFlter
+      default: (amFilter)->
+        @[ipmFilter] = amFilter
         return
 
     @public write: Function,
@@ -73,11 +74,11 @@ module.exports = (LeanRC)->
             vbSuccess = @[ipoOutput].write outputMessage
         return vbSuccess
 
-    constructor: (asName, aoOutput=null, amFlter=null, aoParams=null)->
+    constructor: (asName, aoOutput=null, amFilter=null, aoParams=null)->
       super aoOutput
       @[ipsName] = asName
-      if amFlter?
-        @setFilter amFlter
+      if amFilter?
+        @setFilter amFilter
       if aoParams?
         @setParams aoParams
 

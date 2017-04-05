@@ -32,27 +32,38 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    cpsPath       = @protected @static path: String
-    cpsName       = @protected @static name: String
-    cpsModule     = @protected @static module: String
-    cplOnly       = @protected @static only: Array
-    cplVia        = @protected @static via: Array
-    cplExcept     = @protected @static except: Array
-    cpsAt         = @protected @static at: String
-    cpsResource   = @protected @static resource: String
+    ipsPath       = @protected path: String,
+      default: '/'
+    ipsName       = @protected name: String,
+      default: ''
+    ipsModule     = @protected module: String
+    iplOnly       = @protected only: Array
+    iplVia        = @protected via: Array
+    iplExcept     = @protected except: Array
+    ipsAt         = @protected at: String
+    ipsResource   = @protected resource: String
 
-    cplResources  = @protected @static resources: Array
-    cplRoutes     = @protected @static routes: Array
+    iplResources  = @protected resources: Array
+    iplRoutes     = @protected routes: Array
 
     @public @static map: Function,
       default: (lambda = ->)->
-        lambda.apply @, []
+        @public map: Function,
+          args: []
+          return: RC::Constants.ANY
+          default: lambda
+        return
 
-    @public @static root: Function,
+    @public map: Function,
+      args: []
+      return: RC::Constants.ANY
+      default: ->
+
+    @public root: Function,
       default: ({to, at, resource, action})->
         return
 
-    @public @static defineMethod: Function,
+    @public defineMethod: Function,
       default: (container, method, path, {to, at, resource, action}={})->
         unless path?
           throw new Error 'path is required'
@@ -61,57 +72,57 @@ module.exports = (LeanRC)->
           unless /[#]/.test to
             throw new Error '`to` must be in format `<resource>#<action>`'
           [resource, action] = to.split '#'
-        if not resource? and (vsResource = @[cpsResource]) isnt ''
+        if not resource? and (vsResource = @[ipsResource]) isnt ''
           resource = vsResource
-        if not resource? and (vsName = @[cpsName]) isnt ''
+        if not resource? and (vsName = @[ipsName]) isnt ''
           resource = vsName
         unless resource?
           throw new Error 'options `to` or `resource` must be defined'
         unless action?
           action = path
 
-        path = switch at ? @[cpsAt]
+        path = switch at ? @[ipsAt]
           when 'member'
-            "#{@[cpsPath]}:#{inflect.singularize inflect.underscore resource.replace(/[/]/g, '_').replace /[_]$/g, ''}/#{path}"
+            "#{@[ipsPath]}:#{inflect.singularize inflect.underscore resource.replace(/[/]/g, '_').replace /[_]$/g, ''}/#{path}"
           when 'collection'
-            "#{@[cpsPath]}#{path}"
+            "#{@[ipsPath]}#{path}"
           else
-            "#{@[cpsPath]}#{path}"
+            "#{@[ipsPath]}#{path}"
 
         container.push {method, path, resource, action}
         return
 
-    @public @static get: Function,
+    @public get: Function,
       default: (asPath, aoOpts)->
-        @[cplRoutes] ?= []
-        @defineMethod @[cplRoutes], 'get', asPath, aoOpts
+        @[iplRoutes] ?= []
+        @defineMethod @[iplRoutes], 'get', asPath, aoOpts
         return
 
-    @public @static post: Function,
+    @public post: Function,
       default: (asPath, aoOpts)->
-        @[cplRoutes] ?= []
-        @defineMethod @[cplRoutes], 'post', asPath, aoOpts
+        @[iplRoutes] ?= []
+        @defineMethod @[iplRoutes], 'post', asPath, aoOpts
         return
 
-    @public @static put: Function,
+    @public put: Function,
       default: (asPath, aoOpts)->
-        @[cplRoutes] ?= []
-        @defineMethod @[cplRoutes], 'put', asPath, aoOpts
+        @[iplRoutes] ?= []
+        @defineMethod @[iplRoutes], 'put', asPath, aoOpts
         return
 
-    @public @static patch: Function,
+    @public patch: Function,
       default: (asPath, aoOpts)->
-        @[cplRoutes] ?= []
-        @defineMethod @[cplRoutes], 'patch', asPath, aoOpts
+        @[iplRoutes] ?= []
+        @defineMethod @[iplRoutes], 'patch', asPath, aoOpts
         return
 
-    @public @static delete: Function,
+    @public delete: Function,
       default: (asPath, aoOpts)->
-        @[cplRoutes] ?= []
-        @defineMethod @[cplRoutes], 'delete', asPath, aoOpts
+        @[iplRoutes] ?= []
+        @defineMethod @[iplRoutes], 'delete', asPath, aoOpts
         return
 
-    @public @static resource: Function,
+    @public resource: Function,
       default: (asName, aoOpts = null, lambda = null)->
         vcModule = @Module
         if aoOpts?.constructor is Function
@@ -126,43 +137,43 @@ module.exports = (LeanRC)->
           ''
         else
           "#{asName}/"
-        vsFullPath = switch at ? @[cpsAt]
+        vsFullPath = switch at ? @[ipsAt]
           when 'member'
-            [..., previously, empty] = @[cpsPath].split '/'
-            "#{@[cpsPath]}:#{inflect.singularize inflect.underscore previously}/#{vsPath}"
+            [..., previously, empty] = @[ipsPath].split '/'
+            "#{@[ipsPath]}:#{inflect.singularize inflect.underscore previously}/#{vsPath}"
           when 'collection'
-            "#{@[cpsPath]}#{vsPath}"
+            "#{@[ipsPath]}#{vsPath}"
           else
-            "#{@[cpsPath]}#{vsPath}"
-        vsParentName = @[cpsName]
+            "#{@[ipsPath]}#{vsPath}"
+        vsParentName = @[ipsName]
         vsName = if vsModule? and vsModule isnt ''
           "#{vsModule}/"
         else if vsModule? and vsModule is ''
           ''
         else
           "#{asName}/"
-        @[cplResources] ?= []
+        @[iplResources] ?= []
         class ResourceRouter extends Router
           @inheritProtected()
           @Module: vcModule
-          @protected @static path: String,
+          @protected path: String,
             default: vsFullPath
-          @protected @static name: String,
+          @protected name: String,
             default: "#{vsParentName}#{vsName}"
-          @protected @static module: String,
+          @protected module: String,
             default: vsModule
-          @protected @static only: Array,
+          @protected only: Array,
             default: only
-          @protected @static via: Array,
+          @protected via: Array,
             default: via
-          @protected @static except: Array,
+          @protected except: Array,
             default: except
-          @protected @static resource: String,
+          @protected resource: String,
             default: resource
           @map lambda
-        @[cplResources].push ResourceRouter.initialize()
+        @[iplResources].push ResourceRouter.initialize()
 
-    @public @static namespace: Function,
+    @public namespace: Function,
       default: (asName, aoOpts = null, lambda = null)->
         vcModule = @Module
         if aoOpts?.constructor is Function
@@ -170,124 +181,121 @@ module.exports = (LeanRC)->
           aoOpts = {}
         aoOpts = {} unless aoOpts?
         {module:vsModule, prefix, at} = aoOpts
-        vsParentPath = @[cpsPath]
+        vsParentPath = @[ipsPath]
         vsPath = if prefix? and prefix isnt ''
           "#{prefix}/"
         else if prefix? and prefix is ''
           ''
         else
           "#{asName}/"
-        vsParentName = @[cpsName]
+        vsParentName = @[ipsName]
         vsName = if vsModule? and vsModule isnt ''
           "#{vsModule}/"
         else if vsModule? and vsModule is ''
           ''
         else
           "#{asName}/"
-        @[cplResources] ?= []
-        if lambda?.constructor is Function
-          class NamespaceRouter extends Router
-            @inheritProtected()
-            @Module: vcModule
-            @protected @static path: String,
-              default: "#{vsParentPath}#{vsPath}"
-            @protected @static name: String,
-              default: "#{vsParentName}#{vsName}"
-            @protected @static except: Array,
-              default: 'all'
-            @protected @static at: String,
-              default: at
-            @map lambda
-          @[cplResources].push NamespaceRouter.initialize()
+        @[iplResources] ?= []
+        class NamespaceRouter extends Router
+          @inheritProtected()
+          @Module: vcModule
+          @protected path: String,
+            default: "#{vsParentPath}#{vsPath}"
+          @protected name: String,
+            default: "#{vsParentName}#{vsName}"
+          @protected except: Array,
+            default: 'all'
+          @protected at: String,
+            default: at
+          @map lambda
+        @[iplResources].push NamespaceRouter.initialize()
 
-    @public @static member: Function,
+    @public member: Function,
       default: (lambda)->
         @namespace null, module: '', prefix: '', at: 'member', lambda
 
-    @public @static collection: Function,
+    @public collection: Function,
       default: (lambda = ->)->
         @namespace null, module: '', prefix: '', at: 'collection', lambda
 
     @public routes: Array,
       get: ->
         vlRoutes = []
-        vlRoutes = vlRoutes.concat @constructor[cplRoutes] ? []
+        vlRoutes = vlRoutes.concat @[iplRoutes] ? []
 
-        @constructor[cplResources]?.forEach (ResourceRouter)=>
+        @[iplResources]?.forEach (ResourceRouter)=>
           resourceRouter = ResourceRouter.new()
-          vlRoutes = vlRoutes.concat resourceRouter.routes() ? []
+          vlRoutes = vlRoutes.concat resourceRouter.routes ? []
         return vlRoutes
 
-    @public @static initialize: Function,
-      default: ->
-        @super arguments...
+    constructor: (args...)->
+      super args...
+      @map()
 
-        if @[cplOnly]?.constructor is String
-          @[cplOnly] = [@[cplOnly]]
-        if @[cplVia]?.constructor is String
-          @[cplVia] = [@[cplVia]]
-        if @[cplExcept]?.constructor is String
-          @[cplExcept] = [@[cplExcept]]
+      if @[iplOnly]?.constructor is String
+        @[iplOnly] = [@[iplOnly]]
+      if @[iplVia]?.constructor is String
+        @[iplVia] = [@[iplVia]]
+      if @[iplExcept]?.constructor is String
+        @[iplExcept] = [@[iplExcept]]
 
-        voMethods =
-          list: 'get'
-          detail: 'get'
-          create: 'post'
-          patch: 'patch'
-          update: 'put'
-          delete: 'delete'
+      voMethods =
+        list: 'get'
+        detail: 'get'
+        create: 'post'
+        patch: 'patch'
+        update: 'put'
+        delete: 'delete'
 
-        voPaths =
-          list: ''
-          detail: null
-          create: ''
-          patch: null
-          update: null
-          delete: null
+      voPaths =
+        list: ''
+        detail: null
+        create: ''
+        patch: null
+        update: null
+        delete: null
 
-        @[cplRoutes] ?= []
+      @[iplRoutes] ?= []
 
-        if @[cpsName]? and @[cpsName] isnt ''
-          if @[cplOnly]?
-            @[cplOnly].forEach (asAction)=>
-              vsPath = voPaths[asAction]
-              vsPath ?= ':' + inflect.singularize inflect.underscore (@[cpsResource] ? @[cpsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
-              @defineMethod @[cplRoutes], voMethods[asAction], vsPath,
-                action: asAction
-                resource: @[cpsResource] ? @[cpsName]
-          else if @[cplExcept]?
-            for own asAction, asMethod of voMethods
-              do (asAction, asMethod)=>
-                if not @[cplExcept].includes('all') and not @[cplExcept].includes asAction
-                  vsPath = voPaths[asAction]
-                  vsPath ?= ':' + inflect.singularize inflect.underscore (@[cpsResource] ? @[cpsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
-                  @defineMethod @[cplRoutes], asMethod, vsPath,
-                    action: asAction
-                    resource: @[cpsResource] ? @[cpsName]
-          else if @[cplVia]?
-            @[cplVia].forEach (asCustomAction)=>
-              vsPath = voPaths[asCustomAction]
-              vsPath ?= ':' + inflect.singularize inflect.underscore (@[cpsResource] ? @[cpsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
-              if asCustomAction is 'all'
-                for own asAction, asMethod of voMethods
-                  do (asAction, asMethod)=>
-                    @defineMethod @[cplRoutes], asMethod, vsPath,
-                      action: asAction
-                      resource: @[cpsResource] ? @[cpsName]
-              else
-                @defineMethod @[cplRoutes], voMethods[asCustomAction], vsPath,
-                  action: asCustomAction
-                  resource: @[cpsResource] ? @[cpsName]
-          else
-            for own asAction, asMethod of voMethods
-              do (asAction, asMethod)=>
+      if @[ipsName]? and @[ipsName] isnt ''
+        if @[iplOnly]?
+          @[iplOnly].forEach (asAction)=>
+            vsPath = voPaths[asAction]
+            vsPath ?= ':' + inflect.singularize inflect.underscore (@[ipsResource] ? @[ipsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
+            @defineMethod @[iplRoutes], voMethods[asAction], vsPath,
+              action: asAction
+              resource: @[ipsResource] ? @[ipsName]
+        else if @[iplExcept]?
+          for own asAction, asMethod of voMethods
+            do (asAction, asMethod)=>
+              if not @[iplExcept].includes('all') and not @[iplExcept].includes asAction
                 vsPath = voPaths[asAction]
-                vsPath ?= ':' + inflect.singularize inflect.underscore (@[cpsResource] ? @[cpsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
-                @defineMethod @[cplRoutes], asMethod, vsPath,
+                vsPath ?= ':' + inflect.singularize inflect.underscore (@[ipsResource] ? @[ipsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
+                @defineMethod @[iplRoutes], asMethod, vsPath,
                   action: asAction
-                  resource: @[cpsResource] ? @[cpsName]
-
-        return @
+                  resource: @[ipsResource] ? @[ipsName]
+        else if @[iplVia]?
+          @[iplVia].forEach (asCustomAction)=>
+            vsPath = voPaths[asCustomAction]
+            vsPath ?= ':' + inflect.singularize inflect.underscore (@[ipsResource] ? @[ipsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
+            if asCustomAction is 'all'
+              for own asAction, asMethod of voMethods
+                do (asAction, asMethod)=>
+                  @defineMethod @[iplRoutes], asMethod, vsPath,
+                    action: asAction
+                    resource: @[ipsResource] ? @[ipsName]
+            else
+              @defineMethod @[iplRoutes], voMethods[asCustomAction], vsPath,
+                action: asCustomAction
+                resource: @[ipsResource] ? @[ipsName]
+        else
+          for own asAction, asMethod of voMethods
+            do (asAction, asMethod)=>
+              vsPath = voPaths[asAction]
+              vsPath ?= ':' + inflect.singularize inflect.underscore (@[ipsResource] ? @[ipsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
+              @defineMethod @[iplRoutes], asMethod, vsPath,
+                action: asAction
+                resource: @[ipsResource] ? @[ipsName]
 
 
   return LeanRC::Router.initialize()

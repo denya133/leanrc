@@ -22,6 +22,7 @@ module.exports = (LeanRC)->
         return
 
     @public listNotificationInterests: Function,
+      configurable: yes
       default: -> []
 
     @public handleNotification: Function,

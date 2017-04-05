@@ -38,12 +38,10 @@ module.exports = (LeanRC)->
       default: ->
         vbSuccess = yes
         @[iplMessages] ?= []
-        voMessage = @[iplMessages].shift()
-        while voMessage
-          ok = @[ipoOutput].write message
+        while (voMessage = @[iplMessages].shift())?
+          ok = @[ipoOutput].write voMessage
           unless ok
             vbSuccess = no
-          voMessage = @[iplMessages].shift()
         vbSuccess
 
     @public write: Function,
@@ -53,13 +51,10 @@ module.exports = (LeanRC)->
         switch aoMessage.getType()
           when LeanRC::PipeMessage.NORMAL
             @[ipmStore] aoMessage
-            break
           when LeanRC::QueueControlMessage.FLUSH
             vbSuccess = @[ipmFlush]()
-            break
           when LeanRC::QueueControlMessage.SORT, LeanRC::QueueControlMessage.FIFO
             @[ipsMode] = aoMessage.getType()
-            break
         return vbSuccess
 
     constructor: (aoOutput=null)->

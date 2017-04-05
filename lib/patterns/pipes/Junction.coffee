@@ -13,8 +13,8 @@ module.exports = (LeanRC)->
 
     iplInputPipes = @protected inputPipes: Array
     iplOutputPipes = @protected outputPipes: Array
-    iplPipesMap = @protected pipesMap: Array
-    iplPipeTypesMap = @protected pipeTypesMap: Array
+    iplPipesMap = @protected pipesMap: Object
+    iplPipeTypesMap = @protected pipeTypesMap: Object
 
 
     @public registerPipe: Function,
@@ -28,10 +28,8 @@ module.exports = (LeanRC)->
           switch type
             when LeanRC::Junction.INPUT
               @[iplInputPipes].push name
-              break
             when LeanRC::Junction.OUTPUT
               @[iplOutputPipes].push name
-              break
             else
               vbSuccess = no
         else
@@ -62,20 +60,19 @@ module.exports = (LeanRC)->
       default: (name)->
         if @hasPipe name
           type = @[iplPipeTypesMap][name]
-          pipesList = []
-          switch type
+          pipesList = switch type
             when LeanRC::Junction.INPUT
-              pipesList = @[iplInputPipes]
-              break
+              @[iplInputPipes]
             when LeanRC::Junction.OUTPUT
-              pipesList = @[iplOutputPipes]
-              break
+              @[iplOutputPipes]
+            else
+              []
           for pipe, i in pipesList
             if pipe is name
-              pipesList.splice i, 1
+              pipesList[i..i] = []
               break
-          @[iplPipesMap].splice @[iplPipesMap].indexOf(name), name
-          @[iplPipeTypesMap].splice @[iplPipeTypesMap].indexOf(name), name
+          delete @[iplPipesMap][name]
+          delete @[iplPipeTypesMap][name]
         return
 
     @public retrievePipe: Function,
@@ -103,6 +100,13 @@ module.exports = (LeanRC)->
           pipe = @[iplPipesMap][outputPipeName]
           vbSuccess = pipe.write message
         vbSuccess
+
+    constructor: (args...) ->
+      super args...
+      @[iplInputPipes] = []
+      @[iplOutputPipes] = []
+      @[iplPipesMap] = {}
+      @[iplPipeTypesMap] = {}
 
 
   return LeanRC::Junction.initialize()
