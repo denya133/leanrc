@@ -13,7 +13,10 @@ module.exports = (LeanRC)->
       get: -> ['json', 'html', 'xml', 'atom']
 
     # должены быть объявлены в унаследованном классе
-    # @public routerName: String
+    @public routerName: String,
+      configurable: yes
+      get: (value)->
+        throw new Error '`Switch::routerName` should be defined in derived class'
 
     # @public jsonRendererName: String
     # @public htmlRendererName: String
@@ -147,7 +150,10 @@ module.exports = (LeanRC)->
         return
 
     # должен быть объявлен в унаследованном классе
-    # @public createNativeRoute: Function,
+    @public createNativeRoute: Function,
+      configurable: yes
+      default: ->
+        throw new Error '`Switch::createNativeRoute` should be implemeted in derived class'
 
 
   return LeanRC::Switch.initialize()

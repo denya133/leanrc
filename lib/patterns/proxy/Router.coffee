@@ -32,8 +32,10 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    cpsPath       = @protected @static path: String
-    cpsName       = @protected @static name: String
+    cpsPath       = @protected @static path: String,
+      default: '/'
+    cpsName       = @protected @static name: String,
+      default: ''
     cpsModule     = @protected @static module: String
     cplOnly       = @protected @static only: Array
     cplVia        = @protected @static via: Array
@@ -210,13 +212,7 @@ module.exports = (LeanRC)->
 
     @public routes: Array,
       get: ->
-        vlRoutes = []
-        vlRoutes = vlRoutes.concat @constructor[cplRoutes] ? []
-
-        @constructor[cplResources]?.forEach (ResourceRouter)=>
-          resourceRouter = ResourceRouter.new()
-          vlRoutes = vlRoutes.concat resourceRouter.routes() ? []
-        return vlRoutes
+        return @constructor[cplRoutes] ? []
 
     @public @static initialize: Function,
       default: ->
