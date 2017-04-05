@@ -112,3 +112,37 @@ describe 'Router', ->
         router = Test::TestRouter.new 'TEST_ROUTER'
         assert.equal spyDefineMethod.callCount, 1, 'Methods did not defined'
       .to.not.throw Error
+  describe '#member', ->
+    it 'should define `member` method for router', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @Module: Test
+          @map ->
+            @resource 'test2', except: 'patch', ->
+              @member ->
+                @post 'test4'
+                @get 'test5'
+        Test::TestRouter.initialize()
+        spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
+        router = Test::TestRouter.new 'TEST_ROUTER'
+        assert.lengthOf router.routes, 7, 'Methods did not defined'
+      .to.not.throw Error
+  describe '#collection', ->
+    it 'should define `collection` method for router', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @Module: Test
+          @map ->
+            @resource 'test2', except: 'patch', ->
+              @collection ->
+                @post 'test4'
+                @get 'test5'
+        Test::TestRouter.initialize()
+        spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
+        router = Test::TestRouter.new 'TEST_ROUTER'
+        assert.lengthOf router.routes, 7, 'Methods did not defined'
+      .to.not.throw Error
