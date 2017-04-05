@@ -5,7 +5,7 @@ LeanRC = require.main.require 'lib'
 Router = LeanRC::Router
 
 describe 'Router', ->
-  describe '.new, .map, #map', ->
+  describe '.new, .map, #map, #resource, #namespace, #routes', ->
     it 'should create new router', ->
       expect ->
         class Test extends RC::Module
@@ -37,4 +37,78 @@ describe 'Router', ->
         spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
         router = Test::TestRouter.new 'TEST_ROUTER'
         assert.equal spyDefineMethod.callCount, 3, 'Methods did not defined'
+      .to.not.throw Error
+    it 'should define `get` method for router', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @Module: Test
+          @map ->
+            @resource 'test2', ->
+            @get 'test3', resource: 'test2'
+        Test::TestRouter.initialize()
+        spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
+        router = Test::TestRouter.new 'TEST_ROUTER'
+        assert.equal spyDefineMethod.callCount, 1, 'Methods did not defined'
+      .to.not.throw Error
+  describe '#post', ->
+    it 'should define `post` method for router', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @Module: Test
+          @map ->
+            @resource 'test2', ->
+            @post 'test3', resource: 'test2'
+        Test::TestRouter.initialize()
+        spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
+        router = Test::TestRouter.new 'TEST_ROUTER'
+        assert.equal spyDefineMethod.callCount, 1, 'Methods did not defined'
+      .to.not.throw Error
+  describe '#put', ->
+    it 'should define `put` method for router', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @Module: Test
+          @map ->
+            @resource 'test2', ->
+            @put 'test3', resource: 'test2'
+        Test::TestRouter.initialize()
+        spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
+        router = Test::TestRouter.new 'TEST_ROUTER'
+        assert.equal spyDefineMethod.callCount, 1, 'Methods did not defined'
+      .to.not.throw Error
+  describe '#patch', ->
+    it 'should define `patch` method for router', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @Module: Test
+          @map ->
+            @resource 'test2', ->
+            @patch 'test3', resource: 'test2'
+        Test::TestRouter.initialize()
+        spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
+        router = Test::TestRouter.new 'TEST_ROUTER'
+        assert.equal spyDefineMethod.callCount, 1, 'Methods did not defined'
+      .to.not.throw Error
+  describe '#delete', ->
+    it 'should define `delete` method for router', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @Module: Test
+          @map ->
+            @resource 'test2', ->
+            @delete 'test3', resource: 'test2'
+        Test::TestRouter.initialize()
+        spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
+        router = Test::TestRouter.new 'TEST_ROUTER'
+        assert.equal spyDefineMethod.callCount, 1, 'Methods did not defined'
       .to.not.throw Error
