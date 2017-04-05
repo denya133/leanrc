@@ -12,49 +12,53 @@ module.exports = (LeanRC)->
 
     @public @static @virtual map: Function,
       args: [[Function, RC::Constants.NILL]]
+      return: RC::Constants.NILL
+
+    @public @virtual map: Function,
+      args: [[Function, RC::Constants.NILL]]
       return: RC::Constants.ANY
 
-    @public @static @virtual root: Function,
+    @public @virtual root: Function,
       args: [Object] # {to, at, controller, action}
       return: RC::Constants.NILL
 
-    @public @static @virtual defineMethod: Function,
+    @public @virtual defineMethod: Function,
       args: [String, String, String, Object] # container, method, path, {to, at, controller, action}
       return: RC::Constants.NILL
 
-    @public @static @virtual get: Function,
+    @public @virtual get: Function,
       args: [String, Object] # path, opts
       return: RC::Constants.NILL
 
-    @public @static @virtual post: Function,
+    @public @virtual post: Function,
       args: [String, Object] # path, opts
       return: RC::Constants.NILL
 
-    @public @static @virtual put: Function,
+    @public @virtual put: Function,
       args: [String, Object] # path, opts
       return: RC::Constants.NILL
 
-    @public @static @virtual patch: Function,
+    @public @virtual patch: Function,
       args: [String, Object] # path, opts
       return: RC::Constants.NILL
 
-    @public @static @virtual delete: Function,
+    @public @virtual delete: Function,
       args: [String, Object] # path, opts
       return: RC::Constants.NILL
 
-    @public @static @virtual resource: Function,
+    @public @virtual resource: Function,
       args: [String, Object, Function] # name, opts, lambda
       return: RC::Constants.ANY
 
-    @public @static @virtual namespace: Function,
+    @public @virtual namespace: Function,
       args: [String, Object, Function] # name, opts, lambda
       return: RC::Constants.ANY
 
-    @public @static @virtual member: Function,
+    @public @virtual member: Function,
       args: [Function] # lambda
       return: RC::Constants.ANY
 
-    @public @static @virtual collection: Function,
+    @public @virtual collection: Function,
       args: [[Function, RC::Constants.NILL]] # lambda
       return: RC::Constants.ANY
 
