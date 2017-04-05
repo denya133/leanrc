@@ -87,10 +87,29 @@ describe 'Switch', ->
         switchMediator.onRegister()
         assert.instanceOf switchMediator.getViewComponent(), EventEmitter, 'Event emitter did not created'
       .to.not.throw Error
-  describe 'register mediator', ->
-    it 'should register switch into view', ->
-      # expect ->
-      #   facade = Facade.getInstance 'TEST_SWITCH_XXX'
-      #   switchMediator = Switch.new 'TEST_SWITCH_MEDIATOR'
-      #   facade.registerMediator switchMediator
-      # .to.not.throw Error
+  describe '#onRemove', ->
+    it 'should run remove procedure', ->
+      expect ->
+        facade = Facade.getInstance 'TEST_SWITCH_1'
+        class Test extends RC::Module
+        class Test::TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @Module: Test
+        Test::TestRouter.initialize()
+        facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
+        class Test::TestSwitch extends Switch
+          @inheritProtected()
+          @Module: Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+          @public createNativeRoute: Function,
+            configurable: yes
+            default: ->
+        Test::TestSwitch.initialize()
+        switchMediator = Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator.initializeNotifier 'TEST_SWITCH_1'
+        switchMediator.onRegister()
+        switchMediator.onRemove()
+        assert.equal switchMediator.getViewComponent().eventNames().length, 0, 'Event listeners not cleared'
+      .to.not.throw Error
