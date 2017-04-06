@@ -258,3 +258,67 @@ describe 'Switch', ->
         assert.isTrue spyResponseSend.called, 'Response not sent'
         assert.isTrue spyResponseSend.calledWith(renderedGauge), 'Response data are incorrect'
       .to.not.throw Error
+  describe '#handler', ->
+    it 'should send notification', ->
+      expect ->
+        facade = Facade.getInstance 'TEST_SWITCH_6'
+        class Test extends RC::Module
+        class Test::TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @Module: Test
+        Test::TestRouter.initialize()
+        facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
+        facade.registerProxy LeanRC::Proxy.new LeanRC::Constants.CONFIGURATION,
+          currentUserCookie: 'cuc'
+        class Test::TestSwitch extends Switch
+          @inheritProtected()
+          @Module: Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+          @public createNativeRoute: Function,
+            configurable: yes
+            default: ->
+        Test::TestSwitch.initialize()
+        class Test::Request extends RC::CoreObject
+          @inheritProtected()
+          @Module: Test
+          constructor: (args...) ->
+            super args...
+            @query = a: 1, b: 2, c: 'abc'
+            @params = test: 'test'
+            @cookies = cuc: 'CURRENT_USER_COOKIE'
+            @headers = accept: 'json'
+            @body = test: 'test'
+        Test::Request.initialize()
+        class Test::Response extends RC::CoreObject
+          @inheritProtected()
+          @Module: Test
+        Test::Response.initialize()
+        switchMediator = Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator.initializeNotifier 'TEST_SWITCH_6'
+        spySwitchSendNotification = sinon.spy switchMediator, 'sendNotification'
+        vhParams =
+          req: Test::Request.new()
+          res: Test::Response.new()
+          reverse: 'TEST_REVERSE'
+        vhOptions =
+          method: 'GET'
+          path: '/test'
+          resource: 'test'
+          action: 'list'
+        switchMediator.handler 'test', vhParams, vhOptions
+        assert.isTrue spySwitchSendNotification.called, 'Notification not sent'
+        assert.deepEqual spySwitchSendNotification.args[0], [
+          'test'
+          {
+            queryParams: a: 1, b: 2, c: 'abc'
+            pathPatams: test: 'test'
+            currentUserId: 'CURRENT_USER_COOKIE'
+            headers: accept: 'json'
+            body: test: 'test'
+            reverse: 'TEST_REVERSE'
+          }
+          'list'
+        ]
+      .to.not.throw Error

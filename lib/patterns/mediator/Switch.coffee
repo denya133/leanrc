@@ -102,7 +102,8 @@ module.exports = (LeanRC)->
       default: (resourceName, {req, res, reverse}, {method, path, resource, action})->
         queryParams = req.query
         pathPatams = req.params
-        currentUserId = req.cookies[@getData().currentUserCookie]
+        configurationProxy = @facade.retrieveProxy LeanRC::Constants.CONFIGURATION
+        currentUserId = req.cookies[configurationProxy.getData().currentUserCookie]
         headers = req.headers
         body = req.body
         voMessage = {
