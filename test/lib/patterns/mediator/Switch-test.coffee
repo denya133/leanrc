@@ -121,7 +121,7 @@ describe 'Switch', ->
         class Test extends RC::Module
         require.main.require('test/integration/renderers') Test
         facade.registerProxy Test::JsonRenderer.new 'TEST_JSON_RENDERER'
-        facade.registerProxy Test::HtmlRenderer.new 'TEST_HEML_RENDERER'
+        facade.registerProxy Test::HtmlRenderer.new 'TEST_HTML_RENDERER'
         facade.registerProxy Test::XmlRenderer.new 'TEST_XML_RENDERER'
         facade.registerProxy Test::AtomRenderer.new 'TEST_ATOM_RENDERER'
         class Test::TestRouter extends LeanRC::Router
@@ -135,7 +135,7 @@ describe 'Switch', ->
           @public jsonRendererName: String,
             default: 'TEST_JSON_RENDERER'
           @public htmlRendererName: String,
-            default: 'TEST_HEML_RENDERER'
+            default: 'TEST_HTML_RENDERER'
           @public xmlRendererName: String,
             default: 'TEST_XML_RENDERER'
           @public atomRendererName: String,
@@ -176,4 +176,85 @@ describe 'Switch', ->
         atomRendered = switchMediator.rendererFor('atom').render vhData
         atomRenderedGauge = (new Feed vhData).atom1()
         assert.equal atomRendered, atomRenderedGauge, 'ATOM did not rendered'
+      .to.not.throw Error
+  describe '#sendHttpResponse', ->
+    it 'should send http response', ->
+      expect ->
+        facade = Facade.getInstance 'TEST_SWITCH_5'
+        class Test extends RC::Module
+        spyRendererRender = sinon.spy ->
+        class Test::TestRenderer extends LeanRC::Renderer
+          @inheritProtected()
+          @public render: Function,
+            default: (aoData, aoOptions) ->
+              spyRendererRender aoData, aoOptions
+              vhData = RC::Utils.extend {}, aoData
+              JSON.stringify vhData ? null
+        Test::TestRenderer.initialize()
+        facade.registerProxy Test::TestRenderer.new 'TEST_JSON_RENDERER'
+        facade.registerProxy Test::TestRenderer.new 'TEST_HTML_RENDERER'
+        facade.registerProxy Test::TestRenderer.new 'TEST_XML_RENDERER'
+        facade.registerProxy Test::TestRenderer.new 'TEST_ATOM_RENDERER'
+        class Test::TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @Module: Test
+        Test::TestRouter.initialize()
+        class Test::Request extends RC::CoreObject
+          @inheritProtected()
+          @Module: Test
+          @public format: String,
+            default: 'json'
+          @public accepts: Function,
+            default: (alFormats = []) ->
+              @format  if @format in alFormats
+          constructor: (args...) ->
+            super args...
+            [@format] = args
+        Test::Request.initialize()
+        spyResponseSet = sinon.spy ->
+        spyResponseSend = sinon.spy ->
+        class Test::Response extends RC::CoreObject
+          @inheritProtected()
+          @Module: Test
+          @public set: Function,
+            default: spyResponseSet
+          @public send: Function,
+            default: spyResponseSend
+        Test::Response.initialize()
+        facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
+        class Test::TestSwitch extends Switch
+          @inheritProtected()
+          @Module: Test
+          @public jsonRendererName: String,
+            default: 'TEST_JSON_RENDERER'
+          @public htmlRendererName: String,
+            default: 'TEST_HTML_RENDERER'
+          @public xmlRendererName: String,
+            default: 'TEST_XML_RENDERER'
+          @public atomRendererName: String,
+            default: 'TEST_ATOM_RENDERER'
+          @public routerName: String,
+            default: 'TEST_SWITCH_ROUTER'
+          @public createNativeRoute: Function,
+            default: ->
+        Test::TestSwitch.initialize()
+        facade.registerMediator Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        vhData =
+          id: '123'
+          title: 'Long story'
+          author: name: 'John Doe', email: 'johndoe@example.com'
+          description: 'True long story'
+          updated: new Date()
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        renderedGauge = JSON.stringify vhData
+        voRequest = Test::Request.new 'json'
+        voResponse = Test::Response.new()
+        vhOptions =
+          path: '/test'
+          resource: 'test'
+          action: 'list'
+        switchMediator.sendHttpResponse voRequest, voResponse, vhData, vhOptions
+        assert.isTrue spyRendererRender.calledWith(vhData, vhOptions), 'Render not called'
+        assert.isTrue spyResponseSend.called, 'Response not sent'
+        assert.isTrue spyResponseSend.calledWith(renderedGauge), 'Response data are incorrect'
       .to.not.throw Error

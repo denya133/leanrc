@@ -77,11 +77,11 @@ module.exports = (LeanRC)->
               voRendered = @rendererFor vsFormat
                 .render aoData, {path, resource, action}
             else
-              res.setHeader 'Content-Type', 'text/plain'
+              res.set 'Content-Type', 'text/plain'
               voRendered = JSON.stringify aoData
             res.send voRendered
           else
-            res.setHeader 'Content-Type', 'text/plain'
+            res.set 'Content-Type', 'text/plain'
             res.send JSON.stringify aoData
         return
 
