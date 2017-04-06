@@ -322,3 +322,28 @@ describe 'Switch', ->
           'list'
         ]
       .to.not.throw Error
+  describe '#defineSwaggerEndpoint', ->
+    it 'should define swagger endpoint', ->
+      expect ->
+        RESOURCE = 'test'
+        facade = Facade.getInstance 'TEST_SWITCH_7'
+        facade.registerProxy LeanRC::Proxy.new "#{RESOURCE}Gateway",
+        endpoints: {}
+        class Test extends RC::Module
+        class Test::TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @Module: Test
+        Test::TestRouter.initialize()
+        facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
+        class Test::TestSwitch extends Switch
+          @inheritProtected()
+          @Module: Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+          @public createNativeRoute: Function,
+            configurable: yes
+            default: ->
+        facade.registerMediator Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+      .to.not.throw Error
