@@ -14,61 +14,306 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public method: String
+    @public headers: Object
+    @public host: String,
+      default: ''
+    @public namespace: String,
+      default: ''
+    @public postfix: String,
+      default: 'bulk'
+
+    @public headersForRequest: Function,
+      args: [Object]
+      return: Object
+      default: (params)-> @headers ? {}
+
+    @public methodForRequest: Function,
+      args: [Object]
+      return: String
+      default: ({requestType})->
+        switch requestType
+          when 'find' then 'GET'
+          when 'insert' then 'POST'
+          when 'update' then 'PATCH'
+          when 'replace' then 'PUT'
+          when 'remove' then 'DELETE'
+          else
+            'GET'
+
+    @public dataForRequest: Function,
+      args: [Object]
+      return: Object
+      default: (params)->
+        {store, type, snapshot, requestType, query} = params
+
+    @public urlForRequest: Function,
+      args: [Object]
+      return: String
+      default: (params)->
+        {type, id, ids, snapshot, snapshots, requestType, query} = params
+
+    @public pathForType: Function,
+      args: [String]
+      return: String
+      default: (recordName)->
+        inflect.pluralize inflect.underscore recordName
+
+    ipmUrlPrefix = @protected urlPrefix: Function,
+      args: [String, String]
+      return: String
+      default: (path, parentURL)->
+        if not @host or @host is '/'
+          @host = ''
+
+        if path
+          # Protocol relative url
+          if /^\/\//.test(path) or /http(s)?:\/\//.test(path)
+            # Do nothing, the full @host is already included.
+            return path
+
+          # Absolute path
+          else if path.charAt(0) is '/'
+            return "#{@host}#{path}"
+          # Relative path
+          else
+            return "#{parentURL}/#{path}"
+
+        # No path provided
+        url = []
+        if @host then url.push @host
+        if @namespace then url.push @namespace
+        return url.join '/'
+
+    ipmBuildURL = @protected buildURL: Function,
+      args: [String, String]
+      return: String
+      default: (recordName, id)->
+        url = []
+        prefix = @[ipmUrlPrefix]()
+
+        if recordName
+          path = @pathForType recordName
+          url.push path if path
+
+        url.push encodeURIComponent id if id
+        url.unshift prefix if prefix
+
+        url = url.join '/'
+        if not @host and url and url.charAt(0) isnt '/'
+          url = '/' + url
+
+        return url
+
+    @public urlForFind: Function,
+      args: [Object]
+      return: String
+      default: ()->
+        this._buildURL(recordName, query)
+
+    @public urlForInsert: Function,
+      args: [Object]
+      return: String
+      default: ()->
+        this._buildURL(recordName, query)
+
+    @public urlForUpdate: Function,
+      args: [Object]
+      return: String
+      default: ()->
+        this._buildURL(recordName, query)
+
+    @public urlForReplace: Function,
+      args: [Object]
+      return: String
+      default: ()->
+        this._buildURL(recordName, query)
+
+    @public urlForRemove: Function,
+      args: [Object]
+      return: String
+      default: (recordName, id, query)->
+        this._buildURL(recordName, query)
+
+    @public buildURL: Function,
+      args: [Object]
+      return: String
+      default: (recordName, id, query, requestType)->
+        switch requestType
+          when 'find'
+            @urlForFind recordName, id, query
+          when 'insert'
+            @urlForInsert recordName, id
+          when 'update'
+            @urlForUpdate recordName, id, query
+          when 'replace'
+            @urlForReplace recordName, id, query
+          when 'remove'
+            @urlForRemove recordName, id, query
+          else
+            @[ipmBuildURL] recordName, id
+
+    ipmRequestFor = @protected requestFor: Function,
+      args: [Object]
+      return: Object
+      default: (params)->
+        method =  @methodForRequest params
+        url =     @urlForRequest params
+        headers = @headersForRequest params
+        data =    @dataForRequest params
+        return {method, url, headers, data}
+
+    ipmMakeRequest = @protected makeRequest: Function,
+      args: [Object]
+      return: Object
+      default: (request)-> # result of requestFor
+        {method, url, headers, data} = request
+
+    ipmSendRequest = @protected sendRequest: Function,
+      args: [Object]
+      return: Object
+      default: (request)-> # call from ipmMakeRequest
+
+    @public push: Function,
+      default: (aoRecord)->
+        # здесь надо придумать реальный посыл запроса к серверу
+        return yes
+
+    @public remove: Function,
+      default: (query)->
+        # здесь надо придумать реальный посыл запроса к серверу
+        return yes
+
+    @public take: Function,
+      default: (query)->
+        # здесь надо придумать реальный посыл запроса к серверу
+        return result # курсор с результатами
+
+    @public override: Function,
+      default: (query, aoRecord)->
+        # здесь надо придумать реальный посыл запроса к серверу
+        return result # курсор с результатами
+
+    @public patch: Function,
+      default: (query, aoRecord)->
+        # здесь надо придумать реальный посыл запроса к серверу
+        return result # курсор с результатами
+
+
+
+
+
+    @public forEach: Function,
+      default: (lambda)->
+        throw new Error 'Not available for HTTP requests'
+
+    @public filter: Function,
+      default: (lambda)->
+        throw new Error 'Not available for HTTP requests'
+
+    @public map: Function,
+      default: (lambda)->
+        throw new Error 'Not available for HTTP requests'
+
+    @public reduce: Function,
+      default: (lambda, initialValue)->
+        throw new Error 'Not available for HTTP requests'
+
+    ####### ПОД ВОПРОСОМ КАК ИХ АДАПТИРОВАТЬ ДЛЯ HTTP
+    @public includes: Function,
+      default: (id)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$eq: id}
+          .limit 1
+          .return '@doc'
+        return @query voQuery
+          .hasNext()
+
+    @public exists: Function,
+      default: (query)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter query
+          .limit 1
+          .return '@doc'
+        return @query voQuery
+          .hasNext()
+
+    @public length: Function, # количество объектов в коллекции
+      default: ->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .count()
+        return @query voQuery
+          .first()
+    ####### -----------------------------------------
+
+    @public query: Function,
+      default: (aoQuery)->
+        throw new Error 'Not available for HTTP requests'
+    @public parseQuery: Function,
+      default: (aoQuery)->
+        throw new Error 'Not available for HTTP requests'
+    @public executeQuery: Function,
+      default: (aoQuery, options)->
+        throw new Error 'Not available for HTTP requests'
+
+
+
+
+
+
+
 
     @public parseQuery: Function,
       default: (aoQuery)->
         voQuery = null
-        aggUsed = aggPartial = intoUsed = intoPartial = finAggUsed = finAggPartial = null
+        # aggUsed = aggPartial = intoUsed = intoPartial = finAggUsed = finAggPartial = null
         if aoQuery.$remove?
           do =>
-            @method = 'DELETE'
-            # родилась мысль - чтобы это корректно обрабатывать на HTTP уровне, надо чтобы было: (2 возможных варианта решения)
-            # 1. Либо мы конвертируем половину запроса в запрос на list - чтобы отфильтровать все записи, после чего идем циклом по массиву, и на каждом итеме вызываем запрос на DELETE|>/items/:item_id/
-            # 2. Либо создаем отдельный эндпоинт аналогичный list, но этот эндпоинт обрабатывает метод DELETE - т.е. запрос будет DELETE|</items/?query="<some query>"
             if aoQuery.$forIn?
-              for own asItemRef, asCollectionFullName of aoQuery.$forIn
-                voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
-                  .in asCollectionFullName
-              if (voJoin = aoQuery.$join)?
-                vlJoinFilters = voJoin.$and.map (asItemRef, {$eq:asRelValue})->
-                  voItemRef = qb.ref asItemRef.replace '@', ''
-                  voRelValue = qb.ref asRelValue.replace '@', ''
-                  qb.eq voItemRef, voRelValue
-                voQuery = voQuery.filter qb.and vlJoinFilters...
-              if (voFilter = aoQuery.$filter)?
-                voQuery = voQuery.filter @parseFilter Parser.parse voFilter
-              if (voLet = aoQuery.$let)?
-                for own asRef, aoValue of voLet
-                  voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
-              voQuery = (voQuery ? qb).remove aoQuery.$remove
-              if aoQuery.$into?
-                voQuery = voQuery.into aoQuery.$into
+              voQuery ?= {}
+              voQuery.requestType = 'remove'
+              voQuery.recordName = @delegate.name
+              voQuery.query = _.pick [
+                '$forIn', '$join', '$filter', '$let'
+              ]
+              voQuery.query.$return = '@doc'
+              voQuery
+
+            # if aoQuery.$forIn?
+            #   for own asItemRef, asCollectionFullName of aoQuery.$forIn
+            #     voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
+            #       .in asCollectionFullName
+            #   if (voJoin = aoQuery.$join)?
+            #     vlJoinFilters = voJoin.$and.map (asItemRef, {$eq:asRelValue})->
+            #       voItemRef = qb.ref asItemRef.replace '@', ''
+            #       voRelValue = qb.ref asRelValue.replace '@', ''
+            #       qb.eq voItemRef, voRelValue
+            #     voQuery = voQuery.filter qb.and vlJoinFilters...
+            #   if (voFilter = aoQuery.$filter)?
+            #     voQuery = voQuery.filter @parseFilter Parser.parse voFilter
+            #   if (voLet = aoQuery.$let)?
+            #     for own asRef, aoValue of voLet
+            #       voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
+            #   voQuery = (voQuery ? qb).remove aoQuery.$remove
+            #   if aoQuery.$into?
+            #     voQuery = voQuery.into aoQuery.$into
         else if (voRecord = aoQuery.$insert)?
           do =>
             if aoQuery.$into?
-              @method = 'POST'
-              # вот эту часть от $forIn и до фильтрации с летом - не пойму какой в нее вкладывал смысл - это же всетаки просто вставка новой записи в базу данных.
-              # сейчас придумал один из возможных смыслов - если фильтрация возвращает результат, то вставка происходит, иначе не происходит (аналог условного оператора) - но это надо обсудить.
-              # возможно это полная бессмыслица.
-              if aoQuery.$forIn?
-                for own asItemRef, asCollectionFullName of aoQuery.$forIn
-                  voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
-                    .in asCollectionFullName
-                if (voJoin = aoQuery.$join?.$and)?
-                  vlJoinFilters = voJoin.map (asItemRef, {$eq:asRelValue})->
-                    voItemRef = qb.ref asItemRef.replace '@', ''
-                    voRelValue = qb.ref asRelValue.replace '@', ''
-                    qb.eq voItemRef, voRelValue
-                  voQuery = voQuery.filter qb.and vlJoinFilters...
-                if (voFilter = aoQuery.$filter)?
-                  voQuery = voQuery.filter @parseFilter Parser.parse voFilter
-                if (voLet = aoQuery.$let)?
-                  for own asRef, aoValue of voLet
-                    voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
-              vhObjectForInsert = @serializer.serialize voRecord
-              voQuery = (voQuery ? qb).insert vhObjectForInsert
-                .into aoQuery.$into
+              voQuery ?= {}
+              voQuery.requestType = 'insert'
+              voQuery.recordName = @delegate.name
+              voQuery.snapshot =
+              voQuery.snapshot = _.pick [
+                '$forIn', '$join', '$filter', '$let', '$remove', '$into'
+              ]
+              voQuery
+
+              # vhObjectForInsert = @serializer.serialize voRecord
+              # voQuery = (voQuery ? qb).insert vhObjectForInsert
+              #   .into aoQuery.$into
         else if (voRecord = aoQuery.$update)?
           do =>
             if aoQuery.$into?
@@ -209,11 +454,18 @@ module.exports = (LeanRC)->
         return vsQuery
 
     @public executeQuery: Function,
-      default: (asQuery, options)->
+      default: (aoQuery, options)->
         # здесь надо посылать платформонезависимый http запрос к нужному апи-серверу - например RC::Utils.request - полифил для ноды/аранги
         # конфиги апи сервера (урл,...) можно взять из @getData() тк. конфиги должны быть переданы при инстанцировании прокси.
-        voNativeCursor = db._query asQuery
-        voCursor = LeanRC::Cursor.new @delegate, voNativeCursor # вместо этого курсора надо сделать курсор на основе массива.
+
+        # request = @[ipmRequestFor]({
+        #   store, type, id, snapshot,
+        #   requestType: 'remove'
+        # });
+        request = @[ipmRequestFor] aoQuery
+
+        resultItems = @[ipmMakeRequest] request
+        voCursor = LeanRC::Cursor.new @delegate, resultItems # вместо этого курсора надо сделать курсор на основе массива.
         return voCursor
 
 
