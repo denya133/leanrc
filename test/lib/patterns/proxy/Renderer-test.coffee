@@ -25,7 +25,7 @@ describe 'Renderer', ->
           @inheritProtected()
           @public render: Function,
             default: (aoData, aoOptions)->
-              vhData = RC::Utils.extend {}, data, greeting: 'Hello'
+              vhData = RC::Utils.extend {}, aoData, greeting: 'Hello'
               if aoOptions?.greeting?
                 vhData.greeting = aoOptions.greeting
               "#{vhData.greeting}, #{vhData.firstName} #{vhData.lastName}!"
