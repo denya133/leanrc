@@ -70,3 +70,23 @@ describe 'RecordMixin', ->
         classNames = Test::TestRecord.parentClassNames()
         assert.deepEqual classNames, [ 'CoreObject', 'RecordMixin', 'TestRecord' ], 'Parsed incorrectly'
       .to.not.throw Error
+  describe '.attribute, .attr', ->
+    it 'should define attributes for class', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attribute string: String
+          @attr number: Number
+          @attribute boolean: Boolean
+          @attr date: Date
+        Test::TestRecord.initialize()
+        assert.isTrue 'string' of Test::TestRecord.attributes, 'Attribute `string` did not defined'
+        assert.isTrue 'number' of Test::TestRecord.attributes, 'Attribute `number` did not defined'
+        assert.isTrue 'boolean' of Test::TestRecord.attributes, 'Attribute `boolean` did not defined'
+        assert.isTrue 'date' of Test::TestRecord.attributes, 'Attribute `date` did not defined'
+      .to.not.throw Error
