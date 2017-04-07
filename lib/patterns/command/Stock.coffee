@@ -92,7 +92,10 @@ module.exports = (LeanRC)->
 
 
     # ------------ Chains definitions ---------
-    @chains ['list', 'detail', 'create', 'update', 'delete']
+    @chains [
+      'list', 'detail', 'create', 'update', 'delete'
+      'bulkUpdate', 'bulkPatch', 'bulkDelete'
+    ]
 
     @beforeHook 'beforeAction'
 

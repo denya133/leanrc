@@ -67,6 +67,9 @@ module.exports = (LeanRC)->
         The query for finding objects.
       '
 
+    @public bulkResponseSchema: Object,
+      default: joi.object success: joi.boolean()
+
     @public versionSchema: Object,
       default: joi.string().required().description '
         The version of api endpoint in format `vx.x`
@@ -146,7 +149,7 @@ module.exports = (LeanRC)->
               #{@itemEntityName} with.
             "
             .response @itemSchema, "
-              The new #{@itemEntityName}.
+              The replaced #{@itemEntityName}.
             "
             .error HTTP_NOT_FOUND
             .error HTTP_CONFLICT
@@ -199,6 +202,81 @@ module.exports = (LeanRC)->
               Deletes the #{@itemEntityName}
               from the database.
             "
+
+        @swaggerDefinition 'bulkUpdate', (endpoint)->
+          endpoint
+            .pathParam 'v', @versionSchema
+            .queryParam 'query', @querySchema, "
+              The query for bulk updating
+              #{@listEntityName}.
+            "
+            .body @itemSchema.required(), "
+              The data to replace the
+              #{@itemEntityName} with.
+            "
+            .response @bulkResponseSchema, "
+              Bulk replace has been realized.
+            "
+            .error HTTP_NOT_FOUND
+            .error HTTP_CONFLICT
+            .error UNAUTHORIZED
+            .error UPGRADE_REQUIRED
+            .summary "
+              Replace some #{@listEntityName}
+            "
+            .description "
+              Replaces some existing
+              #{@listEntityName} with the
+              request body.
+            "
+
+        @swaggerDefinition 'bulkPatch', (endpoint)->
+          endpoint
+            .pathParam 'v', @versionSchema
+            .queryParam 'query', @querySchema, "
+              The query for bulk updating
+              #{@listEntityName}.
+            "
+            .body @itemSchema.required(), "
+              The data to update the
+              #{@itemEntityName} with.
+            "
+            .response @bulkResponseSchema, "
+              Bulk update has been realized.
+            "
+            .error HTTP_NOT_FOUND
+            .error HTTP_CONFLICT
+            .error UNAUTHORIZED
+            .error UPGRADE_REQUIRED
+            .summary "
+              Update some #{@listEntityName}
+            "
+            .description "
+              Patches some existing #{@listEntityName}
+              with the request body.
+            "
+
+        @swaggerDefinition 'bulkDelete', (endpoint)->
+          endpoint
+            .pathParam 'v', @versionSchema
+            .queryParam 'query', @querySchema, "
+              The query for bulk updating
+              #{@listEntityName}.
+            "
+            .error HTTP_NOT_FOUND
+            .error UNAUTHORIZED
+            .error UPGRADE_REQUIRED
+            .response @bulkResponseSchema, "
+              Bulk delete has been realized.
+            "
+            .summary "
+              Remove some #{@listEntityName}
+            "
+            .description "
+              Deletes some existing #{@listEntityName}
+              from the database.
+            "
+
         return
 
 
