@@ -82,11 +82,37 @@ describe 'RecordMixin', ->
             default: (asType) -> Test::TestRecord
           @attribute string: String
           @attr number: Number
-          @attribute boolean: Boolean
+          @attribute boolean: Boolean,
+            through: 'Test'
           @attr date: Date
         Test::TestRecord.initialize()
         assert.isTrue 'string' of Test::TestRecord.attributes, 'Attribute `string` did not defined'
         assert.isTrue 'number' of Test::TestRecord.attributes, 'Attribute `number` did not defined'
         assert.isTrue 'boolean' of Test::TestRecord.attributes, 'Attribute `boolean` did not defined'
         assert.isTrue 'date' of Test::TestRecord.attributes, 'Attribute `date` did not defined'
+        assert.equal Test::TestRecord.edges.boolean.through, 'Test', 'Edge through `Test` did not defined'
+      .to.not.throw Error
+  describe '.computed, .comp', ->
+    it 'should define computed properties for class', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @computed string: String,
+            get: (aoData) -> aoData
+          @comp number: Number,
+            get: (aoData) -> aoData
+          @computed boolean: Boolean,
+            get: (aoData) -> aoData
+          @comp date: Date,
+            get: (aoData) -> aoData
+        Test::TestRecord.initialize()
+        assert.isTrue 'string' of Test::TestRecord.computeds, 'Computed property `string` did not defined'
+        assert.isTrue 'number' of Test::TestRecord.computeds, 'Computed property `number` did not defined'
+        assert.isTrue 'boolean' of Test::TestRecord.computeds, 'Computed property `boolean` did not defined'
+        assert.isTrue 'date' of Test::TestRecord.computeds, 'Computed property `date` did not defined'
       .to.not.throw Error
