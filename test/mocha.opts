@@ -13,4 +13,5 @@ test/lib/patterns/query_object/
 test/lib/patterns/pipes/
 test/lib/patterns/mediator/
 test/lib/patterns/proxy/
+test/lib/patterns/gateway/
 test/
