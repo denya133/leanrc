@@ -14,7 +14,7 @@ module.exports = (LeanRC)->
 
     @public normalize: Function,
       default: (acRecord, ahPayload)->
-        acRecord.normalize ahPayload
+        acRecord.normalize ahPayload, @collection
 
     @public serialize: Function,
       default: (aoRecord, options = null)->

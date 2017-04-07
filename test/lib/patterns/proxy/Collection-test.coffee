@@ -5,6 +5,7 @@ LeanRC = require.main.require 'lib'
 
 
 describe 'Collection', ->
+  ###
   describe '.new', ->
     it 'should create collection instance', ->
       expect ->
@@ -23,3 +24,4 @@ describe 'Collection', ->
         assert.equal collection.delegate, Test::TestRecord
         console.log '!!!', collection.collectionFullName()
       .to.not.throw Error
+  ###

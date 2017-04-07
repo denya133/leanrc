@@ -43,63 +43,63 @@ class LeanRC extends RC::Module
   # require('./mixins/PipesSwitchMixin') LeanRC # empty
   require('./mixins/RecordMixin') LeanRC
 
-  require('./patterns/data_mapper/Transform') LeanRC
-  require('./patterns/data_mapper/StringTransform') LeanRC
-  require('./patterns/data_mapper/NumberTransform') LeanRC
-  require('./patterns/data_mapper/DateTransform') LeanRC
-  require('./patterns/data_mapper/BooleanTransform') LeanRC
+  require('./patterns/data_mapper/Transform') LeanRC #tested
+  require('./patterns/data_mapper/StringTransform') LeanRC #tested
+  require('./patterns/data_mapper/NumberTransform') LeanRC #tested
+  require('./patterns/data_mapper/DateTransform') LeanRC #tested
+  require('./patterns/data_mapper/BooleanTransform') LeanRC #tested
   require('./patterns/data_mapper/Serializer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
   require('./patterns/data_mapper/Entry') LeanRC
 
-  require('./patterns/query_object/Query') LeanRC
+  require('./patterns/query_object/Query') LeanRC #tested
 
-  require('./patterns/observer/Notification') LeanRC
-  require('./patterns/observer/Notifier') LeanRC
-  require('./patterns/observer/Observer') LeanRC
+  require('./patterns/observer/Notification') LeanRC #tested
+  require('./patterns/observer/Notifier') LeanRC #tested
+  require('./patterns/observer/Observer') LeanRC #tested
 
-  require('./patterns/proxy/Proxy') LeanRC
+  require('./patterns/proxy/Proxy') LeanRC #tested
   require('./patterns/proxy/Collection') LeanRC
-  require('./patterns/proxy/Gateway') LeanRC
-  require('./patterns/proxy/Renderer') LeanRC
+  require('./patterns/proxy/Gateway') LeanRC #tested
+  require('./patterns/proxy/Renderer') LeanRC #tested
   require('./patterns/proxy/Resource') LeanRC
-  require('./patterns/proxy/Router') LeanRC
+  require('./patterns/proxy/Router') LeanRC #tested
 
-  require('./patterns/mediator/Mediator') LeanRC
-  require('./patterns/mediator/Switch') LeanRC
+  require('./patterns/mediator/Mediator') LeanRC #tested
+  require('./patterns/mediator/Switch') LeanRC #tested
 
-  require('./patterns/command/SimpleCommand') LeanRC
-  require('./patterns/command/MacroCommand') LeanRC
+  require('./patterns/command/SimpleCommand') LeanRC #tested
+  require('./patterns/command/MacroCommand') LeanRC #tested
   require('./patterns/command/Stock') LeanRC
   # require('./patterns/command/MigrateCommand') LeanRC # empty
   # require('./patterns/command/Migration') LeanRC # empty
   # require('./patterns/command/Rollback') LeanRC # empty
 
-  require('./patterns/gateway/Endpoint') LeanRC
+  require('./patterns/gateway/Endpoint') LeanRC #tested
 
   require('./patterns/iterator/Cursor') LeanRC
 
-  require('./patterns/pipes/Pipe') LeanRC
-  require('./patterns/pipes/PipeMessage') LeanRC
-  require('./patterns/pipes/PipeListener') LeanRC
-  require('./patterns/pipes/FilterControlMessage') LeanRC
-  require('./patterns/pipes/Filter') LeanRC
-  require('./patterns/pipes/Junction') LeanRC
-  require('./patterns/pipes/JunctionMediator') LeanRC
-  require('./patterns/pipes/PipeAwareModule') LeanRC
-  require('./patterns/pipes/QueueControlMessage') LeanRC
-  require('./patterns/pipes/Queue') LeanRC
-  require('./patterns/pipes/TeeMerge') LeanRC
-  require('./patterns/pipes/TeeSplit') LeanRC
+  require('./patterns/pipes/Pipe') LeanRC #tested
+  require('./patterns/pipes/PipeMessage') LeanRC #tested
+  require('./patterns/pipes/PipeListener') LeanRC #tested
+  require('./patterns/pipes/FilterControlMessage') LeanRC #tested
+  require('./patterns/pipes/Filter') LeanRC #tested
+  require('./patterns/pipes/Junction') LeanRC #tested
+  require('./patterns/pipes/JunctionMediator') LeanRC #tested
+  require('./patterns/pipes/PipeAwareModule') LeanRC #tested
+  require('./patterns/pipes/QueueControlMessage') LeanRC #tested
+  require('./patterns/pipes/Queue') LeanRC #tested
+  require('./patterns/pipes/TeeMerge') LeanRC #tested
+  require('./patterns/pipes/TeeSplit') LeanRC #tested
 
   # require('./patterns/renderer/Template') LeanRC # empty
 
-  require('./patterns/facade/Facade') LeanRC
+  require('./patterns/facade/Facade') LeanRC #tested
   require('./patterns/facade/Application') LeanRC
 
-  require('./core/View') LeanRC
-  require('./core/Model') LeanRC
-  require('./core/Controller') LeanRC
+  require('./core/View') LeanRC #tested
+  require('./core/Model') LeanRC #tested
+  require('./core/Controller') LeanRC #tested
 
 
 
