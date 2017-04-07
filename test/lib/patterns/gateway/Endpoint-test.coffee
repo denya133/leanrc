@@ -61,3 +61,34 @@ describe 'Endpoint', ->
         endpoint.body body.schema, body.mimes, body.description
         assert.deepEqual endpoint.payload, body, 'Endpoint does not contain body'
       .to.not.throw Error
+  describe '#summary', ->
+    it 'should create endpoint and add summary', ->
+      expect ->
+        gateway = test: 'test'
+        endpoint = Endpoint.new { gateway }
+        summary = 'TEST_SUMMARY'
+        assert.notEqual endpoint.title, summary, 'Endpoint already contains summary'
+        endpoint.summary summary
+        assert.equal endpoint.title, summary, 'Endpoint does not contain summary'
+      .to.not.throw Error
+  describe '#description', ->
+    it 'should create endpoint and add description', ->
+      expect ->
+        gateway = test: 'test'
+        endpoint = Endpoint.new { gateway }
+        description = 'TEST_DESCRIPTION'
+        assert.notEqual endpoint.synopsis, description, 'Endpoint already contains description'
+        endpoint.description description
+        assert.equal endpoint.synopsis, description, 'Endpoint does not contain description'
+      .to.not.throw Error
+  describe '#deprecated', ->
+    it 'should create endpoint and add deprecated', ->
+      expect ->
+        gateway = test: 'test'
+        endpoint = Endpoint.new { gateway }
+        assert.isFalse endpoint.isDeprecated, 'Endpoint already deprecated'
+        endpoint.deprecated yes
+        assert.isTrue endpoint.isDeprecated, 'Endpoint is not deprecated'
+        endpoint.deprecated no
+        assert.isFalse endpoint.isDeprecated, 'Endpoint is deprecated'
+      .to.not.throw Error
