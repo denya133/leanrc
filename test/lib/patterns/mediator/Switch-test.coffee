@@ -327,13 +327,35 @@ describe 'Switch', ->
       expect ->
         RESOURCE = 'test'
         facade = Facade.getInstance 'TEST_SWITCH_7'
-        facade.registerProxy LeanRC::Proxy.new "#{RESOURCE}Gateway",
-        endpoints: {}
+        facade.registerProxy LeanRC::Gateway.new "#{RESOURCE}Gateway",
+          endpoints: {}
         class Test extends RC::Module
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
         Test::TestRouter.initialize()
+        class Test::TestEndpoint extends RC::CoreObject
+          @inheritProtected()
+          @Module: Test
+          @public header: Function,
+            default: (name, schema, description) ->
+          @public pathParam: Function,
+            default: (name, schema, description) ->
+          @public queryParam: Function,
+            default: (name, schema, description) ->
+          @public body: Function,
+            default: (schema, mimes, description) ->
+          @public response: Function,
+            default: (status, schema, mimes, description) ->
+          @public error: Function,
+            default: (status, description) ->
+          @public summary: Function,
+            default: (title) ->
+          @public description: Function,
+            default: (synopsis) ->
+          @public deprecated: Function,
+            default: (isDeprecated) ->
+        Test::TestEndpoint.initialize()
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
         class Test::TestSwitch extends Switch
           @inheritProtected()
@@ -346,4 +368,6 @@ describe 'Switch', ->
             default: ->
         facade.registerMediator Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        voEndpoint = Test::TestEndpoint.new()
+        # switchMediator.defineSwaggerEndpoint voEndpoint, RESOURCE, 'list'
       .to.not.throw Error

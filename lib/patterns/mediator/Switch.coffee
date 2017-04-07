@@ -120,7 +120,7 @@ module.exports = (LeanRC)->
     @public defineSwaggerEndpoint: Function,
       args: [Object]
       return: RC::Constants.NILL
-      default: (aoSwaggerEndpoint)->
+      default: (aoSwaggerEndpoint, resourceName, action)->
         voGateway = @facade.retrieveProxy "#{resourceName}Gateway"
         {
           headers
