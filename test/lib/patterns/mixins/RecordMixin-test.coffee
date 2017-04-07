@@ -20,3 +20,20 @@ describe 'RecordMixin', ->
         record = Test::TestRecord.new {}, {}
         assert.instanceOf record, Test::TestRecord, 'record is not a TestRecord instance'
       .to.not.throw Error
+  describe '.parseRecordName', ->
+    it 'should record name from text', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) ->
+              Test::TestRecord
+        Test::TestRecord.initialize()
+        parsedName = Test::TestRecord.parseRecordName 'test-record'
+        assert.deepEqual parsedName, ['Test', 'TestRecord'], 'Parsed incorrectly'
+        parsedName = Test::TestRecord.parseRecordName 'Tester::Test'
+        assert.deepEqual parsedName, ['Tester', 'Test'], 'Parsed incorrectly'
+      .to.not.throw Error
