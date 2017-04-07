@@ -30,20 +30,20 @@ module.exports = (LeanRC)->
 
     @public header: Function,
       default: (name, schema, description)->
-        @tags ?= []
-        @tags.push {name, schema, description}
+        @headers ?= []
+        @headers.push {name, schema, description}
         return @
 
     @public pathParam: Function,
       default: (name, schema, description)->
-        @tags ?= []
-        @tags.push {name, schema, description}
+        @pathParams ?= []
+        @pathParams.push {name, schema, description}
         return @
 
     @public queryParam: Function,
       default: (name, schema, description)->
-        @tags ?= []
-        @tags.push {name, schema, description}
+        @queryParams ?= []
+        @queryParams.push {name, schema, description}
         return @
 
     @public body: Function,
@@ -53,14 +53,14 @@ module.exports = (LeanRC)->
 
     @public response: Function,
       default: (status, schema, mimes, description)->
-        @tags ?= []
-        @tags.push {status, schema, mimes, description}
+        @responses ?= []
+        @responses.push {status, schema, mimes, description}
         return @
 
     @public error: Function,
       default: (status, description)->
-        @tags ?= []
-        @tags.push {status, description}
+        @errors ?= []
+        @errors.push {status, description}
         return @
 
     @public summary: Function,

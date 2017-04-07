@@ -21,3 +21,13 @@ describe 'Endpoint', ->
         endpoint.tag tag
         assert.include endpoint.tags, tag, 'Endpoint does not contain tag'
       .to.not.throw Error
+  describe '#header', ->
+    it 'should create endpoint and add header', ->
+      expect ->
+        gateway = test: 'test'
+        endpoint = Endpoint.new { gateway }
+        header = name: 'NAME', schema: {}, description: 'DESCRIPTION'
+        assert.notInclude endpoint.headers ? [], header, 'Endpoint already contains header'
+        endpoint.header header.name, header.schema, header.description
+        assert.include endpoint.headers, header, 'Endpoint does not contain header'
+      .to.not.throw Error
