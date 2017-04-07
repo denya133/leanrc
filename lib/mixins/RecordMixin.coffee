@@ -308,11 +308,14 @@ module.exports = (LeanRC)->
 
     @public @static new: Function,
       default: (aoAttributes, aoCollection)->
-        if aoAttributes._type is "#{@moduleName()}::#{@name}"
-          @super arguments...
+        if '_type' of aoAttributes
+          if aoAttributes._type is "#{@moduleName()}::#{@name}"
+            @super arguments...
+          else
+            RecordClass = @findModelByName aoAttributes._type
+            RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
         else
-          RecordClass = @findModelByName aoAttributes._type
-          RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
+          @super arguments...
 
     @public save: Function,
       default: ->
@@ -431,14 +434,14 @@ module.exports = (LeanRC)->
 
 
     @public @static normalize: Function,
-      default: (ahPayload)->
+      default: (ahPayload, aoCollection)->
         unless ahPayload?
           return null
         vhResult = {}
         for own asAttrName, ahAttrValue of @attributes
           do (asAttrName, {transform} = ahAttrValue)->
             vhResult[asAttrName] = transform().normalize ahPayload[asAttrName]
-        @new vhResult
+        @new vhResult, aoCollection
 
     @public @static serialize:   Function,
       default: (aoRecord)->
