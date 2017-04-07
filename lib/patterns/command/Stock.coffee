@@ -90,6 +90,24 @@ module.exports = (LeanRC)->
       default: ->
         @collection.delete @recordId
 
+    @action bulkUpdate: Function,
+      default: ->
+        @collection.query @query
+          .forEach (aoRecord)-> aoRecord.updateAttributes @recordBody
+        return yes
+
+    @action bulkPatch: Function,
+      default: ->
+        @collection.query @query
+          .forEach (aoRecord)-> aoRecord.updateAttributes @recordBody
+        return yes
+
+    @action bulkDelete: Function,
+      default: ->
+        @collection.query @query
+          .forEach (aoRecord)-> aoRecord.destroy()
+        return yes
+
 
     # ------------ Chains definitions ---------
     @chains [
@@ -99,11 +117,10 @@ module.exports = (LeanRC)->
 
     @beforeHook 'beforeAction'
 
-    @beforeHook 'beforeList',       only: ['list']
-    @beforeHook 'beforeDetail',     only: ['detail']
-    @beforeHook 'beforeCreate',     only: ['create']
-    @beforeHook 'beforeUpdate',     only: ['update']
-    @beforeHook 'beforeDelete',     only: ['delete']
+    @beforeHook 'parseQuery', only: ['list', 'bulkUpdate', 'bulkPatch', 'bulkDelete']
+    @beforeHook 'parsePathParams', only: ['detail', 'update', 'delete']
+    @beforeHook 'parseBody', only: ['create', 'bulkUpdate', 'bulkPatch']
+    @beforeHook 'beforeUpdate', only: ['update']
 
     @public beforeAction: Function,
       args: [Object]
@@ -115,51 +132,32 @@ module.exports = (LeanRC)->
         } = {queryParams, pathPatams, currentUserId, headers, body }
         return args
 
-    @public beforeList: Function,
+    @public parseQuery: Function,
       args: [Object]
-      return: RC::Constants.NILL
+      return: RC::Constants.ANY
       default: (args...)->
         @query = JSON.parse @queryParams['query']
-        limit = Number @query.limit
-        @query.limit = switch
-          when limit > MAX_LIMIT, limit < 0, isNaN limit then MAX_LIMIT
-          else limit
-        page = Number @query.page
-        unless isNaN page
-          @query.offset = (page - 1) * @query.limit
-        skip = Number @query.offset
-        @query.offset = switch
-          when skip < 0, isNaN skip then 0
-          else skip
         return args
 
-    @public beforeDetail: Function,
+    @public parsePathParams: Function,
       args: [Object]
-      return: RC::Constants.NILL
+      return: RC::Constants.ANY
       default: (args...)->
         @recordId = @pathParams[@keyName]
         return args
 
-    @public beforeCreate: Function,
+    @public parseBody: Function,
       args: [Object]
-      return: RC::Constants.NILL
+      return: RC::Constants.ANY
       default: (args...)->
         @recordBody = @body?[@itemEntityName]
         return args
 
     @public beforeUpdate: Function,
       args: [Object]
-      return: RC::Constants.NILL
+      return: RC::Constants.ANY
       default: (args...)->
-        @recordId = @pathParams[@keyName]
-        @recordBody = RC::Utils.extend {}, @body?[@itemEntityName], id: @recordId
-        return args
-
-    @public beforeDelete: Function,
-      args: [Object]
-      return: RC::Constants.NILL
-      default: (args...)->
-        @recordId = @pathParams[@keyName]
+        @recordBody = RC::Utils.extend {}, @recordBody, id: @recordId
         return args
 
     @public execute: Function,

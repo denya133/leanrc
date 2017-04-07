@@ -82,9 +82,9 @@ module.exports = (LeanRC)->
         return url.join '/'
 
     ipmBuildURL = @protected buildURL: Function,
-      args: [String, [Object, RC::Constants.NILL]]
+      args: [String, [Object, RC::Constants.NILL], [Boolean, RC::Constants.NILL]]
       return: String
-      default: (recordName, query)->
+      default: (recordName, query, withPostfix=yes)->
         url = []
         prefix = @[ipmUrlPrefix]()
 
@@ -92,7 +92,7 @@ module.exports = (LeanRC)->
           path = @pathForType recordName
           url.push path if path
 
-        url.push encodeURIComponent @postfix if @postfix?
+        url.push encodeURIComponent @postfix if withPostfix and @postfix?
         url.unshift prefix if prefix
 
         url = url.join '/'
@@ -105,13 +105,13 @@ module.exports = (LeanRC)->
       args: [String, Object]
       return: String
       default: (recordName, query)->
-        @[ipmBuildURL] recordName, query
+        @[ipmBuildURL] recordName, query, no
 
     @public urlForInsert: Function,
       args: [String, Object]
       return: String
       default: (recordName)->
-        @[ipmBuildURL] recordName
+        @[ipmBuildURL] recordName, null, no
 
     @public urlForUpdate: Function,
       args: [String, Object, Object]

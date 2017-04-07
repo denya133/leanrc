@@ -20,7 +20,7 @@ describe 'Router', ->
               @resource 'subtest2'
         Test::TestRouter.initialize()
         router = Test::TestRouter.new 'TEST_ROUTER'
-        assert.lengthOf router.routes, 18, 'Routes did not initialized'
+        assert.lengthOf router.routes, 27, 'Routes did not initialized'
       .to.not.throw Error
   describe '#defineMethod', ->
     it 'should define methods for router', ->
@@ -128,7 +128,7 @@ describe 'Router', ->
         Test::TestRouter.initialize()
         spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
         router = Test::TestRouter.new 'TEST_ROUTER'
-        assert.lengthOf router.routes, 7, 'Methods did not defined'
+        assert.lengthOf router.routes, 10, 'Methods did not defined'
       .to.not.throw Error
   describe '#collection', ->
     it 'should define `collection` method for router', ->
@@ -145,7 +145,7 @@ describe 'Router', ->
         Test::TestRouter.initialize()
         spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
         router = Test::TestRouter.new 'TEST_ROUTER'
-        assert.lengthOf router.routes, 7, 'Methods did not defined'
+        assert.lengthOf router.routes, 10, 'Methods did not defined'
       .to.not.throw Error
 
   describe 'complex test', ->
