@@ -327,35 +327,26 @@ describe 'Switch', ->
       expect ->
         RESOURCE = 'test'
         facade = Facade.getInstance 'TEST_SWITCH_7'
-        facade.registerProxy LeanRC::Gateway.new "#{RESOURCE}Gateway",
-          endpoints: {}
+        gateway = LeanRC::Gateway.new "#{RESOURCE}Gateway"
+        listEndpoint = LeanRC::Endpoint.new { gateway }
+        listEndpoint.tag 'TAG'
+        listEndpoint.header 'header', {}, 'test header'
+        listEndpoint.pathParam 'path-param', {}, 'test path param'
+        listEndpoint.queryParam 'query-param', {}, 'test query param'
+        listEndpoint.body {}, ['text/plain'], 'DESCRIPTION'
+        listEndpoint.response 200, {}, ['text/plain'], 'DESCRIPTION'
+        listEndpoint.error 500, {}, ['text/plain'], 'DESCRIPTION'
+        listEndpoint.summary 'TEST_SUMMARY'
+        listEndpoint.description 'DESCRIPTION'
+        listEndpoint.deprecated yes
+        gateway.setData endpoints:
+          list: listEndpoint
+        facade.registerProxy gateway
         class Test extends RC::Module
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
         Test::TestRouter.initialize()
-        class Test::TestEndpoint extends RC::CoreObject
-          @inheritProtected()
-          @Module: Test
-          @public header: Function,
-            default: (name, schema, description) ->
-          @public pathParam: Function,
-            default: (name, schema, description) ->
-          @public queryParam: Function,
-            default: (name, schema, description) ->
-          @public body: Function,
-            default: (schema, mimes, description) ->
-          @public response: Function,
-            default: (status, schema, mimes, description) ->
-          @public error: Function,
-            default: (status, description) ->
-          @public summary: Function,
-            default: (title) ->
-          @public description: Function,
-            default: (synopsis) ->
-          @public deprecated: Function,
-            default: (isDeprecated) ->
-        Test::TestEndpoint.initialize()
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
         class Test::TestSwitch extends Switch
           @inheritProtected()
@@ -368,6 +359,7 @@ describe 'Switch', ->
             default: ->
         facade.registerMediator Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        voEndpoint = Test::TestEndpoint.new()
-        # switchMediator.defineSwaggerEndpoint voEndpoint, RESOURCE, 'list'
+        voEndpoint = LeanRC::Endpoint.new { gateway }
+        switchMediator.defineSwaggerEndpoint voEndpoint, RESOURCE, 'list'
+        assert.deepEqual listEndpoint, voEndpoint, 'Endpoints are not equivalent'
       .to.not.throw Error

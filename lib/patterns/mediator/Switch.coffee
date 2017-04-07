@@ -123,6 +123,7 @@ module.exports = (LeanRC)->
       default: (aoSwaggerEndpoint, resourceName, action)->
         voGateway = @facade.retrieveProxy "#{resourceName}Gateway"
         {
+          tags
           headers
           pathParams
           queryParams
@@ -133,6 +134,8 @@ module.exports = (LeanRC)->
           synopsis
           isDeprecated
         } = voGateway.swaggerDefinitionFor action
+        tags?.forEach (tag)->
+          aoSwaggerEndpoint.tag tag
         headers?.forEach ({name, schema, description})->
           aoSwaggerEndpoint.header name, schema, description
         pathParams?.forEach ({name, schema, description})->
