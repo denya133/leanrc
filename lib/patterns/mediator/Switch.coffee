@@ -77,11 +77,11 @@ module.exports = (LeanRC)->
               voRendered = @rendererFor vsFormat
                 .render aoData, {path, resource, action}
             else
-              res.setHeader 'Content-Type', 'text/plain'
+              res.set 'Content-Type', 'text/plain'
               voRendered = JSON.stringify aoData
             res.send voRendered
           else
-            res.setHeader 'Content-Type', 'text/plain'
+            res.set 'Content-Type', 'text/plain'
             res.send JSON.stringify aoData
         return
 
@@ -102,7 +102,8 @@ module.exports = (LeanRC)->
       default: (resourceName, {req, res, reverse}, {method, path, resource, action})->
         queryParams = req.query
         pathPatams = req.params
-        currentUserId = req.cookies[@getData().currentUserCookie]
+        configurationProxy = @facade.retrieveProxy LeanRC::Constants.CONFIGURATION
+        currentUserId = req.cookies[configurationProxy.getData().currentUserCookie]
         headers = req.headers
         body = req.body
         voMessage = {
@@ -119,9 +120,10 @@ module.exports = (LeanRC)->
     @public defineSwaggerEndpoint: Function,
       args: [Object]
       return: RC::Constants.NILL
-      default: (aoSwaggerEndpoint)->
+      default: (aoSwaggerEndpoint, resourceName, action)->
         voGateway = @facade.retrieveProxy "#{resourceName}Gateway"
         {
+          tags
           headers
           pathParams
           queryParams
@@ -132,6 +134,8 @@ module.exports = (LeanRC)->
           synopsis
           isDeprecated
         } = voGateway.swaggerDefinitionFor action
+        tags?.forEach (tag)->
+          aoSwaggerEndpoint.tag tag
         headers?.forEach ({name, schema, description})->
           aoSwaggerEndpoint.header name, schema, description
         pathParams?.forEach ({name, schema, description})->
