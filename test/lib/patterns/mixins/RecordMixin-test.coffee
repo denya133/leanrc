@@ -55,3 +55,18 @@ describe 'RecordMixin', ->
         parsedName = vsRecord.parseRecordName 'Tester::Test'
         assert.deepEqual parsedName, ['Tester', 'Test'], 'Parsed incorrectly'
       .to.not.throw Error
+  describe '.parentClassNames', ->
+    it 'should get records class parent class names', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) ->
+              Test::TestRecord
+        Test::TestRecord.initialize()
+        classNames = Test::TestRecord.parentClassNames()
+        assert.deepEqual classNames, [ 'CoreObject', 'RecordMixin', 'TestRecord' ], 'Parsed incorrectly'
+      .to.not.throw Error
