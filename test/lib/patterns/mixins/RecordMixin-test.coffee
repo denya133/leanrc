@@ -37,3 +37,21 @@ describe 'RecordMixin', ->
         parsedName = Test::TestRecord.parseRecordName 'Tester::Test'
         assert.deepEqual parsedName, ['Tester', 'Test'], 'Parsed incorrectly'
       .to.not.throw Error
+  describe '#parseRecordName', ->
+    it 'should record name in instance from text', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) ->
+              Test::TestRecord
+        Test::TestRecord.initialize()
+        vsRecord = Test::TestRecord.new()
+        parsedName = vsRecord.parseRecordName 'test-record'
+        assert.deepEqual parsedName, ['Test', 'TestRecord'], 'Parsed incorrectly'
+        parsedName = vsRecord.parseRecordName 'Tester::Test'
+        assert.deepEqual parsedName, ['Tester', 'Test'], 'Parsed incorrectly'
+      .to.not.throw Error

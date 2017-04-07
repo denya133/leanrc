@@ -308,7 +308,7 @@ module.exports = (LeanRC)->
 
     @public @static new: Function,
       default: (aoAttributes, aoCollection)->
-        if '_type' of aoAttributes
+        if '_type' of (aoAttributes ? {})
           if aoAttributes._type is "#{@moduleName()}::#{@name}"
             @super arguments...
           else
