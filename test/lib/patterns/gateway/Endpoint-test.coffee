@@ -51,3 +51,13 @@ describe 'Endpoint', ->
         endpoint.response response.status, response.schema, response.mimes, response.description
         assert.include endpoint.responses, response, 'Endpoint does not contain response'
       .to.not.throw Error
+  describe '#body', ->
+    it 'should create endpoint and add body', ->
+      expect ->
+        gateway = test: 'test'
+        endpoint = Endpoint.new { gateway }
+        body = schema: {}, mimes: [ 'text/plain' ], description: 'DESCRIPTION'
+        assert.notDeepEqual endpoint.payload, body, 'Endpoint already contains body'
+        endpoint.body body.schema, body.mimes, body.description
+        assert.deepEqual endpoint.payload, body, 'Endpoint does not contain body'
+      .to.not.throw Error
