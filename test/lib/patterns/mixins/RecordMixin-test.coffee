@@ -238,3 +238,69 @@ describe 'RecordMixin', ->
         assert.equal inverseInfo.attrName,'test', 'Record class is incorrect'
         assert.equal inverseInfo.relation, 'hasOne', 'Record class is incorrect'
       .to.not.throw Error
+  describe '#create, #isNew', ->
+    it 'should create new record', ->
+      expect ->
+        KEY = 'TEST_RECORD_01'
+        class Test extends RC::Module
+        class Test::Collection extends RC::CoreObject
+          @inheritProtected()
+          @Module: Test
+          @inheritProtected()
+          @include LeanRC::CollectionInterface
+          ipsKey = @protected key: String
+          ipsName = @protected name: String
+          iphData = @protected data: Object
+          @public facade: LeanRC::Facade,
+            get: -> LeanRC::Facade.getInstance KEY
+          @public push: Function,
+            default: (item) ->
+              if item?.id? and not @[iphData][item.id]?
+                item.id ?= RC::Utils.uuid.v4()
+                @[iphData][item.id] = item
+              else
+                throw new Error 'EXISTS'
+              @[iphData][item.id]?
+          @public patch: Function,
+            default: (item) ->
+              if item?id?
+                @[iphData][item.id] = item
+              @[iphData][item.id]?
+          @public remove: Function,
+            default: (id) -> delete @[iphData][id]
+          @public take: Function,
+            default: (id) -> @[iphData][id]
+          @public clone: Function,
+            default: (id) ->
+              if @[iphData][id]?
+                RC::Utils.extend {}, @[iphData][id]
+          @public copy: Function,
+            default: (id) ->
+              if @[iphData][id]?
+                RC::Utils.extend {}, @[iphData][id]
+          @public query: Function,
+            default: (query) ->
+          @public includes: Function,
+            default: (id) ->
+              not @[iphData][id]?
+          @public collectionFullName: Function,
+            default: -> @[ipsName]
+          constructor: (asKey, asName) ->
+            super asKey, asName
+            @[ipsKey] = asKey
+            @[ipsName] = asName
+            @[iphData] = {}
+        Test::Collection.initialize()
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+        Test::TestRecord.initialize()
+        record = Test::TestRecord.new {}, Test::Collection.new KEY
+        assert.isTrue record.isNew(), 'Record is not new'
+        record.id = RC::Utils.uuid.v4()
+        assert.isFalse record.isNew(), 'Record is still new'
+        assert.throws (-> record.create()), Error, 'Document is exist in collection', 'Record not created'
+      .to.not.throw Error
