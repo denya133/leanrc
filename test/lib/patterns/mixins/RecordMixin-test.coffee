@@ -149,3 +149,34 @@ describe 'RecordMixin', ->
         assert.equal relationData.attr, 'relation', 'Value of `attr` is incorrect'
         assert.equal relationData.level, 'PUBLIC', 'Value of `level` is incorrect'
       .to.not.throw Error
+  describe '.hasMany', ->
+    it 'should define one-to-one or one-to-many relation for class', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @hasMany manyRelation: LeanRC::Record,
+            attr: 'relation_attr_many'
+            refKey: 'id'
+            transform: LeanRC::Transform
+            through: 'Test'
+            inverse: 'test'
+            valuable: yes
+            sortable: yes
+            groupable: yes
+            filterable: yes
+        Test::TestRecord.initialize()
+        { manyRelation: relationData } = Test::TestRecord.relations
+        assert.isTrue relationData.valuable, 'Value of `valuable` is incorrect'
+        assert.isTrue relationData.sortable, 'Value of `sortable` is incorrect'
+        assert.isTrue relationData.groupable, 'Value of `groupable` is incorrect'
+        assert.isTrue relationData.filterable, 'Value of `filterable` is incorrect'
+        assert.equal relationData.transform, LeanRC::Transform, 'Value of `transform` is incorrect'
+        assert.equal relationData.relation, 'hasMany', 'Value of `relation` is incorrect'
+        assert.equal relationData.attr, 'manyRelation', 'Value of `attr` is incorrect'
+        assert.equal relationData.level, 'PUBLIC', 'Value of `level` is incorrect'
+      .to.not.throw Error

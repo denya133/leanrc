@@ -15,6 +15,14 @@ module.exports = (LeanRC)->
     @public collection: LeanRC::CollectionInterface
 
     ipoInternalRecord = @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
+    cphAttributes = @protected @static attributesPointer: Symbol,
+      get: -> Symbol.for "attributes_#{@moduleName()}_#{@name}"
+    cphComputeds  = @protected @static computedsPointer: Symbol,
+      get: -> Symbol.for "computeds_#{@moduleName()}_#{@name}"
+    cphEdges      = @protected @static edgesPointer: Symbol,
+      get: -> Symbol.for "edges_#{@moduleName()}_#{@name}"
+    cphRelations  = @protected @static relationsPointer: Symbol,
+      get: -> Symbol.for "relations_#{@moduleName()}_#{@name}"
 
     @public @static schema: Object,
       default: {}
@@ -65,11 +73,11 @@ module.exports = (LeanRC)->
         AbstractClass = @
         fromSuper = if AbstractClass.__super__?
           AbstractClass.__super__.constructor.attributes
-        __attrs[AbstractClass.name] ?= do ->
+        __attrs[AbstractClass[cphAttributes]] ?= do ->
           RC::Utils.extend {}
           , (fromSuper ? {})
-          , (AbstractClass["_#{AbstractClass.name}_attrs"] ? {})
-        __attrs[AbstractClass.name]
+          , (AbstractClass[AbstractClass[cphAttributes]] ? {})
+        __attrs[AbstractClass[cphAttributes]]
 
     @public @static edges: Object,
       default: {}
@@ -77,11 +85,11 @@ module.exports = (LeanRC)->
         AbstractClass = @
         fromSuper = if AbstractClass.__super__?
           AbstractClass.__super__.constructor.edges
-        __edges[AbstractClass.name] ?= do ->
+        __edges[AbstractClass[cphEdges]] ?= do ->
           RC::Utils.extend {}
           , (fromSuper ? {})
-          , (AbstractClass["_#{AbstractClass.name}_edges"] ? {})
-        __edges[AbstractClass.name]
+          , (AbstractClass[AbstractClass[cphEdges]] ? {})
+        __edges[AbstractClass[cphEdges]]
 
     @public @static computeds: Object,
       default: {}
@@ -89,11 +97,11 @@ module.exports = (LeanRC)->
         AbstractClass = @
         fromSuper = if AbstractClass.__super__?
           AbstractClass.__super__.constructor.computeds
-        __comps[AbstractClass.name] ?= do ->
+        __comps[AbstractClass[cphComputeds]] ?= do ->
           RC::Utils.extend {}
           , (fromSuper ? {})
-          , (AbstractClass["_#{AbstractClass.name}_comps"] ? {})
-        __comps[AbstractClass.name]
+          , (AbstractClass[AbstractClass[cphComputeds]] ? {})
+        __comps[AbstractClass[cphComputeds]]
 
     @public @static attribute: Function,
       default: ->
@@ -121,13 +129,13 @@ module.exports = (LeanRC)->
             set.apply @, [voData]
           else
             voData
-        @["_#{@name}_attrs"] ?= {}
-        @["_#{@name}_edges"] ?= {}
-        if @["_#{@name}_attrs"][vsAttr]
+        @[@[cphAttributes]] ?= {}
+        @[@[cphEdges]] ?= {}
+        if @[@[cphAttributes]][vsAttr]
           throw new Error "attr `#{vsAttr}` has been defined previously"
         else
-          @["_#{@name}_attrs"][vsAttr] = opts
-          @["_#{@name}_edges"][vsAttr] = opts if opts.through
+          @[@[cphAttributes]][vsAttr] = opts
+          @[@[cphEdges]][vsAttr] = opts if opts.through
         @public typeDefinition, opts
         return
 
@@ -141,11 +149,11 @@ module.exports = (LeanRC)->
         vsAttr = Object.keys(typeDefinition)[0]
         unless opts.get?
           return throw new Error '`lambda` options is required'
-        @["_#{@name}_comps"] ?= {}
-        if @["_#{@name}_comps"][vsAttr]
+        @[@[cphComputeds]] ?= {}
+        if @[@[cphComputeds]][vsAttr]
           throw new Error "comp `#{vsAttr}` has been defined previously"
         else
-          @["_#{@name}_comps"][vsAttr] = opts
+          @[@[cphComputeds]][vsAttr] = opts
         @public typeDefinition, opts
         return
 
@@ -153,13 +161,13 @@ module.exports = (LeanRC)->
       default: {}
       get: (__relations)->
         AbstractClass = @
-        fromSuper = if @__super__?
-          @__super__.constructor.relations
-        __relations[@name] ?= do =>
+        fromSuper = if AbstractClass.__super__?
+          AbstractClass.__super__.constructor.relations
+        __relations[AbstractClass[cphRelations]] ?= do ->
           RC::Utils.extend {}
           , (fromSuper ? {})
-          , (AbstractClass["_#{@name}_relations"] ? {})
-        __relations[@name]
+          , (AbstractClass[AbstractClass[cphRelations]] ? {})
+        __relations[AbstractClass[cphRelations]]
 
     @public @static belongsTo: Function,
       default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable}={})->
@@ -228,8 +236,8 @@ module.exports = (LeanRC)->
                 $return: '@destination'
               .first()
         @computed "#{vsAttr}": LeanRC::RecordInterface, opts
-        @["_#{@name}_relations"] ?= {}
-        @["_#{@name}_relations"][vsAttr] = opts
+        @[@[cphRelations]] ?= {}
+        @[@[cphRelations]][vsAttr] = opts
         return
 
     @public @static hasMany: Function,
@@ -271,8 +279,8 @@ module.exports = (LeanRC)->
                 '@current._key': {$eq: @_key}
               $return: '@destination'
         @computed "#{vsAttr}": LeanRC::CursorInterface, opts
-        @["_#{@name}_relations"] ?= {}
-        @["_#{@name}_relations"][vsAttr] = opts
+        @[@[cphRelations]] ?= {}
+        @[@[cphRelations]][vsAttr] = opts
         return
 
     @public @static hasOne: Function,
@@ -293,8 +301,8 @@ module.exports = (LeanRC)->
           @collection.take "@doc.#{opts.inverse}": @[opts.refKey]
             .first()
         @computed typeDefinition, opts
-        @["_#{@name}_relations"] ?= {}
-        @["_#{@name}_relations"][vsAttr] = opts
+        @[@[cphRelations]] ?= {}
+        @[@[cphRelations]][vsAttr] = opts
         return
 
     # Cucumber.inverseFor 'tomato' #-> {recordClass: App::Tomato, attrName: 'cucumbers', relation: 'hasMany'}
@@ -465,6 +473,22 @@ module.exports = (LeanRC)->
           @[vsAttrName] = voAttrValue
 
       console.log 'dfdfdf 666'
+
+    @public @static initialize: Function,
+      default: (args...) ->
+        @super args...
+        vlKeys = Reflect.ownKeys @
+        for key in vlKeys
+          switch key.toString()
+            when 'Symbol(_attributes)'
+              @[key]?[@[cphAttributes]] = null
+            when 'Symbol(_edges)'
+              @[key]?[@[cphEdges]] = null
+            when 'Symbol(_computeds)'
+              @[key]?[@[cphEdges]] = null
+            when 'Symbol(_relations)'
+              @[key]?[@[cphRelations]] = null
+        return
 
 
   return LeanRC::RecordMixin.initialize()
