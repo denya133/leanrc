@@ -255,36 +255,14 @@ describe 'RecordMixin', ->
             get: -> LeanRC::Facade.getInstance KEY
           @public push: Function,
             default: (item) ->
-              if item?.id? and not @[iphData][item.id]?
+              if @[iphData][item?.id]?
+                throw new Error 'EXISTS'
+              else
                 item.id ?= RC::Utils.uuid.v4()
                 @[iphData][item.id] = item
-              else
-                throw new Error 'EXISTS'
               @[iphData][item.id]?
-          @public patch: Function,
-            default: (item) ->
-              if item?id?
-                @[iphData][item.id] = item
-              @[iphData][item.id]?
-          @public remove: Function,
-            default: (id) -> delete @[iphData][id]
-          @public take: Function,
-            default: (id) -> @[iphData][id]
-          @public clone: Function,
-            default: (id) ->
-              if @[iphData][id]?
-                RC::Utils.extend {}, @[iphData][id]
-          @public copy: Function,
-            default: (id) ->
-              if @[iphData][id]?
-                RC::Utils.extend {}, @[iphData][id]
-          @public query: Function,
-            default: (query) ->
           @public includes: Function,
-            default: (id) ->
-              not @[iphData][id]?
-          @public collectionFullName: Function,
-            default: -> @[ipsName]
+            default: (id) -> @[iphData][id]?
           constructor: (asKey, asName) ->
             super asKey, asName
             @[ipsKey] = asKey
@@ -300,7 +278,57 @@ describe 'RecordMixin', ->
         Test::TestRecord.initialize()
         record = Test::TestRecord.new {}, Test::Collection.new KEY
         assert.isTrue record.isNew(), 'Record is not new'
-        record.id = RC::Utils.uuid.v4()
+        record.create()
         assert.isFalse record.isNew(), 'Record is still new'
         assert.throws (-> record.create()), Error, 'Document is exist in collection', 'Record not created'
+      .to.not.throw Error
+  describe '#destroy', ->
+    it 'should remove record', ->
+      expect ->
+        KEY = 'TEST_RECORD_02'
+        class Test extends RC::Module
+        class Test::Collection extends RC::CoreObject
+          @inheritProtected()
+          @Module: Test
+          @inheritProtected()
+          @include LeanRC::CollectionInterface
+          ipsKey = @protected key: String
+          ipsName = @protected name: String
+          iphData = @protected data: Object
+          @public facade: LeanRC::Facade,
+            get: -> LeanRC::Facade.getInstance KEY
+          @public push: Function,
+            default: (item) ->
+              if @[iphData][item?.id]?
+                throw new Error 'EXISTS'
+              else
+                item.id ?= RC::Utils.uuid.v4()
+                @[iphData][item.id] = item
+              @[iphData][item.id]?
+          @public remove: Function,
+            default: (query) ->
+              { '@doc._key': { $eq: id }} = query
+              Reflect.deleteProperty @[iphData], id
+          @public includes: Function,
+            default: (id) -> @[iphData][id]?
+          constructor: (asKey, asName) ->
+            super asKey, asName
+            @[ipsKey] = asKey
+            @[ipsName] = asName
+            @[iphData] = {}
+        Test::Collection.initialize()
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+        Test::TestRecord.initialize()
+        collection = Test::Collection.new KEY
+        record = Test::TestRecord.new {}, collection
+        assert.isTrue record.isNew(), 'Record is not new'
+        record.create()
+        assert.isFalse record.isNew(), 'Record is still new'
+        record.destroy()
+        assert.isFalse collection.includes(record.id), 'Record still in collection'
       .to.not.throw Error
