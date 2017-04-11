@@ -327,7 +327,6 @@ module.exports = (LeanRC)->
 
     @public save: Function,
       default: ->
-        @validate()
         if @isNew()
           @create()
         else
