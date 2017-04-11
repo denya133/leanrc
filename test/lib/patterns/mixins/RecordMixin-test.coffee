@@ -635,3 +635,64 @@ describe 'RecordMixin', ->
         newRecord = record.copy()
         assert.isTrue collection.includes(newRecord.id), 'Record copy not saved'
       .to.not.throw Error
+  describe '#decrement, #increment, #toggle', ->
+    it 'should decrease/increase value of number attribute and toggle boolean', ->
+      expect ->
+        KEY = 'TEST_RECORD_08'
+        class Test extends RC::Module
+        class Test::Collection extends RC::CoreObject
+          @inheritProtected()
+          @Module: Test
+          @inheritProtected()
+          @include LeanRC::CollectionInterface
+          ipsKey = @protected key: String
+          ipsName = @protected name: String
+          iphData = @protected data: Object
+          @public facade: LeanRC::Facade,
+            get: -> LeanRC::Facade.getInstance KEY
+          @public find: Function,
+            default: (id) -> @[iphData][id]
+          @public push: Function,
+            default: (item) ->
+              throw new Error 'Item is empty'  unless item?
+              throw new Error "Item '#{item.id}' is already exists"  if @includes item.id
+              item.id ?= RC::Utils.uuid.v4()
+              @[iphData][item.id] = item
+              @[iphData][item.id]?
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              throw new Error "Item '#{id}' is missing"  unless @includes id
+              @[iphData][item.id] = item
+              @[iphData][item.id]?
+          @public includes: Function,
+            default: (id) -> @[iphData][id]? and not @[iphData][id].isHidden
+          constructor: (asKey, asName) ->
+            super asKey, asName
+            @[ipsKey] = asKey
+            @[ipsName] = asName
+            @[iphData] = {}
+        Test::Collection.initialize()
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attr test: Number
+          @attr has: Boolean
+        Test::TestRecord.initialize()
+        collection = Test::Collection.new KEY
+        record = Test::TestRecord.new { test: 1000, has: true }, collection
+        record.save()
+        assert.equal record.test, 1000, 'Initial number value is incorrect'
+        assert.isTrue record.has, 'Initial boolean value is incorrect'
+        record.decrement 'test', 7
+        assert.equal record.test, 993, 'Descreased number value is incorrect'
+        record.increment 'test', 19
+        assert.equal record.test, 1012, 'Increased number value is incorrect'
+        record.toggle 'has'
+        assert.isFalse record.has, 'Toggled boolean value is incorrect'
+        record.toggle 'has'
+        assert.isTrue record.has, 'Toggled boolean value is incorrect'
+      .to.not.throw Error
