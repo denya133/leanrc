@@ -351,7 +351,7 @@ describe 'RecordMixin', ->
             default: (id) -> @[iphData][id]
           @public clone: Function,
             default: (item) ->
-              result = item.constructor.new()
+              result = item.constructor.new item, @
               for key of item.constructor.attributes
                 result[key] = item[key]
               for key of item.constructor.edges
@@ -360,6 +360,7 @@ describe 'RecordMixin', ->
                 result[key] = item[key]
               for key of item.constructor.relations
                 result[key] = item[key]
+              result.id = RC::Utils.uuid.v4()
               result
           @public push: Function,
             default: (item) ->
@@ -400,4 +401,64 @@ describe 'RecordMixin', ->
         record.test = 'test2'
         record.update()
         assert.equal collection.find(record.id).test, 'test2', 'Updated attr not saved'
+      .to.not.throw Error
+  describe '#clone', ->
+    it 'should clone record', ->
+      expect ->
+        KEY = 'TEST_RECORD_04'
+        class Test extends RC::Module
+        class Test::Collection extends RC::CoreObject
+          @inheritProtected()
+          @Module: Test
+          @inheritProtected()
+          @include LeanRC::CollectionInterface
+          ipsKey = @protected key: String
+          ipsName = @protected name: String
+          iphData = @protected data: Object
+          @public facade: LeanRC::Facade,
+            get: -> LeanRC::Facade.getInstance KEY
+          @public find: Function,
+            default: (id) -> @[iphData][id]
+          @public clone: Function,
+            default: (item) ->
+              result = item.constructor.new item, @
+              for key of item.constructor.attributes
+                result[key] = item[key]
+              for key of item.constructor.edges
+                result[key] = item[key]
+              for key of item.constructor.computeds
+                result[key] = item[key]
+              for key of item.constructor.relations
+                result[key] = item[key]
+              result.id = RC::Utils.uuid.v4()
+              result
+          @public push: Function,
+            default: (item) ->
+              if @includes item.id
+                throw new Error 'EXISTS'
+              else
+                item.id ?= RC::Utils.uuid.v4()
+                @[iphData][item.id] = @clone item
+              @[iphData][item.id]?
+          @public includes: Function,
+            default: (id) -> @[iphData][id]?
+          constructor: (asKey, asName) ->
+            super asKey, asName
+            @[ipsKey] = asKey
+            @[ipsName] = asName
+            @[iphData] = {}
+        Test::Collection.initialize()
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attr test: String
+        Test::TestRecord.initialize()
+        collection = Test::Collection.new KEY
+        record = Test::TestRecord.new { test: 'test1' }, collection
+        recordCopy = record.clone()
+        assert.equal record.test, recordCopy.test
+        assert.notEqual record.id, recordCopy.id
       .to.not.throw Error
