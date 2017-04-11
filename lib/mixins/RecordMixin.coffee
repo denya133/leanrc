@@ -157,41 +157,40 @@ module.exports = (LeanRC)->
           RecordClass = @findModelByName aoAttributes._type
           RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
 
-    @public save: Function,
+    @public @async save: Function,
       default: ->
-        @validate()
-        if @isNew()
-          @create()
+        if yield @isNew()
+          yield @create()
         else
-          @update()
+          yield @update()
 
-    @public create: Function,
+    @public @async create: Function,
       default: ->
-        unless @isNew()
+        unless yield @isNew()
           throw new Error 'Document is exist in collection'
-        @collection.push @
+        yield @collection.push @
         return @
 
-    @public update: Function,
+    @public @async update: Function,
       default: ->
-        if @isNew()
+        if yield @isNew()
           throw new Error 'Document does not exist in collection'
-        @collection.patch @id, @
+        yield @collection.patch @id, @
         return @
 
-    @public delete: Function,
+    @public @async delete: Function,
       default: ->
-        if @isNew()
+        if yield @isNew()
           throw new Error 'Document is not exist in collection'
         @isHidden = yes
         @updatedAt = new Date()
-        @save()
+        yield @save()
 
-    @public destroy: Function,
+    @public @async destroy: Function,
       default: ->
-        if @isNew()
+        if yield @isNew()
           throw new Error 'Document is not exist in collection'
-        @collection.remove @id
+        yield @collection.remove @id
         return
 
     @public @virtual attributes: Function, # метод должен вернуть список атрибутов данного рекорда.
@@ -201,52 +200,52 @@ module.exports = (LeanRC)->
     @public clone: Function,
       default: -> @collection.clone @
 
-    @public copy: Function,
-      default: -> @collection.copy @
+    @public @async copy: Function,
+      default: -> yield @collection.copy @
 
-    @public decrement: Function,
+    @public @async decrement: Function,
       default: (asAttribute, step = 1)->
         unless _.isNumber @[asAttribute]
           throw new Error "doc.attribute `#{asAttribute}` is not Number"
         @[asAttribute] -= step
-        @save()
+        yield @save()
 
-    @public increment: Function,
+    @public @async increment: Function,
       default: (asAttribute, step = 1)->
         unless _.isNumber @[asAttribute]
           throw new Error "doc.attribute `#{asAttribute}` is not Number"
         @[asAttribute] += step
-        @save()
+        yield @save()
 
-    @public toggle: Function,
+    @public @async toggle: Function,
       default: (asAttribute)->
         unless _.isBoolean @[asAttribute]
           throw new Error "doc.attribute `#{asAttribute}` is not Boolean"
         @[asAttribute] = not @[asAttribute]
-        @save()
+        yield @save()
 
-    @public touch: Function,
+    @public @async touch: Function,
       default: ->
         @updatedAt = new Date()
-        @save()
+        yield @save()
 
-    @public updateAttribute: Function,
+    @public @async updateAttribute: Function,
       default: (name, value)->
         @[name] = value
-        @save()
+        yield @save()
 
-    @public updateAttributes: Function,
+    @public @async updateAttributes: Function,
       default: (aoAttributes)->
         for own vsAttrName, voAttrValue of aoAttributes
           do (vsAttrName, voAttrValue)=>
             @[vsAttrName] = voAttrValue
-        @save()
+        yield @save()
 
-    @public isNew: Function,
+    @public @async isNew: Function,
       default: ->
-        not @id? or not @collection.includes @id
+        not @id? or not yield @collection.includes @id
 
-    @public @virtual reload: Function,
+    @public @async @virtual reload: Function,
       args: []
       return: LeanRC::RecordInterface
 

@@ -64,18 +64,19 @@ module.exports = (LeanRC)->
               @[attr] = null
               return
           get: ->
-            vcRecord = opts.transform()
-            vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
-            voCollection = @collection.facade.retrieveProxy vsCollectionName
-            unless through
-              voCollection.takeBy "@doc.#{refKey}": @[attr]
-                .first()
-            else
-              if @[through[0]]?[0]?
-                voCollection.take @[through[0]][0][through[1].by]
+            RC::Utils.co =>
+              vcRecord = opts.transform()
+              vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
+              voCollection = @collection.facade.retrieveProxy vsCollectionName
+              unless through
+                cursor = yield voCollection.takeBy "@doc.#{refKey}": @[attr]
+                cursor.first()
               else
-                null
-        @computed "#{vsAttr}": LeanRC::RecordInterface, opts
+                if @[through[0]]?[0]?
+                  yield voCollection.take @[through[0]][0][through[1].by]
+                else
+                  null
+        @computed @async "#{vsAttr}": LeanRC::RecordInterface, opts
         @["_#{@name}_relations"] ?= {}
         @["_#{@name}_relations"][vsAttr] = opts
         return
@@ -91,18 +92,20 @@ module.exports = (LeanRC)->
             @Module::[vsRecordName]
         opts.validate = -> joi.array().items opts.transform().schema
         opts.get = ->
-          vcRecord = opts.transform()
-          vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
-          voCollection = @collection.facade.retrieveProxy vsCollectionName
-          unless opts.through
-            voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
-          else
-            if @[opts.through[0]]?
-              voCollection.takeMany @[opts.through[0]].map (i)->
-                i[opts.through[1].by]
+          RC::Utils.co =>
+            vcRecord = opts.transform()
+            vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
+            voCollection = @collection.facade.retrieveProxy vsCollectionName
+            unless opts.through
+              yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
             else
-              null
-        @computed "#{vsAttr}": LeanRC::CursorInterface, opts
+              if @[opts.through[0]]?
+                throughItems = yield @[opts.through[0]]
+                yield voCollection.takeMany throughItems.map (i)->
+                  i[opts.through[1].by]
+              else
+                null
+        @computed @async "#{vsAttr}": LeanRC::CursorInterface, opts
         @["_#{@name}_relations"] ?= {}
         @["_#{@name}_relations"][vsAttr] = opts
         return
@@ -119,12 +122,13 @@ module.exports = (LeanRC)->
             @Module::[vsRecordName]
         opts.validate = -> opts.transform().schema
         opts.get = ->
-          vcRecord = opts.transform()
-          vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
-          voCollection = @collection.facade.retrieveProxy vsCollectionName
-          voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
-            .first()
-        @computed typeDefinition, opts
+          RC::Utils.co =>
+            vcRecord = opts.transform()
+            vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
+            voCollection = @collection.facade.retrieveProxy vsCollectionName
+            cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
+            cursor.first()
+        @computed @async typeDefinition, opts
         @["_#{@name}_relations"] ?= {}
         @["_#{@name}_relations"][vsAttr] = opts
         return

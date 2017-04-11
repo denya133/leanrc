@@ -38,51 +38,51 @@ module.exports = (LeanRC)->
     @public @virtual build: Function, # создает инстанс рекорда
       args: [Object]
       return: LeanRC::RecordInterface
-    @public @virtual create: Function, # создает инстанс рекорда и делает save
+    @public @async @virtual create: Function, # создает инстанс рекорда и делает save
       args: [Object]
       return: LeanRC::RecordInterface
-    @public @virtual push: Function, # обращается к БД
+    @public @async @virtual push: Function, # обращается к БД
       args: [LeanRC::RecordInterface]
       return: Boolean
 
-    @public @virtual delete: Function,
+    @public @async @virtual delete: Function,
       args: [String]
       return: LeanRC::RecordInterface
 
-    @public @virtual destroy: Function,
+    @public @async @virtual destroy: Function,
       args: [String]
       return: RC::Constants.NILL
-    @public @virtual remove: Function, # обращается к БД
+    @public @async @virtual remove: Function, # обращается к БД
       args: [String]
       return: Boolean
 
-    @public @virtual find: Function,
+    @public @async @virtual find: Function,
       args: [String]
       return: LeanRC::RecordInterface
-    @public @virtual findMany: Function,
+    @public @async @virtual findMany: Function,
       args: [Array]
       return: LeanRC::CursorInterface
-    @public @virtual take: Function, # обращается к БД
+    @public @async @virtual take: Function, # обращается к БД
       args: [String]
       return: LeanRC::CursorInterface
-    @public @virtual takeMany: Function, # обращается к БД
+    @public @async @virtual takeMany: Function, # обращается к БД
       args: [Array]
       return: LeanRC::CursorInterface
-    @public @virtual takeAll: Function, # обращается к БД
+    @public @async @virtual takeAll: Function, # обращается к БД
       args: []
       return: LeanRC::CursorInterface
 
-    @public @virtual replace: Function,
+    @public @async @virtual replace: Function,
       args: [String, Object]
       return: LeanRC::RecordInterface
-    @public @virtual override: Function, # обращается к БД
+    @public @async @virtual override: Function, # обращается к БД
       args: [String, LeanRC::RecordInterface]
       return: Boolean
 
-    @public @virtual update: Function,
+    @public @async @virtual update: Function,
       args: [String, Object]
       return: LeanRC::RecordInterface
-    @public @virtual patch: Function, # обращается к БД
+    @public @async @virtual patch: Function, # обращается к БД
       args: [String, LeanRC::RecordInterface]
       return: Boolean
 
@@ -90,14 +90,14 @@ module.exports = (LeanRC)->
       args: [LeanRC::RecordInterface]
       return: LeanRC::RecordInterface
 
-    @public @virtual copy: Function,
+    @public @async @virtual copy: Function,
       args: [LeanRC::RecordInterface]
       return: LeanRC::RecordInterface
 
-    @public @virtual includes: Function,
+    @public @async @virtual includes: Function,
       args: [String]
       return: Boolean
-    @public @virtual length: Function, # количество объектов в коллекции
+    @public @async @virtual length: Function, # количество объектов в коллекции
       args: []
       return: Number
 

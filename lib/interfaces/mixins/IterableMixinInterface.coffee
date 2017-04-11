@@ -7,16 +7,16 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public @virtual forEach: Function,
+    @public @async @virtual forEach: Function,
       args: [Function]
       return: RC::Constants.NILL
-    @public @virtual filter: Function,
+    @public @async @virtual filter: Function,
       args: [Function]
       return: Array
-    @public @virtual map: Function,
+    @public @async @virtual map: Function,
       args: [Function]
       return: Array
-    @public @virtual reduce: Function,
+    @public @async @virtual reduce: Function,
       args: [Function, RC::Constants.ANY]
       return: RC::Constants.ANY
 

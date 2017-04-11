@@ -11,7 +11,8 @@ module.exports = (LeanRC)->
     @Module: LeanRC
 
     @public delegate: RC::Class # устанавливается при инстанцировании прокси
-    @public serializer: RC::Class # устанавливается при инстанцировании прокси
+    @public serializer: RC::Class,
+      default: LeanRC::Serializer
 
     @public collectionName: Function,
       default: ->
@@ -61,41 +62,41 @@ module.exports = (LeanRC)->
       default: (properties)->
         @delegate.new properties
 
-    @public create: Function,
+    @public @async create: Function,
       default: (properties)->
         voRecord = @build properties
-        voRecord.save()
+        yield voRecord.save()
 
-    @public delete: Function,
+    @public @async delete: Function,
       default: (id)->
-        voRecord = @find id
-        voRecord.delete()
+        voRecord = yield @find id
+        yield voRecord.delete()
         return voRecord
 
-    @public destroy: Function,
+    @public @async destroy: Function,
       default: (id)->
-        voRecord = @find id
-        voRecord.destroy()
+        voRecord = yield @find id
+        yield voRecord.destroy()
         return
 
-    @public find: Function,
+    @public @async find: Function,
       default: (id)->
-        @take id
+        yield @take id
 
-    @public findMany: Function,
+    @public @async findMany: Function,
       default: (ids)->
-        @takeMany ids
+        yield @takeMany ids
 
-    @public replace: Function,
+    @public @async replace: Function,
       default: (id, properties)->
         voRecord = @find id
-        voRecord # ????????????
+        yield voRecord.updateAttributes properties # ????????????
         return voRecord
 
-    @public update: Function,
+    @public @async update: Function,
       default: (id, properties)->
         voRecord = @find id
-        voRecord.updateAttributes properties
+        yield voRecord.updateAttributes properties
         return voRecord
 
     @public clone: Function,
@@ -104,10 +105,10 @@ module.exports = (LeanRC)->
         voRecord.id = @generateId()
         return voRecord
 
-    @public copy: Function,
+    @public @async copy: Function,
       default: (aoRecord)->
         voRecord = @clone aoRecord
-        voRecord.save()
+        yield voRecord.save()
         return voRecord
 
     @public normalize: Function,

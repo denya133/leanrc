@@ -13,22 +13,26 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public forEach: Function,
+    @public @async forEach: Function,
       default: (lambda)->
-        @takeAll().forEach lambda
+        cursor = yield @takeAll()
+        cursor.forEach (item)-> yield lambda item
         return
 
-    @public filter: Function,
+    @public @async filter: Function,
       default: (lambda)->
-        @takeAll().filter lambda
+        cursor = yield @takeAll()
+        cursor.filter (item)-> yield lambda item
 
-    @public map: Function,
+    @public @async map: Function,
       default: (lambda)->
-        @takeAll().map lambda
+        cursor = yield @takeAll()
+        cursor.map (item)-> yield lambda item
 
-    @public reduce: Function,
+    @public @async reduce: Function,
       default: (lambda, initialValue)->
-        @takeAll().reduce lambda, initialValue
+        cursor = yield @takeAll()
+        cursor.reduce ((item, prev)-> yield lambda item, prev), initialValue
 
 
   return LeanRC::IterableMixin.initialize()

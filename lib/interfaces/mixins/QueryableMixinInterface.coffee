@@ -9,51 +9,51 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public @virtual deleteBy: Function,
+    @public @async @virtual deleteBy: Function,
       args: [Object]
       return: RC::Constants.NILL
 
-    @public @virtual destroyBy: Function,
+    @public @async @virtual destroyBy: Function,
       args: [Object]
       return: RC::Constants.NILL
-    @public @virtual removeBy: Function, # обращается к БД
+    @public @async @virtual removeBy: Function, # обращается к БД
       args: [Object]
       return: Boolean
 
-    @public @virtual findBy: Function,
+    @public @async @virtual findBy: Function,
       args: [Object]
       return: LeanRC::CursorInterface
-    @public @virtual takeBy: Function, # обращается к БД
+    @public @async @virtual takeBy: Function, # обращается к БД
       args: [Object]
       return: LeanRC::CursorInterface
 
-    @public @virtual replaceBy: Function,
+    @public @async @virtual replaceBy: Function,
       args: [Object, Object]
       return: RC::Constants.NILL
-    @public @virtual overrideBy: Function, # обращается к БД
+    @public @async @virtual overrideBy: Function, # обращается к БД
       args: [Object, LeanRC::RecordInterface]
       return: Boolean
 
-    @public @virtual updateBy: Function,
+    @public @async @virtual updateBy: Function,
       args: [Object, Object]
       return: RC::Constants.NILL
-    @public @virtual patchBy: Function, # обращается к БД
+    @public @async @virtual patchBy: Function, # обращается к БД
       args: [Object, LeanRC::RecordInterface]
       return: Boolean
 
-    @public @virtual exists: Function,
+    @public @async @virtual exists: Function,
       args: [Object]
       return: Boolean
 
 
 
-    @public @virtual query: Function,
+    @public @async @virtual query: Function,
       args: [[Object, LeanRC::QueryInterface]]
       return: RC::Constants.ANY
     @public @virtual parseQuery: Function, # описание того как стандартный (query object) преобразовать в конкретный запрос к конкретной базе данных
       args: [[Object, LeanRC::QueryInterface]]
       return: [Object, String, LeanRC::QueryInterface]
-    @public @virtual executeQuery: Function,
+    @public @async @virtual executeQuery: Function,
       args: [[Object, String, LeanRC::QueryInterface], Object] # query, options
       return: RC::Constants.ANY
 

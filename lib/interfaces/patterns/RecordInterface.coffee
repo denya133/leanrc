@@ -61,19 +61,19 @@ module.exports = (LeanRC)->
       args: [Object] #attributes
       return: LeanRC::RecordInterface
 
-    @public @virtual save: Function,
+    @public @async @virtual save: Function,
       args: []
       return: RecordInterface
-    @public @virtual create: Function,
+    @public @async @virtual create: Function,
       args: []
       return: RecordInterface
-    @public @virtual update: Function,
+    @public @async @virtual update: Function,
       args: []
       return: RecordInterface
-    @public @virtual delete: Function,
+    @public @async @virtual delete: Function,
       args: []
       return: RecordInterface
-    @public @virtual destroy: Function,
+    @public @async @virtual destroy: Function,
       args: []
       return: RecordInterface
 
@@ -83,31 +83,31 @@ module.exports = (LeanRC)->
     @public @virtual clone: Function,
       args: []
       return: LeanRC::RecordInterface
-    @public @virtual copy: Function,
+    @public @async @virtual copy: Function,
       args: []
       return: LeanRC::RecordInterface
-    @public @virtual decrement: Function,
+    @public @async @virtual decrement: Function,
       args: [String, [Number, RC::Constants.NILL]] #attribute, step
       return: LeanRC::RecordInterface
-    @public @virtual increment: Function,
+    @public @async @virtual increment: Function,
       args: [String, [Number, RC::Constants.NILL]] #attribute, step
       return: LeanRC::RecordInterface
-    @public @virtual toggle: Function,
+    @public @async @virtual toggle: Function,
       args: [String] #attribute
       return: LeanRC::RecordInterface
-    @public @virtual touch: Function,
+    @public @async @virtual touch: Function,
       args: []
       return: LeanRC::RecordInterface
-    @public @virtual updateAttribute: Function,
+    @public @async @virtual updateAttribute: Function,
       args: [String, RC::Constants.ANY] #name, value
       return: LeanRC::RecordInterface
-    @public @virtual updateAttributes: Function,
+    @public @async @virtual updateAttributes: Function,
       args: [Object] #attributes
       return: LeanRC::RecordInterface
-    @public @virtual isNew: Function,
+    @public @async @virtual isNew: Function,
       args: []
       return: Boolean
-    @public @virtual reload: Function,
+    @public @async @virtual reload: Function,
       args: []
       return: LeanRC::RecordInterface
     @public @virtual changedAttributes: Function,
