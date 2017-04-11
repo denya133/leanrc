@@ -68,6 +68,9 @@ module.exports = (LeanRC)->
     @public @virtual takeMany: Function, # обращается к БД
       args: [Array]
       return: LeanRC::CursorInterface
+    @public @virtual takeAll: Function, # обращается к БД
+      args: []
+      return: LeanRC::CursorInterface
 
     @public @virtual replace: Function,
       args: [String, Object]

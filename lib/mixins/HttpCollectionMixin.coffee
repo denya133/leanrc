@@ -11,6 +11,81 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
+    @public push: Function,
+      default: (aoRecord)->
+        voQuery = LeanRC::Query.new()
+          .insert aoRecord
+          .into @collectionFullName()
+        @query voQuery
+        return yes
+
+    @public remove: Function,
+      default: (id)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$eq: id}
+          .remove()
+        @query voQuery
+        return yes
+
+    @public take: Function,
+      default: (id)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$eq: id}
+          .return '@doc'
+        return @query voQuery
+          .first()
+
+    @public takeMany: Function,
+      default: (ids)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$in: ids}
+          .return '@doc'
+        return @query voQuery
+
+    @public takeAll: Function,
+      default: ->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .return '@doc'
+        return @query voQuery
+
+    @public override: Function,
+      default: (id, aoRecord)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$eq: id}
+          .replace aoRecord
+        return @query voQuery
+
+    @public patch: Function,
+      default: (id, aoRecord)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$eq: id}
+          .update aoRecord
+        return @query voQuery
+
+    @public includes: Function,
+      default: (id)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$eq: id}
+          .limit 1
+          .return '@doc'
+        return @query voQuery
+          .hasNext()
+
+    @public length: Function,
+      default: ->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .count()
+        return @query voQuery
+          .first()
+
     @public headers: Object
     @public host: String,
       default: 'http://localhost'
