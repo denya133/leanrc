@@ -1,387 +1,335 @@
-# можно реализовать в составе LeanRC, так как внутри для посылки http запросов будем использовать полифил из RC::Utils.request
+
 
 _             = require 'lodash'
-Parser        = require 'mongo-parse' #mongo-parse@2.0.2
-# moment        = require 'moment'
 RC            = require 'RC'
-
-# будем использовать этот миксин для посылки запросов из ноды в арангу например.
 
 
 module.exports = (LeanRC)->
   class LeanRC::HttpCollectionMixin extends RC::Mixin
     @inheritProtected()
+    @implements LeanRC::QueryableMixinInterface
 
     @Module: LeanRC
 
-    wrapReference = (value)->
-      if _.isString(value) and /^[@]/.test value
-        qb.ref value.replace '@', ''
-      else
-        qb value
+    @public push: Function,
+      default: (aoRecord)->
+        voQuery = LeanRC::Query.new()
+          .insert aoRecord
+          .into @collectionFullName()
+        @query voQuery
+        return yes
 
-    @public operatorsMap: Object,
-      default:
-        # Logical Query Operators
-        $and: (args...)-> qb.and args...
-        $or: (args...)-> qb.or args...
-        $not: (args...)-> qb.not args...
-        $nor: (args...)-> qb.not qb.or args... # not or # !(a||b) === !a && !b
+    @public remove: Function,
+      default: (id)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$eq: id}
+          .remove()
+        @query voQuery
+        return yes
 
-        # Comparison Query Operators (aoSecond is NOT sub-query)
-        $eq: (aoFirst, aoSecond)->
-          qb.eq wrapReference(aoFirst), wrapReference(aoSecond) # ==
-        $ne: (aoFirst, aoSecond)->
-          qb.neq wrapReference(aoFirst), wrapReference(aoSecond) # !=
-        $lt: (aoFirst, aoSecond)->
-          qb.lt wrapReference(aoFirst), wrapReference(aoSecond) # <
-        $lte: (aoFirst, aoSecond)->
-          qb.lte wrapReference(aoFirst), wrapReference(aoSecond) # <=
-        $gt: (aoFirst, aoSecond)->
-          qb.gt wrapReference(aoFirst), wrapReference(aoSecond) # >
-        $gte: (aoFirst, aoSecond)->
-          qb.gte wrapReference(aoFirst), wrapReference(aoSecond) # >=
-        $in: (aoFirst, alItems)-> # check value present in array
-          qb.in wrapReference(aoFirst), qb alItems
-        $nin: (aoFirst, alItems)-> # ... not present in array
-          qb.notIn wrapReference(aoFirst), qb alItems
+    @public take: Function,
+      default: (id)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$eq: id}
+          .return '@doc'
+        return @query voQuery
+          .first()
 
-        # Array Query Operators
-        $all: (aoFirst, alItems)-> # contains some values
-          qb.and alItems.map (aoItem)->
-            qb.in wrapReference(aoItem), wrapReference(aoFirst)
-        $elemMatch: (aoFirst, aoSecond)-> # conditions for complex item
-          wrappedReference = aoFirst.replace '@', ''
-          voFilter = qb.and(aoSecond...).toAQL()
-          voFirst = qb.expr "LENGTH(#{wrappedReference}[* FILTER #{voFilter}])"
-          qb.gt voFirst, qb 0
-        $size: (aoFirst, aoSecond)->
-          voFirst = qb.expr "LENGTH(#{aoFirst.replace '@', ''})"
-          qb.eq voFirst, wrapReference(aoSecond) # condition for array length
+    @public takeMany: Function,
+      default: (ids)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$in: ids}
+          .return '@doc'
+        return @query voQuery
 
-        # Element Query Operators
-        $exists: (aoFirst, aoSecond)-> # condition for check present some value in field
-          voFirst = qb.expr "HAS(#{aoFirst.replace '@', ''})"
-          qb.eq voFirst, wrapReference(aoSecond)
-        $type: (aoFirst, aoSecond)->
-          voFirst = qb.expr "TYPENAME(#{aoFirst.replace '@', ''})"
-          qb.eq voFirst, wrapReference(aoSecond) # check value type
+    @public takeAll: Function,
+      default: ->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .return '@doc'
+        return @query voQuery
 
-        # Evaluation Query Operators
-        $mod: (aoFirst, [divisor, remainder])->
-          qb.eq qb.mod(wrapReference(aoFirst), qb divisor), qb remainder
-        $regex: (aoFirst, aoSecond)-> # value must be string. ckeck it by RegExp.
-          qb.expr "REGEX_TEST(#{aoFirst.replace '@', ''}, \"#{String aoSecond}\")"
+    @public override: Function,
+      default: (id, aoRecord)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$eq: id}
+          .replace aoRecord
+        return @query voQuery
 
-        # Datetime Query Operators
-        $td: (aoFirst, aoSecond)-> # this day (today)
-          todayStart = moment().startOf 'day'
-          todayEnd = moment().endOf 'day'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), todayStart.toISOString()
-              qb.lt wrapReference(aoFirst), todayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), todayStart.toISOString()
-              qb.lt wrapReference(aoFirst), todayEnd.toISOString()
-            ]...
-        $ld: (aoFirst, aoSecond)-> # last day (yesterday)
-          yesterdayStart = moment().subtract(1, 'days').startOf 'day'
-          yesterdayEnd = moment().subtract(1, 'days').endOf 'day'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), yesterdayStart.toISOString()
-              qb.lt wrapReference(aoFirst), yesterdayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), yesterdayStart.toISOString()
-              qb.lt wrapReference(aoFirst), yesterdayEnd.toISOString()
-            ]...
-        $tw: (aoFirst, aoSecond)-> # this week
-          weekStart = moment().startOf 'week'
-          weekEnd = moment().endOf 'week'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), weekStart.toISOString()
-              qb.lt wrapReference(aoFirst), weekEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), weekStart.toISOString()
-              qb.lt wrapReference(aoFirst), weekEnd.toISOString()
-            ]...
-        $lw: (aoFirst, aoSecond)-> # last week
-          weekStart = moment().subtract(1, 'weeks').startOf 'week'
-          weekEnd = weekStart.clone().endOf 'week'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), weekStart.toISOString()
-              qb.lt wrapReference(aoFirst), weekEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), weekStart.toISOString()
-              qb.lt wrapReference(aoFirst), weekEnd.toISOString()
-            ]...
-        $tm: (aoFirst, aoSecond)-> # this month
-          firstDayStart = moment().startOf 'month'
-          lastDayEnd = moment().endOf 'month'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-        $lm: (aoFirst, aoSecond)-> # last month
-          firstDayStart = moment().subtract(1, 'months').startOf 'month'
-          lastDayEnd = firstDayStart.clone().endOf 'month'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-        $ty: (aoFirst, aoSecond)-> # this year
-          firstDayStart = moment().startOf 'year'
-          lastDayEnd = firstDayStart.clone().endOf 'year'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-        $ly: (aoFirst, aoSecond)-> # last year
-          firstDayStart = moment().subtract(1, 'years').startOf 'year'
-          lastDayEnd = firstDayStart.clone().endOf 'year'
-          if aoSecond
-            qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
-          else
-            qb.not qb.and [
-              qb.gte wrapReference(aoFirst), firstDayStart.toISOString()
-              qb.lt wrapReference(aoFirst), lastDayEnd.toISOString()
-            ]...
+    @public patch: Function,
+      default: (id, aoRecord)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$eq: id}
+          .update aoRecord
+        return @query voQuery
 
-    @public parseFilter: Function,
+    @public includes: Function,
+      default: (id)->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .filter '@doc._key': {$eq: id}
+          .limit 1
+          .return '@doc'
+        return @query voQuery
+          .hasNext()
+
+    @public length: Function,
+      default: ->
+        voQuery = LeanRC::Query.new()
+          .forIn '@doc': @collectionFullName()
+          .count()
+        return @query voQuery
+          .first()
+
+    @public headers: Object
+    @public host: String,
+      default: 'http://localhost'
+    @public namespace: String,
+      default: ''
+    @public postfix: String,
+      default: 'bulk'
+
+    @public headersForRequest: Function,
       args: [Object]
-      return: RC::Constants.ANY
-      default: ({field, parts, operator, operand, implicitField})->
-        if field? and operator isnt '$elemMatch' and parts.length is 0
-          @operatorsMap[operator] field, operand
-        else if field? and operator is '$elemMatch'
-          if implicitField is yes
-            @operatorsMap[operator] field, parts.map (part)=>
-              part.field = "@CURRENT"
-              @parseFilter part
+      return: Object
+      default: (params)-> @headers ? {}
+
+    @public methodForRequest: Function,
+      args: [Object]
+      return: String
+      default: ({requestType})->
+        switch requestType
+          when 'find' then 'GET'
+          when 'insert' then 'POST'
+          when 'update' then 'PATCH'
+          when 'replace' then 'PUT'
+          when 'remove' then 'DELETE'
           else
-            @operatorsMap[operator] field, parts.map (part)=>
-              part.field = "@CURRENT.#{part.field}"
-              @parseFilter part
-        else
-          @operatorsMap[operator ? '$and'] parts.map @parseFilter.bind @
+            'GET'
+
+    @public dataForRequest: Function,
+      args: [Object]
+      return: Object
+      default: ({snapshot})->
+        return snapshot
+
+    @public urlForRequest: Function,
+      args: [Object]
+      return: String
+      default: (params)->
+        {recordName, snapshot, requestType, query} = params
+        @buildURL recordName, snapshot, requestType, query
+
+    @public pathForType: Function,
+      args: [String]
+      return: String
+      default: (recordName)->
+        inflect.pluralize inflect.underscore recordName
+
+    ipmUrlPrefix = @protected urlPrefix: Function,
+      args: [String, String]
+      return: String
+      default: (path, parentURL)->
+        if not @host or @host is '/'
+          @host = ''
+
+        if path
+          # Protocol relative url
+          if /^\/\//.test(path) or /http(s)?:\/\//.test(path)
+            # Do nothing, the full @host is already included.
+            return path
+
+          # Absolute path
+          else if path.charAt(0) is '/'
+            return "#{@host}#{path}"
+          # Relative path
+          else
+            return "#{parentURL}/#{path}"
+
+        # No path provided
+        url = []
+        if @host then url.push @host
+        if @namespace then url.push @namespace
+        return url.join '/'
+
+    ipmBuildURL = @protected buildURL: Function,
+      args: [String, [Object, RC::Constants.NILL], [Boolean, RC::Constants.NILL]]
+      return: String
+      default: (recordName, query, withPostfix=yes)->
+        url = []
+        prefix = @[ipmUrlPrefix]()
+
+        if recordName
+          path = @pathForType recordName
+          url.push path if path
+
+        url.push encodeURIComponent @postfix if withPostfix and @postfix?
+        url.unshift prefix if prefix
+
+        url = url.join '/'
+        if not @host and url and url.charAt(0) isnt '/'
+          url = '/' + url
+
+        return url
+
+    @public urlForFind: Function,
+      args: [String, Object]
+      return: String
+      default: (recordName, query)->
+        @[ipmBuildURL] recordName, query, no
+
+    @public urlForInsert: Function,
+      args: [String, Object]
+      return: String
+      default: (recordName)->
+        @[ipmBuildURL] recordName, null, no
+
+    @public urlForUpdate: Function,
+      args: [String, Object, Object]
+      return: String
+      default: (recordName, query)->
+        @[ipmBuildURL] recordName, query
+
+    @public urlForReplace: Function,
+      args: [String, Object, Object]
+      return: String
+      default: (recordName, query)->
+        @[ipmBuildURL] recordName, query
+
+    @public urlForRemove: Function,
+      args: [String, Object]
+      return: String
+      default: (recordName, query)->
+        @[ipmBuildURL] recordName, query
+
+    @public buildURL: Function,
+      args: [String, [Object, RC::Constants.NILL], String, [Object, RC::Constants.NILL]]
+      return: String
+      default: (recordName, snapshot, requestType, query)->
+        switch requestType
+          when 'find'
+            @urlForFind recordName, query
+          when 'insert'
+            @urlForInsert recordName, snapshot
+          when 'update'
+            @urlForUpdate recordName, query, snapshot
+          when 'replace'
+            @urlForReplace recordName, query, snapshot
+          when 'remove'
+            @urlForRemove recordName, query
+          else
+            vsMethod = "urlFor#{inflect.camelize requestType}"
+            @[vsMethod]? recordName, snapshot, requestType, query
+
+    ipmRequestFor = @protected requestFor: Function,
+      args: [Object]
+      return: Object
+      default: (params)->
+        method  = @methodForRequest params
+        url     = @urlForRequest params
+        headers = @headersForRequest params
+        data    = @dataForRequest params
+        query   = params.query
+        return {method, url, headers, data, query}
+
+    # может быть переопределно другим миксином, который будет посылать запросы через jQuery.ajax например
+    ipmSendRequest = @protected sendRequest: Function,
+      args: [Object]
+      return: RC::PromiseInterface
+      default: ({method, url, options})->
+        RC::Utils.request method, url, options
+
+    # может быть переопределно другим миксином, который будет посылать запросы через jQuery.ajax например
+    ipmRequestToHash = @protected requestToHash: Function,
+      args: [Object]
+      return: Object
+      default: ({method, url, headers, data, query})->
+        if query?
+          query = JSON.stringify {query}
+          url = "#{url}?#{query}"
+        {
+          method
+          url
+          options:
+            body: data
+            json: yes
+            headers
+        }
+
+    ipmMakeRequest = @protected makeRequest: Function,
+      args: [Object]
+      return: RC::PromiseInterface
+      default: (request)-> # result of requestFor
+        hash = @[ipmRequestToHash] request
+        @[ipmSendRequest] hash
 
     @public parseQuery: Function,
       default: (aoQuery)->
         voQuery = null
-        aggUsed = aggPartial = intoUsed = intoPartial = finAggUsed = finAggPartial = null
         if aoQuery.$remove?
           do =>
             if aoQuery.$forIn?
-              for own asItemRef, asCollectionFullName of aoQuery.$forIn
-                voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
-                  .in asCollectionFullName
-              if (voJoin = aoQuery.$join)?
-                vlJoinFilters = voJoin.$and.map (asItemRef, {$eq:asRelValue})->
-                  voItemRef = qb.ref asItemRef.replace '@', ''
-                  voRelValue = qb.ref asRelValue.replace '@', ''
-                  qb.eq voItemRef, voRelValue
-                voQuery = voQuery.filter qb.and vlJoinFilters...
-              if (voFilter = aoQuery.$filter)?
-                voQuery = voQuery.filter @parseFilter Parser.parse voFilter
-              if (voLet = aoQuery.$let)?
-                for own asRef, aoValue of voLet
-                  voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
-              voQuery = (voQuery ? qb).remove aoQuery.$remove
-              if aoQuery.$into?
-                voQuery = voQuery.into aoQuery.$into
+              voQuery ?= {}
+              voQuery.requestType = 'remove'
+              voQuery.recordName = @delegate.name
+              voQuery.query = _.pick [
+                '$forIn', '$join', '$filter', '$let'
+              ]
+              voQuery.query.$return = '@doc'
+              voQuery
         else if (voRecord = aoQuery.$insert)?
           do =>
             if aoQuery.$into?
-              if aoQuery.$forIn?
-                for own asItemRef, asCollectionFullName of aoQuery.$forIn
-                  voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
-                    .in asCollectionFullName
-                if (voJoin = aoQuery.$join?.$and)?
-                  vlJoinFilters = voJoin.map (asItemRef, {$eq:asRelValue})->
-                    voItemRef = qb.ref asItemRef.replace '@', ''
-                    voRelValue = qb.ref asRelValue.replace '@', ''
-                    qb.eq voItemRef, voRelValue
-                  voQuery = voQuery.filter qb.and vlJoinFilters...
-                if (voFilter = aoQuery.$filter)?
-                  voQuery = voQuery.filter @parseFilter Parser.parse voFilter
-                if (voLet = aoQuery.$let)?
-                  for own asRef, aoValue of voLet
-                    voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
-              vhObjectForInsert = @serializer.serialize voRecord
-              voQuery = (voQuery ? qb).insert vhObjectForInsert
-                .into aoQuery.$into
+              voQuery ?= {}
+              voQuery.requestType = 'insert'
+              voQuery.recordName = @delegate.name
+              voQuery.snapshot = @serializer.serialize voRecord
+              voQuery
         else if (voRecord = aoQuery.$update)?
           do =>
             if aoQuery.$into?
-              if aoQuery.$forIn?
-                for own asItemRef, asCollectionFullName of aoQuery.$forIn
-                  voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
-                    .in asCollectionFullName
-                if (voJoin = aoQuery.$join?.$and)?
-                  vlJoinFilters = voJoin.map (asItemRef, {$eq:asRelValue})->
-                    voItemRef = qb.ref asItemRef.replace '@', ''
-                    voRelValue = qb.ref asRelValue.replace '@', ''
-                    qb.eq voItemRef, voRelValue
-                  voQuery = voQuery.filter qb.and vlJoinFilters...
-                if (voFilter = aoQuery.$filter)?
-                  voQuery = voQuery.filter @parseFilter Parser.parse voFilter
-                if (voLet = aoQuery.$let)?
-                  for own asRef, aoValue of voLet
-                    voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
-              vhObjectForUpdate = @serializer.serialize voRecord
-              voQuery = (voQuery ? qb).update qb.ref 'doc'
-                .with vhObjectForUpdate
-                .into aoQuery.$into
+              voQuery ?= {}
+              voQuery.requestType = 'update'
+              voQuery.recordName = @delegate.name
+              voQuery.snapshot = @serializer.serialize voRecord
+              voQuery.query = _.pick [
+                '$forIn', '$join', '$filter', '$let'
+              ]
+              voQuery.query.$return = '@doc'
+              voQuery
         else if (voRecord = aoQuery.$replace)?
           do =>
             if aoQuery.$into?
-              if aoQuery.$forIn?
-                for own asItemRef, asCollectionFullName of aoQuery.$forIn
-                  voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
-                    .in asCollectionFullName
-                if (voJoin = aoQuery.$join?.$and)?
-                  vlJoinFilters = voJoin.map (asItemRef, {$eq:asRelValue})->
-                    voItemRef = qb.ref asItemRef.replace '@', ''
-                    voRelValue = qb.ref asRelValue.replace '@', ''
-                    qb.eq voItemRef, voRelValue
-                  voQuery = voQuery.filter qb.and vlJoinFilters...
-                if (voFilter = aoQuery.$filter)?
-                  voQuery = voQuery.filter @parseFilter Parser.parse voFilter
-                if (voLet = aoQuery.$let)?
-                  for own asRef, aoValue of voLet
-                    voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
-              vhObjectForReplace = @serializer.serialize voRecord
-              voQuery = (voQuery ? qb).replace qb.ref 'doc'
-                .with vhObjectForReplace
-                .into aoQuery.$into
+              voQuery ?= {}
+              voQuery.requestType = 'replace'
+              voQuery.recordName = @delegate.name
+              voQuery.snapshot = @serializer.serialize voRecord
+              voQuery.query = _.pick [
+                '$forIn', '$join', '$filter', '$let'
+              ]
+              voQuery.query.$return = '@doc'
+              voQuery
         else if aoQuery.$forIn?
           do =>
-            for own asItemRef, asCollectionFullName of aoQuery.$forIn
-              voQuery = (voQuery ? qb).for qb.ref asItemRef.replace '@', ''
-                .in asCollectionFullName
-            if (voJoin = aoQuery.$join)?
-              vlJoinFilters = voJoin.$and.map (asItemRef, {$eq:asRelValue})->
-                voItemRef = qb.ref asItemRef.replace '@', ''
-                voRelValue = qb.ref asRelValue.replace '@', ''
-                qb.eq voItemRef, voRelValue
-              voQuery = voQuery.filter qb.and vlJoinFilters...
-            if (voFilter = aoQuery.$filter)?
-              voQuery = voQuery.filter @parseFilter Parser.parse voFilter
-            if (voLet = aoQuery.$let)?
-              for own asRef, aoValue of voLet
-                voQuery = (voQuery ? qb).let qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
-            if (voCollect = aoQuery.$collect)?
-              for own asRef, aoValue of voCollect
-                voQuery = voQuery.collect qb.ref(asRef.replace '@', ''), qb.expr @parseQuery LeanRC::Query.new aoValue
-            if (voAggregate = aoQuery.$aggregate)?
-              vsAggregate = (for own asRef, aoValue of voAggregate
-                do (asRef, aoValue)->
-                  "#{asRef.replace '@', ''} = #{aoValue}"
-              ).join ', '
-              aggUsed = _.escapeRegExp "FILTER {{AGGREGATE #{vsAggregate}}}"
-              if aoQuery.$collect?
-                aggPartial = "AGGREGATE #{vsAggregate}"
-              else
-                aggPartial = "COLLECT AGGREGATE #{vsAggregate}"
-              voQuery = voQuery.filter qb.expr "{{AGGREGATE #{vsAggregate}}}"
-            if (vsInto = aoQuery.$into)?
-              intoUsed = _.escapeRegExp "FILTER {{INTO #{vsInto}}}"
-              intoPartial = "INTO #{vsInto}"
-              query = query.filter qb.expr "{{INTO #{vsInto}}}"
-            if (voHaving = aoQuery.$having)?
-              voQuery = voQuery.filter @parseFilter Parser.parse voHaving
-            if (voSort = aoQuery.$sort)?
-              for own asRef, asSortDirect of aoQuery.$sort
-                voQuery = voQuery.sort qb.ref(asRef.replace '@', ''), asSortDirect
+            voQuery ?= {}
+            voQuery.requestType = 'find'
+            voQuery.recordName = @delegate.name
+            voQuery.query = aoQuery
+            voQuery
 
-            if (vnLimit = aoQuery.$limit)?
-              if (vnOffset = aoQuery.$offset)?
-                voQuery = voQuery.limit vnOffset, vnLimit
-              else
-                voQuery = voQuery.limit vnLimit
-
-            if (aoQuery.$count)?
-              voQuery = voQuery.collectWithCountInto 'counter'
-                .return qb.ref('counter').then('counter').else('0')
-            else if (vsSum = aoQuery.$sum)?
-              finAggUsed = "RETURN {{COLLECT AGGREGATE result = SUM\\(TO_NUMBER\\(#{vsSum.replace '@', ''}\\)\\) RETURN result}}"
-              finAggPartial = "COLLECT AGGREGATE result = SUM(TO_NUMBER(#{vsSum.replace '@', ''})) RETURN result"
-              voQuery = voQuery.return qb.expr "{{#{finAggPartial}}}"
-            else if (vsMin = aoQuery.$min)?
-              voQuery = voQuery.sort qb.ref(vsMin.replace '@', '')
-                .limit 1
-                .return qb.ref(vsMin.replace '@', '')
-            else if (vsMax = aoQuery.$max)?
-              voQuery = voQuery.sort qb.ref(vsMax.replace '@', ''), 'DESC'
-                .limit 1
-                .return qb.ref(vsMax.replace '@', '')
-            else if (vsAvg = aoQuery.$avg)?
-              finAggUsed = "RETURN {{COLLECT AGGREGATE result = AVG\\(TO_NUMBER\\(#{vsSum.replace '@', ''}\\)\\) RETURN result}}"
-              finAggPartial = "COLLECT AGGREGATE result = AVG(TO_NUMBER(#{vsSum.replace '@', ''})) RETURN result"
-              voQuery = voQuery.return qb.expr "{{#{finAggPartial}}}"
-            else
-              if aoQuery.$return?
-                voReturn = if _.isString aoQuery.$return
-                  qb.ref aoQuery.$return.replace '@', ''
-                else if _.isObject aoQuery.$return
-                  vhObj = {}
-                  for own key, value of aoQuery.$return
-                    do (key, value)->
-                      vhObj[key] = qb.ref value.replace '@', ''
-                  vhObj
-                if aoQuery.$distinct
-                  voQuery = voQuery.returnDistinct voReturn
-                else
-                  voQuery = voQuery.return voReturn
-        vsQuery = voQuery.toAQL()
-
-        if aggUsed and new RegExp(aggUsed).test vsQuery
-          vsQuery = vsQuery.replace new RegExp(aggUsed), aggPartial
-        if intoUsed and new RegExp(intoUsed).test vsQuery
-          vsQuery = vsQuery.replace new RegExp(intoUsed), intoPartial
-        if finAggUsed and new RegExp(finAggUsed).test vsQuery
-          vsQuery = vsQuery.replace new RegExp(finAggUsed), finAggPartial
-
-        return vsQuery
+        return voQuery
 
     @public executeQuery: Function,
-      default: (asQuery, options)->
-        # здесь надо посылать платформонезависимый http запрос к нужному апи-серверу - например RC::Utils.request - полифил для ноды/аранги
-        # конфиги апи сервера (урл,...) можно взять из @getData() тк. конфиги должны быть переданы при инстанцировании прокси.
-        voNativeCursor = db._query asQuery
-        voCursor = LeanRC::Cursor.new @delegate, voNativeCursor # вместо этого курсора надо сделать курсор на основе массива.
+      default: (aoQuery, options)->
+        request = @[ipmRequestFor] aoQuery
+
+        resultItems = yield @[ipmMakeRequest] request
+        voCursor = LeanRC::Cursor.new @delegate, resultItems
         return voCursor
 
 

@@ -11,7 +11,8 @@ module.exports = (LeanRC)->
     @Module: LeanRC
 
     @public delegate: RC::Class # устанавливается при инстанцировании прокси
-    @public serializer: RC::Class # устанавливается при инстанцировании прокси
+    @public serializer: RC::Class,
+      default: LeanRC::Serializer
 
     @public collectionName: Function,
       default: ->
@@ -61,114 +62,42 @@ module.exports = (LeanRC)->
       default: (properties)->
         @delegate.new properties
 
-    @public create: Function,
+    @public @async create: Function,
       default: (properties)->
         voRecord = @build properties
-        voRecord.save()
+        yield voRecord.save()
 
-    @public push: Function,
-      default: (aoRecord)->
-        voQuery = LeanRC::Query.new()
-          .insert aoRecord
-          .into @collectionFullName()
-        @query voQuery
-        return yes
-
-
-    @public delete: Function,
+    @public @async delete: Function,
       default: (id)->
-        voRecord = @find id
-        voRecord.delete()
+        voRecord = yield @find id
+        yield voRecord.delete()
         return voRecord
 
-    @public deleteBy: Function,
-      default: (query)->
-        @findBy query
-          .forEach (aoRecord)-> aoRecord.delete()
-        return
-
-
-    @public destroy: Function,
+    @public @async destroy: Function,
       default: (id)->
-        voRecord = @find id
-        voRecord.destroy()
+        voRecord = yield @find id
+        yield voRecord.destroy()
         return
 
-    @public destroyBy: Function,
-      default: (query)->
-        @findBy query
-          .forEach (aoRecord)-> aoRecord.destroy()
-        return
-
-    @public remove: Function,
-      default: (query)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionFullName()
-          .filter query
-          .remove()
-        @query voQuery
-        return yes
-
-
-    @public find: Function,
+    @public @async find: Function,
       default: (id)->
-        @take '@doc._key': {$eq: id}
-          .first()
+        yield @take id
 
-    @public findBy: Function,
-      default: (query)->
-        @take query
+    @public @async findMany: Function,
+      default: (ids)->
+        yield @takeMany ids
 
-    @public take: Function,
-      default: (query)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionFullName()
-          .filter query
-          .return '@doc'
-        return @query voQuery
-
-
-    @public replace: Function,
+    @public @async replace: Function,
       default: (id, properties)->
         voRecord = @find id
-        voRecord. # ????????????
+        yield voRecord.updateAttributes properties # ????????????
         return voRecord
 
-    @public replaceBy: Function,
-      default: (query, properties)->
-        @findBy query
-          .forEach (aoRecord)-> aoRecord. #??????????????
-        return
-
-    @public override: Function,
-      default: (query, aoRecord)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionFullName()
-          .filter query
-          .replace aoRecord
-        return @query voQuery
-
-
-    @public update: Function,
+    @public @async update: Function,
       default: (id, properties)->
         voRecord = @find id
-        voRecord.updateAttributes properties
+        yield voRecord.updateAttributes properties
         return voRecord
-
-    @public updateBy: Function,
-      default: (query, properties)->
-        @findBy query
-          .forEach (aoRecord)-> aoRecord.updateAttributes properties
-        return
-
-    @public patch: Function,
-      default: (query, aoRecord)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionFullName()
-          .filter query
-          .update aoRecord
-        return @query voQuery
-
 
     @public clone: Function,
       default: (aoRecord)->
@@ -176,75 +105,11 @@ module.exports = (LeanRC)->
         voRecord.id = @generateId()
         return voRecord
 
-    @public copy: Function,
+    @public @async copy: Function,
       default: (aoRecord)->
         voRecord = @clone aoRecord
-        voRecord.save()
+        yield voRecord.save()
         return voRecord
-
-
-    @public forEach: Function,
-      default: (lambda)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionFullName()
-          .return '@doc'
-        @query voQuery
-          .forEach lambda
-        return
-
-    @public filter: Function,
-      default: (lambda)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionFullName()
-          .return '@doc'
-        return @query voQuery
-          .filter lambda
-
-    @public map: Function,
-      default: (lambda)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionFullName()
-          .return '@doc'
-        return @query voQuery
-          .map lambda
-
-    @public reduce: Function,
-      default: (lambda, initialValue)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionFullName()
-          .return '@doc'
-        return @query voQuery
-          .reduce lambda, initialValue
-
-
-    @public includes: Function,
-      default: (id)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionFullName()
-          .filter '@doc._key': {$eq: id}
-          .limit 1
-          .return '@doc'
-        return @query voQuery
-          .hasNext()
-
-    @public exists: Function,
-      default: (query)->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionFullName()
-          .filter query
-          .limit 1
-          .return '@doc'
-        return @query voQuery
-          .hasNext()
-
-    @public length: Function, # количество объектов в коллекции
-      default: ->
-        voQuery = LeanRC::Query.new()
-          .forIn '@doc': @collectionFullName()
-          .count()
-        return @query voQuery
-          .first()
-
 
     @public normalize: Function,
       default: (ahData)->
@@ -253,16 +118,6 @@ module.exports = (LeanRC)->
     @public serialize: Function,
       default: (aoRecord, ahOptions)->
         @serializer.serialize aoRecord, ahOptions
-
-
-    @public query: Function,
-      default: (aoQuery)->
-        if aoQuery.constructor is LeanRC::Query
-          voQuery = aoQuery
-        else
-          aoQuery = _.pick aoQuery, Object.keys(aoQuery).filter (key)-> aoQuery[key]?
-          voQuery = LeanRC::Query.new aoQuery
-        return @executeQuery @parseQuery voQuery
 
 
   return LeanRC::Collection.initialize()
