@@ -769,3 +769,64 @@ describe 'RecordMixin', ->
         assert.equal collection.find(record.id).word, 'test', 'String attribue not updated correctly'
         assert.isAtMost collection.find(record.id).updatedAt, new Date(), 'Date attribue not updated correctly'
       .to.not.throw Error
+  describe '#changedAttributes, #resetAttribute, #rollbackAttributes', ->
+    it 'should test, reset and rollback attributes', ->
+      expect ->
+        KEY = 'TEST_RECORD_11'
+        class Test extends RC::Module
+        class Test::Collection extends RC::CoreObject
+          @inheritProtected()
+          @Module: Test
+          @inheritProtected()
+          @include LeanRC::CollectionInterface
+          ipsKey = @protected key: String
+          ipsName = @protected name: String
+          iphData = @protected data: Object
+          @public facade: LeanRC::Facade,
+            get: -> LeanRC::Facade.getInstance KEY
+          @public find: Function,
+            default: (id) -> @[iphData][id]
+          @public push: Function,
+            default: (item) ->
+              throw new Error 'Item is empty'  unless item?
+              throw new Error "Item '#{item.id}' is already exists"  if @includes item.id
+              item.id ?= RC::Utils.uuid.v4()
+              @[iphData][item.id] = item
+              @[iphData][item.id]?
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              throw new Error "Item '#{id}' is missing"  unless @includes id
+              @[iphData][item.id] = item
+              @[iphData][item.id]?
+          @public includes: Function,
+            default: (id) -> @[iphData][id]? and not @[iphData][id].isHidden
+          constructor: (asKey, asName) ->
+            super asKey, asName
+            @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
+        Test::Collection.initialize()
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attr test: Number
+          @attr has: Boolean
+          @attr word: String
+        Test::TestRecord.initialize()
+        collection = Test::Collection.new KEY
+        record = Test::TestRecord.new { test: 1000, has: true, word: 'test' }, collection
+        record.save()
+        record.test = 888
+        assert.deepEqual record.changedAttributes().test, [ 1000, 888 ], 'Update is incorrect'
+        record.resetAttribute 'test'
+        assert.isUndefined record.changedAttributes().test, 'Reset is incorrect'
+        record.test = 888
+        record.has = no
+        record.word = 'other'
+        record.rollbackAttributes()
+        assert.equal record.test, 1000, 'Number attribue did not rolled back correctly'
+        assert.equal record.has, yes, 'Boolean attribue did not rolled back correctly'
+        assert.equal record.word, 'test', 'String attribue did not rolled back correctly'
+      .to.not.throw Error
