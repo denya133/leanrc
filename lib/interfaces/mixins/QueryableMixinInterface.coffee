@@ -1,5 +1,8 @@
 RC = require 'RC'
 
+# методы `parseQuery` и `executeQuery` должны быть реализованы в миксинах в отдельных подлючаемых npm-модулях т.к. будут содержать некоторый платформозависимый код.
+
+
 module.exports = (LeanRC)->
   class LeanRC::QueryableMixinInterface extends RC::Interface
     @inheritProtected()

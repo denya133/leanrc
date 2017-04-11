@@ -3,6 +3,12 @@
 _ = require 'lodash'
 RC = require 'RC'
 
+# миксин подмешивается к классам унаследованным от LeanRC::Collection
+# если необходимо реализовать работу методов с использованием абстрактного платформонезависимого класса LeanRC::Query
+# т.о. миксин с реальным платформозависимым кодом для подмешивания в наследников
+# LeanRC::Collection должен содержать только реализации 2-х методов:
+# `parseQuery` и `executeQuery`
+
 
 module.exports = (LeanRC)->
   class LeanRC::QueryableMixin extends RC::Mixin

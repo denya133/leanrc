@@ -2,6 +2,9 @@
 
 RC = require 'RC'
 
+# миксин подмешивается к классам унаследованным от LeanRC::Collection
+# если необходимы методы для работы с collection как с итерируемым объектом
+
 
 module.exports = (LeanRC)->
   class LeanRC::IterableMixin extends RC::Mixin

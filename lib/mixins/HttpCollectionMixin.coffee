@@ -7,6 +7,7 @@ RC            = require 'RC'
 module.exports = (LeanRC)->
   class LeanRC::HttpCollectionMixin extends RC::Mixin
     @inheritProtected()
+    @implements LeanRC::QueryableMixinInterface
 
     @Module: LeanRC
 
@@ -191,24 +192,6 @@ module.exports = (LeanRC)->
       default: (request)-> # result of requestFor
         hash = @[ipmRequestToHash] request
         @[ipmSendRequest] hash
-
-    ####### ПОД ВОПРОСОМ КАК ИХ АДАПТИРОВАТЬ ДЛЯ HTTP
-    @public forEach: Function,
-      default: (lambda)->
-        throw new Error 'Not available for HTTP requests'
-
-    @public filter: Function,
-      default: (lambda)->
-        throw new Error 'Not available for HTTP requests'
-
-    @public map: Function,
-      default: (lambda)->
-        throw new Error 'Not available for HTTP requests'
-
-    @public reduce: Function,
-      default: (lambda, initialValue)->
-        throw new Error 'Not available for HTTP requests'
-    ####### -----------------------------------------
 
     @public parseQuery: Function,
       default: (aoQuery)->

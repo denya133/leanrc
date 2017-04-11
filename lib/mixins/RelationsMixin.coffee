@@ -1,9 +1,12 @@
 # вычленяем из Record'а все что связано с релейшенами, т.к. Рекорды на основе key-value базы данных (Redis-like) не смогут поддерживать связи - т.к. на фундаментальном уровне кроме поиска по id в них нереализован поиск по НЕ-первичным ключам или сложным условиям
-_. = require 'lodash'
+_ = require 'lodash'
 joi = require 'joi'
 inflect = do require 'i'
 
 RC = require 'RC'
+
+# миксин для подмешивания в классы унаследованные от LeanRC::Record
+# если в этих классах необходим функционал релейшенов.
 
 
 module.exports = (LeanRC)->
@@ -72,29 +75,6 @@ module.exports = (LeanRC)->
                 voCollection.take @[through[0]][0][through[1].by]
               else
                 null
-              # @collection.query
-              #   $forIn:
-              #     "@current": @collection.collectionFullName()
-              #   $forIn:
-              #     "@edge": @collection.collectionFullName(through[0])
-              #   $forIn:
-              #     "@destination": voCollection.collectionFullName()
-              #   $join: switch through[1].as
-              #     when 'OUTBOUND'
-              #       $and: [
-              #         '@edge._from': {$eq: '@current._id'}
-              #         '@edge._to': {$eq: '@destination._id'}
-              #       ]
-              #     when 'INBOUND'
-              #       $and: [
-              #         '@edge._from': {$eq: '@destination._id'}
-              #         '@edge._to': {$eq: '@current._id'}
-              #       ]
-              #   $filter:
-              #     '@current._key': {$eq: @_key}
-              #   $limit: 1
-              #   $return: '@destination'
-              # .first()
         @computed "#{vsAttr}": LeanRC::RecordInterface, opts
         @["_#{@name}_relations"] ?= {}
         @["_#{@name}_relations"][vsAttr] = opts
@@ -122,27 +102,6 @@ module.exports = (LeanRC)->
                 i[opts.through[1].by]
             else
               null
-            # @collection.query
-            #   $forIn:
-            #     "@current": @collection.collectionFullName()
-            #   $forIn:
-            #     "@edge": @collection.collectionFullName(opts.through[0])
-            #   $forIn:
-            #     "@destination": voCollection.collectionFullName()
-            #   $join: switch opts.through[1].as
-            #     when 'OUTBOUND'
-            #       $and: [
-            #         '@edge._from': {$eq: '@current._id'}
-            #         '@edge._to': {$eq: '@destination._id'}
-            #       ]
-            #     when 'INBOUND'
-            #       $and: [
-            #         '@edge._from': {$eq: '@destination._id'}
-            #         '@edge._to': {$eq: '@current._id'}
-            #       ]
-            #   $filter:
-            #     '@current._key': {$eq: @_key}
-            #   $return: '@destination'
         @computed "#{vsAttr}": LeanRC::CursorInterface, opts
         @["_#{@name}_relations"] ?= {}
         @["_#{@name}_relations"][vsAttr] = opts

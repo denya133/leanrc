@@ -1,5 +1,6 @@
 RC = require 'RC'
 
+
 module.exports = (LeanRC)->
   class LeanRC::IterableMixinInterface extends RC::Interface
     @inheritProtected()
