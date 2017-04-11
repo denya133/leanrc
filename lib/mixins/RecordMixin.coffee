@@ -337,6 +337,10 @@ module.exports = (LeanRC)->
         unless @isNew()
           throw new Error 'Document is exist in collection'
         @collection.push @
+        vhAttributes = {}
+        for own key of @constructor.attributes
+          vhAttributes[key] = @[key]
+        @[ipoInternalRecord] = vhAttributes
         return @
 
     @public update: Function,
@@ -344,6 +348,10 @@ module.exports = (LeanRC)->
         if @isNew()
           throw new Error 'Document does not exist in collection'
         @collection.patch {'@doc._key': $eq: @id}, @
+        vhAttributes = {}
+        for own key of @constructor.attributes
+          vhAttributes[key] = @[key]
+        @[ipoInternalRecord] = vhAttributes
         return @
 
     @public delete: Function,
@@ -448,7 +456,9 @@ module.exports = (LeanRC)->
         for own asAttrName, ahAttrValue of @attributes
           do (asAttrName, {transform} = ahAttrValue)->
             vhResult[asAttrName] = transform().normalize ahPayload[asAttrName]
-        @new vhResult, aoCollection
+        result = @new vhResult, aoCollection
+        result[ipoInternalRecord] = vhResult
+        result
 
     @public @static serialize:   Function,
       default: (aoRecord)->
