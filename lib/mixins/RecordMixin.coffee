@@ -457,7 +457,10 @@ module.exports = (LeanRC)->
           do (asAttrName, {transform} = ahAttrValue)->
             vhResult[asAttrName] = transform().normalize ahPayload[asAttrName]
         result = @new vhResult, aoCollection
-        result[ipoInternalRecord] = vhResult
+        vhAttributes = {}
+        for own key of @attributes
+          vhAttributes[key] = result[key]
+        result[ipoInternalRecord] = vhAttributes
         result
 
     @public @static serialize:   Function,

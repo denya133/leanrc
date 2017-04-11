@@ -1,5 +1,6 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
+_ = require 'lodash'
 RC = require 'RC'
 LeanRC = require.main.require 'lib'
 RecordMixin = LeanRC::RecordMixin
@@ -829,4 +830,27 @@ describe 'RecordMixin', ->
         assert.equal record.test, 1000, 'Number attribue did not rolled back correctly'
         assert.equal record.has, yes, 'Boolean attribue did not rolled back correctly'
         assert.equal record.word, 'test', 'String attribue did not rolled back correctly'
+      .to.not.throw Error
+  describe '.normalize, .serialize', ->
+    it 'should serialize and deserialize attributes', ->
+      expect ->
+        KEY = 'TEST_RECORD_12'
+        class Test extends RC::Module
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attr test: Number
+          @attr has: Boolean
+          @attr word: String
+        Test::TestRecord.initialize()
+        record = Test::TestRecord.normalize { test: 1000, has: true, word: 'test' }, {}
+        assert.propertyVal record, 'test', 1000, 'Property `test` not defined'
+        assert.propertyVal record, 'has', yes, 'Property `has` not defined'
+        assert.propertyVal record, 'word', 'test', 'Property `word` not defined'
+        assert.deepEqual record.changedAttributes(), {}, 'Attributes are altered'
+        snapshot = Test::TestRecord.serialize record
+        assert.deepEqual snapshot, { test: 1000, has: true, word: 'test' }, 'Snapshot is incorrect'
       .to.not.throw Error
