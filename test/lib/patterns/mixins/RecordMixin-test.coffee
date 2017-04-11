@@ -349,9 +349,6 @@ describe 'RecordMixin', ->
             default: (item) ->
               result = item.constructor.new item, @
               result[key] = item[key]  for key of item.constructor.attributes
-              result[key] = item[key]  for key of item.constructor.edges
-              result[key] = item[key]  for key of item.constructor.computeds
-              result[key] = item[key]  for key of item.constructor.relations
               result.id = RC::Utils.uuid.v4()
               result
           @public push: Function,
@@ -413,9 +410,6 @@ describe 'RecordMixin', ->
             default: (item) ->
               result = item.constructor.new item, @
               result[key] = item[key]  for key of item.constructor.attributes
-              result[key] = item[key]  for key of item.constructor.edges
-              result[key] = item[key]  for key of item.constructor.computeds
-              result[key] = item[key]  for key of item.constructor.relations
               result.id = RC::Utils.uuid.v4()
               result
           @public push: Function,
@@ -467,9 +461,6 @@ describe 'RecordMixin', ->
             default: (item) ->
               result = item.constructor.new item, @
               result[key] = item[key]  for key of item.constructor.attributes
-              result[key] = item[key]  for key of item.constructor.edges
-              result[key] = item[key]  for key of item.constructor.computeds
-              result[key] = item[key]  for key of item.constructor.relations
               result.id = RC::Utils.uuid.v4()
               result
           @public push: Function,
@@ -576,9 +567,6 @@ describe 'RecordMixin', ->
             default: (item) ->
               result = item.constructor.new item, @
               result[key] = item[key]  for key of item.constructor.attributes
-              result[key] = item[key]  for key of item.constructor.edges
-              result[key] = item[key]  for key of item.constructor.computeds
-              result[key] = item[key]  for key of item.constructor.relations
               result.id = RC::Utils.uuid.v4()
               result
           @public copy: Function,
@@ -725,4 +713,59 @@ describe 'RecordMixin', ->
         assert.equal record.test, 888, 'Number attribue not updated correctly'
         assert.equal record.has, yes, 'Boolean attribue not updated correctly'
         assert.equal record.word, 'other', 'String attribue not updated correctly'
+      .to.not.throw Error
+  describe '#touch', ->
+    it 'should save data with date', ->
+      expect ->
+        KEY = 'TEST_RECORD_10'
+        class Test extends RC::Module
+        class Test::Collection extends RC::CoreObject
+          @inheritProtected()
+          @Module: Test
+          @inheritProtected()
+          @include LeanRC::CollectionInterface
+          ipsKey = @protected key: String
+          ipsName = @protected name: String
+          iphData = @protected data: Object
+          @public facade: LeanRC::Facade,
+            get: -> LeanRC::Facade.getInstance KEY
+          @public find: Function,
+            default: (id) -> @[iphData][id]
+          @public push: Function,
+            default: (item) ->
+              throw new Error 'Item is empty'  unless item?
+              throw new Error "Item '#{item.id}' is already exists"  if @includes item.id
+              item.id ?= RC::Utils.uuid.v4()
+              @[iphData][item.id] = item
+              @[iphData][item.id]?
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              throw new Error "Item '#{id}' is missing"  unless @includes id
+              @[iphData][item.id] = item
+              @[iphData][item.id]?
+          @public includes: Function,
+            default: (id) -> @[iphData][id]? and not @[iphData][id].isHidden
+          constructor: (asKey, asName) ->
+            super asKey, asName
+            @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
+        Test::Collection.initialize()
+        class Test::TestRecord extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attribute updatedAt: Date
+          @attribute test: Number
+          @attribute has: Boolean
+          @attribute word: String
+        Test::TestRecord.initialize()
+        collection = Test::Collection.new KEY
+        record = Test::TestRecord.new { test: 1000, has: true, word: 'test' }, collection
+        record.touch()
+        assert.equal collection.find(record.id).test, 1000, 'Number attribue not updated correctly'
+        assert.equal collection.find(record.id).has, yes, 'Boolean attribue not updated correctly'
+        assert.equal collection.find(record.id).word, 'test', 'String attribue not updated correctly'
+        assert.isAtMost collection.find(record.id).updatedAt, new Date(), 'Date attribue not updated correctly'
       .to.not.throw Error
