@@ -617,16 +617,22 @@ describe 'RecordMixin', ->
             super asKey, asName
             @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
         Test::Collection.initialize()
-        class Test::TestRecord extends RC::CoreObject
+        class Test::BasicTestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @Module: Test
           @public @static findModelByName: Function,
-            default: (asType) -> Test::TestRecord
+            default: (asType) -> Test::BasicTestRecord
           @attribute updatedAt: Date
           @attribute test: Number
           @attribute has: Boolean
           @attribute word: String
+        Test::BasicTestRecord.initialize()
+        class Test::TestRecord extends Test::BasicTestRecord
+          @inheritProtected()
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
         Test::TestRecord.initialize()
         collection = Test::Collection.new KEY
         record = Test::TestRecord.new { test: 1000, has: true, word: 'test' }, collection

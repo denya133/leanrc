@@ -29,7 +29,7 @@ module.exports = (LeanRC)->
           vhAttrs = {}
           for own asAttrName, ahAttrValue of @attributes
             do (asAttrName, ahAttrValue)=>
-              vhAttrs[asAttrName] = ahAttrValue.validate
+              vhAttrs[asAttrName] = ahAttrValue.validate?() ? ahAttrValue.validate
           joi.object vhAttrs
         _data[@name]
 
