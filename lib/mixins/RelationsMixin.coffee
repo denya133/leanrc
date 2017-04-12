@@ -12,7 +12,7 @@ RC = require 'RC'
 module.exports = (LeanRC)->
   class LeanRC::RelationsMixin extends RC::Mixin
     @inheritProtected()
-    # @implements LeanRC::RelationsMixinInterface
+    @implements LeanRC::RelationsMixinInterface
 
     @Module: LeanRC
 

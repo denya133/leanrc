@@ -255,10 +255,11 @@ module.exports = (LeanRC)->
         {
           method
           url
-          options:
+          options: {
             body: data
             json: yes
             headers
+          }
         }
 
     ipmMakeRequest = @protected makeRequest: Function,

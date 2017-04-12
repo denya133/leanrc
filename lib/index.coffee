@@ -34,13 +34,20 @@ class LeanRC extends RC::Module
   # require('./interfaces/patterns/RouteInterface') LeanRC # empty
   require('./interfaces/patterns/SwitchInterface') LeanRC
 
+  require('./interfaces/mixins/CrudEndpointsMixinInterface') LeanRC
+  require('./interfaces/mixins/IterableMixinInterface') LeanRC
+  require('./interfaces/mixins/QueryableMixinInterface') LeanRC
+  require('./interfaces/mixins/RelationsMixinInterface') LeanRC
+
   require('./interfaces/core/ControllerInterface') LeanRC
   require('./interfaces/core/ModelInterface') LeanRC
   require('./interfaces/core/ViewInterface') LeanRC
 
-  # require('./mixins/CrudEndpointsMixin') LeanRC # Arango only? Uses 'statuses'
-  # require('./mixins/HttpCollectionMixin') LeanRC # Node.js only? Uses 'mongo-parse'
+  require('./mixins/CrudEndpointsMixin') LeanRC
+  require('./mixins/HttpCollectionMixin') LeanRC
+  require('./mixins/IterableMixin') LeanRC
   # require('./mixins/PipesSwitchMixin') LeanRC # empty
+  require('./mixins/QueryableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC #tested
   require('./mixins/RelationsMixin') LeanRC #tested
 
@@ -61,6 +68,7 @@ class LeanRC extends RC::Module
 
   require('./patterns/proxy/Proxy') LeanRC #tested
   require('./patterns/proxy/Collection') LeanRC
+  # require('./patterns/proxy/Configuration') LeanRC # empty
   require('./patterns/proxy/Gateway') LeanRC #tested
   require('./patterns/proxy/Renderer') LeanRC #tested
   require('./patterns/proxy/Resource') LeanRC
