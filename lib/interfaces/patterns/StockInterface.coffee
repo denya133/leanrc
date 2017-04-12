@@ -39,19 +39,29 @@ module.exports = (LeanRC)->
       return: String
 
 
-    @public @virtual list: Function,
+    @public @async @virtual list: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
-    @public @virtual detail: Function,
+    @public @async @virtual detail: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
-    @public @virtual create: Function,
+    @public @async @virtual create: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
-    @public @virtual update: Function,
+    @public @async @virtual update: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
-    @public @virtual delete: Function,
+    @public @async @virtual delete: Function,
+      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
+      return: RC::Constants.NILL # без return. данные посылаем сигналом
+
+    @public @async @virtual bulkUpdate: Function,
+      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
+      return: RC::Constants.NILL # без return. данные посылаем сигналом
+    @public @async @virtual bulkPatch: Function,
+      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
+      return: RC::Constants.NILL # без return. данные посылаем сигналом
+    @public @async @virtual bulkDelete: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
 

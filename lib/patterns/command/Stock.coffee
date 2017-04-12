@@ -61,10 +61,9 @@ module.exports = (LeanRC)->
         @["_#{@name}_actions"].push actionName
         @public arguments...
 
-    @action list: Function,
+    @action @async list: Function,
       default: ->
-        vlItems = @collection.query @query
-          .toArray()
+        vlItems = (yield @collection.query @query).toArray()
         return {
           meta:
             pagination:
@@ -74,38 +73,38 @@ module.exports = (LeanRC)->
           items: vlItems
         }
 
-    @action detail: Function,
+    @action @async detail: Function,
       default: ->
-        @collection.find @recordId
+        yield @collection.find @recordId
 
-    @action create: Function,
+    @action @async create: Function,
       default: ->
-        @collection.create @recordBody
+        yield @collection.create @recordBody
 
-    @action update: Function,
+    @action @async update: Function,
       default: ->
-        @collection.update @recordId, @recordBody
+        yield @collection.update @recordId, @recordBody
 
-    @action delete: Function,
+    @action @async delete: Function,
       default: ->
-        @collection.delete @recordId
+        yield @collection.delete @recordId
 
-    @action bulkUpdate: Function,
+    @action @async bulkUpdate: Function,
       default: ->
-        @collection.query @query
-          .forEach (aoRecord)-> aoRecord.updateAttributes @recordBody
+        cursor = yield @collection.query @query
+        cursor.forEach (aoRecord)-> yield aoRecord.updateAttributes @recordBody
         return yes
 
-    @action bulkPatch: Function,
+    @action @async bulkPatch: Function,
       default: ->
-        @collection.query @query
-          .forEach (aoRecord)-> aoRecord.updateAttributes @recordBody
+        cursor = yield @collection.query @query
+        cursor.forEach (aoRecord)-> yield aoRecord.updateAttributes @recordBody
         return yes
 
-    @action bulkDelete: Function,
+    @action @async bulkDelete: Function,
       default: ->
-        @collection.query @query
-          .forEach (aoRecord)-> aoRecord.destroy()
+        cursor = yield @collection.query @query
+        cursor.forEach (aoRecord)-> yield aoRecord.destroy()
         return yes
 
 
@@ -162,9 +161,11 @@ module.exports = (LeanRC)->
 
     @public execute: Function,
       default: (aoNotification)->
-        voBody = aoNotification.getBody()
-        voResult = @[aoNotification.getType()]? voBody
-        @sendNotification LeanRC::Constants.HANDLER_RESULT, voResult, voBody.reverse
+        RC::Utils.co =>
+          voBody = aoNotification.getBody()
+          voResult = yield @[aoNotification.getType()]? voBody
+          @sendNotification LeanRC::Constants.HANDLER_RESULT, voResult, voBody.reverse
+        return
 
 
   return LeanRC::Stock.initialize()
