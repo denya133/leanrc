@@ -41,7 +41,8 @@ class LeanRC extends RC::Module
   # require('./mixins/CrudEndpointsMixin') LeanRC # Arango only? Uses 'statuses'
   # require('./mixins/HttpCollectionMixin') LeanRC # Node.js only? Uses 'mongo-parse'
   # require('./mixins/PipesSwitchMixin') LeanRC # empty
-  require('./mixins/RecordMixin') LeanRC
+  require('./mixins/RecordMixin') LeanRC #tested
+  require('./mixins/RelationsMixin') LeanRC #tested
 
   require('./patterns/data_mapper/Transform') LeanRC #tested
   require('./patterns/data_mapper/StringTransform') LeanRC #tested

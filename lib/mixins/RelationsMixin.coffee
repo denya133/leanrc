@@ -12,21 +12,24 @@ RC = require 'RC'
 module.exports = (LeanRC)->
   class LeanRC::RelationsMixin extends RC::Mixin
     @inheritProtected()
-    @implements LeanRC::RelationsMixinInterface
+    # @implements LeanRC::RelationsMixinInterface
 
     @Module: LeanRC
+
+    cphRelations  = @protected @static relationsPointer: Symbol,
+      get: -> Symbol.for "relations_#{@moduleName()}_#{@name}"
 
     @public @static relations: Object,
       default: {}
       get: (__relations)->
         AbstractClass = @
-        fromSuper = if @__super__?
-          @__super__.constructor.relations
-        __relations[@name] ?= do =>
+        fromSuper = if AbstractClass.__super__?
+          AbstractClass.__super__.constructor.relations
+        __relations[AbstractClass[cphRelations]] ?= do ->
           RC::Utils.extend {}
           , (fromSuper ? {})
-          , (AbstractClass["_#{@name}_relations"] ? {})
-        __relations[@name]
+          , (AbstractClass[AbstractClass[cphRelations]] ? {})
+        __relations[AbstractClass[cphRelations]]
 
     @public @static belongsTo: Function,
       default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable}={})->
@@ -77,8 +80,8 @@ module.exports = (LeanRC)->
                 else
                   null
         @computed @async "#{vsAttr}": LeanRC::RecordInterface, opts
-        @["_#{@name}_relations"] ?= {}
-        @["_#{@name}_relations"][vsAttr] = opts
+        @[@[cphRelations]] ?= {}
+        @[@[cphRelations]][vsAttr] = opts
         return
 
     @public @static hasMany: Function,
@@ -106,8 +109,8 @@ module.exports = (LeanRC)->
               else
                 null
         @computed @async "#{vsAttr}": LeanRC::CursorInterface, opts
-        @["_#{@name}_relations"] ?= {}
-        @["_#{@name}_relations"][vsAttr] = opts
+        @[@[cphRelations]] ?= {}
+        @[@[cphRelations]][vsAttr] = opts
         return
 
     @public @static hasOne: Function,
@@ -129,8 +132,8 @@ module.exports = (LeanRC)->
             cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
             cursor.first()
         @computed @async typeDefinition, opts
-        @["_#{@name}_relations"] ?= {}
-        @["_#{@name}_relations"][vsAttr] = opts
+        @[@[cphRelations]] ?= {}
+        @[@[cphRelations]][vsAttr] = opts
         return
 
     # Cucumber.inverseFor 'tomato' #-> {recordClass: App::Tomato, attrName: 'cucumbers', relation: 'hasMany'}
@@ -141,6 +144,22 @@ module.exports = (LeanRC)->
         {inverse:attrName} = vhRelationConfig
         {relation} = recordClass.relations[attrName]
         return {recordClass, attrName, relation}
+
+    @public @static initialize: Function,
+      default: (args...) ->
+        @super args...
+        vlKeys = Reflect.ownKeys @
+        for key in vlKeys
+          switch key.toString()
+            # when 'Symbol(_attributes)'
+            #   @[key]?[@[cphAttributes]] = null
+            # when 'Symbol(_edges)'
+            #   @[key]?[@[cphEdges]] = null
+            # when 'Symbol(_computeds)'
+            #   @[key]?[@[cphEdges]] = null
+            when 'Symbol(_relations)'
+              @[key]?[@[cphRelations]] = null
+        return
 
 
   return LeanRC::RelationsMixin.initialize()
