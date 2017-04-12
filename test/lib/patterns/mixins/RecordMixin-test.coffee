@@ -4,6 +4,7 @@ _ = require 'lodash'
 RC = require 'RC'
 LeanRC = require.main.require 'lib'
 RecordMixin = LeanRC::RecordMixin
+{ co } = RC::Utils
 
 describe 'RecordMixin', ->
   describe '.new', ->
@@ -117,6 +118,7 @@ describe 'RecordMixin', ->
         assert.isTrue 'boolean' of Test::TestRecord.computeds, 'Computed property `boolean` did not defined'
         assert.isTrue 'date' of Test::TestRecord.computeds, 'Computed property `date` did not defined'
       .to.not.throw Error
+  ###
   describe '.belongsTo', ->
     it 'should define one-to-one or one-to-many relation for class', ->
       expect ->
@@ -239,9 +241,10 @@ describe 'RecordMixin', ->
         assert.equal inverseInfo.attrName,'test', 'Record class is incorrect'
         assert.equal inverseInfo.relation, 'hasOne', 'Record class is incorrect'
       .to.not.throw Error
+  ###
   describe '#create, #isNew', ->
     it 'should create new record', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_01'
         class Test extends RC::Module
         class Test::Collection extends RC::CoreObject
@@ -256,14 +259,14 @@ describe 'RecordMixin', ->
             get: -> LeanRC::Facade.getInstance KEY
           @public push: Function,
             default: (item) ->
-              if @[iphData][item?.id]?
-                throw new Error 'EXISTS'
-              else
-                item.id ?= RC::Utils.uuid.v4()
-                @[iphData][item.id] = item
+              throw new Error 'Item is empty'  unless item?
+              if (yield @find item.id)?
+                throw new Error "Item '#{item.id}' is already exists"
+              item.id ?= RC::Utils.uuid.v4()
+              @[iphData][item.id] = item
               @[iphData][item.id]?
-          @public includes: Function,
-            default: (id) -> @[iphData][id]?
+          @public find: Function,
+            default: (id) -> RC::Promise.resolve @[iphData][id]
           constructor: (asKey, asName) ->
             super asKey, asName
             @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
@@ -276,14 +279,15 @@ describe 'RecordMixin', ->
             default: (asType) -> Test::TestRecord
         Test::TestRecord.initialize()
         record = Test::TestRecord.new {}, Test::Collection.new KEY
-        assert.isTrue record.isNew(), 'Record is not new'
-        record.create()
-        assert.isFalse record.isNew(), 'Record is still new'
-        assert.throws (-> record.create()), Error, 'Document is exist in collection', 'Record not created'
-      .to.not.throw Error
+        assert.isTrue yield record.isNew(), 'Record is not new'
+        yield record.create()
+        assert.isFalse yield record.isNew(), 'Record is still new'
+        try yield record.create() catch err
+        assert.instanceOf err, Error, 'Record not created'
+        yield return
   describe '#destroy', ->
     it 'should remove record', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_02'
         class Test extends RC::Module
         class Test::Collection extends RC::CoreObject
@@ -298,18 +302,16 @@ describe 'RecordMixin', ->
             get: -> LeanRC::Facade.getInstance KEY
           @public push: Function,
             default: (item) ->
-              if @[iphData][item?.id]?
-                throw new Error 'EXISTS'
-              else
-                item.id ?= RC::Utils.uuid.v4()
-                @[iphData][item.id] = item
+              throw new Error 'Item is empty'  unless item?
+              if (yield @find item.id)?
+                throw new Error "Item '#{item.id}' is already exists"
+              item.id ?= RC::Utils.uuid.v4()
+              @[iphData][item.id] = item
               @[iphData][item.id]?
           @public remove: Function,
-            default: (query) ->
-              { '@doc._key': { $eq: id }} = query
-              Reflect.deleteProperty @[iphData], id
-          @public includes: Function,
-            default: (id) -> @[iphData][id]?
+            default: (id) -> RC::Promise.resolve Reflect.deleteProperty @[iphData], id
+          @public find: Function,
+            default: (id) -> RC::Promise.resolve @[iphData][id]
           constructor: (asKey, asName) ->
             super asKey, asName
             @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
@@ -323,15 +325,15 @@ describe 'RecordMixin', ->
         Test::TestRecord.initialize()
         collection = Test::Collection.new KEY
         record = Test::TestRecord.new {}, collection
-        assert.isTrue record.isNew(), 'Record is not new'
-        record.create()
-        assert.isFalse record.isNew(), 'Record is still new'
-        record.destroy()
-        assert.isFalse collection.includes(record.id), 'Record still in collection'
-      .to.not.throw Error
+        assert.isTrue (yield record.isNew()), 'Record is not new'
+        yield record.create()
+        assert.isFalse (yield record.isNew()), 'Record is still new'
+        yield record.destroy()
+        assert.isFalse (yield collection.find(record.id))?, 'Record still in collection'
+        yield return
   describe '#update', ->
     it 'should update record', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_03'
         class Test extends RC::Module
         class Test::Collection extends RC::CoreObject
@@ -345,7 +347,7 @@ describe 'RecordMixin', ->
           @public facade: LeanRC::Facade,
             get: -> LeanRC::Facade.getInstance KEY
           @public find: Function,
-            default: (id) -> @[iphData][id]
+            default: (id) -> RC::Promise.resolve @[iphData][id]
           @public clone: Function,
             default: (item) ->
               result = item.constructor.new item, @
@@ -354,22 +356,20 @@ describe 'RecordMixin', ->
               result
           @public push: Function,
             default: (item) ->
-              if @includes item.id
-                throw new Error 'EXISTS'
-              else
-                item.id ?= RC::Utils.uuid.v4()
-                @[iphData][item.id] = @clone item
+              throw new Error 'Item is empty'  unless item?
+              if (yield @find item.id)?
+                throw new Error "Item '#{item.id}' is already exists"
+              item.id ?= RC::Utils.uuid.v4()
+              @[iphData][item.id] = item
               @[iphData][item.id]?
           @public patch: Function,
             default: (query, item) ->
               { '@doc._key': { '$eq': id }} = query
-              if @includes id
+              if (yield @find id)?
                 @[iphData][item.id] = @clone item
               else
                 throw new Error "Item '#{id}' is missing"
               @[iphData][item.id]?
-          @public includes: Function,
-            default: (id) -> @[iphData][id]?
           constructor: (asKey, asName) ->
             super asKey, asName
             @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
@@ -384,12 +384,12 @@ describe 'RecordMixin', ->
         Test::TestRecord.initialize()
         collection = Test::Collection.new KEY
         record = Test::TestRecord.new { test: 'test1' }, collection
-        record.create()
-        assert.equal collection.find(record.id).test, 'test1', 'Initial attr not saved'
+        yield record.create()
+        assert.equal (yield collection.find record.id).test, 'test1', 'Initial attr not saved'
         record.test = 'test2'
-        record.update()
-        assert.equal collection.find(record.id).test, 'test2', 'Updated attr not saved'
-      .to.not.throw Error
+        yield record.update()
+        assert.equal (yield collection.find record.id).test, 'test2', 'Updated attr not saved'
+        yield return
   describe '#clone', ->
     it 'should clone record', ->
       expect ->
@@ -406,7 +406,7 @@ describe 'RecordMixin', ->
           @public facade: LeanRC::Facade,
             get: -> LeanRC::Facade.getInstance KEY
           @public find: Function,
-            default: (id) -> @[iphData][id]
+            default: (id) -> RC::Promise.resolve @[iphData][id]
           @public clone: Function,
             default: (item) ->
               result = item.constructor.new item, @
@@ -415,14 +415,12 @@ describe 'RecordMixin', ->
               result
           @public push: Function,
             default: (item) ->
-              if @includes item.id
-                throw new Error 'EXISTS'
-              else
-                item.id ?= RC::Utils.uuid.v4()
-                @[iphData][item.id] = @clone item
+              throw new Error 'Item is empty'  unless item?
+              if (yield @find item.id)?
+                throw new Error "Item '#{item.id}' is already exists"
+              item.id ?= RC::Utils.uuid.v4()
+              @[iphData][item.id] = item
               @[iphData][item.id]?
-          @public includes: Function,
-            default: (id) -> @[iphData][id]?
           constructor: (asKey, asName) ->
             super asKey, asName
             @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
@@ -443,7 +441,7 @@ describe 'RecordMixin', ->
       .to.not.throw Error
   describe '#save', ->
     it 'should save record', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_05'
         class Test extends RC::Module
         class Test::Collection extends RC::CoreObject
@@ -457,7 +455,7 @@ describe 'RecordMixin', ->
           @public facade: LeanRC::Facade,
             get: -> LeanRC::Facade.getInstance KEY
           @public find: Function,
-            default: (id) -> @[iphData][id]
+            default: (id) -> RC::Promise.resolve @[iphData][id]
           @public clone: Function,
             default: (item) ->
               result = item.constructor.new item, @
@@ -466,14 +464,12 @@ describe 'RecordMixin', ->
               result
           @public push: Function,
             default: (item) ->
-              if @includes item.id
-                throw new Error 'EXISTS'
-              else
-                item.id ?= RC::Utils.uuid.v4()
-                @[iphData][item.id] = item
+              throw new Error 'Item is empty'  unless item?
+              if (yield @find item.id)?
+                throw new Error "Item '#{item.id}' is already exists"
+              item.id ?= RC::Utils.uuid.v4()
+              @[iphData][item.id] = item
               @[iphData][item.id]?
-          @public includes: Function,
-            default: (id) -> @[iphData][id]?
           constructor: (asKey, asName) ->
             super asKey, asName
             @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
@@ -488,12 +484,12 @@ describe 'RecordMixin', ->
         Test::TestRecord.initialize()
         collection = Test::Collection.new KEY
         record = Test::TestRecord.new { test: 'test1' }, collection
-        record.save()
-        assert.isTrue collection.includes(record.id), 'Record is not saved'
-      .to.not.throw Error
+        yield record.save()
+        assert.isTrue (yield collection.find(record.id))?, 'Record is not saved'
+        yield return
   describe '#delete', ->
     it 'should create and then delete a record', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_06'
         class Test extends RC::Module
         class Test::Collection extends RC::CoreObject
@@ -507,17 +503,16 @@ describe 'RecordMixin', ->
           @public facade: LeanRC::Facade,
             get: -> LeanRC::Facade.getInstance KEY
           @public find: Function,
-            default: (id) -> @[iphData][id]
+            default: (id) ->
+              RC::Promise.resolve unless @[iphData][id]?.isHidden then @[iphData][id]
           @public push: Function,
             default: (item) ->
-              if @includes item.id
-                throw new Error 'EXISTS'
-              else
-                item.id ?= RC::Utils.uuid.v4()
-                @[iphData][item.id] = item
+              throw new Error 'Item is empty'  unless item?
+              if (yield @find item.id)?
+                throw new Error "Item '#{item.id}' is already exists"
+              item.id ?= RC::Utils.uuid.v4()
+              @[iphData][item.id] = item
               @[iphData][item.id]?
-          @public includes: Function,
-            default: (id) -> @[iphData][id]? and not @[iphData][id].isHidden
           constructor: (asKey, asName) ->
             super asKey, asName
             @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
@@ -532,14 +527,14 @@ describe 'RecordMixin', ->
         Test::TestRecord.initialize()
         collection = Test::Collection.new KEY
         record = Test::TestRecord.new { test: 'test1' }, collection
-        record.save()
-        assert.isTrue collection.includes(record.id), 'Record is not saved'
-        record.delete()
-        assert.isFalse collection.includes(record.id), 'Record is not maked as delete'
-      .to.not.throw Error
+        yield record.save()
+        assert.isTrue (yield collection.find(record.id))?, 'Record is not saved'
+        yield record.delete()
+        assert.isFalse (yield collection.find(record.id))?, 'Record is not marked as delete'
+        yield return
   describe '#copy', ->
     it 'should create and then copy the record', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_07'
         class Test extends RC::Module
         class Test::Collection extends RC::CoreObject
@@ -553,17 +548,15 @@ describe 'RecordMixin', ->
           @public facade: LeanRC::Facade,
             get: -> LeanRC::Facade.getInstance KEY
           @public find: Function,
-            default: (id) -> @[iphData][id]
+            default: (id) -> RC::Promise.resolve @[iphData][id]
           @public push: Function,
             default: (item) ->
-              if @includes item.id
-                throw new Error 'EXISTS'
-              else
-                item.id ?= RC::Utils.uuid.v4()
-                @[iphData][item.id] = item
+              throw new Error 'Item is empty'  unless item?
+              if (yield @find item.id)?
+                throw new Error "Item '#{item.id}' is already exists"
+              item.id ?= RC::Utils.uuid.v4()
+              @[iphData][item.id] = item
               @[iphData][item.id]?
-          @public includes: Function,
-            default: (id) -> @[iphData][id]? and not @[iphData][id].isHidden
           @public clone: Function,
             default: (item) ->
               result = item.constructor.new item, @
@@ -573,7 +566,7 @@ describe 'RecordMixin', ->
           @public copy: Function,
             default: (item) ->
               newItem = @clone item
-              newItem.save()
+              yield newItem.save()
               newItem
           constructor: (asKey, asName) ->
             super asKey, asName
@@ -589,14 +582,14 @@ describe 'RecordMixin', ->
         Test::TestRecord.initialize()
         collection = Test::Collection.new KEY
         record = Test::TestRecord.new { test: 'test1' }, collection
-        record.save()
-        assert.isTrue collection.includes(record.id), 'Record is not saved'
-        newRecord = record.copy()
-        assert.isTrue collection.includes(newRecord.id), 'Record copy not saved'
-      .to.not.throw Error
+        yield record.save()
+        assert.isTrue (yield collection.find(record.id))?, 'Record is not saved'
+        newRecord = yield record.copy()
+        assert.isTrue (yield collection.find(newRecord.id))?, 'Record copy not saved'
+        yield return
   describe '#decrement, #increment, #toggle', ->
     it 'should decrease/increase value of number attribute and toggle boolean', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_08'
         class Test extends RC::Module
         class Test::Collection extends RC::CoreObject
@@ -610,22 +603,21 @@ describe 'RecordMixin', ->
           @public facade: LeanRC::Facade,
             get: -> LeanRC::Facade.getInstance KEY
           @public find: Function,
-            default: (id) -> @[iphData][id]
+            default: (id) -> RC::Promise.resolve @[iphData][id]
           @public push: Function,
             default: (item) ->
               throw new Error 'Item is empty'  unless item?
-              throw new Error "Item '#{item.id}' is already exists"  if @includes item.id
+              if (yield @find item.id)?
+                throw new Error "Item '#{item.id}' is already exists"
               item.id ?= RC::Utils.uuid.v4()
               @[iphData][item.id] = item
               @[iphData][item.id]?
           @public patch: Function,
             default: (query, item) ->
               { '@doc._key': { '$eq': id }} = query
-              throw new Error "Item '#{id}' is missing"  unless @includes id
+              throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
               @[iphData][item.id] = item
               @[iphData][item.id]?
-          @public includes: Function,
-            default: (id) -> @[iphData][id]? and not @[iphData][id].isHidden
           constructor: (asKey, asName) ->
             super asKey, asName
             @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
@@ -641,7 +633,7 @@ describe 'RecordMixin', ->
         Test::TestRecord.initialize()
         collection = Test::Collection.new KEY
         record = Test::TestRecord.new { test: 1000, has: true }, collection
-        record.save()
+        yield record.save()
         assert.equal record.test, 1000, 'Initial number value is incorrect'
         assert.isTrue record.has, 'Initial boolean value is incorrect'
         record.decrement 'test', 7
@@ -652,10 +644,10 @@ describe 'RecordMixin', ->
         assert.isFalse record.has, 'Toggled boolean value is incorrect'
         record.toggle 'has'
         assert.isTrue record.has, 'Toggled boolean value is incorrect'
-      .to.not.throw Error
+        yield return
   describe '#updateAttribute, #updateAttributes', ->
     it 'should update attributes', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_09'
         class Test extends RC::Module
         class Test::Collection extends RC::CoreObject
@@ -669,22 +661,21 @@ describe 'RecordMixin', ->
           @public facade: LeanRC::Facade,
             get: -> LeanRC::Facade.getInstance KEY
           @public find: Function,
-            default: (id) -> @[iphData][id]
+            default: (id) -> RC::Promise.resolve @[iphData][id]
           @public push: Function,
             default: (item) ->
               throw new Error 'Item is empty'  unless item?
-              throw new Error "Item '#{item.id}' is already exists"  if @includes item.id
+              if (yield @find item.id)?
+                throw new Error "Item '#{item.id}' is already exists"
               item.id ?= RC::Utils.uuid.v4()
               @[iphData][item.id] = item
               @[iphData][item.id]?
           @public patch: Function,
             default: (query, item) ->
               { '@doc._key': { '$eq': id }} = query
-              throw new Error "Item '#{id}' is missing"  unless @includes id
+              throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
               @[iphData][item.id] = item
               @[iphData][item.id]?
-          @public includes: Function,
-            default: (id) -> @[iphData][id]? and not @[iphData][id].isHidden
           constructor: (asKey, asName) ->
             super asKey, asName
             @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
@@ -714,10 +705,10 @@ describe 'RecordMixin', ->
         assert.equal record.test, 888, 'Number attribue not updated correctly'
         assert.equal record.has, yes, 'Boolean attribue not updated correctly'
         assert.equal record.word, 'other', 'String attribue not updated correctly'
-      .to.not.throw Error
+        yield return
   describe '#touch', ->
     it 'should save data with date', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_10'
         class Test extends RC::Module
         class Test::Collection extends RC::CoreObject
@@ -731,22 +722,21 @@ describe 'RecordMixin', ->
           @public facade: LeanRC::Facade,
             get: -> LeanRC::Facade.getInstance KEY
           @public find: Function,
-            default: (id) -> @[iphData][id]
+            default: (id) -> RC::Promise.resolve @[iphData][id]
           @public push: Function,
             default: (item) ->
               throw new Error 'Item is empty'  unless item?
-              throw new Error "Item '#{item.id}' is already exists"  if @includes item.id
+              if (yield @find item.id)?
+                throw new Error "Item '#{item.id}' is already exists"
               item.id ?= RC::Utils.uuid.v4()
               @[iphData][item.id] = item
               @[iphData][item.id]?
           @public patch: Function,
             default: (query, item) ->
               { '@doc._key': { '$eq': id }} = query
-              throw new Error "Item '#{id}' is missing"  unless @includes id
+              throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
               @[iphData][item.id] = item
               @[iphData][item.id]?
-          @public includes: Function,
-            default: (id) -> @[iphData][id]? and not @[iphData][id].isHidden
           constructor: (asKey, asName) ->
             super asKey, asName
             @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
@@ -764,15 +754,15 @@ describe 'RecordMixin', ->
         Test::TestRecord.initialize()
         collection = Test::Collection.new KEY
         record = Test::TestRecord.new { test: 1000, has: true, word: 'test' }, collection
-        record.touch()
-        assert.equal collection.find(record.id).test, 1000, 'Number attribue not updated correctly'
-        assert.equal collection.find(record.id).has, yes, 'Boolean attribue not updated correctly'
-        assert.equal collection.find(record.id).word, 'test', 'String attribue not updated correctly'
-        assert.isAtMost collection.find(record.id).updatedAt, new Date(), 'Date attribue not updated correctly'
-      .to.not.throw Error
+        yield record.touch()
+        assert.equal (yield collection.find record.id).test, 1000, 'Number attribue not updated correctly'
+        assert.equal (yield collection.find record.id).has, yes, 'Boolean attribue not updated correctly'
+        assert.equal (yield collection.find record.id).word, 'test', 'String attribue not updated correctly'
+        assert.isAtMost (yield collection.find record.id).updatedAt, new Date(), 'Date attribue not updated correctly'
+        yield return
   describe '#changedAttributes, #resetAttribute, #rollbackAttributes', ->
     it 'should test, reset and rollback attributes', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_11'
         class Test extends RC::Module
         class Test::Collection extends RC::CoreObject
@@ -786,22 +776,21 @@ describe 'RecordMixin', ->
           @public facade: LeanRC::Facade,
             get: -> LeanRC::Facade.getInstance KEY
           @public find: Function,
-            default: (id) -> @[iphData][id]
+            default: (id) -> RC::Promise.resolve @[iphData][id]
           @public push: Function,
             default: (item) ->
               throw new Error 'Item is empty'  unless item?
-              throw new Error "Item '#{item.id}' is already exists"  if @includes item.id
+              if (yield @find item.id)?
+                throw new Error "Item '#{item.id}' is already exists"
               item.id ?= RC::Utils.uuid.v4()
               @[iphData][item.id] = item
               @[iphData][item.id]?
           @public patch: Function,
             default: (query, item) ->
               { '@doc._key': { '$eq': id }} = query
-              throw new Error "Item '#{id}' is missing"  unless @includes id
+              throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
               @[iphData][item.id] = item
               @[iphData][item.id]?
-          @public includes: Function,
-            default: (id) -> @[iphData][id]? and not @[iphData][id].isHidden
           constructor: (asKey, asName) ->
             super asKey, asName
             @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
@@ -818,7 +807,7 @@ describe 'RecordMixin', ->
         Test::TestRecord.initialize()
         collection = Test::Collection.new KEY
         record = Test::TestRecord.new { test: 1000, has: true, word: 'test' }, collection
-        record.save()
+        yield record.save()
         record.test = 888
         assert.deepEqual record.changedAttributes().test, [ 1000, 888 ], 'Update is incorrect'
         record.resetAttribute 'test'
@@ -830,7 +819,7 @@ describe 'RecordMixin', ->
         assert.equal record.test, 1000, 'Number attribue did not rolled back correctly'
         assert.equal record.has, yes, 'Boolean attribue did not rolled back correctly'
         assert.equal record.word, 'test', 'String attribue did not rolled back correctly'
-      .to.not.throw Error
+        yield return
   describe '.normalize, .serialize', ->
     it 'should serialize and deserialize attributes', ->
       expect ->

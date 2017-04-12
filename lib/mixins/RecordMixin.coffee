@@ -480,7 +480,7 @@ module.exports = (LeanRC)->
 
     constructor: (aoProperties, aoCollection) ->
       super arguments...
-      console.log 'Init of Record', @constructor.name, aoProperties
+      # console.log 'Init of Record', @constructor.name, aoProperties
       @collection = aoCollection
 
       # TODO: надо не забыть про internalRecord
@@ -488,7 +488,7 @@ module.exports = (LeanRC)->
         do (vsAttrName, voAttrValue)=>
           @[vsAttrName] = voAttrValue
 
-      console.log 'dfdfdf 666'
+      # console.log 'dfdfdf 666'
 
     @public @static initialize: Function,
       default: (args...) ->
