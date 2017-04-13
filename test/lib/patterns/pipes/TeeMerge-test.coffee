@@ -16,6 +16,6 @@ describe 'TeeMerge', ->
         voInput1 = Pipe.new()
         voInput2 = Pipe.new()
         merge = TeeMerge.new voInput1, voInput2
-        assert.equal voInput1[Symbol.for 'output'], merge, 'Input 1 not connected'
-        assert.equal voInput2[Symbol.for 'output'], merge, 'Input 2 not connected'
+        assert.equal voInput1[Symbol.for '~output'], merge, 'Input 1 not connected'
+        assert.equal voInput2[Symbol.for '~output'], merge, 'Input 2 not connected'
       .to.not.throw Error

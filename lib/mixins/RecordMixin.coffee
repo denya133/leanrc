@@ -14,13 +14,13 @@ module.exports = (LeanRC)->
     # конструктор принимает второй аргумент, ссылку на коллекцию.
     @public collection: LeanRC::CollectionInterface
 
-    ipoInternalRecord = @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
+    ipoInternalRecord = @private _internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
     cphAttributes = @protected @static attributesPointer: Symbol,
-      get: -> Symbol.for "attributes_#{@moduleName()}_#{@name}"
+      get: -> Symbol.for "~attributes_#{@moduleName()}_#{@name}"
     cphComputeds  = @protected @static computedsPointer: Symbol,
-      get: -> Symbol.for "computeds_#{@moduleName()}_#{@name}"
+      get: -> Symbol.for "~computeds_#{@moduleName()}_#{@name}"
     cphEdges      = @protected @static edgesPointer: Symbol,
-      get: -> Symbol.for "edges_#{@moduleName()}_#{@name}"
+      get: -> Symbol.for "~edges_#{@moduleName()}_#{@name}"
 
     @public @static schema: Object,
       default: {}

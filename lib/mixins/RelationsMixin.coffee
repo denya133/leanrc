@@ -17,7 +17,7 @@ module.exports = (LeanRC)->
     @Module: LeanRC
 
     cphRelations  = @protected @static relationsPointer: Symbol,
-      get: -> Symbol.for "relations_#{@moduleName()}_#{@name}"
+      get: -> Symbol.for "~relations_#{@moduleName()}_#{@name}"
 
     @public @static relations: Object,
       default: {}

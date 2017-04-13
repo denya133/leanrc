@@ -11,8 +11,8 @@ describe 'TeeSplit', ->
         voOutput1 = write: ->
         voOutput2 = write: ->
         split = TeeSplit.new voOutput1, voOutput2
-        assert.include split[Symbol.for 'outputs'], voOutput1, 'Output 1 not connected'
-        assert.include split[Symbol.for 'outputs'], voOutput2, 'Output 2 not connected'
+        assert.include split[Symbol.for '~outputs'], voOutput1, 'Output 1 not connected'
+        assert.include split[Symbol.for '~outputs'], voOutput2, 'Output 2 not connected'
       .to.not.throw Error
   describe '#connect', ->
     it 'should add new output to splitter', ->
@@ -21,10 +21,10 @@ describe 'TeeSplit', ->
         voOutput2 = write: ->
         voOutput3 = write: ->
         split = TeeSplit.new voOutput1, voOutput2
-        assert.include split[Symbol.for 'outputs'], voOutput1, 'Output 1 not connected'
-        assert.include split[Symbol.for 'outputs'], voOutput2, 'Output 2 not connected'
+        assert.include split[Symbol.for '~outputs'], voOutput1, 'Output 1 not connected'
+        assert.include split[Symbol.for '~outputs'], voOutput2, 'Output 2 not connected'
         split.connect voOutput3
-        assert.include split[Symbol.for 'outputs'], voOutput3, 'Output 3 not connected'
+        assert.include split[Symbol.for '~outputs'], voOutput3, 'Output 3 not connected'
       .to.not.throw Error
   describe '#disconnect', ->
     it 'should remove last output from splitter', ->
@@ -33,12 +33,12 @@ describe 'TeeSplit', ->
         voOutput2 = id: 2, write: ->
         voOutput3 = id: 3, write: ->
         split = TeeSplit.new voOutput1, voOutput2
-        assert.include split[Symbol.for 'outputs'], voOutput1, 'Output 1 not connected'
-        assert.include split[Symbol.for 'outputs'], voOutput2, 'Output 2 not connected'
+        assert.include split[Symbol.for '~outputs'], voOutput1, 'Output 1 not connected'
+        assert.include split[Symbol.for '~outputs'], voOutput2, 'Output 2 not connected'
         split.connect voOutput3
-        assert.include split[Symbol.for 'outputs'], voOutput3, 'Output 3 not connected'
+        assert.include split[Symbol.for '~outputs'], voOutput3, 'Output 3 not connected'
         split.disconnect()
-        assert.notInclude split[Symbol.for 'outputs'], voOutput3, 'Output 3 still connected'
+        assert.notInclude split[Symbol.for '~outputs'], voOutput3, 'Output 3 still connected'
       .to.not.throw Error
   describe '#disconnectFitting', ->
     it 'should remove single output from splitter', ->
@@ -50,12 +50,12 @@ describe 'TeeSplit', ->
         voOutput3 = id: 3, write: ->
         spyWrite1 = sinon.spy voOutput3, 'write'
         split = TeeSplit.new voOutput1, voOutput2
-        assert.include split[Symbol.for 'outputs'], voOutput1, 'Output 1 not connected'
-        assert.include split[Symbol.for 'outputs'], voOutput2, 'Output 2 not connected'
+        assert.include split[Symbol.for '~outputs'], voOutput1, 'Output 1 not connected'
+        assert.include split[Symbol.for '~outputs'], voOutput2, 'Output 2 not connected'
         split.connect voOutput3
-        assert.include split[Symbol.for 'outputs'], voOutput3, 'Output 3 not connected'
+        assert.include split[Symbol.for '~outputs'], voOutput3, 'Output 3 not connected'
         split.disconnectFitting voOutput2
-        assert.notInclude split[Symbol.for 'outputs'], voOutput2, 'Output 2 still connected'
+        assert.notInclude split[Symbol.for '~outputs'], voOutput2, 'Output 2 still connected'
       .to.not.throw Error
   describe '#write', ->
     it 'should send message into all connected pipes', ->

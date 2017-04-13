@@ -19,7 +19,7 @@ describe 'Facade', ->
   describe '#initializeNotifier', ->
     it 'should initialize notifier', ->
       facade = Facade.getInstance 'TEST2'
-      ipsMultitonKey  = Symbol.for 'multitonKey'
+      ipsMultitonKey  = Symbol.for '~multitonKey'
       expect facade[ipsMultitonKey]
       .to.equal 'TEST2'
   describe '#registerCommand', ->

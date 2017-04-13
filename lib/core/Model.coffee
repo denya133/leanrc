@@ -10,9 +10,9 @@ module.exports = (LeanRC)->
     @public @static MULTITON_MSG: String,
       default: "Model instance for this multiton key already constructed!"
 
-    iphProxyMap     = @private proxyMap: Object
+    iphProxyMap     = @private _proxyMap: Object
     ipsMultitonKey  = @protected multitonKey: String
-    cphInstanceMap  = @private @static instanceMap: Object,
+    cphInstanceMap  = @private @static _instanceMap: Object,
       default: {}
 
     @public @static getInstance: Function,

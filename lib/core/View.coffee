@@ -10,10 +10,10 @@ module.exports = (LeanRC)->
     @public @static MULTITON_MSG: String,
       default: "View instance for this multiton key already constructed!"
 
-    iphMediatorMap = @private mediatorMap: Object
-    iphObserverMap = @private observerMap: Object
+    iphMediatorMap = @private _mediatorMap: Object
+    iphObserverMap = @private _observerMap: Object
     ipsMultitonKey = @protected multitonKey: String
-    cphInstanceMap = @private @static instanceMap: Object,
+    cphInstanceMap = @private @static _instanceMap: Object,
       default: {}
 
     @public @static getInstance: Function,

@@ -9,5 +9,5 @@ describe 'QueueControlMessage', ->
       expect ->
         vsType = QueueControlMessage.FIFO
         message = QueueControlMessage.new vsType
-        assert.equal message[Symbol.for 'type'], vsType, 'Type is incorrect'
+        assert.equal message[Symbol.for '~type'], vsType, 'Type is incorrect'
       .to.not.throw Error

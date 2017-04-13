@@ -9,26 +9,26 @@ describe 'Filter', ->
     it 'should create new Filter instance', ->
       expect ->
         filter = Filter.new 'TEST'
-        assert.equal filter[Symbol.for 'name'], 'TEST', 'Filter name is incorrect'
-        assert.equal filter[Symbol.for 'mode'], FilterControlMessage.FILTER, 'Filter mode is incorrect'
+        assert.equal filter[Symbol.for '~name'], 'TEST', 'Filter name is incorrect'
+        assert.equal filter[Symbol.for '~mode'], FilterControlMessage.FILTER, 'Filter mode is incorrect'
       .to.not.throw Error
   describe '#setFilter', ->
     it 'should create filter and set filter function', ->
       expect ->
         testFilter = ->
         filter = Filter.new 'TEST'
-        assert.equal filter[Symbol.for 'name'], 'TEST', 'Filter name is incorrect'
+        assert.equal filter[Symbol.for '~name'], 'TEST', 'Filter name is incorrect'
         filter.setFilter testFilter
-        assert.equal filter[Symbol.for 'filter'], testFilter, 'Filter is incorrect'
+        assert.equal filter[Symbol.for '~filter'], testFilter, 'Filter is incorrect'
       .to.not.throw Error
   describe '#setParams', ->
     it 'should create filter and set params', ->
       expect ->
         testParams = test: 'test1'
         filter = Filter.new 'TEST'
-        assert.equal filter[Symbol.for 'name'], 'TEST', 'Filter name is incorrect'
+        assert.equal filter[Symbol.for '~name'], 'TEST', 'Filter name is incorrect'
         filter.setParams testParams
-        assert.equal filter[Symbol.for 'params'], testParams, 'Params is incorrect'
+        assert.equal filter[Symbol.for '~params'], testParams, 'Params is incorrect'
       .to.not.throw Error
   describe '#write', ->
     describe 'if message type is `LeanRC::PipeMessage.NORMAL`', ->
@@ -52,7 +52,7 @@ describe 'Filter', ->
           message.setParams testParams
           filter.write message
           assert.isFalse spyWrite.calledWith(message), '#write called'
-          assert.equal filter[Symbol.for 'params'], testParams, 'params are incorrect'
+          assert.equal filter[Symbol.for '~params'], testParams, 'params are incorrect'
         .to.not.throw Error
     describe 'if message type is `LeanRC::FilterControlMessage.SET_FILTER`', ->
       it 'should get message and update filter function', ->
@@ -66,7 +66,7 @@ describe 'Filter', ->
           message.setFilter testFilter
           filter.write message
           assert.isFalse spyWrite.calledWith(message), '#write called'
-          assert.equal filter[Symbol.for 'filter'], testFilter, 'filter function is incorrect'
+          assert.equal filter[Symbol.for '~filter'], testFilter, 'filter function is incorrect'
         .to.not.throw Error
     describe 'if message type is `LeanRC::FilterControlMessage.BYPASS` or `LeanRC::FilterControlMessage.FILTER`', ->
       it 'should get message and update filter mode', ->
@@ -77,9 +77,9 @@ describe 'Filter', ->
           message = FilterControlMessage.new FilterControlMessage.BYPASS, 'TEST'
           filter.write message
           assert.isFalse spyWrite.calledWith(message), '#write called'
-          assert.equal filter[Symbol.for 'mode'], FilterControlMessage.BYPASS, 'filter mode is incorrect'
+          assert.equal filter[Symbol.for '~mode'], FilterControlMessage.BYPASS, 'filter mode is incorrect'
           message = FilterControlMessage.new FilterControlMessage.FILTER, 'TEST'
           filter.write message
           assert.isFalse spyWrite.calledWith(message), '#write called'
-          assert.equal filter[Symbol.for 'mode'], FilterControlMessage.FILTER, 'filter mode is incorrect'
+          assert.equal filter[Symbol.for '~mode'], FilterControlMessage.FILTER, 'filter mode is incorrect'
         .to.not.throw Error
