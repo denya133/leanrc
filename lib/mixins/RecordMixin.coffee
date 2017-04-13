@@ -15,12 +15,6 @@ module.exports = (LeanRC)->
     @public collection: LeanRC::CollectionInterface
 
     ipoInternalRecord = @private _internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
-    cphAttributes = @protected @static attributesPointer: Symbol,
-      get: -> Symbol.for "~attributes_#{@moduleName()}_#{@name}"
-    cphComputeds  = @protected @static computedsPointer: Symbol,
-      get: -> Symbol.for "~computeds_#{@moduleName()}_#{@name}"
-    cphEdges      = @protected @static edgesPointer: Symbol,
-      get: -> Symbol.for "~edges_#{@moduleName()}_#{@name}"
 
     @public @static schema: Object,
       default: {}
@@ -65,41 +59,23 @@ module.exports = (LeanRC)->
         _.uniq [].concat(fromSuper ? [])
           .concat [AbstractClass.name]
 
+    @public @static including: Function,
+      default: (args...) ->
+        @super args...
+        @inheritProtected()
+        @public @static attributes: Object,
+          get: -> @metaObject.getGroup 'attributes'
+        @public @static edges: Object,
+          get: -> @metaObject.getGroup 'edges'
+        @public @static computeds: Object,
+          get: -> @metaObject.getGroup 'computeds'
+
     @public @static attributes: Object,
-      default: {}
-      get: (__attrs)->
-        AbstractClass = @
-        fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor.attributes
-        __attrs[AbstractClass[cphAttributes]] ?= do ->
-          RC::Utils.extend {}
-          , (fromSuper ? {})
-          , (AbstractClass[AbstractClass[cphAttributes]] ? {})
-        __attrs[AbstractClass[cphAttributes]]
-
+      get: -> @metaObject.getGroup 'attributes'
     @public @static edges: Object,
-      default: {}
-      get: (__edges)->
-        AbstractClass = @
-        fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor.edges
-        __edges[AbstractClass[cphEdges]] ?= do ->
-          RC::Utils.extend {}
-          , (fromSuper ? {})
-          , (AbstractClass[AbstractClass[cphEdges]] ? {})
-        __edges[AbstractClass[cphEdges]]
-
+      get: -> @metaObject.getGroup 'edges'
     @public @static computeds: Object,
-      default: {}
-      get: (__comps)->
-        AbstractClass = @
-        fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor.computeds
-        __comps[AbstractClass[cphComputeds]] ?= do ->
-          RC::Utils.extend {}
-          , (fromSuper ? {})
-          , (AbstractClass[AbstractClass[cphComputeds]] ? {})
-        __comps[AbstractClass[cphComputeds]]
+      get: -> @metaObject.getGroup 'computeds'
 
     @public @static attribute: Function,
       default: ->
@@ -127,13 +103,11 @@ module.exports = (LeanRC)->
             set.apply @, [voData]
           else
             voData
-        @[@[cphAttributes]] ?= {}
-        @[@[cphEdges]] ?= {}
-        if @[@[cphAttributes]][vsAttr]
+        if @attributes[vsAttr]?
           throw new Error "attr `#{vsAttr}` has been defined previously"
         else
-          @[@[cphAttributes]][vsAttr] = opts
-          @[@[cphEdges]][vsAttr] = opts if opts.through
+          @metaObject.addMetaData 'attributes', vsAttr, opts
+          @metaObject.addMetaData 'edges', vsAttr, opts if opts.through
         @public typeDefinition, opts
         return
 
@@ -149,11 +123,10 @@ module.exports = (LeanRC)->
         vsAttr = Object.keys(typeDefinition)[0]
         unless opts.get?
           return throw new Error '`lambda` options is required'
-        @[@[cphComputeds]] ?= {}
-        if @[@[cphComputeds]][vsAttr]
+        if @computeds[vsAttr]?
           throw new Error "comp `#{vsAttr}` has been defined previously"
         else
-          @[@[cphComputeds]][vsAttr] = opts
+          @metaObject.addMetaData 'computeds', vsAttr, opts
         @public typeDefinition, opts
         return
 
@@ -328,20 +301,6 @@ module.exports = (LeanRC)->
           @[vsAttrName] = voAttrValue
 
       # console.log 'dfdfdf 666'
-
-    @public @static initialize: Function,
-      default: (args...) ->
-        @super args...
-        vlKeys = Reflect.ownKeys @
-        for key in vlKeys
-          switch key.toString()
-            when 'Symbol(_attributes)'
-              @[key]?[@[cphAttributes]] = null
-            when 'Symbol(_edges)'
-              @[key]?[@[cphEdges]] = null
-            when 'Symbol(_computeds)'
-              @[key]?[@[cphEdges]] = null
-        return
 
 
   return LeanRC::RecordMixin.initialize()

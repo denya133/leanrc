@@ -16,21 +16,6 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    cphRelations  = @protected @static relationsPointer: Symbol,
-      get: -> Symbol.for "~relations_#{@moduleName()}_#{@name}"
-
-    @public @static relations: Object,
-      default: {}
-      get: (__relations)->
-        AbstractClass = @
-        fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor.relations
-        __relations[AbstractClass[cphRelations]] ?= do ->
-          RC::Utils.extend {}
-          , (fromSuper ? {})
-          , (AbstractClass[AbstractClass[cphRelations]] ? {})
-        __relations[AbstractClass[cphRelations]]
-
     @public @static belongsTo: Function,
       default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable}={})->
         # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
@@ -80,8 +65,7 @@ module.exports = (LeanRC)->
                 else
                   null
         @computed @async "#{vsAttr}": LeanRC::RecordInterface, opts
-        @[@[cphRelations]] ?= {}
-        @[@[cphRelations]][vsAttr] = opts
+        @metaObject.addMetaData 'relations', vsAttr, opts
         return
 
     @public @static hasMany: Function,
@@ -109,8 +93,7 @@ module.exports = (LeanRC)->
               else
                 null
         @computed @async "#{vsAttr}": LeanRC::CursorInterface, opts
-        @[@[cphRelations]] ?= {}
-        @[@[cphRelations]][vsAttr] = opts
+        @metaObject.addMetaData 'relations', vsAttr, opts
         return
 
     @public @static hasOne: Function,
@@ -132,8 +115,7 @@ module.exports = (LeanRC)->
             cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
             cursor.first()
         @computed @async typeDefinition, opts
-        @[@[cphRelations]] ?= {}
-        @[@[cphRelations]][vsAttr] = opts
+        @metaObject.addMetaData 'relations', vsAttr, opts
         return
 
     # Cucumber.inverseFor 'tomato' #-> {recordClass: App::Tomato, attrName: 'cucumbers', relation: 'hasMany'}
@@ -145,21 +127,16 @@ module.exports = (LeanRC)->
         {relation} = recordClass.relations[attrName]
         return {recordClass, attrName, relation}
 
-    @public @static initialize: Function,
+    @public @static including: Function,
       default: (args...) ->
         @super args...
-        vlKeys = Reflect.ownKeys @
-        for key in vlKeys
-          switch key.toString()
-            # when 'Symbol(_attributes)'
-            #   @[key]?[@[cphAttributes]] = null
-            # when 'Symbol(_edges)'
-            #   @[key]?[@[cphEdges]] = null
-            # when 'Symbol(_computeds)'
-            #   @[key]?[@[cphEdges]] = null
-            when 'Symbol(_relations)'
-              @[key]?[@[cphRelations]] = null
-        return
+        @inheritProtected()
+        @public @static relations: Object,
+          get: -> @metaObject.getGroup 'relations'
+
+    @public @static relations: Object,
+      get: -> @metaObject.getGroup 'relations'
+
 
 
   return LeanRC::RelationsMixin.initialize()
