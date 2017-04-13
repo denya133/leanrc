@@ -11,9 +11,9 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    ipnCurrentIndex = @private _currentIndex: Number,
+    ipnCurrentIndex = @private currentIndex: Number,
       default: 0
-    iplArray = @private _array: Array
+    iplArray = @private array: Array
     ipcRecord = @private Record: RC::Class
 
     @public setRecord: Function,
