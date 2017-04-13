@@ -18,10 +18,10 @@ module.exports = (LeanRC)->
     @public @virtual $let: Object
     @public @virtual $filter: Object
     @public @virtual $collect: Object
-    @public @virtual $aggregate: Object
+    # @public @virtual $aggregate: Object
     @public @virtual $into: [String, Object]
     @public @virtual $having: Object
-    @public @virtual $sort: Object
+    @public @virtual $sort: Array
     @public @virtual $limit: Number
     @public @virtual $offset: Number
     @public @virtual $avg: String # '@doc.price'
@@ -51,9 +51,9 @@ module.exports = (LeanRC)->
     @public @virtual collect: Function,
       args: [Object] # definition
       return: QueryInterface
-    @public @virtual aggregate: Function,
-      args: [Object] # definition
-      return: QueryInterface
+    # @public @virtual aggregate: Function,
+    #   args: [Object] # definition
+    #   return: QueryInterface
     @public @virtual into: Function,
       args: [Object] # definition
       return: QueryInterface

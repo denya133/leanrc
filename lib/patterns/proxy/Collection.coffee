@@ -3,6 +3,35 @@ _ = require 'lodash'
 RC = require 'RC'
 
 
+###
+```coffee
+# in application when its need
+
+LeanRC = require 'LeanRC'
+ArangoExtension = require 'leanrc-arango-extension'
+
+# example of concrete application collection for instantuate it in PrepareModelCommand
+module.exports = (App)->
+  class App::ArangoCollection extends LeanRC::Collection
+    @include ArangoExtension::ArangoCollectionMixin
+    #... some other definitions
+
+  return App::ArangoCollection.initialize()
+```
+
+```coffee
+module.exports = (App)->
+  App::PrepareModelCommand extends LeanRC::SimpleCommand
+    @public execute: Function,
+      default: ->
+        #...
+        @facade.registerProxy App::ArangoCollection.new 'CucumbersCollection',
+          # какие-то конфиги
+        #...
+```
+###
+
+
 module.exports = (LeanRC)->
   class LeanRC::Collection extends LeanRC::Proxy
     @inheritProtected()

@@ -58,7 +58,7 @@ But it equvalent json
     '@tomato.active': {$eq: yes}
   ]
   $filter: '@doc.active': {$eq: yes}
-  $sort: '@doc.firstName': 'DESC'
+  $sort: ['@doc.firstName': 'DESC']
   $limit: 10
   $offset: 10
   $return: {user: '@user', cucumbers: '@user_cucumbers', tomato: '@tomato'}
@@ -138,10 +138,10 @@ module.exports = (LeanRC)->
     @public $let: Object
     @public $filter: Object
     @public $collect: Object
-    @public $aggregate: Object
+    # @public $aggregate: Object
     @public $into: [String, Object]
     @public $having: Object
-    @public $sort: Object
+    @public $sort: Array
     @public $limit: Number
     @public $offset: Number
     @public $avg: String # '@doc.price'
@@ -178,10 +178,6 @@ module.exports = (LeanRC)->
       default: (aoDefinition)->
         @$collect = aoDefinition
         return @
-    @public aggregate: Function,
-      default: (aoDefinition)->
-        @$aggregate = aoDefinition
-        return @
     @public into: Function,
       default: (aoDefinition)->
         @$into = aoDefinition
@@ -192,7 +188,8 @@ module.exports = (LeanRC)->
         return @
     @public sort: Function,
       default: (aoDefinition)->
-        @$sort = aoDefinition
+        @$sort ?= []
+        @$sort.push aoDefinition
         return @
     @public limit: Function,
       default: (anValue)->

@@ -69,16 +69,6 @@ describe 'Query', ->
       .to.eql Query.new $collect:
         '@country': '@doc.country'
         '@city': '@doc.city'
-  describe '#aggregate', ->
-    it 'should add `AGRREGATE` equivalent statement', ->
-      query = Query.new()
-        .aggregate
-          '@minAge': 'MIN(@doc.age)'
-          '@maxAge': 'MAX(@doc.age)'
-      expect query
-      .to.eql Query.new $aggregate:
-        '@minAge': 'MIN(@doc.age)'
-        '@maxAge': 'MAX(@doc.age)'
   describe '#into', ->
     it 'should add `INTO` equivalent statement', ->
       query = Query.new()
@@ -97,12 +87,11 @@ describe 'Query', ->
         '@country': {$nin: ['Australia', 'Ukraine']}
   describe '#sort', ->
     it 'should add `ORDER BY` equivalent statement', ->
-      query = Query.new()
-        .sort
-          '@doc.firstName': 'DESC'
-      expect query
-      .to.eql Query.new $sort:
-        '@doc.firstName': 'DESC'
+      expect ->
+        query = Query.new()
+        query.sort '@doc.firstName': 'DESC'
+        assert.deepEqual query.$sort, [ '@doc.firstName': 'DESC' ]
+      .to.not.throw Error
   describe '#limit', ->
     it 'should add `LIMIT` equivalent statement', ->
       expect Query.new().limit 10
