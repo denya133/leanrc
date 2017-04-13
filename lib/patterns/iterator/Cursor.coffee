@@ -21,17 +21,17 @@ module.exports = (LeanRC)->
         @[ipcRecord] = acRecord
         return @
 
-    @public toArray: Function,
+    @public @async toArray: Function,
       default: (acRecord = null)->
-        while @hasNext()
-          @next(acRecord)
+        while yield @hasNext()
+          yield @next acRecord
 
-    @public next: Function,
+    @public @async next: Function,
       default: (acRecord = null)->
         acRecord ?= @[ipcRecord]
         data = @[iplArray][@[ipnCurrentIndex]]
         @[ipnCurrentIndex]++
-        if acRecord?
+        yield if acRecord?
           if data?
             acRecord.new data
           else
@@ -39,106 +39,106 @@ module.exports = (LeanRC)->
         else
           data
 
-    @public hasNext: Function,
-      default: -> not _.isNil @[iplArray][@[ipnCurrentIndex]]
+    @public @async hasNext: Function,
+      default: -> yield not _.isNil @[iplArray][@[ipnCurrentIndex]]
 
-    @public close: Function,
+    @public @async close: Function,
       default: ->
         for item, i in @[iplArray]
           delete @[iplArray][i]
         delete @[iplArray]
-        return
+        yield
 
-    @public count: Function,
-      default: -> @[iplArray].length()
+    @public @async count: Function,
+      default: -> yield @[iplArray].length()
 
-    @public forEach: Function,
+    @public @async forEach: Function,
       default: (lambda, acRecord = null)->
         index = 0
         try
-          while @hasNext()
-            lambda @next(acRecord), index++
+          while yield @hasNext()
+            yield lambda (yield @next acRecord), index++
           return
         catch err
-          @close()
+          yield @close()
           throw err
 
-    @public map: Function,
+    @public @async map: Function,
       default: (lambda, acRecord = null)->
         index = 0
         try
-          while @hasNext()
-            lambda @next(acRecord), index++
+          while yield @hasNext()
+            yield lambda (yield @next acRecord), index++
         catch err
-          @close()
+          yield @close()
           throw err
 
-    @public filter: Function,
+    @public @async filter: Function,
       default: (lambda, acRecord = null)->
         index = 0
         records = []
         try
-          while @hasNext()
-            record = @next(acRecord)
-            if lambda record, index++
+          while yield @hasNext()
+            record = yield @next acRecord
+            if yield lambda record, index++
               records.push record
           records
         catch err
-          @close()
+          yield @close()
           throw err
 
-    @public find: Function,
+    @public @async find: Function,
       default: (lambda, acRecord = null)->
         index = 0
         _record = null
         try
-          while @hasNext()
-            record = @next(acRecord)
-            if lambda record, index++
+          while yield @hasNext()
+            record = yield @next acRecord
+            if yield lambda record, index++
               _record = record
               break
           _record
         catch err
-          @close()
+          yield @close()
           throw err
 
-    @public compact: Function,
+    @public @async compact: Function,
       default: (acRecord = null)->
         acRecord ?= @[ipcRecord]
         index = 0
         records = []
         try
-          while @hasNext()
-            rawRecord = @[iplArray].next()
+          while yield @hasNext()
+            rawRecord = yield @[iplArray].next()
             unless _.isNil rawRecord
               record = acRecord.new rawRecord
               records.push record
           records
         catch err
-          @close()
+          yield @close()
           throw err
 
-    @public reduce: Function,
+    @public @async reduce: Function,
       default: (lambda, initialValue, acRecord = null)->
         try
           index = 0
           _initialValue = initialValue
-          while @hasNext()
-            _initialValue = lambda _initialValue, @next(acRecord), index++
+          while yield @hasNext()
+            _initialValue = yield lambda _initialValue, (yield @next acRecord), index++
           _initialValue
         catch err
-          @close()
+          yield @close()
           throw err
 
-    @public first: Function,
+    @public @async first: Function,
       default: (acRecord = null)->
         try
-          if @hasNext()
-            @next(acRecord)
+          if yield @hasNext()
+            yield @next acRecord
           else
             null
         catch err
-          @close()
+          yield @close()
           throw err
 
     constructor: (acRecord, alArray = null)->

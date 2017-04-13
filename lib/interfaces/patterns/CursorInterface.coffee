@@ -11,51 +11,51 @@ module.exports = (LeanRC)->
       args: [RC::Class]
       return: LeanRC::CursorInterface
 
-    @public @virtual toArray: Function,
+    @public @async @virtual toArray: Function,
       args: [[RC::Class, RC::Constants.NILL]]
       return: Array
 
-    @public @virtual next: Function,
+    @public @async @virtual next: Function,
       args: [[RC::Class, RC::Constants.NILL]]
       return: RC::Constants.ANY
 
-    @public @virtual hasNext: Function,
+    @public @async @virtual hasNext: Function,
       args: []
       return: Boolean
 
-    @public @virtual close: Function,
+    @public @async @virtual close: Function,
       args: []
       return: RC::Constants.NILL
 
-    @public @virtual count: Function,
+    @public @async @virtual count: Function,
       args: []
       return: Number
 
-    @public @virtual forEach: Function,
+    @public @async @virtual forEach: Function,
       args: [Function, [RC::Class, RC::Constants.NILL]]
       return: RC::Constants.NILL
 
-    @public @virtual map: Function,
+    @public @async @virtual map: Function,
       args: [Function, [RC::Class, RC::Constants.NILL]]
       return: Array
 
-    @public @virtual filter: Function,
+    @public @async @virtual filter: Function,
       args: [Function, [RC::Class, RC::Constants.NILL]]
       return: Array
 
-    @public @virtual find: Function,
+    @public @async @virtual find: Function,
       args: [Function, [RC::Class, RC::Constants.NILL]]
       return: RC::Constants.ANY
 
-    @public @virtual compact: Function,
+    @public @async @virtual compact: Function,
       args: [[RC::Class, RC::Constants.NILL]]
       return: Array
 
-    @public @virtual reduce: Function,
+    @public @async @virtual reduce: Function,
       args: [Function, RC::Constants.ANY, [RC::Class, RC::Constants.NILL]]
       return: RC::Constants.ANY
 
-    @public @virtual first: Function,
+    @public @async @virtual first: Function,
       args: [[RC::Class, RC::Constants.NILL]]
       return: RC::Constants.ANY
 
