@@ -138,7 +138,7 @@ module.exports = (LeanRC)->
     @public $let: Object
     @public $filter: Object
     @public $collect: Object
-    @public $aggregate: Object
+    # @public $aggregate: Object
     @public $into: [String, Object]
     @public $having: Object
     @public $sort: Array
@@ -178,10 +178,10 @@ module.exports = (LeanRC)->
       default: (aoDefinition)->
         @$collect = aoDefinition
         return @
-    @public aggregate: Function,
-      default: (aoDefinition)->
-        @$aggregate = aoDefinition
-        return @
+    # @public aggregate: Function,
+    #   default: (aoDefinition)->
+    #     @$aggregate = aoDefinition
+    #     return @
     @public into: Function,
       default: (aoDefinition)->
         @$into = aoDefinition
