@@ -5,23 +5,37 @@ LeanRC = require.main.require 'lib'
 
 
 describe 'Collection', ->
-  ###
   describe '.new', ->
     it 'should create collection instance', ->
       expect ->
         class Test extends RC::Module
         class Test::TestRecord extends LeanRC::Record
-          @Module: Test
           @inheritProtected()
+          @Module: Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
-          @Module: Test
           @inheritProtected()
+          @Module: Test
           @public delegate: RC::Class,
             default: Test::TestRecord
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new {}
-        assert.equal collection.delegate, Test::TestRecord
-        console.log '!!!', collection.collectionFullName()
+        assert.equal collection.delegate, Test::TestRecord, 'Record is incorrect'
       .to.not.throw Error
-  ###
+  describe '.collectionName', ->
+    it 'should get collection name', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new {}
+        assert.equal collection.collectionName(), 'test_records'
+      .to.not.throw Error
