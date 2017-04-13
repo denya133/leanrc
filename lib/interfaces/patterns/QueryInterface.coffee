@@ -21,7 +21,7 @@ module.exports = (LeanRC)->
     @public @virtual $aggregate: Object
     @public @virtual $into: [String, Object]
     @public @virtual $having: Object
-    @public @virtual $sort: Object
+    @public @virtual $sort: Array
     @public @virtual $limit: Number
     @public @virtual $offset: Number
     @public @virtual $avg: String # '@doc.price'
