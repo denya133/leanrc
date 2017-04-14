@@ -5,7 +5,6 @@ LeanRC = require.main.require 'lib'
 Record = LeanRC::Record
 
 describe 'Record', ->
-  ###
   describe '.new', ->
     it 'should create record instance', ->
       expect ->
@@ -15,6 +14,6 @@ describe 'Record', ->
           @Module: Test
         Test::TestRecord.initialize()
         record = Test::TestRecord.new {}
-        console.log 'Schema:', Record.schema
+        assert.instanceOf record, Test::TestRecord, 'Not a TestRecord'
+        assert.instanceOf record, LeanRC::Record, 'Not a Record'
       .to.not.throw Error
-  ###
