@@ -59,17 +59,6 @@ module.exports = (LeanRC)->
         _.uniq [].concat(fromSuper ? [])
           .concat [AbstractClass.name]
 
-    @public @static including: Function,
-      default: (args...) ->
-        @super args...
-        @inheritProtected()
-        @public @static attributes: Object,
-          get: -> @metaObject.getGroup 'attributes'
-        @public @static edges: Object,
-          get: -> @metaObject.getGroup 'edges'
-        @public @static computeds: Object,
-          get: -> @metaObject.getGroup 'computeds'
-
     @public @static attributes: Object,
       get: -> @metaObject.getGroup 'attributes'
     @public @static edges: Object,

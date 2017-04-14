@@ -127,13 +127,6 @@ module.exports = (LeanRC)->
         {relation} = recordClass.relations[attrName]
         return {recordClass, attrName, relation}
 
-    @public @static including: Function,
-      default: (args...) ->
-        @super args...
-        @inheritProtected()
-        @public @static relations: Object,
-          get: -> @metaObject.getGroup 'relations'
-
     @public @static relations: Object,
       get: -> @metaObject.getGroup 'relations'
 
