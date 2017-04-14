@@ -50,7 +50,8 @@ module.exports = (LeanRC)->
         inflect.pluralize inflect.underscore firstClassName
 
     @public collectionPrefix: Function,
-      default: -> "#{inflect.underscore @Module.name}_" # может быть вместо @Module заиспользовать @getData().Module
+      default: ->
+        "#{inflect.underscore @Module().name}_" # может быть вместо @Module заиспользовать @getData().Module
 
     @public collectionFullName: Function,
       default: (asName = null)->
