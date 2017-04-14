@@ -11,6 +11,7 @@ RC = require 'RC'
 ###
 
 module.exports = (LeanRC)->
+  console.log '====>', Reflect.ownKeys LeanRC::Collection
   class LeanRC::Resource extends LeanRC::Collection
     @inheritProtected()
     # @implements LeanRC::ResourceInterface # может и не нужен

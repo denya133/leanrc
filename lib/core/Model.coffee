@@ -29,6 +29,7 @@ module.exports = (LeanRC)->
     @public registerProxy: Function,
       default: (aoProxy)->
         aoProxy.initializeNotifier @[ipsMultitonKey]
+        console.log 'PROXY REGISTER NAME:', aoProxy.getProxyName()
         @[iphProxyMap][aoProxy.getProxyName()] = aoProxy
         aoProxy.onRegister()
         return
@@ -43,6 +44,8 @@ module.exports = (LeanRC)->
 
     @public retrieveProxy: Function,
       default: (asProxyName)->
+        console.log 'PROXY NAME:', asProxyName
+        console.log 'PROXIES:', @[iphProxyMap]
         @[iphProxyMap][asProxyName] ? null
 
     @public hasProxy: Function,
