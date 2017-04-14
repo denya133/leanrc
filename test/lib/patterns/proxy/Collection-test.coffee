@@ -56,3 +56,20 @@ describe 'Collection', ->
         collection = Test::TestCollection.new {}
         assert.equal collection.collectionPrefix(), 'test_'
       .to.not.throw Error
+  describe '#collectionFullName', ->
+    it 'should get collection full name', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new {}
+        assert.equal collection.collectionFullName(), 'test_test_records'
+      .to.not.throw Error
