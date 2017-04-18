@@ -167,8 +167,45 @@ describe 'Collection', ->
         record = yield collection.create test: 'test', data: 123
         assert.isDefined record, 'Record not created'
         assert.isTrue spyCollectionPush.called, 'Record not saved'
+  describe '#update', ->
+    it 'should delete record from collection', ->
+      co ->
+        spyCollectionPush = sinon.spy (record) ->
+          record._key = RC::Utils.uuid.v4()
+          @data.push record
+          yield return
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @attribute data: Number
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public data: Array,
+            default: []
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              record = yield @find id
+              record[key] = value  for own key, value of item
+              yield return record?
+          @public find: Function,
+            default: (id) -> yield RC::Promise.resolve _.find @data, { id }
+          @public push: Function,
+            default: spyCollectionPush
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        record = yield collection.create test: 'test', data: 123
+        record.data = 456
+        yield record.update()
+        assert.equal (yield collection.find record.id).data, 456, 'Record not updated'
   describe '#delete', ->
-    it 'should create record from collection', ->
+    it 'should delete record from collection', ->
       co ->
         spyCollectionPush = sinon.spy (record) ->
           record._key = RC::Utils.uuid.v4()
