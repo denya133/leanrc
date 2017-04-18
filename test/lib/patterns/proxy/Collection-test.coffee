@@ -168,7 +168,7 @@ describe 'Collection', ->
         assert.isDefined record, 'Record not created'
         assert.isTrue spyCollectionPush.called, 'Record not saved'
   describe '#update', ->
-    it 'should delete record from collection', ->
+    it 'should update record in collection', ->
       co ->
         spyCollectionPush = sinon.spy (record) ->
           record._key = RC::Utils.uuid.v4()
@@ -194,7 +194,7 @@ describe 'Collection', ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
-          @public find: Function,
+          @public take: Function,
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
             default: spyCollectionPush
@@ -231,7 +231,7 @@ describe 'Collection', ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
-          @public find: Function,
+          @public take: Function,
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
             default: spyCollectionPush
@@ -241,3 +241,35 @@ describe 'Collection', ->
         yield record.delete()
         assert.isFalse yield record.isNew(), 'Record not saved'
         assert.isTrue record.isHidden, 'Record not hidden'
+  describe '#destroy', ->
+    it 'should destroy record from collection', ->
+      co ->
+        spyCollectionPush = sinon.spy (record) ->
+          record._key = RC::Utils.uuid.v4()
+          @data.push record
+          yield return
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @attribute data: Number
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public data: Array,
+            default: []
+          @public remove: Function,
+            default: (id) -> yield RC::Promise.resolve _.remove @data, { id }
+          @public take: Function,
+            default: (id) -> yield RC::Promise.resolve _.find @data, { id }
+          @public push: Function,
+            default: spyCollectionPush
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        record = yield collection.create test: 'test', data: 123
+        yield record.destroy()
+        assert.isFalse (yield collection.find record.id)?, 'Record removed'
