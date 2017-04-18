@@ -121,3 +121,24 @@ describe 'Collection', ->
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
         assert.isUndefined collection.generateId(), 'Generated ID is defined'
       .to.not.throw Error
+  describe '#build', ->
+    it 'should create record from delegate', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @attribute data: Number
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        record = collection.build test: 'test', data: 123
+        assert.equal record.test, 'test', 'Record#test is incorrect'
+        assert.equal record.data, 123, 'Record#data is incorrect'
+      .to.not.throw Error
