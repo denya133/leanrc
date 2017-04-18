@@ -67,13 +67,11 @@ class LeanRC extends RC::Module
   require('./patterns/observer/Observer') LeanRC #tested
 
   require('./patterns/proxy/Proxy') LeanRC #tested
-  require('./patterns/proxy/Collection') LeanRC
+  require('./patterns/proxy/Collection') LeanRC #tested
   # require('./patterns/proxy/Configuration') LeanRC # empty
   require('./patterns/proxy/Gateway') LeanRC #tested
-
   require('./patterns/proxy/Renderer') LeanRC #tested
   require('./patterns/proxy/Resource') LeanRC
-
   require('./patterns/proxy/Router') LeanRC #tested
 
   require('./patterns/mediator/Mediator') LeanRC #tested

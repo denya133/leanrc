@@ -414,8 +414,6 @@ describe 'Collection', ->
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
-          @public @static findModelByName: Function,
-            default: (asType) -> Test::TestRecord
           @attribute test: String
           @attribute data: Number
           @public init: Function,
@@ -447,8 +445,6 @@ describe 'Collection', ->
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
-          @public @static findModelByName: Function,
-            default: (asType) -> Test::TestRecord
           @attribute test: String
           @attribute data: Number
           @public init: Function,
@@ -486,3 +482,48 @@ describe 'Collection', ->
         assert.equal original.test, clone.test, '`test` values are different'
         assert.equal original.data, clone.data, '`data` values are different'
         assert.notEqual original.id, clone.id, '`id` values are the same'
+  describe '#normalize', ->
+    it 'should normalize record from data', ->
+      co ->
+        spySerializerNormalize = sinon.spy ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @attribute data: Number
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public serializer: Object,
+            default: normalize: spySerializerNormalize
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        record = collection.normalize test: 'test', data: 123
+        assert.isTrue spySerializerNormalize.calledWith(Test::TestRecord, test: 'test', data: 123), 'Normalize called improperly'
+  describe '#normalize', ->
+    it 'should normalize record from data', ->
+      co ->
+        spySerializerSerialize = sinon.spy ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @attribute data: Number
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public serializer: Object,
+            default: serialize: spySerializerSerialize
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        record = collection.build test: 'test', data: 123
+        data = collection.serialize record, value: 'value'
+        assert.isTrue spySerializerSerialize.calledWith(record, value: 'value'), 'Serialize called improperly'
