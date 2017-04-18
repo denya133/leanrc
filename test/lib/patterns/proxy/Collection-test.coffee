@@ -335,3 +335,75 @@ describe 'Collection', ->
         assert.equal records[0].test, 'test1', 'First record is incorrect'
         assert.equal records[1].test, 'test2', 'Second record is incorrect'
         assert.equal records[2].test, 'test3', 'Third record is incorrect'
+  describe '#replace', ->
+    it 'should update record with properties', ->
+      co ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @attribute data: Number
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public data: Array,
+            default: []
+          @public take: Function,
+            default: (id) -> yield RC::Promise.resolve _.find @data, { id }
+          @public push: Function,
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @data.push record
+              yield return
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              record = yield @find id
+              record[key] = value  for own key, value of item
+              yield return record?
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        { id } = yield collection.create test: 'test1', data: 123
+        record = yield collection.replace id, test: 'test2', data: 456
+        assert.equal record.test, 'test2', 'Attribute `test` did not updated'
+        assert.equal record.data, 456, 'Attributes `data` did not updated'
+  describe '#update', ->
+    it 'should update record with properties', ->
+      co ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @attribute data: Number
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public data: Array,
+            default: []
+          @public take: Function,
+            default: (id) -> yield RC::Promise.resolve _.find @data, { id }
+          @public push: Function,
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @data.push record
+              yield return
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              record = yield @find id
+              record[key] = value  for own key, value of item
+              yield return record?
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        { id } = yield collection.create test: 'test1', data: 123
+        record = yield collection.update id, test: 'test2', data: 456
+        assert.equal record.test, 'test2', 'Attribute `test` did not updated'
+        assert.equal record.data, 456, 'Attributes `data` did not updated'
