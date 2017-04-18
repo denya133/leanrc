@@ -1,5 +1,6 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
+_ = require 'lodash'
 RC = require 'RC'
 LeanRC = require.main.require 'lib'
 { co } = RC::Utils
@@ -144,7 +145,7 @@ describe 'Collection', ->
         assert.equal record.data, 123, 'Record#data is incorrect'
       .to.not.throw Error
   describe '#create', ->
-    it 'should create record from delegate', ->
+    it 'should create record in collection', ->
       co ->
         spyCollectionPush = sinon.spy -> yield return
         class Test extends RC::Module
@@ -166,3 +167,40 @@ describe 'Collection', ->
         record = yield collection.create test: 'test', data: 123
         assert.isDefined record, 'Record not created'
         assert.isTrue spyCollectionPush.called, 'Record not saved'
+  describe '#delete', ->
+    it 'should create record from collection', ->
+      co ->
+        spyCollectionPush = sinon.spy (record) ->
+          record._key = RC::Utils.uuid.v4()
+          @data.push record
+          yield return
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @attribute data: Number
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public data: Array,
+            default: []
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              record = yield @find id
+              record[key] = value  for own key, value of item
+              yield return record?
+          @public find: Function,
+            default: (id) -> yield RC::Promise.resolve _.find @data, { id }
+          @public push: Function,
+            default: spyCollectionPush
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        record = yield collection.create test: 'test', data: 123
+        yield record.delete()
+        assert.isFalse yield record.isNew(), 'Record not saved'
+        assert.isTrue record.isHidden, 'Record not hidden'
