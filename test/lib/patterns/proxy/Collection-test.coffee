@@ -299,3 +299,39 @@ describe 'Collection', ->
         record = yield collection.create test: 'test', data: 123
         record2 = yield collection.find record.id
         assert.equal record.test, record2.test, 'Record not found'
+  describe '#findMany', ->
+    it 'should find many records from collection', ->
+      co ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public data: Array,
+            default: []
+          @public takeMany: Function,
+            default: (ids) ->
+              for id in ids then yield @take id
+          @public take: Function,
+            default: (id) -> yield RC::Promise.resolve _.find @data, { id }
+          @public push: Function,
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @data.push record
+              yield return
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        { id: id1 } = yield collection.create test: 'test1'
+        { id: id2 } = yield collection.create test: 'test2'
+        { id: id3 } = yield collection.create test: 'test3'
+        records = yield collection.findMany [ id1, id2, id3 ]
+        assert.equal records.length, 3, 'Found not the three records'
+        assert.equal records[0].test, 'test1', 'First record is incorrect'
+        assert.equal records[1].test, 'test2', 'Second record is incorrect'
+        assert.equal records[2].test, 'test3', 'Third record is incorrect'
