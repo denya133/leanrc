@@ -407,3 +407,82 @@ describe 'Collection', ->
         record = yield collection.update id, test: 'test2', data: 456
         assert.equal record.test, 'test2', 'Attribute `test` did not updated'
         assert.equal record.data, 456, 'Attributes `data` did not updated'
+  describe '#clone', ->
+    it 'should make record copy with new id without save', ->
+      co ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attribute test: String
+          @attribute data: Number
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public data: Array,
+            default: []
+          @public generateId: Function,
+            default: -> RC::Utils.uuid.v4()
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        original = collection.build test: 'test', data: 123
+        clone = collection.clone original
+        assert.notEqual original, clone, 'Record is not a copy but a reference'
+        assert.equal original.test, clone.test, '`test` values are different'
+        assert.equal original.data, clone.data, '`data` values are different'
+        assert.notEqual original.id, clone.id, '`id` values are the same'
+  describe '#copy', ->
+    it 'should make record copy with new id with save', ->
+      co ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attribute test: String
+          @attribute data: Number
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public data: Array,
+            default: []
+          @public take: Function,
+            default: (id) -> yield RC::Promise.resolve _.find @data, { id }
+          @public push: Function,
+            default: (record) ->
+              record._key ?= RC::Utils.uuid.v4()
+              @data.push record
+              yield return
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              record = yield @find id
+              record[key] = value  for own key, value of item
+              yield return record?
+          @public generateId: Function,
+            default: -> RC::Utils.uuid.v4()
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        original = collection.build test: 'test', data: 123
+        clone = yield collection.copy original
+        assert.notEqual original, clone, 'Record is not a copy but a reference'
+        assert.equal original.test, clone.test, '`test` values are different'
+        assert.equal original.data, clone.data, '`data` values are different'
+        assert.notEqual original.id, clone.id, '`id` values are the same'

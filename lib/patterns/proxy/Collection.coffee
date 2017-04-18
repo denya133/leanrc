@@ -131,8 +131,12 @@ module.exports = (LeanRC)->
 
     @public clone: Function,
       default: (aoRecord)->
-        voRecord = @delegate.new aoRecord
-        voRecord.id = @generateId()
+        vhAttributes = {}
+        vlAttributes = Object.keys @delegate.attributes
+        for key in vlAttributes
+          vhAttributes[key] = aoRecord[key]
+        voRecord = @delegate.new vhAttributes, @
+        voRecord._key = @generateId()
         return voRecord
 
     @public @async copy: Function,
