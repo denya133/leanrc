@@ -74,13 +74,6 @@ class LeanRC extends RC::Module
   require('./patterns/proxy/Renderer') LeanRC #tested
   require('./patterns/proxy/Resource') LeanRC
 
-  # console.log 'LeanRC::Collection AFTER RESOURCE', LeanRC::Collection.name
-  # console.log 'super 1', LeanRC::Collection.superclass()?.name
-  # console.log 'super 2', LeanRC::Collection.superclass()?.superclass()?.name
-  # console.log 'super 3', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
-  # console.log 'super 4', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
-  # console.log 'super 5', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
-
   require('./patterns/proxy/Router') LeanRC #tested
 
   require('./patterns/mediator/Mediator') LeanRC #tested
@@ -120,15 +113,4 @@ class LeanRC extends RC::Module
   require('./core/Controller') LeanRC #tested
 
 
-
-
-
-
-# LRC = LeanRC.initialize()
-# console.log 'LeanRC::Collection AFTER ALL', LRC::Collection.name
-# console.log 'super 1', LRC::Collection.superclass()?.name
-# console.log 'super 2', LRC::Collection.superclass()?.superclass()?.name
-# console.log 'super 3', LRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
-# console.log 'super 4', LRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
-# console.log 'super 5', LRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
 module.exports = LeanRC.initialize()

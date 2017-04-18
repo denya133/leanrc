@@ -149,13 +149,5 @@ module.exports = (LeanRC)->
       default: (aoRecord, ahOptions)->
         @serializer.serialize aoRecord, ahOptions
 
-    # constructor: (args...) ->
-    #   super args...
-    #   # console.log '22222222222222222222', @constructor.superclass()
-    #   # console.log '33333333333333333333', @constructor.__super__
-    #   # console.log '44444444444444444444', @class()
-    #   # console.log '55555555555555555555', @constructor.superclass().superclass()
-    #   # console.log '66666666666666666666', @constructor.superclass().superclass().superclass()
-
 
   return LeanRC::Collection.initialize()

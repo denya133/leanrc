@@ -31,7 +31,6 @@ module.exports = (LeanRC)->
       default: (asProxyName, ahData)->
         @super arguments...
 
-        console.log 'CREATE PROXY NAME: ', asProxyName
         @[ipsProxyName] = asProxyName ? @constructor.name
 
         if ahData?

@@ -7,14 +7,6 @@ RecordMixin = LeanRC::RecordMixin
 { co } = RC::Utils
 
 describe 'RecordMixin', ->
-  describe 'before', ->
-    it 'test', ->
-      console.log 'LeanRC::Collection 1234567890', LeanRC::Collection.name
-      console.log 'super 1', LeanRC::Collection.superclass()?.name
-      console.log 'super 2', LeanRC::Collection.superclass()?.superclass()?.name
-      console.log 'super 3', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 4', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 5', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
   describe '.new', ->
     it 'should create item with record mixin', ->
       expect ->
@@ -126,14 +118,6 @@ describe 'RecordMixin', ->
         assert.isTrue 'boolean' of Test::TestRecord.computeds, 'Computed property `boolean` did not defined'
         assert.isTrue 'date' of Test::TestRecord.computeds, 'Computed property `date` did not defined'
       .to.not.throw Error
-  describe 'middle', ->
-    it 'test', ->
-      console.log 'LeanRC::Collection MIDDLE', LeanRC::Collection.name
-      console.log 'super 1', LeanRC::Collection.superclass()?.name
-      console.log 'super 2', LeanRC::Collection.superclass()?.superclass()?.name
-      console.log 'super 3', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 4', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 5', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
   describe '#create, #isNew', ->
     it 'should create new record', ->
       co ->
@@ -142,9 +126,7 @@ describe 'RecordMixin', ->
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
-          console.log '$$$$$$$kkkkk111', LeanRC::CollectionInterface.superclass()
           @include LeanRC::CollectionInterface
-          console.log '$$$$$$$kkkkk222', LeanRC::CollectionInterface.superclass()
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -171,28 +153,13 @@ describe 'RecordMixin', ->
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
         Test::TestRecord.initialize()
-        console.log 'Test::Collection (RecordMixin)', Test::Collection.name
-        console.log 'super 1', Test::Collection.superclass()?.name
-        console.log 'super 2', Test::Collection.superclass()?.superclass()?.name
-        console.log 'super 3', Test::Collection.superclass()?.superclass()?.superclass()?.name
-        console.log 'super 4', Test::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
-        console.log 'super 5', Test::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
         record = Test::TestRecord.new {}, Test::Collection.new KEY
         assert.isTrue yield record.isNew(), 'Record is not new'
         yield record.create()
         assert.isFalse yield record.isNew(), 'Record is still new'
         try yield record.create() catch err
         assert.instanceOf err, Error, 'Record not created'
-        console.log '$$$$$$$kkkkk', LeanRC::CollectionInterface.superclass()
         yield return
-  describe 'middle2', ->
-    it 'test', ->
-      console.log 'LeanRC::Collection MIDDLE2', LeanRC::Collection.name
-      console.log 'super 1', LeanRC::Collection.superclass()?.name
-      console.log 'super 2', LeanRC::Collection.superclass()?.superclass()?.name
-      console.log 'super 3', LeanRC::Collection.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 4', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 5', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
   describe '#destroy', ->
     it 'should remove record', ->
       co ->
