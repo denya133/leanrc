@@ -2,6 +2,7 @@
 sinon = require 'sinon'
 RC = require 'RC'
 LeanRC = require.main.require 'lib'
+{ co } = RC::Utils
 
 
 describe 'Collection', ->
@@ -142,3 +143,26 @@ describe 'Collection', ->
         assert.equal record.test, 'test', 'Record#test is incorrect'
         assert.equal record.data, 123, 'Record#data is incorrect'
       .to.not.throw Error
+  describe '#create', ->
+    it 'should create record from delegate', ->
+      co ->
+        spyCollectionPush = sinon.spy -> yield return
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @attribute data: Number
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public push: Function,
+            default: spyCollectionPush
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        record = yield collection.create test: 'test', data: 123
+        assert.isDefined record, 'Record not created'
+        assert.isTrue spyCollectionPush.called, 'Record not saved'

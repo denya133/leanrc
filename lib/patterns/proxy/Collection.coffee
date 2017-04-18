@@ -90,7 +90,7 @@ module.exports = (LeanRC)->
 
     @public build: Function,
       default: (properties)->
-        @delegate.new properties
+        @delegate.new properties, @
 
     @public @async create: Function,
       default: (properties)->
