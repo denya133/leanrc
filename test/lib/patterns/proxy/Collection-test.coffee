@@ -76,6 +76,7 @@ describe 'Collection', ->
   describe '#recordHasBeenChanged', ->
     it 'should send notification about record changed', ->
       expect ->
+        spyHandleNotitfication = sinon.spy ->
         class Test extends RC::Module
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
@@ -93,7 +94,7 @@ describe 'Collection', ->
           @public listNotificationInterests: Function,
             default: -> [ LeanRC::Constants.RECORD_CHANGED ]
           @public handleNotification: Function,
-            default: ->
+            default: spyHandleNotitfication
         Test::TestMediator.initialize()
         facade = LeanRC::Facade.getInstance 'TEST_COLLECTION_01'
         facade.registerProxy Test::TestCollection.new 'TEST_COLLECTION', {}
@@ -101,4 +102,5 @@ describe 'Collection', ->
         facade.registerMediator Test::TestMediator.new 'TEST_MEDIATOR', {}
         mediator = facade.retrieveMediator 'TEST_MEDIATOR'
         collection.recordHasBeenChanged { test: 'test' }, Test::TestRecord.new()
+        assert.isTrue spyHandleNotitfication.called, 'Notification did not received'
       .to.not.throw Error
