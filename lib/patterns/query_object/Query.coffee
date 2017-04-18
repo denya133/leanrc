@@ -244,11 +244,12 @@ module.exports = (LeanRC)->
         @$sum = asDefinition
         return @
 
-    constructor: (aoQuery)->
-      super arguments...
-      for own key, value of aoQuery
-        do (key, value)=>
-          @[key] = value
+    @public init: Function,
+      default: (aoQuery)->
+        @super arguments...
+        for own key, value of aoQuery
+          do (key, value)=>
+            @[key] = value
 
 
   return LeanRC::Query.initialize()

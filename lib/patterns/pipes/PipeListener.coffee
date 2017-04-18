@@ -7,8 +7,8 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    ipoContext = @private _context: Object
-    ipmListener = @private _listener: RC::Constants.LAMBDA
+    ipoContext = @private context: Object
+    ipmListener = @private listener: RC::Constants.LAMBDA
 
     @public connect: Function,
       default: ->
@@ -23,10 +23,11 @@ module.exports = (LeanRC)->
         @[ipmListener].apply @[ipoContext], [aoMessage]
         return yes
 
-    constructor: (aoContext, amListener)->
-      super arguments...
-      @[ipoContext] = aoContext
-      @[ipmListener] = amListener
+    @public init: Function,
+      default: (aoContext, amListener)->
+        @super arguments...
+        @[ipoContext] = aoContext
+        @[ipmListener] = amListener
 
 
   return LeanRC::PipeListener.initialize()

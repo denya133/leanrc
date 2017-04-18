@@ -15,8 +15,9 @@ module.exports = (LeanRC)->
     @public @static FIFO: String,
       get: -> "#{@BASE}fifo"
 
-    constructor: (asType)->
-      super asType
+    @public init: Function,
+      default: (asType)->
+        @super asType
 
 
   return LeanRC::QueueControlMessage.initialize()

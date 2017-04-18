@@ -57,8 +57,9 @@ module.exports = (LeanRC)->
             @[ipsMode] = aoMessage.getType()
         return vbSuccess
 
-    constructor: (aoOutput=null)->
-      super aoOutput
+    @public init: Function,
+      default: (aoOutput=null)->
+        @super aoOutput
 
 
   return LeanRC::Queue.initialize()

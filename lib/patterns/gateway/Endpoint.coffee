@@ -78,8 +78,9 @@ module.exports = (LeanRC)->
         @isDeprecated = abDeprecated
         return @
 
-    constructor: ({@gateway})->
-      super arguments...
+    @public init: Function,
+      default: ({@gateway})->
+        @super arguments...
 
 
   return LeanRC::Endpoint.initialize()

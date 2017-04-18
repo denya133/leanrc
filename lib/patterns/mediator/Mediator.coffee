@@ -7,8 +7,8 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    ipsMediatorName = @private _mediatorName: String
-    ipoViewComponent = @private _viewComponent: RC::Constants.ANY
+    ipsMediatorName = @private mediatorName: String
+    ipoViewComponent = @private viewComponent: RC::Constants.ANY
 
     @public getMediatorName: Function,
       default: -> @[ipsMediatorName]
@@ -34,11 +34,11 @@ module.exports = (LeanRC)->
     @public onRemove: Function,
       default: -> return
 
-    constructor: (asMediatorName, aoViewComponent)->
-      super arguments...
-
-      @[ipsMediatorName] = asMediatorName ? @constructor.name
-      @[ipoViewComponent] = aoViewComponent
+    @public init: Function,
+      default: (asMediatorName, aoViewComponent)->
+        @super arguments...
+        @[ipsMediatorName] = asMediatorName ? @constructor.name
+        @[ipoViewComponent] = aoViewComponent
 
 
   return LeanRC::Mediator.initialize()

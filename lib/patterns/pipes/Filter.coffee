@@ -74,13 +74,14 @@ module.exports = (LeanRC)->
             vbSuccess = @[ipoOutput].write outputMessage
         return vbSuccess
 
-    constructor: (asName, aoOutput=null, amFilter=null, aoParams=null)->
-      super aoOutput
-      @[ipsName] = asName
-      if amFilter?
-        @setFilter amFilter
-      if aoParams?
-        @setParams aoParams
+    @public init: Function,
+      default: (asName, aoOutput=null, amFilter=null, aoParams=null)->
+        @super aoOutput
+        @[ipsName] = asName
+        if amFilter?
+          @setFilter amFilter
+        if aoParams?
+          @setParams aoParams
 
 
   return LeanRC::Filter.initialize()

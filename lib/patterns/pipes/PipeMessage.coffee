@@ -58,12 +58,13 @@ module.exports = (LeanRC)->
         @[ipoBody] = aoBody
         return
 
-    constructor: (asType, aoHeader=null, aoBody=null, anPriority=5)->
-      super arguments...
-      @setType asType
-      @setHeader aoHeader
-      @setBody aoBody
-      @setPriority anPriority
+    @public init: Function,
+      default: (asType, aoHeader=null, aoBody=null, anPriority=5)->
+        @super arguments...
+        @setType asType
+        @setHeader aoHeader
+        @setBody aoBody
+        @setPriority anPriority
 
 
   return LeanRC::PipeMessage.initialize()

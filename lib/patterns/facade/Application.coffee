@@ -9,10 +9,11 @@ module.exports = (LeanRC)->
     @public @static NAME: String,
       default: 'Application'
 
-    constructor: (args...)->
-      super args...
-      facade = @constructor.Module::ApplicationFacade.getInstance @constructor.Module::Application.NAME
-      facade.startup @
+    @public init: Function,
+      default: (args...)->
+        @super args...
+        facade = @constructor.Module::ApplicationFacade.getInstance @constructor.Module::Application.NAME
+        facade.startup @
 
 
   return LeanRC::Application.initialize()

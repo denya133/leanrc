@@ -144,6 +144,7 @@ describe 'RecordMixin', ->
           @Module: Test
           console.log '$$$$$$$kkkkk111', LeanRC::CollectionInterface.superclass()
           @include LeanRC::CollectionInterface
+          console.log '$$$$$$$kkkkk222', LeanRC::CollectionInterface.superclass()
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -170,6 +171,12 @@ describe 'RecordMixin', ->
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
         Test::TestRecord.initialize()
+        console.log 'Test::Collection (RecordMixin)', Test::Collection.name
+        console.log 'super 1', Test::Collection.superclass()?.name
+        console.log 'super 2', Test::Collection.superclass()?.superclass()?.name
+        console.log 'super 3', Test::Collection.superclass()?.superclass()?.superclass()?.name
+        console.log 'super 4', Test::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
+        console.log 'super 5', Test::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
         record = Test::TestRecord.new {}, Test::Collection.new KEY
         assert.isTrue yield record.isNew(), 'Record is not new'
         yield record.create()
@@ -183,9 +190,9 @@ describe 'RecordMixin', ->
       console.log 'LeanRC::Collection MIDDLE2', LeanRC::Collection.name
       console.log 'super 1', LeanRC::Collection.superclass()?.name
       console.log 'super 2', LeanRC::Collection.superclass()?.superclass()?.name
-      console.log 'super 3', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 4', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 5', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
+      console.log 'super 3', LeanRC::Collection.superclass()?.superclass()?.superclass()?.name
+      console.log 'super 4', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
+      console.log 'super 5', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
   describe '#destroy', ->
     it 'should remove record', ->
       co ->

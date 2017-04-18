@@ -7,9 +7,9 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    ipsName = @private _name: String
-    ipoBody = @private _body: RC::Constants.ANY
-    ipsType = @private _type: String
+    ipsName = @private name: String
+    ipoBody = @private body: RC::Constants.ANY
+    ipsType = @private type: String
 
     @public getName: Function,
       default: ->
@@ -39,11 +39,12 @@ module.exports = (LeanRC)->
           Type: #{if @getType()? then @getType() else 'null'}
         """
 
-    constructor: (asName, aoBody, asType)->
-      super arguments...
-      @[ipsName] = asName
-      @[ipoBody] = aoBody
-      @[ipsType] = asType
+    @public init: Function,
+      default: (asName, aoBody, asType)->
+        @super arguments...
+        @[ipsName] = asName
+        @[ipoBody] = aoBody
+        @[ipsType] = asType
 
 
 

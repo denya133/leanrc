@@ -141,10 +141,11 @@ module.exports = (LeanRC)->
           yield @close()
           throw err
 
-    constructor: (acRecord, alArray = null)->
-      super arguments...
-      @[ipcRecord] = acRecord
-      @[iplArray] = alArray
+    @public init: Function,
+      default: (acRecord, alArray = null)->
+        @super arguments...
+        @[ipcRecord] = acRecord
+        @[iplArray] = alArray
 
 
   return LeanRC::Cursor.initialize()
