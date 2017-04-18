@@ -104,3 +104,20 @@ describe 'Collection', ->
         collection.recordHasBeenChanged { test: 'test' }, Test::TestRecord.new()
         assert.isTrue spyHandleNotitfication.called, 'Notification did not received'
       .to.not.throw Error
+  describe '#generateId', ->
+    it 'should get dummy generated ID', ->
+      expect ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        assert.isUndefined collection.generateId(), 'Generated ID is defined'
+      .to.not.throw Error
