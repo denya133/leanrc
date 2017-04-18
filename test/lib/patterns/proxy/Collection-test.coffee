@@ -170,10 +170,6 @@ describe 'Collection', ->
   describe '#update', ->
     it 'should update record in collection', ->
       co ->
-        spyCollectionPush = sinon.spy (record) ->
-          record._key = RC::Utils.uuid.v4()
-          @data.push record
-          yield return
         class Test extends RC::Module
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
@@ -197,7 +193,10 @@ describe 'Collection', ->
           @public take: Function,
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
-            default: spyCollectionPush
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @data.push record
+              yield return
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
         record = yield collection.create test: 'test', data: 123
@@ -207,10 +206,6 @@ describe 'Collection', ->
   describe '#delete', ->
     it 'should delete record from collection', ->
       co ->
-        spyCollectionPush = sinon.spy (record) ->
-          record._key = RC::Utils.uuid.v4()
-          @data.push record
-          yield return
         class Test extends RC::Module
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
@@ -234,7 +229,10 @@ describe 'Collection', ->
           @public take: Function,
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
-            default: spyCollectionPush
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @data.push record
+              yield return
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
         record = yield collection.create test: 'test', data: 123
@@ -244,10 +242,6 @@ describe 'Collection', ->
   describe '#destroy', ->
     it 'should destroy record from collection', ->
       co ->
-        spyCollectionPush = sinon.spy (record) ->
-          record._key = RC::Utils.uuid.v4()
-          @data.push record
-          yield return
         class Test extends RC::Module
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
@@ -267,9 +261,41 @@ describe 'Collection', ->
           @public take: Function,
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
-            default: spyCollectionPush
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @data.push record
+              yield return
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
         record = yield collection.create test: 'test', data: 123
         yield record.destroy()
         assert.isFalse (yield collection.find record.id)?, 'Record removed'
+  describe '#find', ->
+    it 'should find record from collection', ->
+      co ->
+        class Test extends RC::Module
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @attribute data: Number
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public data: Array,
+            default: []
+          @public take: Function,
+            default: (id) -> yield RC::Promise.resolve _.find @data, { id }
+          @public push: Function,
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @data.push record
+              yield return
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        record = yield collection.create test: 'test', data: 123
+        record2 = yield collection.find record.id
+        assert.equal record.test, record2.test, 'Record not found'
