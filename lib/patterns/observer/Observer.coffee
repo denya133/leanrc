@@ -7,8 +7,8 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    ipoNotify = @private notify: RC::Constants.ANY
-    ipoContext = @private context: RC::Constants.ANY
+    ipoNotify = @private _notify: RC::Constants.ANY
+    ipoContext = @private _context: RC::Constants.ANY
 
     @public setNotifyMethod: Function,
       default: (amNotifyMethod)->

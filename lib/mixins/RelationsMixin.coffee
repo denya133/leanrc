@@ -16,18 +16,6 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    @public @static relations: Object,
-      default: {}
-      get: (__relations)->
-        AbstractClass = @
-        fromSuper = if @__super__?
-          @__super__.constructor.relations
-        __relations[@name] ?= do =>
-          RC::Utils.extend {}
-          , (fromSuper ? {})
-          , (AbstractClass["_#{@name}_relations"] ? {})
-        __relations[@name]
-
     @public @static belongsTo: Function,
       default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable}={})->
         # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
@@ -77,8 +65,7 @@ module.exports = (LeanRC)->
                 else
                   null
         @computed @async "#{vsAttr}": LeanRC::RecordInterface, opts
-        @["_#{@name}_relations"] ?= {}
-        @["_#{@name}_relations"][vsAttr] = opts
+        @metaObject.addMetaData 'relations', vsAttr, opts
         return
 
     @public @static hasMany: Function,
@@ -106,8 +93,7 @@ module.exports = (LeanRC)->
               else
                 null
         @computed @async "#{vsAttr}": LeanRC::CursorInterface, opts
-        @["_#{@name}_relations"] ?= {}
-        @["_#{@name}_relations"][vsAttr] = opts
+        @metaObject.addMetaData 'relations', vsAttr, opts
         return
 
     @public @static hasOne: Function,
@@ -129,8 +115,7 @@ module.exports = (LeanRC)->
             cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
             cursor.first()
         @computed @async typeDefinition, opts
-        @["_#{@name}_relations"] ?= {}
-        @["_#{@name}_relations"][vsAttr] = opts
+        @metaObject.addMetaData 'relations', vsAttr, opts
         return
 
     # Cucumber.inverseFor 'tomato' #-> {recordClass: App::Tomato, attrName: 'cucumbers', relation: 'hasMany'}
@@ -141,6 +126,10 @@ module.exports = (LeanRC)->
         {inverse:attrName} = vhRelationConfig
         {relation} = recordClass.relations[attrName]
         return {recordClass, attrName, relation}
+
+    @public @static relations: Object,
+      get: -> @metaObject.getGroup 'relations'
+
 
 
   return LeanRC::RelationsMixin.initialize()

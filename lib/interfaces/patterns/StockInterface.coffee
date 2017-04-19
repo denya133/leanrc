@@ -55,13 +55,13 @@ module.exports = (LeanRC)->
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
 
-    @action @async @virtual bulkUpdate: Function,
+    @public @async @virtual bulkUpdate: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
-    @action @async @virtual bulkPatch: Function,
+    @public @async @virtual bulkPatch: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
-    @action @async @virtual bulkDelete: Function,
+    @public @async @virtual bulkDelete: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
       return: RC::Constants.NILL # без return. данные посылаем сигналом
 

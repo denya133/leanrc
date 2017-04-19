@@ -14,7 +14,7 @@ module.exports = (LeanRC)->
     # конструктор принимает второй аргумент, ссылку на коллекцию.
     @public collection: LeanRC::CollectionInterface
 
-    ipoInternalRecord = @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
+    ipoInternalRecord = @private _internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
 
     @public @static schema: Object,
       default: {}
@@ -23,7 +23,7 @@ module.exports = (LeanRC)->
           vhAttrs = {}
           for own asAttrName, ahAttrValue of @attributes
             do (asAttrName, ahAttrValue)=>
-              vhAttrs[asAttrName] = ahAttrValue.validate
+              vhAttrs[asAttrName] = ahAttrValue.validate?() ? ahAttrValue.validate
           joi.object vhAttrs
         _data[@name]
 
@@ -60,40 +60,11 @@ module.exports = (LeanRC)->
           .concat [AbstractClass.name]
 
     @public @static attributes: Object,
-      default: {}
-      get: (__attrs)->
-        AbstractClass = @
-        fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor.attributes
-        __attrs[AbstractClass.name] ?= do ->
-          RC::Utils.extend {}
-          , (fromSuper ? {})
-          , (AbstractClass["_#{AbstractClass.name}_attrs"] ? {})
-        __attrs[AbstractClass.name]
-
+      get: -> @metaObject.getGroup 'attributes'
     @public @static edges: Object,
-      default: {}
-      get: (__edges)->
-        AbstractClass = @
-        fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor.edges
-        __edges[AbstractClass.name] ?= do ->
-          RC::Utils.extend {}
-          , (fromSuper ? {})
-          , (AbstractClass["_#{AbstractClass.name}_edges"] ? {})
-        __edges[AbstractClass.name]
-
+      get: -> @metaObject.getGroup 'edges'
     @public @static computeds: Object,
-      default: {}
-      get: (__comps)->
-        AbstractClass = @
-        fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor.computeds
-        __comps[AbstractClass.name] ?= do ->
-          RC::Utils.extend {}
-          , (fromSuper ? {})
-          , (AbstractClass["_#{AbstractClass.name}_comps"] ? {})
-        __comps[AbstractClass.name]
+      get: -> @metaObject.getGroup 'computeds'
 
     @public @static attribute: Function,
       default: ->
@@ -121,13 +92,11 @@ module.exports = (LeanRC)->
             set.apply @, [voData]
           else
             voData
-        @["_#{@name}_attrs"] ?= {}
-        @["_#{@name}_edges"] ?= {}
-        if @["_#{@name}_attrs"][vsAttr]
+        if @attributes[vsAttr]?
           throw new Error "attr `#{vsAttr}` has been defined previously"
         else
-          @["_#{@name}_attrs"][vsAttr] = opts
-          @["_#{@name}_edges"][vsAttr] = opts if opts.through
+          @metaObject.addMetaData 'attributes', vsAttr, opts
+          @metaObject.addMetaData 'edges', vsAttr, opts if opts.through
         @public typeDefinition, opts
         return
 
@@ -137,25 +106,29 @@ module.exports = (LeanRC)->
         return
 
     @public @static comp: Function,
-      default: (typeDefinition, opts)->
+      default: (typeDefinition, ..., opts)->
+        if typeDefinition is opts
+          typeDefinition = "#{opts.attr}": opts.attrType
         vsAttr = Object.keys(typeDefinition)[0]
         unless opts.get?
           return throw new Error '`lambda` options is required'
-        @["_#{@name}_comps"] ?= {}
-        if @["_#{@name}_comps"][vsAttr]
+        if @computeds[vsAttr]?
           throw new Error "comp `#{vsAttr}` has been defined previously"
         else
-          @["_#{@name}_comps"][vsAttr] = opts
+          @metaObject.addMetaData 'computeds', vsAttr, opts
         @public typeDefinition, opts
         return
 
     @public @static new: Function,
       default: (aoAttributes, aoCollection)->
-        if aoAttributes._type is "#{@moduleName()}::#{@name}"
-          @super arguments...
+        if '_type' of (aoAttributes ? {})
+          if aoAttributes._type is "#{@moduleName()}::#{@name}"
+            @super arguments...
+          else
+            RecordClass = @findModelByName aoAttributes._type
+            RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
         else
-          RecordClass = @findModelByName aoAttributes._type
-          RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
+          @super arguments...
 
     @public @async save: Function,
       default: ->
@@ -169,13 +142,21 @@ module.exports = (LeanRC)->
         unless yield @isNew()
           throw new Error 'Document is exist in collection'
         yield @collection.push @
+        vhAttributes = {}
+        for own key of @constructor.attributes
+          vhAttributes[key] = @[key]
+        @[ipoInternalRecord] = vhAttributes
         return @
 
     @public @async update: Function,
       default: ->
         if yield @isNew()
           throw new Error 'Document does not exist in collection'
-        yield @collection.patch @id, @
+        yield @collection.patch {'@doc._key': $eq: @id}, @
+        vhAttributes = {}
+        for own key of @constructor.attributes
+          vhAttributes[key] = @[key]
+        @[ipoInternalRecord] = vhAttributes
         return @
 
     @public @async delete: Function,
@@ -243,7 +224,7 @@ module.exports = (LeanRC)->
 
     @public @async isNew: Function,
       default: ->
-        not @id? or not yield @collection.includes @id
+        not @id? or not (yield @collection.find @id)?
 
     @public @async @virtual reload: Function,
       args: []
@@ -273,14 +254,19 @@ module.exports = (LeanRC)->
 
 
     @public @static normalize: Function,
-      default: (ahPayload)->
+      default: (ahPayload, aoCollection)->
         unless ahPayload?
           return null
         vhResult = {}
         for own asAttrName, ahAttrValue of @attributes
           do (asAttrName, {transform} = ahAttrValue)->
             vhResult[asAttrName] = transform().normalize ahPayload[asAttrName]
-        @new vhResult
+        result = @new vhResult, aoCollection
+        vhAttributes = {}
+        for own key of @attributes
+          vhAttributes[key] = result[key]
+        result[ipoInternalRecord] = vhAttributes
+        result
 
     @public @static serialize:   Function,
       default: (aoRecord)->
@@ -295,7 +281,7 @@ module.exports = (LeanRC)->
 
     constructor: (aoProperties, aoCollection) ->
       super arguments...
-      console.log 'Init of Record', @constructor.name, aoProperties
+      # console.log 'Init of Record', @constructor.name, aoProperties
       @collection = aoCollection
 
       # TODO: надо не забыть про internalRecord
@@ -303,7 +289,7 @@ module.exports = (LeanRC)->
         do (vsAttrName, voAttrValue)=>
           @[vsAttrName] = voAttrValue
 
-      console.log 'dfdfdf 666'
+      # console.log 'dfdfdf 666'
 
 
   return LeanRC::RecordMixin.initialize()

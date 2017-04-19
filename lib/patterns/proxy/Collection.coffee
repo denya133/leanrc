@@ -50,7 +50,8 @@ module.exports = (LeanRC)->
         inflect.pluralize inflect.underscore firstClassName
 
     @public collectionPrefix: Function,
-      default: -> "#{inflect.underscore @Module.name}_" # может быть вместо @Module заиспользовать @getData().Module
+      default: ->
+        "#{inflect.underscore @Module().name}_" # может быть вместо @Module заиспользовать @getData().Module
 
     @public collectionFullName: Function,
       default: (asName = null)->
@@ -58,7 +59,7 @@ module.exports = (LeanRC)->
 
     @public recordHasBeenChanged: Function,
       default: (aoType, aoData)->
-        @facade.sendNotification LeanRC::Constants.RECORD_CHANGED, aoData, aoType
+        @sendNotification LeanRC::Constants.RECORD_CHANGED, aoData, aoType
 
     @public customFilters: Object, # возвращает установленные кастомные фильтры с учетом наследования
       default: {}
@@ -147,6 +148,14 @@ module.exports = (LeanRC)->
     @public serialize: Function,
       default: (aoRecord, ahOptions)->
         @serializer.serialize aoRecord, ahOptions
+
+    # constructor: (args...) ->
+    #   super args...
+    #   # console.log '22222222222222222222', @constructor.superclass()
+    #   # console.log '33333333333333333333', @constructor.__super__
+    #   # console.log '44444444444444444444', @class()
+    #   # console.log '55555555555555555555', @constructor.superclass().superclass()
+    #   # console.log '66666666666666666666', @constructor.superclass().superclass().superclass()
 
 
   return LeanRC::Collection.initialize()

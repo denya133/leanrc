@@ -10,10 +10,10 @@ module.exports = (LeanRC)->
     @public @static MULTITON_MSG: String,
       default: "Controller instance for this multiton key already constructed!"
 
-    ipoView         = @private view: LeanRC::ViewInterface
-    iphCommandMap   = @private commandMap: Object
+    ipoView         = @private _view: LeanRC::ViewInterface
+    iphCommandMap   = @private _commandMap: Object
     ipsMultitonKey  = @protected multitonKey: String
-    cphInstanceMap  = @private @static instanceMap: Object,
+    cphInstanceMap  = @private @static _instanceMap: Object,
       default: {}
 
     @public @static getInstance: Function,

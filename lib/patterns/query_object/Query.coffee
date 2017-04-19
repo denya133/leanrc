@@ -178,10 +178,6 @@ module.exports = (LeanRC)->
       default: (aoDefinition)->
         @$collect = aoDefinition
         return @
-    # @public aggregate: Function,
-    #   default: (aoDefinition)->
-    #     @$aggregate = aoDefinition
-    #     return @
     @public into: Function,
       default: (aoDefinition)->
         @$into = aoDefinition

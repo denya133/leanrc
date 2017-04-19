@@ -7,7 +7,7 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    iplSubCommands = @private subCommands: Array
+    iplSubCommands = @private _subCommands: Array
 
     @public execute: Function,
       default: (aoNotification)->

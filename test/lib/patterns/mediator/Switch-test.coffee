@@ -61,7 +61,7 @@ describe 'Switch', ->
         switchMediator = Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator.initializeNotifier 'TEST_SWITCH_1'
         switchMediator.defineRoutes()
-        assert.equal spyCreateNativeRoute.callCount, 18, 'Some routes are missing'
+        assert.equal spyCreateNativeRoute.callCount, 27, 'Some routes are missing'
       .to.not.throw Error
   describe '#onRegister', ->
     it 'should run register procedure', ->

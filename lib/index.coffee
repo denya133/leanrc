@@ -34,74 +34,101 @@ class LeanRC extends RC::Module
   # require('./interfaces/patterns/RouteInterface') LeanRC # empty
   require('./interfaces/patterns/SwitchInterface') LeanRC
 
+  require('./interfaces/mixins/CrudEndpointsMixinInterface') LeanRC
+  require('./interfaces/mixins/IterableMixinInterface') LeanRC
+  require('./interfaces/mixins/QueryableMixinInterface') LeanRC
+  require('./interfaces/mixins/RelationsMixinInterface') LeanRC
+
   require('./interfaces/core/ControllerInterface') LeanRC
   require('./interfaces/core/ModelInterface') LeanRC
   require('./interfaces/core/ViewInterface') LeanRC
 
-  # require('./mixins/CrudEndpointsMixin') LeanRC # Arango only? Uses 'statuses'
-  # require('./mixins/HttpCollectionMixin') LeanRC # Node.js only? Uses 'mongo-parse'
+  require('./mixins/CrudEndpointsMixin') LeanRC
+  require('./mixins/HttpCollectionMixin') LeanRC
+  require('./mixins/IterableMixin') LeanRC
   # require('./mixins/PipesSwitchMixin') LeanRC # empty
-  require('./mixins/RecordMixin') LeanRC
+  require('./mixins/QueryableMixin') LeanRC
+  require('./mixins/RecordMixin') LeanRC #tested
+  require('./mixins/RelationsMixin') LeanRC #tested
 
-  require('./patterns/data_mapper/Transform') LeanRC
-  require('./patterns/data_mapper/StringTransform') LeanRC
-  require('./patterns/data_mapper/NumberTransform') LeanRC
-  require('./patterns/data_mapper/DateTransform') LeanRC
-  require('./patterns/data_mapper/BooleanTransform') LeanRC
+  require('./patterns/data_mapper/Transform') LeanRC #tested
+  require('./patterns/data_mapper/StringTransform') LeanRC #tested
+  require('./patterns/data_mapper/NumberTransform') LeanRC #tested
+  require('./patterns/data_mapper/DateTransform') LeanRC #tested
+  require('./patterns/data_mapper/BooleanTransform') LeanRC #tested
   require('./patterns/data_mapper/Serializer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
   require('./patterns/data_mapper/Entry') LeanRC
 
-  require('./patterns/query_object/Query') LeanRC
+  require('./patterns/query_object/Query') LeanRC #tested
 
-  require('./patterns/observer/Notification') LeanRC
-  require('./patterns/observer/Notifier') LeanRC
-  require('./patterns/observer/Observer') LeanRC
+  require('./patterns/observer/Notification') LeanRC #tested
+  require('./patterns/observer/Notifier') LeanRC #tested
+  require('./patterns/observer/Observer') LeanRC #tested
 
-  require('./patterns/proxy/Proxy') LeanRC
+  require('./patterns/proxy/Proxy') LeanRC #tested
   require('./patterns/proxy/Collection') LeanRC
-  require('./patterns/proxy/Gateway') LeanRC
-  require('./patterns/proxy/Renderer') LeanRC
+  # require('./patterns/proxy/Configuration') LeanRC # empty
+  require('./patterns/proxy/Gateway') LeanRC #tested
+
+  require('./patterns/proxy/Renderer') LeanRC #tested
   require('./patterns/proxy/Resource') LeanRC
-  require('./patterns/proxy/Router') LeanRC
 
-  require('./patterns/mediator/Mediator') LeanRC
-  require('./patterns/mediator/Switch') LeanRC
+  # console.log 'LeanRC::Collection AFTER RESOURCE', LeanRC::Collection.name
+  # console.log 'super 1', LeanRC::Collection.superclass()?.name
+  # console.log 'super 2', LeanRC::Collection.superclass()?.superclass()?.name
+  # console.log 'super 3', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
+  # console.log 'super 4', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
+  # console.log 'super 5', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
 
-  require('./patterns/command/SimpleCommand') LeanRC
-  require('./patterns/command/MacroCommand') LeanRC
+  require('./patterns/proxy/Router') LeanRC #tested
+
+  require('./patterns/mediator/Mediator') LeanRC #tested
+  require('./patterns/mediator/Switch') LeanRC #tested
+
+  require('./patterns/command/SimpleCommand') LeanRC #tested
+  require('./patterns/command/MacroCommand') LeanRC #tested
   require('./patterns/command/Stock') LeanRC
   # require('./patterns/command/MigrateCommand') LeanRC # empty
   # require('./patterns/command/Migration') LeanRC # empty
   # require('./patterns/command/Rollback') LeanRC # empty
 
-  require('./patterns/gateway/Endpoint') LeanRC
+  require('./patterns/gateway/Endpoint') LeanRC #tested
 
   require('./patterns/iterator/Cursor') LeanRC
 
-  require('./patterns/pipes/Pipe') LeanRC
-  require('./patterns/pipes/PipeMessage') LeanRC
-  require('./patterns/pipes/PipeListener') LeanRC
-  require('./patterns/pipes/FilterControlMessage') LeanRC
-  require('./patterns/pipes/Filter') LeanRC
-  require('./patterns/pipes/Junction') LeanRC
-  require('./patterns/pipes/JunctionMediator') LeanRC
-  require('./patterns/pipes/PipeAwareModule') LeanRC
-  require('./patterns/pipes/QueueControlMessage') LeanRC
-  require('./patterns/pipes/Queue') LeanRC
-  require('./patterns/pipes/TeeMerge') LeanRC
-  require('./patterns/pipes/TeeSplit') LeanRC
+  require('./patterns/pipes/Pipe') LeanRC #tested
+  require('./patterns/pipes/PipeMessage') LeanRC #tested
+  require('./patterns/pipes/PipeListener') LeanRC #tested
+  require('./patterns/pipes/FilterControlMessage') LeanRC #tested
+  require('./patterns/pipes/Filter') LeanRC #tested
+  require('./patterns/pipes/Junction') LeanRC #tested
+  require('./patterns/pipes/JunctionMediator') LeanRC #tested
+  require('./patterns/pipes/PipeAwareModule') LeanRC #tested
+  require('./patterns/pipes/QueueControlMessage') LeanRC #tested
+  require('./patterns/pipes/Queue') LeanRC #tested
+  require('./patterns/pipes/TeeMerge') LeanRC #tested
+  require('./patterns/pipes/TeeSplit') LeanRC #tested
 
   # require('./patterns/renderer/Template') LeanRC # empty
 
-  require('./patterns/facade/Facade') LeanRC
+  require('./patterns/facade/Facade') LeanRC #tested
   require('./patterns/facade/Application') LeanRC
 
-  require('./core/View') LeanRC
-  require('./core/Model') LeanRC
-  require('./core/Controller') LeanRC
+  require('./core/View') LeanRC #tested
+  require('./core/Model') LeanRC #tested
+  require('./core/Controller') LeanRC #tested
 
 
 
 
+
+
+# LRC = LeanRC.initialize()
+# console.log 'LeanRC::Collection AFTER ALL', LRC::Collection.name
+# console.log 'super 1', LRC::Collection.superclass()?.name
+# console.log 'super 2', LRC::Collection.superclass()?.superclass()?.name
+# console.log 'super 3', LRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
+# console.log 'super 4', LRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
+# console.log 'super 5', LRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
 module.exports = LeanRC.initialize()

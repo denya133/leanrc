@@ -43,10 +43,11 @@
   "peerDependencies": {
     "i": "^0.3.5",
     "joi": "^10.3.1",
-    "lodash": "^4.13.1"
+    "lodash": "^4.13.1",
+    "statuses": "^1.3.1"
   },
   "dependencies": {
-    "RC": "git+ssh://git@bitbucket.org/webbasis/rc.git#v1.0.0-rc.16",
+    "RC": "git+ssh://git@bitbucket.org/webbasis/rc.git#v1.0.0-rc.22",
     "change-case": "3.0.0",
     "commander": "2.9.0",
     "fs-extra": "0.30.0",
@@ -73,6 +74,7 @@
     "gulp-header": "1.8.8",
     "gulp-symlink": "^2.1.4",
     "gulp-zip": "3.2.0",
+    "mocha": "^3.2.0",
     "request": "^2.80.0",
     "run-sequence": "1.2.2",
     "sinon": "^1.17.7",

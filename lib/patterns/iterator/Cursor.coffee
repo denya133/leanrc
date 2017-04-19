@@ -47,7 +47,7 @@ module.exports = (LeanRC)->
         for item, i in @[iplArray]
           delete @[iplArray][i]
         delete @[iplArray]
-        yield
+        yield return
 
     @public @async count: Function,
       default: -> yield @[iplArray].length()

@@ -53,7 +53,7 @@ module.exports = (LeanRC)->
           voEmitter.removeAllListeners eventName
         return
 
-    ipoRenderers = @private renderers: Object
+    ipoRenderers = @private _renderers: Object
 
     @public rendererFor: Function,
       args: [String]
