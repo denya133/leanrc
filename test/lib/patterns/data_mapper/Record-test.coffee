@@ -9,6 +9,9 @@ describe 'Record', ->
     it 'should create record instance', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test

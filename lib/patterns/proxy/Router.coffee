@@ -23,6 +23,7 @@
 _             = require 'lodash'
 inflect       = require('i')()
 RC            = require 'RC'
+{NILL, ANY} = RC::
 
 
 module.exports = (LeanRC)->
@@ -50,13 +51,13 @@ module.exports = (LeanRC)->
       default: (lambda = ->)->
         @public map: Function,
           args: []
-          return: RC::Constants.ANY
+          return: ANY
           default: lambda
         return
 
     @public map: Function,
       args: []
-      return: RC::Constants.ANY
+      return: ANY
       default: ->
 
     @public root: Function,

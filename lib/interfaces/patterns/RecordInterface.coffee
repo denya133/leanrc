@@ -1,4 +1,5 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
 
 # так как рекорд будет работать с простыми структурами данных в памяти, он не зависит от платформы.
 # если ему надо будет взаимодействовать с платформозависимой логикой - он будет делать это через прокси, но не напрямую (как в эмбере со стором)
@@ -31,7 +32,7 @@ module.exports = (LeanRC)->
 
 
     @public @static @virtual parentClassNames: Function,
-      args: [[RC::Class, RC::Constants.NILL]]
+      args: [[RC::Class, NILL]]
       return: Array
 
     @public @static @virtual attributes: Function,
@@ -46,16 +47,16 @@ module.exports = (LeanRC)->
 
     @public @static @virtual attribute: Function,
       args: [Object, Object] #typeDefinition, opts
-      return: RC::Constants.NILL
+      return: NILL
     @public @static @virtual attr: Function,
       args: [Object, Object] #typeDefinition, opts
-      return: RC::Constants.NILL
+      return: NILL
     @public @static @virtual computed: Function,
       args: [Object, Object] #typeDefinition, opts
-      return: RC::Constants.NILL
+      return: NILL
     @public @static @virtual comp: Function,
       args: [Object, Object] #typeDefinition, opts
-      return: RC::Constants.NILL
+      return: NILL
 
     @public @static @virtual new: Function,
       args: [Object] #attributes
@@ -87,10 +88,10 @@ module.exports = (LeanRC)->
       args: []
       return: LeanRC::RecordInterface
     @public @async @virtual decrement: Function,
-      args: [String, [Number, RC::Constants.NILL]] #attribute, step
+      args: [String, [Number, NILL]] #attribute, step
       return: LeanRC::RecordInterface
     @public @async @virtual increment: Function,
-      args: [String, [Number, RC::Constants.NILL]] #attribute, step
+      args: [String, [Number, NILL]] #attribute, step
       return: LeanRC::RecordInterface
     @public @async @virtual toggle: Function,
       args: [String] #attribute
@@ -99,7 +100,7 @@ module.exports = (LeanRC)->
       args: []
       return: LeanRC::RecordInterface
     @public @async @virtual updateAttribute: Function,
-      args: [String, RC::Constants.ANY] #name, value
+      args: [String, ANY] #name, value
       return: LeanRC::RecordInterface
     @public @async @virtual updateAttributes: Function,
       args: [Object] #attributes
@@ -115,10 +116,10 @@ module.exports = (LeanRC)->
       return: Object # { isAdmin: [undefined, true], name: [undefined, 'Tomster'] }
     @public @virtual resetAttribute: Function,
       args: [String]
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual rollbackAttributes: Function,
       args: []
-      return: RC::Constants.NILL
+      return: NILL
 
 
   return LeanRC::RecordInterface.initialize()

@@ -9,7 +9,7 @@ module.exports = (LeanRC)->
     ipoOutput = Symbol.for '~output'
     ipsMode = @protected mode: String,
       default: LeanRC::FilterControlMessage.FILTER
-    ipmFilter = @protected filter: RC::Constants.LAMBDA,
+    ipmFilter = @protected filter: RC::LAMBDA,
       default: (aoMessage, aoParams)->
     ipoParams = @protected params: Object
     ipsName = @protected name: String

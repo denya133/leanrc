@@ -10,7 +10,7 @@ module.exports = (LeanRC)->
 
     @public @virtual render: Function,
       args: [Object, Object]
-      return: RC::Constants.ANY
+      return: RC::ANY
 
 
   return LeanRC::RendererInterface.initialize()

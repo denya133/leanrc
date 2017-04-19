@@ -11,6 +11,9 @@ describe 'RecordMixin', ->
     it 'should create item with record mixin', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
@@ -26,6 +29,9 @@ describe 'RecordMixin', ->
     it 'should record name from text', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
@@ -43,6 +49,9 @@ describe 'RecordMixin', ->
     it 'should record name in instance from text', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
@@ -61,6 +70,9 @@ describe 'RecordMixin', ->
     it 'should get records class parent class names', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
@@ -76,6 +88,9 @@ describe 'RecordMixin', ->
     it 'should define attributes for class', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
@@ -98,6 +113,9 @@ describe 'RecordMixin', ->
     it 'should define computed properties for class', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
@@ -123,6 +141,9 @@ describe 'RecordMixin', ->
       co ->
         KEY = 'TEST_RECORD_01'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
@@ -165,6 +186,9 @@ describe 'RecordMixin', ->
       co ->
         KEY = 'TEST_RECORD_02'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
@@ -210,6 +234,9 @@ describe 'RecordMixin', ->
       co ->
         KEY = 'TEST_RECORD_03'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
@@ -268,6 +295,9 @@ describe 'RecordMixin', ->
       expect ->
         KEY = 'TEST_RECORD_04'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
@@ -316,6 +346,9 @@ describe 'RecordMixin', ->
       co ->
         KEY = 'TEST_RECORD_05'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
@@ -363,6 +396,9 @@ describe 'RecordMixin', ->
       co ->
         KEY = 'TEST_RECORD_06'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
@@ -407,6 +443,9 @@ describe 'RecordMixin', ->
       co ->
         KEY = 'TEST_RECORD_07'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
@@ -461,6 +500,9 @@ describe 'RecordMixin', ->
       co ->
         KEY = 'TEST_RECORD_08'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
@@ -518,6 +560,9 @@ describe 'RecordMixin', ->
       co ->
         KEY = 'TEST_RECORD_09'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
@@ -578,6 +623,9 @@ describe 'RecordMixin', ->
       co ->
         KEY = 'TEST_RECORD_10'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
@@ -637,6 +685,9 @@ describe 'RecordMixin', ->
       co ->
         KEY = 'TEST_RECORD_11'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
@@ -696,6 +747,9 @@ describe 'RecordMixin', ->
       expect ->
         KEY = 'TEST_RECORD_12'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin

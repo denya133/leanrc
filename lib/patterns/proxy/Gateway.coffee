@@ -55,7 +55,7 @@ module.exports = (LeanRC)->
 
     @public swaggerDefinition: Function,
       args: [String, Function]
-      return: RC::Constants.NILL
+      return: RC::NILL
       default: (asAction, lambda = (aoData)-> aoData)->
         voEndpoint = lambda.apply @, [LeanRC::Endpoint.new(gateway: @)]
         @[ipoEndpoints] ?= {}

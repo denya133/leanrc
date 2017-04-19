@@ -1,4 +1,5 @@
 RC            = require 'RC'
+{ANY, NILL} = RC::
 
 
 module.exports = (LeanRC)->
@@ -25,23 +26,23 @@ module.exports = (LeanRC)->
       return: LeanRC::EndpointInterface
 
     @public @virtual header: Function,
-      args: [String, Object, [String, RC::Constants.NILL]]
+      args: [String, Object, [String, NILL]]
       return: LeanRC::EndpointInterface
 
     @public @virtual pathParam: Function,
-      args: [String, Object, [String, RC::Constants.NILL]]
+      args: [String, Object, [String, NILL]]
       return: LeanRC::EndpointInterface
 
     @public @virtual queryParam: Function,
-      args: [String, Object, [String, RC::Constants.NILL]]
+      args: [String, Object, [String, NILL]]
       return: LeanRC::EndpointInterface
 
     @public @virtual body: Function,
-      args: [Object, [Array, RC::Constants.NILL], [String, RC::Constants.NILL]]
+      args: [Object, [Array, NILL], [String, NILL]]
       return: LeanRC::EndpointInterface
 
     @public @virtual response: Function,
-      args: [[Number, String], [Object, RC::Constants.NILL], [Array, RC::Constants.NILL], [String, RC::Constants.NILL]]
+      args: [[Number, String], [Object, NILL], [Array, NILL], [String, NILL]]
       return: LeanRC::EndpointInterface
 
     @public @virtual error: Function,

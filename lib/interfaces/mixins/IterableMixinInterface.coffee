@@ -1,4 +1,5 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
 
 
 module.exports = (LeanRC)->
@@ -9,7 +10,7 @@ module.exports = (LeanRC)->
 
     @public @async @virtual forEach: Function,
       args: [Function]
-      return: RC::Constants.NILL
+      return: NILL
     @public @async @virtual filter: Function,
       args: [Function]
       return: Array
@@ -17,8 +18,8 @@ module.exports = (LeanRC)->
       args: [Function]
       return: Array
     @public @async @virtual reduce: Function,
-      args: [Function, RC::Constants.ANY]
-      return: RC::Constants.ANY
+      args: [Function, ANY]
+      return: ANY
 
 
   return LeanRC::IterableMixinInterface.initialize()

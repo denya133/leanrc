@@ -51,7 +51,7 @@ module.exports = (LeanRC)->
 
     @public initializeModel: Function,
       args: []
-      return: RC::Constants.NILL
+      return: RC::NILL
       default: ->
 
     @public init: Function,

@@ -8,7 +8,7 @@ module.exports = (LeanRC)->
     @Module: LeanRC
 
     ipsMediatorName = @private mediatorName: String
-    ipoViewComponent = @private viewComponent: RC::Constants.ANY
+    ipoViewComponent = @private viewComponent: RC::ANY
 
     @public getMediatorName: Function,
       default: -> @[ipsMediatorName]

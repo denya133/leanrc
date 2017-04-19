@@ -9,7 +9,7 @@ module.exports = (LeanRC)->
 
     @public @virtual execute: Function,
       args: [LeanRC::NotificationInterface]
-      return: RC::Constants.NILL
+      return: RC::NILL
 
 
   return LeanRC::CommandInterface.initialize()

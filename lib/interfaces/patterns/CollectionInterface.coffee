@@ -1,4 +1,6 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::CollectionInterface extends RC::Interface
@@ -8,7 +10,7 @@ module.exports = (LeanRC)->
 
     @public @virtual recordHasBeenChanged: Function,
       args: [String, Object]
-      return: RC::Constants.NILL
+      return: NILL
 
     # в классе Proxy от которого будет наследоваться конкретный класс Collection есть метод onRegister в котором можно прописать подключение (или регистрацию) классов Рекорда и Сериализатора
 
@@ -22,18 +24,18 @@ module.exports = (LeanRC)->
       args: []
       return: String
     @public @virtual collectionFullName: Function,
-      args: [[String, RC::Constants.NILL]]
+      args: [[String, NILL]]
       return: String
     @public @virtual customFilters: Function, # возвращает установленные кастомные фильтры с учетом наследования
       args: []
       return: Object
     @public @virtual customFilter: Function,
       args: [String, [Object, Function]]
-      return: RC::Constants.NILL
+      return: NILL
 
     @public @virtual generateId: Function,
       args: []
-      return: [String, RC::Constants.NILL]
+      return: [String, NILL]
 
     @public @virtual build: Function, # создает инстанс рекорда
       args: [Object]
@@ -51,7 +53,7 @@ module.exports = (LeanRC)->
 
     @public @async @virtual destroy: Function,
       args: [String]
-      return: RC::Constants.NILL
+      return: NILL
     @public @async @virtual remove: Function, # обращается к БД
       args: [String]
       return: Boolean
@@ -102,11 +104,11 @@ module.exports = (LeanRC)->
       return: Number
 
     @public @virtual normalize: Function,
-      args: [RC::Constants.ANY] # payload
+      args: [ANY] # payload
       return: LeanRC::RecordInterface # нормализация данных из базы
     @public @virtual serialize: Function,
       args: [LeanRC::RecordInterface] # id, options
-      return: RC::Constants.ANY # сериализация рекорда для отправки в базу
+      return: ANY # сериализация рекорда для отправки в базу
 
 
   return LeanRC::CollectionInterface.initialize()

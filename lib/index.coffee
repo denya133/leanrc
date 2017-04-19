@@ -5,9 +5,10 @@ RC = require 'RC'
 
 class LeanRC extends RC::Module
   @inheritProtected()
-  # Utils: {}
-  # Scripts: {}
-  Constants:    require './Constants'
+
+  @const HANDLER_RESULT:  0
+  @const RECORD_CHANGED:  1
+  @const CONFIGURATION:  2
 
   require('./interfaces/patterns/TransformInterface') LeanRC
   require('./interfaces/patterns/NotificationInterface') LeanRC

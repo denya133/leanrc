@@ -29,7 +29,7 @@ describe 'Switch', ->
         mediatorName = 'TEST_MEDIATOR'
         switchMediator = Switch.new mediatorName
         assert.deepEqual switchMediator.listNotificationInterests(), [
-          LeanRC::Constants.HANDLER_RESULT
+          LeanRC::HANDLER_RESULT
         ], 'Function `listNotificationInterests` returns incorrect values'
       .to.not.throw Error
   describe '#defineRoutes', ->
@@ -37,6 +37,9 @@ describe 'Switch', ->
       expect ->
         facade = Facade.getInstance 'TEST_SWITCH_1'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -68,6 +71,9 @@ describe 'Switch', ->
       expect ->
         facade = Facade.getInstance 'TEST_SWITCH_2'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -93,6 +99,9 @@ describe 'Switch', ->
       expect ->
         facade = Facade.getInstance 'TEST_SWITCH_3'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -119,6 +128,9 @@ describe 'Switch', ->
       expect ->
         facade = Facade.getInstance 'TEST_SWITCH_4'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         require.main.require('test/integration/renderers') Test
         facade.registerProxy Test::JsonRenderer.new 'TEST_JSON_RENDERER'
         facade.registerProxy Test::HtmlRenderer.new 'TEST_HTML_RENDERER'
@@ -182,6 +194,9 @@ describe 'Switch', ->
       expect ->
         facade = Facade.getInstance 'TEST_SWITCH_5'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         spyRendererRender = sinon.spy ->
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
@@ -263,12 +278,15 @@ describe 'Switch', ->
       expect ->
         facade = Facade.getInstance 'TEST_SWITCH_6'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
         Test::TestRouter.initialize()
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
-        facade.registerProxy LeanRC::Proxy.new LeanRC::Constants.CONFIGURATION,
+        facade.registerProxy LeanRC::Proxy.new LeanRC::CONFIGURATION,
           currentUserCookie: 'cuc'
         class Test::TestSwitch extends Switch
           @inheritProtected()
@@ -343,6 +361,9 @@ describe 'Switch', ->
           list: listEndpoint
         facade.registerProxy gateway
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test

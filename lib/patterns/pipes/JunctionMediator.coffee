@@ -44,7 +44,7 @@ module.exports = (LeanRC)->
 
     @public handlePipeMessage: Function,
       args: [LeanRC::PipeMessageInterface]
-      return: RC::Constants.NILL
+      return: RC::NILL
       default: (aoMessage)->
         @sendNotification aoMessage.getType(), aoMessage
 

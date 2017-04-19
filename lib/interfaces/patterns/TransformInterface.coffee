@@ -2,6 +2,8 @@
 # ключевые имена трансформов (в т.ч. базовых) будут использоваться в объявлениях атрибутов рекордов на ряду с joi дефинициями и сопутствующими параметрами.
 
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::TransformInterface extends RC::Interface
@@ -10,11 +12,11 @@ module.exports = (LeanRC)->
     @Module: LeanRC
 
     @public @static @virtual normalize: Function,
-      args: [RC::Constants.ANY] # data
-      return: [RC::Constants.ANY, RC::Constants.NILL]
+      args: [ANY] # data
+      return: [ANY, NILL]
     @public @static @virtual serialize:   Function,
-      args: [RC::Constants.ANY] # data
-      return: [RC::Constants.ANY, RC::Constants.NILL]
+      args: [ANY] # data
+      return: [ANY, NILL]
 
 
   return LeanRC::TransformInterface.initialize()

@@ -1,6 +1,8 @@
 joi = require 'joi'
 
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 
 ###
@@ -84,7 +86,7 @@ module.exports = (LeanRC)->
 
     @public beforeUpdate: Function,
       args: []
-      return: RC::Constants.NILL
+      return: NILL
       default: ->
         @updatedAt = new Date().toISOString()
         return
@@ -98,7 +100,7 @@ module.exports = (LeanRC)->
 
     @public beforeDelete: Function,
       args: []
-      return: RC::Constants.NILL
+      return: NILL
       default: ->
         @isHidden = yes
         @updatedAt = new Date().toISOString()

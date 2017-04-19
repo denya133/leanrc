@@ -11,6 +11,9 @@ describe 'RelationsMixin', ->
     it 'should create item with record mixin', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
@@ -27,6 +30,9 @@ describe 'RelationsMixin', ->
     it 'should define one-to-one or one-to-many relation for class', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
@@ -55,12 +61,15 @@ describe 'RelationsMixin', ->
         assert.equal relationData.transform, LeanRC::Transform, 'Value of `transform` is incorrect'
         assert.equal relationData.relation, 'belongsTo', 'Value of `relation` is incorrect'
         assert.equal relationData.attr, 'relation', 'Value of `attr` is incorrect'
-        assert.equal relationData.level, 'PUBLIC', 'Value of `level` is incorrect'
+        assert.equal relationData.level, RC::PUBLIC, 'Value of `level` is incorrect'
       .to.not.throw Error
   describe '.hasMany', ->
     it 'should define one-to-one or one-to-many relation for class', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
@@ -87,12 +96,15 @@ describe 'RelationsMixin', ->
         assert.equal relationData.transform, LeanRC::Transform, 'Value of `transform` is incorrect'
         assert.equal relationData.relation, 'hasMany', 'Value of `relation` is incorrect'
         assert.equal relationData.attr, 'manyRelation', 'Value of `attr` is incorrect'
-        assert.equal relationData.level, 'PUBLIC', 'Value of `level` is incorrect'
+        assert.equal relationData.level, RC::PUBLIC, 'Value of `level` is incorrect'
       .to.not.throw Error
   describe '.hasOne', ->
     it 'should define many-to-one or many-to-one relation for class', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
@@ -119,12 +131,15 @@ describe 'RelationsMixin', ->
         assert.equal relationData.transform, LeanRC::Transform, 'Value of `transform` is incorrect'
         assert.equal relationData.relation, 'hasOne', 'Value of `relation` is incorrect'
         assert.equal relationData.attr, 'oneRelation', 'Value of `attr` is incorrect'
-        assert.equal relationData.level, 'PUBLIC', 'Value of `level` is incorrect'
+        assert.equal relationData.level, RC::PUBLIC, 'Value of `level` is incorrect'
       .to.not.throw Error
   describe '.inverseFor', ->
     it 'should get inverse info', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::Relation extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin

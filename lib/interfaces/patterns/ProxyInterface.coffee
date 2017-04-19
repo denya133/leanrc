@@ -1,4 +1,6 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::ProxyInterface extends RC::Interface
@@ -11,17 +13,17 @@ module.exports = (LeanRC)->
       args: []
       return: String
     @public @virtual setData: Function,
-      args: [RC::Constants.ANY]
-      return: RC::Constants.NILL
+      args: [ANY]
+      return: NILL
     @public @virtual getData: Function,
       args: []
-      return: RC::Constants.ANY
+      return: ANY
     @public @virtual onRegister: Function,
       args: []
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual onRemove: Function,
       args: []
-      return: RC::Constants.NILL
+      return: NILL
 
 
   return LeanRC::ProxyInterface.initialize()

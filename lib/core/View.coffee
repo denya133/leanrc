@@ -114,7 +114,7 @@ module.exports = (LeanRC)->
 
     @public initializeView: Function,
       args: []
-      return: RC::Constants.NILL
+      return: RC::NILL
       default: ->
 
     @public init: Function,

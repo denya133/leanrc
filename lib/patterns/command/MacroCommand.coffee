@@ -1,4 +1,6 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::MacroCommand extends LeanRC::Notifier
@@ -22,12 +24,12 @@ module.exports = (LeanRC)->
 
     @public initializeMacroCommand: Function,
       args: []
-      return: RC::Constants.NILL
+      return: NILL
       default: ->
 
     @public addSubCommand: Function,
       args: [RC::Class]
-      return: RC::Constants.NILL
+      return: NILL
       default: (aClass)->
         @[iplSubCommands].push aClass
         return

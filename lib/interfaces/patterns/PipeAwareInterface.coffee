@@ -1,4 +1,6 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::PipeAwareInterface extends RC::Interface
@@ -7,10 +9,10 @@ module.exports = (LeanRC)->
 
     @public @virtual acceptInputPipe: Function,
       args: [String, LeanRC::PipeFittingInterface]
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual acceptOutputPipe: Function,
       args: [String, LeanRC::PipeFittingInterface]
-      return: RC::Constants.NILL
+      return: NILL
 
 
   return LeanRC::PipeAwareInterface.initialize()

@@ -1,4 +1,6 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::SwitchInterface extends RC::Interface
@@ -21,23 +23,23 @@ module.exports = (LeanRC)->
 
     @public @virtual sendHttpResponse: Function,
       args: [Object, Object, Object, Object]
-      return: RC::Constants.NILL
+      return: NILL
 
     @public @virtual defineRoutes: Function,
       args: []
-      return: RC::Constants.NILL
+      return: NILL
 
     @public @virtual handler: Function,
       args: [String, Object, Object]
-      return: RC::Constants.NILL
+      return: NILL
 
     @public @virtual defineSwaggerEndpoint: Function,
       args: [Object]
-      return: RC::Constants.NILL
+      return: NILL
 
     @public @virtual createNativeRoute: Function,
       args: [Object]
-      return: RC::Constants.NILL
+      return: NILL
 
 
   return LeanRC::SwitchInterface.initialize()
