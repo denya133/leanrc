@@ -1,14 +1,14 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::PipeListener extends RC::CoreObject
+
+module.exports = (Module)->
+  class PipeListener extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::PipeFittingInterface
+    @implements Module::PipeFittingInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     ipoContext = @private context: Object
-    ipmListener = @private listener: RC::LAMBDA
+    ipmListener = @private listener: Module::LAMBDA
 
     @public connect: Function,
       default: ->
@@ -30,4 +30,4 @@ module.exports = (LeanRC)->
         @[ipmListener] = amListener
 
 
-  return LeanRC::PipeListener.initialize()
+  PipeListener.initialize()

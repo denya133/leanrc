@@ -1,11 +1,11 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::ObserverInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class ObserverInterface extends Module::Interface
     @inheritProtected()
-    @Module: LeanRC
+    @Module: Module
 
     @public @virtual setNotifyMethod: Function,
       args: [Function]
@@ -23,9 +23,9 @@ module.exports = (LeanRC)->
       args: [ANY]
       return: Boolean
     @public @virtual notifyObserver: Function,
-      args: [LeanRC::NotificationInterface]
+      args: [Module::NotificationInterface]
       return: NILL
 
 
 
-  return LeanRC::ObserverInterface.initialize()
+  ObserverInterface.initialize()

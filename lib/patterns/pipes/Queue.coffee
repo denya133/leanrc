@@ -1,18 +1,18 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Queue extends LeanRC::Pipe
+
+module.exports = (Module)->
+  class Queue extends Module::Pipe
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     ipoOutput = Symbol.for '~output'
     ipsMode = @protected mode: String,
-      default: LeanRC::QueueControlMessage.SORT
+      default: Module::QueueControlMessage.SORT
     iplMessages = @protected messages: Array
 
     ipmSortMessagesByPriority = @protected sortMessagesByPriority: Function,
-      args: [LeanRC::PipeMessageInterface, LeanRC::PipeMessageInterface]
+      args: [Module::PipeMessageInterface, Module::PipeMessageInterface]
       return: Number
       default: (msgA, msgB)->
         vnNum = 0
@@ -23,12 +23,12 @@ module.exports = (LeanRC)->
         return vnNum
 
     ipmStore = @protected store: Function,
-      args: [LeanRC::PipeMessageInterface]
-      return: RC::NILL
+      args: [Module::PipeMessageInterface]
+      return: Module::NILL
       default: (aoMessage)->
         @[iplMessages] ?= []
         @[iplMessages].push aoMessage
-        if @[ipsMode] is LeanRC::QueueControlMessage.SORT
+        if @[ipsMode] is Module::QueueControlMessage.SORT
           @[iplMessages].sort @[ipmSortMessagesByPriority]
         return
 
@@ -49,11 +49,11 @@ module.exports = (LeanRC)->
         vbSuccess = yes
         voOutputMessage = null
         switch aoMessage.getType()
-          when LeanRC::PipeMessage.NORMAL
+          when Module::PipeMessage.NORMAL
             @[ipmStore] aoMessage
-          when LeanRC::QueueControlMessage.FLUSH
+          when Module::QueueControlMessage.FLUSH
             vbSuccess = @[ipmFlush]()
-          when LeanRC::QueueControlMessage.SORT, LeanRC::QueueControlMessage.FIFO
+          when Module::QueueControlMessage.SORT, Module::QueueControlMessage.FIFO
             @[ipsMode] = aoMessage.getType()
         return vbSuccess
 
@@ -62,4 +62,4 @@ module.exports = (LeanRC)->
         @super aoOutput
 
 
-  return LeanRC::Queue.initialize()
+  return Queue.initialize()

@@ -1,18 +1,18 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::PipeAwareInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class PipeAwareInterface extends Module::Interface
     @inheritProtected()
-    @Module: LeanRC
+    @Module: Module
 
     @public @virtual acceptInputPipe: Function,
-      args: [String, LeanRC::PipeFittingInterface]
+      args: [String, Module::PipeFittingInterface]
       return: NILL
     @public @virtual acceptOutputPipe: Function,
-      args: [String, LeanRC::PipeFittingInterface]
+      args: [String, Module::PipeFittingInterface]
       return: NILL
 
 
-  return LeanRC::PipeAwareInterface.initialize()
+  PipeAwareInterface.initialize()

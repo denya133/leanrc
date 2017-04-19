@@ -1,14 +1,14 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Proxy extends LeanRC::Notifier
+
+module.exports = (Module)->
+  class Proxy extends Module::Notifier
     @inheritProtected()
-    @implements LeanRC::ProxyInterface
+    @implements Module::ProxyInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     ipsProxyName = @private proxyName: String
-    ipoData = @private data: RC::ANY
+    ipoData = @private data: Module::ANY
 
     @public getProxyName: Function,
       default: -> @[ipsProxyName]
@@ -37,4 +37,4 @@ module.exports = (LeanRC)->
           @setData ahData
 
 
-  return LeanRC::Proxy.initialize()
+  Proxy.initialize()

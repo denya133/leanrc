@@ -1,24 +1,23 @@
 
-RC = require 'RC'
-{ANY, NILL} = RC::
 
+module.exports = (Module)->
+  {ANY, NILL} = Module::
 
-module.exports = (LeanRC)->
-  class LeanRC::CursorInterface extends RC::Interface
+  class CursorInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @virtual setRecord: Function,
-      args: [RC::Class]
-      return: LeanRC::CursorInterface
+      args: [Module::Class]
+      return: Module::CursorInterface
 
     @public @async @virtual toArray: Function,
-      args: [[RC::Class, NILL]]
+      args: [[Module::Class, NILL]]
       return: Array
 
     @public @async @virtual next: Function,
-      args: [[RC::Class, NILL]]
+      args: [[Module::Class, NILL]]
       return: ANY
 
     @public @async @virtual hasNext: Function,
@@ -34,32 +33,32 @@ module.exports = (LeanRC)->
       return: Number
 
     @public @async @virtual forEach: Function,
-      args: [Function, [RC::Class, NILL]]
+      args: [Function, [Module::Class, NILL]]
       return: NILL
 
     @public @async @virtual map: Function,
-      args: [Function, [RC::Class, NILL]]
+      args: [Function, [Module::Class, NILL]]
       return: Array
 
     @public @async @virtual filter: Function,
-      args: [Function, [RC::Class, NILL]]
+      args: [Function, [Module::Class, NILL]]
       return: Array
 
     @public @async @virtual find: Function,
-      args: [Function, [RC::Class, NILL]]
+      args: [Function, [Module::Class, NILL]]
       return: ANY
 
     @public @async @virtual compact: Function,
-      args: [[RC::Class, NILL]]
+      args: [[Module::Class, NILL]]
       return: Array
 
     @public @async @virtual reduce: Function,
-      args: [Function, ANY, [RC::Class, NILL]]
+      args: [Function, ANY, [Module::Class, NILL]]
       return: ANY
 
     @public @async @virtual first: Function,
-      args: [[RC::Class, NILL]]
+      args: [[Module::Class, NILL]]
       return: ANY
 
 
-  return LeanRC::CursorInterface.initialize()
+  CursorInterface.initialize()

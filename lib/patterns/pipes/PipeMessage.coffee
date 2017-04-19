@@ -1,11 +1,11 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::PipeMessage extends RC::CoreObject
+
+module.exports = (Module)->
+  class PipeMessage extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::PipeMessageInterface
+    @implements Module::PipeMessageInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @static PRIORITY_HIGH: Number,
       default: 1
@@ -67,4 +67,4 @@ module.exports = (LeanRC)->
         @setPriority anPriority
 
 
-  return LeanRC::PipeMessage.initialize()
+  PipeMessage.initialize()

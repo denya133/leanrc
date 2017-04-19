@@ -1,13 +1,13 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::QueueControlMessage extends LeanRC::PipeMessage
+
+module.exports = (Module)->
+  class QueueControlMessage extends Module::PipeMessage
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @static BASE: String,
-      get: -> "#{LeanRC::PipeMessage.BASE}queue/"
+      get: -> "#{Module::PipeMessage.BASE}queue/"
     @public @static FLUSH: String,
       get: -> "#{@BASE}flush"
     @public @static SORT: String,
@@ -20,4 +20,4 @@ module.exports = (LeanRC)->
         @super asType
 
 
-  return LeanRC::QueueControlMessage.initialize()
+  QueueControlMessage.initialize()

@@ -1,12 +1,12 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::IterableMixinInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class IterableMixinInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @async @virtual forEach: Function,
       args: [Function]
@@ -22,4 +22,4 @@ module.exports = (LeanRC)->
       return: ANY
 
 
-  return LeanRC::IterableMixinInterface.initialize()
+  IterableMixinInterface.initialize()

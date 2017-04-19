@@ -1,13 +1,13 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::FilterControlMessage extends LeanRC::PipeMessage
+
+module.exports = (Module)->
+  class FilterControlMessage extends Module::PipeMessage
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @static BASE: String,
-      get: -> "#{LeanRC::PipeMessage.BASE}filter-control/"
+      get: -> "#{Module::PipeMessage.BASE}filter-control/"
     @public @static SET_PARAMS: String,
       get: -> "#{@BASE}setparams"
     @public @static SET_FILTER: String,
@@ -18,7 +18,7 @@ module.exports = (LeanRC)->
       get: -> "#{@BASE}filter"
 
     ipsName = @protected name: String
-    ipmFilter = @protected filter: RC::LAMBDA
+    ipmFilter = @protected filter: Module::LAMBDA
     ipoParams = @protected params: Object
 
     @public setName: Function,
@@ -50,4 +50,4 @@ module.exports = (LeanRC)->
         @setParams aoParams
 
 
-  return LeanRC::FilterControlMessage.initialize()
+  FilterControlMessage.initialize()

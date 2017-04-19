@@ -1,12 +1,12 @@
-LeanRC = require.main.require 'lib'
 
-module.exports = (TestApp) ->
-  class TestApp::PrepareViewCommand extends LeanRC::SimpleCommand
+
+module.exports = (Module) ->
+  class PrepareViewCommand extends Module::SimpleCommand
     @inheritProtected()
-    @Module: TestApp
+    @Module: Module
 
     @public execute: Function,
       default: ->
-        @facade.registerMediator TestApp::ConsoleComponentMediator.new TestApp::ConsoleComponentMediator.CONSOLE_MEDIATOR
+        @facade.registerMediator Module::ConsoleComponentMediator.new Module::ConsoleComponentMediator::CONSOLE_MEDIATOR
 
-  TestApp::PrepareViewCommand.initialize()
+  PrepareViewCommand.initialize()

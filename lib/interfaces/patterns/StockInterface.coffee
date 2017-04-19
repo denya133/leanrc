@@ -5,22 +5,21 @@
 
 # в случае со стрим-сервером заливку и отдачу файла будет реализовывать платформозависимый код медиатора, а ресурсная команда Uploads этим заниматься не будет. (чтобы медиатор напрямую писал в нужный прокси, и считывал поток так же напрямую из прокси.)
 
-RC = require 'RC'
-{ANY, NILL} = RC::
 
+module.exports = (Module)->
+  {ANY, NILL} = Module::
 
-module.exports = (LeanRC)->
-  class LeanRC::StockInterface extends RC::Interface
+  class StockInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @virtual entityName: String
     @public @virtual keyName: String
     @public @virtual itemEntityName: String
     @public @virtual listEntityName: String
     @public @virtual collectionName: String
-    @public @virtual collection: LeanRC::CollectionInterface
+    @public @virtual collection: Module::CollectionInterface
 
     @public @virtual queryParams: Object
     @public @virtual pathPatams: Object
@@ -68,4 +67,4 @@ module.exports = (LeanRC)->
       return: NILL # без return. данные посылаем сигналом
 
 
-  return LeanRC::StockInterface.initialize()
+  StockInterface.initialize()

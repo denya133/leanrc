@@ -1,10 +1,10 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Application extends RC::CoreObject
+
+module.exports = (Module)->
+  class Application extends Module::CoreObject
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @static NAME: String,
       default: 'Application'
@@ -16,4 +16,4 @@ module.exports = (LeanRC)->
         facade.startup @
 
 
-  return LeanRC::Application.initialize()
+  Application.initialize()

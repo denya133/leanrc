@@ -13,7 +13,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -33,7 +33,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -53,7 +53,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -73,7 +73,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -94,7 +94,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -127,7 +127,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -147,7 +147,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -172,7 +172,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -197,7 +197,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -236,7 +236,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -275,7 +275,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -309,7 +309,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -341,7 +341,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -380,7 +380,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -419,7 +419,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -458,7 +458,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -492,7 +492,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -540,7 +540,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -565,7 +565,7 @@ describe 'Collection', ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test

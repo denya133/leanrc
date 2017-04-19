@@ -1,13 +1,12 @@
-LeanRC = require.main.require 'lib'
+
 request = require 'request'
 
-module.exports = (RequestApp) ->
-  class RequestApp::RequestProxy extends LeanRC::Proxy
+module.exports = (Module) ->
+  class RequestProxy extends Module::Proxy
     @inheritProtected()
-    @Module: RequestApp
+    @Module: Module
 
-    @public @static REQUEST_PROXY: String,
-      default: 'requestProxy'
+    @const REQUEST_PROXY: 'requestProxy'
 
     @public request: Function,
       default: (data) ->
@@ -16,6 +15,6 @@ module.exports = (RequestApp) ->
             message = "Error: #{err.message ? err}"
           else
             message = JSON.parse(body ? null)?.message ? body
-          @sendNotification RequestApp::AppConstants.RECEIVE_RESPONSE, message
+          @sendNotification Module::RECEIVE_RESPONSE, message
 
-  RequestApp::RequestProxy.initialize()
+  RequestProxy.initialize()

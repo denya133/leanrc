@@ -1,16 +1,15 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Controller extends RC::CoreObject
+
+module.exports = (Module)->
+  class Controller extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::ControllerInterface
+    @implements Module::ControllerInterface
 
-    @Module: LeanRC
+    @Module: Module
 
-    @public @static MULTITON_MSG: String,
-      default: "Controller instance for this multiton key already constructed!"
+    @const MULTITON_MSG: "Controller instance for this multiton key already constructed!"
 
-    ipoView         = @private view: LeanRC::ViewInterface
+    ipoView         = @private view: Module::ViewInterface
     iphCommandMap   = @private commandMap: Object
     ipsMultitonKey  = @protected multitonKey: String
     cphInstanceMap  = @private @static _instanceMap: Object,
@@ -18,15 +17,15 @@ module.exports = (LeanRC)->
 
     @public @static getInstance: Function,
       args: [String]
-      return: RC::Class
+      return: Module::Class
       default: (asKey)->
         unless Controller[cphInstanceMap][asKey]?
-          Controller[cphInstanceMap][asKey] = LeanRC::Controller.new asKey
+          Controller[cphInstanceMap][asKey] = Controller.new asKey
         Controller[cphInstanceMap][asKey]
 
     @public @static removeController: Function,
       args: [String]
-      return: RC::Class
+      return: Module::Class
       default: (asKey)->
         delete Controller[cphInstanceMap][asKey]
 
@@ -42,7 +41,7 @@ module.exports = (LeanRC)->
     @public registerCommand: Function,
       default: (asNotificationName, aCommand)->
         unless @[iphCommandMap][asNotificationName]
-          @[ipoView].registerObserver asNotificationName, LeanRC::Observer.new(@executeCommand, @)
+          @[ipoView].registerObserver asNotificationName, Module::Observer.new(@executeCommand, @)
           @[iphCommandMap][asNotificationName] = aCommand
         return
 
@@ -59,19 +58,19 @@ module.exports = (LeanRC)->
 
     @public initializeController: Function,
       args: []
-      return: RC::NILL
+      return: Module::NILL
       default: ->
-        @[ipoView] = LeanRC::View.getInstance @[ipsMultitonKey]
+        @[ipoView] = Module::View.getInstance @[ipsMultitonKey]
 
     @public init: Function,
       default: (asKey)->
         @super arguments...
         if Controller[cphInstanceMap][asKey]
-          throw new Error Controller.MULTITON_MSG
+          throw new Error Controller::MULTITON_MSG
         Controller[cphInstanceMap][asKey] = @
         @[ipsMultitonKey] = asKey
         @[iphCommandMap] = {}
         @initializeController()
 
 
-  return LeanRC::Controller.initialize()
+  Controller.initialize()

@@ -5,7 +5,7 @@
 ```coffee
   Test.context.use Basis::SessionsUtil.middleware
 
-  class Test::ApplicationRouter extends LeanRC::Router
+  class Test::ApplicationRouter extends Module::Router
     @inheritProtected()
     @Module: Test
     @map ->
@@ -22,16 +22,17 @@
 
 _             = require 'lodash'
 inflect       = require('i')()
-RC            = require 'RC'
-{NILL, ANY} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::Router extends LeanRC::Proxy
+
+module.exports = (Module)->
+  {NILL, ANY} = Module::
+
+  class Router extends Module::Proxy
     @inheritProtected()
-    @implements LeanRC::RouterInterface
+    @implements Module::RouterInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     ipsPath       = @protected path: String,
       default: '/'
@@ -307,4 +308,4 @@ module.exports = (LeanRC)->
                 resource: @[ipsResource] ? @[ipsName]
 
 
-  return LeanRC::Router.initialize()
+  Router.initialize()

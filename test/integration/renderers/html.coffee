@@ -1,12 +1,14 @@
-RC = require 'RC'
-LeanRC = require.main.require 'lib'
 
-module.exports = (Namespace) ->
-  class Namespace::HtmlRenderer extends LeanRC::Renderer
+
+module.exports = (Module) ->
+  class HtmlRenderer extends Module::Renderer
     @inheritProtected()
+
+    @Module: Module
+
     @public render: Function,
       default: (aoData, aoOptions) ->
-        vhData = RC::Utils.extend {}, aoData ? {}
+        vhData = Module::Utils.extend {}, aoData ? {}
         "
         <html>
           <head>
@@ -18,4 +20,5 @@ module.exports = (Namespace) ->
           </body>
         </html>
         "
-  Namespace::HtmlRenderer.initialize()
+
+  HtmlRenderer.initialize()

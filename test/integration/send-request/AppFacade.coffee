@@ -1,9 +1,9 @@
-LeanRC = require.main.require 'lib'
+# LeanRC = require.main.require 'lib'
 
-module.exports = (RequestApp) ->
-  class RequestApp::AppFacade extends LeanRC::Facade
+module.exports = (Module) ->
+  class AppFacade extends Module::Facade
     @inheritProtected()
-    @Module: RequestApp
+    @Module: Module
 
     vpbIsInitialized = @private isInitialized: Boolean,
       default: no
@@ -14,18 +14,18 @@ module.exports = (RequestApp) ->
       default: ->
         unless @[vpbIsInitialized]
           @[vpbIsInitialized] = yes
-          @registerCommand RequestApp::AppConstants.STARTUP, RequestApp::StartupCommand
-          @sendNotification RequestApp::AppConstants.STARTUP
+          @registerCommand Module::STARTUP, Module::StartupCommand
+          @sendNotification Module::STARTUP
 
     @public finish: Function,
       default: ->
-        @removeMediator  RequestApp::ConsoleComponentMediator.CONSOLE_MEDIATOR
+        @removeMediator  Module::ConsoleComponentMediator::CONSOLE_MEDIATOR
 
     @public @static getInstance: Function,
       default: (asKey)->
-        vhInstanceMap = LeanRC::Facade[cphInstanceMap]
+        vhInstanceMap = Module::Facade[cphInstanceMap]
         unless vhInstanceMap[asKey]?
-          vhInstanceMap[asKey] = RequestApp::AppFacade.new asKey
+          vhInstanceMap[asKey] = Module::AppFacade.new asKey
         vhInstanceMap[asKey]
 
-  RequestApp::AppFacade.initialize()
+  AppFacade.initialize()

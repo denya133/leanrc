@@ -3,12 +3,13 @@
 RC = require 'RC'
 
 
-class LeanRC extends RC::Module
+class LeanRC extends RC
   @inheritProtected()
 
   @const HANDLER_RESULT:  0
   @const RECORD_CHANGED:  1
   @const CONFIGURATION:  2
+  @const STARTUP: Symbol 'startup'
 
   require('./interfaces/patterns/TransformInterface') LeanRC
   require('./interfaces/patterns/NotificationInterface') LeanRC

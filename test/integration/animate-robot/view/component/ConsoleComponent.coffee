@@ -1,23 +1,23 @@
-RC = require 'RC'
+
 EventEmitter = require 'events'
 
-module.exports = (TestApp) ->
-  class TestApp::ConsoleComponent extends RC::CoreObject
+module.exports = (Module) ->
+  class ConsoleComponent extends Module::CoreObject
     @inheritProtected()
-    @Module: TestApp
+    @Module: Module
 
     @public @static ANIMATE_ROBOT_EVENT: String,
       default: 'animateRobotEvent'
 
     ipoEventEmitter = @private eventEmitter: EventEmitter,
       default: null
-    ipoInstance = @private instance: TestApp::ConsoleComponent,
+    ipoInstance = @private instance: ConsoleComponent,
       default: null
 
     @public @static getInstance: Function,
       default: ->
         unless @[ipoInstance]?
-          @[ipoInstance] = TestApp::ConsoleComponent.new()
+          @[ipoInstance] = ConsoleComponent.new()
         @[ipoInstance]
 
     @public writeMessages: Function,
@@ -26,7 +26,7 @@ module.exports = (TestApp) ->
 
     @public startAnimateRobot: Function,
       default: ->
-        @[ipoEventEmitter].emit TestApp::ConsoleComponent.ANIMATE_ROBOT_EVENT
+        @[ipoEventEmitter].emit ConsoleComponent.ANIMATE_ROBOT_EVENT
 
     @public subscribeEvent: Function,
       default: (eventName, callback) ->
@@ -43,4 +43,4 @@ module.exports = (TestApp) ->
       @[ipoEventEmitter] = new EventEmitter
 
 
-  TestApp::ConsoleComponent.initialize()
+  ConsoleComponent.initialize()

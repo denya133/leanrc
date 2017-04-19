@@ -1,13 +1,13 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::MacroCommand extends LeanRC::Notifier
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class MacroCommand extends Module::Notifier
     @inheritProtected()
-    @implements LeanRC::CommandInterface
+    @implements Module::CommandInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     iplSubCommands = @private subCommands: Array
 
@@ -28,7 +28,7 @@ module.exports = (LeanRC)->
       default: ->
 
     @public addSubCommand: Function,
-      args: [RC::Class]
+      args: [Module::Class]
       return: NILL
       default: (aClass)->
         @[iplSubCommands].push aClass
@@ -42,4 +42,4 @@ module.exports = (LeanRC)->
         @initializeMacroCommand()
 
 
-  return LeanRC::MacroCommand.initialize()
+  MacroCommand.initialize()

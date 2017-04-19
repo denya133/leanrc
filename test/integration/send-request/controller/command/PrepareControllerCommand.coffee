@@ -1,13 +1,13 @@
-LeanRC = require.main.require 'lib'
 
-module.exports = (RequestApp) ->
-  class RequestApp::PrepareControllerCommand extends LeanRC::SimpleCommand
+
+module.exports = (Module) ->
+  class PrepareControllerCommand extends Module::SimpleCommand
     @inheritProtected()
-    @Module: RequestApp
+    @Module: Module
 
     @public execute: Function,
       default: ->
-        @facade.registerCommand RequestApp::AppConstants.SEND_REQUEST,
-          RequestApp::SendRequestCommand
+        @facade.registerCommand Module::SEND_REQUEST,
+          Module::SendRequestCommand
 
-  RequestApp::PrepareControllerCommand.initialize()
+  PrepareControllerCommand.initialize()

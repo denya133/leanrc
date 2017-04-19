@@ -1,12 +1,12 @@
-LeanRC = require.main.require 'lib'
 
-module.exports = (RequestApp) ->
-  class RequestApp::PrepareModelCommand extends LeanRC::SimpleCommand
+
+module.exports = (Module) ->
+  class PrepareModelCommand extends Module::SimpleCommand
     @inheritProtected()
-    @Module: RequestApp
+    @Module: Module
 
     @public execute: Function,
       default: ->
-        @facade.registerProxy RequestApp::RequestProxy.new RequestApp::RequestProxy.REQUEST_PROXY, no
+        @facade.registerProxy Module::RequestProxy.new Module::RequestProxy::REQUEST_PROXY, no
 
-  RequestApp::PrepareModelCommand.initialize()
+  PrepareModelCommand.initialize()

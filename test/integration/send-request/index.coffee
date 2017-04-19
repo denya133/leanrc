@@ -1,10 +1,11 @@
-RC = require 'RC'
+LeanRC = require.main.require 'lib'
 
 
-class RequestApp extends RC::Module
+class RequestApp extends LeanRC
   @inheritProtected()
 
-  require('./AppConstants') RequestApp
+  @const SEND_REQUEST: Symbol 'sendRequest'
+  @const RECEIVE_RESPONSE: Symbol 'receiveResponse'
 
   require('./controller/command/StartupCommand') RequestApp
   require('./controller/command/PrepareControllerCommand') RequestApp

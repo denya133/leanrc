@@ -1,13 +1,13 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::Observer extends RC::CoreObject
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class Observer extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::ObserverInterface
+    @implements Module::ObserverInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     ipoNotify = @private notify: ANY
     ipoContext = @private context: ANY
@@ -45,4 +45,4 @@ module.exports = (LeanRC)->
 
 
 
-  return LeanRC::Observer.initialize()
+  Observer.initialize()

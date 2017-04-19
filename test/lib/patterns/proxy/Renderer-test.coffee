@@ -21,8 +21,12 @@ describe 'Renderer', ->
       expect ->
         data = firstName: 'John', lastName: 'Doe'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
+          @Module: Test
           @public render: Function,
             default: (aoData, aoOptions)->
               vhData = RC::Utils.extend {}, aoData, greeting: 'Hello'

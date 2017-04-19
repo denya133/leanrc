@@ -1,14 +1,15 @@
-RC = require 'RC'
+
 EventEmitter = require 'events'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::Switch extends LeanRC::Mediator
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class Switch extends Module::Mediator
     @inheritProtected()
-    @implements LeanRC::SwitchInterface
+    @implements Module::SwitchInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     @public responseFormats: Array,
       get: -> ['json', 'html', 'xml', 'atom']
@@ -28,7 +29,7 @@ module.exports = (LeanRC)->
       configurable: yes
       default: ->
         [
-          LeanRC::HANDLER_RESULT
+          Module::HANDLER_RESULT
         ]
 
     @public handleNotification: Function,
@@ -37,7 +38,7 @@ module.exports = (LeanRC)->
         voBody = aoNotification.getBody()
         vsType = aoNotification.getType()
         switch vsName
-          when LeanRC::HANDLER_RESULT
+          when Module::HANDLER_RESULT
             @getViewComponent().emit vsType, voBody
         return
 
@@ -58,13 +59,13 @@ module.exports = (LeanRC)->
 
     @public rendererFor: Function,
       args: [String]
-      return: LeanRC::RendererInterface
+      return: Module::RendererInterface
       default: (asFormat)->
         @[ipoRenderers] ?= {}
         @[ipoRenderers][asFormat] ?= do (asFormat)=>
           voRenderer = if @["#{asFormat}RendererName"]?
             @facade.retrieveProxy @["#{asFormat}RendererName"]
-          voRenderer ?= LeanRC::Renderer.new()
+          voRenderer ?= Module::Renderer.new()
           voRenderer
         @[ipoRenderers][asFormat]
 
@@ -103,7 +104,7 @@ module.exports = (LeanRC)->
       default: (resourceName, {req, res, reverse}, {method, path, resource, action})->
         queryParams = req.query
         pathPatams = req.params
-        configurationProxy = @facade.retrieveProxy LeanRC::CONFIGURATION
+        configurationProxy = @facade.retrieveProxy Module::CONFIGURATION
         currentUserId = req.cookies[configurationProxy.getData().currentUserCookie]
         headers = req.headers
         body = req.body
@@ -161,4 +162,4 @@ module.exports = (LeanRC)->
         throw new Error '`Switch::createNativeRoute` should be implemeted in derived class'
 
 
-  return LeanRC::Switch.initialize()
+  Switch.initialize()

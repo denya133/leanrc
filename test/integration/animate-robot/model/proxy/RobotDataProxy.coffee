@@ -1,17 +1,16 @@
-LeanRC = require.main.require 'lib'
 
-module.exports = (TestApp) ->
-  class TestApp::RobotDataProxy extends LeanRC::Proxy
+
+module.exports = (Module) ->
+  class RobotDataProxy extends Module::Proxy
     @inheritProtected()
-    @Module: TestApp
+    @Module: Module
 
-    @public @static ROBOT_PROXY: String,
-      default: 'robotProxy'
+    @const ROBOT_PROXY: 'robotProxy'
 
     @public animate: Function,
       default: ->
         @setData yes
         if @getData()
-          @sendNotification TestApp::AppConstants.ROBOT_SPEAKING, 'I am awaken. Hello World'
+          @sendNotification Module::ROBOT_SPEAKING, 'I am awaken. Hello World'
 
-  TestApp::RobotDataProxy.initialize()
+  RobotDataProxy.initialize()

@@ -2,19 +2,19 @@
 # является оберткой над обычным массивом
 
 _  = require 'lodash'
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Cursor extends RC::CoreObject
+
+module.exports = (Module)->
+  class Cursor extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::CursorInterface
+    @implements Module::CursorInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     ipnCurrentIndex = @private currentIndex: Number,
       default: 0
     iplArray = @private array: Array
-    ipcRecord = @private Record: RC::Class
+    ipcRecord = @private Record: Module::Class
 
     @public setRecord: Function,
       default: (acRecord)->
@@ -148,4 +148,4 @@ module.exports = (LeanRC)->
         @[iplArray] = alArray
 
 
-  return LeanRC::Cursor.initialize()
+  Cursor.initialize()

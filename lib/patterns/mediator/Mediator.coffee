@@ -1,14 +1,14 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Mediator extends LeanRC::Notifier
+
+module.exports = (Module)->
+  class Mediator extends Module::Notifier
     @inheritProtected()
-    @implements LeanRC::MediatorInterface
+    @implements Module::MediatorInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     ipsMediatorName = @private mediatorName: String
-    ipoViewComponent = @private viewComponent: RC::ANY
+    ipoViewComponent = @private viewComponent: Module::ANY
 
     @public getMediatorName: Function,
       default: -> @[ipsMediatorName]
@@ -41,4 +41,4 @@ module.exports = (LeanRC)->
         @[ipoViewComponent] = aoViewComponent
 
 
-  return LeanRC::Mediator.initialize()
+  Mediator.initialize()

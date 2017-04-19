@@ -36,7 +36,7 @@ describe 'Switch', ->
     it 'should define routes from route proxies', ->
       expect ->
         facade = Facade.getInstance 'TEST_SWITCH_1'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
@@ -70,7 +70,7 @@ describe 'Switch', ->
     it 'should run register procedure', ->
       expect ->
         facade = Facade.getInstance 'TEST_SWITCH_2'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
@@ -98,7 +98,7 @@ describe 'Switch', ->
     it 'should run remove procedure', ->
       expect ->
         facade = Facade.getInstance 'TEST_SWITCH_3'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
@@ -127,7 +127,7 @@ describe 'Switch', ->
     it 'should define renderers and get them one by one', ->
       expect ->
         facade = Facade.getInstance 'TEST_SWITCH_4'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
@@ -200,6 +200,7 @@ describe 'Switch', ->
         spyRendererRender = sinon.spy ->
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
+          @Module: Test
           @public render: Function,
             default: (aoData, aoOptions) ->
               spyRendererRender aoData, aoOptions
@@ -277,7 +278,7 @@ describe 'Switch', ->
     it 'should send notification', ->
       expect ->
         facade = Facade.getInstance 'TEST_SWITCH_6'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
@@ -360,10 +361,10 @@ describe 'Switch', ->
         gateway.setData endpoints:
           list: listEndpoint
         facade.registerProxy gateway
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test

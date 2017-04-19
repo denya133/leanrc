@@ -1,19 +1,18 @@
-RC            = require 'RC'
 
 
-module.exports = (LeanRC)->
-  class LeanRC::GatewayInterface extends RC::Interface
+module.exports = (Module)->
+  class GatewayInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @virtual swaggerDefinition: Function,
       args: [String, Function]
-      return: RC::NILL
+      return: Module::NILL
 
     @public @virtual swaggerDefinitionFor: Function,
       args: [String]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
 
 
-  return LeanRC::GatewayInterface.initialize()
+  GatewayInterface.initialize()

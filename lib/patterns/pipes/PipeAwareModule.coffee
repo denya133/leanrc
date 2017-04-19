@@ -1,16 +1,16 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
+
+module.exports = (Module)->
   {
     ACCEPT_INPUT_PIPE
     ACCEPT_OUTPUT_PIPE
-  } = LeanRC::JunctionMediator
+  } = Module::JunctionMediator
 
-  class LeanRC::PipeAwareModule extends RC::CoreObject
+  class PipeAwareModule extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::PipeAwareInterface
+    @implements Module::PipeAwareInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @static STDOUT: String,
       default: 'standardOutput'
@@ -21,7 +21,7 @@ module.exports = (LeanRC)->
     @public @static STDSHELL: String,
       default: 'standardShell'
 
-    @public facade: LeanRC::FacadeInterface
+    @public facade: Module::FacadeInterface
 
     @public acceptInputPipe: Function,
       default: (asName, aoPipe)->
@@ -38,4 +38,4 @@ module.exports = (LeanRC)->
       @facade = aoFacade
 
 
-  return LeanRC::PipeAwareModule.initialize()
+  PipeAwareModule.initialize()

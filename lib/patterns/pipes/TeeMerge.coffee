@@ -1,13 +1,13 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::TeeMerge extends LeanRC::Pipe
+
+module.exports = (Module)->
+  class TeeMerge extends Module::Pipe
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     @public connectInput: Function,
-      args: [LeanRC::PipeFittingInterface]
+      args: [Module::PipeFittingInterface]
       return: Boolean
       default: (aoInput)->
         aoInput.connect @
@@ -20,4 +20,4 @@ module.exports = (LeanRC)->
         @connectInput input2
 
 
-  return LeanRC::TeeMerge.initialize()
+  TeeMerge.initialize()

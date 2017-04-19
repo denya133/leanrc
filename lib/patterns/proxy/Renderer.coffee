@@ -1,12 +1,11 @@
-RC            = require 'RC'
 
 
-module.exports = (LeanRC)->
-  class LeanRC::Renderer extends LeanRC::Proxy
+module.exports = (Module)->
+  class Renderer extends Module::Proxy
     @inheritProtected()
-    @implements LeanRC::RendererInterface
+    @implements Module::RendererInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     # may be redefine at inheritance
     @public render: Function,
@@ -14,4 +13,4 @@ module.exports = (LeanRC)->
         JSON.stringify aoData
 
 
-  return LeanRC::Renderer.initialize()
+  Renderer.initialize()

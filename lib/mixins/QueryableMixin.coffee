@@ -1,21 +1,18 @@
-
-
 _ = require 'lodash'
-RC = require 'RC'
 
-# миксин подмешивается к классам унаследованным от LeanRC::Collection
-# если необходимо реализовать работу методов с использованием абстрактного платформонезависимого класса LeanRC::Query
+# миксин подмешивается к классам унаследованным от Module::Collection
+# если необходимо реализовать работу методов с использованием абстрактного платформонезависимого класса Module::Query
 # т.о. миксин с реальным платформозависимым кодом для подмешивания в наследников
-# LeanRC::Collection должен содержать только реализации 2-х методов:
+# Module::Collection должен содержать только реализации 2-х методов:
 # `parseQuery` и `executeQuery`
 
 
-module.exports = (LeanRC)->
-  class LeanRC::QueryableMixin extends RC::Mixin
+module.exports = (Module)->
+  class QueryableMixin extends Module::Mixin
     @inheritProtected()
-    @implements LeanRC::QueryableMixinInterface
+    @implements Module::QueryableMixinInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @async findBy: Function,
       default: (query)->
@@ -35,7 +32,7 @@ module.exports = (LeanRC)->
 
     @public @async @async removeBy: Function,
       default: (query)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .filter query
           .remove()
@@ -44,7 +41,7 @@ module.exports = (LeanRC)->
 
     @public @async takeBy: Function,
       default: (query)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .filter query
           .return '@doc'
@@ -59,7 +56,7 @@ module.exports = (LeanRC)->
 
     @public @async overrideBy: Function,
       default: (query, aoRecord)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .filter query
           .replace aoRecord
@@ -74,7 +71,7 @@ module.exports = (LeanRC)->
 
     @public @async patchBy: Function,
       default: (query, aoRecord)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .filter query
           .update aoRecord
@@ -82,7 +79,7 @@ module.exports = (LeanRC)->
 
     @public @async exists: Function,
       default: (query)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .filter query
           .limit 1
@@ -92,12 +89,12 @@ module.exports = (LeanRC)->
 
     @public @async query: Function,
       default: (aoQuery)->
-        if aoQuery.constructor is LeanRC::Query
+        if aoQuery.constructor is Module::Query
           voQuery = aoQuery
         else
           aoQuery = _.pick aoQuery, Object.keys(aoQuery).filter (key)-> aoQuery[key]?
-          voQuery = LeanRC::Query.new aoQuery
+          voQuery = Module::Query.new aoQuery
         yield @executeQuery @parseQuery voQuery
 
 
-  return LeanRC::QueryableMixin.initialize()
+  QueryableMixin.initialize()

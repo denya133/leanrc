@@ -1,12 +1,12 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::RelationsMixinInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class RelationsMixinInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @static @virtual relations: Function,
       args: []
@@ -25,4 +25,4 @@ module.exports = (LeanRC)->
       return: Object
 
 
-  return LeanRC::RelationsMixinInterface.initialize()
+  RelationsMixinInterface.initialize()

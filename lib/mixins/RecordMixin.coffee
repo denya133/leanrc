@@ -2,17 +2,15 @@ _ = require 'lodash'
 joi = require 'joi'
 inflect = do require 'i'
 
-RC = require 'RC'
 
-
-module.exports = (LeanRC)->
-  class LeanRC::RecordMixin extends RC::Mixin
+module.exports = (Module)->
+  class RecordMixin extends Module::Mixin
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     # конструктор принимает второй аргумент, ссылку на коллекцию.
-    @public collection: LeanRC::CollectionInterface
+    @public collection: Module::CollectionInterface
 
     ipoInternalRecord = @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
 
@@ -77,9 +75,9 @@ module.exports = (LeanRC)->
         vcAttrType = typeDefinition[vsAttr]
         opts.transform ?= switch vcAttrType
           when String, Date, Number, Boolean
-            -> LeanRC::["#{vcAttrType.name}Transform"]
+            -> Module::["#{vcAttrType.name}Transform"]
           else
-            -> LeanRC::Transform
+            -> Module::Transform
         opts.validate ?= switch vcAttrType
           when String, Date, Number, Boolean
             -> joi[inflect.underscore vcAttrType.name]()
@@ -228,7 +226,7 @@ module.exports = (LeanRC)->
 
     @public @async @virtual reload: Function,
       args: []
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
 
     # TODO: не учтены установки значений, которые раньше не были установлены
     @public changedAttributes: Function,
@@ -293,4 +291,4 @@ module.exports = (LeanRC)->
         # console.log 'dfdfdf 666'
 
 
-  return LeanRC::RecordMixin.initialize()
+  RecordMixin.initialize()

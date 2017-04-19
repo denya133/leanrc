@@ -1,12 +1,12 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::CollectionInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class CollectionInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @virtual recordHasBeenChanged: Function,
       args: [String, Object]
@@ -15,8 +15,8 @@ module.exports = (LeanRC)->
     # в классе Proxy от которого будет наследоваться конкретный класс Collection есть метод onRegister в котором можно прописать подключение (или регистрацию) классов Рекорда и Сериализатора
 
     # надо определиться с этими двумя пунктами, так ли их объявлять?
-    @public @virtual delegate: RC::Class
-    @public @virtual serializer: RC::Class
+    @public @virtual delegate: Module::Class
+    @public @virtual serializer: Module::Class
     @public @virtual collectionName: Function,
       args: []
       return: String
@@ -39,17 +39,17 @@ module.exports = (LeanRC)->
 
     @public @virtual build: Function, # создает инстанс рекорда
       args: [Object]
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual create: Function, # создает инстанс рекорда и делает save
       args: [Object]
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual push: Function, # обращается к БД
-      args: [LeanRC::RecordInterface]
+      args: [Module::RecordInterface]
       return: Boolean
 
     @public @async @virtual delete: Function,
       args: [String]
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
 
     @public @async @virtual destroy: Function,
       args: [String]
@@ -60,41 +60,41 @@ module.exports = (LeanRC)->
 
     @public @async @virtual find: Function,
       args: [String]
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual findMany: Function,
       args: [Array]
-      return: LeanRC::CursorInterface
+      return: Module::CursorInterface
     @public @async @virtual take: Function, # обращается к БД
       args: [String]
-      return: LeanRC::CursorInterface
+      return: Module::CursorInterface
     @public @async @virtual takeMany: Function, # обращается к БД
       args: [Array]
-      return: LeanRC::CursorInterface
+      return: Module::CursorInterface
     @public @async @virtual takeAll: Function, # обращается к БД
       args: []
-      return: LeanRC::CursorInterface
+      return: Module::CursorInterface
 
     @public @async @virtual replace: Function,
       args: [String, Object]
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual override: Function, # обращается к БД
-      args: [String, LeanRC::RecordInterface]
+      args: [String, Module::RecordInterface]
       return: Boolean
 
     @public @async @virtual update: Function,
       args: [String, Object]
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual patch: Function, # обращается к БД
-      args: [String, LeanRC::RecordInterface]
+      args: [String, Module::RecordInterface]
       return: Boolean
 
     @public @virtual clone: Function,
-      args: [LeanRC::RecordInterface]
-      return: LeanRC::RecordInterface
+      args: [Module::RecordInterface]
+      return: Module::RecordInterface
 
     @public @async @virtual copy: Function,
-      args: [LeanRC::RecordInterface]
-      return: LeanRC::RecordInterface
+      args: [Module::RecordInterface]
+      return: Module::RecordInterface
 
     @public @async @virtual includes: Function,
       args: [String]
@@ -105,10 +105,10 @@ module.exports = (LeanRC)->
 
     @public @virtual normalize: Function,
       args: [ANY] # payload
-      return: LeanRC::RecordInterface # нормализация данных из базы
+      return: Module::RecordInterface # нормализация данных из базы
     @public @virtual serialize: Function,
-      args: [LeanRC::RecordInterface] # id, options
+      args: [Module::RecordInterface] # id, options
       return: ANY # сериализация рекорда для отправки в базу
 
 
-  return LeanRC::CollectionInterface.initialize()
+  CollectionInterface.initialize()

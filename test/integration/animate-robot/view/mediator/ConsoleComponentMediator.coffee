@@ -1,40 +1,39 @@
-LeanRC = require.main.require 'lib'
+
 
 handleAnimateRobot = null
 
-module.exports = (TestApp) ->
-  class TestApp::ConsoleComponentMediator extends LeanRC::Mediator
+module.exports = (Module) ->
+  class ConsoleComponentMediator extends Module::Mediator
     @inheritProtected()
-    @Module: TestApp
+    @Module: Module
 
-    @public @static CONSOLE_MEDIATOR: String,
-      default: 'consoleMediator'
+    @const CONSOLE_MEDIATOR: 'consoleMediator'
 
     @public listNotificationInterests: Function,
       default: -> [
-        TestApp::AppConstants.ROBOT_SPEAKING
+        Module::ROBOT_SPEAKING
       ]
 
     @public handleNotification: Function,
       default: (notification)->
         switch notification.getName()
-          when TestApp::AppConstants.ROBOT_SPEAKING
+          when Module::ROBOT_SPEAKING
             @getViewComponent()?.writeMessages notification.getBody()
 
     @public onRegister: Function,
       default: ->
-        @setViewComponent TestApp::ConsoleComponent.getInstance()
+        @setViewComponent Module::ConsoleComponent.getInstance()
         handleAnimateRobot = => @handleAnimateRobot()
-        @getViewComponent()?.subscribeEvent TestApp::ConsoleComponent.ANIMATE_ROBOT_EVENT, handleAnimateRobot
+        @getViewComponent()?.subscribeEvent Module::ConsoleComponent.ANIMATE_ROBOT_EVENT, handleAnimateRobot
 
     @public onRemove: Function,
       default: ->
-        @getViewComponent()?.unsubscribeEvent TestApp::ConsoleComponent.ANIMATE_ROBOT_EVENT, handleAnimateRobot
+        @getViewComponent()?.unsubscribeEvent Module::ConsoleComponent.ANIMATE_ROBOT_EVENT, handleAnimateRobot
         @setViewComponent null
 
     @public handleAnimateRobot: Function,
       default: ->
-        @sendNotification TestApp::AppConstants.ANIMATE_ROBOT
+        @sendNotification Module::ANIMATE_ROBOT
 
 
-  TestApp::ConsoleComponentMediator.initialize()
+  ConsoleComponentMediator.initialize()

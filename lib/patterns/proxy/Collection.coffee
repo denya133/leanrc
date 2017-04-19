@@ -1,18 +1,17 @@
 inflect = do require 'i'
 _ = require 'lodash'
-RC = require 'RC'
 
 
 ###
 ```coffee
 # in application when its need
 
-LeanRC = require 'LeanRC'
+Module = require 'Module'
 ArangoExtension = require 'leanrc-arango-extension'
 
 # example of concrete application collection for instantuate it in PrepareModelCommand
 module.exports = (App)->
-  class App::ArangoCollection extends LeanRC::Collection
+  class App::ArangoCollection extends Module::Collection
     @include ArangoExtension::ArangoCollectionMixin
     #... some other definitions
 
@@ -21,7 +20,7 @@ module.exports = (App)->
 
 ```coffee
 module.exports = (App)->
-  App::PrepareModelCommand extends LeanRC::SimpleCommand
+  App::PrepareModelCommand extends Module::SimpleCommand
     @public execute: Function,
       default: ->
         #...
@@ -32,16 +31,16 @@ module.exports = (App)->
 ###
 
 
-module.exports = (LeanRC)->
-  class LeanRC::Collection extends LeanRC::Proxy
+module.exports = (Module)->
+  class Collection extends Module::Proxy
     @inheritProtected()
-    @implements LeanRC::CollectionInterface
+    @implements Module::CollectionInterface
 
-    @Module: LeanRC
+    @Module: Module
 
-    @public delegate: RC::Class # устанавливается при инстанцировании прокси
-    @public serializer: RC::Class,
-      default: LeanRC::Serializer
+    @public delegate: Module::Class # устанавливается при инстанцировании прокси
+    @public serializer: Module::Class,
+      default: Module::Serializer
 
     @public collectionName: Function,
       default: ->
@@ -59,7 +58,7 @@ module.exports = (LeanRC)->
 
     @public recordHasBeenChanged: Function,
       default: (aoType, aoData)->
-        @sendNotification LeanRC::RECORD_CHANGED, aoData, aoType
+        @sendNotification Module::RECORD_CHANGED, aoData, aoType
 
     @public customFilters: Object, # возвращает установленные кастомные фильтры с учетом наследования
       default: {}
@@ -68,7 +67,7 @@ module.exports = (LeanRC)->
         fromSuper = if AbstractClass.__super__?
           AbstractClass.__super__.constructor.customFilters
         __customFilters[AbstractClass.name] ?= do ->
-          RC::Utils.extend {}
+          Module::Utils.extend {}
           , (fromSuper ? {})
           , (AbstractClass["_#{AbstractClass.name}_customFilters"] ? {})
         __customFilters[AbstractClass.name]
@@ -154,4 +153,4 @@ module.exports = (LeanRC)->
         @serializer.serialize aoRecord, ahOptions
 
 
-  return LeanRC::Collection.initialize()
+  Collection.initialize()

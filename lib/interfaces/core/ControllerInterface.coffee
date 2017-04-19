@@ -1,17 +1,17 @@
-RC = require 'RC'
-{NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::ControllerInterface extends RC::Interface
+module.exports = (Module)->
+  {NILL} = Module::
+
+  class ControllerInterface extends Module::Interface
     @inheritProtected()
-    @Module: LeanRC
+    @Module: Module
 
     @public @virtual executeCommand: Function,
-      args: [LeanRC::NotificationInterface]
+      args: [Module::NotificationInterface]
       return: NILL
     @public @virtual registerCommand: Function,
-      args: [String, RC::Class]
+      args: [String, Module::Class]
       return: NILL
     @public @virtual hasCommand: Function,
       args: [String]
@@ -21,4 +21,4 @@ module.exports = (LeanRC)->
       return: NILL
 
 
-  return LeanRC::ControllerInterface.initialize()
+  ControllerInterface.initialize()

@@ -1,10 +1,10 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Junction extends RC::CoreObject
+
+module.exports = (Module)->
+  class Junction extends Module::CoreObject
     @inheritProtected()
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @static INPUT: String,
       default: 'input'
@@ -18,7 +18,7 @@ module.exports = (LeanRC)->
 
 
     @public registerPipe: Function,
-      args: [String, String, LeanRC::PipeFittingInterface]
+      args: [String, String, Module::PipeFittingInterface]
       return: Boolean
       default: (name, type, pipe)->
         vbSuccess = yes
@@ -26,9 +26,9 @@ module.exports = (LeanRC)->
           @[iplPipesMap][name] = pipe
           @[iplPipeTypesMap][name] = type
           switch type
-            when LeanRC::Junction.INPUT
+            when Module::Junction.INPUT
               @[iplInputPipes].push name
-            when LeanRC::Junction.OUTPUT
+            when Module::Junction.OUTPUT
               @[iplOutputPipes].push name
             else
               vbSuccess = no
@@ -46,24 +46,24 @@ module.exports = (LeanRC)->
       args: [String]
       return: Boolean
       default: (name)->
-        @hasPipe(name) and @[iplPipeTypesMap][name] is LeanRC::Junction.INPUT
+        @hasPipe(name) and @[iplPipeTypesMap][name] is Module::Junction.INPUT
 
     @public hasOutputPipe: Function,
       args: [String]
       return: Boolean
       default: (name)->
-        @hasPipe(name) and @[iplPipeTypesMap][name] is LeanRC::Junction.OUTPUT
+        @hasPipe(name) and @[iplPipeTypesMap][name] is Module::Junction.OUTPUT
 
     @public removePipe: Function,
       args: [String]
-      return: RC::NILL
+      return: Module::NILL
       default: (name)->
         if @hasPipe name
           type = @[iplPipeTypesMap][name]
           pipesList = switch type
-            when LeanRC::Junction.INPUT
+            when Module::Junction.INPUT
               @[iplInputPipes]
-            when LeanRC::Junction.OUTPUT
+            when Module::Junction.OUTPUT
               @[iplOutputPipes]
             else
               []
@@ -77,7 +77,7 @@ module.exports = (LeanRC)->
 
     @public retrievePipe: Function,
       args: [String]
-      return: LeanRC::PipeFittingInterface
+      return: Module::PipeFittingInterface
       default: (name)->
         @[iplPipesMap][name]
 
@@ -88,11 +88,11 @@ module.exports = (LeanRC)->
         vbSuccess = no
         if @hasInputPipe inputPipeName
           pipe = @[iplPipesMap][inputPipeName]
-          vbSuccess = pipe.connect LeanRC::PipeListener.new context, listener
+          vbSuccess = pipe.connect Module::PipeListener.new context, listener
         vbSuccess
 
     @public sendMessage: Function,
-      args: [String, LeanRC::PipeMessageInterface]
+      args: [String, Module::PipeMessageInterface]
       return: Boolean
       default: (outputPipeName, message)->
         vbSuccess = no
@@ -109,4 +109,4 @@ module.exports = (LeanRC)->
       @[iplPipeTypesMap] = {}
 
 
-  return LeanRC::Junction.initialize()
+  Junction.initialize()

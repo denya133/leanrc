@@ -1,14 +1,13 @@
-RC            = require 'RC'
 
 
-module.exports = (LeanRC)->
-  class LeanRC::Endpoint extends RC::CoreObject
+module.exports = (Module)->
+  class Endpoint extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::EndpointInterface
+    @implements Module::EndpointInterface
 
-    @Module: LeanRC
+    @Module: Module
 
-    @public gateway: LeanRC::GatewayInterface
+    @public gateway: Module::GatewayInterface
 
     @public tags: Array
     @public headers: Array
@@ -83,4 +82,4 @@ module.exports = (LeanRC)->
         @super arguments...
 
 
-  return LeanRC::Endpoint.initialize()
+  Endpoint.initialize()

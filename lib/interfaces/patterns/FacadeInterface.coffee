@@ -1,16 +1,16 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::FacadeInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class FacadeInterface extends Module::Interface
     @inheritProtected()
-    @include LeanRC::NotifierInterface
+    @include Module::NotifierInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @virtual registerCommand: Function,
-      args: [String, RC::Class]
+      args: [String, Module::Class]
       return: NILL
     @public @virtual removeCommand: Function,
       args: [String]
@@ -20,34 +20,34 @@ module.exports = (LeanRC)->
       return: Boolean
 
     @public @virtual registerProxy: Function,
-      args: [LeanRC::ProxyInterface]
+      args: [Module::ProxyInterface]
       return: NILL
     @public @virtual retrieveProxy: Function,
       args: [String]
-      return: LeanRC::ProxyInterface
+      return: Module::ProxyInterface
     @public @virtual removeProxy: Function,
       args: [String]
-      return: LeanRC::ProxyInterface
+      return: Module::ProxyInterface
     @public @virtual hasProxy: Function,
       args: [String]
       return: Boolean
 
     @public @virtual registerMediator: Function,
-      args: [LeanRC::MediatorInterface]
+      args: [Module::MediatorInterface]
       return: NILL
     @public @virtual retrieveMediator: Function,
       args: [String]
-      return: LeanRC::MediatorInterface
+      return: Module::MediatorInterface
     @public @virtual removeMediator: Function,
       args: [String]
-      return: LeanRC::MediatorInterface
+      return: Module::MediatorInterface
     @public @virtual hasMediator: Function,
       args: [String]
       return: Boolean
 
     @public @virtual notifyObservers: Function,
-      args: [LeanRC::NotificationInterface]
+      args: [Module::NotificationInterface]
       return: NILL
 
 
-  return LeanRC::FacadeInterface.initialize()
+  FacadeInterface.initialize()

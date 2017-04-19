@@ -1,16 +1,15 @@
-RC            = require 'RC'
 
 
-module.exports = (LeanRC)->
-  class LeanRC::RendererInterface extends RC::Interface
+module.exports = (Module)->
+  class RendererInterface extends Module::Interface
     @inheritProtected()
-    @include LeanRC::ProxyInterface
+    @include Module::ProxyInterface
 
-    @Module: LeanRC
+    @Module: Module
 
     @public @virtual render: Function,
       args: [Object, Object]
-      return: RC::ANY
+      return: Module::ANY
 
 
-  return LeanRC::RendererInterface.initialize()
+  RendererInterface.initialize()
