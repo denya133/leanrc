@@ -41,12 +41,13 @@ module.exports = (LeanRC)->
             vbSuccess = no
         vbSuccess
 
-    constructor: (output1=null, output2=null)->
-      super arguments...
-      if output1?
-        @connect output1
-      if output2?
-        @connect output2
+    @public init: Function,
+      default: (output1=null, output2=null)->
+        @super arguments...
+        if output1?
+          @connect output1
+        if output2?
+          @connect output2
 
 
   return LeanRC::TeeSplit.initialize()

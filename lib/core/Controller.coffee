@@ -10,8 +10,8 @@ module.exports = (LeanRC)->
     @public @static MULTITON_MSG: String,
       default: "Controller instance for this multiton key already constructed!"
 
-    ipoView         = @private _view: LeanRC::ViewInterface
-    iphCommandMap   = @private _commandMap: Object
+    ipoView         = @private view: LeanRC::ViewInterface
+    iphCommandMap   = @private commandMap: Object
     ipsMultitonKey  = @protected multitonKey: String
     cphInstanceMap  = @private @static _instanceMap: Object,
       default: {}
@@ -63,14 +63,15 @@ module.exports = (LeanRC)->
       default: ->
         @[ipoView] = LeanRC::View.getInstance @[ipsMultitonKey]
 
-    constructor: (asKey)->
-      super arguments...
-      if Controller[cphInstanceMap][asKey]
-        throw new Error Controller.MULTITON_MSG
-      Controller[cphInstanceMap][asKey] = @
-      @[ipsMultitonKey] = asKey
-      @[iphCommandMap] = {}
-      @initializeController()
+    @public init: Function,
+      default: (asKey)->
+        @super arguments...
+        if Controller[cphInstanceMap][asKey]
+          throw new Error Controller.MULTITON_MSG
+        Controller[cphInstanceMap][asKey] = @
+        @[ipsMultitonKey] = asKey
+        @[iphCommandMap] = {}
+        @initializeController()
 
 
   return LeanRC::Controller.initialize()

@@ -7,14 +7,6 @@ RecordMixin = LeanRC::RecordMixin
 { co } = RC::Utils
 
 describe 'RecordMixin', ->
-  describe 'before', ->
-    it 'test', ->
-      console.log 'LeanRC::Collection 1234567890', LeanRC::Collection.name
-      console.log 'super 1', LeanRC::Collection.superclass()?.name
-      console.log 'super 2', LeanRC::Collection.superclass()?.superclass()?.name
-      console.log 'super 3', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 4', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 5', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
   describe '.new', ->
     it 'should create item with record mixin', ->
       expect ->
@@ -126,14 +118,6 @@ describe 'RecordMixin', ->
         assert.isTrue 'boolean' of Test::TestRecord.computeds, 'Computed property `boolean` did not defined'
         assert.isTrue 'date' of Test::TestRecord.computeds, 'Computed property `date` did not defined'
       .to.not.throw Error
-  describe 'middle', ->
-    it 'test', ->
-      console.log 'LeanRC::Collection MIDDLE', LeanRC::Collection.name
-      console.log 'super 1', LeanRC::Collection.superclass()?.name
-      console.log 'super 2', LeanRC::Collection.superclass()?.superclass()?.name
-      console.log 'super 3', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 4', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 5', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
   describe '#create, #isNew', ->
     it 'should create new record', ->
       co ->
@@ -142,7 +126,6 @@ describe 'RecordMixin', ->
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @Module: Test
-          console.log '$$$$$$$kkkkk111', LeanRC::CollectionInterface.superclass()
           @include LeanRC::CollectionInterface
           ipsKey = @protected key: String
           ipsName = @protected name: String
@@ -176,16 +159,7 @@ describe 'RecordMixin', ->
         assert.isFalse yield record.isNew(), 'Record is still new'
         try yield record.create() catch err
         assert.instanceOf err, Error, 'Record not created'
-        console.log '$$$$$$$kkkkk', LeanRC::CollectionInterface.superclass()
         yield return
-  describe 'middle2', ->
-    it 'test', ->
-      console.log 'LeanRC::Collection MIDDLE2', LeanRC::Collection.name
-      console.log 'super 1', LeanRC::Collection.superclass()?.name
-      console.log 'super 2', LeanRC::Collection.superclass()?.superclass()?.name
-      console.log 'super 3', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 4', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
-      console.log 'super 5', LeanRC::Collection.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.superclass()?.name
   describe '#destroy', ->
     it 'should remove record', ->
       co ->

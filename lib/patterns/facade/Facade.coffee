@@ -10,9 +10,9 @@ module.exports = (LeanRC)->
     @public @static MULTITON_MSG: String,
       default: "Facade instance for this multiton key already constructed!"
 
-    ipoModel        = @private _model: LeanRC::ModelInterface
-    ipoView         = @private _view: LeanRC::ViewInterface
-    ipoController   = @private _controller: LeanRC::ControllerInterface
+    ipoModel        = @private model: LeanRC::ModelInterface
+    ipoView         = @private view: LeanRC::ViewInterface
+    ipoController   = @private controller: LeanRC::ControllerInterface
     ipsMultitonKey  = @protected multitonKey: String
     cphInstanceMap  = @protected @static instanceMap: Object,
       default: {}
@@ -115,13 +115,14 @@ module.exports = (LeanRC)->
         @[ipsMultitonKey] = asKey
         return
 
-    constructor: (asKey)->
-      super arguments...
-      if Facade[cphInstanceMap][asKey]?
-        throw new Error Facade.MULTITON_MSG
-      @initializeNotifier asKey
-      Facade[cphInstanceMap][asKey] = @
-      @[ipmInitializeFacade]()
+    @public init: Function,
+      default: (asKey)->
+        @super arguments...
+        if Facade[cphInstanceMap][asKey]?
+          throw new Error Facade.MULTITON_MSG
+        @initializeNotifier asKey
+        Facade[cphInstanceMap][asKey] = @
+        @[ipmInitializeFacade]()
 
 
   return LeanRC::Facade.initialize()

@@ -10,7 +10,7 @@ module.exports = (LeanRC)->
     @public @static MULTITON_MSG: String,
       default: "Model instance for this multiton key already constructed!"
 
-    iphProxyMap     = @private _proxyMap: Object
+    iphProxyMap     = @private proxyMap: Object
     ipsMultitonKey  = @protected multitonKey: String
     cphInstanceMap  = @private @static _instanceMap: Object,
       default: {}
@@ -29,7 +29,6 @@ module.exports = (LeanRC)->
     @public registerProxy: Function,
       default: (aoProxy)->
         aoProxy.initializeNotifier @[ipsMultitonKey]
-        console.log 'PROXY REGISTER NAME:', aoProxy.getProxyName()
         @[iphProxyMap][aoProxy.getProxyName()] = aoProxy
         aoProxy.onRegister()
         return
@@ -44,8 +43,6 @@ module.exports = (LeanRC)->
 
     @public retrieveProxy: Function,
       default: (asProxyName)->
-        console.log 'PROXY NAME:', asProxyName
-        console.log 'PROXIES:', @[iphProxyMap]
         @[iphProxyMap][asProxyName] ? null
 
     @public hasProxy: Function,
@@ -57,16 +54,17 @@ module.exports = (LeanRC)->
       return: RC::Constants.NILL
       default: ->
 
-    constructor: (asKey)->
-      super arguments...
-      if Model[cphInstanceMap][asKey]
-        throw new Error Model.MULTITON_MSG
-      Model[cphInstanceMap][asKey] = @
-      @[ipsMultitonKey] = asKey
-      @[iphProxyMap] = {}
+    @public init: Function,
+      default: (asKey)->
+        @super arguments...
+        if Model[cphInstanceMap][asKey]
+          throw new Error Model.MULTITON_MSG
+        Model[cphInstanceMap][asKey] = @
+        @[ipsMultitonKey] = asKey
+        @[iphProxyMap] = {}
 
-      @initializeModel()
-      return
+        @initializeModel()
+        return
 
 
   return LeanRC::Model.initialize()

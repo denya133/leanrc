@@ -90,7 +90,7 @@ module.exports = (LeanRC)->
 
     @public build: Function,
       default: (properties)->
-        @delegate.new properties
+        @delegate.new properties, @
 
     @public @async create: Function,
       default: (properties)->
@@ -119,20 +119,24 @@ module.exports = (LeanRC)->
 
     @public @async replace: Function,
       default: (id, properties)->
-        voRecord = @find id
+        voRecord = yield @find id
         yield voRecord.updateAttributes properties # ????????????
         return voRecord
 
     @public @async update: Function,
       default: (id, properties)->
-        voRecord = @find id
+        voRecord = yield @find id
         yield voRecord.updateAttributes properties
         return voRecord
 
     @public clone: Function,
       default: (aoRecord)->
-        voRecord = @delegate.new aoRecord
-        voRecord.id = @generateId()
+        vhAttributes = {}
+        vlAttributes = Object.keys @delegate.attributes
+        for key in vlAttributes
+          vhAttributes[key] = aoRecord[key]
+        voRecord = @delegate.new vhAttributes, @
+        voRecord._key = @generateId()
         return voRecord
 
     @public @async copy: Function,
@@ -148,14 +152,6 @@ module.exports = (LeanRC)->
     @public serialize: Function,
       default: (aoRecord, ahOptions)->
         @serializer.serialize aoRecord, ahOptions
-
-    # constructor: (args...) ->
-    #   super args...
-    #   # console.log '22222222222222222222', @constructor.superclass()
-    #   # console.log '33333333333333333333', @constructor.__super__
-    #   # console.log '44444444444444444444', @class()
-    #   # console.log '55555555555555555555', @constructor.superclass().superclass()
-    #   # console.log '66666666666666666666', @constructor.superclass().superclass().superclass()
 
 
   return LeanRC::Collection.initialize()

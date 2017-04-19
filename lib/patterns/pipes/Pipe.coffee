@@ -27,10 +27,11 @@ module.exports = (LeanRC)->
       default: (aoMessage)->
         return @[ipoOutput].write aoMessage
 
-    constructor: (aoOutput)->
-      super arguments...
-      if aoOutput?
-        @connect aoOutput
+    @public init: Function,
+      default: (aoOutput)->
+        @super arguments...
+        if aoOutput?
+          @connect aoOutput
 
 
   return LeanRC::Pipe.initialize()

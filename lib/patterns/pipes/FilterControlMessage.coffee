@@ -42,11 +42,12 @@ module.exports = (LeanRC)->
     @public getParams: Function,
       default: -> @[ipoParams]
 
-    constructor: (asType, asName, amFilter=null, aoParams=null)->
-      super asType
-      @setName asName
-      @setFilter amFilter
-      @setParams aoParams
+    @public init: Function,
+      default: (asType, asName, amFilter=null, aoParams=null)->
+        @super asType
+        @setName asName
+        @setFilter amFilter
+        @setParams aoParams
 
 
   return LeanRC::FilterControlMessage.initialize()

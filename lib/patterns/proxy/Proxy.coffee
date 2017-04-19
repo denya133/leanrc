@@ -7,8 +7,8 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    ipsProxyName = @private _proxyName: String
-    ipoData = @private _data: RC::Constants.ANY
+    ipsProxyName = @private proxyName: String
+    ipoData = @private data: RC::Constants.ANY
 
     @public getProxyName: Function,
       default: -> @[ipsProxyName]
@@ -27,14 +27,14 @@ module.exports = (LeanRC)->
     @public onRemove: Function,
       default: -> return
 
-    constructor: (asProxyName, ahData)->
-      super arguments...
+    @public init: Function,
+      default: (asProxyName, ahData)->
+        @super arguments...
 
-      console.log 'CREATE PROXY NAME: ', asProxyName
-      @[ipsProxyName] = asProxyName ? @constructor.name
+        @[ipsProxyName] = asProxyName ? @constructor.name
 
-      if ahData?
-        @setData ahData
+        if ahData?
+          @setData ahData
 
 
   return LeanRC::Proxy.initialize()

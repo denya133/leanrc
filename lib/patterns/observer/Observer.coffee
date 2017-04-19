@@ -7,8 +7,8 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    ipoNotify = @private _notify: RC::Constants.ANY
-    ipoContext = @private _context: RC::Constants.ANY
+    ipoNotify = @private notify: RC::Constants.ANY
+    ipoContext = @private context: RC::Constants.ANY
 
     @public setNotifyMethod: Function,
       default: (amNotifyMethod)->
@@ -35,10 +35,11 @@ module.exports = (LeanRC)->
         @getNotifyMethod().call @getNotifyContext(), notification
         return
 
-    constructor: (amNotifyMethod, aoNotifyContext)->
-      super arguments...
-      @setNotifyMethod amNotifyMethod
-      @setNotifyContext aoNotifyContext
+    @public init: Function,
+      default: (amNotifyMethod, aoNotifyContext)->
+        @super arguments...
+        @setNotifyMethod amNotifyMethod
+        @setNotifyContext aoNotifyContext
 
 
 

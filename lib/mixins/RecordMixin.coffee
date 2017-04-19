@@ -14,7 +14,7 @@ module.exports = (LeanRC)->
     # конструктор принимает второй аргумент, ссылку на коллекцию.
     @public collection: LeanRC::CollectionInterface
 
-    ipoInternalRecord = @private _internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
+    ipoInternalRecord = @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
 
     @public @static schema: Object,
       default: {}
@@ -279,17 +279,18 @@ module.exports = (LeanRC)->
         vhResult
 
 
-    constructor: (aoProperties, aoCollection) ->
-      super arguments...
-      # console.log 'Init of Record', @constructor.name, aoProperties
-      @collection = aoCollection
+    @public init: Function,
+      default: (aoProperties, aoCollection) ->
+        @super arguments...
+        # console.log 'Init of Record', @constructor.name, aoProperties
+        @collection = aoCollection
 
-      # TODO: надо не забыть про internalRecord
-      for own vsAttrName, voAttrValue of aoProperties
-        do (vsAttrName, voAttrValue)=>
-          @[vsAttrName] = voAttrValue
+        # TODO: надо не забыть про internalRecord
+        for own vsAttrName, voAttrValue of aoProperties
+          do (vsAttrName, voAttrValue)=>
+            @[vsAttrName] = voAttrValue
 
-      # console.log 'dfdfdf 666'
+        # console.log 'dfdfdf 666'
 
 
   return LeanRC::RecordMixin.initialize()

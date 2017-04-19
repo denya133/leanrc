@@ -51,7 +51,7 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    ipoEndpoints = @private _endpoints: Object
+    ipoEndpoints = @private endpoints: Object
 
     @public swaggerDefinition: Function,
       args: [String, Function]

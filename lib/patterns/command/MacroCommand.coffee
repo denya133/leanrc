@@ -7,7 +7,7 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    iplSubCommands = @private _subCommands: Array
+    iplSubCommands = @private subCommands: Array
 
     @public execute: Function,
       default: (aoNotification)->
@@ -32,11 +32,12 @@ module.exports = (LeanRC)->
         @[iplSubCommands].push aClass
         return
 
-    constructor: ->
-      super arguments...
+    @public init: Function,
+      default: ->
+        @super arguments...
 
-      @[iplSubCommands] = []
-      @initializeMacroCommand()
+        @[iplSubCommands] = []
+        @initializeMacroCommand()
 
 
   return LeanRC::MacroCommand.initialize()

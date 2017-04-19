@@ -10,8 +10,8 @@ module.exports = (LeanRC)->
     @public @static MULTITON_MSG: String,
       default: "View instance for this multiton key already constructed!"
 
-    iphMediatorMap = @private _mediatorMap: Object
-    iphObserverMap = @private _observerMap: Object
+    iphMediatorMap = @private mediatorMap: Object
+    iphObserverMap = @private observerMap: Object
     ipsMultitonKey = @protected multitonKey: String
     cphInstanceMap = @private @static _instanceMap: Object,
       default: {}
@@ -117,15 +117,16 @@ module.exports = (LeanRC)->
       return: RC::Constants.NILL
       default: ->
 
-    constructor: (asKey)->
-      super arguments...
-      if View[cphInstanceMap][asKey]
-        throw Error View.MULTITON_MSG
-      View[cphInstanceMap][asKey] = @
-      @[ipsMultitonKey] = asKey
-      @[iphMediatorMap] = {}
-      @[iphObserverMap] = {}
-      @initializeView()
+    @public init: Function,
+      default: (asKey)->
+        @super arguments...
+        if View[cphInstanceMap][asKey]
+          throw Error View.MULTITON_MSG
+        View[cphInstanceMap][asKey] = @
+        @[ipsMultitonKey] = asKey
+        @[iphMediatorMap] = {}
+        @[iphObserverMap] = {}
+        @initializeView()
 
 
   return LeanRC::View.initialize()
