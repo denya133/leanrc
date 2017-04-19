@@ -2,6 +2,7 @@
 
 _             = require 'lodash'
 RC            = require 'RC'
+{ANY, NILL} = RC::
 
 
 module.exports = (LeanRC)->
@@ -158,7 +159,7 @@ module.exports = (LeanRC)->
         return url.join '/'
 
     ipmBuildURL = @protected buildURL: Function,
-      args: [String, [Object, RC::Constants.NILL], [Boolean, RC::Constants.NILL]]
+      args: [String, [Object, NILL], [Boolean, NILL]]
       return: String
       default: (recordName, query, withPostfix=yes)->
         url = []
@@ -208,7 +209,7 @@ module.exports = (LeanRC)->
         @[ipmBuildURL] recordName, query
 
     @public buildURL: Function,
-      args: [String, [Object, RC::Constants.NILL], String, [Object, RC::Constants.NILL]]
+      args: [String, [Object, NILL], String, [Object, NILL]]
       return: String
       default: (recordName, snapshot, requestType, query)->
         switch requestType

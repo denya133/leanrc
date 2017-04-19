@@ -2,6 +2,8 @@ inflect = do require 'i'
 # по сути здесь надо повторить (скопипастить) код из FoxxMC::Controller
 
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::Stock extends LeanRC::SimpleCommand
@@ -123,7 +125,7 @@ module.exports = (LeanRC)->
 
     @public beforeAction: Function,
       args: [Object]
-      return: RC::Constants.NILL
+      return: NILL
       default: (args...)->
         [{queryParams, pathPatams, currentUserId, headers, body }] = args
         {
@@ -133,28 +135,28 @@ module.exports = (LeanRC)->
 
     @public parseQuery: Function,
       args: [Object]
-      return: RC::Constants.ANY
+      return: ANY
       default: (args...)->
         @query = JSON.parse @queryParams['query']
         return args
 
     @public parsePathParams: Function,
       args: [Object]
-      return: RC::Constants.ANY
+      return: ANY
       default: (args...)->
         @recordId = @pathParams[@keyName]
         return args
 
     @public parseBody: Function,
       args: [Object]
-      return: RC::Constants.ANY
+      return: ANY
       default: (args...)->
         @recordBody = @body?[@itemEntityName]
         return args
 
     @public beforeUpdate: Function,
       args: [Object]
-      return: RC::Constants.ANY
+      return: ANY
       default: (args...)->
         @recordBody = RC::Utils.extend {}, @recordBody, id: @recordId
         return args
@@ -164,7 +166,7 @@ module.exports = (LeanRC)->
         RC::Utils.co =>
           voBody = aoNotification.getBody()
           voResult = yield @[aoNotification.getType()]? voBody
-          @sendNotification LeanRC::Constants.HANDLER_RESULT, voResult, voBody.reverse
+          @sendNotification LeanRC::HANDLER_RESULT, voResult, voBody.reverse
         return
 
 

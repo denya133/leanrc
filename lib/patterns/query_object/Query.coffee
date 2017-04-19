@@ -1,4 +1,6 @@
 RC = require 'RC'
+{NILL, ANY} = RC::
+
 
 ###
 в Ember app это может выглядить так.
@@ -103,12 +105,12 @@ module.exports = (LeanRC)->
         $nor: Array # not or # !(a||b) === !a && !b
 
         # без вложенных условий и операторов - value конечное значение для сравнения
-        $eq: RC::Constants.ANY # ==
-        $ne: RC::Constants.ANY # !=
-        $lt: RC::Constants.ANY # <
-        $lte: RC::Constants.ANY # <=
-        $gt: RC::Constants.ANY # >
-        $gte: RC::Constants.ANY # >=
+        $eq: ANY # ==
+        $ne: ANY # !=
+        $lt: ANY # <
+        $lte: ANY # <=
+        $gt: ANY # >
+        $gte: ANY # >=
 
         $in: Array # check value present in array
         $nin: Array # ... not present in array

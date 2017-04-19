@@ -11,6 +11,9 @@ describe 'Collection', ->
     it 'should create collection instance', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -28,6 +31,9 @@ describe 'Collection', ->
     it 'should get collection name', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -45,6 +51,9 @@ describe 'Collection', ->
     it 'should get collection prefix', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -62,6 +71,9 @@ describe 'Collection', ->
     it 'should get collection full name', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -80,6 +92,9 @@ describe 'Collection', ->
       expect ->
         spyHandleNotitfication = sinon.spy ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -94,7 +109,7 @@ describe 'Collection', ->
           @inheritProtected()
           @Module: Test
           @public listNotificationInterests: Function,
-            default: -> [ LeanRC::Constants.RECORD_CHANGED ]
+            default: -> [ LeanRC::RECORD_CHANGED ]
           @public handleNotification: Function,
             default: spyHandleNotitfication
         Test::TestMediator.initialize()
@@ -110,6 +125,9 @@ describe 'Collection', ->
     it 'should get dummy generated ID', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -127,6 +145,9 @@ describe 'Collection', ->
     it 'should create record from delegate', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -149,6 +170,9 @@ describe 'Collection', ->
       co ->
         spyCollectionPush = sinon.spy -> yield return
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -171,6 +195,9 @@ describe 'Collection', ->
     it 'should update record in collection', ->
       co ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -207,6 +234,9 @@ describe 'Collection', ->
     it 'should delete record from collection', ->
       co ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -243,6 +273,9 @@ describe 'Collection', ->
     it 'should destroy record from collection', ->
       co ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -274,6 +307,9 @@ describe 'Collection', ->
     it 'should find record from collection', ->
       co ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -303,6 +339,9 @@ describe 'Collection', ->
     it 'should find many records from collection', ->
       co ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -339,6 +378,9 @@ describe 'Collection', ->
     it 'should update record with properties', ->
       co ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -375,6 +417,9 @@ describe 'Collection', ->
     it 'should update record with properties', ->
       co ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -411,6 +456,9 @@ describe 'Collection', ->
     it 'should make record copy with new id without save', ->
       co ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -442,6 +490,9 @@ describe 'Collection', ->
     it 'should make record copy with new id with save', ->
       co ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -487,6 +538,9 @@ describe 'Collection', ->
       co ->
         spySerializerNormalize = sinon.spy ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test
@@ -509,6 +563,9 @@ describe 'Collection', ->
       co ->
         spySerializerSerialize = sinon.spy ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @Module: Test

@@ -1,18 +1,23 @@
-class RequestApp
+RC = require 'RC'
 
-require('./AppConstants') RequestApp
 
-require('./controller/command/StartupCommand') RequestApp
-require('./controller/command/PrepareControllerCommand') RequestApp
-require('./controller/command/PrepareViewCommand') RequestApp
-require('./controller/command/PrepareModelCommand') RequestApp
-require('./controller/command/SendRequestCommand') RequestApp
+class RequestApp extends RC::Module
+  @inheritProtected()
 
-require('./view/component/ConsoleComponent') RequestApp
-require('./view/mediator/ConsoleComponentMediator') RequestApp
+  require('./AppConstants') RequestApp
 
-require('./model/proxy/RequestProxy') RequestApp
+  require('./controller/command/StartupCommand') RequestApp
+  require('./controller/command/PrepareControllerCommand') RequestApp
+  require('./controller/command/PrepareViewCommand') RequestApp
+  require('./controller/command/PrepareModelCommand') RequestApp
+  require('./controller/command/SendRequestCommand') RequestApp
 
-require('./AppFacade') RequestApp
+  require('./view/component/ConsoleComponent') RequestApp
+  require('./view/mediator/ConsoleComponentMediator') RequestApp
 
-module.exports = RequestApp
+  require('./model/proxy/RequestProxy') RequestApp
+
+  require('./AppFacade') RequestApp
+
+
+module.exports = RequestApp.initialize()

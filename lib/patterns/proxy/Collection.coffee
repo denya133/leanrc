@@ -51,7 +51,7 @@ module.exports = (LeanRC)->
 
     @public collectionPrefix: Function,
       default: ->
-        "#{inflect.underscore @Module().name}_" # может быть вместо @Module заиспользовать @getData().Module
+        "#{inflect.underscore @Module.name}_" # может быть вместо @Module заиспользовать @getData().Module
 
     @public collectionFullName: Function,
       default: (asName = null)->
@@ -59,7 +59,7 @@ module.exports = (LeanRC)->
 
     @public recordHasBeenChanged: Function,
       default: (aoType, aoData)->
-        @sendNotification LeanRC::Constants.RECORD_CHANGED, aoData, aoType
+        @sendNotification LeanRC::RECORD_CHANGED, aoData, aoType
 
     @public customFilters: Object, # возвращает установленные кастомные фильтры с учетом наследования
       default: {}

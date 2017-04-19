@@ -1,4 +1,6 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::MediatorInterface extends RC::Interface
@@ -12,22 +14,22 @@ module.exports = (LeanRC)->
       return: String
     @public @virtual getViewComponent: Function,
       args: []
-      return: RC::Constants.ANY
+      return: ANY
     @public @virtual setViewComponent: Function,
-      args: [RC::Constants.ANY]
-      return: RC::Constants.NILL
+      args: [ANY]
+      return: NILL
     @public @virtual listNotificationInterests: Function,
       args: []
       return: Array
     @public @virtual handleNotification: Function,
       args: [LeanRC::NotificationInterface]
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual onRegister: Function,
       args: []
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual onRemove: Function,
       args: []
-      return: RC::Constants.NILL
+      return: NILL
 
 
   return LeanRC::MediatorInterface.initialize()

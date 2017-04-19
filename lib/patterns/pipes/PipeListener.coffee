@@ -8,7 +8,7 @@ module.exports = (LeanRC)->
     @Module: LeanRC
 
     ipoContext = @private context: Object
-    ipmListener = @private listener: RC::Constants.LAMBDA
+    ipmListener = @private listener: RC::LAMBDA
 
     @public connect: Function,
       default: ->

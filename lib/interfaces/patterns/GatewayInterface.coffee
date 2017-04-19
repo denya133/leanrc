@@ -9,7 +9,7 @@ module.exports = (LeanRC)->
 
     @public @virtual swaggerDefinition: Function,
       args: [String, Function]
-      return: RC::Constants.NILL
+      return: RC::NILL
 
     @public @virtual swaggerDefinitionFor: Function,
       args: [String]

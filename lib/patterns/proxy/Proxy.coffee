@@ -8,7 +8,7 @@ module.exports = (LeanRC)->
     @Module: LeanRC
 
     ipsProxyName = @private proxyName: String
-    ipoData = @private data: RC::Constants.ANY
+    ipoData = @private data: RC::ANY
 
     @public getProxyName: Function,
       default: -> @[ipsProxyName]

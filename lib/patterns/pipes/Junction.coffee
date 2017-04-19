@@ -56,7 +56,7 @@ module.exports = (LeanRC)->
 
     @public removePipe: Function,
       args: [String]
-      return: RC::Constants.NILL
+      return: RC::NILL
       default: (name)->
         if @hasPipe name
           type = @[iplPipeTypesMap][name]

@@ -18,7 +18,7 @@ module.exports = (LeanRC)->
       get: -> "#{@BASE}filter"
 
     ipsName = @protected name: String
-    ipmFilter = @protected filter: RC::Constants.LAMBDA
+    ipmFilter = @protected filter: RC::LAMBDA
     ipoParams = @protected params: Object
 
     @public setName: Function,

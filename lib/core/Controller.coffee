@@ -59,7 +59,7 @@ module.exports = (LeanRC)->
 
     @public initializeController: Function,
       args: []
-      return: RC::Constants.NILL
+      return: RC::NILL
       default: ->
         @[ipoView] = LeanRC::View.getInstance @[ipsMultitonKey]
 

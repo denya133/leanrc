@@ -30,7 +30,7 @@ module.exports = (LeanRC)->
 
     @public @virtual onRegister: Function,
       args: []
-      return: RC::Constants.NILL
+      return: RC::NILL
 
 
   return LeanRC::CrudEndpointsMixinInterface.initialize()

@@ -1,4 +1,6 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::NotifierInterface extends RC::Interface
@@ -6,11 +8,11 @@ module.exports = (LeanRC)->
     @Module: LeanRC
 
     @public @virtual sendNotification: Function,
-      args: [String, RC::Constants.ANY, String]
-      return: RC::Constants.NILL
+      args: [String, ANY, String]
+      return: NILL
     @public @virtual initializeNotifier: Function,
       args: [String]
-      return: RC::Constants.NILL
+      return: NILL
 
 
   return LeanRC::NotifierInterface.initialize()

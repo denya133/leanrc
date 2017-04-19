@@ -8,7 +8,7 @@ module.exports = (LeanRC)->
     @Module: LeanRC
 
     ipsName = @private name: String
-    ipoBody = @private body: RC::Constants.ANY
+    ipoBody = @private body: RC::ANY
     ipsType = @private type: String
 
     @public getName: Function,

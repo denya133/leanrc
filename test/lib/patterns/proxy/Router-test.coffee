@@ -10,6 +10,9 @@ describe 'Router', ->
     it 'should create new router', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -26,6 +29,9 @@ describe 'Router', ->
     it 'should define methods for router', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -42,6 +48,9 @@ describe 'Router', ->
     it 'should define `get` method for router', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -57,6 +66,9 @@ describe 'Router', ->
     it 'should define `post` method for router', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -72,6 +84,9 @@ describe 'Router', ->
     it 'should define `put` method for router', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -87,6 +102,9 @@ describe 'Router', ->
     it 'should define `patch` method for router', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -102,6 +120,9 @@ describe 'Router', ->
     it 'should define `delete` method for router', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -117,6 +138,9 @@ describe 'Router', ->
     it 'should define `member` method for router', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -134,6 +158,9 @@ describe 'Router', ->
     it 'should define `collection` method for router', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test
@@ -152,6 +179,9 @@ describe 'Router', ->
     it 'should define all methods for router', ->
       expect ->
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+        
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @Module: Test

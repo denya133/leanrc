@@ -1,4 +1,6 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::PipeMessageInterface extends RC::Interface
@@ -18,25 +20,25 @@ module.exports = (LeanRC)->
       return: String
     @public @virtual setType: Function,
       args: [String]
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual getPriority: Function,
       args: []
       return: Number
     @public @virtual setPriority: Function,
       args: [Number]
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual getHeader: Function,
       args: []
       return: Object
     @public @virtual setHeader: Function,
       args: [Object]
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual getBody: Function,
       args: []
       return: Object
     @public @virtual setBody: Function,
       args: [Object]
-      return: RC::Constants.NILL
+      return: NILL
 
 
   return LeanRC::PipeMessageInterface.initialize()

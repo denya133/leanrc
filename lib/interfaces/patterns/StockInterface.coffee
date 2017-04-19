@@ -6,6 +6,8 @@
 # в случае со стрим-сервером заливку и отдачу файла будет реализовывать платформозависимый код медиатора, а ресурсная команда Uploads этим заниматься не будет. (чтобы медиатор напрямую писал в нужный прокси, и считывал поток так же напрямую из прокси.)
 
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::StockInterface extends RC::Interface
@@ -41,29 +43,29 @@ module.exports = (LeanRC)->
 
     @public @async @virtual list: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: RC::Constants.NILL # без return. данные посылаем сигналом
+      return: NILL # без return. данные посылаем сигналом
     @public @async @virtual detail: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: RC::Constants.NILL # без return. данные посылаем сигналом
+      return: NILL # без return. данные посылаем сигналом
     @public @async @virtual create: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: RC::Constants.NILL # без return. данные посылаем сигналом
+      return: NILL # без return. данные посылаем сигналом
     @public @async @virtual update: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: RC::Constants.NILL # без return. данные посылаем сигналом
+      return: NILL # без return. данные посылаем сигналом
     @public @async @virtual delete: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: RC::Constants.NILL # без return. данные посылаем сигналом
+      return: NILL # без return. данные посылаем сигналом
 
     @public @async @virtual bulkUpdate: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: RC::Constants.NILL # без return. данные посылаем сигналом
+      return: NILL # без return. данные посылаем сигналом
     @public @async @virtual bulkPatch: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: RC::Constants.NILL # без return. данные посылаем сигналом
+      return: NILL # без return. данные посылаем сигналом
     @public @async @virtual bulkDelete: Function,
       args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: RC::Constants.NILL # без return. данные посылаем сигналом
+      return: NILL # без return. данные посылаем сигналом
 
 
   return LeanRC::StockInterface.initialize()

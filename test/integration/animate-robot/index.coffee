@@ -1,18 +1,23 @@
-class TestApp
+RC = require 'RC'
 
-require('./AppConstants') TestApp
 
-require('./controller/command/StartupCommand') TestApp
-require('./controller/command/PrepareControllerCommand') TestApp
-require('./controller/command/PrepareViewCommand') TestApp
-require('./controller/command/PrepareModelCommand') TestApp
-require('./controller/command/AnimateRobotCommand') TestApp
+class TestApp extends RC::Module
+  @inheritProtected()
 
-require('./view/component/ConsoleComponent') TestApp
-require('./view/mediator/ConsoleComponentMediator') TestApp
+  require('./AppConstants') TestApp
 
-require('./model/proxy/RobotDataProxy') TestApp
+  require('./controller/command/StartupCommand') TestApp
+  require('./controller/command/PrepareControllerCommand') TestApp
+  require('./controller/command/PrepareViewCommand') TestApp
+  require('./controller/command/PrepareModelCommand') TestApp
+  require('./controller/command/AnimateRobotCommand') TestApp
 
-require('./AppFacade') TestApp
+  require('./view/component/ConsoleComponent') TestApp
+  require('./view/mediator/ConsoleComponentMediator') TestApp
 
-module.exports = TestApp
+  require('./model/proxy/RobotDataProxy') TestApp
+
+  require('./AppFacade') TestApp
+
+
+module.exports = TestApp.initialize()

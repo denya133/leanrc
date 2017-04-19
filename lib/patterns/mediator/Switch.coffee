@@ -1,5 +1,6 @@
 RC = require 'RC'
 EventEmitter = require 'events'
+{ANY, NILL} = RC::
 
 
 module.exports = (LeanRC)->
@@ -27,7 +28,7 @@ module.exports = (LeanRC)->
       configurable: yes
       default: ->
         [
-          LeanRC::Constants.HANDLER_RESULT
+          LeanRC::HANDLER_RESULT
         ]
 
     @public handleNotification: Function,
@@ -36,7 +37,7 @@ module.exports = (LeanRC)->
         voBody = aoNotification.getBody()
         vsType = aoNotification.getType()
         switch vsName
-          when LeanRC::Constants.HANDLER_RESULT
+          when LeanRC::HANDLER_RESULT
             @getViewComponent().emit vsType, voBody
         return
 
@@ -69,7 +70,7 @@ module.exports = (LeanRC)->
 
     @public sendHttpResponse: Function,
       args: [Object, Object, Object, Object]
-      return: RC::Constants.NILL
+      return: NILL
       default: (req, res, aoData, {path, resource, action})->
         switch (vsFormat = req.accepts @responseFormats)
           when 'json', 'html', 'xml', 'atom'
@@ -87,7 +88,7 @@ module.exports = (LeanRC)->
 
     @public defineRoutes: Function,
       args: []
-      return: RC::Constants.NILL
+      return: NILL
       default: ->
         voRouter = @facade.retrieveProxy @routerName
         voRouter.routes.forEach (aoRoute)=>
@@ -98,11 +99,11 @@ module.exports = (LeanRC)->
     # так может быть реализовано например в случае, когда нужно чтобы внутри хендлера открывалась транзакция для работы с базой данных. (и после выполнения закрывалась)
     @public handler: Function,
       args: []
-      return: RC::Constants.NILL
+      return: NILL
       default: (resourceName, {req, res, reverse}, {method, path, resource, action})->
         queryParams = req.query
         pathPatams = req.params
-        configurationProxy = @facade.retrieveProxy LeanRC::Constants.CONFIGURATION
+        configurationProxy = @facade.retrieveProxy LeanRC::CONFIGURATION
         currentUserId = req.cookies[configurationProxy.getData().currentUserCookie]
         headers = req.headers
         body = req.body
@@ -119,7 +120,7 @@ module.exports = (LeanRC)->
 
     @public defineSwaggerEndpoint: Function,
       args: [Object]
-      return: RC::Constants.NILL
+      return: NILL
       default: (aoSwaggerEndpoint, resourceName, action)->
         voGateway = @facade.retrieveProxy "#{resourceName}Gateway"
         {

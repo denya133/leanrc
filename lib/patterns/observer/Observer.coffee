@@ -1,4 +1,6 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::Observer extends RC::CoreObject
@@ -7,8 +9,8 @@ module.exports = (LeanRC)->
 
     @Module: LeanRC
 
-    ipoNotify = @private notify: RC::Constants.ANY
-    ipoContext = @private context: RC::Constants.ANY
+    ipoNotify = @private notify: ANY
+    ipoContext = @private context: ANY
 
     @public setNotifyMethod: Function,
       default: (amNotifyMethod)->

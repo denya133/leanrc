@@ -3,6 +3,8 @@
 # для автоматизации и чтобы предотвратить дублирование в таких классах должны определяться общие механизмы, а для отдельных типов данных будет отдельный класс transform
 
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::SerializerInterface extends RC::Interface
@@ -13,11 +15,11 @@ module.exports = (LeanRC)->
     @public @virtual collection: LeanRC::CollectionInterface
 
     @public @virtual normalize: Function, # virtual declaration of method
-      args: [RC::Class, RC::Constants.ANY] # payload
+      args: [RC::Class, ANY] # payload
       return: [LeanRC::RecordInterface]
     @public @virtual serialize:   Function, # virtual declaration of method
       args: [LeanRC::RecordInterface, Object] # record, options
-      return: RC::Constants.ANY
+      return: ANY
 
 
   return LeanRC::SerializerInterface.initialize()

@@ -1,4 +1,6 @@
 RC = require 'RC'
+{ANY, NILL} = RC::
+
 
 module.exports = (LeanRC)->
   class LeanRC::FacadeInterface extends RC::Interface
@@ -9,17 +11,17 @@ module.exports = (LeanRC)->
 
     @public @virtual registerCommand: Function,
       args: [String, RC::Class]
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual removeCommand: Function,
       args: [String]
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual hasCommand: Function,
       args: [String]
       return: Boolean
 
     @public @virtual registerProxy: Function,
       args: [LeanRC::ProxyInterface]
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual retrieveProxy: Function,
       args: [String]
       return: LeanRC::ProxyInterface
@@ -32,7 +34,7 @@ module.exports = (LeanRC)->
 
     @public @virtual registerMediator: Function,
       args: [LeanRC::MediatorInterface]
-      return: RC::Constants.NILL
+      return: NILL
     @public @virtual retrieveMediator: Function,
       args: [String]
       return: LeanRC::MediatorInterface
@@ -45,7 +47,7 @@ module.exports = (LeanRC)->
 
     @public @virtual notifyObservers: Function,
       args: [LeanRC::NotificationInterface]
-      return: RC::Constants.NILL
+      return: NILL
 
 
   return LeanRC::FacadeInterface.initialize()

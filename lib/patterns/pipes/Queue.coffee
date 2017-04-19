@@ -24,7 +24,7 @@ module.exports = (LeanRC)->
 
     ipmStore = @protected store: Function,
       args: [LeanRC::PipeMessageInterface]
-      return: RC::Constants.NILL
+      return: RC::NILL
       default: (aoMessage)->
         @[iplMessages] ?= []
         @[iplMessages].push aoMessage
