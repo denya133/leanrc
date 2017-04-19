@@ -105,8 +105,6 @@ module.exports = (Module)->
       renameIndex: 'renameIndex'
       renameCollection: 'renameCollection'
 
-    @attr name: String
-
     iplSteps = @private steps: Array
 
     # так же в рамках DSL нужны:
@@ -354,7 +352,10 @@ module.exports = (Module)->
     @public init: Function,
       default: (args...)->
         @super args...
-        @name ?= path.basename __filename, '.js'
+        # так как по этомцу ключу будут искаться в базе и проверяться выполенные
+        # чтобы механизм миграций был применим на любом хранилище данных -
+        # поиск должен быть по ключу как если бы хранилище поддерживало только этот поиск.
+        @id ?= path.basename __filename, '.js'
         return
 
 
