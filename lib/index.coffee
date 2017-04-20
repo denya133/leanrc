@@ -6,10 +6,13 @@ RC = require 'RC'
 class LeanRC extends RC
   @inheritProtected()
 
+  @root __dirname
+
   @const HANDLER_RESULT:  0
   @const RECORD_CHANGED:  1
   @const CONFIGURATION:  2
   @const STARTUP: Symbol 'startup'
+  @const MIGRATIONS: Symbol 'MigrationsCollection'
 
   require('./interfaces/patterns/TransformInterface') LeanRC
   require('./interfaces/patterns/NotificationInterface') LeanRC
@@ -113,4 +116,4 @@ class LeanRC extends RC
   require('./core/Controller') LeanRC #tested
 
 
-module.exports = LeanRC.initialize()
+module.exports = LeanRC.initialize().freeze()

@@ -16,7 +16,7 @@ http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStateme
 module.exports = (Module)->
   class CreateUsersCollectionMigration extends Module::Migration
     @inheritProtected()
-    @include ArangoExtension::ArangoMigrationMixin # в этом миксине должны быть реализованы платформозависимые методы, которые будут посылать нативные запросы к реальной базе данных
+    @include Module::ArangoMigrationMixin # в этом миксине должны быть реализованы платформозависимые методы, которые будут посылать нативные запросы к реальной базе данных
 
     @Module: Module
 
@@ -42,7 +42,7 @@ module.exports = (Module)->
 module.exports = (Module)->
   class CreateUsersCollectionMigration extends Module::Migration
     @inheritProtected()
-    @include ArangoExtension::ArangoMigrationMixin # в этом миксине должны быть реализованы платформозависимые методы, которые будут посылать нативные запросы к реальной базе данных
+    @include Module::ArangoMigrationMixin # в этом миксине должны быть реализованы платформозависимые методы, которые будут посылать нативные запросы к реальной базе данных
 
     @Module: Module
 
