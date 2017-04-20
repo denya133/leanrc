@@ -66,3 +66,22 @@ describe 'Cursor', ->
         assert.isTrue (yield cursor.hasNext()), 'There is no next value'
         data = yield cursor.next()
         assert.isFalse (yield cursor.hasNext()), 'There is something else'
+  describe '#toArray', ->
+    it 'should get array from cursor', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute data: String, { default: '' }
+        Test::TestRecord.initialize()
+        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        cursor = Cursor.new Test::TestRecord, array
+        records = yield cursor.toArray()
+        assert.equal records.length, array.length, 'Counts of input and output data are different'
+        for record, index in records
+          assert.instanceOf record, Test::TestRecord, "Record #{index} is incorrect"
+          assert.equal record.data, array[index].data, "Record #{index} `data` is incorrect"
+        return
