@@ -50,7 +50,9 @@ module.exports = (LeanRC)->
         yield return
 
     @public @async count: Function,
-      default: -> yield @[iplArray].length()
+      default: ->
+        array = @[iplArray] ? []
+        yield RC::Promise.resolve array.length?() ? array.length
 
     @public @async forEach: Function,
       default: (lambda, acRecord = null)->

@@ -102,3 +102,18 @@ describe 'Cursor', ->
         yield cursor.close()
         assert.isFalse (yield cursor.hasNext()), 'There is something else'
         return
+  describe '#count', ->
+    it 'should count records in cursor', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute data: String, { default: '' }
+        Test::TestRecord.initialize()
+        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        cursor = Cursor.new Test::TestRecord, array
+        assert.equal (yield cursor.count()), 4, 'Count works incorrectly'
+        return
