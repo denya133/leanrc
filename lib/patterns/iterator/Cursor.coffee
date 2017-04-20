@@ -40,7 +40,7 @@ module.exports = (LeanRC)->
           data
 
     @public @async hasNext: Function,
-      default: -> yield not _.isNil @[iplArray][@[ipnCurrentIndex]]
+      default: -> yield RC::Promise.resolve not _.isNil @[iplArray][@[ipnCurrentIndex]]
 
     @public @async close: Function,
       default: ->

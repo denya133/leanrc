@@ -50,3 +50,19 @@ describe 'Cursor', ->
         assert.equal (yield cursor.next()).data, 'in', 'Third item is incorrect'
         assert.equal (yield cursor.next()).data, 'a boat', 'Fourth item is incorrect'
         assert.isUndefined (yield cursor.next()), 'Unexpected item is present'
+  describe '#hasNext', ->
+    it 'should check if next value is present', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute data: String, { default: '' }
+        Test::TestRecord.initialize()
+        array = [ { data: 'data' } ]
+        cursor = Cursor.new Test::TestRecord, array
+        assert.isTrue (yield cursor.hasNext()), 'There is no next value'
+        data = yield cursor.next()
+        assert.isFalse (yield cursor.hasNext()), 'There is something else'
