@@ -117,3 +117,25 @@ describe 'Cursor', ->
         cursor = Cursor.new Test::TestRecord, array
         assert.equal (yield cursor.count()), 4, 'Count works incorrectly'
         return
+  describe '#forEach', ->
+    it 'should call lambda in each record in cursor', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute data: String, { default: '' }
+        Test::TestRecord.initialize()
+        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        cursor = Cursor.new Test::TestRecord, array
+        spyLambda = sinon.spy -> yield return
+        yield cursor.forEach spyLambda
+        assert.isTrue spyLambda.called, 'Lambda never called'
+        assert.equal spyLambda.callCount, 4, 'Lambda calls are not match'
+        assert.equal spyLambda.args[0][0].data, 'three', 'Lambda 1st call is not match'
+        assert.equal spyLambda.args[1][0].data, 'men', 'Lambda 2nd call is not match'
+        assert.equal spyLambda.args[2][0].data, 'in', 'Lambda 3rd call is not match'
+        assert.equal spyLambda.args[3][0].data, 'a boat', 'Lambda 4th call is not match'
+        return
