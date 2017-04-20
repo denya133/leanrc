@@ -57,8 +57,8 @@ class LeanRC extends RC::Module
   require('./patterns/data_mapper/NumberTransform') LeanRC #tested
   require('./patterns/data_mapper/DateTransform') LeanRC #tested
   require('./patterns/data_mapper/BooleanTransform') LeanRC #tested
-  require('./patterns/data_mapper/Serializer') LeanRC
-  require('./patterns/data_mapper/Record') LeanRC
+  require('./patterns/data_mapper/Serializer') LeanRC #tested
+  require('./patterns/data_mapper/Record') LeanRC #tested
   require('./patterns/data_mapper/Entry') LeanRC
 
   require('./patterns/query_object/Query') LeanRC #tested
