@@ -188,6 +188,7 @@ describe 'Collection', ->
             default: spyCollectionPush
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_01').registerProxy collection
         record = yield collection.create test: 'test', data: 123
         assert.isDefined record, 'Record not created'
         assert.isTrue spyCollectionPush.called, 'Record not saved'
@@ -226,6 +227,7 @@ describe 'Collection', ->
               yield return
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_02').registerProxy collection
         record = yield collection.create test: 'test', data: 123
         record.data = 456
         yield record.update()
@@ -265,6 +267,7 @@ describe 'Collection', ->
               yield return
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_03').registerProxy collection
         record = yield collection.create test: 'test', data: 123
         yield record.delete()
         assert.isFalse yield record.isNew(), 'Record not saved'
@@ -300,6 +303,7 @@ describe 'Collection', ->
               yield return
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_04').registerProxy collection
         record = yield collection.create test: 'test', data: 123
         yield record.destroy()
         assert.isFalse (yield collection.find record.id)?, 'Record removed'
@@ -332,6 +336,7 @@ describe 'Collection', ->
               yield return
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_05').registerProxy collection
         record = yield collection.create test: 'test', data: 123
         record2 = yield collection.find record.id
         assert.equal record.test, record2.test, 'Record not found'
@@ -366,6 +371,7 @@ describe 'Collection', ->
               yield return
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_06').registerProxy collection
         { id: id1 } = yield collection.create test: 'test1'
         { id: id2 } = yield collection.create test: 'test2'
         { id: id3 } = yield collection.create test: 'test3'
@@ -409,6 +415,7 @@ describe 'Collection', ->
               yield return record?
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_07').registerProxy collection
         { id } = yield collection.create test: 'test1', data: 123
         record = yield collection.replace id, test: 'test2', data: 456
         assert.equal record.test, 'test2', 'Attribute `test` did not updated'
@@ -448,6 +455,7 @@ describe 'Collection', ->
               yield return record?
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_08').registerProxy collection
         { id } = yield collection.create test: 'test1', data: 123
         record = yield collection.update id, test: 'test2', data: 456
         assert.equal record.test, 'test2', 'Attribute `test` did not updated'
@@ -480,6 +488,7 @@ describe 'Collection', ->
             default: -> RC::Utils.uuid.v4()
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_09').registerProxy collection
         original = collection.build test: 'test', data: 123
         clone = collection.clone original
         assert.notEqual original, clone, 'Record is not a copy but a reference'
@@ -527,6 +536,7 @@ describe 'Collection', ->
             default: -> RC::Utils.uuid.v4()
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_10').registerProxy collection
         original = collection.build test: 'test', data: 123
         clone = yield collection.copy original
         assert.notEqual original, clone, 'Record is not a copy but a reference'
@@ -556,6 +566,7 @@ describe 'Collection', ->
             default: normalize: spySerializerNormalize
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_11').registerProxy collection
         record = collection.normalize test: 'test', data: 123
         assert.isTrue spySerializerNormalize.calledWith(Test::TestRecord, test: 'test', data: 123), 'Normalize called improperly'
   describe '#normalize', ->
@@ -581,6 +592,7 @@ describe 'Collection', ->
             default: serialize: spySerializerSerialize
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_12').registerProxy collection
         record = collection.build test: 'test', data: 123
         data = collection.serialize record, value: 'value'
         assert.isTrue spySerializerSerialize.calledWith(record, value: 'value'), 'Serialize called improperly'

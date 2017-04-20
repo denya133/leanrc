@@ -75,26 +75,26 @@ module.exports = (Module)->
 
     @afterHook 'afterDestroy', only: ['destroy']
 
-    @public afterCreate: Function,
+    @public @async afterCreate: Function,
       args: [Module::RecordInterface]
       return: Module::RecordInterface
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'createdRecord', aoRecord
-        return
+        yield return @
 
-    @public beforeUpdate: Function,
+    @public @async beforeUpdate: Function,
       args: []
       return: NILL
       default: ->
         @updatedAt = new Date().toISOString()
-        return
+        yield return
 
-    @public afterUpdate: Function,
+    @public @async afterUpdate: Function,
       args: [Module::RecordInterface]
       return: Module::RecordInterface
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'updatedRecord', aoRecord
-        return
+        yield return @
 
     @public beforeDelete: Function,
       args: []
@@ -110,7 +110,7 @@ module.exports = (Module)->
       return: Module::RecordInterface
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'deletedRecord', aoRecord
-        return
+        return @
 
     @public afterDestroy: Function,
       args: [Module::RecordInterface]
