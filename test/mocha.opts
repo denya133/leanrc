@@ -16,3 +16,4 @@ test/lib/patterns/mixins/
 test/lib/patterns/data_mapper/
 test/lib/patterns/proxy/
 test/
+test/lib/patterns/iterator/

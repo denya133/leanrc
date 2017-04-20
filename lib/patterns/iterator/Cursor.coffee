@@ -31,7 +31,7 @@ module.exports = (Module)->
         acRecord ?= @[ipcRecord]
         data = @[iplArray][@[ipnCurrentIndex]]
         @[ipnCurrentIndex]++
-        yield if acRecord?
+        yield Module::Promise.resolve if acRecord?
           if data?
             acRecord.new data
           else
@@ -40,7 +40,7 @@ module.exports = (Module)->
           data
 
     @public @async hasNext: Function,
-      default: -> yield not _.isNil @[iplArray][@[ipnCurrentIndex]]
+      default: -> yield Module::Promise.resolve not _.isNil @[iplArray][@[ipnCurrentIndex]]
 
     @public @async close: Function,
       default: ->
@@ -50,7 +50,9 @@ module.exports = (Module)->
         yield return
 
     @public @async count: Function,
-      default: -> yield @[iplArray].length()
+      default: ->
+        array = @[iplArray] ? []
+        yield Module::Promise.resolve array.length?() ? array.length
 
     @public @async forEach: Function,
       default: (lambda, acRecord = null)->
