@@ -31,7 +31,7 @@ module.exports = (LeanRC)->
         acRecord ?= @[ipcRecord]
         data = @[iplArray][@[ipnCurrentIndex]]
         @[ipnCurrentIndex]++
-        yield if acRecord?
+        yield RC::Promise.resolve if acRecord?
           if data?
             acRecord.new data
           else
