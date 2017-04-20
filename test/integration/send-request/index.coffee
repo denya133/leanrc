@@ -4,6 +4,8 @@ LeanRC = require.main.require 'lib'
 class RequestApp extends LeanRC
   @inheritProtected()
 
+  @root __dirname
+
   @const SEND_REQUEST: Symbol 'sendRequest'
   @const RECEIVE_RESPONSE: Symbol 'receiveResponse'
 
