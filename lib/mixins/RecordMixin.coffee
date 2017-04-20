@@ -132,10 +132,11 @@ module.exports = (LeanRC)->
 
     @public @async save: Function,
       default: ->
-        if yield @isNew()
+        result = if yield @isNew()
           yield @create()
         else
           yield @update()
+        return result
 
     @public @async create: Function,
       default: ->
@@ -146,7 +147,7 @@ module.exports = (LeanRC)->
         for own key of @constructor.attributes
           vhAttributes[key] = @[key]
         @[ipoInternalRecord] = vhAttributes
-        return @
+        yield return @
 
     @public @async update: Function,
       default: ->
@@ -157,7 +158,7 @@ module.exports = (LeanRC)->
         for own key of @constructor.attributes
           vhAttributes[key] = @[key]
         @[ipoInternalRecord] = vhAttributes
-        return @
+        yield return @
 
     @public @async delete: Function,
       default: ->
@@ -223,8 +224,7 @@ module.exports = (LeanRC)->
         yield @save()
 
     @public @async isNew: Function,
-      default: ->
-        not @id? or not (yield @collection.find @id)?
+      default: -> not @id? or not (yield @collection.find @id)?
 
     @public @async @virtual reload: Function,
       args: []

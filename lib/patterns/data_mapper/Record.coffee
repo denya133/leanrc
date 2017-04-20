@@ -77,26 +77,26 @@ module.exports = (LeanRC)->
 
     @afterHook 'afterDestroy', only: ['destroy']
 
-    @public afterCreate: Function,
+    @public @async afterCreate: Function,
       args: [LeanRC::RecordInterface]
       return: LeanRC::RecordInterface
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'createdRecord', aoRecord
-        return
+        yield return @
 
-    @public beforeUpdate: Function,
+    @public @async beforeUpdate: Function,
       args: []
       return: NILL
       default: ->
         @updatedAt = new Date().toISOString()
-        return
+        yield return
 
-    @public afterUpdate: Function,
+    @public @async afterUpdate: Function,
       args: [LeanRC::RecordInterface]
       return: LeanRC::RecordInterface
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'updatedRecord', aoRecord
-        return
+        yield return @
 
     @public beforeDelete: Function,
       args: []
@@ -112,7 +112,7 @@ module.exports = (LeanRC)->
       return: LeanRC::RecordInterface
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'deletedRecord', aoRecord
-        return
+        return @
 
     @public afterDestroy: Function,
       args: [LeanRC::RecordInterface]

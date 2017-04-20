@@ -60,6 +60,7 @@ module.exports = (LeanRC)->
     @public recordHasBeenChanged: Function,
       default: (aoType, aoData)->
         @sendNotification LeanRC::RECORD_CHANGED, aoData, aoType
+        return
 
     @public customFilters: Object, # возвращает установленные кастомные фильтры с учетом наследования
       default: {}
