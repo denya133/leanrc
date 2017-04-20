@@ -13,7 +13,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::RelationsMixinInterface
 
-    @Module: Module
+    @module Module
 
     @public @static belongsTo: Function,
       default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable}={})->

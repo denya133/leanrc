@@ -5,7 +5,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::ProxyInterface
 
-    @Module: Module
+    @module Module
 
     ipsProxyName = @private proxyName: String
     ipoData = @private data: Module::ANY

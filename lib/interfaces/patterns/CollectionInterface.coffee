@@ -6,7 +6,7 @@ module.exports = (Module)->
   class CollectionInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @virtual recordHasBeenChanged: Function,
       args: [String, Object]

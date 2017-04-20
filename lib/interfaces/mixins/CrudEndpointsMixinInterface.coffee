@@ -7,7 +7,7 @@ module.exports = (Module)->
   class CrudEndpointsMixinInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @virtual keyName: String
 

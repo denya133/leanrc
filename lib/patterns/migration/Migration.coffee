@@ -14,11 +14,22 @@ http://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStateme
 ###
 ```coffee
 module.exports = (Module)->
-  class CreateUsersCollectionMigration extends Module::Migration
+  class BaseMigration extends Module::Migration
     @inheritProtected()
     @include Module::ArangoMigrationMixin # в этом миксине должны быть реализованы платформозависимые методы, которые будут посылать нативные запросы к реальной базе данных
 
-    @Module: Module
+    @module Module
+
+  return BaseMigration.initialize()
+```
+
+```coffee
+module.exports = (Module)->
+  class CreateUsersCollectionMigration extends Module::BaseMigration
+    @inheritProtected()
+    @include Module::ArangoMigrationMixin # в этом миксине должны быть реализованы платформозависимые методы, которые будут посылать нативные запросы к реальной базе данных
+
+    @module Module
 
     @up ->
       yield @createCollection 'users'
@@ -40,11 +51,11 @@ module.exports = (Module)->
 
 ```coffee
 module.exports = (Module)->
-  class CreateUsersCollectionMigration extends Module::Migration
+  class CreateUsersCollectionMigration extends Module::BaseMigration
     @inheritProtected()
     @include Module::ArangoMigrationMixin # в этом миксине должны быть реализованы платформозависимые методы, которые будут посылать нативные запросы к реальной базе данных
 
-    @Module: Module
+    @module Module
 
     @change ->
       @createCollection 'users'
@@ -64,7 +75,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::MigrationInterface
 
-    @Module: Module
+    @module Module
 
     @const UP: Symbol 'UP'
     @const DOWN: Symbol 'DOWN'
@@ -227,7 +238,7 @@ module.exports = (Module)->
       # а реальный запускаемый код (автоматический или кастомынй)
       # будет в 'up' и 'down'
       @change ->
-        UsersCollection = @facade.retriveProxy 'UsersCollection'
+        UsersCollection = @collection.facade.retriveProxy 'UsersCollection'
         @addField 'users', 'first_name', 'string'
         @addField 'users', 'last_name', 'string'
 

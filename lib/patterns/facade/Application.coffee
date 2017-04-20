@@ -4,7 +4,7 @@ module.exports = (Module)->
   class Application extends Module::CoreObject
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @static NAME: String,
       default: 'Application'

@@ -5,7 +5,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::RendererInterface
 
-    @Module: Module
+    @module Module
 
     # may be redefine at inheritance
     @public render: Function,

@@ -5,7 +5,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::PipeFittingInterface
 
-    @Module: Module
+    @module Module
 
     ipoContext = @private context: Object
     ipmListener = @private listener: Module::LAMBDA

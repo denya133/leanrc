@@ -5,7 +5,7 @@ module.exports = (Module)->
 
   class NotifierInterface extends Module::Interface
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public @virtual sendNotification: Function,
       args: [String, ANY, String]

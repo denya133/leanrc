@@ -42,7 +42,7 @@ describe 'Switch', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test1', ->
               @resource 'test1'
@@ -53,7 +53,7 @@ describe 'Switch', ->
         spyCreateNativeRoute = sinon.spy ->
         class Test::TestSwitch extends Switch
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
@@ -76,12 +76,12 @@ describe 'Switch', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRouter.initialize()
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
         class Test::TestSwitch extends Switch
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
@@ -104,12 +104,12 @@ describe 'Switch', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRouter.initialize()
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
         class Test::TestSwitch extends Switch
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
@@ -138,12 +138,12 @@ describe 'Switch', ->
         facade.registerProxy Test::AtomRenderer.new 'TEST_ATOM_RENDERER'
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRouter.initialize()
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
         class Test::TestSwitch extends Switch
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public jsonRendererName: String,
             default: 'TEST_JSON_RENDERER'
           @public htmlRendererName: String,
@@ -200,7 +200,7 @@ describe 'Switch', ->
         spyRendererRender = sinon.spy ->
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public render: Function,
             default: (aoData, aoOptions) ->
               spyRendererRender aoData, aoOptions
@@ -213,11 +213,11 @@ describe 'Switch', ->
         facade.registerProxy Test::TestRenderer.new 'TEST_ATOM_RENDERER'
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRouter.initialize()
         class Test::Request extends RC::CoreObject
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public format: String,
             default: 'json'
           @public accepts: Function,
@@ -231,7 +231,7 @@ describe 'Switch', ->
         spyResponseSend = sinon.spy ->
         class Test::Response extends RC::CoreObject
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public set: Function,
             default: spyResponseSet
           @public send: Function,
@@ -240,7 +240,7 @@ describe 'Switch', ->
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
         class Test::TestSwitch extends Switch
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public jsonRendererName: String,
             default: 'TEST_JSON_RENDERER'
           @public htmlRendererName: String,
@@ -284,14 +284,14 @@ describe 'Switch', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRouter.initialize()
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
         facade.registerProxy LeanRC::Proxy.new LeanRC::CONFIGURATION,
           currentUserCookie: 'cuc'
         class Test::TestSwitch extends Switch
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
@@ -301,7 +301,7 @@ describe 'Switch', ->
         Test::TestSwitch.initialize()
         class Test::Request extends RC::CoreObject
           @inheritProtected()
-          @Module: Test
+          @module Test
           constructor: (args...) ->
             super args...
             @query = a: 1, b: 2, c: 'abc'
@@ -312,7 +312,7 @@ describe 'Switch', ->
         Test::Request.initialize()
         class Test::Response extends RC::CoreObject
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::Response.initialize()
         switchMediator = Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator.initializeNotifier 'TEST_SWITCH_6'
@@ -367,12 +367,12 @@ describe 'Switch', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRouter.initialize()
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
         class Test::TestSwitch extends Switch
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'

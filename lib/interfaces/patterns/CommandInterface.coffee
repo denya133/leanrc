@@ -5,7 +5,7 @@ module.exports = (Module)->
     @inheritProtected()
     @include Module::NotifierInterface
 
-    @Module: Module
+    @module Module
 
     @public @virtual execute: Function,
       args: [Module::NotificationInterface]

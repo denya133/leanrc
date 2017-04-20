@@ -7,7 +7,7 @@
 
   class Test::ApplicationRouter extends Module::Router
     @inheritProtected()
-    @Module: Test
+    @module Test
     @map ->
       @namespace 'version', module: '', prefix: ':v', ->
         @resource 'invitations', except: 'delete', ->
@@ -32,7 +32,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::RouterInterface
 
-    @Module: Module
+    @module Module
 
     ipsPath       = @protected path: String,
       default: '/'
@@ -157,7 +157,7 @@ module.exports = (Module)->
         @[iplResources] ?= []
         class ResourceRouter extends Router
           @inheritProtected()
-          @Module: vcModule
+          @module vcModule
           @protected path: String,
             default: vsFullPath
           @protected name: String,
@@ -200,7 +200,7 @@ module.exports = (Module)->
         @[iplResources] ?= []
         class NamespaceRouter extends Router
           @inheritProtected()
-          @Module: vcModule
+          @module vcModule
           @protected path: String,
             default: "#{vsParentPath}#{vsPath}"
           @protected name: String,

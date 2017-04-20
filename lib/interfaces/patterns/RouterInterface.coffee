@@ -9,7 +9,7 @@ module.exports = (Module)->
   class RouterInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @static @virtual map: Function,
       args: [[Function, NILL]]

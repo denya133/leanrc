@@ -6,7 +6,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::TransformInterface
 
-    @Module: Module
+    @module Module
 
     @public @static normalize: Function,
       default: (serialized)->

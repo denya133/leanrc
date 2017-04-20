@@ -26,7 +26,7 @@ describe 'Renderer', ->
 
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public render: Function,
             default: (aoData, aoOptions)->
               vhData = RC::Utils.extend {}, aoData, greeting: 'Hello'

@@ -7,7 +7,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::SerializerInterface
 
-    @Module: Module
+    @module Module
 
     @public collection: Module::CollectionInterface
 

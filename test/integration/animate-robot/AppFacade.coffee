@@ -3,7 +3,7 @@
 module.exports = (Module) ->
   class AppFacade extends Module::Facade
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     vpbIsInitialized = @private isInitialized: Boolean,
       default: no

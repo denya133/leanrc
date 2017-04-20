@@ -9,7 +9,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::SwitchInterface
 
-    @Module: Module
+    @module Module
 
     @public responseFormats: Array,
       get: -> ['json', 'html', 'xml', 'atom']

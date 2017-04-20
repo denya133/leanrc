@@ -6,7 +6,7 @@ module.exports = (Module)->
   class CursorInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @virtual setRecord: Function,
       args: [Module::Class]

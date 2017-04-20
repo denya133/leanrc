@@ -9,7 +9,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::CursorInterface
 
-    @Module: Module
+    @module Module
 
     ipnCurrentIndex = @private currentIndex: Number,
       default: 0

@@ -5,7 +5,7 @@ module.exports = (Module)->
 
   class ObserverInterface extends Module::Interface
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public @virtual setNotifyMethod: Function,
       args: [Function]

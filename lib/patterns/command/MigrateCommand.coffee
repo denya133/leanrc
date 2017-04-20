@@ -6,7 +6,7 @@
 module.exports = (Module) ->
   class MigrateCommand extends Module::SimpleCommand
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public execute: Function,
       default: ->

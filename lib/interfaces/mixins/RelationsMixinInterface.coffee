@@ -6,7 +6,7 @@ module.exports = (Module)->
   class RelationsMixinInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @static @virtual relations: Function,
       args: []

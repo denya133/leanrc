@@ -4,7 +4,7 @@ module.exports = (Module)->
   class TeeMerge extends Module::Pipe
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public connectInput: Function,
       args: [Module::PipeFittingInterface]

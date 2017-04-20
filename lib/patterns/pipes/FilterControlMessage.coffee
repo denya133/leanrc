@@ -4,7 +4,7 @@ module.exports = (Module)->
   class FilterControlMessage extends Module::PipeMessage
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @static BASE: String,
       get: -> "#{Module::PipeMessage.BASE}filter-control/"

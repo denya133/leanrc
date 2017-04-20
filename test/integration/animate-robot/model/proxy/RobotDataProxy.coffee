@@ -3,7 +3,7 @@
 module.exports = (Module) ->
   class RobotDataProxy extends Module::Proxy
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @const ROBOT_PROXY: 'robotProxy'
 

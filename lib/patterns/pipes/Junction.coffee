@@ -4,7 +4,7 @@ module.exports = (Module)->
   class Junction extends Module::CoreObject
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @static INPUT: String,
       default: 'input'

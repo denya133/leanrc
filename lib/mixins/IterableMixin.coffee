@@ -7,7 +7,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::IterableMixinInterface
 
-    @Module: Module
+    @module Module
 
     @public @async forEach: Function,
       default: (lambda)->

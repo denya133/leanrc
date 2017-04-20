@@ -7,7 +7,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::CommandInterface
 
-    @Module: Module
+    @module Module
 
     iplSubCommands = @private subCommands: Array
 

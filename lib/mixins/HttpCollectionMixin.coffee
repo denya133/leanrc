@@ -8,7 +8,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::QueryableMixinInterface
 
-    @Module: Module
+    @module Module
 
     @public push: Function,
       default: (aoRecord)->

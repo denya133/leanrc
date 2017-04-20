@@ -16,7 +16,7 @@ describe 'Record', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         record = Test::TestRecord.new {}
         assert.instanceOf record, Test::TestRecord, 'Not a TestRecord'
@@ -31,11 +31,11 @@ describe 'Record', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -71,11 +71,11 @@ describe 'Record', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -113,11 +113,11 @@ describe 'Record', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -154,11 +154,11 @@ describe 'Record', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -198,11 +198,11 @@ describe 'Record', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -239,11 +239,11 @@ describe 'Record', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,

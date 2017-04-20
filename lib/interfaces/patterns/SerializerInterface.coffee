@@ -9,7 +9,7 @@ module.exports = (Module)->
   class SerializerInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @virtual collection: Module::CollectionInterface
 

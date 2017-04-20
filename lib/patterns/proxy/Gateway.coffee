@@ -9,7 +9,7 @@ module.exports = (App)->
     @inheritProtected()
     @include Module::CrudEndpointsMixin
 
-    @Module: App
+    @module App
 
   return App::CrudGateway.initialize()
 ```
@@ -49,7 +49,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::GatewayInterface
 
-    @Module: Module
+    @module Module
 
     ipoEndpoints = @private endpoints: Object
 

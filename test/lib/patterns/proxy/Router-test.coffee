@@ -15,7 +15,7 @@ describe 'Router', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
               @resource 'test2'
@@ -34,7 +34,7 @@ describe 'Router', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2'
             @defineMethod [], 'get', '/get', resource: 'test2'
@@ -53,7 +53,7 @@ describe 'Router', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
             @get 'test3', resource: 'test2'
@@ -71,7 +71,7 @@ describe 'Router', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
             @post 'test3', resource: 'test2'
@@ -89,7 +89,7 @@ describe 'Router', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
             @put 'test3', resource: 'test2'
@@ -107,7 +107,7 @@ describe 'Router', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
             @patch 'test3', resource: 'test2'
@@ -125,7 +125,7 @@ describe 'Router', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
             @delete 'test3', resource: 'test2'
@@ -143,7 +143,7 @@ describe 'Router', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', except: 'patch', ->
               @member ->
@@ -163,7 +163,7 @@ describe 'Router', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', except: 'patch', ->
               @collection ->
@@ -184,7 +184,7 @@ describe 'Router', ->
 
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @post '/auth/signin', to: 'auth#signin'
             @resource 'users', except: 'delete', ->

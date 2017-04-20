@@ -4,7 +4,7 @@ module.exports = (Module)->
   class JunctionMediator extends Module::Mediator
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @static ACCEPT_INPUT_PIPE: String,
       default: 'acceptInputPipe'

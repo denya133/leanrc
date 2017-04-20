@@ -5,7 +5,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::EndpointInterface
 
-    @Module: Module
+    @module Module
 
     @public gateway: Module::GatewayInterface
 

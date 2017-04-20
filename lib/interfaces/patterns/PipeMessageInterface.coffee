@@ -5,7 +5,7 @@ module.exports = (Module)->
 
   class PipeMessageInterface extends Module::Interface
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public @static @virtual PRIORITY_HIGH: Number
     @public @static @virtual PRIORITY_MED: Number

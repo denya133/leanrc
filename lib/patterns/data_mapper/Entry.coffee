@@ -6,7 +6,7 @@ joi = require 'joi'
 class App::TomatoEntry extends Module::Entry
   @inheritProtected()
 
-  @Module: App
+  @module App
 
   @attr title: String,
     validate: -> joi.string() # !!! нужен для сложной валидации данных
@@ -34,7 +34,7 @@ module.exports = (Module)->
     @implements Module::RecordInterface
     @include Module::RecordMixin
 
-    @Module: Module
+    @module Module
 
     @attribute id: String
     @attribute rev: String

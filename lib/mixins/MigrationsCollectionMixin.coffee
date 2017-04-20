@@ -10,9 +10,22 @@ module.exports = (Module)->
     @include Module::ArangoCollectionMixin
     @include Module::MigrationsCollectionMixin
 
-    @Module: Module
+    @module Module
 
   MigrationsCollection.initialize()
+```
+
+```coffee
+module.exports = (Module)->
+  {MIGRATIONS} = Module::
+
+  class BaseMigration extends Module::Migration
+    @inheritProtected()
+    @include Module::ArangoMigrationMixin
+
+    @module Module
+
+  BaseMigration.initialize()
 ```
 
 ```coffee
@@ -22,12 +35,13 @@ module.exports = (Module)->
   class PrepareModelCommand extends Module::SimpleCommand
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public execute: Function,
       default: ->
         #...
-        @facade.registerProxy Module::MigrationsCollection.new MIGRATIONS
+        @facade.registerProxy Module::MigrationsCollection.new MIGRATIONS,
+          delegate: Module::BaseMigration
         #...
 
   PrepareModelCommand.initialize()
@@ -42,7 +56,7 @@ module.exports = (Module)->
   class MigrationsCollectionMixin extends Module::Mixin
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @async migrate: Function,
       args: []

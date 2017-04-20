@@ -4,7 +4,7 @@ module.exports = (Module)->
   class Queue extends Module::Pipe
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     ipoOutput = Symbol.for '~output'
     ipsMode = @protected mode: String,

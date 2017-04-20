@@ -3,7 +3,7 @@
 module.exports = (Module) ->
   class StartupCommand extends Module::MacroCommand
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public initializeMacroCommand: Function,
       default: ->

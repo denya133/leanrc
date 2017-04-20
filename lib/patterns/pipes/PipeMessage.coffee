@@ -5,7 +5,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::PipeMessageInterface
 
-    @Module: Module
+    @module Module
 
     @public @static PRIORITY_HIGH: Number,
       default: 1

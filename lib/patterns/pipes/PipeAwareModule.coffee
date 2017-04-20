@@ -10,7 +10,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::PipeAwareInterface
 
-    @Module: Module
+    @module Module
 
     @public @static STDOUT: String,
       default: 'standardOutput'

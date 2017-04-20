@@ -13,7 +13,7 @@ module.exports = (Module)->
     @inheritProtected()
     # @implements Module::ResourceInterface # может и не нужен
 
-    @Module: Module
+    @module Module
 
 
   Resource.initialize()

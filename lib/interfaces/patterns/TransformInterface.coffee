@@ -8,7 +8,7 @@ module.exports = (Module)->
   class TransformInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @static @virtual normalize: Function,
       args: [ANY] # data

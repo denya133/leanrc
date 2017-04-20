@@ -5,7 +5,7 @@ module.exports = (Module)->
     @inheritProtected()
     @include Module::ProxyInterface
 
-    @Module: Module
+    @module Module
 
     @public @virtual render: Function,
       args: [Object, Object]

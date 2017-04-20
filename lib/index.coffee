@@ -11,7 +11,9 @@ class LeanRC extends RC
   @const HANDLER_RESULT:  0
   @const RECORD_CHANGED:  1
   @const CONFIGURATION:  2
-  @const STARTUP: Symbol 'startup'
+  @const STARTUP: Symbol 'startup' # для сигнала
+  @const MIGRATE: Symbol 'migrate' # для сигнала
+  @const ROLLBACK: Symbol 'rollback' # для сигнала
   @const MIGRATIONS: Symbol 'MigrationsCollection'
 
   require('./interfaces/patterns/TransformInterface') LeanRC
@@ -43,6 +45,7 @@ class LeanRC extends RC
   require('./interfaces/mixins/IterableMixinInterface') LeanRC
   require('./interfaces/mixins/QueryableMixinInterface') LeanRC
   require('./interfaces/mixins/RelationsMixinInterface') LeanRC
+  # require('./interfaces/mixins/MigrationsCollectionMixin') LeanRC
 
   require('./interfaces/core/ControllerInterface') LeanRC
   require('./interfaces/core/ModelInterface') LeanRC
@@ -86,8 +89,9 @@ class LeanRC extends RC
   require('./patterns/command/MacroCommand') LeanRC #tested
   require('./patterns/command/Stock') LeanRC
   # require('./patterns/command/MigrateCommand') LeanRC # empty
-  # require('./patterns/command/Migration') LeanRC # empty
   # require('./patterns/command/Rollback') LeanRC # empty
+
+  # require('./patterns/migration/Migration') LeanRC # empty
 
   require('./patterns/gateway/Endpoint') LeanRC #tested
 

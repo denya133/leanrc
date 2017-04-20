@@ -10,7 +10,7 @@ module.exports = (Module)->
     @include Module::ChainsMixin
     @implements Module::StockInterface
 
-    @Module: Module
+    @module Module
 
     # @public entityName: String # Имя сущности должно быть установлено при объявлении дочернего класса
 

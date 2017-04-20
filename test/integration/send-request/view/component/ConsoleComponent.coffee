@@ -4,7 +4,7 @@ EventEmitter = require 'events'
 module.exports = (Module) ->
   class Module::ConsoleComponent extends Module::CoreObject
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @const MESSAGE_WRITTEN: 'messageWritten'
     @const SEND_REQUEST_EVENT: 'sendRequestEvent'

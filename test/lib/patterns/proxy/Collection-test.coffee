@@ -16,11 +16,11 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
         Test::TestCollection.initialize()
@@ -36,11 +36,11 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
         Test::TestCollection.initialize()
@@ -56,11 +56,11 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
         Test::TestCollection.initialize()
@@ -76,11 +76,11 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
         Test::TestCollection.initialize()
@@ -97,17 +97,17 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
         Test::TestCollection.initialize()
         class Test::TestMediator extends LeanRC::Mediator
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public listNotificationInterests: Function,
             default: -> [ LeanRC::RECORD_CHANGED ]
           @public handleNotification: Function,
@@ -130,11 +130,11 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
         Test::TestCollection.initialize()
@@ -150,13 +150,13 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
         Test::TestCollection.initialize()
@@ -175,13 +175,13 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public push: Function,
@@ -201,13 +201,13 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -241,13 +241,13 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -281,13 +281,13 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -316,13 +316,13 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -349,12 +349,12 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -389,13 +389,13 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -429,13 +429,13 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -469,7 +469,7 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
           @public init: Function,
@@ -479,7 +479,7 @@ describe 'Collection', ->
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -504,7 +504,7 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
           @public init: Function,
@@ -514,7 +514,7 @@ describe 'Collection', ->
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public data: Array,
@@ -553,13 +553,13 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public serializer: Object,
@@ -579,13 +579,13 @@ describe 'Collection', ->
 
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @attribute data: Number
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
           @public serializer: Object,

@@ -12,7 +12,7 @@ module.exports = (Module)->
   class StockInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @virtual entityName: String
     @public @virtual keyName: String

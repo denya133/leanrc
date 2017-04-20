@@ -9,7 +9,7 @@ module.exports = (Module)->
     @inheritProtected()
     @include Module::TransformInterface
 
-    @Module: Module
+    @module Module
 
     @public @virtual collection: Module::CollectionInterface
 

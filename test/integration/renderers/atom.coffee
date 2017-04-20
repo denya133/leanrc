@@ -7,7 +7,7 @@ module.exports = (Module) ->
   class AtomRenderer extends Module::Renderer
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public render: Function,
       default: (aoData, aoOptions) ->

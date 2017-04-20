@@ -6,7 +6,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::NotificationInterface
 
-    @Module: Module
+    @module Module
 
     ipsName = @private name: String
     ipoBody = @private body: Module::ANY

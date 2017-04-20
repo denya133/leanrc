@@ -5,7 +5,7 @@ module.exports = (Module)->
 
   class ControllerInterface extends Module::Interface
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public @virtual executeCommand: Function,
       args: [Module::NotificationInterface]

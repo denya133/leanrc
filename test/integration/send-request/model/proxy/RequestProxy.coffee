@@ -4,7 +4,7 @@ request = require 'request'
 module.exports = (Module) ->
   class RequestProxy extends Module::Proxy
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @const REQUEST_PROXY: 'requestProxy'
 

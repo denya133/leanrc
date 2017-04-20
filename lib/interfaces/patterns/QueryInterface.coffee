@@ -7,7 +7,7 @@ module.exports = (Module)->
   class QueryInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @static @virtual operatorsMap: Object
 

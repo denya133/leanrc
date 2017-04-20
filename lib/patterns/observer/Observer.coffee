@@ -7,7 +7,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::ObserverInterface
 
-    @Module: Module
+    @module Module
 
     ipoNotify = @private notify: ANY
     ipoContext = @private context: ANY

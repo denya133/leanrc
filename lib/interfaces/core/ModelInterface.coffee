@@ -5,7 +5,7 @@ module.exports = (Module)->
 
   class ModelInterface extends Module::Interface
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public @virtual registerProxy: Function,
       args: [Module::ProxyInterface]

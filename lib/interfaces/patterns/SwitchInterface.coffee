@@ -6,7 +6,7 @@ module.exports = (Module)->
   class SwitchInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @virtual routerName: String
 

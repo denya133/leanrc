@@ -36,11 +36,14 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::CollectionInterface
 
-    @Module: Module
+    @module Module
 
-    @public delegate: Module::Class # устанавливается при инстанцировании прокси
+    @public delegate: Module::Class,
+      get: (delegate)->
+        delegate ? @getData().delegate
     @public serializer: Module::Class,
-      default: Module::Serializer
+      get: (serializer)->
+        serializer ? @getData().serializer ? Module::Serializer
 
     @public collectionName: Function,
       default: ->

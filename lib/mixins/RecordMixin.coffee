@@ -7,7 +7,7 @@ module.exports = (Module)->
   class RecordMixin extends Module::Mixin
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     # конструктор принимает второй аргумент, ссылку на коллекцию.
     @public collection: Module::CollectionInterface

@@ -5,7 +5,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::CommandInterface
 
-    @Module: Module
+    @module Module
 
     @public execute: Function,
       default: ->

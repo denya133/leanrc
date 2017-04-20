@@ -6,7 +6,7 @@ module.exports = (Module)->
   class MigrationInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @async @virtual createCollection: Function,
       args: [String, Object]

@@ -5,7 +5,7 @@ module.exports = (Module)->
 
   class ViewInterface extends Module::Interface
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public @virtual registerObserver: Function,
       args: [String, Module::ObserverInterface]

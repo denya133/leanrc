@@ -3,7 +3,7 @@
 module.exports = (Module) ->
   class AnimateRobotCommand extends Module::SimpleCommand
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public execute: Function,
       default: ->

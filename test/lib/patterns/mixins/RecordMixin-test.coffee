@@ -17,7 +17,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) ->
               Test::TestRecord
@@ -35,7 +35,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) ->
               Test::TestRecord
@@ -55,7 +55,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) ->
               Test::TestRecord
@@ -76,7 +76,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) ->
               Test::TestRecord
@@ -94,7 +94,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @attribute string: String
@@ -119,7 +119,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @computed string: String,
@@ -148,7 +148,7 @@ describe 'RecordMixin', ->
         class TestsCollection extends TestsModule::CoreObject
           @inheritProtected()
           @include TestsModule::CollectionInterface
-          @Module: TestsModule
+          @module TestsModule
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -175,7 +175,7 @@ describe 'RecordMixin', ->
         class TestRecord extends TestsModule::CoreObject
           @inheritProtected()
           @include TestsModule::RecordMixin
-          @Module: TestsModule
+          @module TestsModule
           @public @static findModelByName: Function,
             default: (asType) -> TestsModule::TestRecord
         TestRecord.initialize()
@@ -198,7 +198,7 @@ describe 'RecordMixin', ->
         class TestsCollection extends TestsModule::CoreObject
           @inheritProtected()
           @include TestsModule::CollectionInterface
-          @Module: TestsModule
+          @module TestsModule
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -226,7 +226,7 @@ describe 'RecordMixin', ->
         class TestRecord extends TestsModule::CoreObject
           @inheritProtected()
           @include TestsModule::RecordMixin
-          @Module: TestsModule
+          @module TestsModule
           @public @static findModelByName: Function,
             default: (asType) -> TestsModule::TestRecord
         TestRecord.initialize()
@@ -249,7 +249,7 @@ describe 'RecordMixin', ->
         class TestsCollection extends TestsModule::CoreObject
           @inheritProtected()
           @include TestsModule::CollectionInterface
-          @Module: TestsModule
+          @module TestsModule
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -286,7 +286,7 @@ describe 'RecordMixin', ->
         class TestRecord extends TestsModule::CoreObject
           @inheritProtected()
           @include TestsModule::RecordMixin
-          @Module: TestsModule
+          @module TestsModule
           @public @static findModelByName: Function,
             default: (asType) -> TestsModule::TestRecord
           @attr test: String
@@ -310,7 +310,7 @@ describe 'RecordMixin', ->
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::CollectionInterface
-          @Module: Test
+          @module Test
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -339,7 +339,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: String
@@ -361,7 +361,7 @@ describe 'RecordMixin', ->
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::CollectionInterface
-          @Module: Test
+          @module Test
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -390,7 +390,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: String
@@ -411,7 +411,7 @@ describe 'RecordMixin', ->
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::CollectionInterface
-          @Module: Test
+          @module Test
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -435,7 +435,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: String
@@ -458,7 +458,7 @@ describe 'RecordMixin', ->
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::CollectionInterface
-          @Module: Test
+          @module Test
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -492,7 +492,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: String
@@ -515,7 +515,7 @@ describe 'RecordMixin', ->
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::CollectionInterface
-          @Module: Test
+          @module Test
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -544,7 +544,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: Number
@@ -575,7 +575,7 @@ describe 'RecordMixin', ->
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::CollectionInterface
-          @Module: Test
+          @module Test
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -604,7 +604,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: Number
@@ -638,7 +638,7 @@ describe 'RecordMixin', ->
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::CollectionInterface
-          @Module: Test
+          @module Test
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -667,7 +667,7 @@ describe 'RecordMixin', ->
         class Test::BasicTestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::BasicTestRecord
           @attribute updatedAt: Date
@@ -677,7 +677,7 @@ describe 'RecordMixin', ->
         Test::BasicTestRecord.initialize()
         class Test::TestRecord extends Test::BasicTestRecord
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
         Test::TestRecord.initialize()
@@ -700,7 +700,7 @@ describe 'RecordMixin', ->
         class Test::Collection extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::CollectionInterface
-          @Module: Test
+          @module Test
           ipsKey = @protected key: String
           ipsName = @protected name: String
           iphData = @protected data: Object
@@ -729,7 +729,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: Number
@@ -762,7 +762,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: Number

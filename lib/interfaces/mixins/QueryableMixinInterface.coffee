@@ -9,7 +9,7 @@ module.exports = (Module)->
   class QueryableMixinInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: Module
+    @module Module
 
     @public @async @virtual deleteBy: Function,
       args: [Object]

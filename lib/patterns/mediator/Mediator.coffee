@@ -5,7 +5,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::MediatorInterface
 
-    @Module: Module
+    @module Module
 
     ipsMediatorName = @private mediatorName: String
     ipoViewComponent = @private viewComponent: Module::ANY

@@ -5,7 +5,7 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::PipeFittingInterface
 
-    @Module: Module
+    @module Module
 
     iplOutputs = @protected outputs: Array
 

@@ -5,7 +5,7 @@ handleSendRequest = null
 module.exports = (Module) ->
   class ConsoleComponentMediator extends Module::Mediator
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @const CONSOLE_MEDIATOR: 'consoleMediator'
 

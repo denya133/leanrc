@@ -4,7 +4,7 @@ EventEmitter = require 'events'
 module.exports = (Module) ->
   class ConsoleComponent extends Module::CoreObject
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public @static ANIMATE_ROBOT_EVENT: String,
       default: 'animateRobotEvent'
