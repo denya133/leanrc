@@ -79,21 +79,23 @@ module.exports = (Module)->
 
     @const UP: Symbol 'UP'
     @const DOWN: Symbol 'DOWN'
-    @const SUPPORTED_TYPES: [
-      'json'
-      'binary'
-      'boolean'
-      'date'
-      'datetime'
-      'decimal'
-      'float'
-      'integer'
-      'primary_key'
-      'string'
-      'text'
-      'time'
-      'timestamp'
-    ]
+    @const SUPPORTED_TYPES: {
+      json:         Symbol 'json'
+      binary:       Symbol 'binary'
+      boolean:      Symbol 'boolean'
+      date:         Symbol 'date'
+      datetime:     Symbol 'datetime'
+      decimal:      Symbol 'decimal'
+      float:        Symbol 'float'
+      integer:      Symbol 'integer'
+      primary_key:  Symbol 'primary_key'
+      string:       Symbol 'string'
+      text:         Symbol 'text'
+      time:         Symbol 'time'
+      timestamp:    Symbol 'timestamp'
+      array:        Symbol 'array'
+      hash:         Symbol 'hash'
+    }
     @const REVERSE_MAP:
       createCollection: 'dropCollection'
       dropCollection: 'createCollection'
