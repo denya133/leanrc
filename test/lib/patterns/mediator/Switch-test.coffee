@@ -287,7 +287,13 @@ describe 'Switch', ->
           @module Test
         Test::TestRouter.initialize()
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
-        facade.registerProxy LeanRC::Proxy.new LeanRC::CONFIGURATION,
+        class AppConfiguration extends LeanRC::Configuration
+          @inheritProtected()
+          @module Test
+          @public configs: Object,
+            get: -> @getData()
+        AppConfiguration.initialize()
+        facade.registerProxy AppConfiguration.new LeanRC::CONFIGURATION,
           currentUserCookie: 'cuc'
         class Test::TestSwitch extends Switch
           @inheritProtected()
