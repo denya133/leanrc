@@ -10,7 +10,7 @@ class LeanRC extends RC
 
   @const HANDLER_RESULT:  0
   @const RECORD_CHANGED:  1
-  @const CONFIGURATION:  2
+  @const CONFIGURATION:  Symbol 'ConfigurationProxy'
   @const STARTUP: Symbol 'startup' # для сигнала
   @const MIGRATE: Symbol 'migrate' # для сигнала
   @const ROLLBACK: Symbol 'rollback' # для сигнала
@@ -76,7 +76,7 @@ class LeanRC extends RC
 
   require('./patterns/proxy/Proxy') LeanRC #tested
   require('./patterns/proxy/Collection') LeanRC #tested
-  # require('./patterns/proxy/Configuration') LeanRC # empty
+  require('./patterns/proxy/Configuration') LeanRC
   require('./patterns/proxy/Gateway') LeanRC #tested
   require('./patterns/proxy/Renderer') LeanRC #tested
   require('./patterns/proxy/Resource') LeanRC
