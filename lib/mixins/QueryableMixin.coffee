@@ -24,13 +24,13 @@ module.exports = (LeanRC)->
     @public @async deleteBy: Function,
       default: (query)->
         vlRecords = yield @takeBy query
-        vlRecords.forEach (aoRecord)-> yield aoRecord.delete()
+        yield vlRecords.forEach (aoRecord)-> yield aoRecord.delete()
         return
 
     @public @async destroyBy: Function,
       default: (query)->
         vlRecords = yield @takeBy query
-        vlRecords.forEach (aoRecord)-> yield aoRecord.destroy()
+        yield vlRecords.forEach (aoRecord)-> yield aoRecord.destroy()
         return
 
     @public @async @async removeBy: Function,
@@ -53,7 +53,7 @@ module.exports = (LeanRC)->
     @public @async replaceBy: Function,
       default: (query, properties)->
         vlRecords = yield @takeBy query
-        vlRecords.forEach (aoRecord)->
+        yield vlRecords.forEach (aoRecord)->
           yield aoRecord.updateAttributes properties
         return
 
@@ -68,7 +68,7 @@ module.exports = (LeanRC)->
     @public @async updateBy: Function,
       default: (query, properties)->
         vlRecords = yield @takeBy query
-        vlRecords.forEach (aoRecord)->
+        yield vlRecords.forEach (aoRecord)->
           yield aoRecord.updateAttributes properties
         return
 

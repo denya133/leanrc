@@ -331,7 +331,7 @@ module.exports = (LeanRC)->
         request = @[ipmRequestFor] aoQuery
 
         resultItems = yield @[ipmMakeRequest] request
-        voCursor = LeanRC::Cursor.new @delegate, resultItems
+        voCursor = LeanRC::Cursor.new @, resultItems
         return voCursor
 
 

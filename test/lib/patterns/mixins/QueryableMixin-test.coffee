@@ -157,7 +157,7 @@ describe 'QueryableMixin', ->
   describe '#findBy', ->
     it 'should find data by query', ->
       co ->
-        KEY = 'FACADE_TEST_QUERYABLE_002'
+        KEY = 'FACADE_TEST_QUERYABLE_003'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -209,4 +209,75 @@ describe 'QueryableMixin', ->
         assert.equal record1.test, 'test2'
         record2 = yield (yield queryable.findBy { test: 'test5' }).next()
         assert.isUndefined record2
+        yield return
+  describe '#deleteBy', ->
+    it 'should mark data as deleted by query', ->
+      co ->
+        KEY = 'FACADE_TEST_QUERYABLE_004'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::Queryable extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public parseQuery: Object,
+            default: (aoQuery) -> aoQuery
+          @public @async executeQuery: LeanRC::Cursor,
+            default: (aoParsedQuery) ->
+              data = _.filter @getData(), aoParsedQuery.$filter
+              yield LeanRC::Cursor.new @, data
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              data = _.filter @getData(), { _key: id }
+              if _.isArray data
+                for datum in data
+                  if item.constructor.attributes?
+                    vhAttributes = {}
+                    for own key of item.constructor.attributes
+                      datum[key] = item[key]
+                  else
+                    datum[key] = value  for own key, value of item
+              yield return data.length > 0
+          @public take: Function,
+            default: (id) ->
+              data = _.find @getData(), { _key: id }
+              throw new Error 'NOT_FOUND'  unless data?
+              yield data
+          @public push: Function,
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @getData().push @delegate.serialize record
+              yield return
+        Test::Queryable.initialize()
+        collection = Test::Queryable.new KEY, []
+        facade.registerProxy collection
+        queryable = facade.retrieveProxy KEY
+        yield queryable.create test: 'test1'
+        yield queryable.create test: 'test2'
+        yield queryable.create test: 'test3'
+        yield queryable.create test: 'test2'
+        yield queryable.deleteBy { test: 'test2' }
+        for rawData in queryable.getData()
+          assert.isDefined rawData, 'No specified record'
+          if rawData.test is 'test2'
+            assert.propertyVal rawData, 'isHidden', yes, 'Record was not removed'
+            assert.isNotNull rawData.deletedAt, 'Record deleted data is null'
+            assert.isDefined rawData.deletedAt, 'Record deleted data is undefined'
+          else
+            assert.propertyVal rawData, 'isHidden', no, 'Record was removed'
+            assert.isNull rawData.deletedAt, 'Record deleted data is not null'
         yield return
