@@ -9,9 +9,9 @@ module.exports = (Module) ->
     @module Module
 
     @public execute: Function,
-      default: ->
+      default: (options)->
         migrationsCollection = @facade.retriveProxy Module::MIGRATIONS
-        migrationsCollection.migrate()
+        migrationsCollection.migrate options
         return
 
 
