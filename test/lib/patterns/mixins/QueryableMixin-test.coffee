@@ -105,3 +105,52 @@ describe 'QueryableMixin', ->
         assert.equal record1.test, 'test2'
         assert.isUndefined record2
         yield return
+  describe '#exists', ->
+    it 'should check data existance by query', ->
+      co ->
+        KEY = 'FACADE_TEST_QUERYABLE_002'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+        Test::TestRecord.initialize()
+        class Test::Queryable extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public parseQuery: Object,
+            default: (aoQuery) -> aoQuery
+          @public @async executeQuery: LeanRC::Cursor,
+            default: (aoParsedQuery) ->
+              data = _.filter @getData(), aoParsedQuery.$filter
+              yield LeanRC::Cursor.new @delegate, data
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              record = yield @find id
+              record[key] = value  for own key, value of item
+              yield return record?
+          # @public take: Function,
+          #   default: (id) -> yield _.find @getData(), { id }
+          @public push: Function,
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @getData().push record
+              yield return
+        Test::Queryable.initialize()
+        collection = Test::Queryable.new KEY, []
+        facade.registerProxy collection
+        queryable = facade.retrieveProxy KEY
+        yield queryable.create test: 'test1'
+        yield queryable.create test: 'test2'
+        yield queryable.create test: 'test3'
+        yield queryable.create test: 'test4'
+        assert.isTrue yield queryable.exists { test: 'test2' }
+        assert.isFalse yield queryable.exists { test: 'test5' }
+        yield return
