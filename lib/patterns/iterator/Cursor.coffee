@@ -14,11 +14,12 @@ module.exports = (Module)->
     ipnCurrentIndex = @private currentIndex: Number,
       default: 0
     iplArray = @private array: Array
-    ipcRecord = @private Record: Module::Class
+
+    ipoCollection = @private collection: Module::Collection
 
     @public setRecord: Function,
       default: (acRecord)->
-        @[ipcRecord] = acRecord
+        @[ipoCollection] = acRecord
         return @
 
     @public @async toArray: Function,
@@ -28,12 +29,12 @@ module.exports = (Module)->
 
     @public @async next: Function,
       default: (acRecord = null)->
-        acRecord ?= @[ipcRecord]
+        acRecord ?= @[ipoCollection].delegate
         data = @[iplArray][@[ipnCurrentIndex]]
         @[ipnCurrentIndex]++
         yield Module::Promise.resolve if acRecord?
           if data?
-            acRecord.new data
+            acRecord.new data, @[ipoCollection]
           else
             data
         else
@@ -106,12 +107,12 @@ module.exports = (Module)->
 
     @public @async compact: Function,
       default: (acRecord = null)->
-        acRecord ?= @[ipcRecord]
-        index = 0
+        acRecord ?= @[ipoCollection].delegate
         records = []
         try
-          while yield @hasNext()
-            rawRecord = yield @[iplArray].next()
+          while @[ipnCurrentIndex] < yield @count()
+            rawRecord = @[iplArray][@[ipnCurrentIndex]]
+            ++@[ipnCurrentIndex]
             unless _.isNil rawRecord
               record = acRecord.new rawRecord
               records.push record
@@ -144,9 +145,9 @@ module.exports = (Module)->
           throw err
 
     @public init: Function,
-      default: (acRecord, alArray = null)->
+      default: (aoCollection, alArray = null)->
         @super arguments...
-        @[ipcRecord] = acRecord
+        @[ipoCollection] = aoCollection
         @[iplArray] = alArray
 
 

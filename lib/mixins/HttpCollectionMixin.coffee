@@ -329,7 +329,7 @@ module.exports = (Module)->
         request = @[ipmRequestFor] aoQuery
 
         resultItems = yield @[ipmMakeRequest] request
-        voCursor = Module::Cursor.new @delegate, resultItems
+        voCursor = Module::Cursor.new @, resultItems
         return voCursor
 
 
