@@ -10,43 +10,43 @@ class LeanRC extends RC::Module
   @const RECORD_CHANGED:  1
   @const CONFIGURATION:  2
 
-  require('./interfaces/patterns/TransformInterface') LeanRC
-  require('./interfaces/patterns/NotificationInterface') LeanRC
-  require('./interfaces/patterns/NotifierInterface') LeanRC
-  require('./interfaces/patterns/ObserverInterface') LeanRC
-  require('./interfaces/patterns/CommandInterface') LeanRC
-  require('./interfaces/patterns/MediatorInterface') LeanRC
-  require('./interfaces/patterns/ProxyInterface') LeanRC
-  require('./interfaces/patterns/SerializerInterface') LeanRC
-  require('./interfaces/patterns/FacadeInterface') LeanRC
-  require('./interfaces/patterns/RecordInterface') LeanRC
-  require('./interfaces/patterns/CollectionInterface') LeanRC
-  require('./interfaces/patterns/QueryInterface') LeanRC
-  require('./interfaces/patterns/CursorInterface') LeanRC
-  require('./interfaces/patterns/EndpointInterface') LeanRC
-  require('./interfaces/patterns/GatewayInterface') LeanRC
-  require('./interfaces/patterns/PipeAwareInterface') LeanRC
-  require('./interfaces/patterns/PipeFittingInterface') LeanRC
-  require('./interfaces/patterns/PipeMessageInterface') LeanRC
-  require('./interfaces/patterns/RendererInterface') LeanRC
-  # require('./interfaces/patterns/ResourceInterface') LeanRC # empty
-  require('./interfaces/patterns/StockInterface') LeanRC
-  require('./interfaces/patterns/RouterInterface') LeanRC
-  # require('./interfaces/patterns/RouteInterface') LeanRC # empty
-  require('./interfaces/patterns/SwitchInterface') LeanRC
+  require('./interfaces/patterns/TransformInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/NotificationInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/NotifierInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/ObserverInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/CommandInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/MediatorInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/ProxyInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/SerializerInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/FacadeInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/RecordInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/CollectionInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/QueryInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/CursorInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/EndpointInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/GatewayInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/PipeAwareInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/PipeFittingInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/PipeMessageInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/RendererInterface') LeanRC #does not need testing
+  # require('./interfaces/patterns/ResourceInterface') LeanRC # empty #does not need testing
+  require('./interfaces/patterns/StockInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/RouterInterface') LeanRC #does not need testing
+  # require('./interfaces/patterns/RouteInterface') LeanRC # empty #does not need testing
+  require('./interfaces/patterns/SwitchInterface') LeanRC #does not need testing
 
-  require('./interfaces/mixins/CrudEndpointsMixinInterface') LeanRC
-  require('./interfaces/mixins/IterableMixinInterface') LeanRC
-  require('./interfaces/mixins/QueryableMixinInterface') LeanRC
-  require('./interfaces/mixins/RelationsMixinInterface') LeanRC
+  require('./interfaces/mixins/CrudEndpointsMixinInterface') LeanRC #does not need testing
+  require('./interfaces/mixins/IterableMixinInterface') LeanRC #does not need testing
+  require('./interfaces/mixins/QueryableMixinInterface') LeanRC #does not need testing
+  require('./interfaces/mixins/RelationsMixinInterface') LeanRC #does not need testing
 
-  require('./interfaces/core/ControllerInterface') LeanRC
-  require('./interfaces/core/ModelInterface') LeanRC
-  require('./interfaces/core/ViewInterface') LeanRC
+  require('./interfaces/core/ControllerInterface') LeanRC #does not need testing
+  require('./interfaces/core/ModelInterface') LeanRC #does not need testing
+  require('./interfaces/core/ViewInterface') LeanRC #does not need testing
 
   require('./mixins/CrudEndpointsMixin') LeanRC
   require('./mixins/HttpCollectionMixin') LeanRC
-  require('./mixins/IterableMixin') LeanRC
+  require('./mixins/IterableMixin') LeanRC #tested
   # require('./mixins/PipesSwitchMixin') LeanRC # empty
   require('./mixins/QueryableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC #tested

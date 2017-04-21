@@ -6,7 +6,7 @@ RC = require 'RC'
 
 describe 'IterableMixin', ->
   describe '.new', ->
-    it 'should create cursor instance', ->
+    it 'should create iterable instance', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
