@@ -154,3 +154,59 @@ describe 'QueryableMixin', ->
         assert.isTrue yield queryable.exists { test: 'test2' }
         assert.isFalse yield queryable.exists { test: 'test5' }
         yield return
+  describe '#findBy', ->
+    it 'should find data by query', ->
+      co ->
+        KEY = 'FACADE_TEST_QUERYABLE_002'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::Queryable extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public parseQuery: Object,
+            default: (aoQuery) -> aoQuery
+          @public @async executeQuery: LeanRC::Cursor,
+            default: (aoParsedQuery) ->
+              data = _.filter @getData(), aoParsedQuery.$filter
+              yield LeanRC::Cursor.new @delegate, data
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              record = yield @find id
+              record[key] = value  for own key, value of item
+              yield return record?
+          # @public take: Function,
+          #   default: (id) -> yield _.find @getData(), { id }
+          @public push: Function,
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @getData().push @delegate.serialize record
+              yield return
+        Test::Queryable.initialize()
+        collection = Test::Queryable.new KEY, []
+        facade.registerProxy collection
+        queryable = facade.retrieveProxy KEY
+        yield queryable.create test: 'test1'
+        yield queryable.create test: 'test2'
+        yield queryable.create test: 'test3'
+        yield queryable.create test: 'test4'
+        record1 = yield (yield queryable.findBy { test: 'test2' }).next()
+        assert.isDefined record1
+        assert.equal record1.test, 'test2'
+        record2 = yield (yield queryable.findBy { test: 'test5' }).next()
+        assert.isUndefined record2
+        yield return
