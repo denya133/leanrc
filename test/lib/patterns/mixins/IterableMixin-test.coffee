@@ -37,7 +37,7 @@ describe 'IterableMixin', ->
         assert.equal (yield cursor.count()), 3, 'Records length does not match'
         return
   describe '#forEach', ->
-    it 'should call lambda in each record in cursor', ->
+    it 'should call lambda in each record in iterable', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -74,7 +74,6 @@ describe 'IterableMixin', ->
         assert.equal spyLambda.args[2][0].data, 'in', 'Lambda 3rd call is not match'
         assert.equal spyLambda.args[3][0].data, 'a boat', 'Lambda 4th call is not match'
         return
-  ###
   describe '#map', ->
     it 'should map records using lambda', ->
       co ->
@@ -86,9 +85,26 @@ describe 'IterableMixin', ->
           @Module: Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
+        Test::TestRecord.initialize()
+        class Test::Iterable extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::IterableMixin
+          @Module: Test
+          ipcRecord = @protected record: Test::TestRecord
+          iplArray = @protected array: Array
+          @public init: Function,
+            default: (args...) ->
+              @super args...
+              [vcRecord, vlArray] = args
+              @[ipcRecord] = vcRecord
+              @[iplArray] = vlArray
+          @public @async takeAll: Function,
+            default: ->
+              yield RC::Promise.resolve LeanRC::Cursor.new @[ipcRecord], @[iplArray]
+        Test::Iterable.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
-        cursor = Cursor.new Test::TestRecord, array
-        records = yield cursor.map (record) ->
+        iterable = Test::Iterable.new Test::TestRecord, array
+        records = yield iterable.map (record) ->
           record.data = '+' + record.data + '+'
           yield RC::Promise.resolve record
         assert.lengthOf records, 4, 'Records count is not match'
@@ -97,6 +113,7 @@ describe 'IterableMixin', ->
         assert.equal records[2].data, '+in+', '3rd record is not match'
         assert.equal records[3].data, '+a boat+', '4th record is not match'
         return
+  ###
   describe '#filter', ->
     it 'should filter records using lambda', ->
       co ->
