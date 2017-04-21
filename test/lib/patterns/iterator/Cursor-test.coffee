@@ -191,14 +191,14 @@ describe 'Cursor', ->
           @Module: Test
           @attribute name: String, { default: 'Unknown' }
         Test::TestRecord.initialize()
-        array = [ { name: 'Jay' }, { name: 'George' }, { name: 'Harris' } ]
+        array = [ { name: 'Jerome' }, { name: 'George' }, { name: 'Harris' } ]
         cursor = Cursor.new Test::TestRecord, array
         record = yield cursor.find (record) ->
           yield RC::Promise.resolve record.name is 'George'
         assert.equal record.name, 'George', 'Record is not match'
         return
   describe '#compact', ->
-    it 'should call lambda in each record in cursor', ->
+    it 'should get non-empty records from cursor', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -214,4 +214,24 @@ describe 'Cursor', ->
         assert.lengthOf records, 2, 'Records count not match'
         assert.equal records[0].data, 'men', '1st record is not match'
         assert.equal records[1].data, 'a boat', '2nd record is not match'
+        return
+  describe '#first', ->
+    it 'should get first record from cursor', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute data: String, { default: '' }
+        Test::TestRecord.initialize()
+        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        cursor = Cursor.new Test::TestRecord, array
+        record = yield cursor.first()
+        assert.equal record.data, 'three', '1st record is not match'
+        array = [ { data: 'Jerome' }, { data: 'George' }, { data: 'Harris' } ]
+        cursor = Cursor.new Test::TestRecord, array
+        record = yield cursor.first()
+        assert.equal record.data, 'Jerome', 'Another 1st record is not match'
         return
