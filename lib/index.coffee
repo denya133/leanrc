@@ -87,7 +87,7 @@ class LeanRC extends RC::Module
 
   require('./patterns/gateway/Endpoint') LeanRC #tested
 
-  require('./patterns/iterator/Cursor') LeanRC
+  require('./patterns/iterator/Cursor') LeanRC #tested
 
   require('./patterns/pipes/Pipe') LeanRC #tested
   require('./patterns/pipes/PipeMessage') LeanRC #tested

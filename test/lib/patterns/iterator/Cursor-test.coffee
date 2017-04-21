@@ -215,6 +215,28 @@ describe 'Cursor', ->
         assert.equal records[0].data, 'men', '1st record is not match'
         assert.equal records[1].data, 'a boat', '2nd record is not match'
         return
+  describe '#reduce', ->
+    it 'should reduce records using lambda', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute data: String, { default: '' }
+        Test::TestRecord.initialize()
+        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        cursor = Cursor.new Test::TestRecord, array
+        records = yield cursor.reduce (accumulator, item) ->
+          accumulator[item.data] = item
+          yield RC::Promise.resolve accumulator
+        , {}
+        assert.equal records['three'].data, 'three', '1st record is not match'
+        assert.equal records['men'].data, 'men', '2nd record is not match'
+        assert.equal records['in'].data, 'in', '3rd record is not match'
+        assert.equal records['a boat'].data, 'a boat', '4th record is not match'
+        return
   describe '#first', ->
     it 'should get first record from cursor', ->
       co ->
