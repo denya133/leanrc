@@ -107,11 +107,11 @@ module.exports = (LeanRC)->
     @public @async compact: Function,
       default: (acRecord = null)->
         acRecord ?= @[ipcRecord]
-        index = 0
         records = []
         try
-          while yield @hasNext()
-            rawRecord = yield @[iplArray].next()
+          while @[ipnCurrentIndex] < yield @count()
+            rawRecord = @[iplArray][@[ipnCurrentIndex]]
+            ++@[ipnCurrentIndex]
             unless _.isNil rawRecord
               record = acRecord.new rawRecord
               records.push record

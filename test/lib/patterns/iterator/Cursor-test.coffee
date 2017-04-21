@@ -155,7 +155,7 @@ describe 'Cursor', ->
         records = yield cursor.map (record) ->
           record.data = '+' + record.data + '+'
           yield RC::Promise.resolve record
-        assert.equal records.length, 4, 'Records count is not match'
+        assert.lengthOf records, 4, 'Records count is not match'
         assert.equal records[0].data, '+three+', '1st record is not match'
         assert.equal records[1].data, '+men+', '2nd record is not match'
         assert.equal records[2].data, '+in+', '3rd record is not match'
@@ -176,7 +176,42 @@ describe 'Cursor', ->
         cursor = Cursor.new Test::TestRecord, array
         records = yield cursor.filter (record) ->
           yield RC::Promise.resolve record.data.length > 3
-        assert.equal records.length, 2, 'Records count is not match'
+        assert.lengthOf records, 2, 'Records count is not match'
         assert.equal records[0].data, 'three', '1st record is not match'
+        assert.equal records[1].data, 'a boat', '2nd record is not match'
+        return
+  describe '#find', ->
+    it 'should find record using lambda', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute name: String, { default: 'Unknown' }
+        Test::TestRecord.initialize()
+        array = [ { name: 'Jay' }, { name: 'George' }, { name: 'Harris' } ]
+        cursor = Cursor.new Test::TestRecord, array
+        record = yield cursor.find (record) ->
+          yield RC::Promise.resolve record.name is 'George'
+        assert.equal record.name, 'George', 'Record is not match'
+        return
+  describe '#compact', ->
+    it 'should call lambda in each record in cursor', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute data: String, { default: '' }
+        Test::TestRecord.initialize()
+        array = [ null, { data: 'men' }, undefined, { data: 'a boat' } ]
+        cursor = Cursor.new Test::TestRecord, array
+        records = yield cursor.compact()
+        assert.lengthOf records, 2, 'Records count not match'
+        assert.equal records[0].data, 'men', '1st record is not match'
         assert.equal records[1].data, 'a boat', '2nd record is not match'
         return
