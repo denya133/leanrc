@@ -147,7 +147,6 @@ describe 'IterableMixin', ->
         assert.equal records[0].data, 'three', '1st record is not match'
         assert.equal records[1].data, 'a boat', '2nd record is not match'
         return
-  ###
   describe '#reduce', ->
     it 'should reduce records using lambda', ->
       co ->
@@ -159,9 +158,25 @@ describe 'IterableMixin', ->
           @Module: Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
+        class Test::Iterable extends RC::CoreObject
+          @inheritProtected()
+          @include LeanRC::IterableMixin
+          @Module: Test
+          ipcRecord = @protected record: Test::TestRecord
+          iplArray = @protected array: Array
+          @public init: Function,
+            default: (args...) ->
+              @super args...
+              [vcRecord, vlArray] = args
+              @[ipcRecord] = vcRecord
+              @[iplArray] = vlArray
+          @public @async takeAll: Function,
+            default: ->
+              yield RC::Promise.resolve LeanRC::Cursor.new @[ipcRecord], @[iplArray]
+        Test::Iterable.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
-        cursor = Cursor.new Test::TestRecord, array
-        records = yield cursor.reduce (accumulator, item) ->
+        iterable = Test::Iterable.new Test::TestRecord, array
+        records = yield iterable.reduce (accumulator, item) ->
           accumulator[item.data] = item
           yield RC::Promise.resolve accumulator
         , {}
@@ -170,4 +185,3 @@ describe 'IterableMixin', ->
         assert.equal records['in'].data, 'in', '3rd record is not match'
         assert.equal records['a boat'].data, 'a boat', '4th record is not match'
         return
-  ###
