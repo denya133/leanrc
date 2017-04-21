@@ -19,8 +19,8 @@ describe 'IterableMixin', ->
           @inheritProtected()
           @include LeanRC::IterableMixin
           @Module: Test
-          ipcRecord = @protected cursor: Test::TestRecord
-          iplArray = @protected cursor: Array
+          ipcRecord = @protected record: Test::TestRecord
+          iplArray = @protected array: Array
           @public init: Function,
             default: (args...) ->
               @super args...
@@ -36,7 +36,6 @@ describe 'IterableMixin', ->
         cursor = yield iterable.takeAll()
         assert.equal (yield cursor.count()), 3, 'Records length does not match'
         return
-  ###
   describe '#forEach', ->
     it 'should call lambda in each record in cursor', ->
       co ->
@@ -52,8 +51,8 @@ describe 'IterableMixin', ->
           @inheritProtected()
           @include LeanRC::IterableMixin
           @Module: Test
-          ipcRecord = @protected cursor: Test::TestRecord
-          iplArray = @protected cursor: Array
+          ipcRecord = @protected record: Test::TestRecord
+          iplArray = @protected array: Array
           @public init: Function,
             default: (args...) ->
               @super args...
@@ -62,7 +61,7 @@ describe 'IterableMixin', ->
               @[iplArray] = vlArray
           @public @async takeAll: Function,
             default: ->
-              yield RC::Promise.resolve LeanRC::Cursor @[ipcRecord], @[iplArray]
+              yield RC::Promise.resolve LeanRC::Cursor.new @[ipcRecord], @[iplArray]
         Test::Iterable.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
         iterable = Test::Iterable.new Test::TestRecord, array
@@ -75,7 +74,7 @@ describe 'IterableMixin', ->
         assert.equal spyLambda.args[2][0].data, 'in', 'Lambda 3rd call is not match'
         assert.equal spyLambda.args[3][0].data, 'a boat', 'Lambda 4th call is not match'
         return
-  ##
+  ###
   describe '#map', ->
     it 'should map records using lambda', ->
       co ->
