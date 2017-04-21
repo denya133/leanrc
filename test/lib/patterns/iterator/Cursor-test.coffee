@@ -139,3 +139,25 @@ describe 'Cursor', ->
         assert.equal spyLambda.args[2][0].data, 'in', 'Lambda 3rd call is not match'
         assert.equal spyLambda.args[3][0].data, 'a boat', 'Lambda 4th call is not match'
         return
+  describe '#map', ->
+    it 'should map records using lambda', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute data: String, { default: '' }
+        Test::TestRecord.initialize()
+        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        cursor = Cursor.new Test::TestRecord, array
+        records = yield cursor.map (record) ->
+          record.data = '+' + record.data + '+'
+          yield RC::Promise.resolve record
+        assert.equal records.length, 4, 'Records count is not match'
+        assert.equal records[0].data, '+three+', '1st record is not match'
+        assert.equal records[1].data, '+men+', '2nd record is not match'
+        assert.equal records[2].data, '+in+', '3rd record is not match'
+        assert.equal records[3].data, '+a boat+', '4th record is not match'
+        return
