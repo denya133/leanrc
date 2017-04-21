@@ -1,17 +1,109 @@
 # можно унаследовать от SimpleCommand
 # внутри он должен обратиться к фасаду чтобы тот вернул ему 'MigrationsCollection'
-# и уже у коллекции вызвать метод `rollback` - остальное ложится на плечи коллекции
+
+_             = require 'lodash'
+inflect       = do require 'i'
 
 
-module.exports = (Module) ->
-  class RollbackCommand extends Module::SimpleCommand
+###
+```coffee
+module.exports = (Module)->
+  {MIGRATIONS} = Module::
+
+  class BaseMigration extends Module::Migration
     @inheritProtected()
+    @include Module::ArangoMigrationMixin
+
+    @module Module
+
+  BaseMigration.initialize()
+```
+
+```coffee
+module.exports = (Module)->
+  {MIGRATIONS} = Module::
+
+  class PrepareModelCommand extends Module::SimpleCommand
+    @inheritProtected()
+
     @module Module
 
     @public execute: Function,
-      default: (options)->
-        migrationsCollection = @facade.retriveProxy Module::MIGRATIONS
-        migrationsCollection.rollback options
+      default: ->
+        #...
+        @facade.registerProxy Module::BaseCollection.new MIGRATIONS,
+          delegate: Module::BaseMigration
+        #...
+
+  PrepareModelCommand.initialize()
+```
+###
+
+# !!! Коллекция должна быть зарегистрирована через Module::MIGRATIONS константу
+
+
+module.exports = (Module) ->
+  {ANY, NILL} = Module::
+
+  class RollbackCommand extends Module::SimpleCommand
+    @inheritProtected()
+
+    @module Module
+
+    @public migrationsCollection: Module::CollectionInterface
+    @public migrationNames: Array
+
+    @public migrationsDir: String,
+      get: ->
+        "#{@Module::ROOT}/compiled_migrations"
+
+    @public init: Function,
+      default: (args...)->
+        @super args...
+        {filesList} = Module::Utils
+        @migrationsCollection = @facade.retriveProxy Module::MIGRATIONS
+        @migrationNames = _.orderBy filesList(@migrationsDir).map (i)=>
+          migrationName = i.replace '.js', ''
+          vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
+          require(vsMigrationPath) Module
+          migrationName
         return
+
+    @public execute: Function,
+      default: (options)->
+        @rollback options
+        return
+
+    @public @async rollback: Function,
+      args: []
+      return: NILL
+      default: (options)->
+        if options?.steps? and not _.isNumber options.steps
+          throw new Error 'Not valid steps params'
+          yield return
+
+        executedMigrations = yield @migrationsCollection.query {
+          $forIn: '@doc': @migrationsCollection.collectionName()
+          $sort: ['@doc._key': 'DESC']
+          $limit: options.steps ? 1
+        }
+          .toArray()
+
+        for executedMigration in executedMigrations
+          try
+            clearedMigrationName = executedMigration.replace /^\d{14}[_]/, ''
+            migrationClassName = inflect.camelize clearedMigrationName
+            vcMigration = Module::[migrationClassName]
+            voMigration = vcMigration.new {}, @migrationsCollection
+            yield voMigration.migrate Module::Migration::DOWN
+            yield voMigration.destroy()
+          catch err
+            error = "!!! Error in migration #{executedMigration}"
+            console.error error, err.message, err.stack
+            break
+          if options?.until? and options.until is migrationName
+            break
+        yield return
+
 
   RollbackCommand.initialize()

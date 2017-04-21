@@ -45,7 +45,6 @@ class LeanRC extends RC
   require('./interfaces/mixins/IterableMixinInterface') LeanRC
   require('./interfaces/mixins/QueryableMixinInterface') LeanRC
   require('./interfaces/mixins/RelationsMixinInterface') LeanRC
-  # require('./interfaces/mixins/MigrationsCollectionMixin') LeanRC
 
   require('./interfaces/core/ControllerInterface') LeanRC
   require('./interfaces/core/ModelInterface') LeanRC
