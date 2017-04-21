@@ -110,8 +110,6 @@ class LeanRC extends RC
   require('./patterns/pipes/TeeMerge') LeanRC #tested
   require('./patterns/pipes/TeeSplit') LeanRC #tested
 
-  # require('./patterns/renderer/Template') LeanRC # empty
-
   require('./patterns/facade/Facade') LeanRC #tested
   require('./patterns/facade/Application') LeanRC
 

@@ -72,7 +72,7 @@ module.exports = (Module)->
     @public sendHttpResponse: Function,
       args: [Object, Object, Object, Object]
       return: NILL
-      default: (req, res, aoData, {path, resource, action})->
+      default: (req, res, aoData, {method, path, resource, action})->
         switch (vsFormat = req.accepts @responseFormats)
           when 'json', 'html', 'xml', 'atom'
             if @["#{vsFormat}RendererName"]?
