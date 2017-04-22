@@ -51,7 +51,17 @@ module.exports = (Module) ->
     @module Module
 
     @public migrationsCollection: Module::CollectionInterface
-    @public migrationNames: Array
+    @public migrationNames: Module::PromiseInterface,
+      get: ->
+        {co, filesList} = Module::Utils
+        @[iplMigrationNames] ?= co =>
+          files = yield filesList @migrationsDir
+          yield return _.orderBy (files ? []).map (i)=>
+            migrationName = i.replace '.js', ''
+            vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
+            require(vsMigrationPath) Module
+            migrationName
+        @[iplMigrationNames]
 
     @public migrationsDir: String,
       get: ->
@@ -60,13 +70,7 @@ module.exports = (Module) ->
     @public init: Function,
       default: (args...)->
         @super args...
-        {filesList} = Module::Utils
         @migrationsCollection = @facade.retriveProxy Module::MIGRATIONS
-        @migrationNames = _.orderBy filesList(@migrationsDir).map (i)=>
-          migrationName = i.replace '.js', ''
-          vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
-          require(vsMigrationPath) Module
-          migrationName
         return
 
     @public execute: Function,
@@ -81,6 +85,8 @@ module.exports = (Module) ->
         if options?.steps? and not _.isNumber options.steps
           throw new Error 'Not valid steps params'
           yield return
+
+        yield @migrationNames
 
         executedMigrations = yield @migrationsCollection.query {
           $forIn: '@doc': @migrationsCollection.collectionName()

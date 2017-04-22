@@ -50,8 +50,20 @@ module.exports = (Module) ->
 
     @module Module
 
+    iplMigrationNames = @private migrationNames: Module::PromiseInterface
+
     @public migrationsCollection: Module::CollectionInterface
-    @public migrationNames: Array
+    @public migrationNames: Module::PromiseInterface,
+      get: ->
+        {co, filesList} = Module::Utils
+        @[iplMigrationNames] ?= co =>
+          files = yield filesList @migrationsDir
+          yield return _.orderBy (files ? []).map (i)=>
+            migrationName = i.replace '.js', ''
+            vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
+            require(vsMigrationPath) Module
+            migrationName
+        @[iplMigrationNames]
 
     @public migrationsDir: String,
       get: ->
@@ -60,13 +72,7 @@ module.exports = (Module) ->
     @public init: Function,
       default: (args...)->
         @super args...
-        {filesList} = Module::Utils
         @migrationsCollection = @facade.retriveProxy Module::MIGRATIONS
-        @migrationNames = _.orderBy filesList(@migrationsDir).map (i)=>
-          migrationName = i.replace '.js', ''
-          vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
-          require(vsMigrationPath) Module
-          migrationName
         return
 
     @public execute: Function,
@@ -78,7 +84,8 @@ module.exports = (Module) ->
       args: []
       return: NILL
       default: (options)->
-        for migrationName in @migrationNames
+        migrationNames = yield @migrationNames
+        for migrationName in migrationNames
           unless yield @migrationsCollection.includes migrationName
             clearedMigrationName = migrationName.replace /^\d{14}[_]/, ''
             migrationClassName = inflect.camelize clearedMigrationName

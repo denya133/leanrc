@@ -7,7 +7,7 @@ module.exports = (Module)->
 
     @module Module
 
-    @public @virtual render: Function,
+    @public @async @virtual render: Function,
       args: [Object, Object]
       return: Module::ANY
 
