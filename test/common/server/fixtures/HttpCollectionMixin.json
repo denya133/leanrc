@@ -1,0 +1,68 @@
+{
+  "/": {
+    "OPTIONS": {
+      "headers": {
+        "Allow": "HEAD, OPTIONS, GET, POST, PUT, PATCH, DELETE"
+      },
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "HEAD": {
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "GET,POST,PUT,PATCH": {
+      "data": {
+        "message": "OK"
+      },
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "DELETE": {
+      "statusCode": 202,
+      "statusMessage": "No Content"
+    }
+  },
+  "/test": {
+    "OPTIONS": {
+      "headers": {
+        "Allow": "HEAD, OPTIONS, GET, POST, PUT, PATCH, DELETE"
+      },
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "HEAD": {
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "GET,POST,PUT,PATCH": {
+      "data": {
+        "message": "OK"
+      },
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "DELETE": {
+      "statusCode": 202,
+      "statusMessage": "No Content"
+    }
+  },
+  "/redirect": {
+    "OPTIONS": {
+      "headers": {
+        "Allow": "HEAD, OPTIONS, GET, POST, PUT, PATCH, DELETE"
+      },
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "HEAD": {
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "GET,POST,PUT,PATCH,DELETE": {
+      "redirect": "/",
+      "statusCode": 302,
+      "statusMessage": "Found"
+    }
+  }
+}
