@@ -15,6 +15,7 @@ class LeanRC extends RC
   @const MIGRATE: Symbol 'migrate' # для сигнала
   @const ROLLBACK: Symbol 'rollback' # для сигнала
   @const MIGRATIONS: Symbol 'MigrationsCollection'
+  @const DELAYED_JOBS: Symbol 'DelayedJobsCollection'
 
   require('./interfaces/patterns/TransformInterface') LeanRC #does not need testing
   require('./interfaces/patterns/NotificationInterface') LeanRC #does not need testing
