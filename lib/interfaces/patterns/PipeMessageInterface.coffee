@@ -1,11 +1,11 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::PipeMessageInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class PipeMessageInterface extends Module::Interface
     @inheritProtected()
-    @Module: LeanRC
+    @module Module
 
     @public @static @virtual PRIORITY_HIGH: Number
     @public @static @virtual PRIORITY_MED: Number
@@ -41,4 +41,4 @@ module.exports = (LeanRC)->
       return: NILL
 
 
-  return LeanRC::PipeMessageInterface.initialize()
+  PipeMessageInterface.initialize()

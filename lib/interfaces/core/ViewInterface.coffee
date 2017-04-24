@@ -1,33 +1,33 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::ViewInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class ViewInterface extends Module::Interface
     @inheritProtected()
-    @Module: LeanRC
+    @module Module
 
     @public @virtual registerObserver: Function,
-      args: [String, LeanRC::ObserverInterface]
+      args: [String, Module::ObserverInterface]
       return: NILL
     @public @virtual removeObserver: Function,
       args: [String, ANY]
       return: NILL
     @public @virtual notifyObservers: Function,
-      args: [LeanRC::NotificationInterface]
+      args: [Module::NotificationInterface]
       return: NILL
     @public @virtual registerMediator: Function,
-      args: [LeanRC::MediatorInterface]
+      args: [Module::MediatorInterface]
       return: NILL
     @public @virtual retrieveMediator: Function,
       args: [String]
-      return: LeanRC::MediatorInterface
+      return: Module::MediatorInterface
     @public @virtual removeMediator: Function,
       args: [String]
-      return: LeanRC::MediatorInterface
+      return: Module::MediatorInterface
     @public @virtual hasMediator: Function,
       args: [String]
       return: Boolean
 
 
-  return LeanRC::ViewInterface.initialize()
+  ViewInterface.initialize()

@@ -9,13 +9,13 @@ describe 'Router', ->
   describe '.new, .map, #map, #resource, #namespace, #routes', ->
     it 'should create new router', ->
       expect ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
               @resource 'test2'
@@ -28,13 +28,13 @@ describe 'Router', ->
   describe '#defineMethod', ->
     it 'should define methods for router', ->
       expect ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2'
             @defineMethod [], 'get', '/get', resource: 'test2'
@@ -47,13 +47,13 @@ describe 'Router', ->
       .to.not.throw Error
     it 'should define `get` method for router', ->
       expect ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
             @get 'test3', resource: 'test2'
@@ -65,13 +65,13 @@ describe 'Router', ->
   describe '#post', ->
     it 'should define `post` method for router', ->
       expect ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
             @post 'test3', resource: 'test2'
@@ -83,13 +83,13 @@ describe 'Router', ->
   describe '#put', ->
     it 'should define `put` method for router', ->
       expect ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
             @put 'test3', resource: 'test2'
@@ -101,13 +101,13 @@ describe 'Router', ->
   describe '#patch', ->
     it 'should define `patch` method for router', ->
       expect ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
             @patch 'test3', resource: 'test2'
@@ -119,13 +119,13 @@ describe 'Router', ->
   describe '#delete', ->
     it 'should define `delete` method for router', ->
       expect ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', ->
             @delete 'test3', resource: 'test2'
@@ -137,13 +137,13 @@ describe 'Router', ->
   describe '#member', ->
     it 'should define `member` method for router', ->
       expect ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', except: 'patch', ->
               @member ->
@@ -157,13 +157,13 @@ describe 'Router', ->
   describe '#collection', ->
     it 'should define `collection` method for router', ->
       expect ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @resource 'test2', except: 'patch', ->
               @collection ->
@@ -178,13 +178,13 @@ describe 'Router', ->
   describe 'complex test', ->
     it 'should define all methods for router', ->
       expect ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
-        
+
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
-          @Module: Test
+          @module Test
           @map ->
             @post '/auth/signin', to: 'auth#signin'
             @resource 'users', except: 'delete', ->

@@ -1,14 +1,13 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Model extends RC::CoreObject
+
+module.exports = (Module)->
+  class Model extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::ModelInterface
+    @implements Module::ModelInterface
 
-    @Module: LeanRC
+    @module Module
 
-    @public @static MULTITON_MSG: String,
-      default: "Model instance for this multiton key already constructed!"
+    @const MULTITON_MSG: "Model instance for this multiton key already constructed!"
 
     iphProxyMap     = @private proxyMap: Object
     ipsMultitonKey  = @protected multitonKey: String
@@ -18,7 +17,7 @@ module.exports = (LeanRC)->
     @public @static getInstance: Function,
       default: (asKey)->
         unless Model[cphInstanceMap][asKey]?
-          Model[cphInstanceMap][asKey] = LeanRC::Model.new asKey
+          Model[cphInstanceMap][asKey] = Model.new asKey
         Model[cphInstanceMap][asKey]
 
     @public @static removeModel: Function,
@@ -51,14 +50,14 @@ module.exports = (LeanRC)->
 
     @public initializeModel: Function,
       args: []
-      return: RC::NILL
+      return: Module::NILL
       default: ->
 
     @public init: Function,
       default: (asKey)->
         @super arguments...
         if Model[cphInstanceMap][asKey]
-          throw new Error Model.MULTITON_MSG
+          throw new Error Model::MULTITON_MSG
         Model[cphInstanceMap][asKey] = @
         @[ipsMultitonKey] = asKey
         @[iphProxyMap] = {}
@@ -67,4 +66,4 @@ module.exports = (LeanRC)->
         return
 
 
-  return LeanRC::Model.initialize()
+  Model.initialize()

@@ -1,14 +1,14 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::SimpleCommand extends LeanRC::Notifier
+
+module.exports = (Module)->
+  class SimpleCommand extends Module::Notifier
     @inheritProtected()
-    @implements LeanRC::CommandInterface
+    @implements Module::CommandInterface
 
-    @Module: LeanRC
+    @module Module
 
     @public execute: Function,
       default: ->
 
 
-  return LeanRC::SimpleCommand.initialize()
+  SimpleCommand.initialize()

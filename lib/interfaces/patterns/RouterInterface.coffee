@@ -2,15 +2,14 @@
 # ApplicationRouter будет наследоваться от Command класса, и в него будет подмешиваться миксин RouterMixin
 # на основе декларативно объявленной карты роутов, он будет оркестрировать медиаторы, которые будут отвечать за принятие сигналов от Express или Foxx
 
-RC = require 'RC'
-{ANY, NILL} = RC::
 
+module.exports = (Module)->
+  {ANY, NILL} = Module::
 
-module.exports = (LeanRC)->
-  class LeanRC::RouterInterface extends RC::Interface
+  class RouterInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: LeanRC
+    @module Module
 
     @public @static @virtual map: Function,
       args: [[Function, NILL]]
@@ -67,4 +66,4 @@ module.exports = (LeanRC)->
     @public @virtual routes: Array
 
 
-  return LeanRC::RouterInterface.initialize()
+  RouterInterface.initialize()

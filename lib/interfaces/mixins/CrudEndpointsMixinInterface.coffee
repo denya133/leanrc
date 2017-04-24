@@ -1,14 +1,13 @@
 _             = require 'lodash'
 joi           = require 'joi'
 inflect       = require('i')()
-RC            = require 'RC'
 
 
-module.exports = (LeanRC)->
-  class LeanRC::CrudEndpointsMixinInterface extends RC::Interface
+module.exports = (Module)->
+  class CrudEndpointsMixinInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: LeanRC
+    @module Module
 
     @public @virtual keyName: String
 
@@ -30,7 +29,7 @@ module.exports = (LeanRC)->
 
     @public @virtual onRegister: Function,
       args: []
-      return: RC::NILL
+      return: Module::NILL
 
 
-  return LeanRC::CrudEndpointsMixinInterface.initialize()
+  CrudEndpointsMixinInterface.initialize()

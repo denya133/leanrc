@@ -13,16 +13,22 @@ describe 'Renderer', ->
   describe '#render', ->
     it 'should render the data', ->
       expect ->
-        data = test: 'test1', data: 'data1'
-        renderer = LeanRC::Renderer.new 'TEST_RENDERER'
-        assert.equal renderer.render(data), JSON.stringify(data), 'Data not rendered'
+        LeanRC::Utils.co ->
+          data = test: 'test1', data: 'data1'
+          renderer = LeanRC::Renderer.new 'TEST_RENDERER'
+          renderResult = yield renderer.render data
+          assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
       .to.not.throw Error
     it 'should render the data in customized renderer', ->
       expect ->
         data = firstName: 'John', lastName: 'Doe'
         class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
+          @module Test
           @public render: Function,
             default: (aoData, aoOptions)->
               vhData = RC::Utils.extend {}, aoData, greeting: 'Hello'

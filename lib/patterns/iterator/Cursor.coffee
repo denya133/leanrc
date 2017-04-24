@@ -2,19 +2,20 @@
 # является оберткой над обычным массивом
 
 _  = require 'lodash'
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Cursor extends RC::CoreObject
+
+module.exports = (Module)->
+  class Cursor extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::CursorInterface
+    @implements Module::CursorInterface
 
-    @Module: LeanRC
+    @module Module
 
     ipnCurrentIndex = @private currentIndex: Number,
       default: 0
     iplArray = @private array: Array
-    ipoCollection = @private collection: LeanRC::Collection
+
+    ipoCollection = @private collection: Module::Collection
 
     @public setRecord: Function,
       default: (acRecord)->
@@ -31,7 +32,7 @@ module.exports = (LeanRC)->
         acRecord ?= @[ipoCollection].delegate
         data = @[iplArray][@[ipnCurrentIndex]]
         @[ipnCurrentIndex]++
-        yield RC::Promise.resolve if acRecord?
+        yield Module::Promise.resolve if acRecord?
           if data?
             acRecord.new data, @[ipoCollection]
           else
@@ -40,7 +41,7 @@ module.exports = (LeanRC)->
           data
 
     @public @async hasNext: Function,
-      default: -> yield RC::Promise.resolve not _.isNil @[iplArray][@[ipnCurrentIndex]]
+      default: -> yield Module::Promise.resolve not _.isNil @[iplArray][@[ipnCurrentIndex]]
 
     @public @async close: Function,
       default: ->
@@ -52,7 +53,7 @@ module.exports = (LeanRC)->
     @public @async count: Function,
       default: ->
         array = @[iplArray] ? []
-        yield RC::Promise.resolve array.length?() ? array.length
+        yield Module::Promise.resolve array.length?() ? array.length
 
     @public @async forEach: Function,
       default: (lambda, acRecord = null)->
@@ -150,4 +151,4 @@ module.exports = (LeanRC)->
         @[iplArray] = alArray
 
 
-  return LeanRC::Cursor.initialize()
+  Cursor.initialize()

@@ -3,12 +3,18 @@
 RC = require 'RC'
 
 
-class LeanRC extends RC::Module
+class LeanRC extends RC
   @inheritProtected()
+
+  @root __dirname
 
   @const HANDLER_RESULT:  0
   @const RECORD_CHANGED:  1
-  @const CONFIGURATION:  2
+  @const CONFIGURATION:  Symbol 'ConfigurationProxy'
+  @const STARTUP: Symbol 'startup' # для сигнала
+  @const MIGRATE: Symbol 'migrate' # для сигнала
+  @const ROLLBACK: Symbol 'rollback' # для сигнала
+  @const MIGRATIONS: Symbol 'MigrationsCollection'
 
   require('./interfaces/patterns/TransformInterface') LeanRC #does not need testing
   require('./interfaces/patterns/NotificationInterface') LeanRC #does not need testing
@@ -39,6 +45,7 @@ class LeanRC extends RC::Module
   require('./interfaces/mixins/IterableMixinInterface') LeanRC #does not need testing
   require('./interfaces/mixins/QueryableMixinInterface') LeanRC #does not need testing
   require('./interfaces/mixins/RelationsMixinInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/MigrationInterface') LeanRC #does not need testing
 
   require('./interfaces/core/ControllerInterface') LeanRC #does not need testing
   require('./interfaces/core/ModelInterface') LeanRC #does not need testing
@@ -69,7 +76,7 @@ class LeanRC extends RC::Module
 
   require('./patterns/proxy/Proxy') LeanRC #tested
   require('./patterns/proxy/Collection') LeanRC #tested
-  # require('./patterns/proxy/Configuration') LeanRC # empty
+  require('./patterns/proxy/Configuration') LeanRC
   require('./patterns/proxy/Gateway') LeanRC #tested
   require('./patterns/proxy/Renderer') LeanRC #tested
   require('./patterns/proxy/Resource') LeanRC
@@ -81,9 +88,10 @@ class LeanRC extends RC::Module
   require('./patterns/command/SimpleCommand') LeanRC #tested
   require('./patterns/command/MacroCommand') LeanRC #tested
   require('./patterns/command/Stock') LeanRC
-  # require('./patterns/command/MigrateCommand') LeanRC # empty
-  # require('./patterns/command/Migration') LeanRC # empty
-  # require('./patterns/command/Rollback') LeanRC # empty
+  require('./patterns/command/MigrateCommand') LeanRC
+  require('./patterns/command/RollbackCommand') LeanRC
+
+  require('./patterns/migration/Migration') LeanRC
 
   require('./patterns/gateway/Endpoint') LeanRC #tested
 
@@ -102,8 +110,6 @@ class LeanRC extends RC::Module
   require('./patterns/pipes/TeeMerge') LeanRC #tested
   require('./patterns/pipes/TeeSplit') LeanRC #tested
 
-  # require('./patterns/renderer/Template') LeanRC # empty
-
   require('./patterns/facade/Facade') LeanRC #tested
   require('./patterns/facade/Application') LeanRC
 
@@ -112,4 +118,4 @@ class LeanRC extends RC::Module
   require('./core/Controller') LeanRC #tested
 
 
-module.exports = LeanRC.initialize()
+module.exports = LeanRC.initialize().freeze()

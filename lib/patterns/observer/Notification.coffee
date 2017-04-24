@@ -1,14 +1,15 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Notification extends RC::CoreObject
+
+module.exports = (Module)->
+
+  class Notification extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::NotificationInterface
+    @implements Module::NotificationInterface
 
-    @Module: LeanRC
+    @module Module
 
     ipsName = @private name: String
-    ipoBody = @private body: RC::ANY
+    ipoBody = @private body: Module::ANY
     ipsType = @private type: String
 
     @public getName: Function,
@@ -48,4 +49,4 @@ module.exports = (LeanRC)->
 
 
 
-  return LeanRC::Notification.initialize()
+  Notification.initialize()

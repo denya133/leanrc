@@ -1,13 +1,12 @@
 _ = require 'lodash'
-RC = require 'RC'
 
 
-module.exports = (LeanRC)->
-  class LeanRC::DateTransform extends RC::CoreObject
+module.exports = (Module)->
+  class DateTransform extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::TransformInterface
+    @implements Module::TransformInterface
 
-    @Module: LeanRC
+    @module Module
 
     @public @static normalize: Function,
       default: (serialized)->
@@ -21,4 +20,4 @@ module.exports = (LeanRC)->
           return null
 
 
-  return LeanRC::DateTransform.initialize()
+  DateTransform.initialize()

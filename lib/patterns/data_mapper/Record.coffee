@@ -1,20 +1,16 @@
 joi = require 'joi'
 
-RC = require 'RC'
-{ANY, NILL} = RC::
-
-
 
 ###
 ```coffee
-class App::TomatoRecord extends LeanRC::Record
+class App::TomatoRecord extends Module::Record
   @inheritProtected()
 
-  @Module: App
+  @module App
 
   @attr title: String,
     validate: -> joi.string() # !!! нужен для сложной валидации данных
-    # transform указывать не надо, т.к. стандартный тип, LeanRC::StringTransform
+    # transform указывать не надо, т.к. стандартный тип, Module::StringTransform
 
   @attr nameObj: App::NameObj,
     validate: -> joi.object().required().start().end().default({})
@@ -29,14 +25,16 @@ class App::TomatoRecord extends LeanRC::Record
 ###
 
 
-module.exports = (LeanRC)->
-  class LeanRC::Record extends RC::CoreObject
-    @inheritProtected()
-    @implements LeanRC::RecordInterface
-    @include RC::ChainsMixin
-    @include LeanRC::RecordMixin
+module.exports = (Module)->
+  {ANY, NILL} = Module::
 
-    @Module: LeanRC
+  class Record extends Module::CoreObject
+    @inheritProtected()
+    @implements Module::RecordInterface
+    @include Module::ChainsMixin
+    @include Module::RecordMixin
+
+    @module Module
 
     @attribute _key: String
     @attribute _rev: String
@@ -78,8 +76,8 @@ module.exports = (LeanRC)->
     @afterHook 'afterDestroy', only: ['destroy']
 
     @public @async afterCreate: Function,
-      args: [LeanRC::RecordInterface]
-      return: LeanRC::RecordInterface
+      args: [Module::RecordInterface]
+      return: Module::RecordInterface
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'createdRecord', aoRecord
         yield return @
@@ -92,8 +90,8 @@ module.exports = (LeanRC)->
         yield return
 
     @public @async afterUpdate: Function,
-      args: [LeanRC::RecordInterface]
-      return: LeanRC::RecordInterface
+      args: [Module::RecordInterface]
+      return: Module::RecordInterface
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'updatedRecord', aoRecord
         yield return @
@@ -108,18 +106,18 @@ module.exports = (LeanRC)->
         return
 
     @public afterDelete: Function,
-      args: [LeanRC::RecordInterface]
-      return: LeanRC::RecordInterface
+      args: [Module::RecordInterface]
+      return: Module::RecordInterface
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'deletedRecord', aoRecord
         return @
 
     @public afterDestroy: Function,
-      args: [LeanRC::RecordInterface]
-      return: LeanRC::RecordInterface
+      args: [Module::RecordInterface]
+      return: Module::RecordInterface
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'destroyedRecord', aoRecord
         return
 
 
-  return LeanRC::Record.initialize()
+  Record.initialize()

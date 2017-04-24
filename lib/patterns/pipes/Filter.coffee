@@ -1,29 +1,29 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Filter extends LeanRC::Pipe
+
+module.exports = (Module)->
+  class Filter extends Module::Pipe
     @inheritProtected()
 
-    @Module: LeanRC
+    @module Module
 
     ipoOutput = Symbol.for '~output'
     ipsMode = @protected mode: String,
-      default: LeanRC::FilterControlMessage.FILTER
-    ipmFilter = @protected filter: RC::LAMBDA,
+      default: Module::FilterControlMessage.FILTER
+    ipmFilter = @protected filter: Module::LAMBDA,
       default: (aoMessage, aoParams)->
     ipoParams = @protected params: Object
     ipsName = @protected name: String
 
     ipmIsTarget = @protected isTarget: Function,
-      args: [LeanRC::PipeMessageInterface]
+      args: [Module::PipeMessageInterface]
       return: Boolean
       default: (aoMessage)-> # must be instance of FilterControlMessage
-        aoMessage instanceof LeanRC::FilterControlMessage and
+        aoMessage instanceof Module::FilterControlMessage and
           aoMessage?.getName() is @[ipsName]
 
     ipmApplyFilter = @protected applyFilter: Function,
-      args: [LeanRC::PipeMessageInterface]
-      return: LeanRC::PipeMessageInterface
+      args: [Module::PipeMessageInterface]
+      return: Module::PipeMessageInterface
       default: (aoMessage)->
         @[ipmFilter].apply @, [aoMessage, @[ipoParams]]
         return aoMessage
@@ -43,28 +43,28 @@ module.exports = (LeanRC)->
         vbSuccess = yes
         voOutputMessage = null
         switch aoMessage.getType()
-          when LeanRC::PipeMessage.NORMAL
+          when Module::PipeMessage.NORMAL
             try
-              if @[ipsMode] is LeanRC::FilterControlMessage.FILTER
+              if @[ipsMode] is Module::FilterControlMessage.FILTER
                 voOutputMessage = @[ipmApplyFilter] aoMessage
               else
                 voOutputMessage = aoMessage
               vbSuccess = @[ipoOutput].write voOutputMessage
             catch err
               vbSuccess = no
-          when LeanRC::FilterControlMessage.SET_PARAMS
+          when Module::FilterControlMessage.SET_PARAMS
             if @[ipmIsTarget] aoMessage
               @setParams aoMessage.getParams()
             else
               vbSuccess = @[ipoOutput].write voOutputMessage
             break
-          when LeanRC::FilterControlMessage.SET_FILTER
+          when Module::FilterControlMessage.SET_FILTER
             if @[ipmIsTarget] aoMessage
               @setFilter aoMessage.getFilter()
             else
               vbSuccess = @[ipoOutput].write voOutputMessage
             break
-          when LeanRC::FilterControlMessage.BYPASS, LeanRC::FilterControlMessage.FILTER
+          when Module::FilterControlMessage.BYPASS, Module::FilterControlMessage.FILTER
             if @[ipmIsTarget] aoMessage
               @[ipsMode] = aoMessage.getType()
             else
@@ -84,4 +84,4 @@ module.exports = (LeanRC)->
           @setParams aoParams
 
 
-  return LeanRC::Filter.initialize()
+  Filter.initialize()

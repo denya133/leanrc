@@ -1,7 +1,3 @@
-RC = require 'RC'
-{NILL, ANY} = RC::
-
-
 ###
 в Ember app это может выглядить так.
 ```coffee
@@ -90,12 +86,14 @@ example for collect
 ```
 ###
 
-module.exports = (LeanRC)->
-  class LeanRC::Query extends RC::CoreObject
-    @inheritProtected()
-    @implements LeanRC::QueryInterface
+module.exports = (Module)->
+  {NILL, ANY} = Module::
 
-    @Module: LeanRC
+  class Query extends Module::CoreObject
+    @inheritProtected()
+    @implements Module::QueryInterface
+
+    @module Module
 
     @public @static operatorsMap: Object,
       default:
@@ -161,7 +159,7 @@ module.exports = (LeanRC)->
     @public forIn: Function,
       default: (aoDefinitions)->
         @$forIn ?= {}
-        @$forIn = RC::Utils.extend {}, @$forIn, aoDefinitions
+        @$forIn = Module::Utils.extend {}, @$forIn, aoDefinitions
         return @
     @public join: Function, # критерии связывания как в SQL JOIN ... ON
       default: (aoDefinitions)->
@@ -174,7 +172,7 @@ module.exports = (LeanRC)->
     @public let: Function,
       default: (aoDefinitions)->
         @$let ?= {}
-        @$let = RC::Utils.extend {}, @$let, aoDefinitions
+        @$let = Module::Utils.extend {}, @$let, aoDefinitions
         return @
     @public collect: Function,
       default: (aoDefinition)->
@@ -254,4 +252,4 @@ module.exports = (LeanRC)->
             @[key] = value
 
 
-  return LeanRC::Query.initialize()
+  Query.initialize()

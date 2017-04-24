@@ -1,13 +1,13 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::MediatorInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class MediatorInterface extends Module::Interface
     @inheritProtected()
-    @include LeanRC::NotifierInterface
+    @include Module::NotifierInterface
 
-    @Module: LeanRC
+    @module Module
 
     @public @virtual getMediatorName: Function,
       args: []
@@ -22,7 +22,7 @@ module.exports = (LeanRC)->
       args: []
       return: Array
     @public @virtual handleNotification: Function,
-      args: [LeanRC::NotificationInterface]
+      args: [Module::NotificationInterface]
       return: NILL
     @public @virtual onRegister: Function,
       args: []
@@ -32,4 +32,4 @@ module.exports = (LeanRC)->
       return: NILL
 
 
-  return LeanRC::MediatorInterface.initialize()
+  MediatorInterface.initialize()

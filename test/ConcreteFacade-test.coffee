@@ -40,7 +40,7 @@ describe 'ConcreteFacade', ->
         app.startup()
         consoleComponent = RequestApp::ConsoleComponent.getInstance()
         consoleComponentSpy = sinon.spy consoleComponent, 'writeMessages'
-        consoleComponent.subscribeEventOnce RequestApp::ConsoleComponent.MESSAGE_WRITTEN, =>
+        consoleComponent.subscribeEventOnce RequestApp::ConsoleComponent::MESSAGE_WRITTEN, =>
           assert consoleComponentSpy.called, 'Console not filled'
           app.finish()
           done()

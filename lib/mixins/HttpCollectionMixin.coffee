@@ -1,20 +1,18 @@
-
-
 _             = require 'lodash'
-RC            = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::HttpCollectionMixin extends RC::Mixin
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class HttpCollectionMixin extends Module::Mixin
     @inheritProtected()
-    @implements LeanRC::QueryableMixinInterface
+    @implements Module::QueryableMixinInterface
 
-    @Module: LeanRC
+    @module Module
 
     @public push: Function,
       default: (aoRecord)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .insert aoRecord
           .into @collectionFullName()
         @query voQuery
@@ -22,7 +20,7 @@ module.exports = (LeanRC)->
 
     @public remove: Function,
       default: (id)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .filter '@doc._key': {$eq: id}
           .remove()
@@ -31,7 +29,7 @@ module.exports = (LeanRC)->
 
     @public take: Function,
       default: (id)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .filter '@doc._key': {$eq: id}
           .return '@doc'
@@ -40,7 +38,7 @@ module.exports = (LeanRC)->
 
     @public takeMany: Function,
       default: (ids)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .filter '@doc._key': {$in: ids}
           .return '@doc'
@@ -48,14 +46,14 @@ module.exports = (LeanRC)->
 
     @public takeAll: Function,
       default: ->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .return '@doc'
         return @query voQuery
 
     @public override: Function,
       default: (id, aoRecord)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .filter '@doc._key': {$eq: id}
           .replace aoRecord
@@ -63,7 +61,7 @@ module.exports = (LeanRC)->
 
     @public patch: Function,
       default: (id, aoRecord)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .filter '@doc._key': {$eq: id}
           .update aoRecord
@@ -71,7 +69,7 @@ module.exports = (LeanRC)->
 
     @public includes: Function,
       default: (id)->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .filter '@doc._key': {$eq: id}
           .limit 1
@@ -81,7 +79,7 @@ module.exports = (LeanRC)->
 
     @public length: Function,
       default: ->
-        voQuery = LeanRC::Query.new()
+        voQuery = Module::Query.new()
           .forIn '@doc': @collectionFullName()
           .count()
         return @query voQuery
@@ -241,9 +239,9 @@ module.exports = (LeanRC)->
     # может быть переопределно другим миксином, который будет посылать запросы через jQuery.ajax например
     ipmSendRequest = @protected sendRequest: Function,
       args: [Object]
-      return: RC::PromiseInterface
+      return: Module::PromiseInterface
       default: ({method, url, options})->
-        RC::Utils.request method, url, options
+        Module::Utils.request method, url, options
 
     # может быть переопределно другим миксином, который будет посылать запросы через jQuery.ajax например
     ipmRequestToHash = @protected requestToHash: Function,
@@ -265,7 +263,7 @@ module.exports = (LeanRC)->
 
     ipmMakeRequest = @protected makeRequest: Function,
       args: [Object]
-      return: RC::PromiseInterface
+      return: Module::PromiseInterface
       default: (request)-> # result of requestFor
         hash = @[ipmRequestToHash] request
         @[ipmSendRequest] hash
@@ -331,8 +329,8 @@ module.exports = (LeanRC)->
         request = @[ipmRequestFor] aoQuery
 
         resultItems = yield @[ipmMakeRequest] request
-        voCursor = LeanRC::Cursor.new @, resultItems
+        voCursor = Module::Cursor.new @, resultItems
         return voCursor
 
 
-  return LeanRC::HttpCollectionMixin.initialize()
+  HttpCollectionMixin.initialize()

@@ -1,18 +1,16 @@
 joi = require 'joi'
 
-RC = require 'RC'
-
 
 ###
 ```coffee
-class App::TomatoEntry extends LeanRC::Entry
+class App::TomatoEntry extends Module::Entry
   @inheritProtected()
 
-  @Module: App
+  @module App
 
   @attr title: String,
     validate: -> joi.string() # !!! нужен для сложной валидации данных
-    # transform указывать не надо, т.к. стандартный тип, LeanRC::StringTransform
+    # transform указывать не надо, т.к. стандартный тип, Module::StringTransform
 
   @attr nameObj: App::NameObj,
     validate: -> joi.object().required().start().end().default({})
@@ -30,13 +28,13 @@ class App::TomatoEntry extends LeanRC::Entry
 # сигнатуры наследников классов Entry и Record могут отличаться (иногда не существенно, а иногда существенно)
 
 
-module.exports = (LeanRC)->
-  class LeanRC::Entry extends RC::CoreObject
+module.exports = (Module)->
+  class Entry extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::RecordInterface
-    @include LeanRC::RecordMixin
+    @implements Module::RecordInterface
+    @include Module::RecordMixin
 
-    @Module: LeanRC
+    @module Module
 
     @attribute id: String
     @attribute rev: String
@@ -47,4 +45,4 @@ module.exports = (LeanRC)->
     @attribute deletedAt: Date
 
 
-  return LeanRC::Entry.initialize()
+  Entry.initialize()

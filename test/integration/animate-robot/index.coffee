@@ -1,10 +1,13 @@
-RC = require 'RC'
+LeanRC = require.main.require 'lib'
 
 
-class TestApp extends RC::Module
+class TestApp extends LeanRC
   @inheritProtected()
 
-  require('./AppConstants') TestApp
+  @root __dirname
+
+  @const ANIMATE_ROBOT: Symbol 'animateRobot'
+  @const ROBOT_SPEAKING: Symbol 'robotSpeaking'
 
   require('./controller/command/StartupCommand') TestApp
   require('./controller/command/PrepareControllerCommand') TestApp

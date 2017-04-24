@@ -1,17 +1,16 @@
 inflect = do require 'i'
 # по сути здесь надо повторить (скопипастить) код из FoxxMC::Controller
 
-RC = require 'RC'
-{ANY, NILL} = RC::
 
+module.exports = (Module)->
+  {ANY, NILL} = Module::
 
-module.exports = (LeanRC)->
-  class LeanRC::Stock extends LeanRC::SimpleCommand
+  class Stock extends Module::SimpleCommand
     @inheritProtected()
-    @include RC::ChainsMixin
-    @implements LeanRC::StockInterface
+    @include Module::ChainsMixin
+    @implements Module::StockInterface
 
-    @Module: LeanRC
+    @module Module
 
     # @public entityName: String # Имя сущности должно быть установлено при объявлении дочернего класса
 
@@ -31,7 +30,7 @@ module.exports = (LeanRC)->
       get: ->
         "#{inflect.pluralize inflect.camelize @entityName}Collection"
 
-    @public collection: LeanRC::CollectionInterface,
+    @public collection: Module::CollectionInterface,
       get: ->
         @facade.retrieveProxy @collectionName
 
@@ -51,7 +50,7 @@ module.exports = (LeanRC)->
         fromSuper = if @__super__?
           @__super__.constructor.actions
         __actions[@name] ?= do =>
-          RC::Utils.extend []
+          Module::Utils.extend []
           , (fromSuper ? [])
           , (@["_#{@name}_actions"] ? [])
         __actions[@name]
@@ -158,16 +157,16 @@ module.exports = (LeanRC)->
       args: [Object]
       return: ANY
       default: (args...)->
-        @recordBody = RC::Utils.extend {}, @recordBody, id: @recordId
+        @recordBody = Module::Utils.extend {}, @recordBody, id: @recordId
         return args
 
     @public execute: Function,
       default: (aoNotification)->
-        RC::Utils.co =>
+        Module::Utils.co =>
           voBody = aoNotification.getBody()
           voResult = yield @[aoNotification.getType()]? voBody
-          @sendNotification LeanRC::HANDLER_RESULT, voResult, voBody.reverse
+          @sendNotification Module::HANDLER_RESULT, voResult, voBody.reverse
         return
 
 
-  return LeanRC::Stock.initialize()
+  Stock.initialize()

@@ -5,9 +5,9 @@
 ```coffee
   Test.context.use Basis::SessionsUtil.middleware
 
-  class Test::ApplicationRouter extends LeanRC::Router
+  class Test::ApplicationRouter extends Module::Router
     @inheritProtected()
-    @Module: Test
+    @module Test
     @map ->
       @namespace 'version', module: '', prefix: ':v', ->
         @resource 'invitations', except: 'delete', ->
@@ -22,16 +22,17 @@
 
 _             = require 'lodash'
 inflect       = require('i')()
-RC            = require 'RC'
-{NILL, ANY} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::Router extends LeanRC::Proxy
+
+module.exports = (Module)->
+  {NILL, ANY} = Module::
+
+  class Router extends Module::Proxy
     @inheritProtected()
-    @implements LeanRC::RouterInterface
+    @implements Module::RouterInterface
 
-    @Module: LeanRC
+    @module Module
 
     ipsPath       = @protected path: String,
       default: '/'
@@ -156,7 +157,7 @@ module.exports = (LeanRC)->
         @[iplResources] ?= []
         class ResourceRouter extends Router
           @inheritProtected()
-          @Module: vcModule
+          @module vcModule
           @protected path: String,
             default: vsFullPath
           @protected name: String,
@@ -199,7 +200,7 @@ module.exports = (LeanRC)->
         @[iplResources] ?= []
         class NamespaceRouter extends Router
           @inheritProtected()
-          @Module: vcModule
+          @module vcModule
           @protected path: String,
             default: "#{vsParentPath}#{vsPath}"
           @protected name: String,
@@ -307,4 +308,4 @@ module.exports = (LeanRC)->
                 resource: @[ipsResource] ? @[ipsName]
 
 
-  return LeanRC::Router.initialize()
+  Router.initialize()

@@ -1,13 +1,13 @@
-LeanRC = require.main.require 'lib'
 
-module.exports = (TestApp) ->
-  class TestApp::PrepareControllerCommand extends LeanRC::SimpleCommand
+
+module.exports = (Module) ->
+  class PrepareControllerCommand extends Module::SimpleCommand
     @inheritProtected()
-    @Module: TestApp
+    @module Module
 
     @public execute: Function,
       default: ->
-        @facade.registerCommand TestApp::AppConstants.ANIMATE_ROBOT,
-          TestApp::AnimateRobotCommand
+        @facade.registerCommand Module::ANIMATE_ROBOT,
+          Module::AnimateRobotCommand
 
-  TestApp::PrepareControllerCommand.initialize()
+  PrepareControllerCommand.initialize()

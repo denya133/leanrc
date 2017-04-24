@@ -1,14 +1,14 @@
-LeanRC = require.main.require 'lib'
 
-module.exports = (RequestApp) ->
-  class RequestApp::StartupCommand extends LeanRC::MacroCommand
+
+module.exports = (Module) ->
+  class StartupCommand extends Module::MacroCommand
     @inheritProtected()
-    @Module: RequestApp
+    @module Module
 
     @public initializeMacroCommand: Function,
       default: ->
-        @addSubCommand RequestApp::PrepareControllerCommand
-        @addSubCommand RequestApp::PrepareViewCommand
-        @addSubCommand RequestApp::PrepareModelCommand
+        @addSubCommand Module::PrepareControllerCommand
+        @addSubCommand Module::PrepareViewCommand
+        @addSubCommand Module::PrepareModelCommand
 
-  RequestApp::StartupCommand.initialize()
+  StartupCommand.initialize()

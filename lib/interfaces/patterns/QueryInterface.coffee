@@ -3,13 +3,11 @@
 # Важно: в финале у инстанса не будет метода `exec` который есть сейчас, но будет метод `query` который будет вызываться извне, а в результате будет возвращатся объект с интерфейсом QueryObjectInterface , чтобы потом на основе этих данных конструировать на нужном языке запрос в базу данных
 
 
-RC = require 'RC'
-
-module.exports = (LeanRC)->
-  class LeanRC::QueryInterface extends RC::Interface
+module.exports = (Module)->
+  class QueryInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: LeanRC
+    @module Module
 
     @public @static @virtual operatorsMap: Object
 
@@ -104,4 +102,4 @@ module.exports = (LeanRC)->
       return: QueryInterface
 
 
-  return LeanRC::QueryInterface.initialize()
+  QueryInterface.initialize()

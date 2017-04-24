@@ -1,13 +1,13 @@
-LeanRC = require.main.require 'lib'
 
-module.exports = (TestApp) ->
-  class TestApp::AnimateRobotCommand extends LeanRC::SimpleCommand
+
+module.exports = (Module) ->
+  class AnimateRobotCommand extends Module::SimpleCommand
     @inheritProtected()
-    @Module: TestApp
+    @module Module
 
     @public execute: Function,
       default: ->
-        proxy = @facade.retrieveProxy TestApp::RobotDataProxy.ROBOT_PROXY
+        proxy = @facade.retrieveProxy Module::RobotDataProxy::ROBOT_PROXY
         proxy.animate()
 
-  TestApp::AnimateRobotCommand.initialize()
+  AnimateRobotCommand.initialize()

@@ -18,7 +18,7 @@ describe 'RelationsMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) ->
               Test::TestRecord
@@ -37,7 +37,7 @@ describe 'RelationsMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @belongsTo relation: LeanRC::Record,
@@ -74,7 +74,7 @@ describe 'RelationsMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @hasMany manyRelation: LeanRC::Record,
@@ -109,7 +109,7 @@ describe 'RelationsMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @hasOne oneRelation: LeanRC::Record,
@@ -144,7 +144,7 @@ describe 'RelationsMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
-          @Module: Test
+          @module Test
           @hasOne test: LeanRC::Record,
             inverse: 'relation'
         Test::Relation.initialize()
@@ -152,7 +152,7 @@ describe 'RelationsMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @belongsTo relation: LeanRC::Record,

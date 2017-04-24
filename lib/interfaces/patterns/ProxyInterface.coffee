@@ -1,13 +1,13 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::ProxyInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class ProxyInterface extends Module::Interface
     @inheritProtected()
-    @include LeanRC::NotifierInterface
+    @include Module::NotifierInterface
 
-    @Module: LeanRC
+    @module Module
 
     @public @virtual getProxyName: Function,
       args: []
@@ -26,4 +26,4 @@ module.exports = (LeanRC)->
       return: NILL
 
 
-  return LeanRC::ProxyInterface.initialize()
+  ProxyInterface.initialize()

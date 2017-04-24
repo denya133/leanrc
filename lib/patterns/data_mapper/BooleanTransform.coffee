@@ -1,12 +1,11 @@
-RC = require 'RC'
 
 
-module.exports = (LeanRC)->
-  class LeanRC::BooleanTransform extends RC::CoreObject
+module.exports = (Module)->
+  class BooleanTransform extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::TransformInterface
+    @implements Module::TransformInterface
 
-    @Module: LeanRC
+    @module Module
 
     @public @static normalize: Function,
       default: (serialized)->
@@ -26,4 +25,4 @@ module.exports = (LeanRC)->
         Boolean deserialized
 
 
-  return LeanRC::BooleanTransform.initialize()
+  BooleanTransform.initialize()

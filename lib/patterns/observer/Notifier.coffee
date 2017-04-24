@@ -1,21 +1,20 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Notifier extends RC::CoreObject
+
+module.exports = (Module)->
+  class Notifier extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::NotifierInterface
+    @implements Module::NotifierInterface
 
-    @Module: LeanRC
+    @module Module
 
-    @public @static MULTITON_MSG: String,
-      default: "multitonKey for this Notifier not yet initialized!"
+    @const MULTITON_MSG: "multitonKey for this Notifier not yet initialized!"
 
     ipsMultitonKey = @protected multitonKey: String
-    @public facade: LeanRC::FacadeInterface,
+    @public facade: Module::FacadeInterface,
       get: ->
         unless @[ipsMultitonKey]?
-          throw new Error Notifier.MULTITON_MSG
-        LeanRC::Facade.getInstance @[ipsMultitonKey]
+          throw new Error Notifier::MULTITON_MSG
+        Module::Facade.getInstance @[ipsMultitonKey]
 
     @public sendNotification: Function,
       default: (asName, aoBody, asType)->
@@ -28,8 +27,4 @@ module.exports = (LeanRC)->
         return
 
 
-
-
-
-
-  return LeanRC::Notifier.initialize()
+  Notifier.initialize()

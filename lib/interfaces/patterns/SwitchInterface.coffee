@@ -1,12 +1,12 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::SwitchInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class SwitchInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: LeanRC
+    @module Module
 
     @public @virtual routerName: String
 
@@ -19,7 +19,7 @@ module.exports = (LeanRC)->
 
     @public @virtual rendererFor: Function,
       args: [String]
-      return: LeanRC::RendererInterface
+      return: Module::RendererInterface
 
     @public @virtual sendHttpResponse: Function,
       args: [Object, Object, Object, Object]
@@ -42,4 +42,4 @@ module.exports = (LeanRC)->
       return: NILL
 
 
-  return LeanRC::SwitchInterface.initialize()
+  SwitchInterface.initialize()

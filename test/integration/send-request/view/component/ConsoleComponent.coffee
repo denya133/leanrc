@@ -1,36 +1,33 @@
-RC = require 'RC'
+
 EventEmitter = require 'events'
 
-module.exports = (RequestApp) ->
-  class RequestApp::ConsoleComponent extends RC::CoreObject
+module.exports = (Module) ->
+  class Module::ConsoleComponent extends Module::CoreObject
     @inheritProtected()
-    @Module: RequestApp
+    @module Module
 
-    @public @static MESSAGE_WRITTEN: String,
-      default: 'messageWritten'
-
-    @public @static SEND_REQUEST_EVENT: String,
-      default: 'sendRequestEvent'
+    @const MESSAGE_WRITTEN: 'messageWritten'
+    @const SEND_REQUEST_EVENT: 'sendRequestEvent'
 
     ipoEventEmitter = @private eventEmitter: EventEmitter,
       default: null
-    ipoInstance = @private instance: RequestApp::ConsoleComponent,
+    ipoInstance = @private instance: Module::ConsoleComponent,
       default: null
 
     @public @static getInstance: Function,
       default: ->
         unless @[ipoInstance]?
-          @[ipoInstance] = RequestApp::ConsoleComponent.new()
+          @[ipoInstance] = Module::ConsoleComponent.new()
         @[ipoInstance]
 
     @public writeMessages: Function,
       default: (messages...) ->
         console.log messages...
-        @[ipoEventEmitter].emit RequestApp::ConsoleComponent.MESSAGE_WRITTEN
+        @[ipoEventEmitter].emit Module::ConsoleComponent::MESSAGE_WRITTEN
 
     @public sendRequest: Function,
       default: ->
-        @[ipoEventEmitter].emit RequestApp::ConsoleComponent.SEND_REQUEST_EVENT
+        @[ipoEventEmitter].emit Module::ConsoleComponent::SEND_REQUEST_EVENT
 
     @public subscribeEvent: Function,
       default: (eventName, callback) ->
@@ -51,4 +48,4 @@ module.exports = (RequestApp) ->
       @[ipoEventEmitter] = new EventEmitter
 
 
-  RequestApp::ConsoleComponent.initialize()
+  Module::ConsoleComponent.initialize()

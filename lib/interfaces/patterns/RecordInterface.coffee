@@ -1,17 +1,17 @@
-RC = require 'RC'
-{ANY, NILL} = RC::
-
 # так как рекорд будет работать с простыми структурами данных в памяти, он не зависит от платформы.
 # если ему надо будет взаимодействовать с платформозависимой логикой - он будет делать это через прокси, но не напрямую (как в эмбере со стором)
 
-module.exports = (LeanRC)->
-  class LeanRC::RecordInterface extends RC::Interface
+
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class RecordInterface extends Module::Interface
     @inheritProtected()
-    @include LeanRC::TransformInterface
+    @include Module::TransformInterface
 
-    @Module: LeanRC
+    @module Module
 
-    @public @virtual collection: LeanRC::CollectionInterface
+    @public @virtual collection: Module::CollectionInterface
 
     @public @static @virtual schema: Object
 
@@ -32,7 +32,7 @@ module.exports = (LeanRC)->
 
 
     @public @static @virtual parentClassNames: Function,
-      args: [[RC::Class, NILL]]
+      args: [[Module::Class, NILL]]
       return: Array
 
     @public @static @virtual attributes: Function,
@@ -60,7 +60,7 @@ module.exports = (LeanRC)->
 
     @public @static @virtual new: Function,
       args: [Object] #attributes
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
 
     @public @async @virtual save: Function,
       args: []
@@ -83,34 +83,34 @@ module.exports = (LeanRC)->
       return: Array
     @public @virtual clone: Function,
       args: []
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual copy: Function,
       args: []
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual decrement: Function,
       args: [String, [Number, NILL]] #attribute, step
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual increment: Function,
       args: [String, [Number, NILL]] #attribute, step
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual toggle: Function,
       args: [String] #attribute
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual touch: Function,
       args: []
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual updateAttribute: Function,
       args: [String, ANY] #name, value
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual updateAttributes: Function,
       args: [Object] #attributes
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @async @virtual isNew: Function,
       args: []
       return: Boolean
     @public @async @virtual reload: Function,
       args: []
-      return: LeanRC::RecordInterface
+      return: Module::RecordInterface
     @public @virtual changedAttributes: Function,
       args: []
       return: Object # { isAdmin: [undefined, true], name: [undefined, 'Tomster'] }
@@ -122,4 +122,4 @@ module.exports = (LeanRC)->
       return: NILL
 
 
-  return LeanRC::RecordInterface.initialize()
+  RecordInterface.initialize()

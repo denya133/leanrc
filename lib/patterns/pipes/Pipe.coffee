@@ -1,13 +1,13 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Pipe extends RC::CoreObject
+
+module.exports = (Module)->
+  class Pipe extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::PipeFittingInterface
+    @implements Module::PipeFittingInterface
 
-    @Module: LeanRC
+    @module Module
 
-    ipoOutput = @protected output: LeanRC::PipeFittingInterface
+    ipoOutput = @protected output: Module::PipeFittingInterface
 
     @public connect: Function,
       default: (aoOutput)->
@@ -34,4 +34,4 @@ module.exports = (LeanRC)->
           @connect aoOutput
 
 
-  return LeanRC::Pipe.initialize()
+  Pipe.initialize()

@@ -1,11 +1,14 @@
-RC = require 'RC'
-LeanRC = require.main.require 'lib'
 
-module.exports = (Namespace) ->
-  class Namespace::JsonRenderer extends LeanRC::Renderer
+
+module.exports = (Module) ->
+  class JsonRenderer extends Module::Renderer
     @inheritProtected()
+
+    @module Module
+
     @public render: Function,
       default: (aoData, aoOptions) ->
-        vhData = RC::Utils.extend {}, aoData
+        vhData = Module::Utils.extend {}, aoData
         JSON.stringify vhData ? null
-  Namespace::JsonRenderer.initialize()
+
+  JsonRenderer.initialize()

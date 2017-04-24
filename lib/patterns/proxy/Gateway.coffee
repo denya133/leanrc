@@ -1,23 +1,22 @@
-RC            = require 'RC'
 
 
 ###
 ```coffee
-LeanRC = require 'LeanRC'
+Module = require 'Module'
 
 module.exports = (App)->
-  App::CrudGateway extends LeanRC::Gateway
+  App::CrudGateway extends Module::Gateway
     @inheritProtected()
-    @include LeanRC::CrudEndpointsMixin
+    @include Module::CrudEndpointsMixin
 
-    @Module: App
+    @module App
 
   return App::CrudGateway.initialize()
 ```
 
 ```coffee
 module.exports = (App)->
-  App::PrepareModelCommand extends LeanRC::SimpleCommand
+  App::PrepareModelCommand extends Module::SimpleCommand
     @public execute: Function,
       default: ->
         #...
@@ -32,7 +31,7 @@ module.exports = (App)->
           endpoints: {
             changeColor: App::TomatosChangeColorEndpoint.new()
           }
-        @facade.registerProxy LeanRC::Gateway.new 'AuthGateway',
+        @facade.registerProxy Module::Gateway.new 'AuthGateway',
           entityName: 'user'
           endpoints: {
             signin: App::AuthSigninEndpoint.new()
@@ -44,35 +43,36 @@ module.exports = (App)->
 ```
 ###
 
-module.exports = (LeanRC)->
-  class LeanRC::Gateway extends LeanRC::Proxy
-    @inheritProtected()
-    @implements LeanRC::GatewayInterface
 
-    @Module: LeanRC
+module.exports = (Module)->
+  class Gateway extends Module::Proxy
+    @inheritProtected()
+    @implements Module::GatewayInterface
+
+    @module Module
 
     ipoEndpoints = @private endpoints: Object
 
     @public swaggerDefinition: Function,
       args: [String, Function]
-      return: RC::NILL
+      return: Module::NILL
       default: (asAction, lambda = (aoData)-> aoData)->
-        voEndpoint = lambda.apply @, [LeanRC::Endpoint.new(gateway: @)]
+        voEndpoint = lambda.apply @, [Module::Endpoint.new(gateway: @)]
         @[ipoEndpoints] ?= {}
         @[ipoEndpoints][asAction] = voEndpoint
         return
 
     @public swaggerDefinitionFor: Function,
       args: [String]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
       default: (asAction)-> @[ipoEndpoints]?[asAction]
 
     @public onRegister: Function,
       default: (args...)->
         @super args...
         {endpoints} = @getData()
-        @[ipoEndpoints] = RC::Utils.extend {}, (@[ipoEndpoints] ? {}), endpoints
+        @[ipoEndpoints] = Module::Utils.extend {}, (@[ipoEndpoints] ? {}), endpoints
         return
 
 
-  return LeanRC::Gateway.initialize()
+  Gateway.initialize()

@@ -1,12 +1,12 @@
-LeanRC = require.main.require 'lib'
 
-module.exports = (TestApp) ->
-  class TestApp::PrepareModelCommand extends LeanRC::SimpleCommand
+
+module.exports = (Module) ->
+  class PrepareModelCommand extends Module::SimpleCommand
     @inheritProtected()
-    @Module: TestApp
+    @module Module
 
     @public execute: Function,
       default: ->
-        @facade.registerProxy TestApp::RobotDataProxy.new TestApp::RobotDataProxy.ROBOT_PROXY, no
+        @facade.registerProxy Module::RobotDataProxy.new Module::RobotDataProxy::ROBOT_PROXY, no
 
-  TestApp::PrepareModelCommand.initialize()
+  PrepareModelCommand.initialize()

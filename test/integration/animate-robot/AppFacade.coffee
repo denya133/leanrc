@@ -1,9 +1,9 @@
-LeanRC = require.main.require 'lib'
 
-module.exports = (TestApp) ->
-  class TestApp::AppFacade extends LeanRC::Facade
+
+module.exports = (Module) ->
+  class AppFacade extends Module::Facade
     @inheritProtected()
-    @Module: TestApp
+    @module Module
 
     vpbIsInitialized = @private isInitialized: Boolean,
       default: no
@@ -14,18 +14,18 @@ module.exports = (TestApp) ->
       default: ->
         unless @[vpbIsInitialized]
           @[vpbIsInitialized] = yes
-          @registerCommand TestApp::AppConstants.STARTUP, TestApp::StartupCommand
-          @sendNotification TestApp::AppConstants.STARTUP
+          @registerCommand Module::STARTUP, Module::StartupCommand
+          @sendNotification Module::STARTUP
 
     @public finish: Function,
       default: ->
-        @removeMediator  TestApp::ConsoleComponentMediator.CONSOLE_MEDIATOR
+        @removeMediator  Module::ConsoleComponentMediator::CONSOLE_MEDIATOR
 
     @public @static getInstance: Function,
       default: (asKey)->
-        vhInstanceMap = LeanRC::Facade[cphInstanceMap]
+        vhInstanceMap = Module::Facade[cphInstanceMap]
         unless vhInstanceMap[asKey]?
-          vhInstanceMap[asKey] = TestApp::AppFacade.new asKey
+          vhInstanceMap[asKey] = Module::AppFacade.new asKey
         vhInstanceMap[asKey]
 
-  TestApp::AppFacade.initialize()
+  AppFacade.initialize()

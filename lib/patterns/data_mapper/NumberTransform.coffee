@@ -1,13 +1,12 @@
 _ = require 'lodash'
-RC = require 'RC'
 
 
-module.exports = (LeanRC)->
-  class LeanRC::NumberTransform extends RC::CoreObject
+module.exports = (Module)->
+  class NumberTransform extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::TransformInterface
+    @implements Module::TransformInterface
 
-    @Module: LeanRC
+    @module Module
 
     @public @static normalize: Function,
       default: (serialized)->
@@ -26,4 +25,4 @@ module.exports = (LeanRC)->
           return if _.isNumber(transformed) then transformed else null
 
 
-  return LeanRC::NumberTransform.initialize()
+  NumberTransform.initialize()

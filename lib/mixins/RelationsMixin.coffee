@@ -3,18 +3,17 @@ _ = require 'lodash'
 joi = require 'joi'
 inflect = do require 'i'
 
-RC = require 'RC'
 
-# миксин для подмешивания в классы унаследованные от LeanRC::Record
+# миксин для подмешивания в классы унаследованные от Module::Record
 # если в этих классах необходим функционал релейшенов.
 
 
-module.exports = (LeanRC)->
-  class LeanRC::RelationsMixin extends RC::Mixin
+module.exports = (Module)->
+  class RelationsMixin extends Module::Mixin
     @inheritProtected()
-    @implements LeanRC::RelationsMixinInterface
+    @implements Module::RelationsMixinInterface
 
-    @Module: LeanRC
+    @module Module
 
     @public @static belongsTo: Function,
       default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable}={})->
@@ -52,7 +51,7 @@ module.exports = (LeanRC)->
               @[attr] = null
               return
           get: ->
-            RC::Utils.co =>
+            Module::Utils.co =>
               vcRecord = opts.transform()
               vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
               voCollection = @collection.facade.retrieveProxy vsCollectionName
@@ -64,7 +63,7 @@ module.exports = (LeanRC)->
                   yield voCollection.take @[through[0]][0][through[1].by]
                 else
                   null
-        @computed @async "#{vsAttr}": LeanRC::RecordInterface, opts
+        @computed @async "#{vsAttr}": Module::RecordInterface, opts
         @metaObject.addMetaData 'relations', vsAttr, opts
         return
 
@@ -79,7 +78,7 @@ module.exports = (LeanRC)->
             @Module::[vsRecordName]
         opts.validate = -> joi.array().items opts.transform().schema
         opts.get = ->
-          RC::Utils.co =>
+          Module::Utils.co =>
             vcRecord = opts.transform()
             vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
             voCollection = @collection.facade.retrieveProxy vsCollectionName
@@ -92,7 +91,7 @@ module.exports = (LeanRC)->
                   i[opts.through[1].by]
               else
                 null
-        @computed @async "#{vsAttr}": LeanRC::CursorInterface, opts
+        @computed @async "#{vsAttr}": Module::CursorInterface, opts
         @metaObject.addMetaData 'relations', vsAttr, opts
         return
 
@@ -108,7 +107,7 @@ module.exports = (LeanRC)->
             @Module::[vsRecordName]
         opts.validate = -> opts.transform().schema
         opts.get = ->
-          RC::Utils.co =>
+          Module::Utils.co =>
             vcRecord = opts.transform()
             vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
             voCollection = @collection.facade.retrieveProxy vsCollectionName
@@ -132,4 +131,4 @@ module.exports = (LeanRC)->
 
 
 
-  return LeanRC::RelationsMixin.initialize()
+  RelationsMixin.initialize()

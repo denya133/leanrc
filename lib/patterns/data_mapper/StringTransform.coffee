@@ -1,13 +1,12 @@
 _ = require 'lodash'
-RC = require 'RC'
 
 
-module.exports = (LeanRC)->
-  class LeanRC::StringTransform extends RC::CoreObject
+module.exports = (Module)->
+  class StringTransform extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::TransformInterface
+    @implements Module::TransformInterface
 
-    @Module: LeanRC
+    @module Module
 
     @public @static normalize: Function,
       default: (serialized)->
@@ -18,4 +17,4 @@ module.exports = (LeanRC)->
         if _.isNil(deserialized) then null else String deserialized
 
 
-  return LeanRC::StringTransform.initialize()
+  StringTransform.initialize()

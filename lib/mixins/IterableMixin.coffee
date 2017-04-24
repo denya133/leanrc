@@ -1,17 +1,13 @@
-
-
-RC = require 'RC'
-
-# миксин подмешивается к классам унаследованным от LeanRC::Collection
+# миксин подмешивается к классам унаследованным от Module::Collection
 # если необходимы методы для работы с collection как с итерируемым объектом
 
 
-module.exports = (LeanRC)->
-  class LeanRC::IterableMixin extends RC::Mixin
+module.exports = (Module)->
+  class IterableMixin extends Module::Mixin
     @inheritProtected()
-    @implements LeanRC::IterableMixinInterface
+    @implements Module::IterableMixinInterface
 
-    @Module: LeanRC
+    @module Module
 
     @public @async forEach: Function,
       default: (lambda)->
@@ -35,4 +31,4 @@ module.exports = (LeanRC)->
         yield cursor.reduce ((item, prev)-> yield lambda item, prev), initialValue
 
 
-  return LeanRC::IterableMixin.initialize()
+  IterableMixin.initialize()

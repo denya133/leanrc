@@ -1,18 +1,17 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::Facade extends RC::CoreObject
+
+module.exports = (Module)->
+  class Facade extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::FacadeInterface
+    @implements Module::FacadeInterface
 
-    @Module: LeanRC
+    @module Module
 
-    @public @static MULTITON_MSG: String,
-      default: "Facade instance for this multiton key already constructed!"
+    @const MULTITON_MSG: "Facade instance for this multiton key already constructed!"
 
-    ipoModel        = @private model: LeanRC::ModelInterface
-    ipoView         = @private view: LeanRC::ViewInterface
-    ipoController   = @private controller: LeanRC::ControllerInterface
+    ipoModel        = @private model: Module::ModelInterface
+    ipoView         = @private view: Module::ViewInterface
+    ipoController   = @private controller: Module::ControllerInterface
     ipsMultitonKey  = @protected multitonKey: String
     cphInstanceMap  = @protected @static instanceMap: Object,
       default: {}
@@ -20,18 +19,18 @@ module.exports = (LeanRC)->
     ipmInitializeModel = @protected initializeModel: Function,
       default: ->
         unless @[ipoModel]?
-          @[ipoModel] = LeanRC::Model.getInstance @[ipsMultitonKey]
+          @[ipoModel] = Module::Model.getInstance @[ipsMultitonKey]
 
     ipmInitializeController = @protected initializeController: Function,
       default: ->
         unless @[ipoController]?
-          @[ipoController] = LeanRC::Controller.getInstance @[ipsMultitonKey]
+          @[ipoController] = Module::Controller.getInstance @[ipsMultitonKey]
         return
 
     ipmInitializeView = @protected initializeView: Function,
       default: ->
         unless @[ipoView]?
-          @[ipoView] = LeanRC::View.getInstance @[ipsMultitonKey]
+          @[ipoView] = Module::View.getInstance @[ipsMultitonKey]
         return
 
     ipmInitializeFacade = @protected initializeFacade: Function,
@@ -44,7 +43,7 @@ module.exports = (LeanRC)->
     @public @static getInstance: Function,
       default: (asKey)->
         unless Facade[cphInstanceMap][asKey]?
-          Facade[cphInstanceMap][asKey] = LeanRC::Facade.new asKey
+          Facade[cphInstanceMap][asKey] = Facade.new asKey
         Facade[cphInstanceMap][asKey]
 
     @public registerCommand: Function,
@@ -107,7 +106,7 @@ module.exports = (LeanRC)->
 
     @public sendNotification: Function,
       default: (asName, asBody, asType)->
-        @notifyObservers LeanRC::Notification.new asName, asBody, asType
+        @notifyObservers Module::Notification.new asName, asBody, asType
         return
 
     @public initializeNotifier: Function,
@@ -119,10 +118,10 @@ module.exports = (LeanRC)->
       default: (asKey)->
         @super arguments...
         if Facade[cphInstanceMap][asKey]?
-          throw new Error Facade.MULTITON_MSG
+          throw new Error Facade::MULTITON_MSG
         @initializeNotifier asKey
         Facade[cphInstanceMap][asKey] = @
         @[ipmInitializeFacade]()
 
 
-  return LeanRC::Facade.initialize()
+  Facade.initialize()

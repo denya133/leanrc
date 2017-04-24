@@ -1,14 +1,14 @@
-RC            = require 'RC'
-{ANY, NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::EndpointInterface extends RC::Interface
+module.exports = (Module)->
+  {ANY, NILL} = Module::
+
+  class EndpointInterface extends Module::Interface
     @inheritProtected()
 
-    @Module: LeanRC
+    @module Module
 
-    @public @virtual gateway: LeanRC::GatewayInterface
+    @public @virtual gateway: Module::GatewayInterface
 
     @public @virtual tags: Array
     @public @virtual headers: Array
@@ -23,43 +23,43 @@ module.exports = (LeanRC)->
 
     @public @virtual tag: Function,
       args: [String]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
 
     @public @virtual header: Function,
       args: [String, Object, [String, NILL]]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
 
     @public @virtual pathParam: Function,
       args: [String, Object, [String, NILL]]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
 
     @public @virtual queryParam: Function,
       args: [String, Object, [String, NILL]]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
 
     @public @virtual body: Function,
       args: [Object, [Array, NILL], [String, NILL]]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
 
     @public @virtual response: Function,
       args: [[Number, String], [Object, NILL], [Array, NILL], [String, NILL]]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
 
     @public @virtual error: Function,
       args: [[Number, String], String]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
 
     @public @virtual summary: Function,
       args: [String]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
 
     @public @virtual description: Function,
       args: [String]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
 
     @public @virtual deprecated: Function,
       args: [Boolean]
-      return: LeanRC::EndpointInterface
+      return: Module::EndpointInterface
 
 
-  return LeanRC::EndpointInterface.initialize()
+  EndpointInterface.initialize()

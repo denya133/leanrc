@@ -2,7 +2,7 @@ _             = require 'lodash'
 joi           = require 'joi'
 inflect       = require('i')()
 status        = require 'statuses'
-RC            = require 'RC'
+
 
 HTTP_NOT_FOUND    = status 'not found'
 HTTP_CONFLICT     = status 'conflict'
@@ -13,26 +13,26 @@ UPGRADE_REQUIRED  = status 'upgrade required'
 
 ###
 ```coffee
-LeanRC = require 'LeanRC'
+Module = require 'Module'
 
 module.exports = (App)->
-  App::CrudGateway extends LeanRC::Gateway
+  App::CrudGateway extends Module::Gateway
     @inheritProtected()
-    @include LeanRC::CrudEndpointsMixin
+    @include Module::CrudEndpointsMixin
 
-    @Module: App
+    @module App
 
   return App::CrudGateway.initialize()
 ```
 
 ###
 
-module.exports = (LeanRC)->
-  class LeanRC::CrudEndpointsMixin extends RC::Mixin
+module.exports = (Module)->
+  class CrudEndpointsMixin extends Module::Mixin
     @inheritProtected()
-    @implements LeanRC::CrudEndpointsMixinInterface
+    @implements Module::CrudEndpointsMixinInterface
 
-    @Module: LeanRC
+    @module Module
 
     @public keyName: String,
       get: ->
@@ -280,4 +280,4 @@ module.exports = (LeanRC)->
         return
 
 
-  return LeanRC::CrudEndpointsMixin.initialize()
+  CrudEndpointsMixin.initialize()

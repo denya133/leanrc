@@ -1,11 +1,11 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::TeeSplit extends RC::CoreObject
+
+module.exports = (Module)->
+  class TeeSplit extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::PipeFittingInterface
+    @implements Module::PipeFittingInterface
 
-    @Module: LeanRC
+    @module Module
 
     iplOutputs = @protected outputs: Array
 
@@ -21,8 +21,8 @@ module.exports = (LeanRC)->
         return @[iplOutputs].pop()
 
     @public disconnectFitting: Function,
-      args: [LeanRC::PipeFittingInterface]
-      return: LeanRC::PipeFittingInterface
+      args: [Module::PipeFittingInterface]
+      return: Module::PipeFittingInterface
       default: (aoTarget)->
         voRemoved = null
         @[iplOutputs] ?= []
@@ -50,4 +50,4 @@ module.exports = (LeanRC)->
           @connect output2
 
 
-  return LeanRC::TeeSplit.initialize()
+  TeeSplit.initialize()

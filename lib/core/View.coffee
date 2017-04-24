@@ -1,14 +1,13 @@
-RC = require 'RC'
 
-module.exports = (LeanRC)->
-  class LeanRC::View extends RC::CoreObject
+
+module.exports = (Module)->
+  class View extends Module::CoreObject
     @inheritProtected()
-    @implements LeanRC::ViewInterface
+    @implements Module::ViewInterface
 
-    @Module: LeanRC
+    @module Module
 
-    @public @static MULTITON_MSG: String,
-      default: "View instance for this multiton key already constructed!"
+    @const MULTITON_MSG: "View instance for this multiton key already constructed!"
 
     iphMediatorMap = @private mediatorMap: Object
     iphObserverMap = @private observerMap: Object
@@ -19,7 +18,7 @@ module.exports = (LeanRC)->
     @public @static getInstance: Function,
       default: (asKey)->
         unless View[cphInstanceMap][asKey]
-          View[cphInstanceMap][asKey] = LeanRC::View.new asKey
+          View[cphInstanceMap][asKey] = View.new asKey
         View[cphInstanceMap][asKey]
 
     @public @static removeView: Function,
@@ -74,7 +73,7 @@ module.exports = (LeanRC)->
         # Get Notification interests, if any.
         vlInterests = aoMediator.listNotificationInterests() ? []
         if vlInterests.length > 0
-          voObserver = LeanRC::Observer.new aoMediator.handleNotification, aoMediator
+          voObserver = Module::Observer.new aoMediator.handleNotification, aoMediator
           for vsInterest in vlInterests
             do (vsInterest)=>
               @registerObserver vsInterest, voObserver
@@ -114,14 +113,14 @@ module.exports = (LeanRC)->
 
     @public initializeView: Function,
       args: []
-      return: RC::NILL
+      return: Module::NILL
       default: ->
 
     @public init: Function,
       default: (asKey)->
         @super arguments...
         if View[cphInstanceMap][asKey]
-          throw Error View.MULTITON_MSG
+          throw Error View::MULTITON_MSG
         View[cphInstanceMap][asKey] = @
         @[ipsMultitonKey] = asKey
         @[iphMediatorMap] = {}
@@ -129,4 +128,4 @@ module.exports = (LeanRC)->
         @initializeView()
 
 
-  return LeanRC::View.initialize()
+  View.initialize()

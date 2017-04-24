@@ -1,40 +1,39 @@
-LeanRC = require.main.require 'lib'
+
 
 handleSendRequest = null
 
-module.exports = (RequestApp) ->
-  class RequestApp::ConsoleComponentMediator extends LeanRC::Mediator
+module.exports = (Module) ->
+  class ConsoleComponentMediator extends Module::Mediator
     @inheritProtected()
-    @Module: RequestApp
+    @module Module
 
-    @public @static CONSOLE_MEDIATOR: String,
-      default: 'consoleMediator'
+    @const CONSOLE_MEDIATOR: 'consoleMediator'
 
     @public listNotificationInterests: Function,
       default: -> [
-        RequestApp::AppConstants.RECEIVE_RESPONSE
+        Module::RECEIVE_RESPONSE
       ]
 
     @public handleNotification: Function,
       default: (notification)->
         switch notification.getName()
-          when RequestApp::AppConstants.RECEIVE_RESPONSE
+          when Module::RECEIVE_RESPONSE
             @getViewComponent()?.writeMessages notification.getBody()
 
     @public onRegister: Function,
       default: ->
-        @setViewComponent RequestApp::ConsoleComponent.getInstance()
+        @setViewComponent Module::ConsoleComponent.getInstance()
         handleSendRequest = => @handleSendRequest()
-        @getViewComponent()?.subscribeEvent RequestApp::ConsoleComponent.SEND_REQUEST_EVENT, handleSendRequest
+        @getViewComponent()?.subscribeEvent Module::ConsoleComponent::SEND_REQUEST_EVENT, handleSendRequest
 
     @public onRemove: Function,
       default: ->
-        @getViewComponent()?.unsubscribeEvent RequestApp::ConsoleComponent.SEND_REQUEST_EVENT, handleSendRequest
+        @getViewComponent()?.unsubscribeEvent Module::ConsoleComponent::SEND_REQUEST_EVENT, handleSendRequest
         @setViewComponent null
 
     @public handleSendRequest: Function,
       default: ->
-        @sendNotification RequestApp::AppConstants.SEND_REQUEST
+        @sendNotification Module::SEND_REQUEST
 
 
-  RequestApp::ConsoleComponentMediator.initialize()
+  ConsoleComponentMediator.initialize()

@@ -1,25 +1,25 @@
-RC = require 'RC'
-{NILL} = RC::
 
 
-module.exports = (LeanRC)->
-  class LeanRC::ModelInterface extends RC::Interface
+module.exports = (Module)->
+  {NILL} = Module::
+
+  class ModelInterface extends Module::Interface
     @inheritProtected()
-    @Module: LeanRC
+    @module Module
 
     @public @virtual registerProxy: Function,
-      args: [LeanRC::ProxyInterface]
+      args: [Module::ProxyInterface]
       return: NILL
     @public @virtual removeProxy: Function,
       args: [String]
-      return: LeanRC::ProxyInterface
+      return: Module::ProxyInterface
     @public @virtual retrieveProxy: Function,
       args: [String]
-      return: LeanRC::ProxyInterface
+      return: Module::ProxyInterface
     @public @virtual hasProxy: Function,
       args: [String]
       return: Boolean
 
 
 
-  return LeanRC::ModelInterface.initialize()
+  ModelInterface.initialize()
