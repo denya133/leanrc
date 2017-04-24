@@ -48,7 +48,7 @@ class LeanRC extends RC::Module
   require('./mixins/HttpCollectionMixin') LeanRC
   require('./mixins/IterableMixin') LeanRC #tested
   # require('./mixins/PipesSwitchMixin') LeanRC # empty
-  require('./mixins/QueryableMixin') LeanRC
+  require('./mixins/QueryableMixin') LeanRC #tested
   require('./mixins/RecordMixin') LeanRC #tested
   require('./mixins/RelationsMixin') LeanRC #tested
 
