@@ -290,8 +290,7 @@ describe 'HttpCollectionMixin', ->
         assert.equal url, 'TEST_Test_SNAP_test_QUE'
         yield return
   describe '#urlForRequest', ->
-    ###
-    it 'should get method name from request params', ->
+    it 'should get url from request params', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -301,19 +300,47 @@ describe 'HttpCollectionMixin', ->
           @include LeanRC::QueryableMixin
           @include LeanRC::HttpCollectionMixin
           @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+          @public urlForTest: Function,
+            default: (recordName, snapshot, requestType, query) ->
+              "TEST_#{recordName ? 'RECORD_NAME'}_#{snapshot ? 'SNAPSHOT'}_#{requestType ? 'REQUEST_TYPE'}_#{query ? 'QUERY'}"
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
-        method = collection.urlForRequest requestType: 'find'
-        assert.equal method, 'GET', 'Find method is incorrect'
-        method = collection.urlForRequest requestType: 'insert'
-        assert.equal method, 'POST', 'Insert method is incorrect'
-        method = collection.urlForRequest requestType: 'update'
-        assert.equal method, 'PATCH', 'Update method is incorrect'
-        method = collection.urlForRequest requestType: 'replace'
-        assert.equal method, 'PUT', 'Replace method is incorrect'
-        method = collection.urlForRequest requestType: 'remove'
-        assert.equal method, 'DELETE', 'Remove method is incorrect'
-        method = collection.urlForRequest requestType: 'someOther'
-        assert.equal method, 'GET', 'Any other method is incorrect'
+        url = collection.urlForRequest
+          recordName: 'Test'
+          snapshot: {}
+          requestType: 'find'
+          query: {}
+        assert.equal url, 'http://localhost:8000/v1/tests'
+        url = collection.urlForRequest
+          recordName: 'Test'
+          snapshot: {}
+          requestType: 'insert'
+          query: {}
+        assert.equal url, 'http://localhost:8000/v1/tests'
+        url = collection.urlForRequest
+          recordName: 'Test'
+          snapshot: {}
+          requestType: 'update'
+          query: {}
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection.urlForRequest
+          recordName: 'Test'
+          snapshot: {}
+          requestType: 'replace'
+          query: {}
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection.urlForRequest
+          recordName: 'Test'
+          snapshot: {}
+          requestType: 'remove'
+          query: {}
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection.urlForRequest
+          recordName: 'Test'
+          snapshot: 'SNAP'
+          requestType: 'test'
+          query: 'QUE'
+        assert.equal url, 'TEST_Test_SNAP_test_QUE'
         yield return
-    ###
