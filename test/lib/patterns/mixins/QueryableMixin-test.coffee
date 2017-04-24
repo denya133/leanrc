@@ -341,7 +341,7 @@ describe 'QueryableMixin', ->
   describe '#destroyBy', ->
     it 'should remove records by query', ->
       co ->
-        KEY = 'FACADE_TEST_QUERYABLE_005'
+        KEY = 'FACADE_TEST_QUERYABLE_006'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -399,4 +399,82 @@ describe 'QueryableMixin', ->
         data = queryable.getData()
         assert.lengthOf data, 2, 'Records did not removed'
         assert.lengthOf _.filter(data, { test: 'test2' }), 0, 'Found removed records'
+        yield return
+  describe '#overrideBy', ->
+    it 'should update data inrecords by query', ->
+      co ->
+        KEY = 'FACADE_TEST_QUERYABLE_007'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @attribute updated: Boolean, { default: no }
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::Queryable extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public parseQuery: Object,
+            default: (aoQuery) -> aoQuery
+          @public @async executeQuery: LeanRC::Cursor,
+            default: (aoParsedQuery) ->
+              if (item = aoParsedQuery['$replace'])?
+                toBeReplaced = _.filter @getData(), aoParsedQuery.$filter
+                if _.isArray toBeReplaced
+                  for datum in toBeReplaced
+                    if item.constructor.attributes?
+                      vhAttributes = {}
+                      for own key of item.constructor.attributes
+                        datum[key] = item[key]
+                    else
+                      datum[key] = value  for own key, value of item
+              data = _.filter @getData(), aoParsedQuery.$filter
+              yield LeanRC::Cursor.new @, data
+          @public take: Function,
+            default: (id) ->
+              data = _.find @getData(), { _key: id }
+              throw new Error 'NOT_FOUND'  unless data?
+              yield data
+          @public push: Function,
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @getData().push @delegate.serialize record
+              yield return
+        Test::Queryable.initialize()
+        collection = Test::Queryable.new KEY, []
+        facade.registerProxy collection
+        queryable = facade.retrieveProxy KEY
+        yield queryable.create test: 'test1'
+        yield queryable.create test: 'test2'
+        yield queryable.create test: 'test3'
+        yield queryable.create test: 'test2'
+        yield queryable.overrideBy { test: 'test2' }, yield queryable.build test: 'test2', updated: yes
+        for rawData in queryable.getData()
+          assert.isDefined rawData, 'No specified record'
+          if rawData.test is 'test2'
+            assert.propertyVal rawData, 'updated', yes, 'Record was not overriden'
+          else
+            assert.propertyVal rawData, 'updated', no, 'Record was overriden'
+        queryable.setData []
+        yield queryable.create test: 'test1'
+        yield queryable.create test: 'test2'
+        yield queryable.create test: 'test3'
+        yield queryable.create test: 'test2'
+        yield queryable.overrideBy { test: 'test2' }, { updated: yes }
+        for rawData in queryable.getData()
+          assert.isDefined rawData, 'No specified record'
+          if rawData.test is 'test2'
+            assert.propertyVal rawData, 'updated', yes, 'Record was not overriden'
+          else
+            assert.propertyVal rawData, 'updated', no, 'Record was overriden'
         yield return
