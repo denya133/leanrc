@@ -24,12 +24,12 @@ describe 'HttpCollectionMixin', ->
         collection = Test::HttpCollection.new()
         assert.instanceOf collection, Test::HttpCollection
         yield return
-  describe '#', ->
+  describe '#~requestToHash, #~makeRequest', ->
     before ->
       server.listen 8000
     after ->
       server.close()
-    it 'should ...', ->
+    it 'should make simple request', ->
       co ->
         KEY = 'FACADE_TEST_HTTP_COLLECTION_001'
         facade = LeanRC::Facade.getInstance KEY
@@ -56,6 +56,15 @@ describe 'HttpCollectionMixin', ->
         facade.registerProxy Test::HttpCollection.new KEY
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, Test::HttpCollection
-        data = yield RC::Utils.request 'GET', 'http://localhost:8000', json: yes
-        console.log 'DATA:', data
+        hash = collection[Symbol.for '~requestToHash']
+          method: 'GET'
+          url: 'http://localhost:8000'
+        assert.equal hash.method, 'GET', 'Method is incorrect'
+        assert.equal hash.url, 'http://localhost:8000', 'URL is incorrect'
+        assert.equal hash.options?.json, yes, 'JSON option is not set'
+        data = yield collection[Symbol.for '~makeRequest']
+          method: 'GET'
+          url: 'http://localhost:8000'
+        assert.equal data.status, 200, 'Request received not OK status'
+        assert.equal data?.body?.message, 'OK', 'Incorrect body'
         yield return
