@@ -12,10 +12,6 @@ describe 'QueryableMixin', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        # class Test::TestRecord extends LeanRC::Record
-        #   @inheritProtected()
-        #   @Module: Test
-        # Test::TestRecord.initialize()
         class Test::Queryable extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::QueryableMixin
@@ -25,7 +21,7 @@ describe 'QueryableMixin', ->
           @public @async executeQuery: LeanRC::Cursor,
             default: (aoParsedQuery) -> yield return aoParsedQuery
         Test::Queryable.initialize()
-        queryable = Test::Queryable.new()# Test::TestRecord, array
+        queryable = Test::Queryable.new()
         assert.instanceOf queryable, Test::Queryable
         yield return
   describe '#query', ->
@@ -34,10 +30,6 @@ describe 'QueryableMixin', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        # class Test::TestRecord extends LeanRC::Record
-        #   @inheritProtected()
-        #   @Module: Test
-        # Test::TestRecord.initialize()
         spyExecuteQuery = sinon.spy (aoParsedQuery) -> yield return aoParsedQuery
         spyParseQuery = sinon.spy (aoQuery) -> aoQuery
         class Test::Queryable extends RC::CoreObject
@@ -84,8 +76,6 @@ describe 'QueryableMixin', ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
-          # @public take: Function,
-          #   default: (id) -> yield _.find @getData(), { id }
           @public push: Function,
             default: (record) ->
               record._key = RC::Utils.uuid.v4()
@@ -136,8 +126,6 @@ describe 'QueryableMixin', ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
-          # @public take: Function,
-          #   default: (id) -> yield _.find @getData(), { id }
           @public push: Function,
             default: (record) ->
               record._key = RC::Utils.uuid.v4()
@@ -189,8 +177,6 @@ describe 'QueryableMixin', ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
-          # @public take: Function,
-          #   default: (id) -> yield _.find @getData(), { id }
           @public push: Function,
             default: (record) ->
               record._key = RC::Utils.uuid.v4()
@@ -280,4 +266,137 @@ describe 'QueryableMixin', ->
           else
             assert.propertyVal rawData, 'isHidden', no, 'Record was removed'
             assert.isNull rawData.deletedAt, 'Record deleted data is not null'
+        yield return
+  describe '#removeBy', ->
+    it 'should remove data by query', ->
+      co ->
+        KEY = 'FACADE_TEST_QUERYABLE_005'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::Queryable extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public parseQuery: Object,
+            default: (aoQuery) -> aoQuery
+          @public @async executeQuery: LeanRC::Cursor,
+            default: (aoParsedQuery) ->
+              data = []
+              switch
+                when aoParsedQuery['$remove']
+                  _.remove @getData(), aoParsedQuery['$filter']
+                  yield return
+                else
+                  data = _.filter @getData(), aoParsedQuery.$filter
+              yield LeanRC::Cursor.new @, []
+          @public patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              data = _.filter @getData(), { _key: id }
+              if _.isArray data
+                for datum in data
+                  if item.constructor.attributes?
+                    vhAttributes = {}
+                    for own key of item.constructor.attributes
+                      datum[key] = item[key]
+                  else
+                    datum[key] = value  for own key, value of item
+              yield return data.length > 0
+          @public take: Function,
+            default: (id) ->
+              data = _.find @getData(), { _key: id }
+              throw new Error 'NOT_FOUND'  unless data?
+              yield data
+          @public push: Function,
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @getData().push @delegate.serialize record
+              yield return
+        Test::Queryable.initialize()
+        collection = Test::Queryable.new KEY, []
+        facade.registerProxy collection
+        queryable = facade.retrieveProxy KEY
+        yield queryable.create test: 'test1'
+        yield queryable.create test: 'test2'
+        yield queryable.create test: 'test3'
+        yield queryable.create test: 'test2'
+        yield queryable.removeBy { test: 'test2' }
+        data = queryable.getData()
+        assert.lengthOf data, 2, 'Records did not removed'
+        assert.lengthOf _.filter(data, { test: 'test2' }), 0, 'Found removed records'
+        yield return
+  describe '#destroyBy', ->
+    it 'should remove records by query', ->
+      co ->
+        KEY = 'FACADE_TEST_QUERYABLE_005'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::Queryable extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @Module: Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public parseQuery: Object,
+            default: (aoQuery) -> aoQuery
+          @public @async executeQuery: LeanRC::Cursor,
+            default: (aoParsedQuery) ->
+              data = []
+              switch
+                when aoParsedQuery['$remove']
+                  _.remove @getData(), aoParsedQuery['$filter']
+                  yield return
+                else
+                  data = _.filter @getData(), aoParsedQuery.$filter
+              yield LeanRC::Cursor.new @, data
+          @public take: Function,
+            default: (id) ->
+              data = _.find @getData(), { _key: id }
+              throw new Error 'NOT_FOUND'  unless data?
+              yield data
+          @public push: Function,
+            default: (record) ->
+              record._key = RC::Utils.uuid.v4()
+              @getData().push @delegate.serialize record
+              yield return
+          @public @async remove: Function,
+            default: (id) ->
+              _.remove @getData(), { _key: id }
+              yield return
+        Test::Queryable.initialize()
+        collection = Test::Queryable.new KEY, []
+        facade.registerProxy collection
+        queryable = facade.retrieveProxy KEY
+        yield queryable.create test: 'test1'
+        yield queryable.create test: 'test2'
+        yield queryable.create test: 'test3'
+        yield queryable.create test: 'test2'
+        yield queryable.destroyBy { test: 'test2' }
+        data = queryable.getData()
+        assert.lengthOf data, 2, 'Records did not removed'
+        assert.lengthOf _.filter(data, { test: 'test2' }), 0, 'Found removed records'
         yield return
