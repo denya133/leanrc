@@ -159,10 +159,105 @@ describe 'HttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/tests'
         yield return
   describe '#urlForFind', ->
+    it 'should get url for find request', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        url = collection.urlForFind 'Test', {}
+        assert.equal url, 'http://localhost:8000/v1/tests'
+        url = collection.urlForFind 'TestRecord', {}
+        assert.equal url, 'http://localhost:8000/v1/test_records'
+        yield return
   describe '#urlForInsert', ->
+    it 'should get url for insert request', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        url = collection.urlForInsert 'Test', {}
+        assert.equal url, 'http://localhost:8000/v1/tests'
+        url = collection.urlForInsert 'TestRecord', {}
+        assert.equal url, 'http://localhost:8000/v1/test_records'
+        yield return
   describe '#urlForUpdate', ->
+    it 'should get url for insert request', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        url = collection.urlForUpdate 'Test', {}
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection.urlForUpdate 'TestRecord', {}
+        assert.equal url, 'http://localhost:8000/v1/test_records/bulk'
+        yield return
   describe '#urlForReplace', ->
+    it 'should get url for insert request', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        url = collection.urlForReplace 'Test', {}
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection.urlForReplace 'TestRecord', {}
+        assert.equal url, 'http://localhost:8000/v1/test_records/bulk'
+        yield return
   describe '#urlForRemove', ->
+    it 'should get url for insert request', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        url = collection.urlForRemove 'Test', {}
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection.urlForRemove 'TestRecord', {}
+        assert.equal url, 'http://localhost:8000/v1/test_records/bulk'
+        yield return
   describe '#buildURL', ->
     ###
     it 'should get url from request params', ->
