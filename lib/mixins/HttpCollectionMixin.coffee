@@ -1,4 +1,5 @@
 _             = require 'lodash'
+inflect       = do require 'i'
 
 
 module.exports = (Module)->

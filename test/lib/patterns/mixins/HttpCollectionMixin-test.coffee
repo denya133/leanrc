@@ -68,3 +68,123 @@ describe 'HttpCollectionMixin', ->
         assert.equal data.status, 200, 'Request received not OK status'
         assert.equal data?.body?.message, 'OK', 'Incorrect body'
         yield return
+  describe '#methodForRequest', ->
+    it 'should get method name from request params', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        method = collection.methodForRequest requestType: 'find'
+        assert.equal method, 'GET', 'Find method is incorrect'
+        method = collection.methodForRequest requestType: 'insert'
+        assert.equal method, 'POST', 'Insert method is incorrect'
+        method = collection.methodForRequest requestType: 'update'
+        assert.equal method, 'PATCH', 'Update method is incorrect'
+        method = collection.methodForRequest requestType: 'replace'
+        assert.equal method, 'PUT', 'Replace method is incorrect'
+        method = collection.methodForRequest requestType: 'remove'
+        assert.equal method, 'DELETE', 'Remove method is incorrect'
+        method = collection.methodForRequest requestType: 'someOther'
+        assert.equal method, 'GET', 'Any other method is incorrect'
+        yield return
+  describe '#~urlPrefix', ->
+    it 'should get url prefix', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        url = collection[Symbol.for '~urlPrefix'] 'Test', 'Tests'
+        assert.equal url, 'Tests/Test'
+        url = collection[Symbol.for '~urlPrefix'] '/Test'
+        assert.equal url, 'http://localhost:8000/Test'
+        url = collection[Symbol.for '~urlPrefix']()
+        assert.equal url, 'http://localhost:8000/v1'
+        yield return
+  describe '#~buildURL', ->
+    ###
+    it 'should get url from request params', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: '/v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        url = collection.buildURL 'Test', {}
+        console.log 'URL:', url
+        yield return
+    ###
+  describe '#urlForFind', ->
+  describe '#urlForInsert', ->
+  describe '#urlForUpdate', ->
+  describe '#urlForReplace', ->
+  describe '#urlForRemove', ->
+  describe '#buildURL', ->
+    ###
+    it 'should get url from request params', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: '/v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        url = collection.buildURL 'Test'
+        yield return
+    ###
+  describe '#urlForRequest', ->
+    ###
+    it 'should get method name from request params', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        method = collection.urlForRequest requestType: 'find'
+        assert.equal method, 'GET', 'Find method is incorrect'
+        method = collection.urlForRequest requestType: 'insert'
+        assert.equal method, 'POST', 'Insert method is incorrect'
+        method = collection.urlForRequest requestType: 'update'
+        assert.equal method, 'PATCH', 'Update method is incorrect'
+        method = collection.urlForRequest requestType: 'replace'
+        assert.equal method, 'PUT', 'Replace method is incorrect'
+        method = collection.urlForRequest requestType: 'remove'
+        assert.equal method, 'DELETE', 'Remove method is incorrect'
+        method = collection.urlForRequest requestType: 'someOther'
+        assert.equal method, 'GET', 'Any other method is incorrect'
+        yield return
+    ###
