@@ -139,7 +139,6 @@ describe 'HttpCollectionMixin', ->
         assert.equal url, 'test_infos'
         yield return
   describe '#~buildURL', ->
-    ###
     it 'should get url from request params', ->
       co ->
         class Test extends LeanRC::Module
@@ -151,13 +150,14 @@ describe 'HttpCollectionMixin', ->
           @include LeanRC::HttpCollectionMixin
           @Module: Test
           @public host: String, { default: 'http://localhost:8000' }
-          @public namespace: String, { default: '/v1' }
+          @public namespace: String, { default: 'v1' }
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
         url = collection[Symbol.for '~buildURL'] 'Test', {}
-        console.log 'URL:', url
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection[Symbol.for '~buildURL'] 'Test', {}, no
+        assert.equal url, 'http://localhost:8000/v1/tests'
         yield return
-    ###
   describe '#urlForFind', ->
   describe '#urlForInsert', ->
   describe '#urlForUpdate', ->
