@@ -365,3 +365,75 @@ describe 'HttpCollectionMixin', ->
         headers = collection.headersForRequest()
         assert.deepEqual headers, { 'Allow': 'GET' }
         yield return
+  describe '#~requestFor', ->
+    it 'should request params', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        sampleData = test: 'test'
+        request = collection[Symbol.for '~requestFor']
+          recordName: 'TestRecord'
+          snapshot: sampleData
+          requestType: 'find'
+          query: test: 'test'
+        assert.deepEqual request,
+          method: 'GET'
+          url: 'http://localhost:8000/v1/test_records'
+          headers: {}
+          data: sampleData
+          query: test: 'test'
+        request = collection[Symbol.for '~requestFor']
+          recordName: 'TestRecord'
+          snapshot: sampleData
+          requestType: 'insert'
+          query: test: 'test'
+        assert.deepEqual request,
+          method: 'POST'
+          url: 'http://localhost:8000/v1/test_records'
+          headers: {}
+          data: sampleData
+          query: test: 'test'
+        request = collection[Symbol.for '~requestFor']
+          recordName: 'TestRecord'
+          snapshot: sampleData
+          requestType: 'update'
+          query: test: 'test'
+        assert.deepEqual request,
+          method: 'PATCH'
+          url: 'http://localhost:8000/v1/test_records/bulk'
+          headers: {}
+          data: sampleData
+          query: test: 'test'
+        request = collection[Symbol.for '~requestFor']
+          recordName: 'TestRecord'
+          snapshot: sampleData
+          requestType: 'replace'
+          query: test: 'test'
+        assert.deepEqual request,
+          method: 'PUT'
+          url: 'http://localhost:8000/v1/test_records/bulk'
+          headers: {}
+          data: sampleData
+          query: test: 'test'
+        request = collection[Symbol.for '~requestFor']
+          recordName: 'TestRecord'
+          snapshot: sampleData
+          requestType: 'remove'
+          query: test: 'test'
+        assert.deepEqual request,
+          method: 'DELETE'
+          url: 'http://localhost:8000/v1/test_records/bulk'
+          headers: {}
+          data: sampleData
+          query: test: 'test'
+        yield return
