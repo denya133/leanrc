@@ -116,6 +116,28 @@ describe 'HttpCollectionMixin', ->
         url = collection[Symbol.for '~urlPrefix']()
         assert.equal url, 'http://localhost:8000/v1'
         yield return
+  describe '#pathForType', ->
+    it 'should get url prefix', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        url = collection.pathForType 'Type'
+        assert.equal url, 'types'
+        url = collection.pathForType 'TestRecord'
+        assert.equal url, 'test_records'
+        url = collection.pathForType 'test-info'
+        assert.equal url, 'test_infos'
+        yield return
   describe '#~buildURL', ->
     ###
     it 'should get url from request params', ->
@@ -132,7 +154,7 @@ describe 'HttpCollectionMixin', ->
           @public namespace: String, { default: '/v1' }
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
-        url = collection.buildURL 'Test', {}
+        url = collection[Symbol.for '~buildURL'] 'Test', {}
         console.log 'URL:', url
         yield return
     ###
