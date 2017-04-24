@@ -344,3 +344,24 @@ describe 'HttpCollectionMixin', ->
           query: 'QUE'
         assert.equal url, 'TEST_Test_SNAP_test_QUE'
         yield return
+  describe '#headersForRequest', ->
+    it 'should get headers for collection', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        headers = collection.headersForRequest()
+        assert.deepEqual headers, {}
+        collection.headers = 'Allow': 'GET'
+        headers = collection.headersForRequest()
+        assert.deepEqual headers, { 'Allow': 'GET' }
+        yield return
