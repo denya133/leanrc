@@ -259,7 +259,6 @@ describe 'HttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/test_records/bulk'
         yield return
   describe '#buildURL', ->
-    ###
     it 'should get url from request params', ->
       co ->
         class Test extends LeanRC::Module
@@ -271,12 +270,25 @@ describe 'HttpCollectionMixin', ->
           @include LeanRC::HttpCollectionMixin
           @Module: Test
           @public host: String, { default: 'http://localhost:8000' }
-          @public namespace: String, { default: '/v1' }
+          @public namespace: String, { default: 'v1' }
+          @public urlForTest: Function,
+            default: (recordName, snapshot, requestType, query) ->
+              "TEST_#{recordName ? 'RECORD_NAME'}_#{snapshot ? 'SNAPSHOT'}_#{requestType ? 'REQUEST_TYPE'}_#{query ? 'QUERY'}"
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
-        url = collection.buildURL 'Test'
+        url = collection.buildURL 'Test', {}, 'find', {}
+        assert.equal url, 'http://localhost:8000/v1/tests'
+        url = collection.buildURL 'Test', {}, 'insert', {}
+        assert.equal url, 'http://localhost:8000/v1/tests'
+        url = collection.buildURL 'Test', {}, 'update', {}
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection.buildURL 'Test', {}, 'replace', {}
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection.buildURL 'Test', {}, 'remove', {}
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection.buildURL 'Test', 'SNAP', 'test', 'QUE'
+        assert.equal url, 'TEST_Test_SNAP_test_QUE'
         yield return
-    ###
   describe '#urlForRequest', ->
     ###
     it 'should get method name from request params', ->
