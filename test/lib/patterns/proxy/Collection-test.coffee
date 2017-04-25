@@ -560,17 +560,17 @@ describe 'Collection', ->
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public serializer: Object,
-            default: normalize: spySerializerNormalize
         Test::TestCollection.initialize()
-        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        collection = Test::TestCollection.new 'TEST_COLLECTION',
+          delegate: Test::TestRecord
+          serializer: class Serializer
+            @new: (args) -> Reflect.construct @, args
+            normalize: spySerializerNormalize
         LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_11').registerProxy collection
         record = collection.normalize test: 'test', data: 123
         assert.isTrue spySerializerNormalize.calledWith(Test::TestRecord, test: 'test', data: 123), 'Normalize called improperly'
-  describe '#normalize', ->
-    it 'should normalize record from data', ->
+  describe '#serialize', ->
+    it 'should serialize record to data', ->
       co ->
         spySerializerSerialize = sinon.spy ->
         class Test extends RC::Module
@@ -586,12 +586,12 @@ describe 'Collection', ->
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public serializer: Object,
-            default: serialize: spySerializerSerialize
         Test::TestCollection.initialize()
-        collection = Test::TestCollection.new 'TEST_COLLECTION', {}
+        collection = Test::TestCollection.new 'TEST_COLLECTION',
+          delegate: Test::TestRecord
+          serializer: class Serializer
+            @new: (args) -> Reflect.construct @, args
+            serialize: spySerializerSerialize
         LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_12').registerProxy collection
         record = collection.build test: 'test', data: 123
         data = collection.serialize record, value: 'value'

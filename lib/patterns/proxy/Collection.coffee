@@ -40,10 +40,8 @@ module.exports = (Module)->
 
     @public delegate: Module::Class,
       get: (delegate)->
-        delegate ? @getData().delegate
-    @public serializer: Module::Class,
-      get: (serializer)->
-        serializer ? @getData().serializer ? Module::Serializer
+        delegate ? @getData()?.delegate
+    @public serializer: Module::SerializerInterface
 
     @public collectionName: Function,
       default: ->
@@ -155,6 +153,13 @@ module.exports = (Module)->
     @public serialize: Function,
       default: (aoRecord, ahOptions)->
         @serializer.serialize aoRecord, ahOptions
+
+    @public init: Function,
+      default: (args...)->
+        @super args...
+        vcSerializer = @getData()?.serializer ? Module::Serializer
+        @serializer = vcSerializer.new @
+        @
 
 
   Collection.initialize()

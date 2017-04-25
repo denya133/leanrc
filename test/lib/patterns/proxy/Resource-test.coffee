@@ -24,7 +24,7 @@ describe 'Resource', ->
           @public delegate: RC::Class,
             default: Test::TestRecord
         Test::TestResource.initialize()
-        resource = Test::TestResource.new {}
+        resource = Test::TestResource.new 'TEST'
         assert.equal resource.delegate, Test::TestRecord, 'Record is incorrect'
       .to.not.throw Error
   describe '#collectionName', ->
@@ -560,17 +560,17 @@ describe 'Resource', ->
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public serializer: Object,
-            default: normalize: spySerializerNormalize
         Test::TestResource.initialize()
-        resource = Test::TestResource.new 'TEST_RESOURCE', {}
+        resource = Test::TestResource.new 'TEST_RESOURCE',
+          delegate: Test::TestRecord
+          serializer: class Serializer
+            @new: (args) -> Reflect.construct @, args
+            normalize: spySerializerNormalize
         LeanRC::Facade.getInstance('TEST_RESOURCE_FACADE_11').registerProxy resource
         record = resource.normalize test: 'test', data: 123
         assert.isTrue spySerializerNormalize.calledWith(Test::TestRecord, test: 'test', data: 123), 'Normalize called improperly'
-  describe '#normalize', ->
-    it 'should normalize record from data', ->
+  describe '#serialize', ->
+    it 'should serialize record to data', ->
       co ->
         spySerializerSerialize = sinon.spy ->
         class Test extends RC::Module
@@ -586,12 +586,12 @@ describe 'Resource', ->
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public serializer: Object,
-            default: serialize: spySerializerSerialize
         Test::TestResource.initialize()
-        resource = Test::TestResource.new 'TEST_RESOURCE', {}
+        resource = Test::TestResource.new 'TEST_RESOURCE',
+          delegate: Test::TestRecord
+          serializer: class Serializer
+            @new: (args) -> Reflect.construct @, args
+            serialize: spySerializerSerialize
         LeanRC::Facade.getInstance('TEST_RESOURCE_FACADE_12').registerProxy resource
         record = resource.build test: 'test', data: 123
         data = resource.serialize record, value: 'value'

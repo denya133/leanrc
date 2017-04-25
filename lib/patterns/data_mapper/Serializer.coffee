@@ -20,5 +20,11 @@ module.exports = (Module)->
         vcRecord = aoRecord.constructor
         vcRecord.serialize aoRecord, options
 
+    @public init: Function,
+      default: (args...)->
+        @super args...
+        [@collection] = args
+        @
+
 
   Serializer.initialize()
