@@ -9,126 +9,127 @@ inflect = do require 'i'
 
 
 module.exports = (Module)->
-  class RelationsMixin extends Module::Mixin
-    @inheritProtected()
-    @implements Module::RelationsMixinInterface
+  Module.defineMixin 'RelationsMixin', (BaseClass) ->
+    class RelationsMixin extends BaseClass
+      @inheritProtected()
+      @implements Module::RelationsMixinInterface
 
-    @module Module
+      @module Module
 
-    @public @static belongsTo: Function,
-      default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable}={})->
-        # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
-        vsAttr = Object.keys(typeDefinition)[0]
-        attr ?= "#{vsAttr}Id"
-        refKey ?= '_key'
-        @attribute "#{attr}": String
-        if attr isnt "#{vsAttr}Id"
-          @computed "#{vsAttr}Id": String,
-            valuable: "#{vsAttr}Id"
-            filterable: "#{vsAttr}Id"
+      @public @static belongsTo: Function,
+        default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable}={})->
+          # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
+          vsAttr = Object.keys(typeDefinition)[0]
+          attr ?= "#{vsAttr}Id"
+          refKey ?= '_key'
+          @attribute "#{attr}": String
+          if attr isnt "#{vsAttr}Id"
+            @computed "#{vsAttr}Id": String,
+              valuable: "#{vsAttr}Id"
+              filterable: "#{vsAttr}Id"
+              set: (aoData)->
+                aoData = set?.apply(@, [aoData]) ? aoData
+                @[attr] = aoData
+                return
+              get: ->
+                get?.apply(@, [@[attr]]) ? @[attr]
+          opts =
+            valuable: valuable
+            sortable: sortable
+            groupable: groupable
+            filterable: filterable
+            transform: transform ? =>
+              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
+              @Module::[vsRecordName]
+            validate: -> opts.transform().schema
+            inverse: inverse ? "#{inflect.pluralize inflect.camelize @name, no}"
+            relation: 'belongsTo'
             set: (aoData)->
-              aoData = set?.apply(@, [aoData]) ? aoData
-              @[attr] = aoData
-              return
+              if (id = aoData?[refKey])?
+                @[attr] = id
+                return
+              else
+                @[attr] = null
+                return
             get: ->
-              get?.apply(@, [@[attr]]) ? @[attr]
-        opts =
-          valuable: valuable
-          sortable: sortable
-          groupable: groupable
-          filterable: filterable
-          transform: transform ? =>
-            [vsModuleName, vsRecordName] = @parseRecordName vsAttr
-            @Module::[vsRecordName]
-          validate: -> opts.transform().schema
-          inverse: inverse ? "#{inflect.pluralize inflect.camelize @name, no}"
-          relation: 'belongsTo'
-          set: (aoData)->
-            if (id = aoData?[refKey])?
-              @[attr] = id
-              return
-            else
-              @[attr] = null
-              return
-          get: ->
+              Module::Utils.co =>
+                vcRecord = opts.transform()
+                vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
+                voCollection = @collection.facade.retrieveProxy vsCollectionName
+                unless through
+                  cursor = yield voCollection.takeBy "@doc.#{refKey}": @[attr]
+                  cursor.first()
+                else
+                  if @[through[0]]?[0]?
+                    yield voCollection.take @[through[0]][0][through[1].by]
+                  else
+                    null
+          @computed @async "#{vsAttr}": Module::RecordInterface, opts
+          @metaObject.addMetaData 'relations', vsAttr, opts
+          return
+
+      @public @static hasMany: Function,
+        default: (typeDefinition, opts={})->
+          vsAttr = Object.keys(typeDefinition)[0]
+          opts.refKey ?= '_key'
+          opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
+          opts.relation = 'hasMany'
+          opts.transform ?= =>
+              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
+              @Module::[vsRecordName]
+          opts.validate = -> joi.array().items opts.transform().schema
+          opts.get = ->
             Module::Utils.co =>
               vcRecord = opts.transform()
               vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
               voCollection = @collection.facade.retrieveProxy vsCollectionName
-              unless through
-                cursor = yield voCollection.takeBy "@doc.#{refKey}": @[attr]
-                cursor.first()
+              unless opts.through
+                yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
               else
-                if @[through[0]]?[0]?
-                  yield voCollection.take @[through[0]][0][through[1].by]
+                if @[opts.through[0]]?
+                  throughItems = yield @[opts.through[0]]
+                  yield voCollection.takeMany throughItems.map (i)->
+                    i[opts.through[1].by]
                 else
                   null
-        @computed @async "#{vsAttr}": Module::RecordInterface, opts
-        @metaObject.addMetaData 'relations', vsAttr, opts
-        return
+          @computed @async "#{vsAttr}": Module::CursorInterface, opts
+          @metaObject.addMetaData 'relations', vsAttr, opts
+          return
 
-    @public @static hasMany: Function,
-      default: (typeDefinition, opts={})->
-        vsAttr = Object.keys(typeDefinition)[0]
-        opts.refKey ?= '_key'
-        opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
-        opts.relation = 'hasMany'
-        opts.transform ?= =>
-            [vsModuleName, vsRecordName] = @parseRecordName vsAttr
-            @Module::[vsRecordName]
-        opts.validate = -> joi.array().items opts.transform().schema
-        opts.get = ->
-          Module::Utils.co =>
-            vcRecord = opts.transform()
-            vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
-            voCollection = @collection.facade.retrieveProxy vsCollectionName
-            unless opts.through
-              yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
-            else
-              if @[opts.through[0]]?
-                throughItems = yield @[opts.through[0]]
-                yield voCollection.takeMany throughItems.map (i)->
-                  i[opts.through[1].by]
-              else
-                null
-        @computed @async "#{vsAttr}": Module::CursorInterface, opts
-        @metaObject.addMetaData 'relations', vsAttr, opts
-        return
+      @public @static hasOne: Function,
+        default: (typeDefinition, opts={})->
+          # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
+          vsAttr = Object.keys(typeDefinition)[0]
+          opts.refKey ?= '_key'
+          opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
+          opts.relation = 'hasOne'
+          opts.transform ?= =>
+              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
+              @Module::[vsRecordName]
+          opts.validate = -> opts.transform().schema
+          opts.get = ->
+            Module::Utils.co =>
+              vcRecord = opts.transform()
+              vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
+              voCollection = @collection.facade.retrieveProxy vsCollectionName
+              cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
+              cursor.first()
+          @computed @async typeDefinition, opts
+          @metaObject.addMetaData 'relations', vsAttr, opts
+          return
 
-    @public @static hasOne: Function,
-      default: (typeDefinition, opts={})->
-        # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
-        vsAttr = Object.keys(typeDefinition)[0]
-        opts.refKey ?= '_key'
-        opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
-        opts.relation = 'hasOne'
-        opts.transform ?= =>
-            [vsModuleName, vsRecordName] = @parseRecordName vsAttr
-            @Module::[vsRecordName]
-        opts.validate = -> opts.transform().schema
-        opts.get = ->
-          Module::Utils.co =>
-            vcRecord = opts.transform()
-            vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
-            voCollection = @collection.facade.retrieveProxy vsCollectionName
-            cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
-            cursor.first()
-        @computed @async typeDefinition, opts
-        @metaObject.addMetaData 'relations', vsAttr, opts
-        return
+      # Cucumber.inverseFor 'tomato' #-> {recordClass: App::Tomato, attrName: 'cucumbers', relation: 'hasMany'}
+      @public @static inverseFor: Function,
+        default: (asAttrName)->
+          vhRelationConfig = @relations[asAttrName]
+          recordClass = vhRelationConfig.transform()
+          {inverse:attrName} = vhRelationConfig
+          {relation} = recordClass.relations[attrName]
+          return {recordClass, attrName, relation}
 
-    # Cucumber.inverseFor 'tomato' #-> {recordClass: App::Tomato, attrName: 'cucumbers', relation: 'hasMany'}
-    @public @static inverseFor: Function,
-      default: (asAttrName)->
-        vhRelationConfig = @relations[asAttrName]
-        recordClass = vhRelationConfig.transform()
-        {inverse:attrName} = vhRelationConfig
-        {relation} = recordClass.relations[attrName]
-        return {recordClass, attrName, relation}
-
-    @public @static relations: Object,
-      get: -> @metaObject.getGroup 'relations'
+      @public @static relations: Object,
+        get: -> @metaObject.getGroup 'relations'
 
 
 
-  RelationsMixin.initialize()
+    RelationsMixin.initializeMixin()

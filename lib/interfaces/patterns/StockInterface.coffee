@@ -9,62 +9,63 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  class StockInterface extends Module::Interface
-    @inheritProtected()
+  Module.defineInterface 'StockInterface', (BaseClass) ->
+    class StockInterface extends BaseClass
+      @inheritProtected()
 
-    @module Module
+      @module Module
 
-    @public @virtual entityName: String
-    @public @virtual keyName: String
-    @public @virtual itemEntityName: String
-    @public @virtual listEntityName: String
-    @public @virtual collectionName: String
-    @public @virtual collection: Module::CollectionInterface
+      @public @virtual entityName: String
+      @public @virtual keyName: String
+      @public @virtual itemEntityName: String
+      @public @virtual listEntityName: String
+      @public @virtual collectionName: String
+      @public @virtual collection: Module::CollectionInterface
 
-    @public @virtual queryParams: Object
-    @public @virtual pathPatams: Object
-    @public @virtual currentUserId: String
-    @public @virtual headers: Object
-    @public @virtual body: Object
+      @public @virtual queryParams: Object
+      @public @virtual pathPatams: Object
+      @public @virtual currentUserId: String
+      @public @virtual headers: Object
+      @public @virtual body: Object
 
-    @public @virtual query: Object
-    @public @virtual recordId: String
-    @public @virtual recordBody: Object
-
-
-    @public @static @virtual actions: Function,
-      args: []
-      return: Array
-    @public @static @virtual action: Function, # alias for @public
-      args: [Object, Object] # nameDefinition, config
-      return: String
+      @public @virtual query: Object
+      @public @virtual recordId: String
+      @public @virtual recordBody: Object
 
 
-    @public @async @virtual list: Function,
-      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: NILL # без return. данные посылаем сигналом
-    @public @async @virtual detail: Function,
-      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: NILL # без return. данные посылаем сигналом
-    @public @async @virtual create: Function,
-      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: NILL # без return. данные посылаем сигналом
-    @public @async @virtual update: Function,
-      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: NILL # без return. данные посылаем сигналом
-    @public @async @virtual delete: Function,
-      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: NILL # без return. данные посылаем сигналом
-
-    @public @async @virtual bulkUpdate: Function,
-      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: NILL # без return. данные посылаем сигналом
-    @public @async @virtual bulkPatch: Function,
-      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: NILL # без return. данные посылаем сигналом
-    @public @async @virtual bulkDelete: Function,
-      args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
-      return: NILL # без return. данные посылаем сигналом
+      @public @static @virtual actions: Function,
+        args: []
+        return: Array
+      @public @static @virtual action: Function, # alias for @public
+        args: [Object, Object] # nameDefinition, config
+        return: String
 
 
-  StockInterface.initialize()
+      @public @async @virtual list: Function,
+        args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
+        return: NILL # без return. данные посылаем сигналом
+      @public @async @virtual detail: Function,
+        args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
+        return: NILL # без return. данные посылаем сигналом
+      @public @async @virtual create: Function,
+        args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
+        return: NILL # без return. данные посылаем сигналом
+      @public @async @virtual update: Function,
+        args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
+        return: NILL # без return. данные посылаем сигналом
+      @public @async @virtual delete: Function,
+        args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
+        return: NILL # без return. данные посылаем сигналом
+
+      @public @async @virtual bulkUpdate: Function,
+        args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
+        return: NILL # без return. данные посылаем сигналом
+      @public @async @virtual bulkPatch: Function,
+        args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
+        return: NILL # без return. данные посылаем сигналом
+      @public @async @virtual bulkDelete: Function,
+        args: [Object] # {queryParams, pathPatams, currentUserId, headers, body }
+        return: NILL # без return. данные посылаем сигналом
+
+
+    StockInterface.initializeInterface()

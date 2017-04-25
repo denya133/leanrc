@@ -1,15 +1,16 @@
 
 
 module.exports = (Module)->
-  class CommandInterface extends Module::Interface
-    @inheritProtected()
-    @include Module::NotifierInterface
+  Module.defineInterface 'CommandInterface', (BaseClass) ->
+    class CommandInterface extends BaseClass
+      @inheritProtected()
+      @include Module::NotifierInterface
 
-    @module Module
+      @module Module
 
-    @public @virtual execute: Function,
-      args: [Module::NotificationInterface]
-      return: Module::NILL
+      @public @virtual execute: Function,
+        args: [Module::NotificationInterface]
+        return: Module::NILL
 
 
-  CommandInterface.initialize()
+    CommandInterface.initializeInterface()

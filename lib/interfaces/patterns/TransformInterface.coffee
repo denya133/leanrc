@@ -5,17 +5,18 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  class TransformInterface extends Module::Interface
-    @inheritProtected()
+  Module.defineInterface 'TransformInterface', (BaseClass) ->
+    class TransformInterface extends BaseClass
+      @inheritProtected()
 
-    @module Module
+      @module Module
 
-    @public @static @virtual normalize: Function,
-      args: [ANY] # data
-      return: [ANY, NILL]
-    @public @static @virtual serialize:   Function,
-      args: [ANY] # data
-      return: [ANY, NILL]
+      @public @static @virtual normalize: Function,
+        args: [ANY] # data
+        return: [ANY, NILL]
+      @public @static @virtual serialize:   Function,
+        args: [ANY] # data
+        return: [ANY, NILL]
 
 
-  TransformInterface.initialize()
+    TransformInterface.initializeInterface()
