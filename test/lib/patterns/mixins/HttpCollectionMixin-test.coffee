@@ -404,6 +404,26 @@ describe 'HttpCollectionMixin', ->
         headers = collection.headersForRequest()
         assert.deepEqual headers, { 'Allow': 'GET' }
         yield return
+  describe '#dataForRequest', ->
+    it 'should get data for request', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        collection = Test::HttpCollection.new()
+        data = collection.dataForRequest snapshot: test: 'test1'
+        assert.deepEqual data, { test: 'test1' }
+        data = collection.dataForRequest snapshot: test: 'test2'
+        assert.deepEqual data, { test: 'test2' }
+        yield return
   describe '#~requestFor', ->
     it 'should request params', ->
       co ->
