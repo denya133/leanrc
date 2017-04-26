@@ -66,6 +66,8 @@
     }
   },
   "/v1/test_records": {
+    "single": "test_record",
+    "plural": "test_records",
     "POST": {
       "statusCode": 200,
       "statusMessage": "OK",

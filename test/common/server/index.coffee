@@ -67,8 +67,11 @@ module.exports = (options) ->
               if method.data is 'SELF'
                 if req.method is 'POST'
                   body._key = RC::Utils.uuid.v4()
-                body = [ body ]  unless _.isArray body
-                response = JSON.stringify body
+                  resp = "#{path.single}": body
+                else
+                  body = [ body ]  unless _.isArray body
+                  resp = "#{path.plural}": body
+                response = JSON.stringify resp
               else
                 response = JSON.stringify method.data  if method.data?
         else

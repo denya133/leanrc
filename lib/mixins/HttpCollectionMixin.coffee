@@ -330,8 +330,20 @@ module.exports = (Module)->
         default: (aoQuery, options)->
           request = @[ipmRequestFor] aoQuery
 
-          resultItems = yield @[ipmMakeRequest] request
-          voCursor = Module::Cursor.new @, resultItems.body
+          { body } = yield @[ipmMakeRequest] request
+
+          items = []
+
+          if body?
+            pluralKey = @collectionName()
+            if _.isArray snapshots = body[pluralKey]
+              items.push snapshots...
+            else
+              singularKey = inflect.singularize pluralKey
+              unless _.isArray snapshot = body[singularKey]
+                items.push snapshot
+
+          voCursor = Module::Cursor.new @, items
           return voCursor
 
 
