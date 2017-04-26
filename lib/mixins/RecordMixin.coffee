@@ -141,7 +141,10 @@ module.exports = (Module)->
         default: ->
           unless yield @isNew()
             throw new Error 'Document is exist in collection'
-          yield @collection.push @
+          response = yield @collection.push @
+          if response?
+            { _key, id } = response
+            @_key ?= id ? _key  if _key or id
           vhAttributes = {}
           for own key of @constructor.attributes
             vhAttributes[key] = @[key]

@@ -537,3 +537,46 @@ describe 'HttpCollectionMixin', ->
         assert.equal spyQuery.args[0][0].$insert, record
         assert.equal spyQuery.args[0][0].$into, collection.collectionFullName()
         yield return
+  describe '#remove', ->
+    before ->
+      server.listen 8000
+    after ->
+      server.close()
+    it 'should remove data from collection', ->
+      co ->
+        KEY = 'FACADE_TEST_HTTP_COLLECTION_003'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        facade.registerProxy Test::HttpCollection.new KEY,
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+        collection = facade.retrieveProxy KEY
+        assert.instanceOf collection, Test::HttpCollection
+        record = yield collection.create test: 'test1'
+        stubIsNew = sinon.stub record, 'isNew'
+        stubIsNew.returns RC::Promise.resolve no
+        spyQuery = sinon.spy collection, 'query'
+        yield record.destroy()
+        assert.deepEqual spyQuery.args[0][0].$forIn, { '@doc': 'test_test_records' }
+        assert.deepEqual spyQuery.args[0][0].$filter, { '@doc._key': { '$eq': record.id } }
+        assert.isTrue spyQuery.args[0][0].$remove
+        yield return

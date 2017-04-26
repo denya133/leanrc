@@ -17,8 +17,9 @@ module.exports = (Module)->
           voQuery = Module::Query.new()
             .insert aoRecord
             .into @collectionFullName()
-          yield @query voQuery
-          return yes
+          response = yield @query voQuery
+          first = yield response.next()
+          return first
 
       @public @async remove: Function,
         default: (id)->
@@ -279,7 +280,7 @@ module.exports = (Module)->
                 voQuery ?= {}
                 voQuery.requestType = 'remove'
                 voQuery.recordName = @delegate.name
-                voQuery.query = _.pick [
+                voQuery.query = _.pick aoQuery, [
                   '$forIn', '$join', '$filter', '$let'
                 ]
                 voQuery.query.$return = '@doc'
@@ -299,7 +300,7 @@ module.exports = (Module)->
                 voQuery.requestType = 'update'
                 voQuery.recordName = @delegate.name
                 voQuery.snapshot = @serializer.serialize voRecord
-                voQuery.query = _.pick [
+                voQuery.query = _.pick aoQuery, [
                   '$forIn', '$join', '$filter', '$let'
                 ]
                 voQuery.query.$return = '@doc'
@@ -311,7 +312,7 @@ module.exports = (Module)->
                 voQuery.requestType = 'replace'
                 voQuery.recordName = @delegate.name
                 voQuery.snapshot = @serializer.serialize voRecord
-                voQuery.query = _.pick [
+                voQuery.query = _.pick aoQuery, [
                   '$forIn', '$join', '$filter', '$let'
                 ]
                 voQuery.query.$return = '@doc'
