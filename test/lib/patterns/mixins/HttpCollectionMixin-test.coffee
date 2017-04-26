@@ -530,7 +530,10 @@ describe 'HttpCollectionMixin', ->
           serializer: LeanRC::Serializer
         collection = facade.retrieveProxy KEY
         spyPush = sinon.spy collection, 'push'
+        spyQuery = sinon.spy collection, 'query'
         assert.instanceOf collection, Test::HttpCollection
         record = yield collection.create test: 'test1'
         assert.equal record, spyPush.args[0][0]
+        assert.equal spyQuery.args[0][0].$insert, record
+        assert.equal spyQuery.args[0][0].$into, collection.collectionFullName()
         yield return
