@@ -12,79 +12,79 @@ module.exports = (Module)->
 
       @module Module
 
-      @public push: Function,
+      @public @async push: Function,
         default: (aoRecord)->
           voQuery = Module::Query.new()
             .insert aoRecord
             .into @collectionFullName()
-          @query voQuery
+          yield @query voQuery
           return yes
 
-      @public remove: Function,
+      @public @async remove: Function,
         default: (id)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .filter '@doc._key': {$eq: id}
             .remove()
-          @query voQuery
+          yield @query voQuery
           return yes
 
-      @public take: Function,
+      @public @async take: Function,
         default: (id)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .filter '@doc._key': {$eq: id}
             .return '@doc'
-          return @query voQuery
+          return yield @query voQuery
             .first()
 
-      @public takeMany: Function,
+      @public @async takeMany: Function,
         default: (ids)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .filter '@doc._key': {$in: ids}
             .return '@doc'
-          return @query voQuery
+          return yield @query voQuery
 
-      @public takeAll: Function,
+      @public @async takeAll: Function,
         default: ->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .return '@doc'
-          return @query voQuery
+          return yield @query voQuery
 
-      @public override: Function,
+      @public @async override: Function,
         default: (id, aoRecord)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .filter '@doc._key': {$eq: id}
             .replace aoRecord
-          return @query voQuery
+          return yield @query voQuery
 
-      @public patch: Function,
+      @public @async patch: Function,
         default: (id, aoRecord)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .filter '@doc._key': {$eq: id}
             .update aoRecord
-          return @query voQuery
+          return yield @query voQuery
 
-      @public includes: Function,
+      @public @async includes: Function,
         default: (id)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .filter '@doc._key': {$eq: id}
             .limit 1
             .return '@doc'
-          return @query voQuery
+          return yield @query voQuery
             .hasNext()
 
-      @public length: Function,
+      @public @async length: Function,
         default: ->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .count()
-          return @query voQuery
+          return yield @query voQuery
             .first()
 
       @public headers: Object
@@ -331,7 +331,7 @@ module.exports = (Module)->
           request = @[ipmRequestFor] aoQuery
 
           resultItems = yield @[ipmMakeRequest] request
-          voCursor = Module::Cursor.new @, resultItems
+          voCursor = Module::Cursor.new @, resultItems.body
           return voCursor
 
 

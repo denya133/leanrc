@@ -90,7 +90,7 @@ module.exports = (Module)->
 
       @public @async query: Function,
         default: (aoQuery)->
-          if aoQuery.constructor is Module::Query
+          if aoQuery instanceof Module::Query
             voQuery = aoQuery
           else
             aoQuery = _.pick aoQuery, Object.keys(aoQuery).filter (key)-> aoQuery[key]?

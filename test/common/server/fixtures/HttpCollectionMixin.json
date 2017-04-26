@@ -64,5 +64,12 @@
       "statusCode": 302,
       "statusMessage": "Found"
     }
+  },
+  "/v1/test_records": {
+    "POST": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "SELF"
+    }
   }
 }
