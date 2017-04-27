@@ -4,11 +4,9 @@ inflect       = require('i')()
 
 
 module.exports = (Module)->
-  Module.defineInterface 'CrudEndpointsMixinInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class CrudEndpointsMixinInterface extends BaseClass
       @inheritProtected()
-
-      @module Module
 
       @public @virtual keyName: String
 

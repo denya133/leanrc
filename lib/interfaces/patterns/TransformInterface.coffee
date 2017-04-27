@@ -5,11 +5,9 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'TransformInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class TransformInterface extends BaseClass
       @inheritProtected()
-
-      @module Module
 
       @public @static @virtual normalize: Function,
         args: [ANY] # data

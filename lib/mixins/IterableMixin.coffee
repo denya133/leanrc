@@ -3,12 +3,10 @@
 
 
 module.exports = (Module)->
-  Module.defineMixin 'IterableMixin', (BaseClass) ->
+  Module.defineMixin (BaseClass) ->
     class IterableMixin extends BaseClass
       @inheritProtected()
       @implements Module::IterableMixinInterface
-
-      @module Module
 
       @public @async forEach: Function,
         default: (lambda)->

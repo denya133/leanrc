@@ -1,12 +1,10 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface 'RendererInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class RendererInterface extends BaseClass
       @inheritProtected()
       @include Module::ProxyInterface
-
-      @module Module
 
       @public @async @virtual render: Function,
         args: [Object, Object]

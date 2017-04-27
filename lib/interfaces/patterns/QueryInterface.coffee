@@ -4,11 +4,9 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface 'QueryInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class QueryInterface extends BaseClass
       @inheritProtected()
-
-      @module Module
 
       @public @static @virtual operatorsMap: Object
 

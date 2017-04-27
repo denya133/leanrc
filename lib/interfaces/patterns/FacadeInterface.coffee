@@ -3,12 +3,10 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'FacadeInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class FacadeInterface extends BaseClass
       @inheritProtected()
       @include Module::NotifierInterface
-
-      @module Module
 
       @public @virtual registerCommand: Function,
         args: [String, Module::Class]

@@ -3,10 +3,9 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'ObserverInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class ObserverInterface extends BaseClass
       @inheritProtected()
-      @module Module
 
       @public @virtual setNotifyMethod: Function,
         args: [Function]

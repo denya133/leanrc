@@ -15,6 +15,10 @@ class LeanRC extends RC
   @const MIGRATE: Symbol 'migrate' # для сигнала
   @const ROLLBACK: Symbol 'rollback' # для сигнала
   @const MIGRATIONS: Symbol 'MigrationsCollection'
+  @const RESQUE: Symbol 'ResqueProxy'
+  @const DELAYED_JOBS_QUEUE: 'delayed_jobs'
+  @const DELAYED_JOBS_SCRIPT: 'DelayedJobScript'
+  @const JOB_RESULT:  Symbol 'JOB_RESULT'
 
   require('./interfaces/patterns/TransformInterface') LeanRC #does not need testing
   require('./interfaces/patterns/NotificationInterface') LeanRC #does not need testing
@@ -46,6 +50,10 @@ class LeanRC extends RC
   require('./interfaces/mixins/QueryableMixinInterface') LeanRC #does not need testing
   require('./interfaces/mixins/RelationsMixinInterface') LeanRC #does not need testing
   require('./interfaces/patterns/MigrationInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/DelayedQueueInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/ResqueInterface') LeanRC #does not need testing
+  require('./interfaces/mixins/DelayableMixinInterface') LeanRC #does not need testing
+  require('./interfaces/patterns/ScriptInterface') LeanRC #does not need testing
 
   require('./interfaces/core/ControllerInterface') LeanRC #does not need testing
   require('./interfaces/core/ModelInterface') LeanRC #does not need testing
@@ -58,6 +66,7 @@ class LeanRC extends RC
   require('./mixins/QueryableMixin') LeanRC #tested
   require('./mixins/RecordMixin') LeanRC #tested
   require('./mixins/RelationsMixin') LeanRC #tested
+  require('./mixins/DelayableMixin') LeanRC #tested
 
   require('./patterns/data_mapper/Transform') LeanRC #tested
   require('./patterns/data_mapper/StringTransform') LeanRC #tested
@@ -67,6 +76,7 @@ class LeanRC extends RC
   require('./patterns/data_mapper/Serializer') LeanRC #tested
   require('./patterns/data_mapper/Record') LeanRC #tested
   require('./patterns/data_mapper/Entry') LeanRC # tested
+  require('./patterns/data_mapper/DelayedQueue') LeanRC
 
   require('./patterns/query_object/Query') LeanRC #tested
 
@@ -81,6 +91,7 @@ class LeanRC extends RC
   require('./patterns/proxy/Renderer') LeanRC #needs update tests
   require('./patterns/proxy/Resource') LeanRC #tested
   require('./patterns/proxy/Router') LeanRC #tested
+  require('./patterns/proxy/Resque') LeanRC
 
   require('./patterns/mediator/Mediator') LeanRC #tested
   require('./patterns/mediator/Switch') LeanRC #needs update tests
@@ -90,6 +101,8 @@ class LeanRC extends RC
   require('./patterns/command/Stock') LeanRC
   require('./patterns/command/MigrateCommand') LeanRC
   require('./patterns/command/RollbackCommand') LeanRC
+  require('./patterns/command/Script') LeanRC
+  require('./patterns/command/DelayedJobScript') LeanRC
 
   require('./patterns/migration/Migration') LeanRC
 

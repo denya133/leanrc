@@ -3,11 +3,9 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'IterableMixinInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class IterableMixinInterface extends BaseClass
       @inheritProtected()
-
-      @module Module
 
       @public @async @virtual forEach: Function,
         args: [Function]

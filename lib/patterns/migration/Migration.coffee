@@ -1,4 +1,3 @@
-# надо унаследовать от SimpleCommand
 path = require 'path'
 
 ###
@@ -21,6 +20,25 @@ module.exports = (Module)->
     @module Module
 
   return BaseMigration.initialize()
+```
+
+```coffee
+module.exports = (Module)->
+  {MIGRATIONS} = Module::
+
+  class PrepareModelCommand extends Module::SimpleCommand
+    @inheritProtected()
+
+    @module Module
+
+    @public execute: Function,
+      default: ->
+        #...
+        @facade.registerProxy Module::BaseCollection.new MIGRATIONS,
+          delegate: Module::BaseMigration
+        #...
+
+  PrepareModelCommand.initialize()
 ```
 
 ```coffee

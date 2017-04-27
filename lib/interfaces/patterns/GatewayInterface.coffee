@@ -1,11 +1,9 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface 'GatewayInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class GatewayInterface extends BaseClass
       @inheritProtected()
-
-      @module Module
 
       @public @virtual swaggerDefinition: Function,
         args: [String, Function]

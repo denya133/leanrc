@@ -28,12 +28,10 @@ module.exports = (App)->
 ###
 
 module.exports = (Module)->
-  Module.defineMixin 'CrudEndpointsMixin', (BaseClass) ->
+  Module.defineMixin (BaseClass) ->
     class CrudEndpointsMixin extends BaseClass
       @inheritProtected()
       @implements Module::CrudEndpointsMixinInterface
-
-      @module Module
 
       @public keyName: String,
         get: ->

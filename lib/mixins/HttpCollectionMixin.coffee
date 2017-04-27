@@ -5,12 +5,10 @@ inflect       = do require 'i'
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineMixin 'HttpCollectionMixin', (BaseClass) ->
+  Module.defineMixin (BaseClass) ->
     class HttpCollectionMixin extends BaseClass
       @inheritProtected()
       @implements Module::QueryableMixinInterface
-
-      @module Module
 
       @public @async push: Function,
         default: (aoRecord)->

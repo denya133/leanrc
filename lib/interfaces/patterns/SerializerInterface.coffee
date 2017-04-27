@@ -6,11 +6,9 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'SerializerInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class SerializerInterface extends BaseClass
       @inheritProtected()
-
-      @module Module
 
       @public @virtual collection: Module::CollectionInterface
 

@@ -9,11 +9,9 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'StockInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class StockInterface extends BaseClass
       @inheritProtected()
-
-      @module Module
 
       @public @virtual entityName: String
       @public @virtual keyName: String

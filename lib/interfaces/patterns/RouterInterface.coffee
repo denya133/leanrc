@@ -6,11 +6,9 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'RouterInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class RouterInterface extends BaseClass
       @inheritProtected()
-
-      @module Module
 
       @public @static @virtual map: Function,
         args: [[Function, NILL]]

@@ -3,11 +3,9 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'CursorInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class CursorInterface extends BaseClass
       @inheritProtected()
-
-      @module Module
 
       @public @virtual setRecord: Function,
         args: [Module::Class]
