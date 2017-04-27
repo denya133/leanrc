@@ -1,8 +1,8 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-Filter = LeanRC::Filter
-FilterControlMessage = LeanRC::FilterControlMessage
+Filter = LeanRC::Pipes::Filter
+FilterControlMessage = LeanRC::Pipes::FilterControlMessage
 
 describe 'Filter', ->
   describe '.new', ->
@@ -37,7 +37,7 @@ describe 'Filter', ->
           output = write: ->
           spyWrite = sinon.spy output, 'write'
           filter = Filter.new 'TEST', output, (aoMessage) -> aoMessage
-          message = FilterControlMessage.new LeanRC::PipeMessage.NORMAL, 'TEST'
+          message = FilterControlMessage.new LeanRC::Pipes::PipeMessage.NORMAL, 'TEST'
           filter.write message
           assert.isTrue spyWrite.calledWith(message), '#write called incorrectly'
         .to.not.throw Error

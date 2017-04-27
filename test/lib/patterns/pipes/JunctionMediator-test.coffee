@@ -1,11 +1,11 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-JunctionMediator = LeanRC::JunctionMediator
-Junction = LeanRC::Junction
-Pipe = LeanRC::Pipe
+JunctionMediator = LeanRC::Pipes::JunctionMediator
+Junction = LeanRC::Pipes::Junction
+Pipe = LeanRC::Pipes::Pipe
 Notification = LeanRC::Notification
-PipeMessage = LeanRC::PipeMessage
+PipeMessage = LeanRC::Pipes::PipeMessage
 
 describe 'JunctionMediator', ->
   describe '.new', ->

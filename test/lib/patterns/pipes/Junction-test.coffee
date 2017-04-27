@@ -1,8 +1,8 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-Junction = LeanRC::Junction
-Pipe = LeanRC::Pipe
+Junction = LeanRC::Pipes::Junction
+Pipe = LeanRC::Pipes::Pipe
 
 describe 'Junction', ->
   describe '.new', ->
@@ -94,7 +94,7 @@ describe 'Junction', ->
         junction.registerPipe 'TEST_INPUT', Junction.INPUT, inputPipe
         junction.addPipeListener 'TEST_INPUT', context, (aoMessage) -> @test aoMessage
         assert.isTrue junction.hasInputPipe('TEST_INPUT'), 'TEST_INPUT pipe not registered'
-        message = LeanRC::PipeMessage.new LeanRC::PipeMessage.NORMAL
+        message = LeanRC::Pipes::PipeMessage.new LeanRC::Pipes::PipeMessage.NORMAL
         inputPipe.write message
         assert.isTrue spyTest.calledWith(message), 'Listener did not called on context'
       .to.not.throw Error
@@ -105,7 +105,7 @@ describe 'Junction', ->
         spyWrite = sinon.spy voOutput, 'write'
         junction = Junction.new()
         outputPipe = Pipe.new voOutput
-        message = LeanRC::PipeMessage.new LeanRC::PipeMessage.NORMAL
+        message = LeanRC::Pipes::PipeMessage.new LeanRC::Pipes::PipeMessage.NORMAL
         junction.registerPipe 'TEST_OUTPUT', Junction.OUTPUT, outputPipe
         junction.sendMessage 'TEST_OUTPUT', message
         assert.isTrue spyWrite.calledWith(message), 'Message received with context'
