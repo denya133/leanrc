@@ -87,7 +87,7 @@
       "statusMessage": "No Content",
       "data": "QUERY"
     },
-    "PUT": {
+    "PUT,PATCH": {
       "statusCode": 200,
       "statusMessage": "OK",
       "data": "QUERY"

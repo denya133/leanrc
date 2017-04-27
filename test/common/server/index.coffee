@@ -104,7 +104,7 @@ module.exports = (options) ->
                       records = _.filter collection, filter
                       response = JSON.stringify "#{path.plural}": records
                       _.remove collection, filter
-                    when 'PUT'
+                    when 'PUT', 'PATCH'
                       records = _.filter collection, filter
                       for record in records
                         for key, value of body when key not in [ '_key', 'id' ]
