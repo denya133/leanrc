@@ -52,7 +52,7 @@ class LeanRC extends RC
   require('./interfaces/patterns/MigrationInterface') LeanRC #does not need testing
   require('./interfaces/patterns/DelayedQueueInterface') LeanRC #does not need testing
   require('./interfaces/patterns/ResqueInterface') LeanRC #does not need testing
-  require('./interfaces/patterns/DelayableMixinInterface') LeanRC #does not need testing
+  require('./interfaces/mixins/DelayableMixinInterface') LeanRC #does not need testing
   require('./interfaces/patterns/ScriptInterface') LeanRC #does not need testing
 
   require('./interfaces/core/ControllerInterface') LeanRC #does not need testing

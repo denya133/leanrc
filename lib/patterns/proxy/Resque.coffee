@@ -56,8 +56,9 @@ module.exports = (Module)->
 
     @public @async all: Function,
       default: ->
-        yield return for vhQueue in yield @allQueues()
+        results = for vhQueue in yield @allQueues()
           Module::DelayedQueue.new vhQueue, @
+        yield return results
 
     @public @async get: Function,
       default: (queueName)->
