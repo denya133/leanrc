@@ -8,6 +8,10 @@ module.exports = (Module)->
 
     @module Module
 
+    @public @virtual fullQueueName: Function,
+      args: [String]
+      return: String
+
     @public @async @virtual create: Function,
       args: [String, Number]
       return: Module::DelayedQueueInterface
