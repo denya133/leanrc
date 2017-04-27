@@ -1,7 +1,7 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface 'RendererInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class RendererInterface extends BaseClass
       @inheritProtected()
       @include Module::ProxyInterface

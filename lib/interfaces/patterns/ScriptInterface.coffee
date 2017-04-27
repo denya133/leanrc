@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {NILL, LAMBDA} = Module::
 
-  Module.defineInterface 'ScriptInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class ScriptInterface extends BaseClass
       @inheritProtected()
 

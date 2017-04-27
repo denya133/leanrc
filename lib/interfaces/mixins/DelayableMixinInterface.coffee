@@ -1,7 +1,7 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface 'DelayableMixinInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class DelayableMixinInterface extends BaseClass
       @inheritProtected()
 

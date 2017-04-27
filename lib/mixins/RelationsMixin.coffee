@@ -9,7 +9,7 @@ inflect = do require 'i'
 
 
 module.exports = (Module)->
-  Module.defineMixin 'RelationsMixin', (BaseClass) ->
+  Module.defineMixin (BaseClass) ->
     class RelationsMixin extends BaseClass
       @inheritProtected()
       @implements Module::RelationsMixinInterface

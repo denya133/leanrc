@@ -1,7 +1,7 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface 'GatewayInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class GatewayInterface extends BaseClass
       @inheritProtected()
 

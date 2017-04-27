@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'MediatorInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class MediatorInterface extends BaseClass
       @inheritProtected()
       @include Module::NotifierInterface

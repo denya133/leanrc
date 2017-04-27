@@ -6,7 +6,7 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'QueryableMixinInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class QueryableMixinInterface extends BaseClass
       @inheritProtected()
 

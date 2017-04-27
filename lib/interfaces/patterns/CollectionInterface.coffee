@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'CollectionInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class CollectionInterface extends BaseClass
       @inheritProtected()
 

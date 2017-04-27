@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'ResqueInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class ResqueInterface extends BaseClass
       @inheritProtected()
 

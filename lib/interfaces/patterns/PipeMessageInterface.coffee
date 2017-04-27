@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'PipeMessageInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class PipeMessageInterface extends BaseClass
       @inheritProtected()
 

@@ -9,7 +9,7 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'StockInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class StockInterface extends BaseClass
       @inheritProtected()
 

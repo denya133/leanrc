@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'NotificationInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class NotificationInterface extends BaseClass
       @inheritProtected()
 

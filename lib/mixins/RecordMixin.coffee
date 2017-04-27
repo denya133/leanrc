@@ -4,7 +4,7 @@ inflect = do require 'i'
 
 
 module.exports = (Module)->
-  Module.defineMixin 'RecordMixin', (BaseClass) ->
+  Module.defineMixin (BaseClass) ->
     class RecordMixin extends BaseClass
       @inheritProtected()
 

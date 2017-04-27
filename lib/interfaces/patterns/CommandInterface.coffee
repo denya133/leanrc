@@ -1,7 +1,7 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface 'CommandInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class CommandInterface extends BaseClass
       @inheritProtected()
       @include Module::NotifierInterface

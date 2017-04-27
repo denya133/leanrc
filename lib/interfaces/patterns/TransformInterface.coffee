@@ -5,7 +5,7 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'TransformInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class TransformInterface extends BaseClass
       @inheritProtected()
 

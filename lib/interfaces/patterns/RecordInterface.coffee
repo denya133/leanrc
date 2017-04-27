@@ -5,7 +5,7 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'RecordInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class RecordInterface extends BaseClass
       @inheritProtected()
       @include Module::TransformInterface

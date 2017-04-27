@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface 'DelayedQueueInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class DelayedQueueInterface extends BaseClass
       @inheritProtected()
 

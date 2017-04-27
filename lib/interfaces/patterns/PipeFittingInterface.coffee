@@ -1,7 +1,7 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface 'PipeFittingInterface', (BaseClass) ->
+  Module.defineInterface (BaseClass) ->
     class PipeFittingInterface extends BaseClass
       @inheritProtected()
 
