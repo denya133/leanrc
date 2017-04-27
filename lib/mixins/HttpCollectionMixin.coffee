@@ -83,8 +83,7 @@ module.exports = (Module)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .count()
-          return yield @query voQuery
-            .first()
+          return yield (yield @query voQuery).first()
 
       @public headers: Object
       @public host: String,
@@ -334,13 +333,16 @@ module.exports = (Module)->
           items = []
 
           if body?
-            pluralKey = @collectionName()
-            if _.isArray snapshots = body[pluralKey]
-              items.push snapshots...
+            if aoQuery.query?['$count']
+              items.push body.count
             else
-              singularKey = inflect.singularize pluralKey
-              unless _.isArray snapshot = body[singularKey]
-                items.push snapshot
+              pluralKey = @collectionName()
+              if _.isArray snapshots = body[pluralKey]
+                items.push snapshots...
+              else
+                singularKey = inflect.singularize pluralKey
+                unless _.isArray snapshot = body[singularKey]
+                  items.push snapshot
 
           voCursor = Module::Cursor.new @, items
           return voCursor

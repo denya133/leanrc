@@ -99,7 +99,10 @@ module.exports = (options) ->
                   switch req.method
                     when 'GET'
                       records = _.filter collection, filter
-                      response = JSON.stringify "#{path.plural}": records
+                      if query['$count']
+                        response = JSON.stringify count: records.length
+                      else
+                        response = JSON.stringify "#{path.plural}": records
                     when 'DELETE'
                       records = _.filter collection, filter
                       response = JSON.stringify "#{path.plural}": records

@@ -829,3 +829,43 @@ describe 'HttpCollectionMixin', ->
         includes = yield collection.includes record.id
         assert.isTrue includes
         yield return
+  describe '#length', ->
+    before ->
+      server.listen 8000
+    after ->
+      server.close()
+    it 'should count items in the collection', ->
+      co ->
+        KEY = 'FACADE_TEST_HTTP_COLLECTION_010'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        facade.registerProxy Test::HttpCollection.new KEY,
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+        collection = facade.retrieveProxy KEY
+        assert.instanceOf collection, Test::HttpCollection
+        count = 11
+        for i in [ 1 .. count ]
+          yield collection.create test: 'test1'
+        length = yield collection.length()
+        assert.equal count, length
+        yield return

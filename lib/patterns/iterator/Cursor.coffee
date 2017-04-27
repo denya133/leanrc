@@ -33,7 +33,7 @@ module.exports = (Module)->
         data = @[iplArray][@[ipnCurrentIndex]]
         @[ipnCurrentIndex]++
         yield Module::Promise.resolve if acRecord?
-          if data?
+          if _.isObject data
             acRecord.new data, @[ipoCollection]
           else
             data
@@ -41,7 +41,8 @@ module.exports = (Module)->
           data
 
     @public @async hasNext: Function,
-      default: -> yield Module::Promise.resolve not _.isNil @[iplArray][@[ipnCurrentIndex]]
+      default: ->
+        yield Module::Promise.resolve not _.isNil @[iplArray][@[ipnCurrentIndex]]
 
     @public @async close: Function,
       default: ->
@@ -114,7 +115,10 @@ module.exports = (Module)->
             rawRecord = @[iplArray][@[ipnCurrentIndex]]
             ++@[ipnCurrentIndex]
             unless _.isNil rawRecord
-              record = acRecord.new rawRecord
+              if _.isNumber rawRecord
+                record = rawRecord
+              else
+                record = acRecord.new rawRecord
               records.push record
           records
         catch err
