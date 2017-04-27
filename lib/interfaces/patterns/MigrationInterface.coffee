@@ -7,8 +7,6 @@ module.exports = (Module)->
     class MigrationInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @async @virtual createCollection: Function,
         args: [String, Object]
         return: NILL

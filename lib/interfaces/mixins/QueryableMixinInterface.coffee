@@ -10,8 +10,6 @@ module.exports = (Module)->
     class QueryableMixinInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @async @virtual deleteBy: Function,
         args: [Object]
         return: NILL

@@ -8,8 +8,6 @@ module.exports = (Module)->
     class CrudEndpointsMixinInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @virtual keyName: String
 
       @public @virtual itemEntityName: String

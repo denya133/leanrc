@@ -9,8 +9,6 @@ module.exports = (Module)->
     class TransformInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @static @virtual normalize: Function,
         args: [ANY] # data
         return: [ANY, NILL]

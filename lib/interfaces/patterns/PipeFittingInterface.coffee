@@ -4,7 +4,6 @@ module.exports = (Module)->
   Module.defineInterface 'PipeFittingInterface', (BaseClass) ->
     class PipeFittingInterface extends BaseClass
       @inheritProtected()
-      @module Module
 
       @public @virtual connect: Function,
         args: [Module::PipeFittingInterface]

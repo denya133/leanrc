@@ -8,8 +8,6 @@ module.exports = (Module)->
       @inheritProtected()
       @implements Module::IterableMixinInterface
 
-      @module Module
-
       @public @async forEach: Function,
         default: (lambda)->
           cursor = yield @takeAll()

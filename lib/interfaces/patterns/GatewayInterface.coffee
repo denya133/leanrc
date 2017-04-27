@@ -5,8 +5,6 @@ module.exports = (Module)->
     class GatewayInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @virtual swaggerDefinition: Function,
         args: [String, Function]
         return: Module::NILL

@@ -13,8 +13,6 @@ module.exports = (Module)->
     class StockInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @virtual entityName: String
       @public @virtual keyName: String
       @public @virtual itemEntityName: String

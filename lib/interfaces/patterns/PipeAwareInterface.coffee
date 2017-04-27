@@ -6,7 +6,6 @@ module.exports = (Module)->
   Module.defineInterface 'PipeAwareInterface', (BaseClass) ->
     class PipeAwareInterface extends BaseClass
       @inheritProtected()
-      @module Module
 
       @public @virtual acceptInputPipe: Function,
         args: [String, Module::PipeFittingInterface]

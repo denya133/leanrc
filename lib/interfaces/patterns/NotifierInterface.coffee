@@ -6,7 +6,6 @@ module.exports = (Module)->
   Module.defineInterface 'NotifierInterface', (BaseClass) ->
     class NotifierInterface extends BaseClass
       @inheritProtected()
-      @module Module
 
       @public @virtual sendNotification: Function,
         args: [String, ANY, String]

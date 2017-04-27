@@ -10,8 +10,6 @@ module.exports = (Module)->
     class RouterInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @static @virtual map: Function,
         args: [[Function, NILL]]
         return: NILL

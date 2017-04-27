@@ -33,8 +33,6 @@ module.exports = (Module)->
       @inheritProtected()
       @implements Module::CrudEndpointsMixinInterface
 
-      @module Module
-
       @public keyName: String,
         get: ->
           inflect.singularize inflect.underscore @getData().entityName

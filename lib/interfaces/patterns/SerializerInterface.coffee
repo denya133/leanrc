@@ -10,8 +10,6 @@ module.exports = (Module)->
     class SerializerInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @virtual collection: Module::CollectionInterface
 
       @public @virtual normalize: Function, # virtual declaration of method

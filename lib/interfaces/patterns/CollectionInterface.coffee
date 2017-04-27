@@ -7,8 +7,6 @@ module.exports = (Module)->
     class CollectionInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @virtual recordHasBeenChanged: Function,
         args: [String, Object]
         return: NILL

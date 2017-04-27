@@ -14,8 +14,6 @@ module.exports = (Module)->
       @inheritProtected()
       @implements Module::RelationsMixinInterface
 
-      @module Module
-
       @public @static belongsTo: Function,
         default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable}={})->
           # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters

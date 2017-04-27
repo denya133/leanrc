@@ -10,8 +10,6 @@ module.exports = (Module)->
       @inheritProtected()
       @include Module::TransformInterface
 
-      @module Module
-
       @public @virtual collection: Module::CollectionInterface
 
       @public @static @virtual schema: Object

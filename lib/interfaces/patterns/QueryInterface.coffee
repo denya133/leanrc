@@ -8,8 +8,6 @@ module.exports = (Module)->
     class QueryInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @static @virtual operatorsMap: Object
 
       @public @virtual $forIn: Object

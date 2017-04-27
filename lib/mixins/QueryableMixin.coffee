@@ -13,8 +13,6 @@ module.exports = (Module)->
       @inheritProtected()
       @implements Module::QueryableMixinInterface
 
-      @module Module
-
       @public @async findBy: Function,
         default: (query)->
           yield @takeBy query

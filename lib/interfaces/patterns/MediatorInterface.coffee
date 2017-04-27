@@ -8,8 +8,6 @@ module.exports = (Module)->
       @inheritProtected()
       @include Module::NotifierInterface
 
-      @module Module
-
       @public @virtual getMediatorName: Function,
         args: []
         return: String

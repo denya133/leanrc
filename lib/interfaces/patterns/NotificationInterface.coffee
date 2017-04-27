@@ -6,7 +6,6 @@ module.exports = (Module)->
   Module.defineInterface 'NotificationInterface', (BaseClass) ->
     class NotificationInterface extends BaseClass
       @inheritProtected()
-      @module Module
 
       @public @virtual getName: Function,
         args: []

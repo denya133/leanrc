@@ -7,8 +7,6 @@ module.exports = (Module)->
     class SwitchInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @virtual routerName: String
 
       @public @virtual responseFormats: Array

@@ -7,8 +7,6 @@ module.exports = (Module)->
     class IterableMixinInterface extends BaseClass
       @inheritProtected()
 
-      @module Module
-
       @public @async @virtual forEach: Function,
         args: [Function]
         return: NILL
