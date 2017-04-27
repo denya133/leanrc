@@ -76,8 +76,7 @@ module.exports = (Module)->
             .filter '@doc._key': {$eq: id}
             .limit 1
             .return '@doc'
-          return yield @query voQuery
-            .hasNext()
+          return yield (yield @query voQuery).hasNext()
 
       @public @async length: Function,
         default: ->
