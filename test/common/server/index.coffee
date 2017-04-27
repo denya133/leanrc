@@ -92,6 +92,10 @@ module.exports = (options) ->
                             switch type
                               when '$eq'
                                 return no  unless property is cond
+                              when '$in'
+                                return no  unless property in cond
+                              else
+                                return no
                       yes
                     records = _.filter collection, filter
                     response = JSON.stringify "#{path.plural}": records
