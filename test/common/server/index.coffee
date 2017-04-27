@@ -9,7 +9,7 @@ module.exports = (options) ->
   server =  data: {}
 
   FIXTURE_NAME = "#{__dirname}/fixtures/#{options.fixture}.json"
-  FIXTURE = (try require FIXTURE_NAME) ? {
+  FIXTURE = (try require FIXTURE_NAME catch err then console.log err) ? {
     "/": {
       "OPTIONS": {
         "headers": {
@@ -25,13 +25,13 @@ module.exports = (options) ->
     }
   }
 
-  for own path, methods of FIXTURE
-    for own method, methodConfig of methods
-      if method is '*' or ',' in method
-        names = if method is '*' then [
+  for own pathName, methods of FIXTURE
+    for own methodName, methodConfig of methods
+      if methodName is '*' or ',' in methodName
+        names = if methodName is '*' then [
           'HEAD', 'OPTIONS', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'
-        ] else method.split ','
-        delete methods[method]
+        ] else methodName.split ','
+        delete methods[methodName]
         for name in names
           methods[name] = methodConfig  unless _.isEmpty name
 
@@ -50,6 +50,7 @@ module.exports = (options) ->
       # console.log 'BODY:', req.body
       body = if _.isEmpty(req.body) then {} else (try JSON.parse req.body) ? {}
       path = FIXTURE[url.pathname]
+      # console.log 'PATH:', path
       if path?
         if (method = path[req.method])?
           if method.redirect?
@@ -77,28 +78,33 @@ module.exports = (options) ->
                     resp = "#{path.plural}": body
                   response = JSON.stringify resp
                 when 'QUERY'
-                  if req.method is 'GET'
-                    { query } = querystring.parse url.query
-                    { query } = JSON.parse query  unless _.isEmpty query
-                    collection = server.data[query['$forIn']['@doc']] ? []
-                    filter = (item) ->
-                      for k, v of query.$filter
-                        key = k.replace '@doc.', ''
-                        property = _.get item, key
-                        if _.isString v
-                          return no  unless property is v
-                        else
-                          for type, cond of v
-                            switch type
-                              when '$eq'
-                                return no  unless property is cond
-                              when '$in'
-                                return no  unless property in cond
-                              else
-                                return no
-                      yes
-                    records = _.filter collection, filter
-                    response = JSON.stringify "#{path.plural}": records
+                  { query } = querystring.parse url.query
+                  { query } = JSON.parse query  unless _.isEmpty query
+                  collection = server.data[query['$forIn']['@doc']] ? []
+                  filter = (item) ->
+                    for k, v of query.$filter
+                      key = k.replace '@doc.', ''
+                      property = _.get item, key
+                      if _.isString v
+                        return no  unless property is v
+                      else
+                        for type, cond of v
+                          switch type
+                            when '$eq'
+                              return no  unless property is cond
+                            when '$in'
+                              return no  unless property in cond
+                            else
+                              return no
+                    yes
+                  switch req.method
+                    when 'GET'
+                      records = _.filter collection, filter
+                      response = JSON.stringify "#{path.plural}": records
+                    when 'DELETE'
+                      records = _.filter collection, filter
+                      response = JSON.stringify "#{path.plural}": records
+                      _.remove collection, filter
                 else
                   response = JSON.stringify method.data  if method.data?
         else
@@ -118,6 +124,7 @@ module.exports = (options) ->
     return
 
   server.close = (callback) ->
+    server.data = {}
     @server.close callback
 
   server

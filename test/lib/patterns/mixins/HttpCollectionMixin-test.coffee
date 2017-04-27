@@ -572,13 +572,11 @@ describe 'HttpCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, Test::HttpCollection
         record = yield collection.create test: 'test1'
-        stubIsNew = sinon.stub record, 'isNew'
-        stubIsNew.returns RC::Promise.resolve no
         spyQuery = sinon.spy collection, 'query'
         yield record.destroy()
-        assert.deepEqual spyQuery.args[0][0].$forIn, { '@doc': 'test_test_records' }
-        assert.deepEqual spyQuery.args[0][0].$filter, { '@doc._key': { '$eq': record.id } }
-        assert.isTrue spyQuery.args[0][0].$remove
+        assert.deepEqual spyQuery.args[1][0].$forIn, { '@doc': 'test_test_records' }
+        assert.deepEqual spyQuery.args[1][0].$filter, { '@doc._key': { '$eq': record.id } }
+        assert.isTrue spyQuery.args[1][0].$remove
         yield return
   describe '#take', ->
     before ->
