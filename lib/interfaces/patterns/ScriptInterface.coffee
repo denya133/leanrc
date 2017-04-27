@@ -3,18 +3,17 @@
 module.exports = (Module)->
   {NILL, LAMBDA} = Module::
 
-  class ScriptInterface extends Module::Interface
-    @inheritProtected()
+  Module.defineInterface 'ScriptInterface', (BaseClass) ->
+    class ScriptInterface extends BaseClass
+      @inheritProtected()
 
-    @module Module
+      @public @async @virtual body: Function,
+        args: [Object]
+        return: [NILL, Error]
 
-    @public @async @virtual body: Function,
-      args: [Object]
-      return: [NILL, Error]
-
-    @public @static @virtual do: Function,
-      args: [LAMBDA]
-      return: String
+      @public @static @virtual do: Function,
+        args: [LAMBDA]
+        return: String
 
 
-  ScriptInterface.initialize()
+    ScriptInterface.initializeInterface()
