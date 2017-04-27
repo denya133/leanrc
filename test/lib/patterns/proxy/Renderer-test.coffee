@@ -2,6 +2,7 @@
 sinon = require 'sinon'
 RC = require 'RC'
 LeanRC = require.main.require 'lib'
+{ co } = LeanRC::Utils
 
 
 describe 'Renderer', ->
@@ -10,15 +11,28 @@ describe 'Renderer', ->
       expect ->
         renderer = LeanRC::Renderer.new 'TEST_RENDERER'
       .to.not.throw Error
+  describe '#templatesDir', ->
+    it 'should get templates directory', ->
+      expect ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestRenderer extends LeanRC::Renderer
+          @inheritProtected()
+          @module Test
+        Test::TestRenderer.initialize()
+        renderer = Test::TestRenderer.new()
+        assert.equal renderer.templatesDir, "#{__dirname}/templates"
+      .to.not.throw Error
   describe '#render', ->
     it 'should render the data', ->
-      expect ->
-        LeanRC::Utils.co ->
-          data = test: 'test1', data: 'data1'
-          renderer = LeanRC::Renderer.new 'TEST_RENDERER'
-          renderResult = yield renderer.render data
-          assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
-      .to.not.throw Error
+      co ->
+        data = test: 'test1', data: 'data1'
+        renderer = LeanRC::Renderer.new 'TEST_RENDERER'
+        renderResult = yield renderer.render data
+        assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
+        yield return
     it 'should render the data in customized renderer', ->
       expect ->
         data = firstName: 'John', lastName: 'Doe'
