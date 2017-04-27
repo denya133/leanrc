@@ -627,7 +627,7 @@ describe 'HttpCollectionMixin', ->
       server.close()
     it 'should get data items by id list from collection', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_004'
+        KEY = 'FACADE_TEST_HTTP_COLLECTION_005'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -663,5 +663,50 @@ describe 'HttpCollectionMixin', ->
         count = originalRecords.length
         for i in [ 1 .. count ]
           for attribute in Test::TestRecord.attributes
+            assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
+        yield return
+  describe '#takeTake', ->
+    before ->
+      server.listen 8000
+    after ->
+      server.close()
+    it 'should get all data items from collection', ->
+      co ->
+        KEY = 'FACADE_TEST_HTTP_COLLECTION_006'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::UniqueTestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::UniqueTestRecord'
+        Test::UniqueTestRecord.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        facade.registerProxy Test::HttpCollection.new KEY,
+          delegate: Test::UniqueTestRecord
+          serializer: LeanRC::Serializer
+        collection = facade.retrieveProxy KEY
+        assert.instanceOf collection, Test::HttpCollection
+        originalRecords = []
+        for i in [ 1 .. 5 ]
+          originalRecords.push yield collection.create test: 'test1'
+        ids = originalRecords.map (item) -> item.id
+        recordDuplicates = yield (yield collection.takeAll()).toArray()
+        assert.equal originalRecords.length, recordDuplicates.length
+        count = originalRecords.length
+        for i in [ 1 .. count ]
+          for attribute in Test::UniqueTestRecord.attributes
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
         yield return
