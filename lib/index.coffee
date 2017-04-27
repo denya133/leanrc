@@ -63,7 +63,7 @@ class LeanRC extends RC
   require('./mixins/HttpCollectionMixin') LeanRC
   require('./mixins/IterableMixin') LeanRC #tested
   # require('./mixins/PipesSwitchMixin') LeanRC # empty
-  require('./mixins/QueryableMixin') LeanRC
+  require('./mixins/QueryableMixin') LeanRC #tested
   require('./mixins/RecordMixin') LeanRC #tested
   require('./mixins/RelationsMixin') LeanRC #tested
   require('./mixins/DelayableMixin') LeanRC #tested
@@ -75,7 +75,7 @@ class LeanRC extends RC
   require('./patterns/data_mapper/BooleanTransform') LeanRC #tested
   require('./patterns/data_mapper/Serializer') LeanRC #tested
   require('./patterns/data_mapper/Record') LeanRC #tested
-  require('./patterns/data_mapper/Entry') LeanRC # empty
+  require('./patterns/data_mapper/Entry') LeanRC # tested
   require('./patterns/data_mapper/DelayedQueue') LeanRC
 
   require('./patterns/query_object/Query') LeanRC #tested
@@ -88,13 +88,13 @@ class LeanRC extends RC
   require('./patterns/proxy/Collection') LeanRC #tested
   require('./patterns/proxy/Configuration') LeanRC
   require('./patterns/proxy/Gateway') LeanRC #tested
-  require('./patterns/proxy/Renderer') LeanRC #tested
-  require('./patterns/proxy/Resource') LeanRC
+  require('./patterns/proxy/Renderer') LeanRC #needs update tests
+  require('./patterns/proxy/Resource') LeanRC #tested
   require('./patterns/proxy/Router') LeanRC #tested
   require('./patterns/proxy/Resque') LeanRC
 
   require('./patterns/mediator/Mediator') LeanRC #tested
-  require('./patterns/mediator/Switch') LeanRC #tested
+  require('./patterns/mediator/Switch') LeanRC #needs update tests
 
   require('./patterns/command/SimpleCommand') LeanRC #tested
   require('./patterns/command/MacroCommand') LeanRC #tested

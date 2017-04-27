@@ -6,19 +6,20 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  class SerializerInterface extends Module::Interface
-    @inheritProtected()
+  Module.defineInterface 'SerializerInterface', (BaseClass) ->
+    class SerializerInterface extends BaseClass
+      @inheritProtected()
 
-    @module Module
+      @module Module
 
-    @public @virtual collection: Module::CollectionInterface
+      @public @virtual collection: Module::CollectionInterface
 
-    @public @virtual normalize: Function, # virtual declaration of method
-      args: [Module::Class, ANY] # payload
-      return: [Module::RecordInterface]
-    @public @virtual serialize:   Function, # virtual declaration of method
-      args: [Module::RecordInterface, Object] # record, options
-      return: ANY
+      @public @virtual normalize: Function, # virtual declaration of method
+        args: [Module::Class, ANY] # payload
+        return: [Module::RecordInterface]
+      @public @virtual serialize:   Function, # virtual declaration of method
+        args: [Module::RecordInterface, Object] # record, options
+        return: ANY
 
 
-  SerializerInterface.initialize()
+    SerializerInterface.initializeInterface()

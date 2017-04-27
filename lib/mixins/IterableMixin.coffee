@@ -3,32 +3,33 @@
 
 
 module.exports = (Module)->
-  class IterableMixin extends Module::Mixin
-    @inheritProtected()
-    @implements Module::IterableMixinInterface
+  Module.defineMixin 'IterableMixin', (BaseClass) ->
+    class IterableMixin extends BaseClass
+      @inheritProtected()
+      @implements Module::IterableMixinInterface
 
-    @module Module
+      @module Module
 
-    @public @async forEach: Function,
-      default: (lambda)->
-        cursor = yield @takeAll()
-        yield cursor.forEach (item)-> yield lambda item
-        return
+      @public @async forEach: Function,
+        default: (lambda)->
+          cursor = yield @takeAll()
+          yield cursor.forEach (item)-> yield lambda item
+          return
 
-    @public @async filter: Function,
-      default: (lambda)->
-        cursor = yield @takeAll()
-        yield cursor.filter (item)-> yield lambda item
+      @public @async filter: Function,
+        default: (lambda)->
+          cursor = yield @takeAll()
+          yield cursor.filter (item)-> yield lambda item
 
-    @public @async map: Function,
-      default: (lambda)->
-        cursor = yield @takeAll()
-        yield cursor.map (item)-> yield lambda item
+      @public @async map: Function,
+        default: (lambda)->
+          cursor = yield @takeAll()
+          yield cursor.map (item)-> yield lambda item
 
-    @public @async reduce: Function,
-      default: (lambda, initialValue)->
-        cursor = yield @takeAll()
-        yield cursor.reduce ((item, prev)-> yield lambda item, prev), initialValue
+      @public @async reduce: Function,
+        default: (lambda, initialValue)->
+          cursor = yield @takeAll()
+          yield cursor.reduce ((item, prev)-> yield lambda item, prev), initialValue
 
 
-  IterableMixin.initialize()
+    IterableMixin.initializeMixin()
