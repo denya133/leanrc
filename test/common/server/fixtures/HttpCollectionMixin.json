@@ -72,6 +72,11 @@
       "statusCode": 200,
       "statusMessage": "OK",
       "data": "SELF"
+    },
+    "GET": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "QUERY"
     }
   }
 }

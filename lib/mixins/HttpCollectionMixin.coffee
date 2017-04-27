@@ -36,7 +36,7 @@ module.exports = (Module)->
             .forIn '@doc': @collectionFullName()
             .filter '@doc._key': {$eq: id}
             .return '@doc'
-          return yield @query voQuery
+          return yield (yield @query voQuery)
             .first()
 
       @public @async takeMany: Function,
@@ -252,8 +252,8 @@ module.exports = (Module)->
         return: Object
         default: ({method, url, headers, data, query})->
           if query?
-            query = JSON.stringify {query}
-            url = "#{url}?#{query}"
+            query = JSON.stringify { query }
+            url += "?query=#{query}"
           {
             method
             url

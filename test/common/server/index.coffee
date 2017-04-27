@@ -1,11 +1,12 @@
 http = require 'http'
 URL = require 'url'
+querystring = require 'querystring'
 _ = require 'lodash'
 RC = require 'RC'
 
 module.exports = (options) ->
 
-  server = {}
+  server =  data: {}
 
   FIXTURE_NAME = "#{__dirname}/fixtures/#{options.fixture}.json"
   FIXTURE = (try require FIXTURE_NAME) ? {
@@ -64,16 +65,38 @@ module.exports = (options) ->
               for own headerName, headerValue of method.headers
                 res.setHeader headerName, headerValue
             if method.data?
-              if method.data is 'SELF'
-                if req.method is 'POST'
-                  body._key = RC::Utils.uuid.v4()
-                  resp = "#{path.single}": body
+              switch method.data
+                when 'SELF'
+                  if req.method is 'POST'
+                    body._key = RC::Utils.uuid.v4()
+                    resp = "#{path.single}": body
+                    server.data["test_#{path.plural}"] ?= []
+                    server.data["test_#{path.plural}"].push body
+                  else
+                    body = [ body ]  unless _.isArray body
+                    resp = "#{path.plural}": body
+                  response = JSON.stringify resp
+                when 'QUERY'
+                  if req.method is 'GET'
+                    { query } = querystring.parse url.query
+                    { query } = JSON.parse query  unless _.isEmpty query
+                    collection = server.data[query['$forIn']['@doc']] ? []
+                    filter = (item) ->
+                      for k, v of query.$filter
+                        key = k.replace '@doc.', ''
+                        property = _.get item, key
+                        if _.isString v
+                          return no  unless property is v
+                        else
+                          for type, cond of v
+                            switch type
+                              when '$eq'
+                                return no  unless property is cond
+                      yes
+                    records = _.filter collection, filter
+                    response = JSON.stringify "#{path.plural}": records
                 else
-                  body = [ body ]  unless _.isArray body
-                  resp = "#{path.plural}": body
-                response = JSON.stringify resp
-              else
-                response = JSON.stringify method.data  if method.data?
+                  response = JSON.stringify method.data  if method.data?
         else
           res.statusCode = 405
           res.statusMessage = 'Method Not Allowed'

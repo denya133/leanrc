@@ -294,5 +294,7 @@ module.exports = (Module)->
 
           # console.log 'dfdfdf 666'
 
+      @public toJSON: Function, { default: -> @constructor.serialize @ }
+
 
     RecordMixin.initializeMixin()

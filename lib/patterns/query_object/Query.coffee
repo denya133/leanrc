@@ -1,3 +1,5 @@
+_ = require 'lodash'
+
 ###
 в Ember app это может выглядить так.
 ```coffee
@@ -250,6 +252,14 @@ module.exports = (Module)->
         for own key, value of aoQuery
           do (key, value)=>
             @[key] = value
+
+    @public toJSON: Function,
+      default: ->
+        _.pick @, [
+          '$forIn', '$join', '$let', '$filter', '$collect', '$into', '$having'
+          '$sort', '$limit', '$offset', '$avg', '$sum', '$min', '$max', '$count'
+          '$distinct', '$remove', '$insert', '$update', '$replace', '$return'
+        ]
 
 
   Query.initialize()

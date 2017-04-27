@@ -580,3 +580,43 @@ describe 'HttpCollectionMixin', ->
         assert.deepEqual spyQuery.args[0][0].$filter, { '@doc._key': { '$eq': record.id } }
         assert.isTrue spyQuery.args[0][0].$remove
         yield return
+  describe '#take', ->
+    before ->
+      server.listen 8000
+    after ->
+      server.close()
+    it 'should get data item by id from collection', ->
+      co ->
+        KEY = 'FACADE_TEST_HTTP_COLLECTION_004'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @Module: Test
+          @attribute test: String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::HttpCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::QueryableMixin
+          @include LeanRC::HttpCollectionMixin
+          @Module: Test
+          @public host: String, { default: 'http://localhost:8000' }
+          @public namespace: String, { default: 'v1' }
+        Test::HttpCollection.initialize()
+        facade.registerProxy Test::HttpCollection.new KEY,
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+        collection = facade.retrieveProxy KEY
+        assert.instanceOf collection, Test::HttpCollection
+        record = yield collection.create test: 'test1'
+        recordDuplicate = yield collection.take record.id
+        assert.notEqual record, recordDuplicate
+        for attribute in Test::TestRecord.attributes
+          assert.equal record[attribute], recordDuplicate[attribute]
+        yield return
