@@ -86,6 +86,11 @@
       "statusCode": 204,
       "statusMessage": "No Content",
       "data": "QUERY"
+    },
+    "PUT": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "QUERY"
     }
   },
   "/v1/unique_test_records": {

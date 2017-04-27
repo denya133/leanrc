@@ -36,8 +36,7 @@ module.exports = (Module)->
             .forIn '@doc': @collectionFullName()
             .filter '@doc._key': {$eq: id}
             .return '@doc'
-          return yield (yield @query voQuery)
-            .first()
+          return yield (yield @query voQuery).first()
 
       @public @async takeMany: Function,
         default: (ids)->
@@ -60,7 +59,7 @@ module.exports = (Module)->
             .forIn '@doc': @collectionFullName()
             .filter '@doc._key': {$eq: id}
             .replace aoRecord
-          return yield @query voQuery
+          return yield (yield @query voQuery).first()
 
       @public @async patch: Function,
         default: (id, aoRecord)->
@@ -68,7 +67,7 @@ module.exports = (Module)->
             .forIn '@doc': @collectionFullName()
             .filter '@doc._key': {$eq: id}
             .update aoRecord
-          return yield @query voQuery
+          return yield (yield @query voQuery).first()
 
       @public @async includes: Function,
         default: (id)->
@@ -295,7 +294,7 @@ module.exports = (Module)->
                 voQuery
           else if (voRecord = aoQuery.$update)?
             do =>
-              if aoQuery.$into?
+              if aoQuery.$forIn?
                 voQuery ?= {}
                 voQuery.requestType = 'update'
                 voQuery.recordName = @delegate.name
@@ -307,7 +306,7 @@ module.exports = (Module)->
                 voQuery
           else if (voRecord = aoQuery.$replace)?
             do =>
-              if aoQuery.$into?
+              if aoQuery.$forIn?
                 voQuery ?= {}
                 voQuery.requestType = 'replace'
                 voQuery.recordName = @delegate.name

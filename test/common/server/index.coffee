@@ -50,7 +50,6 @@ module.exports = (options) ->
       # console.log 'BODY:', req.body
       body = if _.isEmpty(req.body) then {} else (try JSON.parse req.body) ? {}
       path = FIXTURE[url.pathname]
-      # console.log 'PATH:', path
       if path?
         if (method = path[req.method])?
           if method.redirect?
@@ -105,6 +104,12 @@ module.exports = (options) ->
                       records = _.filter collection, filter
                       response = JSON.stringify "#{path.plural}": records
                       _.remove collection, filter
+                    when 'PUT'
+                      records = _.filter collection, filter
+                      for record in records
+                        for key, value of body when key not in [ '_key', 'id' ]
+                          record[key] = value
+                      response = JSON.stringify "#{path.plural}": records
                 else
                   response = JSON.stringify method.data  if method.data?
         else
