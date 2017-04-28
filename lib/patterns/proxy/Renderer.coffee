@@ -1,4 +1,4 @@
-
+_ = require 'lodash'
 
 ###
 пример темплейта
@@ -46,7 +46,10 @@ module.exports = (Module)->
     # may be redefine at inheritance
     @public @async render: Function,
       default: (aoData, {path, resource, action} = {})->
-        vhData = Module::Utils.extend {}, aoData
+        vhData = if _.isArray aoData
+          Module::Utils.extend [], aoData
+        else
+          Module::Utils.extend {}, aoData
         if path? and resource? and action?
           # открытый вопрос - как определить какой темплейт рендерить
           # вопрос в том еще - как должен выглядить путь до темплейта
