@@ -78,6 +78,29 @@ describe 'Stock', ->
         { collectionName } = stock
         assert.equal collectionName, 'TestEntitiesCollection'
         yield return
+  describe '#collection', ->
+    it 'should get collection', ->
+      co ->
+        TEST_FACADE = 'TEST_FACADE_001'
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestStock extends LeanRC::Stock
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestStock.initialize()
+        facade = LeanRC::Facade.getInstance TEST_FACADE
+        stock = Test::TestStock.new()
+        stock.initializeNotifier TEST_FACADE
+        { collectionName } = stock
+        boundCollection = LeanRC::Collection.new collectionName
+        facade.registerProxy boundCollection
+        { collection } = stock
+        assert.equal collection, boundCollection
+        yield return
   describe '#execute', ->
     ###
     it 'should create new stock', ->
