@@ -50,7 +50,10 @@ module.exports = (Module)->
     @public @static action: Function,
       default: (nameDefinition, config)->
         [actionName] = Object.keys nameDefinition
-        @metaObject.addMetaData 'actions', actionName, config
+        if nameDefinition.attr? and not config?
+          @metaObject.addMetaData 'actions', nameDefinition.attr, nameDefinition
+        else
+          @metaObject.addMetaData 'actions', actionName, config
         @public arguments...
 
     @action @async list: Function,
@@ -84,19 +87,19 @@ module.exports = (Module)->
     @action @async bulkUpdate: Function,
       default: ->
         cursor = yield @collection.query @query
-        cursor.forEach (aoRecord)-> yield aoRecord.updateAttributes @recordBody
+        yield cursor.forEach (aoRecord)-> yield aoRecord.updateAttributes @recordBody
         return yes
 
     @action @async bulkPatch: Function,
       default: ->
         cursor = yield @collection.query @query
-        cursor.forEach (aoRecord)-> yield aoRecord.updateAttributes @recordBody
+        yield cursor.forEach (aoRecord)-> yield aoRecord.updateAttributes @recordBody
         return yes
 
     @action @async bulkDelete: Function,
       default: ->
         cursor = yield @collection.query @query
-        cursor.forEach (aoRecord)-> yield aoRecord.destroy()
+        yield cursor.forEach (aoRecord)-> yield aoRecord.destroy()
         return yes
 
 
