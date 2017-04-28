@@ -5,7 +5,6 @@
 test/lib/
 test/lib/core/
 test/lib/patterns/
-test/lib/patterns/command/
 test/lib/patterns/facade/
 test/lib/patterns/observer/
 test/lib/patterns/query_object/
@@ -17,3 +16,4 @@ test/lib/patterns/mixins/
 test/lib/patterns/proxy/
 test/lib/patterns/mediator/
 test/
+test/lib/patterns/command/

@@ -59,7 +59,7 @@ module.exports = (Module) ->
         @[iplMigrationNames] ?= co =>
           files = yield filesList @migrationsDir
           yield return _.orderBy (files ? []).map (i)=>
-            migrationName = i.replace '.js', ''
+            migrationName = i.replace /\.js|\.coffee/, ''
             vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
             require(vsMigrationPath) Module
             migrationName
