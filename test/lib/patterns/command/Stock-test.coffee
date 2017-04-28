@@ -27,6 +27,23 @@ describe 'Stock', ->
         { keyName } = stock
         assert.equal keyName, 'test_entity'
         yield return
+  describe '#itemEntityName', ->
+    it 'should get item name using entity name', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestStock extends LeanRC::Stock
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestStock.initialize()
+        stock = Test::TestStock.new()
+        { itemEntityName } = stock
+        assert.equal itemEntityName, 'test_entity'
+        yield return
   describe '#execute', ->
     ###
     it 'should create new stock', ->
