@@ -35,9 +35,6 @@ class LeanRC extends RC
   require('./interfaces/patterns/CursorInterface') LeanRC #does not need testing
   require('./interfaces/patterns/EndpointInterface') LeanRC #does not need testing
   require('./interfaces/patterns/GatewayInterface') LeanRC #does not need testing
-  require('./interfaces/patterns/PipeAwareInterface') LeanRC #does not need testing
-  require('./interfaces/patterns/PipeFittingInterface') LeanRC #does not need testing
-  require('./interfaces/patterns/PipeMessageInterface') LeanRC #does not need testing
   require('./interfaces/patterns/RendererInterface') LeanRC #does not need testing
   # require('./interfaces/patterns/ResourceInterface') LeanRC # empty #does not need testing
   require('./interfaces/patterns/StockInterface') LeanRC #does not need testing
@@ -60,7 +57,7 @@ class LeanRC extends RC
   require('./interfaces/core/ViewInterface') LeanRC #does not need testing
 
   require('./mixins/CrudEndpointsMixin') LeanRC
-  require('./mixins/HttpCollectionMixin') LeanRC
+  require('./mixins/HttpCollectionMixin') LeanRC #tested
   require('./mixins/IterableMixin') LeanRC #tested
   # require('./mixins/PipesSwitchMixin') LeanRC # empty
   require('./mixins/QueryableMixin') LeanRC #tested
@@ -124,6 +121,10 @@ class Pipes extends LeanRC
   @inheritProtected()
 
   @root __dirname
+
+  require('./interfaces/patterns/PipeAwareInterface') Pipes #does not need testing
+  require('./interfaces/patterns/PipeFittingInterface') Pipes #does not need testing
+  require('./interfaces/patterns/PipeMessageInterface') Pipes #does not need testing
 
   require('./patterns/pipes/Pipe') Pipes #tested
   require('./patterns/pipes/PipeMessage') Pipes #tested

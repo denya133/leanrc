@@ -6,6 +6,7 @@ LeanRC = require.main.require 'lib'
 RC = require 'RC'
 Facade = LeanRC::Facade
 Switch = LeanRC::Switch
+{ co } = RC::Utils
 
 describe 'Switch', ->
   describe '.new', ->
@@ -32,6 +33,23 @@ describe 'Switch', ->
           LeanRC::HANDLER_RESULT
         ], 'Function `listNotificationInterests` returns incorrect values'
       .to.not.throw Error
+  describe '#handleNotification', ->
+    it 'should try handle sent notification', ->
+      co ->
+        mediatorName = 'TEST_MEDIATOR'
+        notitficationName = LeanRC::HANDLER_RESULT
+        notificationBody = test: 'test'
+        notitficationType = 'TEST_TYPE'
+        notification = LeanRC::Notification.new notitficationName, notificationBody, notitficationType
+        viewComponent = new EventEmitter
+        switchMediator = Switch.new mediatorName, viewComponent
+        promise = RC::Promise.new (resolve, reject) ->
+          viewComponent.once notitficationType, (body) -> resolve body
+          return
+        switchMediator.handleNotification notification
+        body = yield promise
+        assert.deepEqual body, notificationBody
+        yield return
   describe '#defineRoutes', ->
     it 'should define routes from route proxies', ->
       expect ->

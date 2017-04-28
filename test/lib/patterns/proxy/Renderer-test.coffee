@@ -2,6 +2,7 @@
 sinon = require 'sinon'
 RC = require 'RC'
 LeanRC = require.main.require 'lib'
+{ co } = LeanRC::Utils
 
 
 describe 'Renderer', ->
@@ -10,17 +11,95 @@ describe 'Renderer', ->
       expect ->
         renderer = LeanRC::Renderer.new 'TEST_RENDERER'
       .to.not.throw Error
+  describe '#templatesDir', ->
+    it 'should get templates directory', ->
+      expect ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestRenderer extends LeanRC::Renderer
+          @inheritProtected()
+          @module Test
+        Test::TestRenderer.initialize()
+        renderer = Test::TestRenderer.new()
+        assert.equal renderer.templatesDir, "#{__dirname}/templates"
+      .to.not.throw Error
+  describe '#templates', ->
+    it 'should get templates from scripts', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestRenderer extends LeanRC::Renderer
+          @inheritProtected()
+          @module Test
+        Test::TestRenderer.initialize()
+        renderer = Test::TestRenderer.new()
+        templates = yield renderer.templates
+        assert.property templates, 'test'
+        yield return
+    it 'should run test template from script', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestRenderer extends LeanRC::Renderer
+          @inheritProtected()
+          @module Test
+        Test::TestRenderer.initialize()
+        renderer = Test::TestRenderer.new()
+        templates = yield renderer.templates
+        items = [
+          id: 1, _key: 1, test: 'test1'
+        ,
+          id: 2, _key: 2, test: 'test2'
+        ,
+          id: 3, _key: 3, test: 'test3'
+        ]
+        output = templates.test 'TestRecord', 'find', items
+        assert.property output, 'test_records'
+        assert.sameDeepMembers output.test_records, [
+          id: 1, test: 'test1'
+        ,
+          id: 2, test: 'test2'
+        ,
+          id: 3, test: 'test3'
+        ]
+        yield return
   describe '#render', ->
     it 'should render the data', ->
-      expect ->
-        LeanRC::Utils.co ->
-          data = test: 'test1', data: 'data1'
-          renderer = LeanRC::Renderer.new 'TEST_RENDERER'
-          renderResult = yield renderer.render data
-          assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
-      .to.not.throw Error
+      co ->
+        data = test: 'test1', data: 'data1'
+        renderer = LeanRC::Renderer.new 'TEST_RENDERER'
+        renderResult = yield renderer.render data
+        assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
+        yield return
+    it 'should render the data with template', ->
+      ###
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestRenderer extends LeanRC::Renderer
+          @inheritProtected()
+          @module Test
+        Test::TestRenderer.initialize()
+        data = test: 'test1', data: 'data1'
+        renderer = Test::TestRenderer.new 'TEST_RENDERER'
+        renderResult = yield renderer.render data,
+          path: 'test'
+          resource: 'TestRecord'
+          action: 'find'
+        console.log '0000000000000', renderResult
+        # assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
+        yield return
+      ###
     it 'should render the data in customized renderer', ->
-      expect ->
+      co ->
         data = firstName: 'John', lastName: 'Doe'
         class Test extends RC::Module
           @inheritProtected()
@@ -37,8 +116,8 @@ describe 'Renderer', ->
               "#{vhData.greeting}, #{vhData.firstName} #{vhData.lastName}!"
         Test::TestRenderer.initialize()
         renderer = Test::TestRenderer.new 'TEST_RENDERER'
-        result = renderer.render data
+        result = yield renderer.render data
         assert.equal result, 'Hello, John Doe!', 'Data without options not rendered'
-        result = renderer.render data, greeting: 'Hola'
+        result = yield renderer.render data, greeting: 'Hola'
         assert.equal result, 'Hola, John Doe!', 'Data with options not rendered'
-      .to.not.throw Error
+        yield return
