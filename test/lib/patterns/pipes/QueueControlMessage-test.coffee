@@ -1,7 +1,7 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-QueueControlMessage = LeanRC::QueueControlMessage
+QueueControlMessage = LeanRC::Pipes::QueueControlMessage
 
 describe 'QueueControlMessage', ->
   describe '.new', ->

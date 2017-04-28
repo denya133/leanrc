@@ -1,7 +1,7 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-FilterControlMessage = LeanRC::FilterControlMessage
+FilterControlMessage = LeanRC::Pipes::FilterControlMessage
 
 describe 'FilterControlMessage', ->
   describe '.new', ->

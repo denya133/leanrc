@@ -2,9 +2,9 @@
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 Facade = LeanRC::Facade
-PipeAwareModule = LeanRC::PipeAwareModule
-Pipe = LeanRC::Pipe
-JunctionMediator = LeanRC::JunctionMediator
+PipeAwareModule = LeanRC::Pipes::PipeAwareModule
+Pipe = LeanRC::Pipes::Pipe
+JunctionMediator = LeanRC::Pipes::JunctionMediator
 
 describe 'PipeAwareModule', ->
   describe '.new', ->

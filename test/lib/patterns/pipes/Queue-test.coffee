@@ -1,9 +1,9 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-Queue = LeanRC::Queue
-PipeMessage = LeanRC::PipeMessage
-QueueControlMessage = LeanRC::QueueControlMessage
+Queue = LeanRC::Pipes::Queue
+PipeMessage = LeanRC::Pipes::PipeMessage
+QueueControlMessage = LeanRC::Pipes::QueueControlMessage
 
 describe 'Queue', ->
   describe '.new', ->
@@ -31,7 +31,7 @@ describe 'Queue', ->
         message = PipeMessage.new PipeMessage.NORMAL
         queue.write message  for i in [1 .. length]
         assert.equal queue[Symbol.for '~messages'].length, length, 'Messages were not saved'
-        message = QueueControlMessage.new LeanRC::QueueControlMessage.FLUSH
+        message = QueueControlMessage.new LeanRC::Pipes::QueueControlMessage.FLUSH
         res = queue.write message
         assert.equal queue[Symbol.for '~messages'].length, 0, 'Messages not flushed'
         assert.equal spyOutputWrite.callCount, length, 'Message not queued'
@@ -42,7 +42,7 @@ describe 'Queue', ->
         voOutput = write: -> yes
         spyOutputWrite = sinon.spy voOutput, 'write'
         queue = Queue.new voOutput
-        message = QueueControlMessage.new LeanRC::QueueControlMessage.SORT
+        message = QueueControlMessage.new LeanRC::Pipes::QueueControlMessage.SORT
         res = queue.write message
         for i in [1 .. length]
           message = PipeMessage.new PipeMessage.NORMAL, null, "MESSAGE_#{i}",  length - i
@@ -57,7 +57,7 @@ describe 'Queue', ->
         voOutput = write: -> yes
         spyOutputWrite = sinon.spy voOutput, 'write'
         queue = Queue.new voOutput
-        message = QueueControlMessage.new LeanRC::QueueControlMessage.FIFO
+        message = QueueControlMessage.new LeanRC::Pipes::QueueControlMessage.FIFO
         res = queue.write message
         for i in [1 .. length]
           message = PipeMessage.new PipeMessage.NORMAL, null, "MESSAGE_#{i}",  length - i

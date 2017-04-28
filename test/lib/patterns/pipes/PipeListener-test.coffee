@@ -1,7 +1,7 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-PipeListener = LeanRC::PipeListener
+PipeListener = LeanRC::Pipes::PipeListener
 
 describe 'PipeListener', ->
   describe '.new, #write', ->

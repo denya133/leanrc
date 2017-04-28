@@ -1,8 +1,8 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-Pipe = LeanRC::Pipe
-TeeMerge = LeanRC::TeeMerge
+Pipe = LeanRC::Pipes::Pipe
+TeeMerge = LeanRC::Pipes::TeeMerge
 
 describe 'TeeMerge', ->
   describe '.new', ->

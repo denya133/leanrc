@@ -35,9 +35,6 @@ class LeanRC extends RC
   require('./interfaces/patterns/CursorInterface') LeanRC #does not need testing
   require('./interfaces/patterns/EndpointInterface') LeanRC #does not need testing
   require('./interfaces/patterns/GatewayInterface') LeanRC #does not need testing
-  require('./interfaces/patterns/PipeAwareInterface') LeanRC #does not need testing
-  require('./interfaces/patterns/PipeFittingInterface') LeanRC #does not need testing
-  require('./interfaces/patterns/PipeMessageInterface') LeanRC #does not need testing
   require('./interfaces/patterns/RendererInterface') LeanRC #does not need testing
   # require('./interfaces/patterns/ResourceInterface') LeanRC # empty #does not need testing
   require('./interfaces/patterns/StockInterface') LeanRC #does not need testing
@@ -110,19 +107,6 @@ class LeanRC extends RC
 
   require('./patterns/iterator/Cursor') LeanRC #tested
 
-  require('./patterns/pipes/Pipe') LeanRC #tested
-  require('./patterns/pipes/PipeMessage') LeanRC #tested
-  require('./patterns/pipes/PipeListener') LeanRC #tested
-  require('./patterns/pipes/FilterControlMessage') LeanRC #tested
-  require('./patterns/pipes/Filter') LeanRC #tested
-  require('./patterns/pipes/Junction') LeanRC #tested
-  require('./patterns/pipes/JunctionMediator') LeanRC #tested
-  require('./patterns/pipes/PipeAwareModule') LeanRC #tested
-  require('./patterns/pipes/QueueControlMessage') LeanRC #tested
-  require('./patterns/pipes/Queue') LeanRC #tested
-  require('./patterns/pipes/TeeMerge') LeanRC #tested
-  require('./patterns/pipes/TeeSplit') LeanRC #tested
-
   require('./patterns/facade/Facade') LeanRC #tested
   require('./patterns/facade/Application') LeanRC
 
@@ -131,4 +115,32 @@ class LeanRC extends RC
   require('./core/Controller') LeanRC #tested
 
 
-module.exports = LeanRC.initialize().freeze()
+LeanRC.initialize()
+
+class Pipes extends LeanRC
+  @inheritProtected()
+
+  @root __dirname
+
+  require('./interfaces/patterns/PipeAwareInterface') Pipes #does not need testing
+  require('./interfaces/patterns/PipeFittingInterface') Pipes #does not need testing
+  require('./interfaces/patterns/PipeMessageInterface') Pipes #does not need testing
+
+  require('./patterns/pipes/Pipe') Pipes #tested
+  require('./patterns/pipes/PipeMessage') Pipes #tested
+  require('./patterns/pipes/PipeListener') Pipes #tested
+  require('./patterns/pipes/FilterControlMessage') Pipes #tested
+  require('./patterns/pipes/Filter') Pipes #tested
+  require('./patterns/pipes/Junction') Pipes #tested
+  require('./patterns/pipes/JunctionMediator') Pipes #tested
+  require('./patterns/pipes/PipeAwareModule') Pipes #tested
+  require('./patterns/pipes/QueueControlMessage') Pipes #tested
+  require('./patterns/pipes/Queue') Pipes #tested
+  require('./patterns/pipes/TeeMerge') Pipes #tested
+  require('./patterns/pipes/TeeSplit') Pipes #tested
+
+Pipes.initialize()
+
+LeanRC.const Pipes: Pipes.freeze()
+
+module.exports = LeanRC.freeze()
