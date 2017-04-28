@@ -28,14 +28,14 @@ module.exports = (Module)->
       get: ->
         {co, filesTree} = Module::Utils
         @[ipoTemplates] ?= co =>
-          files = yield filesTree @templatesDir
+          files = yield filesTree @templatesDir, filesOnly: yes
           (files ? []).map (i)=>
-            templateName = i.replace '.js', ''
+            templateName = i.replace /\.js|\.coffee/, ''
             vsTemplatePath = "#{@templatesDir}/#{templateName}"
             [templateName, require vsTemplatePath]
-          .reduce ([key, value], prev)->
-            prev[key] = value
-            prev
+          .reduce (acc, [key, value])->
+            acc[key] = value
+            acc
           , {}
         @[ipoTemplates]
 

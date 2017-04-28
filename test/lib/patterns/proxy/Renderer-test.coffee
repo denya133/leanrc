@@ -25,6 +25,50 @@ describe 'Renderer', ->
         renderer = Test::TestRenderer.new()
         assert.equal renderer.templatesDir, "#{__dirname}/templates"
       .to.not.throw Error
+  describe '#templates', ->
+    it 'should get templates from scripts', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestRenderer extends LeanRC::Renderer
+          @inheritProtected()
+          @module Test
+        Test::TestRenderer.initialize()
+        renderer = Test::TestRenderer.new()
+        templates = yield renderer.templates
+        assert.property templates, 'test'
+        yield return
+    it 'should run test template from script', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestRenderer extends LeanRC::Renderer
+          @inheritProtected()
+          @module Test
+        Test::TestRenderer.initialize()
+        renderer = Test::TestRenderer.new()
+        templates = yield renderer.templates
+        items = [
+          id: 1, _key: 1, test: 'test1'
+        ,
+          id: 2, _key: 2, test: 'test2'
+        ,
+          id: 3, _key: 3, test: 'test3'
+        ]
+        output = templates.test 'TestRecord', 'find', items
+        assert.property output, 'test_records'
+        assert.sameDeepMembers output.test_records, [
+          id: 1, test: 'test1'
+        ,
+          id: 2, test: 'test2'
+        ,
+          id: 3, test: 'test3'
+        ]
+        yield return
   describe '#render', ->
     it 'should render the data', ->
       co ->
