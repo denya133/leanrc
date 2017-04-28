@@ -2,6 +2,7 @@
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 Stock = LeanRC::Stock
+{ co } = LeanRC::Utils
 
 describe 'Stock', ->
   describe '.new', ->
@@ -9,6 +10,23 @@ describe 'Stock', ->
       expect ->
         stock = Stock.new()
       .to.not.throw Error
+  describe '#keyName', ->
+    it 'should get key name using entity name', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestStock extends LeanRC::Stock
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestStock.initialize()
+        stock = Test::TestStock.new()
+        { keyName } = stock
+        assert.equal keyName, 'test_entity'
+        yield return
   describe '#execute', ->
     ###
     it 'should create new stock', ->

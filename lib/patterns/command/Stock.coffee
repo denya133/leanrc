@@ -35,7 +35,7 @@ module.exports = (Module)->
         @facade.retrieveProxy @collectionName
 
     @public queryParams: Object
-    @public pathPatams: Object
+    @public pathParams: Object
     @public currentUserId: String
     @public headers: Object
     @public body: Object
@@ -126,10 +126,10 @@ module.exports = (Module)->
       args: [Object]
       return: NILL
       default: (args...)->
-        [{queryParams, pathPatams, currentUserId, headers, body }] = args
+        [{queryParams, pathParams, currentUserId, headers, body }] = args
         {
-          @queryParams, @pathPatams, @currentUserId, @headers, @body
-        } = {queryParams, pathPatams, currentUserId, headers, body }
+          @queryParams, @pathParams, @currentUserId, @headers, @body
+        } = {queryParams, pathParams, currentUserId, headers, body }
         return args
 
     @public parseQuery: Function,
