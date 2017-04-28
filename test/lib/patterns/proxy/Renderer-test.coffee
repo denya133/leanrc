@@ -77,8 +77,29 @@ describe 'Renderer', ->
         renderResult = yield renderer.render data
         assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
         yield return
+    it 'should render the data with template', ->
+      ###
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestRenderer extends LeanRC::Renderer
+          @inheritProtected()
+          @module Test
+        Test::TestRenderer.initialize()
+        data = test: 'test1', data: 'data1'
+        renderer = Test::TestRenderer.new 'TEST_RENDERER'
+        renderResult = yield renderer.render data,
+          path: 'test'
+          resource: 'TestRecord'
+          action: 'find'
+        console.log '0000000000000', renderResult
+        # assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
+        yield return
+      ###
     it 'should render the data in customized renderer', ->
-      expect ->
+      co ->
         data = firstName: 'John', lastName: 'Doe'
         class Test extends RC::Module
           @inheritProtected()
@@ -95,8 +116,8 @@ describe 'Renderer', ->
               "#{vhData.greeting}, #{vhData.firstName} #{vhData.lastName}!"
         Test::TestRenderer.initialize()
         renderer = Test::TestRenderer.new 'TEST_RENDERER'
-        result = renderer.render data
+        result = yield renderer.render data
         assert.equal result, 'Hello, John Doe!', 'Data without options not rendered'
-        result = renderer.render data, greeting: 'Hola'
+        result = yield renderer.render data, greeting: 'Hola'
         assert.equal result, 'Hola, John Doe!', 'Data with options not rendered'
-      .to.not.throw Error
+        yield return
