@@ -31,9 +31,7 @@ module.exports = (Module)->
       @public @virtual recordBody: Object
 
 
-      @public @static @virtual actions: Function,
-        args: []
-        return: Array
+      @public @static @virtual actions: Object
       @public @static @virtual action: Function, # alias for @public
         args: [Object, Object] # nameDefinition, config
         return: String

@@ -45,21 +45,12 @@ module.exports = (Module)->
     @public recordBody: Object
 
     @public @static actions: Object,
-      default: {}
-      get: (__actions)->
-        fromSuper = if @__super__?
-          @__super__.constructor.actions
-        __actions[@name] ?= do =>
-          Module::Utils.extend []
-          , (fromSuper ? [])
-          , (@["_#{@name}_actions"] ? [])
-        __actions[@name]
+      get: -> @metaObject.getGroup 'actions'
 
     @public @static action: Function,
       default: (nameDefinition, config)->
         [actionName] = Object.keys nameDefinition
-        @["_#{@name}_actions"] ?= []
-        @["_#{@name}_actions"].push actionName
+        @metaObject.addMetaData 'actions', actionName, config
         @public arguments...
 
     @action @async list: Function,
