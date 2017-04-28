@@ -45,9 +45,9 @@ module.exports = (Module)->
 ###
 В папке configs/
 должны быть файлы:
-development.example
-production.example
-test.example
+development.coffee.example
+production.coffee.example
+test.coffee.example
 
 Они же должны быть разрешены в гитигноре и быть под репозиторием, все остальные файлы должны быть в гитигноре (не под репозиторием)
 
