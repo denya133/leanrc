@@ -19,6 +19,8 @@ class LeanRC extends RC
   @const DELAYED_JOBS_QUEUE: 'delayed_jobs'
   @const DELAYED_JOBS_SCRIPT: 'DelayedJobScript'
   @const JOB_RESULT:  Symbol 'JOB_RESULT'
+  @const SHELL:  Symbol 'ShellApplication'
+  @const APPLICATION_MEDIATOR:  Symbol 'ApplicationMediator'
 
   require('./interfaces/patterns/TransformInterface') LeanRC #does not need testing
   require('./interfaces/patterns/NotificationInterface') LeanRC #does not need testing
