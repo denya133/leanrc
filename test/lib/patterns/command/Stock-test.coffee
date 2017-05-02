@@ -289,7 +289,7 @@ describe 'Stock', ->
         assert.deepEqual stock.recordBody, test: 'test9'
         yield return
   describe '#beforeUpdate', ->
-    it 'should get body', ->
+    it 'should get body with ID', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -450,7 +450,6 @@ describe 'Stock', ->
         assert.propertyVal result, 'test', 'test2'
         yield return
   describe '#create', ->
-    ###
     it 'should create stock singe item', ->
       co ->
         KEY = 'TEST_STOCK_003'
@@ -506,23 +505,12 @@ describe 'Stock', ->
           serializer: LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
-        # yield collection.create test: 'test1'
-        # record = yield collection.create test: 'test2'
         stock = Test::TestStock.new()
         stock.initializeNotifier KEY
         hooks = Test::TestStock.metaObject.getGroup 'hooks'
-        params =
-          queryParams: {}
-          pathParams: {}
-          currentUserId: 'ID'
-          headers: {}
-          body: { test: 'test3' }
-        result = yield stock.create params
-        console.log '0000000000000000000', result.toJSON()
-        # assert.propertyVal result, 'id', record.id
+        result = yield stock.create body: test_entity: test: 'test3'
         assert.propertyVal result, 'test', 'test3'
         yield return
-    ###
   describe '#execute', ->
     ###
     it 'should create new stock', ->
