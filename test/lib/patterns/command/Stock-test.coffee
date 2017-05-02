@@ -205,6 +205,32 @@ describe 'Stock', ->
         assert.propertyVal actions.bulkDelete, 'level', LeanRC::PUBLIC
         assert.propertyVal actions.bulkDelete, 'async', LeanRC::ASYNC
         yield return
+  describe '#beforeActionHook', ->
+    it 'should parse action params as argumants', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestStock extends LeanRC::Stock
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestStock.initialize()
+        stock = Test::TestStock.new()
+        stock.beforeActionHook
+          queryParams: query: '{"test":"test123"}'
+          pathParams: testParam: 'testParamValue'
+          currentUserId: 'ID'
+          headers: 'test-header': 'test-header-value'
+          body: test: 'test678'
+        assert.deepPropertyVal stock, 'queryParams.query', '{"test":"test123"}'
+        assert.deepPropertyVal stock, 'pathParams.testParam', 'testParamValue'
+        assert.propertyVal stock, 'currentUserId', 'ID'
+        assert.deepPropertyVal stock, 'headers.test-header', 'test-header-value'
+        assert.deepPropertyVal stock, 'body.test', 'test678'
+        yield return
   describe '#list', ->
     it 'should list of stock items', ->
       co ->
@@ -344,6 +370,80 @@ describe 'Stock', ->
         assert.propertyVal result, 'id', record.id
         assert.propertyVal result, 'test', 'test2'
         yield return
+  describe '#create', ->
+    ###
+    it 'should create stock singe item', ->
+      co ->
+        KEY = 'TEST_STOCK_003'
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::TestStock extends LeanRC::Stock
+          @inheritProtected()
+          @module Test
+          @public entityName: String, { default: 'TestEntity' }
+        Test::TestStock.initialize()
+        class Test::Collection extends LeanRC::Collection
+          @inheritProtected()
+          @module Test
+          @include LeanRC::QueryableMixin
+          @public parseQuery: Object,
+            default: (aoQuery) -> aoQuery
+          @public @async executeQuery: Function,
+            default: (aoParsedQuery) ->
+              data = _.filter @getData().data, aoParsedQuery.$filter
+              yield LeanRC::Cursor.new @, data
+          @public @async push: Function,
+            default: (aoRecord) ->
+              isExist = (id) => (_.find @getData().data, _key: id)?
+              while isExist key = LeanRC::Utils.uuid.v4() then
+              aoRecord._key = key
+              @getData().data.push aoRecord.toJSON()
+              yield yes
+          @public @async take: Function,
+            default: (id) ->
+              result = []
+              if (data = _.find @getData().data, _key: id)?
+                result.push data
+              cursor = LeanRC::Cursor.new @, result
+              yield cursor.first()
+        Test::Collection.initialize()
+        facade = LeanRC::Facade.getInstance KEY
+        COLLECTION_NAME = 'TestEntitiesCollection'
+        facade.registerProxy Test::Collection.new COLLECTION_NAME,
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+          data: []
+        collection = facade.retrieveProxy COLLECTION_NAME
+        # yield collection.create test: 'test1'
+        # record = yield collection.create test: 'test2'
+        stock = Test::TestStock.new()
+        stock.initializeNotifier KEY
+        hooks = Test::TestStock.metaObject.getGroup 'hooks'
+        params =
+          queryParams: {}
+          pathParams: {}
+          currentUserId: 'ID'
+          headers: {}
+          body: { test: 'test3' }
+        result = yield stock.create params
+        console.log '0000000000000000000', result.toJSON()
+        # assert.propertyVal result, 'id', record.id
+        assert.propertyVal result, 'test', 'test3'
+        yield return
+    ###
   describe '#execute', ->
     ###
     it 'should create new stock', ->
