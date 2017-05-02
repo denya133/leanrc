@@ -7,6 +7,8 @@ class TomatosSchema extends Tomatos
 
   @root __dirname
 
+  require('./migrations/BaseMigration') @Module
+
   require('./commands/PrepareControllerCommand') @Module
   require('./commands/PrepareViewCommand') @Module
   require('./commands/PrepareModelCommand') @Module
@@ -24,5 +26,6 @@ class TomatosSchema extends Tomatos
   require('./ApplicationFacade') @Module
 
   require('./Application') @Module
+
 
 module.exports = TomatosSchema.initialize().freeze()

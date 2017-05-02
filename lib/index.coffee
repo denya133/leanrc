@@ -16,11 +16,13 @@ class LeanRC extends RC
   @const ROLLBACK: Symbol 'rollback' # для сигнала
   @const MIGRATIONS: Symbol 'MigrationsCollection'
   @const RESQUE: Symbol 'ResqueProxy'
+  @const START_RESQUE: Symbol 'start_resque'
   @const DELAYED_JOBS_QUEUE: 'delayed_jobs'
   @const DELAYED_JOBS_SCRIPT: 'DelayedJobScript'
   @const JOB_RESULT:  Symbol 'JOB_RESULT'
   @const SHELL:  Symbol 'ShellApplication'
   @const APPLICATION_MEDIATOR:  Symbol 'ApplicationMediator'
+  @const MEM_RESQUE_EXEC:  Symbol 'MemoryResqueExecutor'
 
   require('./interfaces/patterns/TransformInterface') LeanRC #does not need testing
   require('./interfaces/patterns/NotificationInterface') LeanRC #does not need testing
@@ -60,6 +62,9 @@ class LeanRC extends RC
 
   require('./mixins/CrudEndpointsMixin') LeanRC
   require('./mixins/HttpCollectionMixin') LeanRC #tested
+  require('./mixins/MemoryCollectionMixin') LeanRC
+  require('./mixins/MemoryMigrationMixin') LeanRC
+  require('./mixins/MemoryResqueMixin') LeanRC
   require('./mixins/IterableMixin') LeanRC #tested
   # require('./mixins/PipesSwitchMixin') LeanRC # empty
   require('./mixins/QueryableMixin') LeanRC #tested
@@ -94,6 +99,7 @@ class LeanRC extends RC
 
   require('./patterns/mediator/Mediator') LeanRC #tested
   require('./patterns/mediator/Switch') LeanRC #needs update tests
+  require('./patterns/mediator/MemoryResqueExecutor') LeanRC
 
   require('./patterns/command/SimpleCommand') LeanRC #tested
   require('./patterns/command/MacroCommand') LeanRC #tested
