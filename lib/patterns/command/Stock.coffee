@@ -113,7 +113,7 @@ module.exports = (Module)->
 
     @beforeHook 'parseQuery', only: ['list', 'bulkUpdate', 'bulkPatch', 'bulkDelete']
     @beforeHook 'parsePathParams', only: ['detail', 'update', 'delete']
-    @beforeHook 'parseBody', only: ['create', 'bulkUpdate', 'bulkPatch']
+    @beforeHook 'parseBody', only: ['create', 'update', 'bulkUpdate', 'bulkPatch']
     @beforeHook 'beforeUpdate', only: ['update']
 
     @public beforeActionHook: Function,
