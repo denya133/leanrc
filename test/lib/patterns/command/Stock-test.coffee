@@ -231,6 +231,25 @@ describe 'Stock', ->
         assert.deepPropertyVal stock, 'headers.test-header', 'test-header-value'
         assert.deepPropertyVal stock, 'body.test', 'test678'
         yield return
+  describe '#parseQuery', ->
+    it 'should stock query', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestStock extends LeanRC::Stock
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestStock.initialize()
+        stock = Test::TestStock.new()
+        stock.beforeActionHook
+          queryParams: query: '{"test":"test123"}'
+        stock.parseQuery()
+        assert.deepEqual stock.query, test: 'test123'
+        yield return
   describe '#list', ->
     it 'should list of stock items', ->
       co ->
