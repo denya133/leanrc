@@ -250,6 +250,25 @@ describe 'Stock', ->
         stock.parseQuery()
         assert.deepEqual stock.query, test: 'test123'
         yield return
+  describe '#parsePathParams', ->
+    it 'should get stock record ID', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestStock extends LeanRC::Stock
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestStock.initialize()
+        stock = Test::TestStock.new()
+        stock.beforeActionHook
+          pathParams: test_entity: 'ID123456'
+        stock.parsePathParams()
+        assert.propertyVal stock, 'recordId', 'ID123456'
+        yield return
   describe '#list', ->
     it 'should list of stock items', ->
       co ->
