@@ -585,6 +585,79 @@ describe 'Stock', ->
           body: test_entity: test: 'test8'
         assert.propertyVal result, 'test', 'test8'
         yield return
+  describe '#delete', ->
+    it 'should remove stock single item', ->
+      co ->
+        KEY = 'TEST_STOCK_005'
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::TestStock extends LeanRC::Stock
+          @inheritProtected()
+          @module Test
+          @public entityName: String, { default: 'TestEntity' }
+        Test::TestStock.initialize()
+        class Test::Collection extends LeanRC::Collection
+          @inheritProtected()
+          @module Test
+          @include LeanRC::QueryableMixin
+          @public parseQuery: Object,
+            default: (aoQuery) -> aoQuery
+          @public @async executeQuery: Function,
+            default: (aoParsedQuery) ->
+              data = _.filter @getData().data, aoParsedQuery.$filter
+              yield LeanRC::Cursor.new @, data
+          @public @async push: Function,
+            default: (aoRecord) ->
+              isExist = (id) => (_.find @getData().data, _key: id)?
+              while isExist key = LeanRC::Utils.uuid.v4() then
+              aoRecord._key = key
+              @getData().data.push aoRecord.toJSON()
+              yield yes
+          @public @async patch: Function,
+            default: (id, aoRecord) ->
+              { '@doc._key': { '$eq': id } } = id
+              item = _.find @getData().data, _key: id
+              if item?
+                FORBIDDEN = [ '_key', 'id', '_type', '_rev' ]
+                snapshot = _.omit (aoRecord.toJSON?() ? aoRecord ? {}), FORBIDDEN
+                item[key] = value  for own key, value of snapshot
+              yield @take id
+          @public @async take: Function,
+            default: (id) ->
+              result = []
+              if (data = _.find @getData().data, _key: id)?
+                result.push data
+              cursor = LeanRC::Cursor.new @, result
+              yield cursor.first()
+        Test::Collection.initialize()
+        facade = LeanRC::Facade.getInstance KEY
+        COLLECTION_NAME = 'TestEntitiesCollection'
+        facade.registerProxy Test::Collection.new COLLECTION_NAME,
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+          data: []
+        collection = facade.retrieveProxy COLLECTION_NAME
+        stock = Test::TestStock.new()
+        stock.initializeNotifier KEY
+        hooks = Test::TestStock.metaObject.getGroup 'hooks'
+        record = yield stock.create body: test_entity: test: 'test3'
+        result = yield stock.delete
+          pathParams: test_entity: record.id
+        assert.propertyVal result, 'isHidden', yes
+        yield return
   describe '#execute', ->
     ###
     it 'should create new stock', ->
