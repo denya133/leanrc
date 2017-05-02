@@ -87,19 +87,21 @@ module.exports = (Module)->
     @action @async bulkUpdate: Function,
       default: ->
         cursor = yield @collection.query @query
-        yield cursor.forEach (aoRecord)-> yield aoRecord.updateAttributes @recordBody
+        body = @recordBody
+        yield cursor.forEach (aoRecord) -> yield aoRecord.updateAttributes body
         return yes
 
     @action @async bulkPatch: Function,
       default: ->
         cursor = yield @collection.query @query
-        yield cursor.forEach (aoRecord)-> yield aoRecord.updateAttributes @recordBody
+        body = @recordBody
+        yield cursor.forEach (aoRecord) -> yield aoRecord.updateAttributes body
         return yes
 
     @action @async bulkDelete: Function,
       default: ->
         cursor = yield @collection.query @query
-        yield cursor.forEach (aoRecord)-> yield aoRecord.destroy()
+        yield cursor.forEach (aoRecord) -> yield aoRecord.destroy()
         return yes
 
 
