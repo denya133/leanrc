@@ -1,5 +1,6 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
+_ = require 'lodash'
 LeanRC = require.main.require 'lib'
 Stock = LeanRC::Stock
 { co } = LeanRC::Utils
@@ -203,6 +204,79 @@ describe 'Stock', ->
         assert.propertyVal actions.bulkDelete, 'attrType', Function
         assert.propertyVal actions.bulkDelete, 'level', LeanRC::PUBLIC
         assert.propertyVal actions.bulkDelete, 'async', LeanRC::ASYNC
+        yield return
+  describe '#list', ->
+    it 'should list of stock items', ->
+      co ->
+        KEY = 'TEST_STOCK_001'
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::TestStock extends LeanRC::Stock
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+          @errorHook 'showError'
+          @public showError: Function,
+            default: (args...) ->
+              console.log 'ERROR:', args...
+              args
+        Test::TestStock.initialize()
+        class Test::Collection extends LeanRC::Collection
+          @inheritProtected()
+          @module Test
+          @include LeanRC::QueryableMixin
+          @public parseQuery: Object,
+            default: (aoQuery) -> aoQuery
+          @public @async executeQuery: Function,
+            default: (aoParsedQuery) ->
+              data = _.filter @getData().data, aoParsedQuery.$filter
+              yield LeanRC::Cursor.new @, data
+          @public @async push: Function,
+            default: (aoRecord) ->
+              isExist = (id) => (_.find @getData().data, _key: id)?
+              while isExist key = LeanRC::Utils.uuid.v4() then
+              aoRecord._key = key
+              @getData().data.push aoRecord.toJSON()
+              yield yes
+        Test::Collection.initialize()
+        facade = LeanRC::Facade.getInstance KEY
+        COLLECTION_NAME = 'TestEntitiesCollection'
+        facade.registerProxy Test::Collection.new COLLECTION_NAME,
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+          data: []
+        collection = facade.retrieveProxy COLLECTION_NAME
+        yield collection.create test: 'test1'
+        yield collection.create test: 'test2'
+        stock = Test::TestStock.new()
+        stock.initializeNotifier KEY
+        hooks = Test::TestStock.metaObject.getGroup 'hooks'
+        { items, meta } = yield stock.list
+          queryParams: query: '{}'
+          pathParams: {}
+          currentUserId: 'ID'
+          headers: {}
+          body: {}
+        assert.deepEqual meta, pagination:
+          total: 'not defined'
+          limit: 'not defined'
+          offset: 'not defined'
+        assert.propertyVal items[0], 'test', 'test1'
+        assert.propertyVal items[1], 'test', 'test2'
         yield return
   describe '#execute', ->
     ###

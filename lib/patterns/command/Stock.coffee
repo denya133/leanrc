@@ -58,7 +58,7 @@ module.exports = (Module)->
 
     @action @async list: Function,
       default: ->
-        vlItems = (yield @collection.query @query).toArray()
+        vlItems = yield (yield @collection.query @query).toArray()
         return {
           meta:
             pagination:
@@ -109,21 +109,18 @@ module.exports = (Module)->
       'bulkUpdate', 'bulkPatch', 'bulkDelete'
     ]
 
-    @beforeHook 'beforeAction'
+    @beforeHook 'beforeActionHook'
 
     @beforeHook 'parseQuery', only: ['list', 'bulkUpdate', 'bulkPatch', 'bulkDelete']
     @beforeHook 'parsePathParams', only: ['detail', 'update', 'delete']
     @beforeHook 'parseBody', only: ['create', 'bulkUpdate', 'bulkPatch']
     @beforeHook 'beforeUpdate', only: ['update']
 
-    @public beforeAction: Function,
+    @public beforeActionHook: Function,
       args: [Object]
       return: NILL
       default: (args...)->
-        [{queryParams, pathParams, currentUserId, headers, body }] = args
-        {
-          @queryParams, @pathParams, @currentUserId, @headers, @body
-        } = {queryParams, pathParams, currentUserId, headers, body }
+        [{ @queryParams, @pathParams, @currentUserId, @headers, @body }] = args
         return args
 
     @public parseQuery: Function,
