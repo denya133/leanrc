@@ -93,6 +93,7 @@ module.exports =
   #...
 ```
 ###
+_ = require 'lodash'
 
 module.exports = (Module)->
   {
