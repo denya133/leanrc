@@ -364,7 +364,6 @@ describe 'Stock', ->
         yield collection.create test: 'test2'
         stock = Test::TestStock.new()
         stock.initializeNotifier KEY
-        hooks = Test::TestStock.metaObject.getGroup 'hooks'
         { items, meta } = yield stock.list
           queryParams: query: '{}'
           pathParams: {}
@@ -438,7 +437,6 @@ describe 'Stock', ->
         record = yield collection.create test: 'test2'
         stock = Test::TestStock.new()
         stock.initializeNotifier KEY
-        hooks = Test::TestStock.metaObject.getGroup 'hooks'
         params =
           queryParams: {}
           pathParams: "#{stock.keyName}": record.id
@@ -507,7 +505,6 @@ describe 'Stock', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         stock = Test::TestStock.new()
         stock.initializeNotifier KEY
-        hooks = Test::TestStock.metaObject.getGroup 'hooks'
         result = yield stock.create body: test_entity: test: 'test3'
         assert.propertyVal result, 'test', 'test3'
         yield return
@@ -578,7 +575,6 @@ describe 'Stock', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         stock = Test::TestStock.new()
         stock.initializeNotifier KEY
-        hooks = Test::TestStock.metaObject.getGroup 'hooks'
         record = yield stock.create body: test_entity: test: 'test3'
         result = yield stock.update
           pathParams: test_entity: record.id
@@ -652,7 +648,6 @@ describe 'Stock', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         stock = Test::TestStock.new()
         stock.initializeNotifier KEY
-        hooks = Test::TestStock.metaObject.getGroup 'hooks'
         record = yield stock.create body: test_entity: test: 'test3'
         result = yield stock.delete
           pathParams: test_entity: record.id
@@ -729,7 +724,6 @@ describe 'Stock', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         stock = Test::TestStock.new()
         stock.initializeNotifier KEY
-        hooks = Test::TestStock.metaObject.getGroup 'hooks'
         record1 = yield stock.create body: test_entity: test: 'test1'
         record2 = yield stock.create body: test_entity: test: 'test2'
         record3 = yield stock.create body: test_entity: test: 'test2'
@@ -812,7 +806,6 @@ describe 'Stock', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         stock = Test::TestStock.new()
         stock.initializeNotifier KEY
-        hooks = Test::TestStock.metaObject.getGroup 'hooks'
         record1 = yield stock.create body: test_entity: test: 'test1'
         record2 = yield stock.create body: test_entity: test: 'test2'
         record3 = yield stock.create body: test_entity: test: 'test2'
@@ -890,7 +883,6 @@ describe 'Stock', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         stock = Test::TestStock.new()
         stock.initializeNotifier KEY
-        hooks = Test::TestStock.metaObject.getGroup 'hooks'
         record1 = yield stock.create body: test_entity: test: 'test1'
         record2 = yield stock.create body: test_entity: test: 'test2'
         record3 = yield stock.create body: test_entity: test: 'test2'
@@ -903,18 +895,87 @@ describe 'Stock', ->
         assert.lengthOf _.filter(collection.getData().data, test: 'test2'), 0
         yield return
   describe '#execute', ->
-    ###
-    it 'should create new stock', ->
-      expect ->
-        trigger = sinon.spy()
-        trigger.reset()
-        class TestStock extends Stock
+    it 'should call execution', ->
+      co ->
+        KEY = 'TEST_STOCK_008'
+        class Test extends LeanRC::Module
           @inheritProtected()
-          @public execute: Function,
+          @root __dirname
+        Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @public @static findModelByName: Function,
+            default: (asType) -> Test::TestRecord
+          @public init: Function,
             default: ->
-              trigger()
-        stock = TestStock.new()
-        stock.execute()
-        assert trigger.called
-      .to.not.throw Error
-    ###
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::TestStock extends LeanRC::Stock
+          @inheritProtected()
+          @module Test
+          @public entityName: String, { default: 'TestEntity' }
+        Test::TestStock.initialize()
+        class Test::Collection extends LeanRC::Collection
+          @inheritProtected()
+          @module Test
+          @include LeanRC::QueryableMixin
+          @public parseQuery: Object,
+            default: (aoQuery) ->
+              voQuery = _.mapKeys aoQuery, (value, key) -> key.replace /^@doc\./, ''
+              voQuery = _.mapValues voQuery, (value, key) ->
+                if value['$eq']? then value['$eq'] else value
+              $filter: voQuery
+          @public @async executeQuery: Function,
+            default: (aoParsedQuery) ->
+              data = _.filter @getData().data, aoParsedQuery.$filter
+              yield LeanRC::Cursor.new @, data
+          @public @async push: Function,
+            default: (aoRecord) ->
+              isExist = (id) => (_.find @getData().data, _key: id)?
+              while isExist key = LeanRC::Utils.uuid.v4() then
+              aoRecord._key = key
+              @getData().data.push aoRecord.toJSON()
+              yield yes
+          @public @async remove: Function,
+            default: (id) ->
+              _.remove @getData().data, _key: id
+              yield return yes
+          @public @async take: Function,
+            default: (id) ->
+              result = []
+              if (data = _.find @getData().data, _key: id)?
+                result.push data
+              cursor = LeanRC::Cursor.new @, result
+              yield cursor.first()
+        Test::Collection.initialize()
+        facade = LeanRC::Facade.getInstance KEY
+        COLLECTION_NAME = 'TestEntitiesCollection'
+        facade.registerProxy Test::Collection.new COLLECTION_NAME,
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+          data: []
+        collection = facade.retrieveProxy COLLECTION_NAME
+        stock = Test::TestStock.new()
+        stock.initializeNotifier KEY
+        yield stock.create body: test_entity: test: 'test1'
+        yield stock.create body: test_entity: test: 'test2'
+        yield stock.create body: test_entity: test: 'test2'
+        spySendNotitfication = sinon.spy stock, 'sendNotification'
+        testBody =
+          queryParams: query: '{"test":{"$eq":"test2"}}'
+          reverse: 'TEST_REVERSE'
+        notification = LeanRC::Notification.new 'TEST_NAME', testBody, 'list'
+        yield stock.execute notification
+        [ name, body, type ] = spySendNotitfication.args[0]
+        assert.equal name, LeanRC::HANDLER_RESULT
+        { meta, items } = body
+        assert.deepEqual meta, pagination:
+          total: 'not defined'
+          limit: 'not defined'
+          offset: 'not defined'
+        assert.lengthOf items, 2
+        assert.equal type, 'TEST_REVERSE'
+        yield return

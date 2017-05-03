@@ -153,13 +153,14 @@ module.exports = (Module)->
         @recordBody = Module::Utils.extend {}, @recordBody, id: @recordId
         return args
 
-    @public execute: Function,
+    @public @async execute: Function,
+      args: [Module::NotificationInterface]
+      return: Module::NILL
       default: (aoNotification)->
-        Module::Utils.co =>
-          voBody = aoNotification.getBody()
-          voResult = yield @[aoNotification.getType()]? voBody
-          @sendNotification Module::HANDLER_RESULT, voResult, voBody.reverse
-        return
+        voBody = aoNotification.getBody()
+        voResult = yield @[aoNotification.getType()]? voBody
+        @sendNotification Module::HANDLER_RESULT, voResult, voBody.reverse
+        yield return
 
 
   Stock.initialize()
