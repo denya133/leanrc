@@ -3,8 +3,8 @@
 module.exports = (Module)->
   class Transform extends Module::CoreObject
     @inheritProtected()
-    @module Module
     @implements Module::TransformInterface
+    @module Module
 
     @public @static normalize: Function,
       default: (serialized)->

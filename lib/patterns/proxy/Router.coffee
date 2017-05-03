@@ -30,9 +30,9 @@ module.exports = (Module)->
 
   class Router extends Module::Proxy
     @inheritProtected()
-    @module Module
     @implements Module::RouterInterface
     @include Module::ConfigurableMixin
+    @module Module
 
     ipsPath       = @protected path: String,
       default: '/'

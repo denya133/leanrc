@@ -3,8 +3,8 @@
 module.exports = (Module)->
   class Endpoint extends Module::CoreObject
     @inheritProtected()
-    @module Module
     @implements Module::EndpointInterface
+    @module Module
 
     @public gateway: Module::GatewayInterface
 

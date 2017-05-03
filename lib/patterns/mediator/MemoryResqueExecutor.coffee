@@ -49,14 +49,15 @@ module.exports = (Module)->
     DelayableMixin
     Facade
     ConfigurableMixin
+    ResqueInterface
   } = Module::
   {co, isArangoDB} = Module::Utils
 
   class MemoryResqueExecutor extends Mediator
     @inheritProtected()
-    @module Module
     @include DelayableMixin
     @include ConfigurableMixin
+    @module Module
 
     @public fullQueueName: Function,
       args: [String]
@@ -164,7 +165,8 @@ module.exports = (Module)->
       args: []
       return: NILL
       default: ->
-        yield return if @[ipbIsStopped]
+        if @[ipbIsStopped]
+          yield return
         if isArangoDB
           yield MemoryResqueExecutor.delay(@facade,
             delayUntil: Date.now() + 100

@@ -31,9 +31,9 @@ class App::TomatoEntry extends Module::Entry
 module.exports = (Module)->
   class Entry extends Module::CoreObject
     @inheritProtected()
-    @module Module
     @implements Module::RecordInterface
     @include Module::RecordMixin
+    @module Module
 
     @attribute id: String
     @attribute rev: String

@@ -34,9 +34,9 @@ module.exports = (App)->
 module.exports = (Module)->
   class Collection extends Module::Proxy
     @inheritProtected()
-    @module Module
     @implements Module::CollectionInterface
     @include Module::ConfigurableMixin
+    @module Module
 
     @public delegate: Module::Class,
       get: (delegate)->

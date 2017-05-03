@@ -91,8 +91,8 @@ module.exports = (Module)->
 module.exports = (Module)->
   class Migration extends Module::Record
     @inheritProtected()
-    @module Module
     @implements Module::MigrationInterface
+    @module Module
 
     @const UP: Symbol 'UP'
     @const DOWN: Symbol 'DOWN'

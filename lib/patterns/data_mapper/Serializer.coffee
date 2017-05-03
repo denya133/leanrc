@@ -5,8 +5,8 @@
 module.exports = (Module)->
   class Serializer extends Module::CoreObject
     @inheritProtected()
-    @module Module
     @implements Module::SerializerInterface
+    @module Module
 
     @public collection: Module::CollectionInterface
 

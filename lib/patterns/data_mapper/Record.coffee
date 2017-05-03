@@ -30,10 +30,10 @@ module.exports = (Module)->
 
   class Record extends Module::CoreObject
     @inheritProtected()
-    @module Module
     @implements Module::RecordInterface
     @include Module::ChainsMixin
     @include Module::RecordMixin
+    @module Module
 
     @attribute _key: String
     @attribute _rev: String

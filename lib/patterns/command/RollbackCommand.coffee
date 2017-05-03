@@ -47,8 +47,8 @@ module.exports = (Module) ->
 
   class RollbackCommand extends Module::SimpleCommand
     @inheritProtected()
-    @module Module
     @include Module::ConfigurableMixin
+    @module Module
 
     @public migrationsCollection: Module::CollectionInterface
     @public migrationNames: Module::PromiseInterface,

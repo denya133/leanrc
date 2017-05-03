@@ -3,8 +3,8 @@
 module.exports = (Module)->
   class SimpleCommand extends Module::Notifier
     @inheritProtected()
-    @module Module
     @implements Module::CommandInterface
+    @module Module
 
     @public execute: Function,
       default: ->

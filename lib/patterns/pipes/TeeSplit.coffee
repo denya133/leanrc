@@ -3,8 +3,8 @@
 module.exports = (Module)->
   class TeeSplit extends Module::CoreObject
     @inheritProtected()
-    @module Module
     @implements Module::PipeFittingInterface
+    @module Module
 
     iplOutputs = @protected outputs: Array
 

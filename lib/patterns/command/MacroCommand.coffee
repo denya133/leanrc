@@ -5,8 +5,8 @@ module.exports = (Module)->
 
   class MacroCommand extends Module::Notifier
     @inheritProtected()
-    @module Module
     @implements Module::CommandInterface
+    @module Module
 
     iplSubCommands = @private subCommands: Array
 

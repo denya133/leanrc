@@ -47,8 +47,8 @@ module.exports = (Module) ->
 
   class MigrateCommand extends Module::SimpleCommand
     @inheritProtected()
-    @module Module
     @include Module::ConfigurableMixin
+    @module Module
 
     iplMigrationNames = @private migrationNames: Module::PromiseInterface
 

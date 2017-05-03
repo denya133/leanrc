@@ -3,8 +3,8 @@
 module.exports = (Module)->
   class Mediator extends Module::Notifier
     @inheritProtected()
-    @module Module
     @implements Module::MediatorInterface
+    @module Module
 
     ipsMediatorName = @private mediatorName: String
     ipoViewComponent = @private viewComponent: Module::ANY

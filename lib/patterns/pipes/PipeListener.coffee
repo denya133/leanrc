@@ -3,8 +3,8 @@
 module.exports = (Module)->
   class PipeListener extends Module::CoreObject
     @inheritProtected()
-    @module Module
     @implements Module::PipeFittingInterface
+    @module Module
 
     ipoContext = @private context: Object
     ipmListener = @private listener: Module::LAMBDA

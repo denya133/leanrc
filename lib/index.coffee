@@ -74,6 +74,7 @@ class LeanRC extends RC
   require('./mixins/DelayableMixin') LeanRC #tested
 
   require('./patterns/data_mapper/Transform') LeanRC #tested
+
   require('./patterns/data_mapper/StringTransform') LeanRC #tested
   require('./patterns/data_mapper/NumberTransform') LeanRC #tested
   require('./patterns/data_mapper/DateTransform') LeanRC #tested
@@ -88,6 +89,7 @@ class LeanRC extends RC
   require('./patterns/observer/Notification') LeanRC #tested
   require('./patterns/observer/Notifier') LeanRC #tested
   require('./patterns/observer/Observer') LeanRC #tested
+
 
   require('./patterns/proxy/Proxy') LeanRC #tested
   require('./patterns/proxy/Collection') LeanRC #tested

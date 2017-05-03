@@ -5,8 +5,8 @@ module.exports = (Module)->
 
   class Observer extends Module::CoreObject
     @inheritProtected()
-    @module Module
     @implements Module::ObserverInterface
+    @module Module
 
     ipoNotify = @private notify: ANY
     ipoContext = @private context: ANY

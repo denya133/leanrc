@@ -4,8 +4,8 @@ _ = require 'lodash'
 module.exports = (Module)->
   class NumberTransform extends Module::CoreObject
     @inheritProtected()
-    @module Module
     @implements Module::TransformInterface
+    @module Module
 
     @public @static normalize: Function,
       default: (serialized)->
