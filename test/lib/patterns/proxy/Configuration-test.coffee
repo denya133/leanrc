@@ -52,3 +52,20 @@ describe 'Configuration', ->
         assert.propertyVal configuration, 'test2', 42
         assert.propertyVal configuration, 'test3', yes
         yield return
+  describe '#onRegister', ->
+    it 'should initiate setup configuration instance', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Configuration extends LeanRC::Configuration
+          @inheritProtected()
+          @module Test
+        Test::Configuration.initialize()
+        configuration = Test::Configuration.new()
+        configuration.onRegister()
+        assert.propertyVal configuration, 'test1', 'default'
+        assert.propertyVal configuration, 'test2', 42
+        assert.propertyVal configuration, 'test3', yes
+        yield return
