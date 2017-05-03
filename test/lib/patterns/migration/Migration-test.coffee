@@ -282,3 +282,21 @@ describe 'Migration', ->
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
           method: 'removeTimestamps'
         yield return
+  describe '.reversible', ->
+    it 'should add reversible step', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::BaseMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+        Test::BaseMigration.initialize()
+        Test::BaseMigration.reversible 'ARG_1', 'ARG_2', 'ARG_3'
+        migration = Test::BaseMigration.new()
+        assert.lengthOf migration.steps, 1
+        assert.deepEqual migration.steps[0],
+          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+          method: 'reversible'
+        yield return
