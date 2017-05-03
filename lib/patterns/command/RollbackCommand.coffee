@@ -88,12 +88,9 @@ module.exports = (Module) ->
 
         yield @migrationNames
 
-        executedMigrations = yield @migrationsCollection.query {
-          $forIn: '@doc': @migrationsCollection.collectionName()
-          $sort: ['@doc._key': 'DESC']
-          $limit: options.steps ? 1
-        }
-          .toArray()
+        executedMigrations = (yield @migrationsCollection.takeAll()).toArray()
+        executedMigrations = _.orderBy executedMigrations, ['id', 'desc']
+        executedMigrations = executedMigrations[0...(options.steps ? 1)]
 
         for executedMigration in executedMigrations
           try
