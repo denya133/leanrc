@@ -87,11 +87,12 @@ module.exports = (Module) ->
         migrationNames = yield @migrationNames
         for migrationName in migrationNames
           unless yield @migrationsCollection.includes migrationName
+            id = String migrationName
             clearedMigrationName = migrationName.replace /^\d{14}[_]/, ''
             migrationClassName = inflect.camelize clearedMigrationName
             vcMigration = Module::[migrationClassName]
             try
-              voMigration = vcMigration.new {}, @migrationsCollection
+              voMigration = vcMigration.new {id}, @migrationsCollection
               yield voMigration.migrate Module::Migration::UP
               yield voMigration.save()
             catch err
