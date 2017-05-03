@@ -257,11 +257,11 @@ module.exports = (Module)->
       # а реальный запускаемый код (автоматический или кастомынй)
       # будет в 'up' и 'down'
       @change ->
-        UsersCollection = @collection.facade.retriveProxy 'UsersCollection'
         @addField 'users', 'first_name', 'string'
         @addField 'users', 'last_name', 'string'
 
         @reversible wrap (dir)->
+          UsersCollection = @collection.facade.retriveProxy 'UsersCollection'
           yield UsersCollection.forEach wrap (u)->
             yield dir.up   wrap ->
               [u.first_name, u.last_name] = u.full_name.split(' ')
