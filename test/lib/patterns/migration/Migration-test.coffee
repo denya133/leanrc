@@ -30,3 +30,21 @@ describe 'Migration', ->
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
           method: 'createCollection'
         yield return
+  describe '.createEdgeCollection', ->
+    it 'should add step for create edge collection', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::BaseMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+        Test::BaseMigration.initialize()
+        Test::BaseMigration.createEdgeCollection 'ARG_1', 'ARG_2', 'ARG_3'
+        migration = Test::BaseMigration.new()
+        assert.lengthOf migration.steps, 1
+        assert.deepEqual migration.steps[0],
+          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+          method: 'createEdgeCollection'
+        yield return
