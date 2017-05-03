@@ -60,7 +60,7 @@ class LeanRC extends RC
   require('./interfaces/core/ModelInterface') LeanRC
   require('./interfaces/core/ViewInterface') LeanRC
 
-  require('./mixins/ConfigurableMixin') LeanRC #needs tests
+  require('./mixins/ConfigurableMixin') LeanRC
   require('./mixins/CrudEndpointsMixin') LeanRC #needs tests
   require('./mixins/HttpCollectionMixin') LeanRC
   require('./mixins/MemoryCollectionMixin') LeanRC #needs tests
