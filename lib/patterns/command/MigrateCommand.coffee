@@ -58,11 +58,14 @@ module.exports = (Module) ->
         {co, filesList} = Module::Utils
         @[iplMigrationNames] ?= co =>
           files = yield filesList @migrationsDir
-          yield return _.orderBy (files ? []).map (i)=>
+          yield return _.orderBy _.compact (files ? []).map (i)=>
             migrationName = i.replace /\.js|\.coffee/, ''
-            vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
-            require(vsMigrationPath) Module
-            migrationName
+            if migrationName isnt 'BaseMigration'
+              vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
+              require(vsMigrationPath) Module
+              migrationName
+            else
+              null
         @[iplMigrationNames]
 
     @public migrationsDir: String,
