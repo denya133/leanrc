@@ -120,3 +120,21 @@ describe 'Migration', ->
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
           method: 'changeCollection'
         yield return
+  describe '.changeField', ->
+    it 'should add step to change field in collection', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::BaseMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+        Test::BaseMigration.initialize()
+        Test::BaseMigration.changeField 'ARG_1', 'ARG_2', 'ARG_3'
+        migration = Test::BaseMigration.new()
+        assert.lengthOf migration.steps, 1
+        assert.deepEqual migration.steps[0],
+          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+          method: 'changeField'
+        yield return
