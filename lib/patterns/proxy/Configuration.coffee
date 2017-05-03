@@ -106,7 +106,7 @@ module.exports = (Module)->
 
     @public environment: String,
       get: ->
-        if isArangoDB
+        if isArangoDB()
           if module.context.isProduction
             'production'
           else
