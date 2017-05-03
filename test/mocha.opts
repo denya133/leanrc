@@ -13,7 +13,7 @@ test/lib/patterns/gateway/
 test/lib/patterns/data_mapper/
 test/lib/patterns/iterator/
 test/lib/patterns/mixins/
-test/lib/patterns/proxy/
 test/lib/patterns/mediator/
-test/
 test/lib/patterns/command/
+test/
+test/lib/patterns/proxy/
