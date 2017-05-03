@@ -137,6 +137,9 @@ module.exports = (Module)->
 
     iplSteps = @private steps: Array
 
+    @public steps: Array,
+      get: -> Module::Utils.extend [], @[iplSteps] ? []
+
     # так же в рамках DSL нужны:
     # Creation
     #@createCollection #name, options, type # type is `document` or `edge`
