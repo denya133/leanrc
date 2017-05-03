@@ -42,9 +42,9 @@ module.exports = (Module)->
 
   class Resque extends Module::Proxy
     @inheritProtected()
-    @implements Module::ResqueInterface
-
     @module Module
+    @implements Module::ResqueInterface
+    @include Module::ConfigurableMixin
 
     @public fullQueueName: Function,
       default: (queueName)-> "#{@moduleName}|>#{queueName}"

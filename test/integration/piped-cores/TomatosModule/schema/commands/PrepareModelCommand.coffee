@@ -22,9 +22,7 @@ module.exports = (Module) ->
     @public execute: Function,
       default: ->
         @facade.registerProxy BaseConfiguration.new CONFIGURATION
-        @facade.registerProxy BaseResque.new RESQUE,
-          # и в Resque переделать на использование Configuration Proxy
-          dbAddress: 'localhost:27017/resqueDB' 
+        @facade.registerProxy BaseResque.new RESQUE
         @facade.registerProxy MigrationsCollection.new MIGRATIONS,
           delegate: BaseMigration
         @facade.registerProxy BaseCollection.new 'TomatosCollection',

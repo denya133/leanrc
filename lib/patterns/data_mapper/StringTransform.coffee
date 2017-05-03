@@ -4,9 +4,8 @@ _ = require 'lodash'
 module.exports = (Module)->
   class StringTransform extends Module::CoreObject
     @inheritProtected()
-    @implements Module::TransformInterface
-
     @module Module
+    @implements Module::TransformInterface
 
     @public @static normalize: Function,
       default: (serialized)->

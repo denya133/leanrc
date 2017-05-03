@@ -3,9 +3,8 @@
 module.exports = (Module)->
   class PipeMessage extends Module::CoreObject
     @inheritProtected()
-    @implements Module::PipeMessageInterface
-
     @module Module
+    @implements Module::PipeMessageInterface
 
     @public @static PRIORITY_HIGH: Number,
       default: 1

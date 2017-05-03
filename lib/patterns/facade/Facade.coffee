@@ -3,9 +3,8 @@
 module.exports = (Module)->
   class Facade extends Module::CoreObject
     @inheritProtected()
-    @implements Module::FacadeInterface
-
     @module Module
+    @implements Module::FacadeInterface
 
     @const MULTITON_MSG: "Facade instance for this multiton key already constructed!"
 

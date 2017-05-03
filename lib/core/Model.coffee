@@ -3,9 +3,8 @@
 module.exports = (Module)->
   class Model extends Module::CoreObject
     @inheritProtected()
-    @implements Module::ModelInterface
-
     @module Module
+    @implements Module::ModelInterface
 
     @const MULTITON_MSG: "Model instance for this multiton key already constructed!"
 

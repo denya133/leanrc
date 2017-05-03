@@ -34,9 +34,9 @@ module.exports = (App)->
 module.exports = (Module)->
   class Collection extends Module::Proxy
     @inheritProtected()
-    @implements Module::CollectionInterface
-
     @module Module
+    @implements Module::CollectionInterface
+    @include Module::ConfigurableMixin
 
     @public delegate: Module::Class,
       get: (delegate)->
@@ -51,7 +51,7 @@ module.exports = (Module)->
 
     @public collectionPrefix: Function,
       default: ->
-        "#{inflect.underscore @Module.name}_" # может быть вместо @Module заиспользовать @getData().Module
+        "#{inflect.underscore @Module.name}_"
 
     @public collectionFullName: Function,
       default: (asName = null)->

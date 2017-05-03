@@ -102,7 +102,6 @@ module.exports = (Module)->
 
   class Configuration extends Module::Proxy
     @inheritProtected()
-
     @module Module
 
     @public environment: String,

@@ -3,9 +3,8 @@
 module.exports = (Module)->
   class Pipe extends Module::CoreObject
     @inheritProtected()
-    @implements Module::PipeFittingInterface
-
     @module Module
+    @implements Module::PipeFittingInterface
 
     ipoOutput = @protected output: Module::PipeFittingInterface
 

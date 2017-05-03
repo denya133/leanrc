@@ -11,9 +11,8 @@
 module.exports = (Module)->
   class Resource extends Module::Collection
     @inheritProtected()
-    # @implements Module::ResourceInterface # может и не нужен
-
     @module Module
+    # @implements Module::ResourceInterface # может и не нужен
 
 
   Resource.initialize()

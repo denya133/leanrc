@@ -4,9 +4,8 @@ module.exports = (Module)->
 
   class Notification extends Module::CoreObject
     @inheritProtected()
-    @implements Module::NotificationInterface
-
     @module Module
+    @implements Module::NotificationInterface
 
     ipsName = @private name: String
     ipoBody = @private body: Module::ANY

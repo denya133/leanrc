@@ -7,9 +7,9 @@ module.exports = (Module)->
 
   class Switch extends Module::Mediator
     @inheritProtected()
-    @implements Module::SwitchInterface
-
     @module Module
+    @implements Module::SwitchInterface
+    @include Module::ConfigurableMixin
 
     @public responseFormats: Array,
       get: -> ['json', 'html', 'xml', 'atom']

@@ -8,9 +8,8 @@ module.exports = (Module)->
 
   class PipeAwareModule extends Module::CoreObject
     @inheritProtected()
-    @implements Module::PipeAwareInterface
-
     @module Module
+    @implements Module::PipeAwareInterface
 
     @public @static STDOUT: String,
       default: 'standardOutput'

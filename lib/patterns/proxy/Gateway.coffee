@@ -47,9 +47,9 @@ module.exports = (App)->
 module.exports = (Module)->
   class Gateway extends Module::Proxy
     @inheritProtected()
-    @implements Module::GatewayInterface
-
     @module Module
+    @implements Module::GatewayInterface
+    @include Module::ConfigurableMixin
 
     ipoEndpoints = @private endpoints: Object
 

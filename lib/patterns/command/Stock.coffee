@@ -7,10 +7,10 @@ module.exports = (Module)->
 
   class Stock extends Module::SimpleCommand
     @inheritProtected()
-    @include Module::ChainsMixin
-    @implements Module::StockInterface
-
     @module Module
+    @implements Module::StockInterface
+    @include Module::ConfigurableMixin
+    @include Module::ChainsMixin
 
     # @public entityName: String # Имя сущности должно быть установлено при объявлении дочернего класса
 

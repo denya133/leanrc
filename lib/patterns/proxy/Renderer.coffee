@@ -19,9 +19,9 @@ module.exports = (resource, action, aoData)->
 module.exports = (Module)->
   class Renderer extends Module::Proxy
     @inheritProtected()
-    @implements Module::RendererInterface
-
     @module Module
+    @implements Module::RendererInterface
+    @include Module::ConfigurableMixin
 
     ipoTemplates = @private templates: Module::PromiseInterface
     @public templates: Module::PromiseInterface,

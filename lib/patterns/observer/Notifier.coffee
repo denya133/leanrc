@@ -3,9 +3,8 @@
 module.exports = (Module)->
   class Notifier extends Module::CoreObject
     @inheritProtected()
-    @implements Module::NotifierInterface
-
     @module Module
+    @implements Module::NotifierInterface
 
     @const MULTITON_MSG: "multitonKey for this Notifier not yet initialized!"
 

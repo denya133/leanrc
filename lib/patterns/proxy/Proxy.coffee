@@ -3,9 +3,8 @@
 module.exports = (Module)->
   class Proxy extends Module::Notifier
     @inheritProtected()
-    @implements Module::ProxyInterface
-
     @module Module
+    @implements Module::ProxyInterface
 
     ipsProxyName = @private proxyName: String
     ipoData = @private data: Module::ANY

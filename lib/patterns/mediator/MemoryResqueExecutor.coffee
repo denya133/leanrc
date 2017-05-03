@@ -48,6 +48,7 @@ module.exports = (Module)->
     Mediator
     DelayableMixin
     Facade
+    ConfigurableMixin
   } = Module::
   {co, isArangoDB} = Module::Utils
 
@@ -55,6 +56,7 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
     @include DelayableMixin
+    @include ConfigurableMixin
 
     @public fullQueueName: Function,
       args: [String]
