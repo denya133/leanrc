@@ -300,3 +300,19 @@ describe 'Migration', ->
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
           method: 'reversible'
         yield return
+  describe '.execute', ->
+    it 'should run generator closure with some code', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::BaseMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+        Test::BaseMigration.initialize()
+        migration = Test::BaseMigration.new()
+        spyExecute = sinon.spy -> yield return
+        yield migration.execute spyExecute
+        assert.isTrue spyExecute.called
+        yield return
