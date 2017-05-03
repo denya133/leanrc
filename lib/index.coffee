@@ -91,7 +91,7 @@ class LeanRC extends RC
 
   require('./patterns/proxy/Proxy') LeanRC
   require('./patterns/proxy/Collection') LeanRC
-  require('./patterns/proxy/Configuration') LeanRC #needs update tests
+  require('./patterns/proxy/Configuration') LeanRC
   require('./patterns/proxy/Gateway') LeanRC
   require('./patterns/proxy/Renderer') LeanRC
   require('./patterns/proxy/Resource') LeanRC

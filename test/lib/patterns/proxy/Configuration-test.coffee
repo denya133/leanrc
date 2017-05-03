@@ -51,6 +51,7 @@ describe 'Configuration', ->
         assert.propertyVal configuration, 'test1', 'default'
         assert.propertyVal configuration, 'test2', 42
         assert.propertyVal configuration, 'test3', yes
+        assert.propertyVal configuration, 'test4', 'test'
         yield return
   describe '#onRegister', ->
     it 'should initiate setup configuration instance', ->
@@ -68,4 +69,5 @@ describe 'Configuration', ->
         assert.propertyVal configuration, 'test1', 'default'
         assert.propertyVal configuration, 'test2', 42
         assert.propertyVal configuration, 'test3', yes
+        assert.propertyVal configuration, 'test4', 'test'
         yield return
