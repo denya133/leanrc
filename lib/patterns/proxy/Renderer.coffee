@@ -20,7 +20,7 @@ module.exports = (Module)->
   class Renderer extends Module::Proxy
     @inheritProtected()
     @implements Module::RendererInterface
-
+    @include Module::ConfigurableMixin
     @module Module
 
     ipoTemplates = @private templates: Module::PromiseInterface

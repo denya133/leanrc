@@ -308,11 +308,12 @@ describe 'Switch', ->
         class AppConfiguration extends LeanRC::Configuration
           @inheritProtected()
           @module Test
-          @public configs: Object,
-            get: -> @getData()
+          @public defineConfigProperties: Function,
+            default: ->
+          @public currentUserCookie: String,
+            default: 'cuc'
         AppConfiguration.initialize()
-        facade.registerProxy AppConfiguration.new LeanRC::CONFIGURATION,
-          currentUserCookie: 'cuc'
+        facade.registerProxy AppConfiguration.new LeanRC::CONFIGURATION
         class Test::TestSwitch extends Switch
           @inheritProtected()
           @module Test

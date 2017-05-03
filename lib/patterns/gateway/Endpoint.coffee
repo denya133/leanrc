@@ -4,7 +4,6 @@ module.exports = (Module)->
   class Endpoint extends Module::CoreObject
     @inheritProtected()
     @implements Module::EndpointInterface
-
     @module Module
 
     @public gateway: Module::GatewayInterface

@@ -5,7 +5,6 @@ module.exports = (Module)->
   class StringTransform extends Module::CoreObject
     @inheritProtected()
     @implements Module::TransformInterface
-
     @module Module
 
     @public @static normalize: Function,

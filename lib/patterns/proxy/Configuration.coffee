@@ -11,11 +11,15 @@
 ###
 ```coffee
 module.exports = (Module)->
-  class AppConfiguration extends Module::Configuration
-    @inheritProtected()
-    @include Module::ArangoConfigurationMixin
+  {
+    Configuration
+    ArangoConfigurationMixin
+  } = Module::
 
+  class AppConfiguration extends Configuration
+    @inheritProtected()
     @module Module
+    @include ArangoConfigurationMixin
 
   return AppConfiguration.initialize()
 ```
@@ -24,9 +28,14 @@ module.exports = (Module)->
 ###
 ```coffee
 module.exports = (Module)->
-  {CONFIGURATION} = Module::
+  {
+    CONFIGURATION
 
-  class PrepareModelCommand extends Module::SimpleCommand
+    SimpleCommand
+    AppConfiguration
+  } = Module::
+
+  class PrepareModelCommand extends SimpleCommand
     @inheritProtected()
 
     @module Module
@@ -34,8 +43,7 @@ module.exports = (Module)->
     @public execute: Function,
       default: ->
         #...
-        @facade.registerProxy Module::AppConfiguration.new CONFIGURATION,
-          environment: 'production'
+        @facade.registerProxy AppConfiguration.new CONFIGURATION
         #...
 
   PrepareModelCommand.initialize()
@@ -45,9 +53,9 @@ module.exports = (Module)->
 ###
 В папке configs/
 должны быть файлы:
-development.example
-production.example
-test.example
+development.coffee.example
+production.coffee.example
+test.coffee.example
 
 Они же должны быть разрешены в гитигноре и быть под репозиторием, все остальные файлы должны быть в гитигноре (не под репозиторием)
 
@@ -87,23 +95,87 @@ module.exports =
 ###
 
 module.exports = (Module)->
-  {extend} = Module::Utils
+  {
+    NILL
+  } = Module::
+  {extend, isArangoDB} = Module::Utils
 
   class Configuration extends Module::Proxy
     @inheritProtected()
-
     @module Module
 
-    # может быть переопределен в миксинах с платформенным кодом
-    @public configs: Object,
+    @public environment: String,
       get: ->
+        if isArangoDB
+          if module.context.isProduction
+            'production'
+          else
+            'development'
+        else
+          if process.env.NODE_ENV is 'production'
+            'production'
+          else
+            'development'
+
+    @public defineConfigProperties: Function,
+      args: []
+      return: NILL
+      default: ->
         manifestPath = "#{@Module::ROOT}/../manifest.json"
         configFromManifest = require(manifestPath).configuration
-        {env, environment} = @getData()
-        vsEnv = env ? environment ? 'development'
-        filePath = "#{@Module::ROOT}/../configs/#{vsEnv}"
+        filePath = "#{@Module::ROOT}/../configs/#{@environment}"
         configFromFile = require filePath
-        extend {}, configFromManifest, configFromFile
+        configs = extend {}, configFromManifest, configFromFile
+        for own key, value of configs
+          do (attr = key, config = value)=>
+            unless config.description?
+              throw new Error "Description in config definition is required"
+              return
+            if config.required and not config.default?
+              throw new Error "Attribute '#{attr}' is required in config"
+              return
+            # проверка типа
+            unless config.type?
+              throw new Error "Type in config definition is required"
+              return
+            switch config.type
+              when 'string'
+                unless _.isString config.default
+                  throw new Error "Default for '#{attr}' must be string"
+                  return
+              when 'number'
+                unless _.isNumber config.default
+                  throw new Error "Default for '#{attr}' must be number"
+                  return
+              when 'boolean'
+                unless _.isBoolean config.default
+                  throw new Error "Default for '#{attr}' must be boolean"
+                  return
+              when 'integer'
+                unless _.isInteger config.default
+                  throw new Error "Default for '#{attr}' must be integer"
+                  return
+              when 'json'
+                unless _.isObject(config.default) or _.isArray(config.default)
+                  throw new Error "Default for '#{attr}' must be object or array"
+                  return
+              when 'password' #like string but will be displayed as a masked input field in the web frontend
+                unless _.isString config.default
+                  throw new Error "Default for '#{attr}' must be string"
+                  return
+            Reflect.defineProperty @, attr,
+              enumerable: yes
+              configurable: yes
+              writable: no
+              value: config.default
+            return
+        return
+
+    @public onRegister: Function,
+      default: (args...)->
+        @super args...
+        @defineConfigProperties()
+        return
 
 
   Configuration.initialize()

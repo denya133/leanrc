@@ -8,7 +8,7 @@ module.exports = (Module)->
   class Script extends Module::SimpleCommand
     @inheritProtected()
     @implements Module::ScriptInterface
-
+    @include Module::ConfigurableMixin
     @module Module
 
     @public @static do: Function,

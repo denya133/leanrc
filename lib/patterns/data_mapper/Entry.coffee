@@ -33,7 +33,6 @@ module.exports = (Module)->
     @inheritProtected()
     @implements Module::RecordInterface
     @include Module::RecordMixin
-
     @module Module
 
     @attribute id: String

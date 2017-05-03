@@ -7,7 +7,6 @@ module.exports = (Module)->
 
   class DelayedJobScript extends Module::Script
     @inheritProtected()
-
     @module Module
 
     @do (aoData)->

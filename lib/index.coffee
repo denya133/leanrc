@@ -16,9 +16,13 @@ class LeanRC extends RC
   @const ROLLBACK: Symbol 'rollback' # для сигнала
   @const MIGRATIONS: Symbol 'MigrationsCollection'
   @const RESQUE: Symbol 'ResqueProxy'
+  @const START_RESQUE: Symbol 'start_resque'
   @const DELAYED_JOBS_QUEUE: 'delayed_jobs'
   @const DELAYED_JOBS_SCRIPT: 'DelayedJobScript'
   @const JOB_RESULT:  Symbol 'JOB_RESULT'
+  @const SHELL:  Symbol 'ShellApplication'
+  @const APPLICATION_MEDIATOR:  Symbol 'ApplicationMediator'
+  @const MEM_RESQUE_EXEC:  Symbol 'MemoryResqueExecutor'
 
   require('./interfaces/patterns/TransformInterface') LeanRC
   require('./interfaces/patterns/NotificationInterface') LeanRC
@@ -56,14 +60,18 @@ class LeanRC extends RC
   require('./interfaces/core/ModelInterface') LeanRC
   require('./interfaces/core/ViewInterface') LeanRC
 
+  require('./mixins/ConfigurableMixin') LeanRC #needs tests
   require('./mixins/CrudEndpointsMixin') LeanRC #needs tests
   require('./mixins/HttpCollectionMixin') LeanRC
+  require('./mixins/MemoryCollectionMixin') LeanRC #needs tests
+  require('./mixins/MemoryMigrationMixin') LeanRC #needs tests
+  require('./mixins/MemoryResqueMixin') LeanRC #needs tests
   require('./mixins/IterableMixin') LeanRC
   # require('./mixins/PipesSwitchMixin') LeanRC # empty
   require('./mixins/QueryableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
-  require('./mixins/DelayableMixin') LeanRC
+  require('./mixins/DelayableMixin') LeanRC #needs tests
 
   require('./patterns/data_mapper/Transform') LeanRC
   require('./patterns/data_mapper/StringTransform') LeanRC
@@ -83,7 +91,7 @@ class LeanRC extends RC
 
   require('./patterns/proxy/Proxy') LeanRC
   require('./patterns/proxy/Collection') LeanRC
-  require('./patterns/proxy/Configuration') LeanRC
+  require('./patterns/proxy/Configuration') LeanRC #needs update tests
   require('./patterns/proxy/Gateway') LeanRC
   require('./patterns/proxy/Renderer') LeanRC
   require('./patterns/proxy/Resource') LeanRC
@@ -92,10 +100,11 @@ class LeanRC extends RC
 
   require('./patterns/mediator/Mediator') LeanRC
   require('./patterns/mediator/Switch') LeanRC
+  require('./patterns/mediator/MemoryResqueExecutor') LeanRC #needs tests
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
-  require('./patterns/command/Stock') LeanRC #needs tests
+  require('./patterns/command/Stock') LeanRC
   require('./patterns/command/MigrateCommand') LeanRC #needs tests
   require('./patterns/command/RollbackCommand') LeanRC #needs tests
   require('./patterns/command/Script') LeanRC #needs tests

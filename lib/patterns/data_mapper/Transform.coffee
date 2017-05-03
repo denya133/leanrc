@@ -4,7 +4,6 @@ module.exports = (Module)->
   class Transform extends Module::CoreObject
     @inheritProtected()
     @implements Module::TransformInterface
-
     @module Module
 
     @public @static normalize: Function,

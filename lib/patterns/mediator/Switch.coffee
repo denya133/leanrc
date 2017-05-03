@@ -8,7 +8,7 @@ module.exports = (Module)->
   class Switch extends Module::Mediator
     @inheritProtected()
     @implements Module::SwitchInterface
-
+    @include Module::ConfigurableMixin
     @module Module
 
     @public responseFormats: Array,
@@ -105,7 +105,7 @@ module.exports = (Module)->
         queryParams = req.query
         pathPatams = req.params
         configurationProxy = @facade.retrieveProxy Module::CONFIGURATION
-        currentUserId = req.cookies[configurationProxy.configs.currentUserCookie]
+        currentUserId = req.cookies[configurationProxy.currentUserCookie]
         headers = req.headers
         body = req.body
         voMessage = {

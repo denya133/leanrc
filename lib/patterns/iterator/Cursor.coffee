@@ -8,7 +8,6 @@ module.exports = (Module)->
   class Cursor extends Module::CoreObject
     @inheritProtected()
     @implements Module::CursorInterface
-
     @module Module
 
     ipnCurrentIndex = @private currentIndex: Number,

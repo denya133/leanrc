@@ -5,7 +5,6 @@ module.exports = (Module)->
   class NumberTransform extends Module::CoreObject
     @inheritProtected()
     @implements Module::TransformInterface
-
     @module Module
 
     @public @static normalize: Function,
