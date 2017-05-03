@@ -17,7 +17,7 @@ module.exports = (Module)->
       @public @static belongsTo: Function,
         default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable}={})->
           # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
-          vsAttr = Object.keys(typeDefinition)[0]
+          [vsAttr] = Object.keys typeDefinition
           attr ?= "#{vsAttr}Id"
           refKey ?= '_key'
           @attribute "#{attr}": String
@@ -68,7 +68,7 @@ module.exports = (Module)->
 
       @public @static hasMany: Function,
         default: (typeDefinition, opts={})->
-          vsAttr = Object.keys(typeDefinition)[0]
+          [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= '_key'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
           opts.relation = 'hasMany'
@@ -97,7 +97,7 @@ module.exports = (Module)->
       @public @static hasOne: Function,
         default: (typeDefinition, opts={})->
           # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
-          vsAttr = Object.keys(typeDefinition)[0]
+          [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= '_key'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
           opts.relation = 'hasOne'

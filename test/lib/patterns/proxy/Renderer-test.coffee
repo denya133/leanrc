@@ -78,7 +78,6 @@ describe 'Renderer', ->
         assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
         yield return
     it 'should render the data with template', ->
-      ###
       co ->
         class Test extends RC::Module
           @inheritProtected()
@@ -88,16 +87,16 @@ describe 'Renderer', ->
           @inheritProtected()
           @module Test
         Test::TestRenderer.initialize()
-        data = test: 'test1', data: 'data1'
+        data = id: 1, _key: 1, test: 'test1', data: 'data1'
         renderer = Test::TestRenderer.new 'TEST_RENDERER'
         renderResult = yield renderer.render data,
           path: 'test'
           resource: 'TestRecord'
           action: 'find'
-        console.log '0000000000000', renderResult
-        # assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
+        assert.deepEqual renderResult, JSON.stringify test_records: [
+          id: 1, test: "test1", data: "data1"
+        ]
         yield return
-      ###
     it 'should render the data in customized renderer', ->
       co ->
         data = firstName: 'John', lastName: 'Doe'

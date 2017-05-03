@@ -70,7 +70,7 @@ module.exports = (Module)->
 
       @public @static attr: Function,
         default: (typeDefinition, opts={})->
-          vsAttr = Object.keys(typeDefinition)[0]
+          [vsAttr] = Object.keys typeDefinition
           vcAttrType = typeDefinition[vsAttr]
           opts.transform ?= switch vcAttrType
             when String, Date, Number, Boolean
@@ -106,7 +106,7 @@ module.exports = (Module)->
         default: (typeDefinition, ..., opts)->
           if typeDefinition is opts
             typeDefinition = "#{opts.attr}": opts.attrType
-          vsAttr = Object.keys(typeDefinition)[0]
+          [vsAttr] = Object.keys typeDefinition
           unless opts.get?
             return throw new Error '`lambda` options is required'
           if @computeds[vsAttr]?

@@ -35,7 +35,7 @@ module.exports = (Module)->
         @facade.retrieveProxy @collectionName
 
     @public queryParams: Object
-    @public pathPatams: Object
+    @public pathParams: Object
     @public currentUserId: String
     @public headers: Object
     @public body: Object
@@ -45,26 +45,20 @@ module.exports = (Module)->
     @public recordBody: Object
 
     @public @static actions: Object,
-      default: {}
-      get: (__actions)->
-        fromSuper = if @__super__?
-          @__super__.constructor.actions
-        __actions[@name] ?= do =>
-          Module::Utils.extend []
-          , (fromSuper ? [])
-          , (@["_#{@name}_actions"] ? [])
-        __actions[@name]
+      get: -> @metaObject.getGroup 'actions'
 
     @public @static action: Function,
       default: (nameDefinition, config)->
         [actionName] = Object.keys nameDefinition
-        @["_#{@name}_actions"] ?= []
-        @["_#{@name}_actions"].push actionName
+        if nameDefinition.attr? and not config?
+          @metaObject.addMetaData 'actions', nameDefinition.attr, nameDefinition
+        else
+          @metaObject.addMetaData 'actions', actionName, config
         @public arguments...
 
     @action @async list: Function,
       default: ->
-        vlItems = (yield @collection.query @query).toArray()
+        vlItems = yield (yield @collection.query @query).toArray()
         return {
           meta:
             pagination:
@@ -93,19 +87,21 @@ module.exports = (Module)->
     @action @async bulkUpdate: Function,
       default: ->
         cursor = yield @collection.query @query
-        cursor.forEach (aoRecord)-> yield aoRecord.updateAttributes @recordBody
+        body = @recordBody
+        yield cursor.forEach (aoRecord) -> yield aoRecord.updateAttributes body
         return yes
 
     @action @async bulkPatch: Function,
       default: ->
         cursor = yield @collection.query @query
-        cursor.forEach (aoRecord)-> yield aoRecord.updateAttributes @recordBody
+        body = @recordBody
+        yield cursor.forEach (aoRecord) -> yield aoRecord.updateAttributes body
         return yes
 
     @action @async bulkDelete: Function,
       default: ->
         cursor = yield @collection.query @query
-        cursor.forEach (aoRecord)-> yield aoRecord.destroy()
+        yield cursor.forEach (aoRecord) -> yield aoRecord.destroy()
         return yes
 
 
@@ -115,21 +111,18 @@ module.exports = (Module)->
       'bulkUpdate', 'bulkPatch', 'bulkDelete'
     ]
 
-    @beforeHook 'beforeAction'
+    @beforeHook 'beforeActionHook'
 
     @beforeHook 'parseQuery', only: ['list', 'bulkUpdate', 'bulkPatch', 'bulkDelete']
     @beforeHook 'parsePathParams', only: ['detail', 'update', 'delete']
-    @beforeHook 'parseBody', only: ['create', 'bulkUpdate', 'bulkPatch']
+    @beforeHook 'parseBody', only: ['create', 'update', 'bulkUpdate', 'bulkPatch']
     @beforeHook 'beforeUpdate', only: ['update']
 
-    @public beforeAction: Function,
+    @public beforeActionHook: Function,
       args: [Object]
       return: NILL
       default: (args...)->
-        [{queryParams, pathPatams, currentUserId, headers, body }] = args
-        {
-          @queryParams, @pathPatams, @currentUserId, @headers, @body
-        } = {queryParams, pathPatams, currentUserId, headers, body }
+        [{ @queryParams, @pathParams, @currentUserId, @headers, @body }] = args
         return args
 
     @public parseQuery: Function,
@@ -160,13 +153,14 @@ module.exports = (Module)->
         @recordBody = Module::Utils.extend {}, @recordBody, id: @recordId
         return args
 
-    @public execute: Function,
+    @public @async execute: Function,
+      args: [Module::NotificationInterface]
+      return: Module::NILL
       default: (aoNotification)->
-        Module::Utils.co =>
-          voBody = aoNotification.getBody()
-          voResult = yield @[aoNotification.getType()]? voBody
-          @sendNotification Module::HANDLER_RESULT, voResult, voBody.reverse
-        return
+        voBody = aoNotification.getBody()
+        voResult = yield @[aoNotification.getType()]? voBody
+        @sendNotification Module::HANDLER_RESULT, voResult, voBody.reverse
+        yield return
 
 
   Stock.initialize()
