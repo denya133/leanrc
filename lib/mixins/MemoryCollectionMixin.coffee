@@ -11,15 +11,19 @@ module.exports = (Module)->
 
       ipoCollection = @protected collection: Object
 
-      @public @async onRegister: Function,
+      @public onRegister: Function,
         default: (args...)->
           @super args...
           @[ipoCollection] = {}
           return
 
+      @public generateId: Function,
+        default: -> Module::Utils.uuid.v4()
+
       @public @async push: Function,
         default: (aoRecord)->
           vsKey = aoRecord.id
+          return no  unless vsKey?
           @[ipoCollection][vsKey] = @serializer.serialize aoRecord
           yield return yes
 

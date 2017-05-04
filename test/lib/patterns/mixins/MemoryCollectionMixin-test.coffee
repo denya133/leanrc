@@ -13,18 +13,16 @@ describe 'MemoryCollectionMixin', ->
         Test.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
           @include LeanRC::MemoryCollectionMixin
           @Module: Test
         Test::MemoryCollection.initialize()
         collection = Test::MemoryCollection.new()
         assert.instanceOf collection, Test::MemoryCollection
         yield return
-  ###
   describe '#push', ->
     it 'should put data into collection', ->
       co ->
-        KEY = 'FACADE_TEST_MEMORY_COLLECTION_002'
+        KEY = 'FACADE_TEST_MEMORY_COLLECTION_001'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -40,24 +38,22 @@ describe 'MemoryCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
           @include LeanRC::MemoryCollectionMixin
-          @Module: Test
-          @public host: String, { default: 'http://localhost:8000' }
-          @public namespace: String, { default: 'v1' }
+          @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
           serializer: LeanRC::Serializer
         collection = facade.retrieveProxy KEY
         spyPush = sinon.spy collection, 'push'
-        spyQuery = sinon.spy collection, 'query'
         assert.instanceOf collection, Test::MemoryCollection
-        record = yield collection.create test: 'test1'
+        record = Test::TestRecord.new test: 'test1', collection
+        record._key = collection.generateId()
+        yield collection.push record
         assert.equal record, spyPush.args[0][0]
-        assert.equal spyQuery.args[0][0].$insert, record
-        assert.equal spyQuery.args[0][0].$into, collection.collectionFullName()
+        assert.deepEqual record.toJSON(), collection[Symbol.for '~collection'][record.id]
         yield return
+  ###
   describe '#remove', ->
     it 'should remove data from collection', ->
       co ->
@@ -77,11 +73,8 @@ describe 'MemoryCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
           @include LeanRC::MemoryCollectionMixin
           @Module: Test
-          @public host: String, { default: 'http://localhost:8000' }
-          @public namespace: String, { default: 'v1' }
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -89,7 +82,6 @@ describe 'MemoryCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, Test::MemoryCollection
         record = yield collection.create test: 'test1'
-        spyQuery = sinon.spy collection, 'query'
         yield record.destroy()
         assert.deepEqual spyQuery.args[1][0].$forIn, { '@doc': 'test_test_records' }
         assert.deepEqual spyQuery.args[1][0].$filter, { '@doc._key': { '$eq': record.id } }
@@ -114,11 +106,8 @@ describe 'MemoryCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
           @include LeanRC::MemoryCollectionMixin
           @Module: Test
-          @public host: String, { default: 'http://localhost:8000' }
-          @public namespace: String, { default: 'v1' }
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -150,11 +139,8 @@ describe 'MemoryCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
           @include LeanRC::MemoryCollectionMixin
           @Module: Test
-          @public host: String, { default: 'http://localhost:8000' }
-          @public namespace: String, { default: 'v1' }
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -191,11 +177,8 @@ describe 'MemoryCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
           @include LeanRC::MemoryCollectionMixin
           @Module: Test
-          @public host: String, { default: 'http://localhost:8000' }
-          @public namespace: String, { default: 'v1' }
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -232,11 +215,8 @@ describe 'MemoryCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
           @include LeanRC::MemoryCollectionMixin
           @Module: Test
-          @public host: String, { default: 'http://localhost:8000' }
-          @public namespace: String, { default: 'v1' }
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -269,11 +249,8 @@ describe 'MemoryCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
           @include LeanRC::MemoryCollectionMixin
           @Module: Test
-          @public host: String, { default: 'http://localhost:8000' }
-          @public namespace: String, { default: 'v1' }
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -306,11 +283,8 @@ describe 'MemoryCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
           @include LeanRC::MemoryCollectionMixin
           @Module: Test
-          @public host: String, { default: 'http://localhost:8000' }
-          @public namespace: String, { default: 'v1' }
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -341,11 +315,8 @@ describe 'MemoryCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
           @include LeanRC::MemoryCollectionMixin
           @Module: Test
-          @public host: String, { default: 'http://localhost:8000' }
-          @public namespace: String, { default: 'v1' }
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
