@@ -104,6 +104,48 @@ describe 'Record', ->
         updated = yield record.save()
         newUpdatedAt = record.updatedAt
         assert.notEqual oldUpdatedAt, newUpdatedAt, 'Record not updated'
+  describe '#beforeCreate', ->
+    it 'should be called before create', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+        Test.initialize()
+
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+        Test::TestRecord.initialize()
+        class Test::TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @module Test
+          @public delegate: RC::Class,
+            default: Test::TestRecord
+          @public data: Array,
+            default: []
+          @public generateId: Function,
+            default: -> LeanRC::Utils.uuid.v4()
+          @public @async push: Function,
+            default: (record) ->
+              # record._key ?= RC::Utils.uuid.v4()
+              @data.push record
+              yield return
+          @public @async patch: Function,
+            default: (query, item) ->
+              { '@doc._key': { '$eq': id }} = query
+              record = yield @find id
+              record[key] = value  for own key, value of item
+              yield return record?
+          @public @async take: Function,
+            default: (id) ->
+              yield RC::Promise.resolve _.find @data, { id }
+        Test::TestCollection.initialize()
+        collection = Test::TestCollection.new 'TEST_COLLECTION_03'
+        facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_02'
+        facade.registerProxy collection
+        record = collection.build()
+        assert.isUndefined record.id
+        yield record.save()
+        assert.isDefined record.id
   describe '#afterUpdate', ->
     it 'should be called after update', ->
       co ->

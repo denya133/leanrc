@@ -61,6 +61,7 @@ module.exports = (Module)->
     @chains ['create', 'update', 'delete', 'destroy']
 
     @beforeHook 'beforeUpdate', only: ['update']
+    @beforeHook 'beforeCreate', only: ['create']
 
     @afterHook 'afterUpdate', only: ['update']
     @afterHook 'afterCreate', only: ['create']
@@ -86,6 +87,13 @@ module.exports = (Module)->
       return: NILL
       default: ->
         @updatedAt = new Date().toISOString()
+        yield return
+
+    @public @async beforeCreate: Function,
+      args: []
+      return: NILL
+      default: ->
+        @_key ?= @collection.generateId()
         yield return
 
     @public @async afterUpdate: Function,
