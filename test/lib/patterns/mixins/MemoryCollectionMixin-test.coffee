@@ -118,7 +118,6 @@ describe 'MemoryCollectionMixin', ->
         for attribute in Test::TestRecord.attributes
           assert.equal record[attribute], recordDuplicate[attribute]
         yield return
-  ###
   describe '#takeMany', ->
     it 'should get data items by id list from collection', ->
       co ->
@@ -157,6 +156,7 @@ describe 'MemoryCollectionMixin', ->
           for attribute in Test::TestRecord.attributes
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
         yield return
+  ###
   describe '#takeAll', ->
     it 'should get all data items from collection', ->
       co ->
