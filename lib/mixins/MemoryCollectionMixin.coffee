@@ -61,7 +61,7 @@ module.exports = (Module)->
 
       @public @async length: Function,
         default: ->
-          yield return Object.keys(@[ipoCollection]).length()
+          yield return Object.keys(@[ipoCollection]).length
 
 
     MemoryCollectionMixin.initializeMixin()

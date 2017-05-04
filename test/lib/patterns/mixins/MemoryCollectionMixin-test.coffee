@@ -299,11 +299,10 @@ describe 'MemoryCollectionMixin', ->
         includes = yield collection.includes record.id
         assert.isTrue includes
         yield return
-  ###
   describe '#length', ->
     it 'should count items in the collection', ->
       co ->
-        KEY = 'FACADE_TEST_MEMORY_COLLECTION_010'
+        KEY = 'FACADE_TEST_MEMORY_COLLECTION_009'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -333,4 +332,3 @@ describe 'MemoryCollectionMixin', ->
         length = yield collection.length()
         assert.equal count, length
         yield return
-  ###
