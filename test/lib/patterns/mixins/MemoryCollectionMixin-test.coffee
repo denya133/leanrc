@@ -56,7 +56,7 @@ describe 'MemoryCollectionMixin', ->
   describe '#remove', ->
     it 'should remove data from collection', ->
       co ->
-        KEY = 'FACADE_TEST_MEMORY_COLLECTION_003'
+        KEY = 'FACADE_TEST_MEMORY_COLLECTION_002'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -88,7 +88,7 @@ describe 'MemoryCollectionMixin', ->
   describe '#take', ->
     it 'should get data item by id from collection', ->
       co ->
-        KEY = 'FACADE_TEST_MEMORY_COLLECTION_004'
+        KEY = 'FACADE_TEST_MEMORY_COLLECTION_003'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -121,7 +121,7 @@ describe 'MemoryCollectionMixin', ->
   describe '#takeMany', ->
     it 'should get data items by id list from collection', ->
       co ->
-        KEY = 'FACADE_TEST_MEMORY_COLLECTION_005'
+        KEY = 'FACADE_TEST_MEMORY_COLLECTION_004'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -159,7 +159,7 @@ describe 'MemoryCollectionMixin', ->
   describe '#takeAll', ->
     it 'should get all data items from collection', ->
       co ->
-        KEY = 'FACADE_TEST_MEMORY_COLLECTION_006'
+        KEY = 'FACADE_TEST_MEMORY_COLLECTION_005'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -196,7 +196,7 @@ describe 'MemoryCollectionMixin', ->
   describe '#override', ->
     it 'should replace data item by id in collection', ->
       co ->
-        KEY = 'FACADE_TEST_MEMORY_COLLECTION_007'
+        KEY = 'FACADE_TEST_MEMORY_COLLECTION_006'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -230,11 +230,10 @@ describe 'MemoryCollectionMixin', ->
         assert.propertyVal record, 'test', 'test1'
         assert.propertyVal updatedRecord, 'test', 'test2'
         yield return
-  ###
   describe '#patch', ->
     it 'should update data item by id in collection', ->
       co ->
-        KEY = 'FACADE_TEST_MEMORY_COLLECTION_008'
+        KEY = 'FACADE_TEST_MEMORY_COLLECTION_007'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -259,12 +258,16 @@ describe 'MemoryCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, Test::MemoryCollection
         record = yield collection.create test: 'test1'
-        updatedRecord = yield collection.patch record.id, collection.build test: 'test2'
+        raw = collection.build
+          _key: record.id
+          test: 'test2'
+        updatedRecord = yield (yield collection.patch record.id, raw).first()
         assert.isDefined updatedRecord
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'
         assert.propertyVal updatedRecord, 'test', 'test2'
         yield return
+  ###
   describe '#includes', ->
     it 'should test if item is included in the collection', ->
       co ->
