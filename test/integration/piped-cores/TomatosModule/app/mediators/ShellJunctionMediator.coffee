@@ -1,12 +1,27 @@
-RC      = require 'RC'
-LeanRC  = require 'LeanRC'
+
 
 # это медиатор, для ораганизации пайпов между Core и сторонними ядрами-клиентами чтобы обмениваться данными со сторонними (отдельно запущенными) микросервисами.
 
 module.exports = (Module) ->
-  class Module::ShellJunctionMediator extends LeanRC::JunctionMediator
+  {
+    Pipes
+    ApplicationFacade
+  } = Module::
+  {
+    JunctionMediator
+    PipeAwareModule
+    Pipe
+    TeeMerge
+    TeeSplit
+    Junction
+  } = Pipes::
+
+  class ShellJunctionMediator extends JunctionMediator
     @inheritProtected()
-    @Module: Module
+    @module Module
+
+    @public @static NAME: String,
+      default: 'TomatosShellJunctionMediator'
 
     @public @static CONSOLE_MEDIATOR: String,
       default: 'consoleMediator'
@@ -38,13 +53,13 @@ module.exports = (Module) ->
 
             # Connect a module's STDSHELL to the shell's STDIN
             var module = note.getBody()
-            var moduleToShell = LeanRC::Pipe.new()
+            var moduleToShell = Pipe.new()
             module.acceptOutputPipe(PipeAwareModule.STDSHELL, moduleToShell)
             var shellIn = junction.retrievePipe(PipeAwareModule.STDIN)
             shellIn.connectInput(moduleToShell)
 
             # Connect the shell's STDOUT to the module's STDIN
-            var shellToModule = LeanRC::Pipe.new()
+            var shellToModule = Pipe.new()
             module.acceptInputPipe(PipeAwareModule.STDIN, shellToModule)
             var shellOut = junction.retrievePipe(PipeAwareModule.STDOUT)
             shellOut.connect(shellToModule)
@@ -71,18 +86,19 @@ module.exports = (Module) ->
     @public onRegister: Function,
       default: ->
         # The STDOUT pipe from the shell to all modules
-        junction.registerPipe( PipeAwareModule.STDOUT,  LeanRC::Junction.OUTPUT, LeanRC::TeeSplit.new() )
+        junction.registerPipe( PipeAwareModule.STDOUT,  Junction.OUTPUT, TeeSplit.new() )
 
         # The STDIN pipe to the shell from all modules
-        junction.registerPipe( PipeAwareModule.STDIN,  LeanRC::Junction.INPUT, LeanRC::TeeMerge.new() )
+        junction.registerPipe( PipeAwareModule.STDIN,  Junction.INPUT, TeeMerge.new() )
         junction.addPipeListener( PipeAwareModule.STDIN, this, handlePipeMessage )
 
         # The STDLOG pipe from the shell to the logger
-        junction.registerPipe( PipeAwareModule.STDLOG, LeanRC::Junction.OUTPUT, LeanRC::Pipe.new() )
+        junction.registerPipe( PipeAwareModule.STDLOG, Junction.OUTPUT, Pipe.new() )
         sendNotification(ApplicationFacade.CONNECT_SHELL_TO_LOGGER, junction )
 
-    constructor: ->
-      super 'ShellJunctionMediator', LeanRC::Junction.new()
+    @public init: Function,
+      default: ->
+        @super ShellJunctionMediator.NAME, Junction.new()
 
 
-  Module::ShellJunctionMediator.initialize()
+  ShellJunctionMediator.initialize()

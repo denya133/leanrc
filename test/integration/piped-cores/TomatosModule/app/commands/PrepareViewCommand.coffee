@@ -1,16 +1,23 @@
-RC      = require 'RC'
-LeanRC  = require 'LeanRC'
+
 
 module.exports = (Module) ->
-  class Module::PrepareViewCommand extends LeanRC::SimpleCommand
+  {
+    APPLICATION_MEDIATOR
+
+    SimpleCommand
+    ApplicationMediator
+    ShellJunctionMediator
+  } = Module::
+
+  class PrepareViewCommand extends SimpleCommand
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public execute: Function,
       default: (aoNotification)->
         voApplication = aoNotification.getBody()
-        @facade.registerMediator Module::ApplicationMediator.new 'ApplicationMediator', voApplication
-        @facade.registerMediator Module::ShellJunctionMediator.new()
+        @facade.registerMediator ApplicationMediator.new APPLICATION_MEDIATOR, voApplication
+        @facade.registerMediator ShellJunctionMediator.new()
 
 
-  Module::PrepareViewCommand.initialize()
+  PrepareViewCommand.initialize()

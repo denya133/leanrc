@@ -20,12 +20,11 @@ class TomatosSchema extends Tomatos
   require('./proxies/BaseConfiguration') @Module
   require('./proxies/BaseCollection') @Module
   require('./proxies/BaseResque') @Module
-
-  # ... здесь надо рекваить все миграции
+  require('./proxies/MigrationsCollection') @Module
 
   require('./ApplicationFacade') @Module
 
-  require('./Application') @Module
+  require('./SchemaApplication') @Module
 
 
 module.exports = TomatosSchema.initialize().freeze()

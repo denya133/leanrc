@@ -1,10 +1,16 @@
-RC      = require 'RC'
-LeanRC  = require 'LeanRC'
+
 
 module.exports = (Module) ->
-  class Module::ApplicationFacade extends LeanRC::Facade
+  {
+    STARTUP
+
+    Facade
+    StartupCommand
+  } = Module::
+
+  class ApplicationFacade extends Facade
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     vpbIsInitialized = @private isInitialized: Boolean,
       default: no
@@ -14,21 +20,21 @@ module.exports = (Module) ->
     @protected initializeController: Function,
       default: (args...)->
         @super args...
-        @registerCommand Module::Constants.STARTUP, Module::StartupCommand
+        @registerCommand STARTUP, StartupCommand
         # ... здесь могут быть регистрации и других команд
 
     @public startup: Function,
       default: (aoApplication)->
         unless @[vpbIsInitialized]
           @[vpbIsInitialized] = yes
-          @sendNotification Module::Constants.STARTUP, aoApplication
+          @sendNotification STARTUP, aoApplication
 
     @public @static getInstance: Function,
       default: (asKey)->
-        vhInstanceMap = LeanRC::Facade[cphInstanceMap]
+        vhInstanceMap = Facade[cphInstanceMap]
         unless vhInstanceMap[asKey]?
-          vhInstanceMap[asKey] = Module::ApplicationFacade.new asKey
+          vhInstanceMap[asKey] = ApplicationFacade.new asKey
         vhInstanceMap[asKey]
 
 
-  Module::ApplicationFacade.initialize()
+  ApplicationFacade.initialize()
