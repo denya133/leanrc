@@ -12,12 +12,13 @@ module.exports = (Module)->
       default: (aoInput)->
         aoInput.connect @
 
-    constructor: (input1=null, input2=null)->
-      super arguments...
-      if input1?
-        @connectInput input1
-      if input2?
-        @connectInput input2
+    @public init: Function,
+      default: (input1=null, input2=null)->
+        @super arguments...
+        if input1?
+          @connectInput input1
+        if input2?
+          @connectInput input2
 
 
   TeeMerge.initialize()

@@ -64,7 +64,7 @@ module.exports = (Module)->
       return: String
       default: (queueName)-> @[ipoResque].fullQueueName queueName
 
-    ipsMultitonKey = Symbol.for 'multitonKey'
+    ipsMultitonKey = Symbol.for '~multitonKey'
     ipoTimer = @private timer: Object
     ipbIsStopped = @private isStopped: Boolean
     ipoDefinedProcessors = @private definedProcessors: Object

@@ -4,12 +4,24 @@ LeanRC  = require 'LeanRC'
 handleAnimateRobot = null
 
 module.exports = (Module) ->
-  class Module::CoreMediator extends LeanRC::JunctionMediator
+  {
+    Pipes
+  } = Module::
+  {
+    JunctionMediator
+    Junction
+    PipeAwareModule
+    TeeMerge
+    Filter
+    PipeListener
+  } = Pipes::
+
+  class HttpClientJunctionMediator extends JunctionMediator
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public @static NAME: String,
-      default: 'GroupsCoreJunctionMediator'
+      default: 'TomatosHttpClientJunctionMediator'
 
     @public listNotificationInterests: Function,
       default: (args...)->
@@ -20,11 +32,11 @@ module.exports = (Module) ->
     @public handleNotification: Function,
       default: (aoNotification)->
         switch aoNotification.getName()
-          when LeanRC::JunctionMediator.ACCEPT_INPUT_PIPE
+          when JunctionMediator.ACCEPT_INPUT_PIPE
             name = aoNotification.getType()
-            if name is LeanRC::PipeAwareModule.STDIN
+            if name is PipeAwareModule.STDIN
               pipe = aoNotification.getBody()
-              tee = junction.retrievePipe LeanRC::PipeAwareModule.STDIN
+              tee = junction.retrievePipe PipeAwareModule.STDIN
               tee.connectInput pipe
             else
               @super aoNotification
@@ -38,15 +50,16 @@ module.exports = (Module) ->
 
     @public onRegister: Function,
       default: ->
-        teeMerge = LeanRC::TeeMerge.new()
-        filter = LeanRC::Filter.new LogFilterMessage.LOG_FILTER_NAME, null, LogFilterMessage.filterLogByLevel
-        filter.connect LeanRC::PipeListener.new @, @handlePipeMessage
+        teeMerge = TeeMerge.new()
+        filter = Filter.new LogFilterMessage.LOG_FILTER_NAME, null, LogFilterMessage.filterLogByLevel
+        filter.connect PipeListener.new @, @handlePipeMessage
         teeMerge.connect filter
-        junction.registerPipe LeanRC::PipeAwareModule.STDIN, LeanRC::Junction.INPUT, teeMerge
+        junction.registerPipe PipeAwareModule.STDIN, Junction.INPUT, teeMerge
         return
 
-    constructor: ->
-      super @constructor.NAME, LeanRC::Junction.new()
+    @public init: Function,
+      default: ->
+        @super HttpClientJunctionMediator.NAME, Junction.new()
 
 
-  Module::CoreMediator.initialize()
+  HttpClientJunctionMediator.initialize()

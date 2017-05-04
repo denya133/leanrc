@@ -12,7 +12,7 @@ module.exports = (Module)->
     @public init: Function,
       default: (args...)->
         @super args...
-        facade = @constructor.Module::ApplicationFacade.getInstance @constructor.Module::Application.NAME
+        facade = @constructor.Module::ApplicationFacade.getInstance @constructor.NAME
         facade.startup @
 
 

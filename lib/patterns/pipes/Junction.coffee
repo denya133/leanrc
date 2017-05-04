@@ -101,12 +101,13 @@ module.exports = (Module)->
           vbSuccess = pipe.write message
         vbSuccess
 
-    constructor: (args...) ->
-      super args...
-      @[iplInputPipes] = []
-      @[iplOutputPipes] = []
-      @[iplPipesMap] = {}
-      @[iplPipeTypesMap] = {}
+    @public init: Function,
+      default: (args...) ->
+        @super args...
+        @[iplInputPipes] = []
+        @[iplOutputPipes] = []
+        @[iplPipesMap] = {}
+        @[iplPipeTypesMap] = {}
 
 
   Junction.initialize()
