@@ -156,7 +156,6 @@ describe 'MemoryCollectionMixin', ->
           for attribute in Test::TestRecord.attributes
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
         yield return
-  ###
   describe '#takeAll', ->
     it 'should get all data items from collection', ->
       co ->
@@ -187,7 +186,6 @@ describe 'MemoryCollectionMixin', ->
         originalRecords = []
         for i in [ 1 .. 5 ]
           originalRecords.push yield collection.create test: 'test1'
-        ids = originalRecords.map (item) -> item.id
         recordDuplicates = yield (yield collection.takeAll()).toArray()
         assert.equal originalRecords.length, recordDuplicates.length
         count = originalRecords.length
@@ -195,6 +193,7 @@ describe 'MemoryCollectionMixin', ->
           for attribute in Test::TestRecord.attributes
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
         yield return
+  ###
   describe '#override', ->
     it 'should replace data item by id in collection', ->
       co ->
