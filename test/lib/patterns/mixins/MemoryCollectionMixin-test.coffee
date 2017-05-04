@@ -14,7 +14,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
-          @Module: Test
+          @module Test
         Test::MemoryCollection.initialize()
         collection = Test::MemoryCollection.new()
         assert.instanceOf collection, Test::MemoryCollection
@@ -29,7 +29,7 @@ describe 'MemoryCollectionMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @public init: Function,
             default: ->
@@ -53,7 +53,6 @@ describe 'MemoryCollectionMixin', ->
         assert.equal record, spyPush.args[0][0]
         assert.deepEqual record.toJSON(), collection[Symbol.for '~collection'][record.id]
         yield return
-  ###
   describe '#remove', ->
     it 'should remove data from collection', ->
       co ->
@@ -64,7 +63,7 @@ describe 'MemoryCollectionMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @public init: Function,
             default: ->
@@ -74,7 +73,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
-          @Module: Test
+          @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -82,11 +81,11 @@ describe 'MemoryCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, Test::MemoryCollection
         record = yield collection.create test: 'test1'
+        assert.deepEqual record.toJSON(), collection[Symbol.for '~collection'][record.id]
         yield record.destroy()
-        assert.deepEqual spyQuery.args[1][0].$forIn, { '@doc': 'test_test_records' }
-        assert.deepEqual spyQuery.args[1][0].$filter, { '@doc._key': { '$eq': record.id } }
-        assert.isTrue spyQuery.args[1][0].$remove
+        assert.isUndefined collection[Symbol.for '~collection'][record.id]
         yield return
+  ###
   describe '#take', ->
     it 'should get data item by id from collection', ->
       co ->
@@ -97,7 +96,7 @@ describe 'MemoryCollectionMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @public init: Function,
             default: ->
@@ -107,7 +106,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
-          @Module: Test
+          @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -130,7 +129,7 @@ describe 'MemoryCollectionMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @public init: Function,
             default: ->
@@ -140,7 +139,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
-          @Module: Test
+          @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -168,7 +167,7 @@ describe 'MemoryCollectionMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @public init: Function,
             default: ->
@@ -178,7 +177,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
-          @Module: Test
+          @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -206,7 +205,7 @@ describe 'MemoryCollectionMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @public init: Function,
             default: ->
@@ -216,7 +215,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
-          @Module: Test
+          @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -240,7 +239,7 @@ describe 'MemoryCollectionMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @public init: Function,
             default: ->
@@ -250,7 +249,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
-          @Module: Test
+          @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -274,7 +273,7 @@ describe 'MemoryCollectionMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @public init: Function,
             default: ->
@@ -284,7 +283,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
-          @Module: Test
+          @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
@@ -306,7 +305,7 @@ describe 'MemoryCollectionMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute test: String
           @public init: Function,
             default: ->
@@ -316,7 +315,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
-          @Module: Test
+          @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
           delegate: Test::TestRecord
