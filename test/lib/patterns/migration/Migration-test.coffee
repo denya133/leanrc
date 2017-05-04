@@ -398,3 +398,21 @@ describe 'Migration', ->
         assert.equal spyCreateCollection.args[0][0], 'TEST_COLLECTION'
         assert.equal spyRemoveField.args[0][0], 'TEST_FIELD'
         yield return
+  describe '.up', ->
+    it 'should replace forward stepping caller', ->
+      co ->
+        spyUp = sinon.spy -> yield return
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::BaseMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+          @up spyUp
+        Test::BaseMigration.initialize()
+        migration = Test::BaseMigration.new()
+        assert.isFalse spyUp.called
+        yield migration.up()
+        assert.isTrue spyUp.called
+        yield return
