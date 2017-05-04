@@ -332,7 +332,7 @@ describe 'Migration', ->
         assert.isTrue spyChange.called
         yield return
   describe '#up', ->
-    it 'should steps in forward direction', ->
+    it 'should run steps in forward direction', ->
       co ->
         spyReversibleUp = sinon.spy -> yield return
         spyCreateCollection = sinon.spy -> yield return
@@ -363,7 +363,7 @@ describe 'Migration', ->
         assert.equal spyAddField.args[0][0], 'TEST_FIELD'
         yield return
   describe '#down', ->
-    it 'should steps in backward direction', ->
+    it 'should run steps in backward direction', ->
       co ->
         spyReversibleDown = sinon.spy -> yield return
         spyCreateCollection = sinon.spy -> yield return
@@ -415,4 +415,22 @@ describe 'Migration', ->
         assert.isFalse spyUp.called
         yield migration.up()
         assert.isTrue spyUp.called
+        yield return
+  describe '.down', ->
+    it 'should replace forward stepping caller', ->
+      co ->
+        spyDown = sinon.spy -> yield return
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::BaseMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+          @down spyDown
+        Test::BaseMigration.initialize()
+        migration = Test::BaseMigration.new()
+        assert.isFalse spyDown.called
+        yield migration.down()
+        assert.isTrue spyDown.called
         yield return
