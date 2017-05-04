@@ -34,26 +34,26 @@ module.exports = (Module)->
 
       @public @async take: Function,
         default: (id)->
-          yield return Module::Cursor.new @delegate, [@[ipoCollection][id]]
+          yield return Module::Cursor.new @, [@[ipoCollection][id]]
 
       @public @async takeMany: Function,
         default: (ids)->
-          yield return Module::Cursor.new @delegate, ids.map (id)=>
+          yield return Module::Cursor.new @, ids.map (id)=>
             @[ipoCollection][id]
 
       @public @async takeAll: Function,
         default: ->
-          yield return Module::Cursor.new @delegate, _.values @[ipoCollection]
+          yield return Module::Cursor.new @, _.values @[ipoCollection]
 
       @public @async override: Function,
         default: (id, aoRecord)->
           @[ipoCollection][id] = @serializer.serialize aoRecord
-          yield return Module::Cursor.new @delegate, [@[ipoCollection][id]]
+          yield return Module::Cursor.new @, [@[ipoCollection][id]]
 
       @public @async patch: Function,
         default: (id, aoRecord)->
           @[ipoCollection][id] = @serializer.serialize aoRecord
-          yield return Module::Cursor.new @delegate, [@[ipoCollection][id]]
+          yield return Module::Cursor.new @, [@[ipoCollection][id]]
 
       @public @async includes: Function,
         default: (id)->

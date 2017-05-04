@@ -193,7 +193,6 @@ describe 'MemoryCollectionMixin', ->
           for attribute in Test::TestRecord.attributes
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
         yield return
-  ###
   describe '#override', ->
     it 'should replace data item by id in collection', ->
       co ->
@@ -222,12 +221,16 @@ describe 'MemoryCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, Test::MemoryCollection
         record = yield collection.create test: 'test1'
-        updatedRecord = yield collection.override record.id, collection.build test: 'test2'
+        raw = collection.build
+          _key: record.id
+          test: 'test2'
+        updatedRecord = yield (yield collection.override record.id, raw).first()
         assert.isDefined updatedRecord
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'
         assert.propertyVal updatedRecord, 'test', 'test2'
         yield return
+  ###
   describe '#patch', ->
     it 'should update data item by id in collection', ->
       co ->
