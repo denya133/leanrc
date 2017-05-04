@@ -85,7 +85,6 @@ describe 'MemoryCollectionMixin', ->
         yield record.destroy()
         assert.isUndefined collection[Symbol.for '~collection'][record.id]
         yield return
-  ###
   describe '#take', ->
     it 'should get data item by id from collection', ->
       co ->
@@ -119,6 +118,7 @@ describe 'MemoryCollectionMixin', ->
         for attribute in Test::TestRecord.attributes
           assert.equal record[attribute], recordDuplicate[attribute]
         yield return
+  ###
   describe '#takeMany', ->
     it 'should get data items by id list from collection', ->
       co ->
