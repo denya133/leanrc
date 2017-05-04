@@ -331,3 +331,34 @@ describe 'Migration', ->
         Test::BaseMigration.change spyChange
         assert.isTrue spyChange.called
         yield return
+  describe '#up', ->
+    it 'should steps in forward direction', ->
+      co ->
+        spyReversibleUp = sinon.spy -> yield return
+        spyCreateCollection = sinon.spy -> yield return
+        spyAddField = sinon.spy -> yield return
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::BaseMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+          @reversible ({ up, down }) ->
+            yield up spyReversibleUp
+            yield @createCollection 'TEST_COLLECTION'
+            yield return
+          @addField 'TEST_FIELD'
+          @public @async createCollection: Function,
+            default: spyCreateCollection
+          @public @async addField: Function,
+            default: spyAddField
+        Test::BaseMigration.initialize()
+        migration = Test::BaseMigration.new()
+        yield migration.up()
+        assert.isTrue spyReversibleUp.called
+        assert.isTrue spyCreateCollection.calledAfter spyReversibleUp
+        assert.isTrue spyAddField.calledAfter spyCreateCollection
+        assert.equal spyCreateCollection.args[0][0], 'TEST_COLLECTION'
+        assert.equal spyAddField.args[0][0], 'TEST_FIELD'
+        yield return
