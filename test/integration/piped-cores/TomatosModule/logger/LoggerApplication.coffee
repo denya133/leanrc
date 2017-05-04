@@ -3,15 +3,14 @@
 module.exports = (Module) ->
   {
     ApplicationFacade
-    Application
   } = Module::
 
-  class CoreApplication extends Application
+  class LoggerApplication extends Application
     @inheritProtected()
     @module Module
 
     @public @static NAME: String,
-      default: 'TomatosCore'
+      default: 'Logger'
 
 
-  CoreApplication.initialize()
+  LoggerApplication.initialize()

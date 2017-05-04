@@ -1,7 +1,8 @@
-RC      = require 'RC'
-LeanRC  = require 'LeanRC'
-
-handleAnimateRobot = null
+Logger = require '../../logger'
+{
+  LogMessage
+  LogFilterMessage
+} = Logger::
 
 module.exports = (Module) ->
   {
@@ -14,11 +15,30 @@ module.exports = (Module) ->
     TeeMerge
     Filter
     PipeListener
+    FilterControlMessage
   } = Pipes::
+  {
+    SET_PARAMS
+  } = FilterControlMessage
+  {
+    STDLOG
+  } = PipeAwareModule
+  {
+    SEND_TO_LOG
+    LEVELS
+    DEBUG
+    ERROR
+    FATAL
+    INFO
+    WARN
+    CHANGE
+  } = LogMessage
 
   class CoreJunctionMediator extends JunctionMediator
     @inheritProtected()
     @module Module
+
+    ipoMultitonKey = Symbol.for '~multitonKey'
 
     @public @static NAME: String,
       default: 'TomatosCoreJunctionMediator'
@@ -26,35 +46,52 @@ module.exports = (Module) ->
     @public listNotificationInterests: Function,
       default: (args...)->
         interests = @super args...
-        # interests.push ApplicationFacade.EXPORT_LOG_BUTTON
+        interests.push SEND_TO_LOG
+        interests.push LogFilterMessage.SET_LOG_LEVEL
         interests
 
     @public handleNotification: Function,
-      default: (aoNotification)->
-        switch aoNotification.getName()
-          when JunctionMediator.ACCEPT_INPUT_PIPE
-            name = aoNotification.getType()
-            if name is PipeAwareModule.STDIN
-              pipe = aoNotification.getBody()
-              tee = junction.retrievePipe PipeAwareModule.STDIN
-              tee.connectInput pipe
-            else
-              @super aoNotification
+      default: (note)->
+        switch note.getName()
+          when SEND_TO_LOG
+            switch note.getType()
+              when LEVELS[DEBUG]
+                level = DEBUG
+                break
+              when LEVELS[ERROR]
+                level = ERROR
+                break
+              when LEVELS[FATAL]
+                level = FATAL
+                break
+              when LEVELS[INFO]
+                level = INFO;
+                break
+              when LEVELS[WARN]
+                level = WARN
+                break
+              else
+                level = DEBUG
+                break
+            logMessage = LogMessage.new level, @[ipoMultitonKey], note.getBody()
+            junction.sendMessage STDLOG, logMessage
+            break
+          when LogFilterMessage.SET_LOG_LEVEL
+            logLevel = note.getBody()
+            setLogLevelMessage = LogFilterMessage.new SET_PARAMS, logLevel
+
+            changedLevel = junction.sendMessage STDLOG, setLogLevelMessage
+            changedLevelMessage = LogMessage.new CHANGE, @[ipoMultitonKey], "
+              Changed Log Level to: #{LogMessage.LEVELS[logLevel]}
+            "
+            logChanged = junction.sendMessage STDLOG, changedLevelMessage
+            break
           else
-            @super aoNotification
+            @super note
 
     @public handlePipeMessage: Function,
       default: (aoMessage)->
         # ... some code
-        return
-
-    @public onRegister: Function,
-      default: ->
-        teeMerge = TeeMerge.new()
-        filter = Filter.new LogFilterMessage.LOG_FILTER_NAME, null, LogFilterMessage.filterLogByLevel
-        filter.connect PipeListener.new @, @handlePipeMessage
-        teeMerge.connect filter
-        junction.registerPipe PipeAwareModule.STDIN, Junction.INPUT, teeMerge
         return
 
     @public init: Function,

@@ -118,7 +118,6 @@ class LeanRC extends RC
   require('./patterns/iterator/Cursor') LeanRC
 
   require('./patterns/facade/Facade') LeanRC
-  require('./patterns/facade/Application') LeanRC #needs tests
 
   require('./core/View') LeanRC
   require('./core/Model') LeanRC
@@ -152,5 +151,7 @@ class Pipes extends LeanRC
 Pipes.initialize()
 
 LeanRC.const Pipes: Pipes.freeze()
+
+require('./patterns/facade/Application') LeanRC #needs tests
 
 module.exports = LeanRC.freeze()

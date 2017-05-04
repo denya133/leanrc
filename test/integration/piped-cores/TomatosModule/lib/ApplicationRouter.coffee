@@ -1,17 +1,17 @@
-RC      = require 'RC'
-LeanRC  = require 'LeanRC'
 
-module.exports = (App)->
-  class App::ApplicationRouter extends LeanRC::Router
+
+module.exports = (Module)->
+  {
+    Router
+  } = Module::
+
+  class ApplicationRouter extends Router
     @inheritProtected()
-    @Module: App
+    @module Module
 
     @map ->
       @namespace 'version', module: '', prefix: ':v', ->
-        @resource 'spaces'
-        @resource 'companies'
-        @resource 'user_companies'
-        @resource 'teams'
+        @resource 'tomatos'
 
 
-  return App::ApplicationRouter.initialize()
+  ApplicationRouter.initialize()
