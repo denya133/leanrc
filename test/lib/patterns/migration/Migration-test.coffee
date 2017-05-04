@@ -362,3 +362,39 @@ describe 'Migration', ->
         assert.equal spyCreateCollection.args[0][0], 'TEST_COLLECTION'
         assert.equal spyAddField.args[0][0], 'TEST_FIELD'
         yield return
+  describe '#down', ->
+    it 'should steps in backward direction', ->
+      co ->
+        spyReversibleDown = sinon.spy -> yield return
+        spyCreateCollection = sinon.spy -> yield return
+        spyRenameIndex = sinon.spy -> yield return
+        spyRemoveField = sinon.spy -> yield return
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::BaseMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+          @reversible ({ up, down }) ->
+            yield down spyReversibleDown
+            yield @createCollection 'TEST_COLLECTION'
+            yield return
+          @addField 'TEST_FIELD'
+          @renameIndex 'TEST_INDEX'
+          @public @async createCollection: Function,
+            default: spyCreateCollection
+          @public @async renameIndex: Function,
+            default: spyRenameIndex
+          @public @async removeField: Function,
+            default: spyRemoveField
+        Test::BaseMigration.initialize()
+        migration = Test::BaseMigration.new()
+        yield migration.down()
+        assert.isTrue spyRenameIndex.called
+        assert.isTrue spyRemoveField.calledAfter spyRenameIndex
+        assert.isTrue spyReversibleDown.calledAfter spyRemoveField
+        assert.isTrue spyCreateCollection.calledAfter spyReversibleDown
+        assert.equal spyCreateCollection.args[0][0], 'TEST_COLLECTION'
+        assert.equal spyRemoveField.args[0][0], 'TEST_FIELD'
+        yield return

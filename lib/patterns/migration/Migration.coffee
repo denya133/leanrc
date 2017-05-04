@@ -1,4 +1,5 @@
 path = require 'path'
+_ = require 'lodash'
 
 ###
 http://edgeguides.rubyonrails.org/active_record_migrations.html
@@ -375,7 +376,7 @@ module.exports = (Module)->
             [collectionName, oldName, newName] = args
             yield @[method] collectionName, newName, oldName
           else
-            yield @[Migration::REVERSE_MAP[methodName]] args...
+            yield @[Migration::REVERSE_MAP[method]] args...
         , @
         yield return
 
