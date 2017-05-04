@@ -15,6 +15,6 @@ test/lib/patterns/iterator/
 test/lib/patterns/mediator/
 test/lib/patterns/command/
 test/lib/patterns/proxy/
-test/lib/patterns/mixins/
-test/
 test/lib/patterns/migration/
+test/
+test/lib/patterns/mixins/
