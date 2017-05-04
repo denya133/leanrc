@@ -21,7 +21,7 @@ module.exports = (Module)->
         default: (collection_name, field_name, options)->
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retriveProxy collectionName
-          ipoCollection = Symbol.for 'collection'
+          ipoCollection = Symbol.for '~collection'
           if options.default?
             if _.isNumber(options.default) or _.isBoolean(options.default)
               initial = options.default
@@ -46,7 +46,7 @@ module.exports = (Module)->
         default: (collection_name, options)->
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retriveProxy collectionName
-          ipoCollection = Symbol.for 'collection'
+          ipoCollection = Symbol.for '~collection'
           for own id, doc of memCollection[ipoCollection]
             doc.createdAt ?= null
             doc.updatedAt ?= null
@@ -79,7 +79,7 @@ module.exports = (Module)->
           } = Module::Migration::SUPPORTED_TYPES
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retriveProxy collectionName
-          ipoCollection = Symbol.for 'collection'
+          ipoCollection = Symbol.for '~collection'
           for own id, doc of memCollection[ipoCollection]
             switch options.type
               when boolean
@@ -101,7 +101,7 @@ module.exports = (Module)->
         default: (collection_name, field_name, new_field_name)->
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retriveProxy collectionName
-          ipoCollection = Symbol.for 'collection'
+          ipoCollection = Symbol.for '~collection'
           for own id, doc of memCollection[ipoCollection]
             doc[new_field_name] = doc[field_name]
             delete doc[field_name]
@@ -120,7 +120,7 @@ module.exports = (Module)->
         default: (collection_name)->
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retriveProxy collectionName
-          ipoCollection = Symbol.for 'collection'
+          ipoCollection = Symbol.for '~collection'
           for own id, doc of @collection[ipoCollection]
             delete memCollection[ipoCollection][id]
             return
@@ -133,7 +133,7 @@ module.exports = (Module)->
           qualifiedName = "#{collection_1}_#{collection_2}"
           collectionName = "#{inflect.camelize qualifiedName}Collection"
           memCollection = @collection.facade.retriveProxy collectionName
-          ipoCollection = Symbol.for 'collection'
+          ipoCollection = Symbol.for '~collection'
           for own id, doc of @collection[ipoCollection]
             delete memCollection[ipoCollection][id]
             return
@@ -145,7 +145,7 @@ module.exports = (Module)->
         default: (collection_name, field_name)->
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retriveProxy collectionName
-          ipoCollection = Symbol.for 'collection'
+          ipoCollection = Symbol.for '~collection'
           for own id, doc of memCollection[ipoCollection]
             delete doc[field_name]
             return
@@ -159,7 +159,7 @@ module.exports = (Module)->
         default: (collection_name, options)->
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retriveProxy collectionName
-          ipoCollection = Symbol.for 'collection'
+          ipoCollection = Symbol.for '~collection'
           for own id, doc of memCollection[ipoCollection]
             delete doc.createdAt
             delete doc.updatedAt

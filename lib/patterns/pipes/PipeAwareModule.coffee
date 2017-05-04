@@ -32,9 +32,10 @@ module.exports = (Module)->
         @facade.sendNotification ACCEPT_OUTPUT_PIPE, aoPipe, asName
         return
 
-    constructor: (aoFacade)->
-      super arguments...
-      @facade = aoFacade
+    @public init: Function,
+      default: (aoFacade)->
+        @super arguments...
+        @facade = aoFacade
 
 
   PipeAwareModule.initialize()
