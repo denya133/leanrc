@@ -93,6 +93,7 @@ module.exports =
   #...
 ```
 ###
+_ = require 'lodash'
 
 module.exports = (Module)->
   {
@@ -106,7 +107,7 @@ module.exports = (Module)->
 
     @public environment: String,
       get: ->
-        if isArangoDB
+        if isArangoDB()
           if module.context.isProduction
             'production'
           else

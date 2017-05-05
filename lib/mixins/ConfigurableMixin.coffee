@@ -11,7 +11,7 @@ module.exports = (Module)->
 
       @public configs: Object,
         get: ->
-          @facade.retriveProxy CONFIGURATION
+          @facade.retrieveProxy CONFIGURATION
 
 
     ConfigurableMixin.initializeMixin()

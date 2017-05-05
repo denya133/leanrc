@@ -11,15 +11,19 @@ module.exports = (Module)->
 
       ipoCollection = @protected collection: Object
 
-      @public @async onRegister: Function,
+      @public onRegister: Function,
         default: (args...)->
           @super args...
           @[ipoCollection] = {}
           return
 
+      @public generateId: Function,
+        default: -> Module::Utils.uuid.v4()
+
       @public @async push: Function,
         default: (aoRecord)->
           vsKey = aoRecord.id
+          return no  unless vsKey?
           @[ipoCollection][vsKey] = @serializer.serialize aoRecord
           yield return yes
 
@@ -30,26 +34,26 @@ module.exports = (Module)->
 
       @public @async take: Function,
         default: (id)->
-          yield return Module::Cursor.new @delegate, [@[ipoCollection][id]]
+          yield return Module::Cursor.new @, [@[ipoCollection][id]]
 
       @public @async takeMany: Function,
         default: (ids)->
-          yield return Module::Cursor.new @delegate, ids.map (id)=>
+          yield return Module::Cursor.new @, ids.map (id)=>
             @[ipoCollection][id]
 
       @public @async takeAll: Function,
         default: ->
-          yield return Module::Cursor.new @delegate, _.values @[ipoCollection]
+          yield return Module::Cursor.new @, _.values @[ipoCollection]
 
       @public @async override: Function,
         default: (id, aoRecord)->
           @[ipoCollection][id] = @serializer.serialize aoRecord
-          yield return Module::Cursor.new @delegate, [@[ipoCollection][id]]
+          yield return Module::Cursor.new @, [@[ipoCollection][id]]
 
       @public @async patch: Function,
         default: (id, aoRecord)->
           @[ipoCollection][id] = @serializer.serialize aoRecord
-          yield return Module::Cursor.new @delegate, [@[ipoCollection][id]]
+          yield return Module::Cursor.new @, [@[ipoCollection][id]]
 
       @public @async includes: Function,
         default: (id)->
@@ -57,7 +61,7 @@ module.exports = (Module)->
 
       @public @async length: Function,
         default: ->
-          yield return Object.keys(@[ipoCollection]).length()
+          yield return Object.keys(@[ipoCollection]).length
 
 
     MemoryCollectionMixin.initializeMixin()

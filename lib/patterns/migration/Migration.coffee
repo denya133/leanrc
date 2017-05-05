@@ -1,4 +1,5 @@
 path = require 'path'
+_ = require 'lodash'
 
 ###
 http://edgeguides.rubyonrails.org/active_record_migrations.html
@@ -136,6 +137,9 @@ module.exports = (Module)->
       renameCollection: 'renameCollection'
 
     iplSteps = @private steps: Array
+
+    @public steps: Array,
+      get: -> Module::Utils.extend [], @[iplSteps] ? []
 
     # так же в рамках DSL нужны:
     # Creation
@@ -336,14 +340,16 @@ module.exports = (Module)->
     # здесь должна быть объявлена логика "автоматическая" - если вызов `change` создает метаданные, то заиспользовать эти метаданные для выполнения. Если метаданных нет, то скорее всего либо это пока еще пустая миграция без кода вообще, либо в унаследованном классе будут переопределны и `up` и `down`
     @public @async up: Function,
       default: ->
-        @[iplSteps]?.forEach ({method, args})->
+        steps = @[iplSteps]?[..] ? []
+        yield Module::Utils.forEach steps, ({ method, args }) ->
           if method is 'reversible'
             [lambda] = args
-            yield lambda
+            yield lambda.call @,
               up: (f)-> f()
               down: -> Module::Promise.resolve()
           else
             yield @[method] args...
+        , @
         yield return
 
     @public @static up: Function,
@@ -356,10 +362,10 @@ module.exports = (Module)->
       default: ->
         steps = @[iplSteps]?[..] ? []
         steps.reverse()
-        steps.forEach ({method, args})->
+        yield Module::Utils.forEach steps, ({ method, args }) ->
           if method is 'reversible'
             [lambda] = args
-            yield lambda
+            yield lambda.call @,
               up: -> Module::Promise.resolve()
               down: (f)-> f()
           else if _.includes [
@@ -370,7 +376,8 @@ module.exports = (Module)->
             [collectionName, oldName, newName] = args
             yield @[method] collectionName, newName, oldName
           else
-            yield @[Migration::REVERSE_MAP[methodName]] args...
+            yield @[Migration::REVERSE_MAP[method]] args...
+        , @
         yield return
 
     @public @static down: Function,
