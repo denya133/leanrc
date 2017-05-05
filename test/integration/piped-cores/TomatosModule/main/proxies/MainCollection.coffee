@@ -7,11 +7,11 @@ module.exports = (Module)->
     IterableMixin
   } = Module::
 
-  class BaseCollection extends Collection
+  class MainCollection extends Collection
     @inheritProtected()
     @include MemoryCollectionMixin
     @include IterableMixin
     @module Module
 
 
-  BaseCollection.initialize()
+  MainCollection.initialize()

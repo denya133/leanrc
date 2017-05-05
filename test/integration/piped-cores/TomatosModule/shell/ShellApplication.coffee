@@ -2,6 +2,7 @@
 
 module.exports = (Module) ->
   {
+    LogFilterMessage
     Application
   } = Module::
 
@@ -11,6 +12,12 @@ module.exports = (Module) ->
 
     @public @static NAME: String,
       default: 'TomatosShell'
+
+    @public setLogLevelMethod: Function,
+      args: []
+      return: NILL
+      default: (level)->
+        @facade.sendNotification LogFilterMessage.SET_LOG_LEVEL, level
 
 
   ShellApplication.initialize()

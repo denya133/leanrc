@@ -1,3 +1,4 @@
+{CucumberEntry} = require('../../../CucumbersModule')::
 
 
 module.exports = (Module) ->
@@ -6,10 +7,12 @@ module.exports = (Module) ->
     RESQUE
 
     SimpleCommand
-    BaseConfiguration
-    BaseResque
-    BaseCollection
+    MainConfiguration
+    MainResque
+    MainCollection
+    CucumbersResource
     TomatoRecord
+    CucumberEntry
   } = Module::
 
   class PrepareModelCommand extends SimpleCommand
@@ -18,10 +21,12 @@ module.exports = (Module) ->
 
     @public execute: Function,
       default: ->
-        @facade.registerProxy BaseConfiguration.new CONFIGURATION
-        @facade.registerProxy BaseResque.new RESQUE
-        @facade.registerProxy BaseCollection.new 'TomatosCollection',
+        @facade.registerProxy MainConfiguration.new CONFIGURATION
+        @facade.registerProxy MainResque.new RESQUE
+        @facade.registerProxy MainCollection.new 'TomatosCollection',
           delegate: TomatoRecord
+        @facade.registerProxy CucumbersResource.new 'CucumbersResource',
+          delegate: CucumberEntry
 
 
   PrepareModelCommand.initialize()

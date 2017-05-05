@@ -7,11 +7,11 @@ module.exports = (Module)->
     IterableMixin
   } = Module::
 
-  class BaseResource extends Resource
+  class CucumbersResource extends Resource
     @inheritProtected()
     @include HttpCollectionMixin
     @include IterableMixin
     @module Module
 
 
-  BaseResource.initialize()
+  CucumbersResource.initialize()

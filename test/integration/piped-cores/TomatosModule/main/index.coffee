@@ -13,9 +13,10 @@ class TomatosMain extends Tomatos
 
   require('./mediators/MainJunctionMediator') @Module
 
-  require('./proxies/BaseConfiguration') @Module
-  require('./proxies/BaseCollection') @Module
-  require('./proxies/BaseResque') @Module
+  require('./proxies/MainConfiguration') @Module
+  require('./proxies/MainCollection') @Module
+  require('./proxies/MainResque') @Module
+  require('./proxies/CucumbersResource') @Module
 
   require('./ApplicationFacade') @Module
 

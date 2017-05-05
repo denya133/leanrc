@@ -7,11 +7,11 @@ module.exports = (Module)->
     MemoryResqueMixin
   } = Module::
 
-  class BaseResque extends Resque
+  class MainResque extends Resque
     @inheritProtected()
     @module Module
 
     @include MemoryResqueMixin
 
 
-  BaseResque.initialize()
+  MainResque.initialize()

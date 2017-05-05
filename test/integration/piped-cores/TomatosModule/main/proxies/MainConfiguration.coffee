@@ -5,8 +5,8 @@ module.exports = (Module)->
     Configuration
   } = Module::
 
-  class BaseConfiguration extends Configuration
+  class MainConfiguration extends Configuration
     @inheritProtected()
     @module Module
 
-  BaseConfiguration.initialize()
+  MainConfiguration.initialize()

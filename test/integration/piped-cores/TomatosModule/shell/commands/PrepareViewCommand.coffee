@@ -1,5 +1,4 @@
 {MainApplication} = require('../../main')::
-{HttpClientApplication} = require('../../../CucumbersModule/http-client')::
 
 
 module.exports = (Module) ->
@@ -9,7 +8,6 @@ module.exports = (Module) ->
     SimpleCommand
     ApplicationMediator
     LoggerModuleMediator
-    CucumbersModuleMediator
     ShellJunctionMediator
     MainModuleMediator
     Application
@@ -30,11 +28,6 @@ module.exports = (Module) ->
         @facade.registerMediator ShellJunctionMediator.new()
 
         @facade.registerMediator ApplicationMediator.new APPLICATION_MEDIATOR, voApplication
-
-        cucumbers = HttpClientApplication.new()
-        @sendNotification CONNECT_MODULE_TO_LOGGER, cucumbers
-        @sendNotification CONNECT_MODULE_TO_SHELL, cucumbers
-        @facade.registerMediator CucumbersModuleMediator.new cucumbers
 
         main = MainApplication.new()
         @sendNotification CONNECT_MODULE_TO_LOGGER, main
