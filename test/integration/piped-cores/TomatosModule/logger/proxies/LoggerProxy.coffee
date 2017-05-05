@@ -2,7 +2,6 @@
 
 module.exports = (Module) ->
   {
-    LOG_MSG
     NILL
 
     SimpleCommand

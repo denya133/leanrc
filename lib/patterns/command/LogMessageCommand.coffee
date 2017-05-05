@@ -3,7 +3,6 @@
 module.exports = (Module) ->
   {
     SimpleCommand
-    LoggerProxy
     Application
   } = Module::
   {

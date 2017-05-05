@@ -23,6 +23,7 @@ class LeanRC extends RC
   @const SHELL:  Symbol 'ShellApplication'
   @const APPLICATION_MEDIATOR:  Symbol 'ApplicationMediator'
   @const MEM_RESQUE_EXEC:  Symbol 'MemoryResqueExecutor'
+  @const LOG_MSG: Symbol 'logMessage'
 
   require('./interfaces/patterns/TransformInterface') LeanRC
   require('./interfaces/patterns/NotificationInterface') LeanRC
@@ -110,6 +111,7 @@ class LeanRC extends RC
   require('./patterns/command/RollbackCommand') LeanRC #needs tests
   require('./patterns/command/Script') LeanRC #needs tests
   require('./patterns/command/DelayedJobScript') LeanRC #needs tests
+  require('./patterns/command/LogMessageCommand') LeanRC #needs tests
 
   require('./patterns/migration/Migration') LeanRC #needs tests
 
@@ -153,5 +155,8 @@ Pipes.initialize()
 LeanRC.const Pipes: Pipes.freeze()
 
 require('./patterns/facade/Application') LeanRC #needs tests
+require('./patterns/data_mapper/LogMessage') LeanRC #needs tests
+require('./patterns/data_mapper/LogFilterMessage') LeanRC #needs tests
+require('./mixins/LoggingJunctionMixin') LeanRC #needs tests
 
 module.exports = LeanRC.freeze()

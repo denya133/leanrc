@@ -1,10 +1,8 @@
-RC      = require 'RC'
-LeanRC  = require 'LeanRC'
 
-handleAnimateRobot = null
 
 module.exports = (Module) ->
   {
+    LoggingJunctionMixin
     Pipes
   } = Module::
   {
@@ -18,6 +16,7 @@ module.exports = (Module) ->
 
   class HttpClientJunctionMediator extends JunctionMediator
     @inheritProtected()
+    @include LoggingJunctionMixin
     @module Module
 
     @public @static NAME: String,
@@ -25,36 +24,19 @@ module.exports = (Module) ->
 
     @public listNotificationInterests: Function,
       default: (args...)->
-        interests = @super args...
-        # interests.push ApplicationFacade.EXPORT_LOG_BUTTON
-        interests
+        @super args...
 
     @public handleNotification: Function,
-      default: (aoNotification)->
-        switch aoNotification.getName()
-          when JunctionMediator.ACCEPT_INPUT_PIPE
-            name = aoNotification.getType()
-            if name is PipeAwareModule.STDIN
-              pipe = aoNotification.getBody()
-              tee = junction.retrievePipe PipeAwareModule.STDIN
-              tee.connectInput pipe
-            else
-              @super aoNotification
+      default: (note)->
+        switch note.getName()
+          when 'some_signal_name'
+
           else
-            @super aoNotification
+            @super note
 
     @public handlePipeMessage: Function,
       default: (aoMessage)->
         # ... some code
-        return
-
-    @public onRegister: Function,
-      default: ->
-        teeMerge = TeeMerge.new()
-        filter = Filter.new LogFilterMessage.LOG_FILTER_NAME, null, LogFilterMessage.filterLogByLevel
-        filter.connect PipeListener.new @, @handlePipeMessage
-        teeMerge.connect filter
-        junction.registerPipe PipeAwareModule.STDIN, Junction.INPUT, teeMerge
         return
 
     @public init: Function,

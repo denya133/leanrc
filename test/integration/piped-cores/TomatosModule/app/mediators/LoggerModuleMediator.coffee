@@ -3,13 +3,15 @@
 
 module.exports = (Module) ->
   {
-    CONNECT_MODULE_TO_LOGGER
-    CONNECT_SHELL_TO_LOGGER
-
     Mediator
     Pipes
+    Application
     ApplicationFacade
   } = Module::
+  {
+    CONNECT_MODULE_TO_LOGGER
+    CONNECT_SHELL_TO_LOGGER
+  } = Application::
   {
     PipeAwareInterface
     PipeAwareModule

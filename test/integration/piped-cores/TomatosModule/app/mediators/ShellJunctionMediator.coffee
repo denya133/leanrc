@@ -1,13 +1,11 @@
-Logger = require '../../logger'
-{
-  LogMessage
-  LogFilterMessage
-} = Logger::
+
 
 # это медиатор, для ораганизации пайпов между Core и сторонними ядрами-клиентами чтобы обмениваться данными со сторонними (отдельно запущенными) микросервисами.
 
 module.exports = (Module) ->
   {
+    LoggingJunctionMixin
+    LogMessage
     Pipes
     ApplicationFacade
     Application
@@ -23,11 +21,7 @@ module.exports = (Module) ->
     TeeMerge
     TeeSplit
     Junction
-    FilterControlMessage
   } = Pipes::
-  {
-    SET_PARAMS
-  } = FilterControlMessage
   {
     INPUT
     OUTPUT
@@ -42,15 +36,12 @@ module.exports = (Module) ->
     SEND_TO_LOG
     LEVELS
     DEBUG
-    ERROR
-    FATAL
     INFO
-    WARN
-    CHANGE
   } = LogMessage
 
   class ShellJunctionMediator extends JunctionMediator
     @inheritProtected()
+    @include LoggingJunctionMixin
     @module Module
 
     @public @static NAME: String,
@@ -59,8 +50,6 @@ module.exports = (Module) ->
     @public listNotificationInterests: Function,
       default: (args...)->
         interests = @super args...
-        interests.push SEND_TO_LOG
-        interests.push LogFilterMessage.SET_LOG_LEVEL
 
         # interests.push Module::Constants.REQUEST_LOG_WINDOW
         # interests.push Module::Constants.REQUEST_LOG_BUTTON
@@ -70,39 +59,6 @@ module.exports = (Module) ->
     @public handleNotification: Function,
       default: (aoNotification)->
         switch aoNotification.getName()
-          when SEND_TO_LOG
-            switch aoNotification.getType()
-              when LEVELS[DEBUG]
-                level = DEBUG
-                break
-              when LEVELS[ERROR]
-                level = ERROR
-                break
-              when LEVELS[FATAL]
-                level = FATAL
-                break
-              when LEVELS[INFO]
-                level = INFO;
-                break
-              when LEVELS[WARN]
-                level = WARN
-                break
-              else
-                level = DEBUG
-                break
-            logMessage = LogMessage.new level, @[ipoMultitonKey], aoNotification.getBody()
-            junction.sendMessage STDLOG, logMessage
-            break
-          when LogFilterMessage.SET_LOG_LEVEL
-            logLevel = aoNotification.getBody()
-            setLogLevelMessage = LogFilterMessage.new SET_PARAMS, logLevel
-
-            changedLevel = junction.sendMessage STDLOG, setLogLevelMessage
-            changedLevelMessage = LogMessage.new CHANGE, @[ipoMultitonKey], "
-              Changed Log Level to: #{LogMessage.LEVELS[logLevel]}
-            "
-            logChanged = junction.sendMessage STDLOG, changedLevelMessage
-            break
           # when Module::Constants.REQUEST_LOG_WINDOW
           #   sendNotification(LogMessage.SEND_TO_LOG,"Requesting log button from LoggerModule.",LogMessage.LEVELS[LogMessage.DEBUG])
           #   junction.sendMessage(PipeAwareModule.STDLOG,new UIQueryMessage(UIQueryMessage.GET,LoggerModule.LOG_BUTTON_UI))
