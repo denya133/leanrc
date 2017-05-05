@@ -163,3 +163,34 @@ describe 'Resque', ->
         queue = yield resque.get 'TEST_QUEUE_1'
         assert.isUndefined queue
         yield return
+  describe '#update', ->
+    it 'should update single queue', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @module Test
+          @public @async ensureQueue: Function,
+            default: (asQueueName, anConcurrency) ->
+              queue = _.find @getData().data, name: asQueueName
+              if queue?
+                queue.concurrency = anConcurrency
+              else
+                queue = name: asQueueName, concurrency: anConcurrency
+                @getData().data.push queue
+              yield return queue
+          @public @async getQueue: Function,
+            default: (asQueueName) ->
+              yield return _.find @getData().data, name: asQueueName
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE', data: []
+        yield resque.create 'TEST_QUEUE_1', 4
+        queue = yield resque.get 'TEST_QUEUE_1'
+        assert.propertyVal queue, 'concurrency', 4
+        yield resque.update 'TEST_QUEUE_1', 3
+        queue = yield resque.get 'TEST_QUEUE_1'
+        assert.propertyVal queue, 'concurrency', 3
+        yield return
