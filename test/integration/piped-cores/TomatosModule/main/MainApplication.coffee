@@ -6,12 +6,12 @@ module.exports = (Module) ->
     Application
   } = Module::
 
-  class CoreApplication extends Application
+  class MainApplication extends Application
     @inheritProtected()
     @module Module
 
     @public @static NAME: String,
-      default: 'TomatosCore'
+      default: 'TomatosMain'
 
 
-  CoreApplication.initialize()
+  MainApplication.initialize()

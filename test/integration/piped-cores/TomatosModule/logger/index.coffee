@@ -1,4 +1,4 @@
-
+# Это может быть сторонний модуль, который может подключаться как Cucumbers
 LeanRC = require.main.require 'lib'
 
 class Logger extends LeanRC

@@ -14,7 +14,7 @@ module.exports = (Module) ->
     PipeListener
   } = Pipes::
 
-  class CoreJunctionMediator extends JunctionMediator
+  class MainJunctionMediator extends JunctionMediator
     @inheritProtected()
     @include LoggingJunctionMixin
     @module Module
@@ -22,7 +22,7 @@ module.exports = (Module) ->
     ipoMultitonKey = Symbol.for '~multitonKey'
 
     @public @static NAME: String,
-      default: 'TomatosCoreJunctionMediator'
+      default: 'TomatosMainJunctionMediator'
 
     @public listNotificationInterests: Function,
       default: (args...)->
@@ -43,7 +43,7 @@ module.exports = (Module) ->
 
     @public init: Function,
       default: ->
-        @super CoreJunctionMediator.NAME, Junction.new()
+        @super MainJunctionMediator.NAME, Junction.new()
 
 
-  CoreJunctionMediator.initialize()
+  MainJunctionMediator.initialize()

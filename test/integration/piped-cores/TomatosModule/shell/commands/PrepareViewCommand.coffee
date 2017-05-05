@@ -1,4 +1,4 @@
-{CoreApplication} = require('../../core')::
+{MainApplication} = require('../../main')::
 {HttpClientApplication} = require('../../../CucumbersModule/http-client')::
 
 
@@ -11,7 +11,7 @@ module.exports = (Module) ->
     LoggerModuleMediator
     CucumbersModuleMediator
     ShellJunctionMediator
-    CoreModuleMediator
+    MainModuleMediator
     Application
   } = Module::
   {
@@ -36,10 +36,10 @@ module.exports = (Module) ->
         @sendNotification CONNECT_MODULE_TO_SHELL, cucumbers
         @facade.registerMediator CucumbersModuleMediator.new cucumbers
 
-        core = CoreApplication.new()
-        @sendNotification CONNECT_MODULE_TO_LOGGER, core
-        @sendNotification CONNECT_MODULE_TO_SHELL, core
-        @facade.registerMediator CoreModuleMediator.new core
+        main = MainApplication.new()
+        @sendNotification CONNECT_MODULE_TO_LOGGER, main
+        @sendNotification CONNECT_MODULE_TO_SHELL, main
+        @facade.registerMediator MainModuleMediator.new main
         return
 
 

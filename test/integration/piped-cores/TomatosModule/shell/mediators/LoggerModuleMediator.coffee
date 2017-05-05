@@ -1,3 +1,4 @@
+# Это может быть сторонний модуль, который может подключаться как Cucumbers
 {LoggerApplication} = require('../../logger')::
 
 

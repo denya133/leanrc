@@ -1,7 +1,7 @@
 
 Tomatos = require '../lib'
 
-class TomatosCore extends Tomatos
+class TomatosMain extends Tomatos
   @inheritProtected()
 
   @root __dirname
@@ -11,7 +11,7 @@ class TomatosCore extends Tomatos
   require('./commands/PrepareModelCommand') @Module
   require('./commands/StartupCommand') @Module
 
-  require('./mediators/CoreJunctionMediator') @Module
+  require('./mediators/MainJunctionMediator') @Module
 
   require('./proxies/BaseConfiguration') @Module
   require('./proxies/BaseCollection') @Module
@@ -19,7 +19,7 @@ class TomatosCore extends Tomatos
 
   require('./ApplicationFacade') @Module
 
-  require('./CoreApplication') @Module
+  require('./MainApplication') @Module
 
 
-module.exports = TomatosCore.initialize().freeze()
+module.exports = TomatosMain.initialize().freeze()
