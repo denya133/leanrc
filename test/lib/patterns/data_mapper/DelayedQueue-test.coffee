@@ -144,3 +144,32 @@ describe 'DelayedQueue', ->
         assert.equal spyMethod.args[0][0], 'TEST_QUEUE'
         assert.equal spyMethod.args[0][1], '42'
         yield return
+  describe '#all', ->
+    it 'should get all jobs from queue', ->
+      co ->
+        JOB = id: '42', job: 'job'
+        spyMethod = sinon.spy -> yield return [ JOB ]
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class Test::Resque extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+          @public @async allJobs: Function,
+            default: spyMethod
+        Test::Resque.initialize()
+        class Test::DelayedQueue extends LeanRC::DelayedQueue
+          @inheritProtected()
+          @module Test
+        Test::DelayedQueue.initialize()
+        queue = Test::DelayedQueue.new
+          name: 'TEST_QUEUE'
+          concurrency: 4
+        , Test::Resque.new()
+        UNTIL_DATE = new Date()
+        jobs = yield queue.all 'TEST_SCRIPT'
+        assert.deepEqual jobs, [ JOB ]
+        assert.isTrue spyMethod.called
+        assert.equal spyMethod.args[0][0], 'TEST_QUEUE'
+        assert.equal spyMethod.args[0][1], 'TEST_SCRIPT'
+        yield return
