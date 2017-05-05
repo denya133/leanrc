@@ -83,7 +83,7 @@ class LeanRC extends RC
   require('./patterns/data_mapper/Serializer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
   require('./patterns/data_mapper/Entry') LeanRC
-  require('./patterns/data_mapper/DelayedQueue') LeanRC #needs tests
+  require('./patterns/data_mapper/DelayedQueue') LeanRC
 
   require('./patterns/query_object/Query') LeanRC
 
@@ -98,7 +98,7 @@ class LeanRC extends RC
   require('./patterns/proxy/Renderer') LeanRC
   require('./patterns/proxy/Resource') LeanRC
   require('./patterns/proxy/Router') LeanRC
-  require('./patterns/proxy/Resque') LeanRC #needs tests
+  require('./patterns/proxy/Resque') LeanRC
 
   require('./patterns/mediator/Mediator') LeanRC
   require('./patterns/mediator/Switch') LeanRC

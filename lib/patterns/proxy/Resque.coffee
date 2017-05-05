@@ -47,7 +47,7 @@ module.exports = (Module)->
     @module Module
 
     @public fullQueueName: Function,
-      default: (queueName)-> "#{@moduleName}|>#{queueName}"
+      default: (queueName)-> "#{@moduleName()}|>#{queueName}"
 
     @public @async create: Function,
       default: (queueName, concurrency)->
