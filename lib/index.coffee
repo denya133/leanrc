@@ -111,7 +111,6 @@ class LeanRC extends RC
   require('./patterns/command/RollbackCommand') LeanRC #needs tests
   require('./patterns/command/Script') LeanRC #needs tests
   require('./patterns/command/DelayedJobScript') LeanRC #needs tests
-  require('./patterns/command/LogMessageCommand') LeanRC #needs tests
 
   require('./patterns/migration/Migration') LeanRC #needs tests
 
@@ -155,6 +154,7 @@ Pipes.initialize()
 LeanRC.const Pipes: Pipes.freeze()
 
 require('./patterns/facade/Application') LeanRC #needs tests
+require('./patterns/command/LogMessageCommand') LeanRC #needs tests
 require('./patterns/data_mapper/LogMessage') LeanRC #needs tests
 require('./patterns/data_mapper/LogFilterMessage') LeanRC #needs tests
 require('./mixins/LoggingJunctionMixin') LeanRC #needs tests

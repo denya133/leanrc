@@ -28,7 +28,7 @@ module.exports = (Module) ->
       default: [ 'NONE', 'FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG' ]
     @public @static SEND_TO_LOG: String,
       get: ->
-        Message.BASE + 'LoggerModule/sendToLog'
+        PipeMessage.BASE + 'LoggerModule/sendToLog'
     @public @static STDLOG: String,
       default: 'standardLog'
 
@@ -63,7 +63,7 @@ module.exports = (Module) ->
       default: (logLevel, sender, message)->
         time = new Date().toTimeString()
         headers = {logLevel, sender, time}
-        @super Message.NORMAL, headers, message
+        @super PipeMessage.NORMAL, headers, message
         return
 
 
