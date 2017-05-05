@@ -59,3 +59,22 @@ describe 'MemoryResqueMixin', ->
         assert.isUndefined resque[Symbol.for '~delayedJobs']
         assert.isUndefined resque[Symbol.for '~delayedQueues']
         yield return
+  describe '#ensureQueue', ->
+    it 'should create queue config', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE'
+        resque.onRegister()
+        resque.ensureQueue 'TEST_QUEUE', 5
+        queue = resque[Symbol.for '~delayedQueues']['Test|>TEST_QUEUE']
+        assert.propertyVal queue, 'name', 'TEST_QUEUE'
+        assert.propertyVal queue, 'concurrency', 5
+        yield return
