@@ -1,2 +1,20 @@
-# В этом файле должен быть код модуля, доступный для экспорта наружу (например в core или в client)
-# а также в package.json main параметр будет ссылаться именно на этот index.coffee файл
+
+
+LeanRC = require.main.require 'lib'
+
+
+class Cucumbers extends LeanRC
+  @inheritProtected()
+
+  @root __dirname
+
+  require('./entries/CucumberEntry') @Module
+
+  require('./records/CucumberRecord') @Module
+
+  require('./stocks/CucumbersStock') @Module
+
+  require('./ApplicationRouter') @Module
+
+
+module.exports = Cucumbers.initialize().freeze()

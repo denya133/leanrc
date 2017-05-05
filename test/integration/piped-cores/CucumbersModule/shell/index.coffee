@@ -3,7 +3,7 @@
 LeanRC = require.main.require 'lib'
 
 
-class TomatosShell extends LeanRC
+class CucumbersShell extends LeanRC
   @inheritProtected()
 
   @root __dirname
@@ -21,4 +21,4 @@ class TomatosShell extends LeanRC
   require('./ShellApplication') @Module
 
 
-module.exports = TomatosShell.initialize().freeze()
+module.exports = CucumbersShell.initialize().freeze()
