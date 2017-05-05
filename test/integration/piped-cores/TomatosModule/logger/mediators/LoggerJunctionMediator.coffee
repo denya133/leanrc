@@ -1,11 +1,11 @@
-RC      = require 'RC'
-LeanRC  = require 'LeanRC'
 
-handleAnimateRobot = null
 
 module.exports = (Module) ->
   {
+    LOG_MSG
+
     Pipes
+    LogFilterMessage
   } = Module::
   {
     JunctionMediator
@@ -15,28 +15,39 @@ module.exports = (Module) ->
     Filter
     PipeListener
   } = Pipes::
+  {
+    STDIN
+  } = PipeAwareModule
+  {
+    INPUT
+  } = Junction
+  {
+    ACCEPT_INPUT_PIPE
+  } = JunctionMediator
+  {
+    LOG_FILTER_NAME
+    filterLogByLevel
+  } = LogFilterMessage
 
-  class CoreJunctionMediator extends JunctionMediator
+  class LoggerJunctionMediator extends JunctionMediator
     @inheritProtected()
     @module Module
 
     @public @static NAME: String,
-      default: 'TomatosCoreJunctionMediator'
+      default: 'LoggerJunctionMediator'
 
     @public listNotificationInterests: Function,
       default: (args...)->
-        interests = @super args...
-        # interests.push ApplicationFacade.EXPORT_LOG_BUTTON
-        interests
+        @super args...
 
     @public handleNotification: Function,
       default: (aoNotification)->
         switch aoNotification.getName()
-          when JunctionMediator.ACCEPT_INPUT_PIPE
+          when ACCEPT_INPUT_PIPE
             name = aoNotification.getType()
-            if name is PipeAwareModule.STDIN
+            if name is STDIN
               pipe = aoNotification.getBody()
-              tee = junction.retrievePipe PipeAwareModule.STDIN
+              tee = junction.retrievePipe STDIN
               tee.connectInput pipe
             else
               @super aoNotification
@@ -45,21 +56,21 @@ module.exports = (Module) ->
 
     @public handlePipeMessage: Function,
       default: (aoMessage)->
-        # ... some code
+        @sendNotification LOG_MSG, aoMessage
         return
 
     @public onRegister: Function,
       default: ->
         teeMerge = TeeMerge.new()
-        filter = Filter.new LogFilterMessage.LOG_FILTER_NAME, null, LogFilterMessage.filterLogByLevel
+        filter = Filter.new LOG_FILTER_NAME, null, filterLogByLevel
         filter.connect PipeListener.new @, @handlePipeMessage
         teeMerge.connect filter
-        junction.registerPipe PipeAwareModule.STDIN, Junction.INPUT, teeMerge
+        junction.registerPipe STDIN, INPUT, teeMerge
         return
 
     @public init: Function,
       default: ->
-        @super CoreJunctionMediator.NAME, Junction.new()
+        @super LoggerJunctionMediator.NAME, Junction.new()
 
 
-  CoreJunctionMediator.initialize()
+  LoggerJunctionMediator.initialize()

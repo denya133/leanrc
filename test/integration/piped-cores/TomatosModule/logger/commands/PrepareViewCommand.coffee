@@ -3,7 +3,7 @@
 module.exports = (Module) ->
   {
     SimpleCommand
-    CoreJunctionMediator
+    LoggerJunctionMediator
   } = Module::
 
   class PrepareViewCommand extends SimpleCommand
@@ -12,7 +12,7 @@ module.exports = (Module) ->
 
     @public execute: Function,
       default: (aoNotification)->
-        @facade.registerMediator CoreJunctionMediator.new()
+        @facade.registerMediator LoggerJunctionMediator.new()
         return
 
 

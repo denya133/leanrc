@@ -11,7 +11,7 @@ class TomatosShell extends LeanRC
   require('./commands/PrepareViewCommand') @Module
   require('./commands/StartupCommand') @Module
 
-  require('./mediators/CoreModuleMediator') @Module
+  require('./mediators/MainModuleMediator') @Module
   require('./mediators/CucumbersModuleMediator') @Module
   require('./mediators/ShellJunctionMediator') @Module
   require('./mediators/ApplicationMediator') @Module

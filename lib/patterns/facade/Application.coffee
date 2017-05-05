@@ -1,19 +1,23 @@
 
 
 module.exports = (Module)->
-  class Application extends Module::CoreObject
+  class Application extends Module::Pipes::PipeAwareModule
     @inheritProtected()
-
     @module Module
 
-    @public @static NAME: String,
-      default: 'Application'
+    @const CONNECT_MODULE_TO_LOGGER: Symbol 'connectModuleToLogger'
+    @const CONNECT_SHELL_TO_LOGGER: Symbol 'connectShellToLogger'
+    @const CONNECT_MODULE_TO_SHELL: Symbol 'connectModuleToShell'
+
+    @public @static NAME: String
 
     @public init: Function,
-      default: (args...)->
-        @super args...
-        facade = @constructor.Module::ApplicationFacade.getInstance @constructor.NAME
-        facade.startup @
+      default: ->
+        {ApplicationFacade} = @constructor.Module::
+        {NAME, name} = @constructor
+        @super ApplicationFacade.getInstance NAME ? name
+        @facade.startup @
+        return
 
 
   Application.initialize()

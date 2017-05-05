@@ -5,12 +5,12 @@ module.exports = (Module) ->
     ApplicationFacade
   } = Module::
 
-  class HttpClientApplication extends Application
+  class LoggerApplication extends Application
     @inheritProtected()
     @module Module
 
     @public @static NAME: String,
-      default: 'TomatosHttpClient'
+      default: 'Logger'
 
 
-  HttpClientApplication.initialize()
+  LoggerApplication.initialize()

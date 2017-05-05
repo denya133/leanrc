@@ -14,7 +14,7 @@ GroupsHttpClient = require 'leanrc-groups/http-client'
 AuthRabbitmqClient = require 'leanrc-auth/rabbitmq-client'
 
 # если надо зарекваить основное ядро из текущего модуля (в Application)
-GroupsCore = require 'leanrc-groups/core'
+GroupsMain = require 'leanrc-groups/main'
 
 # Если надо зарекваить Application текущего модуль
 (может быть заиспользовано в обертке которая будет запускать текущее приложение `а-ля сервер`)
