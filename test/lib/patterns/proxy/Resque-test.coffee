@@ -21,3 +21,18 @@ describe 'Resque', ->
         resque = Test::Resque.new 'TEST_RESQUE'
         assert.instanceOf resque, Test::Resque
         yield return
+  describe '#fullQueueName', ->
+    it 'should get full queue name', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @module Test
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE'
+        queueName = resque.fullQueueName 'TEST'
+        assert.equal queueName, 'Test|>TEST'
+        yield return
