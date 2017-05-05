@@ -39,3 +39,23 @@ describe 'MemoryResqueMixin', ->
         assert.deepEqual resque[Symbol.for '~delayedJobs'], {}
         assert.deepEqual resque[Symbol.for '~delayedQueues'], {}
         yield return
+  describe '#onRemove', ->
+    it 'should unregister resque instance', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE'
+        resque.onRegister()
+        assert.deepEqual resque[Symbol.for '~delayedJobs'], {}
+        assert.deepEqual resque[Symbol.for '~delayedQueues'], {}
+        resque.onRemove()
+        assert.isUndefined resque[Symbol.for '~delayedJobs']
+        assert.isUndefined resque[Symbol.for '~delayedQueues']
+        yield return

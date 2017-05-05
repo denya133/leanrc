@@ -59,8 +59,8 @@ module.exports = (Module)->
               return
             delete @[ipoDelayedQueues].queueName
             return
-          delete @[ipoDelayedQueues]
-          delete @[ipoDelayedJobs]
+          @[ipoDelayedQueues] = undefined
+          @[ipoDelayedJobs] = undefined
           return
 
       @public @async ensureQueue: Function,
