@@ -128,3 +128,38 @@ describe 'Resque', ->
         assert.propertyVal queue, 'name', 'TEST_QUEUE_1'
         assert.propertyVal queue, 'concurrency', 4
         yield return
+  describe '#remove', ->
+    it 'should remove single queue', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @module Test
+          @public @async ensureQueue: Function,
+            default: (asQueueName, anConcurrency) ->
+              queue = _.find @getData().data, name: asQueueName
+              if queue?
+                queue.concurrency = anConcurrency
+              else
+                queue = name: asQueueName, concurrency: anConcurrency
+                @getData().data.push queue
+              yield return queue
+          @public @async getQueue: Function,
+            default: (asQueueName) ->
+              yield return _.find @getData().data, name: asQueueName
+          @public @async removeQueue: Function,
+            default: (asQueueName) ->
+              _.remove @getData().data, name: asQueueName
+              yield return
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE', data: []
+        yield resque.create 'TEST_QUEUE_1', 4
+        queue = yield resque.get 'TEST_QUEUE_1'
+        assert.isDefined queue
+        yield resque.remove 'TEST_QUEUE_1'
+        queue = yield resque.get 'TEST_QUEUE_1'
+        assert.isUndefined queue
+        yield return
