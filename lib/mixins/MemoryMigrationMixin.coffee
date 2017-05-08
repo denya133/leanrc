@@ -119,7 +119,6 @@ module.exports = (Module)->
           ipoCollection = Symbol.for '~collection'
           for own id, doc of @collection[ipoCollection]
             delete memCollection[ipoCollection][id]
-            return
           delete memCollection[ipoCollection]
           memCollection[ipoCollection] = {}
           yield return
