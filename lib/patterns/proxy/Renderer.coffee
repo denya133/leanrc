@@ -43,7 +43,7 @@ module.exports = (Module)->
 
     @public templatesDir: String,
       get: ->
-        "#{@Module::ROOT}/templates"
+        "#{@configs.ROOT}/../lib/templates"
 
     # may be redefine at inheritance
     @public @async render: Function,

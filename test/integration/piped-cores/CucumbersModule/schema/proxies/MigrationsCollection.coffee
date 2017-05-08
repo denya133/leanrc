@@ -8,9 +8,8 @@ module.exports = (Module)->
 
   class MigrationsCollection extends Collection
     @inheritProtected()
-    @module Module
-
     @include MemoryCollectionMixin
+    @module Module
 
 
   MigrationsCollection.initialize()

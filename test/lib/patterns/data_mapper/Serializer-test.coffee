@@ -13,7 +13,7 @@ describe 'Serializer', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @attribute string: String
@@ -40,7 +40,7 @@ describe 'Serializer', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
           @attribute string: String

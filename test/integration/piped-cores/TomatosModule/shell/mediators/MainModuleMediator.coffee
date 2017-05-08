@@ -14,7 +14,7 @@ module.exports = (Module) ->
 
   class MainModuleMediator extends Mediator
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public main: PipeAwareInterface,
       get: -> @getViewComponent()

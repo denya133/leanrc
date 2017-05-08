@@ -27,7 +27,7 @@ module.exports = (Module) ->
 
   class LoggerModuleMediator extends Mediator
     @inheritProtected()
-    @Module: Module
+    @module Module
 
     @public logger: PipeAwareInterface,
       get: -> @getViewComponent()

@@ -14,7 +14,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         array = [ {}, {}, {} ]
         cursor = Cursor.new delegate: Test::TestRecord, array
@@ -27,7 +27,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         cursor = Cursor.new()
         cursor.setRecord Test::TestRecord
@@ -40,7 +40,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
@@ -58,7 +58,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         array = [ { data: 'data' } ]
@@ -74,7 +74,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
@@ -93,7 +93,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
@@ -110,7 +110,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
@@ -125,7 +125,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
@@ -147,7 +147,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
@@ -169,7 +169,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
@@ -188,7 +188,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute name: String, { default: 'Unknown' }
         Test::TestRecord.initialize()
         array = [ { name: 'Jerome' }, { name: 'George' }, { name: 'Harris' } ]
@@ -205,7 +205,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         array = [ null, { data: 'men' }, undefined, { data: 'a boat' } ]
@@ -223,7 +223,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
@@ -245,7 +245,7 @@ describe 'Cursor', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]

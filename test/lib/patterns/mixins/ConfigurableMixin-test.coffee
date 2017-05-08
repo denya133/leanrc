@@ -20,7 +20,7 @@ describe 'ConfigurableMixin', ->
           @inheritProtected()
           @module Test
         Test::Configuration.initialize()
-        facade.registerProxy Test::Configuration.new LeanRC::CONFIGURATION
+        facade.registerProxy Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         class Test::Test extends LeanRC::Proxy
           @inheritProtected()
           @include LeanRC::ConfigurableMixin

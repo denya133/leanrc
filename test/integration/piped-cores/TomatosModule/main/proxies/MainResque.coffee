@@ -9,9 +9,8 @@ module.exports = (Module)->
 
   class MainResque extends Resque
     @inheritProtected()
-    @module Module
-
     @include MemoryResqueMixin
+    @module Module
 
 
   MainResque.initialize()

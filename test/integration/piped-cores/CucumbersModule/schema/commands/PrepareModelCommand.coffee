@@ -21,7 +21,7 @@ module.exports = (Module) ->
 
     @public execute: Function,
       default: ->
-        @facade.registerProxy BaseConfiguration.new CONFIGURATION
+        @facade.registerProxy BaseConfiguration.new CONFIGURATION, @Module::ROOT
         @facade.registerProxy BaseResque.new RESQUE
         @facade.registerProxy MigrationsCollection.new MIGRATIONS,
           delegate: BaseMigration

@@ -10,9 +10,8 @@ module.exports = (Module)->
 
   class BaseResque extends Resque
     @inheritProtected()
-    @module Module
-
     @include MemoryResqueMixin
+    @module Module
 
 
   BaseResque.initialize()

@@ -18,7 +18,7 @@ describe 'Configuration', ->
           @inheritProtected()
           @module Test
         Test::Configuration.initialize()
-        configuration = Test::Configuration.new()
+        configuration = Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         yield return
   describe '#environment', ->
     it 'should get environment name', ->
@@ -31,7 +31,7 @@ describe 'Configuration', ->
           @inheritProtected()
           @module Test
         Test::Configuration.initialize()
-        configuration = Test::Configuration.new()
+        configuration = Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         environment = configuration.environment
         assert.equal environment, 'development'
         yield return
@@ -46,7 +46,7 @@ describe 'Configuration', ->
           @inheritProtected()
           @module Test
         Test::Configuration.initialize()
-        configuration = Test::Configuration.new()
+        configuration = Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         configuration.defineConfigProperties()
         assert.propertyVal configuration, 'test1', 'default'
         assert.propertyVal configuration, 'test2', 42
@@ -64,7 +64,7 @@ describe 'Configuration', ->
           @inheritProtected()
           @module Test
         Test::Configuration.initialize()
-        configuration = Test::Configuration.new()
+        configuration = Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         configuration.onRegister()
         assert.propertyVal configuration, 'test1', 'default'
         assert.propertyVal configuration, 'test2', 42
