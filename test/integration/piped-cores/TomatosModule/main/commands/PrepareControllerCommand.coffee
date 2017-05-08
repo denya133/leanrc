@@ -6,6 +6,7 @@ module.exports = (Module) ->
 
     SimpleCommand
     DelayedJobScript
+    TomatosStock
   } = Module::
 
   class PrepareControllerCommand extends SimpleCommand
@@ -15,6 +16,7 @@ module.exports = (Module) ->
     @public execute: Function,
       default: ->
         @facade.registerCommand DELAYED_JOBS_SCRIPT, DelayedJobScript
+        @facade.registerCommand 'TomatosStock', TomatosStock
 
 
   PrepareControllerCommand.initialize()

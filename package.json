@@ -61,8 +61,11 @@
   },
   "devDependencies": {
     "LeanRC": "file:./",
+    "body-parser": "1.17.1",
     "chai": "^3.5.0",
     "coffee-script": "1.12.4",
+    "cookie-parser": "1.4.3",
+    "express": "^4.15.2",
     "feed": "^1.0.2",
     "i": "^0.3.5",
     "joi": "^10.3.1",

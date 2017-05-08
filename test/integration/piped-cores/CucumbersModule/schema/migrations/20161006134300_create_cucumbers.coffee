@@ -11,15 +11,15 @@ module.exports = (Module)->
 
     @change ->
       @createCollection 'cucumbers'
-      @addField 'cucumbers', _id, 'string'
-      @addField 'cucumbers', _key, 'string'
-      @addField 'cucumbers', _type, 'string'
-      @addField 'cucumbers', _rev, 'string'
-      @addField 'cucumbers', isHidden, 'boolean'
+      @addField 'cucumbers', '_id', 'string'
+      @addField 'cucumbers', '_key', 'string'
+      @addField 'cucumbers', '_type', 'string'
+      @addField 'cucumbers', '_rev', 'string'
+      @addField 'cucumbers', 'isHidden', 'boolean'
       @addTimestamps()
 
-      @addField 'cucumbers', name, 'string'
-      @addField 'cucumbers', description, 'text'
+      @addField 'cucumbers', 'name', 'string'
+      @addField 'cucumbers', 'description', 'text'
 
       @addIndex 'cucumbers', ['_id'], type: 'hash', unique: yes
       @addIndex 'cucumbers', ['_key'], type: 'hash', unique: yes

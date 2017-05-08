@@ -11,15 +11,15 @@ module.exports = (Module)->
 
     @change ->
       @createCollection 'tomatos'
-      @addField 'tomatos', _id, 'string'
-      @addField 'tomatos', _key, 'string'
-      @addField 'tomatos', _type, 'string'
-      @addField 'tomatos', _rev, 'string'
-      @addField 'tomatos', isHidden, 'boolean'
+      @addField 'tomatos', '_id', 'string'
+      @addField 'tomatos', '_key', 'string'
+      @addField 'tomatos', '_type', 'string'
+      @addField 'tomatos', '_rev', 'string'
+      @addField 'tomatos', 'isHidden', 'boolean'
       @addTimestamps()
 
-      @addField 'tomatos', name, 'string'
-      @addField 'tomatos', description, 'text'
+      @addField 'tomatos', 'name', 'string'
+      @addField 'tomatos', 'description', 'text'
 
       @addIndex 'tomatos', ['_id'], type: 'hash', unique: yes
       @addIndex 'tomatos', ['_key'], type: 'hash', unique: yes

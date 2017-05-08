@@ -5,6 +5,8 @@ module.exports = (Module) ->
   {
     CONFIGURATION
     RESQUE
+    APPLICATION_RENDERER
+    APPLICATION_ROUTER
 
     SimpleCommand
     MainConfiguration
@@ -13,6 +15,8 @@ module.exports = (Module) ->
     CucumbersResource
     TomatoRecord
     CucumberEntry
+    Renderer
+    ApplicationRouter
   } = Module::
 
   class PrepareModelCommand extends SimpleCommand
@@ -27,6 +31,8 @@ module.exports = (Module) ->
           delegate: TomatoRecord
         @facade.registerProxy CucumbersResource.new 'CucumbersResource',
           delegate: CucumberEntry
+        @facade.registerProxy Renderer.new APPLICATION_RENDERER
+        @facade.registerProxy ApplicationRouter.new APPLICATION_ROUTER
 
 
   PrepareModelCommand.initialize()
