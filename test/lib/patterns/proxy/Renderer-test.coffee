@@ -38,7 +38,7 @@ describe 'Renderer', ->
         Test::TestRenderer.initialize()
         renderer = Test::TestRenderer.new()
         templates = yield renderer.templates
-        assert.property templates, 'test'
+        assert.property templates, 'TestRecord/find'
         yield return
     it 'should run test template from script', ->
       co ->
@@ -59,7 +59,7 @@ describe 'Renderer', ->
         ,
           id: 3, _key: 3, test: 'test3'
         ]
-        output = templates.test 'TestRecord', 'find', items
+        output = templates['TestRecord/find'] 'TestRecord', 'find', items
         assert.property output, 'test_records'
         assert.sameDeepMembers output.test_records, [
           id: 1, test: 'test1'
@@ -91,7 +91,7 @@ describe 'Renderer', ->
         renderer = Test::TestRenderer.new 'TEST_RENDERER'
         renderResult = yield renderer.render data,
           path: 'test'
-          resource: 'TestRecord'
+          resource: 'TestRecord/'
           action: 'find'
         assert.deepEqual renderResult, JSON.stringify test_records: [
           id: 1, test: "test1", data: "data1"

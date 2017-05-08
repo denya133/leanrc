@@ -8,7 +8,9 @@ inflect   = do require 'inflect'
 
 # это специально не класс, а функция чтобы съэкономить процессорные ресурсы
 module.exports = (resource, action, aoData)->
-  "#{inflect.pluralaze inflect.undescore resource}": aoData.map (i)->
+  voData = if _.isArray aoData then aoData else [ aoData ]
+  resource = resource.replace(/[/]/g, '_').replace /[_]$/g, ''
+  "#{inflect.pluralize inflect.underscore resource}": voData.map (i)->
     _.omit i, '_key', '_type', '_owner'
 ```
 но также могут быть созданы обобщенные шаблоны, с каким-то кодом представления одного или нескольких итемов, чтобы в темплейтах рекваить (с них доп-параметры можно передавать аргументами или через карирование)
@@ -54,8 +56,9 @@ module.exports = (Module)->
           # открытый вопрос - как определить какой темплейт рендерить
           # вопрос в том еще - как должен выглядить путь до темплейта
           # и как он должен соотноситься с path
+          templatePath = resource + action
           templates = yield @templates
-          renderedResult = templates[path]? resource, action, vhData
+          renderedResult = templates[templatePath]? resource, action, vhData
           res = JSON.stringify renderedResult ? vhData ? null
           yield return res
         else
