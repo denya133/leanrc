@@ -181,3 +181,205 @@ describe 'MemoryResqueMixin', ->
           lockLifetime: 5000
           lockLimit: 2
         yield return
+  describe '#getJob', ->
+    it 'should get saved job', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE'
+        resque.onRegister()
+        resque.ensureQueue 'TEST_QUEUE_1', 1
+        DATA = data: 'data'
+        DATE = new Date()
+        jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT', DATA, DATE
+        job = yield resque.getJob 'TEST_QUEUE_1', jobId
+        assert.deepEqual job,
+          queueName: 'Test|>TEST_QUEUE_1'
+          data: scriptName: 'TEST_SCRIPT', data: DATA
+          delayUntil: DATE
+          status: 'scheduled'
+          lockLifetime: 5000
+          lockLimit: 2
+        yield return
+  describe '#deleteJob', ->
+    it 'should remove saved job', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE'
+        resque.onRegister()
+        resque.ensureQueue 'TEST_QUEUE_1', 1
+        DATA = data: 'data'
+        DATE = new Date()
+        jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT', DATA, DATE
+        job = yield resque.getJob 'TEST_QUEUE_1', jobId
+        assert.deepEqual job,
+          queueName: 'Test|>TEST_QUEUE_1'
+          data: scriptName: 'TEST_SCRIPT', data: DATA
+          delayUntil: DATE
+          status: 'scheduled'
+          lockLifetime: 5000
+          lockLimit: 2
+        assert.isTrue yield resque.deleteJob 'TEST_QUEUE_1', jobId
+        assert.isNull yield resque.getJob 'TEST_QUEUE_1', jobId
+        yield return
+  describe '#allJobs', ->
+    it 'should list all jobs', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE'
+        resque.onRegister()
+        resque.ensureQueue 'TEST_QUEUE_1', 1
+        resque.ensureQueue 'TEST_QUEUE_2', 1
+        DATA = data: 'data'
+        DATE = new Date()
+        yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_2', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
+        jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_2', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_2', 'TEST_SCRIPT_1', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_2', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_2', 'TEST_SCRIPT_1', DATA, DATE
+        yield resque.deleteJob 'TEST_QUEUE_1', jobId
+        jobs = yield resque.allJobs 'TEST_QUEUE_1'
+        assert.lengthOf jobs, 3
+        jobs = yield resque.allJobs 'TEST_QUEUE_1', 'TEST_SCRIPT_2'
+        assert.lengthOf jobs, 2
+        yield return
+  describe '#pendingJobs', ->
+    it 'should list pending jobs', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE'
+        resque.onRegister()
+        resque.ensureQueue 'TEST_QUEUE_1', 1
+        resque.ensureQueue 'TEST_QUEUE_2', 1
+        DATA = data: 'data'
+        DATE = new Date()
+        yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_2', 'TEST_SCRIPT_1', DATA, DATE
+        jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_2', DATA, DATE
+        job = yield resque.getJob 'TEST_QUEUE_1', jobId
+        job.status = 'running'
+        jobs = yield resque.pendingJobs 'TEST_QUEUE_1'
+        assert.lengthOf jobs, 2
+        jobs = yield resque.pendingJobs 'TEST_QUEUE_1', 'TEST_SCRIPT_2'
+        assert.lengthOf jobs, 1
+        yield return
+  describe '#progressJobs', ->
+    it 'should list runnning jobs', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE'
+        resque.onRegister()
+        resque.ensureQueue 'TEST_QUEUE_1', 1
+        resque.ensureQueue 'TEST_QUEUE_2', 1
+        DATA = data: 'data'
+        DATE = new Date()
+        yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_2', 'TEST_SCRIPT_1', DATA, DATE
+        jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_2', DATA, DATE
+        job = yield resque.getJob 'TEST_QUEUE_1', jobId
+        job.status = 'running'
+        jobs = yield resque.progressJobs 'TEST_QUEUE_1'
+        assert.lengthOf jobs, 1
+        jobs = yield resque.progressJobs 'TEST_QUEUE_1', 'TEST_SCRIPT_2'
+        assert.lengthOf jobs, 0
+        yield return
+  describe '#completedJobs', ->
+    it 'should list complete jobs', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE'
+        resque.onRegister()
+        resque.ensureQueue 'TEST_QUEUE_1', 1
+        resque.ensureQueue 'TEST_QUEUE_2', 1
+        DATA = data: 'data'
+        DATE = new Date()
+        yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_2', 'TEST_SCRIPT_1', DATA, DATE
+        jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_2', DATA, DATE
+        job = yield resque.getJob 'TEST_QUEUE_1', jobId
+        job.status = 'completed'
+        jobs = yield resque.completedJobs 'TEST_QUEUE_1'
+        assert.lengthOf jobs, 1
+        jobs = yield resque.completedJobs 'TEST_QUEUE_1', 'TEST_SCRIPT_2'
+        assert.lengthOf jobs, 0
+        yield return
+  describe '#failedJobs', ->
+    it 'should list failed jobs', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE'
+        resque.onRegister()
+        resque.ensureQueue 'TEST_QUEUE_1', 1
+        resque.ensureQueue 'TEST_QUEUE_2', 1
+        DATA = data: 'data'
+        DATE = new Date()
+        yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_2', 'TEST_SCRIPT_1', DATA, DATE
+        jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
+        yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_2', DATA, DATE
+        job = yield resque.getJob 'TEST_QUEUE_1', jobId
+        job.status = 'failed'
+        jobs = yield resque.failedJobs 'TEST_QUEUE_1'
+        assert.lengthOf jobs, 1
+        jobs = yield resque.failedJobs 'TEST_QUEUE_1', 'TEST_SCRIPT_2'
+        assert.lengthOf jobs, 0
+        yield return
