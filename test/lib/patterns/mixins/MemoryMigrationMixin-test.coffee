@@ -435,251 +435,51 @@ describe 'MemoryMigrationMixin', ->
         yield migration.up()
         assert.isTrue spyRemoveIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
         yield return
-  ###
-  describe '.removeTimestamps', ->
+  describe '#removeTimestamps', ->
     it 'should apply step to remove timestamps in collection', ->
       co ->
+        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_008'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
         Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+        Test::MemoryCollection.initialize()
         class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @removeTimestamps 'Test'
         Test::BaseMigration.initialize()
-        Test::BaseMigration.removeTimestamps 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'removeTimestamps'
-        yield return
-  describe '.reversible', ->
-    it 'should add reversible step', ->
-      co ->
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-        Test::BaseMigration.initialize()
-        Test::BaseMigration.reversible 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'reversible'
-        yield return
-  describe '#execute', ->
-    it 'should run generator closure with some code', ->
-      co ->
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
-        spyExecute = sinon.spy -> yield return
-        yield migration.execute spyExecute
-        assert.isTrue spyExecute.called
-        yield return
-  describe '.change', ->
-    it 'should run closure with some code', ->
-      co ->
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-        Test::BaseMigration.initialize()
-        spyChange = sinon.spy ->
-        Test::BaseMigration.change spyChange
-        assert.isTrue spyChange.called
-        yield return
-  describe '#up', ->
-    it 'should run steps in forward direction', ->
-      co ->
-        spyReversibleUp = sinon.spy -> yield return
-        spyCreateCollection = sinon.spy -> yield return
-        spyAddField = sinon.spy -> yield return
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-          @reversible ({ up, down }) ->
-            yield up spyReversibleUp
-            yield @createCollection 'TEST_COLLECTION'
-            yield return
-          @addField 'TEST_FIELD'
-          @public @async createCollection: Function,
-            default: spyCreateCollection
-          @public @async addField: Function,
-            default: spyAddField
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+        collection = facade.retrieveProxy 'TestCollection'
+        DATE = new Date()
+        yield collection.create test: '42', createdAt: DATE
+        yield collection.create test: '42', createdAt: DATE
+        yield collection.create test: '42', createdAt: DATE
+        migration = Test::BaseMigration.new {}, collection
+        for own id, doc of collection[Symbol.for '~collection']
+          assert.property doc, 'createdAt'
+          assert.property doc, 'updatedAt'
+          assert.property doc, 'deletedAt'
         yield migration.up()
-        assert.isTrue spyReversibleUp.called
-        assert.isTrue spyCreateCollection.calledAfter spyReversibleUp
-        assert.isTrue spyAddField.calledAfter spyCreateCollection
-        assert.equal spyCreateCollection.args[0][0], 'TEST_COLLECTION'
-        assert.equal spyAddField.args[0][0], 'TEST_FIELD'
+        for own id, doc of collection[Symbol.for '~collection']
+          assert.notProperty doc, 'createdAt'
+          assert.notProperty doc, 'updatedAt'
+          assert.notProperty doc, 'deletedAt'
         yield return
-  describe '#down', ->
-    it 'should run steps in backward direction', ->
-      co ->
-        spyReversibleDown = sinon.spy -> yield return
-        spyCreateCollection = sinon.spy -> yield return
-        spyRenameIndex = sinon.spy -> yield return
-        spyRemoveField = sinon.spy -> yield return
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-          @reversible ({ up, down }) ->
-            yield down spyReversibleDown
-            yield @createCollection 'TEST_COLLECTION'
-            yield return
-          @addField 'TEST_FIELD'
-          @renameIndex 'TEST_INDEX'
-          @public @async createCollection: Function,
-            default: spyCreateCollection
-          @public @async renameIndex: Function,
-            default: spyRenameIndex
-          @public @async removeField: Function,
-            default: spyRemoveField
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
-        yield migration.down()
-        assert.isTrue spyRenameIndex.called
-        assert.isTrue spyRemoveField.calledAfter spyRenameIndex
-        assert.isTrue spyReversibleDown.calledAfter spyRemoveField
-        assert.isTrue spyCreateCollection.calledAfter spyReversibleDown
-        assert.equal spyCreateCollection.args[0][0], 'TEST_COLLECTION'
-        assert.equal spyRemoveField.args[0][0], 'TEST_FIELD'
-        yield return
-  describe '.up', ->
-    it 'should replace forward stepping caller', ->
-      co ->
-        spyUp = sinon.spy -> yield return
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-          @up spyUp
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
-        assert.isFalse spyUp.called
-        yield migration.up()
-        assert.isTrue spyUp.called
-        yield return
-  describe '.down', ->
-    it 'should replace forward stepping caller', ->
-      co ->
-        spyDown = sinon.spy -> yield return
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-          @down spyDown
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
-        assert.isFalse spyDown.called
-        yield migration.down()
-        assert.isTrue spyDown.called
-        yield return
-  describe '#migrate', ->
-    it 'should run steps in forward direction', ->
-      co ->
-        spyReversibleUp = sinon.spy -> yield return
-        spyCreateCollection = sinon.spy -> yield return
-        spyAddField = sinon.spy -> yield return
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-          @reversible ({ up, down }) ->
-            yield up spyReversibleUp
-            yield @createCollection 'TEST_COLLECTION'
-            yield return
-          @addField 'TEST_FIELD'
-          @public @async createCollection: Function,
-            default: spyCreateCollection
-          @public @async addField: Function,
-            default: spyAddField
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
-        yield migration.migrate Test::BaseMigration::UP
-        assert.isTrue spyReversibleUp.called
-        assert.isTrue spyCreateCollection.calledAfter spyReversibleUp
-        assert.isTrue spyAddField.calledAfter spyCreateCollection
-        assert.equal spyCreateCollection.args[0][0], 'TEST_COLLECTION'
-        assert.equal spyAddField.args[0][0], 'TEST_FIELD'
-        yield return
-    it 'should run steps in backward direction', ->
-      co ->
-        spyReversibleDown = sinon.spy -> yield return
-        spyCreateCollection = sinon.spy -> yield return
-        spyRenameIndex = sinon.spy -> yield return
-        spyRemoveField = sinon.spy -> yield return
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-          @reversible ({ up, down }) ->
-            yield down spyReversibleDown
-            yield @createCollection 'TEST_COLLECTION'
-            yield return
-          @addField 'TEST_FIELD'
-          @renameIndex 'TEST_INDEX'
-          @public @async createCollection: Function,
-            default: spyCreateCollection
-          @public @async renameIndex: Function,
-            default: spyRenameIndex
-          @public @async removeField: Function,
-            default: spyRemoveField
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
-        yield migration.migrate Test::BaseMigration::DOWN
-        assert.isTrue spyRenameIndex.called
-        assert.isTrue spyRemoveField.calledAfter spyRenameIndex
-        assert.isTrue spyReversibleDown.calledAfter spyRemoveField
-        assert.isTrue spyCreateCollection.calledAfter spyReversibleDown
-        assert.equal spyCreateCollection.args[0][0], 'TEST_COLLECTION'
-        assert.equal spyRemoveField.args[0][0], 'TEST_FIELD'
-        yield return
-  ###
