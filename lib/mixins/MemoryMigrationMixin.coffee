@@ -34,7 +34,7 @@ module.exports = (Module)->
           else
             initial = null
           for own id, doc of memCollection[ipoCollection]
-            doc[field_name] = initial
+            doc[field_name] ?= initial
           yield return
 
       @public @async addIndex: Function,

@@ -116,26 +116,50 @@ describe 'MemoryMigrationMixin', ->
         yield migration.up()
         assert.isTrue spyAddIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
         yield return
-  ###
-  describe '.addTimestamps', ->
+  describe '#addTimestamps', ->
     it 'should apply step to add timesteps in collection', ->
       co ->
+        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_002'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
         Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+        Test::MemoryCollection.initialize()
         class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @addTimestamps 'Test'
         Test::BaseMigration.initialize()
-        Test::BaseMigration.addTimestamps 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'addTimestamps'
+        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+        collection = facade.retrieveProxy 'TestCollection'
+        yield collection.create _key: 1
+        yield collection.create _key: 2
+        yield collection.create _key: 3
+        migration = Test::BaseMigration.new {}, collection
+        yield migration.up()
+        for own id, doc of collection[Symbol.for '~collection']
+          assert.property doc, 'createdAt'
+          assert.property doc, 'updatedAt'
+          assert.property doc, 'updatedAt'
         yield return
+  ###
   describe '.changeCollection', ->
     it 'should apply step to change collection', ->
       co ->
