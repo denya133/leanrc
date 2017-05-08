@@ -18,9 +18,9 @@ module.exports = (Module)->
           yield return
 
       @public @async addField: Function,
-        default: (collection_name, field_name, options)->
+        default: (collection_name, field_name, options = {})->
           collectionName = "#{inflect.camelize collection_name}Collection"
-          memCollection = @collection.facade.retriveProxy collectionName
+          memCollection = @collection.facade.retrieveProxy collectionName
           ipoCollection = Symbol.for '~collection'
           if options.default?
             if _.isNumber(options.default) or _.isBoolean(options.default)
@@ -34,8 +34,7 @@ module.exports = (Module)->
           else
             initial = null
           for own id, doc of memCollection[ipoCollection]
-            doc[field_name] = initial
-            return
+            doc[field_name] ?= initial
           yield return
 
       @public @async addIndex: Function,
@@ -45,13 +44,12 @@ module.exports = (Module)->
       @public @async addTimestamps: Function,
         default: (collection_name, options)->
           collectionName = "#{inflect.camelize collection_name}Collection"
-          memCollection = @collection.facade.retriveProxy collectionName
+          memCollection = @collection.facade.retrieveProxy collectionName
           ipoCollection = Symbol.for '~collection'
           for own id, doc of memCollection[ipoCollection]
             doc.createdAt ?= null
             doc.updatedAt ?= null
             doc.deletedAt ?= null
-            return
           yield return
 
       @public @async changeCollection: Function,
@@ -59,7 +57,7 @@ module.exports = (Module)->
           yield return
 
       @public @async changeField: Function,
-        default: (collection_name, field_name, options)->
+        default: (collection_name, field_name, options = {})->
           {
             json
             binary
@@ -78,7 +76,7 @@ module.exports = (Module)->
             hash
           } = Module::Migration::SUPPORTED_TYPES
           collectionName = "#{inflect.camelize collection_name}Collection"
-          memCollection = @collection.facade.retriveProxy collectionName
+          memCollection = @collection.facade.retrieveProxy collectionName
           ipoCollection = Symbol.for '~collection'
           for own id, doc of memCollection[ipoCollection]
             switch options.type
@@ -94,18 +92,16 @@ module.exports = (Module)->
                 doc[field_name] = new Date(String  doc[field_name]).toISOString()
               when time, timestamp
                 doc[field_name] = new Date(String  doc[field_name]).getTime()
-            return
           yield return
 
       @public @async renameField: Function,
         default: (collection_name, field_name, new_field_name)->
           collectionName = "#{inflect.camelize collection_name}Collection"
-          memCollection = @collection.facade.retriveProxy collectionName
+          memCollection = @collection.facade.retrieveProxy collectionName
           ipoCollection = Symbol.for '~collection'
           for own id, doc of memCollection[ipoCollection]
             doc[new_field_name] = doc[field_name]
             delete doc[field_name]
-            return
           yield return
 
       @public @async renameIndex: Function,
@@ -119,11 +115,10 @@ module.exports = (Module)->
       @public @async dropCollection: Function,
         default: (collection_name)->
           collectionName = "#{inflect.camelize collection_name}Collection"
-          memCollection = @collection.facade.retriveProxy collectionName
+          memCollection = @collection.facade.retrieveProxy collectionName
           ipoCollection = Symbol.for '~collection'
           for own id, doc of @collection[ipoCollection]
             delete memCollection[ipoCollection][id]
-            return
           delete memCollection[ipoCollection]
           memCollection[ipoCollection] = {}
           yield return
@@ -132,11 +127,10 @@ module.exports = (Module)->
         default: (collection_1, collection_2)->
           qualifiedName = "#{collection_1}_#{collection_2}"
           collectionName = "#{inflect.camelize qualifiedName}Collection"
-          memCollection = @collection.facade.retriveProxy collectionName
+          memCollection = @collection.facade.retrieveProxy collectionName
           ipoCollection = Symbol.for '~collection'
           for own id, doc of @collection[ipoCollection]
             delete memCollection[ipoCollection][id]
-            return
           delete memCollection[ipoCollection]
           memCollection[ipoCollection] = {}
           yield return
@@ -144,11 +138,10 @@ module.exports = (Module)->
       @public @async removeField: Function,
         default: (collection_name, field_name)->
           collectionName = "#{inflect.camelize collection_name}Collection"
-          memCollection = @collection.facade.retriveProxy collectionName
+          memCollection = @collection.facade.retrieveProxy collectionName
           ipoCollection = Symbol.for '~collection'
           for own id, doc of memCollection[ipoCollection]
             delete doc[field_name]
-            return
           yield return
 
       @public @async removeIndex: Function,
@@ -158,13 +151,12 @@ module.exports = (Module)->
       @public @async removeTimestamps: Function,
         default: (collection_name, options)->
           collectionName = "#{inflect.camelize collection_name}Collection"
-          memCollection = @collection.facade.retriveProxy collectionName
+          memCollection = @collection.facade.retrieveProxy collectionName
           ipoCollection = Symbol.for '~collection'
           for own id, doc of memCollection[ipoCollection]
             delete doc.createdAt
             delete doc.updatedAt
             delete doc.deletedAt
-            return
           yield return
 
 

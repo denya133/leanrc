@@ -96,7 +96,7 @@ module.exports = (Module)->
         @setViewComponent new EventEmitter()
         @[ipoConcurrencyCount] = {}
         @[ipoDefinedProcessors] = {}
-        @[ipoResque] = @facade.retriveProxy RESQUE
+        @[ipoResque] = @facade.retrieveProxy RESQUE
         @defineProcessors()
         return
 

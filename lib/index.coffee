@@ -67,9 +67,9 @@ class LeanRC extends RC
   require('./mixins/CrudEndpointsMixin') LeanRC #needs tests
   require('./mixins/HttpCollectionMixin') LeanRC
   require('./mixins/MemoryCollectionMixin') LeanRC
-  require('./mixins/MemoryMigrationMixin') LeanRC #needs tests
+  require('./mixins/MemoryMigrationMixin') LeanRC
   require('./mixins/MemoryResqueMixin') LeanRC
-  require('./mixins/MemoryConfigurationMixin') LeanRC #needs tests
+  require('./mixins/MemoryConfigurationMixin') LeanRC
   require('./mixins/IterableMixin') LeanRC
   # require('./mixins/PipesSwitchMixin') LeanRC # empty
   require('./mixins/QueryableMixin') LeanRC

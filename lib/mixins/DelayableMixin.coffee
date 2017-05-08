@@ -13,7 +13,7 @@ module.exports = (Module)->
 
       ipmDelayJob = @private @async delayJob: Function,
         default: (facade, data, options = {})->
-          resque = facade.retriveProxy Module::RESQUE
+          resque = facade.retrieveProxy Module::RESQUE
           queue = yield resque.get options.queue ? Module::DELAYED_JOBS_QUEUE
           yield queue.push Module::DELAYED_JOBS_SCRIPT, data, options.delayUntil
           yield return
