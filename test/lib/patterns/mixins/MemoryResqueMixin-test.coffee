@@ -181,3 +181,30 @@ describe 'MemoryResqueMixin', ->
           lockLifetime: 5000
           lockLimit: 2
         yield return
+  describe '#getJob', ->
+    it 'should get saved job', ->
+      co ->
+        class Test extends RC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        resque = Test::Resque.new 'TEST_RESQUE'
+        resque.onRegister()
+        resque.ensureQueue 'TEST_QUEUE_1', 1
+        DATA = data: 'data'
+        DATE = new Date()
+        jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT', DATA, DATE
+        job = yield resque.getJob 'TEST_QUEUE_1', jobId
+        assert.deepEqual job,
+          queueName: 'Test|>TEST_QUEUE_1'
+          data: scriptName: 'TEST_SCRIPT', data: DATA
+          delayUntil: DATE
+          status: 'scheduled'
+          lockLifetime: 5000
+          lockLimit: 2
+        yield return
