@@ -38,8 +38,7 @@ describe 'MemoryMigrationMixin', ->
         yield migration.up()
         assert.isTrue spyCreateCollection.calledWith 'TestCollection'
         yield return
-  ###
-  describe '.createEdgeCollection', ->
+  describe '#createEdgeCollection', ->
     it 'should add step for create edge collection', ->
       co ->
         class Test extends LeanRC::Module
@@ -50,14 +49,14 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @createEdgeCollection 'TestEdgeCollection'
         Test::BaseMigration.initialize()
-        Test::BaseMigration.createEdgeCollection 'ARG_1', 'ARG_2', 'ARG_3'
         migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'createEdgeCollection'
+        spyCreateCollection = sinon.spy migration, 'createEdgeCollection'
+        yield migration.up()
+        assert.isTrue spyCreateCollection.calledWith 'TestEdgeCollection'
         yield return
+  ###
   describe '.addField', ->
     it 'should add step to add field in record at collection', ->
       co ->
