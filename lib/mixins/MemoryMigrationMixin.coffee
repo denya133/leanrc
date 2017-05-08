@@ -57,7 +57,7 @@ module.exports = (Module)->
           yield return
 
       @public @async changeField: Function,
-        default: (collection_name, field_name, options)->
+        default: (collection_name, field_name, options = {})->
           {
             json
             binary
@@ -92,7 +92,6 @@ module.exports = (Module)->
                 doc[field_name] = new Date(String  doc[field_name]).toISOString()
               when time, timestamp
                 doc[field_name] = new Date(String  doc[field_name]).getTime()
-            return
           yield return
 
       @public @async renameField: Function,

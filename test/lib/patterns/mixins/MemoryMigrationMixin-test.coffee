@@ -177,27 +177,49 @@ describe 'MemoryMigrationMixin', ->
         yield migration.up()
         assert.isTrue spyChangeCollection.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
         yield return
-  ###
-  describe '.changeField', ->
+  describe '#changeField', ->
     it 'should apply step to change field in collection', ->
       co ->
+        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_003'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
         Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+        Test::MemoryCollection.initialize()
         class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @changeField 'Test', 'test', type: LeanRC::Migration::SUPPORTED_TYPES.integer
         Test::BaseMigration.initialize()
-        Test::BaseMigration.changeField 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'changeField'
+        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+        collection = facade.retrieveProxy 'TestCollection'
+        yield collection.create test: '42'
+        yield collection.create test: '42'
+        yield collection.create test: '42'
+        migration = Test::BaseMigration.new {}, collection
+        yield migration.up()
+        for own id, doc of collection[Symbol.for '~collection']
+          assert.propertyVal doc, 'test', 42
         yield return
-  describe '.renameField', ->
+  ###
+  describe '#renameField', ->
     it 'should apply step to rename field in collection', ->
       co ->
         class Test extends LeanRC::Module
