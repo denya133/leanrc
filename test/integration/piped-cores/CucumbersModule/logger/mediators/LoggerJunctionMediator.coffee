@@ -33,6 +33,8 @@ module.exports = (Module) ->
     @inheritProtected()
     @module Module
 
+    ipoJunction = Symbol.for '~junction'
+
     @public @static NAME: String,
       default: 'LoggerJunctionMediator'
 
@@ -47,7 +49,7 @@ module.exports = (Module) ->
             name = aoNotification.getType()
             if name is STDIN
               pipe = aoNotification.getBody()
-              tee = junction.retrievePipe STDIN
+              tee = @[ipoJunction].retrievePipe STDIN
               tee.connectInput pipe
             else
               @super aoNotification
@@ -65,7 +67,7 @@ module.exports = (Module) ->
         filter = Filter.new LOG_FILTER_NAME, null, filterLogByLevel
         filter.connect PipeListener.new @, @handlePipeMessage
         teeMerge.connect filter
-        junction.registerPipe STDIN, INPUT, teeMerge
+        @[ipoJunction].registerPipe STDIN, INPUT, teeMerge
         return
 
     @public init: Function,

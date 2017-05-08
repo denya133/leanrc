@@ -6,14 +6,14 @@ class Logger extends LeanRC
 
   @root __dirname
 
+  require('./mediators/LoggerJunctionMediator') @Module
+
+  require('./proxies/LoggerProxy') @Module
+
   require('./commands/PrepareControllerCommand') @Module
   require('./commands/PrepareViewCommand') @Module
   require('./commands/PrepareModelCommand') @Module
   require('./commands/StartupCommand') @Module
-
-  require('./mediators/LoggerJunctionMediator') @Module
-
-  require('./proxies/LoggerProxy') @Module
 
   require('./ApplicationFacade') @Module
 

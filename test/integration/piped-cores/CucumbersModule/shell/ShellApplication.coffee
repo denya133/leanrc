@@ -2,6 +2,8 @@
 
 module.exports = (Module) ->
   {
+    NILL
+
     LogFilterMessage
     Application
   } = Module::

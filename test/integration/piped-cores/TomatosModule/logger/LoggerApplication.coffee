@@ -2,7 +2,7 @@
 
 module.exports = (Module) ->
   {
-    ApplicationFacade
+    Application
   } = Module::
 
   class LoggerApplication extends Application

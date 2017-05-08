@@ -1,1 +1,1 @@
-module.exports = './lib'
+module.exports = require './lib'
