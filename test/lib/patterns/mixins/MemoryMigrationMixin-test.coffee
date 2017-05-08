@@ -417,8 +417,7 @@ describe 'MemoryMigrationMixin', ->
         for own id, doc of collection[Symbol.for '~collection']
           assert.notProperty doc, 'test'
         yield return
-  ###
-  describe '.removeIndex', ->
+  describe '#removeIndex', ->
     it 'should apply step to remove index in collection', ->
       co ->
         class Test extends LeanRC::Module
@@ -429,14 +428,14 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @removeIndex 'ARG_1', 'ARG_2', 'ARG_3'
         Test::BaseMigration.initialize()
-        Test::BaseMigration.removeIndex 'ARG_1', 'ARG_2', 'ARG_3'
         migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'removeIndex'
+        spyRemoveIndex = sinon.spy migration, 'removeIndex'
+        yield migration.up()
+        assert.isTrue spyRemoveIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
         yield return
+  ###
   describe '.removeTimestamps', ->
     it 'should apply step to remove timestamps in collection', ->
       co ->
