@@ -265,7 +265,7 @@ module.exports = (Module)->
         @addField 'users', 'last_name', 'string'
 
         @reversible wrap (dir)->
-          UsersCollection = @collection.facade.retriveProxy 'UsersCollection'
+          UsersCollection = @collection.facade.retrieveProxy 'UsersCollection'
           yield UsersCollection.forEach wrap (u)->
             yield dir.up   wrap ->
               [u.first_name, u.last_name] = u.full_name.split(' ')

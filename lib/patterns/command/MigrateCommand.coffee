@@ -75,7 +75,7 @@ module.exports = (Module) ->
     @public init: Function,
       default: (args...)->
         @super args...
-        @migrationsCollection = @facade.retriveProxy Module::MIGRATIONS
+        @migrationsCollection = @facade.retrieveProxy Module::MIGRATIONS
         return
 
     @public execute: Function,

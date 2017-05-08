@@ -21,7 +21,7 @@ describe 'MemoryMigrationMixin', ->
         migration = Test::BaseMigration.new()
         yield return
   describe '#createCollection', ->
-    it 'should add step for create collection', ->
+    it 'should apply step for create collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -39,7 +39,7 @@ describe 'MemoryMigrationMixin', ->
         assert.isTrue spyCreateCollection.calledWith 'TestCollection'
         yield return
   describe '#createEdgeCollection', ->
-    it 'should add step for create edge collection', ->
+    it 'should apply step for create edge collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -56,28 +56,51 @@ describe 'MemoryMigrationMixin', ->
         yield migration.up()
         assert.isTrue spyCreateCollection.calledWith 'TestEdgeCollection'
         yield return
-  ###
-  describe '.addField', ->
-    it 'should add step to add field in record at collection', ->
+  describe '#addField', ->
+    it 'should apply step to add field in record at collection', ->
       co ->
+        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_001'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
         Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
         class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @addField 'Test', 'test',
+            default: 'Test1'
         Test::BaseMigration.initialize()
-        Test::BaseMigration.addField 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'addField'
+        class Test::MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+        Test::MemoryCollection.initialize()
+        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+        collection = facade.retrieveProxy 'TestCollection'
+        yield collection.create _key: 1
+        yield collection.create _key: 2
+        yield collection.create _key: 3
+        migration = Test::BaseMigration.new {}, collection
+        yield migration.up()
+        for own id, doc of collection[Symbol.for '~collection']
+          assert.propertyVal doc, 'test', 'Test1'
         yield return
+  ###
   describe '.addIndex', ->
-    it 'should add step to add index in collection', ->
+    it 'should apply step to add index in collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -96,7 +119,7 @@ describe 'MemoryMigrationMixin', ->
           method: 'addIndex'
         yield return
   describe '.addTimestamps', ->
-    it 'should add step to add timesteps in collection', ->
+    it 'should apply step to add timesteps in collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -115,7 +138,7 @@ describe 'MemoryMigrationMixin', ->
           method: 'addTimestamps'
         yield return
   describe '.changeCollection', ->
-    it 'should add step to change collection', ->
+    it 'should apply step to change collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -134,7 +157,7 @@ describe 'MemoryMigrationMixin', ->
           method: 'changeCollection'
         yield return
   describe '.changeField', ->
-    it 'should add step to change field in collection', ->
+    it 'should apply step to change field in collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -153,7 +176,7 @@ describe 'MemoryMigrationMixin', ->
           method: 'changeField'
         yield return
   describe '.renameField', ->
-    it 'should add step to rename field in collection', ->
+    it 'should apply step to rename field in collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -172,7 +195,7 @@ describe 'MemoryMigrationMixin', ->
           method: 'renameField'
         yield return
   describe '.renameIndex', ->
-    it 'should add step to rename index in collection', ->
+    it 'should apply step to rename index in collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -191,7 +214,7 @@ describe 'MemoryMigrationMixin', ->
           method: 'renameIndex'
         yield return
   describe '.renameCollection', ->
-    it 'should add step to rename collection', ->
+    it 'should apply step to rename collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -210,7 +233,7 @@ describe 'MemoryMigrationMixin', ->
           method: 'renameCollection'
         yield return
   describe '.dropCollection', ->
-    it 'should add step to drop collection', ->
+    it 'should apply step to drop collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -229,7 +252,7 @@ describe 'MemoryMigrationMixin', ->
           method: 'dropCollection'
         yield return
   describe '.dropEdgeCollection', ->
-    it 'should add step to drop edge collection', ->
+    it 'should apply step to drop edge collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -248,7 +271,7 @@ describe 'MemoryMigrationMixin', ->
           method: 'dropEdgeCollection'
         yield return
   describe '.removeField', ->
-    it 'should add step to remove field in collection', ->
+    it 'should apply step to remove field in collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -267,7 +290,7 @@ describe 'MemoryMigrationMixin', ->
           method: 'removeField'
         yield return
   describe '.removeIndex', ->
-    it 'should add step to remove index in collection', ->
+    it 'should apply step to remove index in collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -286,7 +309,7 @@ describe 'MemoryMigrationMixin', ->
           method: 'removeIndex'
         yield return
   describe '.removeTimestamps', ->
-    it 'should add step to remove timestamps in collection', ->
+    it 'should apply step to remove timestamps in collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
