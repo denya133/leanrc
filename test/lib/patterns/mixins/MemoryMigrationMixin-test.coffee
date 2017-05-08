@@ -13,33 +13,32 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new 'TEST_MIGRATION'
+        migration = Test::BaseMigration.new()
         yield return
-  ###
-  describe '.createCollection', ->
+  describe '#createCollection', ->
     it 'should add step for create collection', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @createCollection 'TestCollection'
         Test::BaseMigration.initialize()
-        Test::BaseMigration.createCollection 'ARG_1', 'ARG_2', 'ARG_3'
         migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'createCollection'
+        spyCreateCollection = sinon.spy migration, 'createCollection'
+        yield migration.up()
+        assert.isTrue spyCreateCollection.calledWith 'TestCollection'
         yield return
+  ###
   describe '.createEdgeCollection', ->
     it 'should add step for create edge collection', ->
       co ->
@@ -47,7 +46,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -66,7 +65,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -85,7 +84,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -104,7 +103,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -123,7 +122,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -142,7 +141,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -161,7 +160,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -180,7 +179,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -199,7 +198,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -218,7 +217,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -237,7 +236,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -256,7 +255,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -275,7 +274,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -294,7 +293,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -313,7 +312,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -332,7 +331,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -349,7 +348,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -368,7 +367,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -401,7 +400,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -435,7 +434,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -454,7 +453,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -475,7 +474,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
@@ -507,7 +506,7 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::BaseMigration extends LeanRC::Proxy
+        class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
