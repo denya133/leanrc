@@ -218,26 +218,49 @@ describe 'MemoryMigrationMixin', ->
         for own id, doc of collection[Symbol.for '~collection']
           assert.propertyVal doc, 'test', 42
         yield return
-  ###
   describe '#renameField', ->
     it 'should apply step to rename field in collection', ->
       co ->
+        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_004'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
         Test.initialize()
+        class Test::TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @_type = 'Test::TestRecord'
+        Test::TestRecord.initialize()
+        class Test::MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+        Test::MemoryCollection.initialize()
         class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @renameField 'Test', 'test', 'test1'
         Test::BaseMigration.initialize()
-        Test::BaseMigration.renameField 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'renameField'
+        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
+          delegate: Test::TestRecord
+          serializer: LeanRC::Serializer
+        collection = facade.retrieveProxy 'TestCollection'
+        yield collection.create test: '42'
+        yield collection.create test: '42'
+        yield collection.create test: '42'
+        migration = Test::BaseMigration.new {}, collection
+        yield migration.up()
+        for own id, doc of collection[Symbol.for '~collection']
+          assert.notProperty doc, 'test'
+          assert.property doc, 'test1'
         yield return
+  ###
   describe '.renameIndex', ->
     it 'should apply step to rename index in collection', ->
       co ->

@@ -102,7 +102,6 @@ module.exports = (Module)->
           for own id, doc of memCollection[ipoCollection]
             doc[new_field_name] = doc[field_name]
             delete doc[field_name]
-            return
           yield return
 
       @public @async renameIndex: Function,
