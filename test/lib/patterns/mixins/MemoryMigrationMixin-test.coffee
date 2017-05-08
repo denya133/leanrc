@@ -159,8 +159,7 @@ describe 'MemoryMigrationMixin', ->
           assert.property doc, 'updatedAt'
           assert.property doc, 'updatedAt'
         yield return
-  ###
-  describe '.changeCollection', ->
+  describe '#changeCollection', ->
     it 'should apply step to change collection', ->
       co ->
         class Test extends LeanRC::Module
@@ -171,14 +170,14 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @changeCollection 'ARG_1', 'ARG_2', 'ARG_3'
         Test::BaseMigration.initialize()
-        Test::BaseMigration.changeCollection 'ARG_1', 'ARG_2', 'ARG_3'
         migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'changeCollection'
+        spyChangeCollection = sinon.spy migration, 'changeCollection'
+        yield migration.up()
+        assert.isTrue spyChangeCollection.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
         yield return
+  ###
   describe '.changeField', ->
     it 'should apply step to change field in collection', ->
       co ->
