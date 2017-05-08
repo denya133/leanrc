@@ -278,8 +278,7 @@ describe 'MemoryMigrationMixin', ->
         yield migration.up()
         assert.isTrue spyRenameIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
         yield return
-  ###
-  describe '.renameCollection', ->
+  describe '#renameCollection', ->
     it 'should apply step to rename collection', ->
       co ->
         class Test extends LeanRC::Module
@@ -290,14 +289,14 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @renameCollection 'ARG_1', 'ARG_2', 'ARG_3'
         Test::BaseMigration.initialize()
-        Test::BaseMigration.renameCollection 'ARG_1', 'ARG_2', 'ARG_3'
         migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'renameCollection'
+        spyRenameCollection = sinon.spy migration, 'renameCollection'
+        yield migration.up()
+        assert.isTrue spyRenameCollection.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
         yield return
+  ###
   describe '.dropCollection', ->
     it 'should apply step to drop collection', ->
       co ->
