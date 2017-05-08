@@ -98,8 +98,7 @@ describe 'MemoryMigrationMixin', ->
         for own id, doc of collection[Symbol.for '~collection']
           assert.propertyVal doc, 'test', 'Test1'
         yield return
-  ###
-  describe '.addIndex', ->
+  describe '#addIndex', ->
     it 'should apply step to add index in collection', ->
       co ->
         class Test extends LeanRC::Module
@@ -110,14 +109,14 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @addIndex 'ARG_1', 'ARG_2', 'ARG_3'
         Test::BaseMigration.initialize()
-        Test::BaseMigration.addIndex 'ARG_1', 'ARG_2', 'ARG_3'
         migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'addIndex'
+        spyAddIndex = sinon.spy migration, 'addIndex'
+        yield migration.up()
+        assert.isTrue spyAddIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
         yield return
+  ###
   describe '.addTimestamps', ->
     it 'should apply step to add timesteps in collection', ->
       co ->

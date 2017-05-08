@@ -50,7 +50,6 @@ module.exports = (Module)->
             doc.createdAt ?= null
             doc.updatedAt ?= null
             doc.deletedAt ?= null
-            return
           yield return
 
       @public @async changeCollection: Function,
