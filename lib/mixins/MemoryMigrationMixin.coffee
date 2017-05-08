@@ -131,7 +131,6 @@ module.exports = (Module)->
           ipoCollection = Symbol.for '~collection'
           for own id, doc of @collection[ipoCollection]
             delete memCollection[ipoCollection][id]
-            return
           delete memCollection[ipoCollection]
           memCollection[ipoCollection] = {}
           yield return
@@ -143,7 +142,6 @@ module.exports = (Module)->
           ipoCollection = Symbol.for '~collection'
           for own id, doc of memCollection[ipoCollection]
             delete doc[field_name]
-            return
           yield return
 
       @public @async removeIndex: Function,
@@ -159,7 +157,6 @@ module.exports = (Module)->
             delete doc.createdAt
             delete doc.updatedAt
             delete doc.deletedAt
-            return
           yield return
 
 
