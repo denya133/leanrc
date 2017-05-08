@@ -260,8 +260,7 @@ describe 'MemoryMigrationMixin', ->
           assert.notProperty doc, 'test'
           assert.property doc, 'test1'
         yield return
-  ###
-  describe '.renameIndex', ->
+  describe '#renameIndex', ->
     it 'should apply step to rename index in collection', ->
       co ->
         class Test extends LeanRC::Module
@@ -272,14 +271,14 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
+          @renameIndex 'ARG_1', 'ARG_2', 'ARG_3'
         Test::BaseMigration.initialize()
-        Test::BaseMigration.renameIndex 'ARG_1', 'ARG_2', 'ARG_3'
         migration = Test::BaseMigration.new()
-        assert.lengthOf migration.steps, 1
-        assert.deepEqual migration.steps[0],
-          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-          method: 'renameIndex'
+        spyRenameIndex = sinon.spy migration, 'renameIndex'
+        yield migration.up()
+        assert.isTrue spyRenameIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
         yield return
+  ###
   describe '.renameCollection', ->
     it 'should apply step to rename collection', ->
       co ->
