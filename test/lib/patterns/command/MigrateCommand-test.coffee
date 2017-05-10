@@ -1,3 +1,4 @@
+EventEmitter = require 'events'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
@@ -149,4 +150,46 @@ describe 'MigrateCommand', ->
         for migrationName in migrationNames
           assert.property collectionData, migrationName
           break  if migrationName is untilName
+        yield return
+  describe '#execute', ->
+    it 'should run migrations via "execute"', ->
+      co ->
+        KEY = 'TEST_MIGRATE_COMMAND_005'
+        facade = LeanRC::Facade.getInstance KEY
+        trigger = new EventEmitter
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root2"
+        Test.initialize()
+        class TestConfiguration extends LeanRC::Configuration
+          @inheritProtected()
+          @module Test
+        TestConfiguration.initialize()
+        class TestMemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+        TestMemoryCollection.initialize()
+        class TestCommand extends LeanRC::MigrateCommand
+          @inheritProtected()
+          @module Test
+          @public @async migrate: Function,
+            default: (options) ->
+              result = yield @super options
+              trigger.emit 'MIGRATE', options
+              yield return result
+        TestCommand.initialize()
+        facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
+          delegate: LeanRC::Migration
+          serializer: LeanRC::Serializer
+        facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
+        command = TestCommand.new()
+        command.initializeNotifier KEY
+        untilName = '00000000000002_second_migration'
+        promise = LeanRC::Promise.new (resolve, reject) ->
+          trigger.once 'MIGRATE', (options) -> resolve options
+          return
+        command.execute until: untilName
+        options = yield promise
+        assert.deepEqual options, until: untilName
         yield return
