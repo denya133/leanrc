@@ -134,3 +134,26 @@ describe 'CrudEndpointsMixin', ->
         assert.deepEqual itemSchema, joi.object
           cucumber: TestRecord.schema
         yield return
+  describe '#querySchema', ->
+    it 'should get gateway query schema', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+        TestRecord.initialize()
+        class TestCrudGateway extends LeanRC::Gateway
+          @inheritProtected()
+          @include LeanRC::CrudEndpointsMixin
+          @module Test
+        TestCrudGateway.initialize()
+        gateway = TestCrudGateway.new 'CucumberGateway',
+          entityName: 'cucumber'
+          schema: TestRecord.schema
+        { querySchema } = gateway
+        assert.deepEqual querySchema, joi.string().empty('{}').optional().default '{}', '
+          The query for finding objects.
+        '
+        yield return
