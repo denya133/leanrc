@@ -1,6 +1,7 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 _ = require 'lodash'
+joi = require 'joi'
 LeanRC = require.main.require 'lib'
 RC = require 'RC'
 { co } = RC::Utils
@@ -88,4 +89,26 @@ describe 'CrudEndpointsMixin', ->
           schema: TestRecord.schema
         { schema } = gateway
         assert.equal schema, TestRecord.schema
+        yield return
+  describe '#listSchema', ->
+    it 'should get gateway list schema', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+        TestRecord.initialize()
+        class TestCrudGateway extends LeanRC::Gateway
+          @inheritProtected()
+          @include LeanRC::CrudEndpointsMixin
+          @module Test
+        TestCrudGateway.initialize()
+        gateway = TestCrudGateway.new 'CucumberGateway',
+          entityName: 'cucumber'
+          schema: TestRecord.schema
+        { listSchema } = gateway
+        assert.deepEqual listSchema, joi.object
+          cucumbers: joi.array().items TestRecord.schema
         yield return
