@@ -50,6 +50,8 @@ module.exports = (Module) ->
     @include Module::ConfigurableMixin
     @module Module
 
+    iplMigrationNames = @private migrationNames: Module::PromiseInterface
+
     @public migrationsCollection: Module::CollectionInterface
     @public migrationNames: Module::PromiseInterface,
       get: ->
@@ -57,7 +59,7 @@ module.exports = (Module) ->
         @[iplMigrationNames] ?= co =>
           files = yield filesList @migrationsDir
           yield return _.orderBy _.compact (files ? []).map (i)=>
-            migrationName = i.replace '.js', ''
+            migrationName = i.replace /\.js|\.coffee/, ''
             if migrationName isnt 'BaseMigration'
               vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
               require(vsMigrationPath) Module
