@@ -201,3 +201,29 @@ describe 'CrudEndpointsMixin', ->
           The version of api endpoint in format `vx.x`
         '
         yield return
+  describe '#onRegister', ->
+    it 'should run gateway register handler', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+        TestRecord.initialize()
+        class TestCrudGateway extends LeanRC::Gateway
+          @inheritProtected()
+          @include LeanRC::CrudEndpointsMixin
+          @module Test
+        TestCrudGateway.initialize()
+        gateway = TestCrudGateway.new 'CucumberGateway',
+          entityName: 'cucumber'
+          schema: TestRecord.schema
+        gateway.onRegister()
+        definitions = [
+          'list', 'detail', 'create', 'update', 'patch', 'delete'
+          'bulkUpdate', 'bulkPatch', 'bulkDelete'
+        ]
+        for definition in definitions
+          assert.equal gateway.swaggerDefinitionFor('list').gateway, gateway
+        yield return
