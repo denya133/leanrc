@@ -70,7 +70,7 @@ module.exports = (Module) ->
 
     @public migrationsDir: String,
       get: ->
-        "#{@Module::ROOT}/compiled_migrations"
+        "#{@configs.ROOT}/compiled_migrations"
 
     @public init: Function,
       default: (args...)->

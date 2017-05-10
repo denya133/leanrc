@@ -44,6 +44,8 @@ module.exports = (Module) ->
     @include LoggingJunctionMixin
     @module Module
 
+    ipoJunction = Symbol.for '~junction'
+
     @public @static NAME: String,
       default: 'TomatosShellJunctionMediator'
 
@@ -60,27 +62,27 @@ module.exports = (Module) ->
       default: (aoNotification)->
         switch aoNotification.getName()
           # when Module::Constants.REQUEST_LOG_WINDOW
-          #   sendNotification(LogMessage.SEND_TO_LOG,"Requesting log button from LoggerModule.",LogMessage.LEVELS[LogMessage.DEBUG])
-          #   junction.sendMessage(PipeAwareModule.STDLOG,new UIQueryMessage(UIQueryMessage.GET,LoggerModule.LOG_BUTTON_UI))
+          #   @sendNotification(LogMessage.SEND_TO_LOG,"Requesting log button from LoggerModule.",LogMessage.LEVELS[LogMessage.DEBUG])
+          #   @[ipoJunction].sendMessage(PipeAwareModule.STDLOG,new UIQueryMessage(UIQueryMessage.GET,LoggerModule.LOG_BUTTON_UI))
           #   break
           # when Module::Constants.REQUEST_LOG_BUTTON
-          #   sendNotification(LogMessage.SEND_TO_LOG,"Requesting log window from LoggerModule.",LogMessage.LEVELS[LogMessage.DEBUG])
-          #   junction.sendMessage(PipeAwareModule.STDLOG,new UIQueryMessage(UIQueryMessage.GET,LoggerModule.LOG_WINDOW_UI))
+          #   @sendNotification(LogMessage.SEND_TO_LOG,"Requesting log window from LoggerModule.",LogMessage.LEVELS[LogMessage.DEBUG])
+          #   @[ipoJunction].sendMessage(PipeAwareModule.STDLOG,new UIQueryMessage(UIQueryMessage.GET,LoggerModule.LOG_WINDOW_UI))
           #   break
           when CONNECT_MODULE_TO_SHELL
-            sendNotification(LogMessage.SEND_TO_LOG,"Connecting new module instance to Shell.",LogMessage.LEVELS[LogMessage.DEBUG])
+            @sendNotification(LogMessage.SEND_TO_LOG,"Connecting new module instance to Shell.",LogMessage.LEVELS[LogMessage.DEBUG])
 
             # Connect a module's STDSHELL to the shell's STDIN
             module = aoNotification.getBody()
             moduleToShell = Pipe.new()
             module.acceptOutputPipe STDSHELL, moduleToShell
-            shellIn = junction.retrievePipe STDIN
+            shellIn = @[ipoJunction].retrievePipe STDIN
             shellIn.connectInput moduleToShell
 
             # Connect the shell's STDOUT to the module's STDIN
             shellToModule = Pipe.new()
             module.acceptInputPipe STDIN, shellToModule
-            shellOut = junction.retrievePipe STDOUT
+            shellOut = @[ipoJunction].retrievePipe STDOUT
             shellOut.connect shellToModule
             break
           else
@@ -90,30 +92,30 @@ module.exports = (Module) ->
       default: (aoMessage)->
         # switch aoMessage.name
         #   when LoggerModule.LOG_BUTTON_UI
-        #     sendNotification(ApplicationFacade.SHOW_LOG_BUTTON, UIQueryMessage(message).component, UIQueryMessage(message).name )
-        #     junction.sendMessage(PipeAwareModule.STDLOG,new LogMessage(LogMessage.INFO,this.multitonKey,'Recieved the Log Button on STDSHELL'))
+        #     @sendNotification(ApplicationFacade.SHOW_LOG_BUTTON, UIQueryMessage(message).component, UIQueryMessage(message).name )
+        #     @[ipoJunction].sendMessage(PipeAwareModule.STDLOG,new LogMessage(LogMessage.INFO,this.multitonKey,'Recieved the Log Button on STDSHELL'))
         #     break
         #   when LoggerModule.LOG_WINDOW_UI
-        #     sendNotification(ApplicationFacade.SHOW_LOG_WINDOW, UIQueryMessage(message).component, UIQueryMessage(message).name )
-        #     junction.sendMessage(PipeAwareModule.STDLOG,new LogMessage(LogMessage.INFO,this.multitonKey,'Recieved the Log Window on STDSHELL'))
+        #     @sendNotification(ApplicationFacade.SHOW_LOG_WINDOW, UIQueryMessage(message).component, UIQueryMessage(message).name )
+        #     @[ipoJunction].sendMessage(PipeAwareModule.STDLOG,new LogMessage(LogMessage.INFO,this.multitonKey,'Recieved the Log Window on STDSHELL'))
         #     break
         #   when PrattlerModule.FEED_WINDOW_UI
-        #     sendNotification(ApplicationFacade.SHOW_FEED_WINDOW, UIQueryMessage(message).component, UIQueryMessage(message).name )
-        #     junction.sendMessage(PipeAwareModule.STDLOG,new LogMessage(LogMessage.INFO,this.multitonKey,'Recieved the Feed Window on STDSHELL'))
+        #     @sendNotification(ApplicationFacade.SHOW_FEED_WINDOW, UIQueryMessage(message).component, UIQueryMessage(message).name )
+        #     @[ipoJunction].sendMessage(PipeAwareModule.STDLOG,new LogMessage(LogMessage.INFO,this.multitonKey,'Recieved the Feed Window on STDSHELL'))
         #     break
 
     @public onRegister: Function,
       default: ->
         # The STDOUT pipe from the shell to all modules
-        junction.registerPipe STDOUT,  OUTPUT, TeeSplit.new()
+        @[ipoJunction].registerPipe STDOUT,  OUTPUT, TeeSplit.new()
 
         # The STDIN pipe to the shell from all modules
-        junction.registerPipe STDIN,  INPUT, TeeMerge.new()
-        junction.addPipeListener STDIN, @, @handlePipeMessage
+        @[ipoJunction].registerPipe STDIN,  INPUT, TeeMerge.new()
+        @[ipoJunction].addPipeListener STDIN, @, @handlePipeMessage
 
         # The STDLOG pipe from the shell to the logger
-        junction.registerPipe STDLOG, OUTPUT, Pipe.new()
-        sendNotification CONNECT_SHELL_TO_LOGGER, junction
+        @[ipoJunction].registerPipe STDLOG, OUTPUT, Pipe.new()
+        @sendNotification CONNECT_SHELL_TO_LOGGER, @[ipoJunction]
 
     @public init: Function,
       default: ->

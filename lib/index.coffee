@@ -22,6 +22,8 @@ class LeanRC extends RC
   @const JOB_RESULT:  Symbol 'JOB_RESULT'
   @const SHELL:  Symbol 'ShellApplication'
   @const APPLICATION_MEDIATOR:  Symbol 'ApplicationMediator'
+  @const APPLICATION_ROUTER:  Symbol 'ApplicationRouter'
+  @const APPLICATION_RENDERER:  Symbol 'ApplicationRenderer'
   @const MEM_RESQUE_EXEC:  Symbol 'MemoryResqueExecutor'
   @const LOG_MSG: Symbol 'logMessage'
 

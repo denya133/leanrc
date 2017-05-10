@@ -11,6 +11,9 @@ module.exports = (Module)->
 
     @public @static NAME: String
 
+    @public finish: Function,
+      default: -> @facade.finish()
+
     @public init: Function,
       default: ->
         {ApplicationFacade} = @constructor.Module::

@@ -43,8 +43,7 @@ module.exports = (Module)->
     @public execute: Function,
       default: ->
         #...
-        @facade.registerProxy AppConfiguration.new CONFIGURATION
-        #...
+        @facade.registerProxy AppConfiguration.new CONFIGURATION, @Module::ROOT
 
   PrepareModelCommand.initialize()
 ```
@@ -105,6 +104,9 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
+    @public ROOT: String,
+      get: -> @getData()
+
     @public environment: String,
       get: ->
         if isArangoDB()
@@ -122,9 +124,9 @@ module.exports = (Module)->
       args: []
       return: NILL
       default: ->
-        manifestPath = "#{@Module::ROOT}/../manifest.json"
+        manifestPath = "#{@ROOT}/../manifest.json"
         configFromManifest = require(manifestPath).configuration
-        filePath = "#{@Module::ROOT}/../configs/#{@environment}"
+        filePath = "#{@ROOT}/../configs/#{@environment}"
         configFromFile = require filePath
         configs = extend {}, configFromManifest, configFromFile
         for own key, value of configs

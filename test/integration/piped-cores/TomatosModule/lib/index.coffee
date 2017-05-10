@@ -12,6 +12,8 @@ class Tomatos extends LeanRC
 
   require('./records/TomatoRecord') @Module
 
+  require('./stocks/TomatosStock') @Module
+
   require('./ApplicationRouter') @Module
 
 

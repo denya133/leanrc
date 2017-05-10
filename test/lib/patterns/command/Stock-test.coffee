@@ -337,8 +337,8 @@ describe 'Stock', ->
         Test::TestStock.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @module Test
           @include LeanRC::QueryableMixin
+          @module Test
           @public parseQuery: Object,
             default: (aoQuery) -> aoQuery
           @public @async executeQuery: Function,
@@ -403,8 +403,8 @@ describe 'Stock', ->
         Test::TestStock.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @module Test
           @include LeanRC::QueryableMixin
+          @module Test
           @public parseQuery: Object,
             default: (aoQuery) -> aoQuery
           @public @async executeQuery: Function,
@@ -473,8 +473,8 @@ describe 'Stock', ->
         Test::TestStock.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @module Test
           @include LeanRC::QueryableMixin
+          @module Test
           @public parseQuery: Object,
             default: (aoQuery) -> aoQuery
           @public @async executeQuery: Function,
@@ -534,8 +534,8 @@ describe 'Stock', ->
         Test::TestStock.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @module Test
           @include LeanRC::QueryableMixin
+          @module Test
           @public parseQuery: Object,
             default: (aoQuery) -> aoQuery
           @public @async executeQuery: Function,
@@ -607,8 +607,8 @@ describe 'Stock', ->
         Test::TestStock.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @module Test
           @include LeanRC::QueryableMixin
+          @module Test
           @public parseQuery: Object,
             default: (aoQuery) -> aoQuery
           @public @async executeQuery: Function,
@@ -679,8 +679,8 @@ describe 'Stock', ->
         Test::TestStock.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @module Test
           @include LeanRC::QueryableMixin
+          @module Test
           @public parseQuery: Object,
             default: (aoQuery) ->
               voQuery = _.mapKeys aoQuery, (value, key) -> key.replace /^@doc\./, ''
@@ -761,8 +761,8 @@ describe 'Stock', ->
         Test::TestStock.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @module Test
           @include LeanRC::QueryableMixin
+          @module Test
           @public parseQuery: Object,
             default: (aoQuery) ->
               voQuery = _.mapKeys aoQuery, (value, key) -> key.replace /^@doc\./, ''
@@ -843,8 +843,8 @@ describe 'Stock', ->
         Test::TestStock.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @module Test
           @include LeanRC::QueryableMixin
+          @module Test
           @public parseQuery: Object,
             default: (aoQuery) ->
               voQuery = _.mapKeys aoQuery, (value, key) -> key.replace /^@doc\./, ''
@@ -920,8 +920,8 @@ describe 'Stock', ->
         Test::TestStock.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @module Test
           @include LeanRC::QueryableMixin
+          @module Test
           @public parseQuery: Object,
             default: (aoQuery) ->
               voQuery = _.mapKeys aoQuery, (value, key) -> key.replace /^@doc\./, ''

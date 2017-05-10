@@ -50,6 +50,9 @@ module.exports = (Module)->
     class MemoryConfigurationMixin extends BaseClass
       @inheritProtected()
 
+      @public ROOT: String,
+        get: -> @Module::ROOT
+
       @public defineConfigProperties: Function,
         default: ->
           configs = @getData()

@@ -1,34 +1,3 @@
-{ db } = require '@arangodb'
-
-migration =
-  up: ->
-    {read, write} = Basis::Space.getLocksFor '.createFromBatch'
-    db._executeTransaction
-      collections:
-        read: read
-        write: write
-        allowImplicit: no
-      action: ->
-        Basis::Space.createFromBatch
-          id:         '_default'
-          shortName:  '_default'
-          ownerId:    'admin'
-          kind:       'default'
-          description: 'Global space for any public content'
-        return
-    return
-  down: ->
-    {read, write} = Basis::Space.getLocksFor '.destroy'
-    db._executeTransaction
-      collections:
-        read: read
-        write: write
-        allowImplicit: no
-      action: ->
-        Basis::Space.destroy('_default')
-        return
-    return
-
 
 
 module.exports = (Module)->

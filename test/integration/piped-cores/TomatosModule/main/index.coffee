@@ -6,16 +6,17 @@ class TomatosMain extends Tomatos
 
   @root __dirname
 
+  require('./mediators/MainJunctionMediator') @Module
+
+  require('./proxies/MainConfiguration') @Module
+  require('./proxies/MainCollection') @Module
+  require('./proxies/MainResque') @Module
+  require('./proxies/CucumbersResource') @Module
+
   require('./commands/PrepareControllerCommand') @Module
   require('./commands/PrepareViewCommand') @Module
   require('./commands/PrepareModelCommand') @Module
   require('./commands/StartupCommand') @Module
-
-  require('./mediators/MainJunctionMediator') @Module
-
-  require('./proxies/BaseConfiguration') @Module
-  require('./proxies/BaseCollection') @Module
-  require('./proxies/BaseResque') @Module
 
   require('./ApplicationFacade') @Module
 

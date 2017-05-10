@@ -13,12 +13,12 @@ describe 'IterableMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
         Test::TestRecord.initialize()
         class Test::Iterable extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::IterableMixin
-          @Module: Test
+          @module Test
           ipcRecord = @protected record: Test::TestRecord
           iplArray = @protected array: Array
           @public init: Function,
@@ -44,13 +44,13 @@ describe 'IterableMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         class Test::Iterable extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::IterableMixin
-          @Module: Test
+          @module Test
           ipcRecord = @protected record: Test::TestRecord
           iplArray = @protected array: Array
           @public init: Function,
@@ -82,13 +82,13 @@ describe 'IterableMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         class Test::Iterable extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::IterableMixin
-          @Module: Test
+          @module Test
           ipcRecord = @protected record: Test::TestRecord
           iplArray = @protected array: Array
           @public init: Function,
@@ -120,13 +120,13 @@ describe 'IterableMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         class Test::Iterable extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::IterableMixin
-          @Module: Test
+          @module Test
           ipcRecord = @protected record: Test::TestRecord
           iplArray = @protected array: Array
           @public init: Function,
@@ -155,13 +155,13 @@ describe 'IterableMixin', ->
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
-          @Module: Test
+          @module Test
           @attribute data: String, { default: '' }
         Test::TestRecord.initialize()
         class Test::Iterable extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::IterableMixin
-          @Module: Test
+          @module Test
           ipcRecord = @protected record: Test::TestRecord
           iplArray = @protected array: Array
           @public init: Function,

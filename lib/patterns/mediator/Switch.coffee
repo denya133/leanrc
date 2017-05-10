@@ -2,8 +2,30 @@
 EventEmitter = require 'events'
 
 
+###
+```coffee
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  class HttpSwitch extends Module::Switch
+    @inheritProtected()
+    @include Module::ArangoSwitchMixin
+
+    @module Module
+
+    @public routerName: String,
+      default: 'ApplicationRouter'
+    @public jsonRendererName: String,
+      default: 'JsonRenderer'  # or 'ApplicationRenderer'
+  HttpSwitch.initialize()
+```
+###
+
+
+module.exports = (Module)->
+  {
+    ANY
+    NILL
+    APPLICATION_ROUTER
+  } = Module::
 
   class Switch extends Module::Mediator
     @inheritProtected()
@@ -14,11 +36,9 @@ module.exports = (Module)->
     @public responseFormats: Array,
       get: -> ['json', 'html', 'xml', 'atom']
 
-    # должены быть объявлены в унаследованном классе
     @public routerName: String,
       configurable: yes
-      get: (value)->
-        throw new Error '`Switch::routerName` should be defined in derived class'
+      default: APPLICATION_ROUTER
 
     # @public jsonRendererName: String
     # @public htmlRendererName: String
@@ -91,7 +111,7 @@ module.exports = (Module)->
       args: []
       return: NILL
       default: ->
-        voRouter = @facade.retrieveProxy @routerName
+        voRouter = @facade.retrieveProxy @routerName ? APPLICATION_ROUTER
         voRouter.routes.forEach (aoRoute)=>
           @createNativeRoute aoRoute
         return

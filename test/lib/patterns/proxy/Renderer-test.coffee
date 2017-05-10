@@ -14,43 +14,67 @@ describe 'Renderer', ->
   describe '#templatesDir', ->
     it 'should get templates directory', ->
       expect ->
+        KEY = 'TEST_RENDERER_001'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends RC::Module
           @inheritProtected()
-          @root __dirname
+          @root "#{__dirname}/config/root"
         Test.initialize()
+        class Test::Configuration extends LeanRC::Configuration
+          @inheritProtected()
+          @module Test
+        Test::Configuration.initialize()
+        facade.registerProxy Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
           @module Test
         Test::TestRenderer.initialize()
         renderer = Test::TestRenderer.new()
-        assert.equal renderer.templatesDir, "#{__dirname}/templates"
+        facade.registerProxy renderer
+        assert.equal renderer.templatesDir, "#{__dirname}/config/root/../lib/templates"
       .to.not.throw Error
   describe '#templates', ->
     it 'should get templates from scripts', ->
       co ->
+        KEY = 'TEST_RENDERER_002'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends RC::Module
           @inheritProtected()
-          @root __dirname
+          @root "#{__dirname}/config/root"
         Test.initialize()
+        class Test::Configuration extends LeanRC::Configuration
+          @inheritProtected()
+          @module Test
+        Test::Configuration.initialize()
+        facade.registerProxy Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
           @module Test
         Test::TestRenderer.initialize()
         renderer = Test::TestRenderer.new()
+        facade.registerProxy renderer
         templates = yield renderer.templates
-        assert.property templates, 'test'
+        assert.property templates, 'TestRecord/find'
         yield return
     it 'should run test template from script', ->
       co ->
+        KEY = 'TEST_RENDERER_003'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends RC::Module
           @inheritProtected()
-          @root __dirname
+          @root "#{__dirname}/config/root"
         Test.initialize()
+        class Test::Configuration extends LeanRC::Configuration
+          @inheritProtected()
+          @module Test
+        Test::Configuration.initialize()
+        facade.registerProxy Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
           @module Test
         Test::TestRenderer.initialize()
         renderer = Test::TestRenderer.new()
+        facade.registerProxy renderer
         templates = yield renderer.templates
         items = [
           id: 1, _key: 1, test: 'test1'
@@ -59,7 +83,7 @@ describe 'Renderer', ->
         ,
           id: 3, _key: 3, test: 'test3'
         ]
-        output = templates.test 'TestRecord', 'find', items
+        output = templates['TestRecord/find'] 'TestRecord', 'find', items
         assert.property output, 'test_records'
         assert.sameDeepMembers output.test_records, [
           id: 1, test: 'test1'
@@ -72,26 +96,37 @@ describe 'Renderer', ->
   describe '#render', ->
     it 'should render the data', ->
       co ->
+        KEY = 'TEST_RENDERER_004'
+        facade = LeanRC::Facade.getInstance KEY
         data = test: 'test1', data: 'data1'
         renderer = LeanRC::Renderer.new 'TEST_RENDERER'
+        facade.registerProxy renderer
         renderResult = yield renderer.render data
         assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
         yield return
     it 'should render the data with template', ->
       co ->
+        KEY = 'TEST_RENDERER_005'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends RC::Module
           @inheritProtected()
-          @root __dirname
+          @root "#{__dirname}/config/root"
         Test.initialize()
+        class Test::Configuration extends LeanRC::Configuration
+          @inheritProtected()
+          @module Test
+        Test::Configuration.initialize()
+        facade.registerProxy Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
           @module Test
         Test::TestRenderer.initialize()
         data = id: 1, _key: 1, test: 'test1', data: 'data1'
         renderer = Test::TestRenderer.new 'TEST_RENDERER'
+        facade.registerProxy renderer
         renderResult = yield renderer.render data,
           path: 'test'
-          resource: 'TestRecord'
+          resource: 'TestRecord/'
           action: 'find'
         assert.deepEqual renderResult, JSON.stringify test_records: [
           id: 1, test: "test1", data: "data1"
