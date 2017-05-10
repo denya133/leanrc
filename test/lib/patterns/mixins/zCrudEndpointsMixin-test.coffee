@@ -178,3 +178,26 @@ describe 'CrudEndpointsMixin', ->
         { bulkResponseSchema } = gateway
         assert.deepEqual bulkResponseSchema, joi.object success: joi.boolean()
         yield return
+  describe '#versionSchema', ->
+    it 'should get gateway version schema', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+        Test.initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+        TestRecord.initialize()
+        class TestCrudGateway extends LeanRC::Gateway
+          @inheritProtected()
+          @include LeanRC::CrudEndpointsMixin
+          @module Test
+        TestCrudGateway.initialize()
+        gateway = TestCrudGateway.new 'CucumberGateway',
+          entityName: 'cucumber'
+          schema: TestRecord.schema
+        { versionSchema } = gateway
+        assert.deepEqual versionSchema, joi.string().required().description '
+          The version of api endpoint in format `vx.x`
+        '
+        yield return
