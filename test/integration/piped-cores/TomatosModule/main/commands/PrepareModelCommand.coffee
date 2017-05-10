@@ -25,7 +25,6 @@ module.exports = (Module) ->
 
     @public execute: Function,
       default: ->
-        console.log '???? ROOT 000', @constructor.Module
         @facade.registerProxy MainConfiguration.new CONFIGURATION, @Module::ROOT
         @facade.registerProxy MainResque.new RESQUE
         @facade.registerProxy MainCollection.new 'TomatosCollection',

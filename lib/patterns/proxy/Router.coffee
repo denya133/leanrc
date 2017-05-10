@@ -26,7 +26,12 @@ inflect       = require('i')()
 
 
 module.exports = (Module)->
-  {NILL, ANY} = Module::
+  {
+    NILL
+    ANY
+
+    Class
+  } = Module::
 
   class Router extends Module::Proxy
     @inheritProtected()
@@ -173,7 +178,8 @@ module.exports = (Module)->
           @protected resource: String,
             default: resource
           @map lambda
-        @[iplResources].push ResourceRouter.initialize()
+        ResourceRouter.constructor = Class
+        @[iplResources].push ResourceRouter
 
     @public namespace: Function,
       default: (asName, aoOpts = null, lambda = null)->
@@ -210,7 +216,8 @@ module.exports = (Module)->
           @protected at: String,
             default: at
           @map lambda
-        @[iplResources].push NamespaceRouter.initialize()
+        NamespaceRouter.constructor = Class
+        @[iplResources].push NamespaceRouter
 
     @public member: Function,
       default: (lambda)->

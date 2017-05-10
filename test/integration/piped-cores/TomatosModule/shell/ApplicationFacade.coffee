@@ -3,6 +3,7 @@
 module.exports = (Module) ->
   {
     STARTUP
+    APPLICATION_MEDIATOR
 
     Facade
     StartupCommand
@@ -28,6 +29,17 @@ module.exports = (Module) ->
         unless @[vpbIsInitialized]
           @[vpbIsInitialized] = yes
           @sendNotification STARTUP, aoApplication
+
+    @public finish: Function,
+      default: ->
+        @removeCommand STARTUP
+
+        # @removeProxy CONFIGURATION
+
+        @removeMediator 'LoggerModuleMediator'
+        @removeMediator 'TomatosShellJunctionMediator'
+        @removeMediator APPLICATION_MEDIATOR
+        @removeMediator 'MainModuleMediator'
 
     @public @static getInstance: Function,
       default: (asKey)->
