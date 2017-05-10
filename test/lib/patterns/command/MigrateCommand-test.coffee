@@ -15,8 +15,6 @@ describe 'MigrateCommand', ->
       co ->
         KEY = 'TEST_MIGRATE_COMMAND_001'
         facade = LeanRC::Facade.getInstance KEY
-        trigger = sinon.spy ->
-        trigger.reset()
         class Test extends LeanRC::Module
           @inheritProtected()
           @root "#{__dirname}/config/root"
@@ -35,12 +33,6 @@ describe 'MigrateCommand', ->
           @include LeanRC::MemoryCollectionMixin
           @module Test
         TestMemoryCollection.initialize()
-        class TestCommand extends LeanRC::MigrateCommand
-          @inheritProtected()
-          @module Test
-          @public execute: Function,
-            default: -> trigger()
-        TestCommand.initialize()
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
           delegate: TestRecord
           serializer: LeanRC::Serializer
@@ -55,8 +47,6 @@ describe 'MigrateCommand', ->
       co ->
         KEY = 'TEST_MIGRATE_COMMAND_002'
         facade = LeanRC::Facade.getInstance KEY
-        trigger = sinon.spy ->
-        trigger.reset()
         class Test extends LeanRC::Module
           @inheritProtected()
           @root "#{__dirname}/config/root"
@@ -79,12 +69,6 @@ describe 'MigrateCommand', ->
           @include LeanRC::MemoryCollectionMixin
           @module Test
         TestMemoryCollection.initialize()
-        class TestCommand extends LeanRC::MigrateCommand
-          @inheritProtected()
-          @module Test
-          @public execute: Function,
-            default: -> trigger()
-        TestCommand.initialize()
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
           delegate: TestRecord
           serializer: LeanRC::Serializer
@@ -99,8 +83,6 @@ describe 'MigrateCommand', ->
       co ->
         KEY = 'TEST_MIGRATE_COMMAND_003'
         facade = LeanRC::Facade.getInstance KEY
-        trigger = sinon.spy ->
-        trigger.reset()
         class Test extends LeanRC::Module
           @inheritProtected()
           @root "#{__dirname}/config/root"
@@ -123,12 +105,6 @@ describe 'MigrateCommand', ->
           @include LeanRC::MemoryCollectionMixin
           @module Test
         TestMemoryCollection.initialize()
-        class TestCommand extends LeanRC::MigrateCommand
-          @inheritProtected()
-          @module Test
-          @public execute: Function,
-            default: -> trigger()
-        TestCommand.initialize()
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
           delegate: TestRecord
           serializer: LeanRC::Serializer
@@ -137,4 +113,40 @@ describe 'MigrateCommand', ->
         command.initializeNotifier KEY
         migrationNames = yield command.migrationNames
         assert.deepEqual migrationNames, [ '01_migration', '02_migration', '03_migration' ]
+        yield return
+  describe '#migrate', ->
+    it 'should run migrations', ->
+      co ->
+        KEY = 'TEST_MIGRATE_COMMAND_004'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root2"
+        Test.initialize()
+        class TestConfiguration extends LeanRC::Configuration
+          @inheritProtected()
+          @module Test
+        TestConfiguration.initialize()
+        class TestMemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+        TestMemoryCollection.initialize()
+        class TestCommand extends LeanRC::MigrateCommand
+          @inheritProtected()
+          @module Test
+        TestCommand.initialize()
+        facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
+          delegate: LeanRC::Migration
+          serializer: LeanRC::Serializer
+        facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
+        command = TestCommand.new()
+        command.initializeNotifier KEY
+        migrationNames = yield command.migrationNames
+        untilName = '00000000000002_second_migration'
+        yield command.migrate until: untilName
+        collectionData = facade.retrieveProxy(LeanRC::MIGRATIONS)[Symbol.for '~collection']
+        for migrationName in migrationNames
+          assert.property collectionData, migrationName
+          break  if migrationName is untilName
         yield return
