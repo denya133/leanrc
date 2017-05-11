@@ -173,9 +173,8 @@ describe 'RollbackCommand', ->
         collectionData = facade.retrieveProxy(LeanRC::MIGRATIONS)[Symbol.for '~collection']
         assert.deepEqual collectionData, {}
         yield return
-  ###
   describe '#execute', ->
-    it 'should run migrations via "execute"', ->
+    it 'should run rollback migrations via "execute"', ->
       co ->
         KEY = 'TEST_ROLLBACK_COMMAND_005'
         facade = LeanRC::Facade.getInstance KEY
@@ -184,6 +183,16 @@ describe 'RollbackCommand', ->
           @inheritProtected()
           @root "#{__dirname}/config/root2"
         Test.initialize()
+        class TestMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+          @public @static findModelByName: Function,
+            default: -> Test::TestMigration
+          @public init: Function,
+            default: (args...) ->
+              @super args...
+              @_type = 'Test::TestMigration'
+        TestMigration.initialize()
         class TestConfiguration extends LeanRC::Configuration
           @inheritProtected()
           @module Test
@@ -199,21 +208,34 @@ describe 'RollbackCommand', ->
           @public @async rollback: Function,
             default: (options) ->
               result = yield @super options
-              trigger.emit 'MIGRATE', options
+              trigger.emit 'ROLLBACK', options
               yield return result
         TestCommand.initialize()
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
-          delegate: LeanRC::Migration
+          delegate: Test::TestMigration
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
+        class TestMigrateCommand extends LeanRC::MigrateCommand
+          @inheritProtected()
+          @module Test
+        TestMigrateCommand.initialize()
+        forward = TestMigrateCommand.new()
+        forward.initializeNotifier KEY
         command = TestCommand.new()
         command.initializeNotifier KEY
+        migrationNames = yield command.migrationNames
         untilName = '00000000000002_second_migration'
         promise = LeanRC::Promise.new (resolve, reject) ->
-          trigger.once 'MIGRATE', (options) -> resolve options
+          trigger.once 'ROLLBACK', (options) -> resolve options
           return
-        command.execute until: untilName
+        yield forward.migrate until: untilName
+        collectionData = facade.retrieveProxy(LeanRC::MIGRATIONS)[Symbol.for '~collection']
+        for migrationName, index in migrationNames
+          if migrationName is untilName
+            steps = index + 1
+            break
+        steps ?= migrationNames.length
+        command.execute { steps }
         options = yield promise
-        assert.deepEqual options, until: untilName
+        assert.deepEqual options, steps: 2
         yield return
-  ###
