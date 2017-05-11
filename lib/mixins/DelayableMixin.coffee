@@ -11,7 +11,7 @@ module.exports = (Module)->
 
       iphDelayableMap = @private @static delayableMap: Object
 
-      ipmDelayJob = @private @async delayJob: Function,
+      cpmDelayJob = @private @static @async delayJob: Function,
         default: (facade, data, options = {})->
           resque = facade.retrieveProxy Module::RESQUE
           queue = yield resque.get options.queue ? Module::DELAYED_JOBS_QUEUE
@@ -50,7 +50,7 @@ module.exports = (Module)->
                       className:  @name
                       methodName: methodName
                       args: args
-                    @[ipmDelayJob] facade, data, opts
+                    @[cpmDelayJob] facade, data, opts
             obj
 
           @[iphDelayableMap]
