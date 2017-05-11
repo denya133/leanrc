@@ -1,7 +1,7 @@
 LeanRC = require.main.require 'lib'
 
 module.exports = (Module)->
-  class SecondMigration extends LeanRC::Migration
+  class SecondMigration extends Module::TestMigration
     @inheritProtected()
     @module Module
 

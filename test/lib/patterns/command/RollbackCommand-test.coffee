@@ -115,7 +115,6 @@ describe 'RollbackCommand', ->
         migrationNames = yield command.migrationNames
         assert.deepEqual migrationNames, [ '01_migration', '02_migration', '03_migration' ]
         yield return
-  ###
   describe '#rollback', ->
     it 'should run migrations', ->
       co ->
@@ -125,6 +124,16 @@ describe 'RollbackCommand', ->
           @inheritProtected()
           @root "#{__dirname}/config/root2"
         Test.initialize()
+        class TestMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+          @public @static findModelByName: Function,
+            default: -> Test::TestMigration
+          @public init: Function,
+            default: (args...) ->
+              @super args...
+              @_type = 'Test::TestMigration'
+        TestMigration.initialize()
         class TestConfiguration extends LeanRC::Configuration
           @inheritProtected()
           @module Test
@@ -139,19 +148,32 @@ describe 'RollbackCommand', ->
           @module Test
         TestCommand.initialize()
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
-          delegate: LeanRC::Migration
+          delegate: Test::TestMigration
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
+        class TestMigrateCommand extends LeanRC::MigrateCommand
+          @inheritProtected()
+          @module Test
+        TestMigrateCommand.initialize()
+        forward = TestMigrateCommand.new()
+        forward.initializeNotifier KEY
         command = TestCommand.new()
         command.initializeNotifier KEY
         migrationNames = yield command.migrationNames
         untilName = '00000000000002_second_migration'
-        yield command.rollback until: untilName
+        yield forward.migrate until: untilName
         collectionData = facade.retrieveProxy(LeanRC::MIGRATIONS)[Symbol.for '~collection']
-        for migrationName in migrationNames
+        for migrationName, index in migrationNames
           assert.property collectionData, migrationName
-          break  if migrationName is untilName
+          if migrationName is untilName
+            steps = index + 1
+            break
+        steps ?= migrationNames.length
+        yield command.rollback { steps }
+        collectionData = facade.retrieveProxy(LeanRC::MIGRATIONS)[Symbol.for '~collection']
+        assert.deepEqual collectionData, {}
         yield return
+  ###
   describe '#execute', ->
     it 'should run migrations via "execute"', ->
       co ->

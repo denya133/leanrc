@@ -124,6 +124,16 @@ describe 'MigrateCommand', ->
           @inheritProtected()
           @root "#{__dirname}/config/root2"
         Test.initialize()
+        class TestMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+          @public @static findModelByName: Function,
+            default: -> Test::TestMigration
+          @public init: Function,
+            default: (args...) ->
+              @super args...
+              @_type = 'Test::TestMigration'
+        TestMigration.initialize()
         class TestConfiguration extends LeanRC::Configuration
           @inheritProtected()
           @module Test
@@ -165,6 +175,16 @@ describe 'MigrateCommand', ->
           @inheritProtected()
           @module Test
         TestConfiguration.initialize()
+        class TestMigration extends LeanRC::Migration
+          @inheritProtected()
+          @module Test
+          @public @static findModelByName: Function,
+            default: -> Test::TestMigration
+          @public init: Function,
+            default: (args...) ->
+              @super args...
+              @_type = 'Test::TestMigration'
+        TestMigration.initialize()
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
