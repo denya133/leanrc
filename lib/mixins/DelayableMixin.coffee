@@ -50,7 +50,7 @@ module.exports = (Module)->
                       className:  @name
                       methodName: methodName
                       args: args
-                    @[cpmDelayJob] facade, data, opts
+                    yield return @[cpmDelayJob] facade, data, opts
             obj
 
           @[iphDelayableMap]
