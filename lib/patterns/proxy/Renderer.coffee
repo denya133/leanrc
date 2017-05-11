@@ -4,7 +4,7 @@ _ = require 'lodash'
 пример темплейта
 ```coffee
 _         = require 'lodash'
-inflect   = do require 'inflect'
+inflect   = do require 'i'
 
 # это специально не класс, а функция чтобы съэкономить процессорные ресурсы
 module.exports = (resource, action, aoData)->

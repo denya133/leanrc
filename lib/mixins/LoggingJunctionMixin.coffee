@@ -32,6 +32,7 @@ module.exports = (Module)->
       @inheritProtected()
 
       ipoMultitonKey = Symbol.for '~multitonKey'
+      ipoJunction = Symbol.for '~junction'
 
       @public listNotificationInterests: Function,
         default: (args...)->
@@ -64,17 +65,17 @@ module.exports = (Module)->
                   level = DEBUG
                   break
               logMessage = LogMessage.new level, @[ipoMultitonKey], note.getBody()
-              junction.sendMessage STDLOG, logMessage
+              @[ipoJunction].sendMessage STDLOG, logMessage
               break
             when LogFilterMessage.SET_LOG_LEVEL
               logLevel = note.getBody()
               setLogLevelMessage = LogFilterMessage.new SET_PARAMS, logLevel
 
-              changedLevel = junction.sendMessage STDLOG, setLogLevelMessage
+              changedLevel = @[ipoJunction].sendMessage STDLOG, setLogLevelMessage
               changedLevelMessage = LogMessage.new CHANGE, @[ipoMultitonKey], "
                 Changed Log Level to: #{LogMessage.LEVELS[logLevel]}
               "
-              logChanged = junction.sendMessage STDLOG, changedLevelMessage
+              logChanged = @[ipoJunction].sendMessage STDLOG, changedLevelMessage
               break
             else
               @super note

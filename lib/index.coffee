@@ -76,6 +76,7 @@ class LeanRC extends RC
   require('./mixins/RecordMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
   require('./mixins/DelayableMixin') LeanRC #needs tests
+  require('./mixins/BulkActionsStockMixin') LeanRC #needs tests
 
   require('./patterns/data_mapper/Transform') LeanRC
   require('./patterns/data_mapper/StringTransform') LeanRC

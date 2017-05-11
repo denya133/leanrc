@@ -1,6 +1,3 @@
-_             = require 'lodash'
-joi           = require 'joi'
-inflect       = require('i')()
 
 
 module.exports = (Module)->

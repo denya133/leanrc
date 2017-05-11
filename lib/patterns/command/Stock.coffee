@@ -58,7 +58,7 @@ module.exports = (Module)->
 
     @action @async list: Function,
       default: ->
-        vlItems = yield (yield @collection.query @query).toArray()
+        vlItems = yield (yield @collection.takeAll()).toArray()
         return {
           meta:
             pagination:
@@ -84,38 +84,16 @@ module.exports = (Module)->
       default: ->
         yield @collection.delete @recordId
 
-    @action @async bulkUpdate: Function,
-      default: ->
-        cursor = yield @collection.query @query
-        body = @recordBody
-        yield cursor.forEach (aoRecord) -> yield aoRecord.updateAttributes body
-        return yes
-
-    @action @async bulkPatch: Function,
-      default: ->
-        cursor = yield @collection.query @query
-        body = @recordBody
-        yield cursor.forEach (aoRecord) -> yield aoRecord.updateAttributes body
-        return yes
-
-    @action @async bulkDelete: Function,
-      default: ->
-        cursor = yield @collection.query @query
-        yield cursor.forEach (aoRecord) -> yield aoRecord.destroy()
-        return yes
-
 
     # ------------ Chains definitions ---------
     @chains [
       'list', 'detail', 'create', 'update', 'delete'
-      'bulkUpdate', 'bulkPatch', 'bulkDelete'
     ]
 
     @beforeHook 'beforeActionHook'
 
-    @beforeHook 'parseQuery', only: ['list', 'bulkUpdate', 'bulkPatch', 'bulkDelete']
     @beforeHook 'parsePathParams', only: ['detail', 'update', 'delete']
-    @beforeHook 'parseBody', only: ['create', 'update', 'bulkUpdate', 'bulkPatch']
+    @beforeHook 'parseBody', only: ['create', 'update']
     @beforeHook 'beforeUpdate', only: ['update']
 
     @public beforeActionHook: Function,
@@ -123,13 +101,6 @@ module.exports = (Module)->
       return: NILL
       default: (args...)->
         [{ @queryParams, @pathParams, @currentUserId, @headers, @body }] = args
-        return args
-
-    @public parseQuery: Function,
-      args: [Object]
-      return: ANY
-      default: (args...)->
-        @query = JSON.parse @queryParams['query']
         return args
 
     @public parsePathParams: Function,
