@@ -118,6 +118,47 @@ describe 'MemoryResqueExecutor', ->
         assert.propertyVal job, 'status', 'failed'
         assert.deepEqual job.reason, error: 'error'
         yield return
+  describe '#defineProcessors', ->
+    it 'should define processors', ->
+      co ->
+        KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_001'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+          @inheritProtected()
+          @module Test
+        Test::MemoryResqueExecutor.initialize()
+        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        resque = facade.retrieveProxy LeanRC::RESQUE
+        resque.create 'TEST_QUEUE_1', 4
+        resque.create 'TEST_QUEUE_2', 4
+        executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
+        viewComponent = { id: 'view-component' }
+        executor = Test::MemoryResqueExecutor.new executorName, viewComponent
+        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
+        definedProcessorsSymbol = _.find executorSymbols, (item) ->
+          item.toString() is 'Symbol(_definedProcessors)'
+        concurrencyCountSymbol = _.find executorSymbols, (item) ->
+          item.toString() is 'Symbol(_concurrencyCount)'
+        resqueSymbol = _.find executorSymbols, (item) ->
+          item.toString() is 'Symbol(_resque)'
+        executor.initializeNotifier KEY
+        executor.setViewComponent new EventEmitter()
+        executor[definedProcessorsSymbol] = {}
+        executor[concurrencyCountSymbol] = {}
+        executor[resqueSymbol] = resque
+        yield executor.defineProcessors()
+        assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_1'
+        assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
+        yield return
   ###
   describe '#getMediatorName', ->
     it 'should get mediator name', ->

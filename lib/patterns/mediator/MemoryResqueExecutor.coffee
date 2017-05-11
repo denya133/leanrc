@@ -69,7 +69,7 @@ module.exports = (Module)->
     ipbIsStopped = @private isStopped: Boolean
     ipoDefinedProcessors = @private definedProcessors: Object
     ipoConcurrencyCount = @private concurrencyCount: Object
-    ipoResque = @private resqie: ResqueInterface
+    ipoResque = @private resque: ResqueInterface
 
     @public listNotificationInterests: Function,
       default: ->
@@ -105,8 +105,9 @@ module.exports = (Module)->
       return: NILL
       default: ->
         for {name, concurrency} in yield @[ipoResque].allQueues()
-          [moduleName] = name.split '|>'
-          if moduleName is @moduleName
+          fullQueueName = @[ipoResque].fullQueueName name
+          [moduleName] = fullQueueName.split '|>'
+          if moduleName is @moduleName()
             @define name, {concurrency}, co.wrap (job, done)=>
               reverse = if isArangoDB
                 crypto.genRandomAlphaNumbers 32
