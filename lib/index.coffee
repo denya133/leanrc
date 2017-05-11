@@ -113,7 +113,7 @@ class LeanRC extends RC
   require('./patterns/command/MigrateCommand') LeanRC
   require('./patterns/command/RollbackCommand') LeanRC
   require('./patterns/command/Script') LeanRC
-  require('./patterns/command/DelayedJobScript') LeanRC #needs tests
+  require('./patterns/command/DelayedJobScript') LeanRC
 
   require('./patterns/migration/Migration') LeanRC
 
