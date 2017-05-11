@@ -62,7 +62,7 @@ module.exports = (Module) ->
             migrationName = i.replace /\.js|\.coffee/, ''
             if migrationName isnt 'BaseMigration'
               vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
-              require(vsMigrationPath) Module
+              require(vsMigrationPath) @Module
               migrationName
             else
               null
@@ -72,7 +72,7 @@ module.exports = (Module) ->
       get: ->
         "#{@configs.ROOT}/compiled_migrations"
 
-    @public init: Function,
+    @public initializeNotifier: Function,
       default: (args...)->
         @super args...
         @migrationsCollection = @facade.retrieveProxy Module::MIGRATIONS
@@ -93,9 +93,9 @@ module.exports = (Module) ->
             id = String migrationName
             clearedMigrationName = migrationName.replace /^\d{14}[_]/, ''
             migrationClassName = inflect.camelize clearedMigrationName
-            vcMigration = Module::[migrationClassName]
+            vcMigration = @Module::[migrationClassName]
             try
-              voMigration = vcMigration.new {id}, @migrationsCollection
+              voMigration = vcMigration.new { _key: id }, @migrationsCollection
               yield voMigration.migrate Module::Migration::UP
               yield voMigration.save()
             catch err
