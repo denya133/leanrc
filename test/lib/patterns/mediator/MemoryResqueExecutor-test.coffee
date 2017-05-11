@@ -12,6 +12,16 @@ describe 'MemoryResqueExecutor', ->
         executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
         assert.instanceOf executor, LeanRC::MemoryResqueExecutor
         yield return
+  describe '#listNotificationInterests', ->
+    it 'should check notification interests list', ->
+      co ->
+        executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
+        viewComponent = { id: 'view-component' }
+        executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
+        assert.deepEqual executor.listNotificationInterests(), [
+          LeanRC::JOB_RESULT, LeanRC::START_RESQUE
+        ]
+        yield return
   ###
   describe '#getMediatorName', ->
     it 'should get mediator name', ->
