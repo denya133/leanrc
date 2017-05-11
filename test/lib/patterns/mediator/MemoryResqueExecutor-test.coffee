@@ -35,6 +35,18 @@ describe 'MemoryResqueExecutor', ->
           item.toString() is 'Symbol(_isStopped)'
         assert.isTrue executor[stoppedSymbol]
         yield return
+  describe '#onRemove', ->
+    it 'should handle remove event', ->
+      co ->
+        executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
+        viewComponent = { id: 'view-component' }
+        executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
+        executor.onRemove()
+        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
+        stoppedSymbol = _.find executorSymbols, (item) ->
+          item.toString() is 'Symbol(_isStopped)'
+        assert.isTrue executor[stoppedSymbol]
+        yield return
   ###
   describe '#getMediatorName', ->
     it 'should get mediator name', ->
