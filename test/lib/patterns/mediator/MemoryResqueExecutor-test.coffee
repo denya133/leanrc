@@ -1,5 +1,6 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
+_ = require 'lodash'
 LeanRC = require.main.require 'lib'
 { co } = LeanRC::Utils
 
@@ -21,6 +22,18 @@ describe 'MemoryResqueExecutor', ->
         assert.deepEqual executor.listNotificationInterests(), [
           LeanRC::JOB_RESULT, LeanRC::START_RESQUE
         ]
+        yield return
+  describe '#stop', ->
+    it 'should stop executor', ->
+      co ->
+        executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
+        viewComponent = { id: 'view-component' }
+        executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
+        executor.stop()
+        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
+        stoppedSymbol = _.find executorSymbols, (item) ->
+          item.toString() is 'Symbol(_isStopped)'
+        assert.isTrue executor[stoppedSymbol]
         yield return
   ###
   describe '#getMediatorName', ->
