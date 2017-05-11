@@ -8,10 +8,11 @@ inflect   = do require 'i'
 
 # это специально не класс, а функция чтобы съэкономить процессорные ресурсы
 module.exports = (resource, action, aoData)->
-  voData = if _.isArray aoData then aoData else [ aoData ]
   resource = resource.replace(/[/]/g, '_').replace /[_]$/g, ''
-  "#{inflect.pluralize inflect.underscore resource}": voData.map (i)->
+  meta: aoData.meta
+  "#{inflect.pluralize inflect.underscore resource}": aoData.items.map (i)->
     _.omit i, '_key', '_type', '_owner'
+
 ```
 но также могут быть созданы обобщенные шаблоны, с каким-то кодом представления одного или нескольких итемов, чтобы в темплейтах рекваить (с них доп-параметры можно передавать аргументами или через карирование)
 ###

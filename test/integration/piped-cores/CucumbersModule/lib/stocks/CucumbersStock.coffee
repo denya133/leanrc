@@ -16,7 +16,9 @@ module.exports = (Module)->
 
     @public @async list: Function,
       default: (args...)->
-        yield @super args...
+        r = yield @super args...
+        console.log '?????LLList', r
+        yield return r
 
 
 

@@ -7,7 +7,7 @@ module.exports = (Module) ->
     MIGRATIONS
 
     SimpleCommand
-    BaseConfiguration
+    Configuration
     BaseResque
     MigrationsCollection
     BaseMigration
@@ -21,7 +21,7 @@ module.exports = (Module) ->
 
     @public execute: Function,
       default: ->
-        @facade.registerProxy BaseConfiguration.new CONFIGURATION, @Module::ROOT
+        @facade.registerProxy Configuration.new CONFIGURATION, @Module::ROOT
         @facade.registerProxy BaseResque.new RESQUE
         @facade.registerProxy MigrationsCollection.new MIGRATIONS,
           delegate: BaseMigration

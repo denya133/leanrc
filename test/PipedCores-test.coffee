@@ -20,3 +20,13 @@ describe 'PipedCores', ->
         app = TomatosApp::ShellApplication.new()
         app.finish()
       .to.not.throw Error
+  describe 'Create Cucumbers app instance and send request', ->
+    it 'should create new CucumbersApp and respond on request', ->
+      co ->
+        try
+          cucumbers = CucumbersApp::ShellApplication.new()
+          res = yield request.get 'http://localhost:3002/0.1/cucumbers'
+          console.log '?????', res
+        catch err
+          console.error '????? ERROR', err
+        cucumbers.finish()
