@@ -7,6 +7,7 @@ class TomatosMain extends Tomatos
   @root __dirname
 
   require('./mediators/MainJunctionMediator') @Module
+  require('./mediators/MainSwitch') @Module
 
   require('./proxies/MainConfiguration') @Module
   require('./proxies/MainCollection') @Module

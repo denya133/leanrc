@@ -18,3 +18,8 @@ module.exports =
     description: "Admin password."
     type: "string"
     default: "1111"
+
+  cucumbersServer:
+    description: "URL for cucumbers server"
+    type: "string"
+    default: "http://127.0.0.1:3002/"

@@ -2,7 +2,7 @@ _             = require 'lodash'
 express       = require 'express'
 http          = require 'http'
 crypto        = require 'crypto'
-inflect       = do require 'inflect'
+inflect       = do require 'i'
 status        = require 'statuses'
 
 expressCookieParser = require 'cookie-parser'
@@ -21,13 +21,10 @@ module.exports = (Module)->
     APPLICATION_RENDERER
 
     Switch
-    ConfigurableMixin
   } = Module::
 
   class MainSwitch extends Switch
     @inheritProtected()
-    @include ConfigurableMixin
-
     @module Module
 
     @public routerName: String,

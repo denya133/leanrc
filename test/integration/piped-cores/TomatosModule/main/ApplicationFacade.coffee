@@ -48,6 +48,7 @@ module.exports = (Module) ->
         @removeProxy 'CucumbersResource'
 
         @removeMediator 'TomatosMainJunctionMediator'
+        @removeMediator 'MainSwitch'
 
     @public @static getInstance: Function,
       default: (asKey)->

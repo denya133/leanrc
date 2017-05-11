@@ -2,7 +2,7 @@ _             = require 'lodash'
 express       = require 'express'
 http          = require 'http'
 crypto        = require 'crypto'
-inflect       = do require 'inflect'
+inflect       = do require 'i'
 status        = require 'statuses'
 
 expressCookieParser = require 'cookie-parser'
@@ -16,22 +16,20 @@ UNAUTHORIZED      = status 'unauthorized'
 module.exports = (Module)->
   {
     NILL
-    CONFIGURATION
+    APPLICATION_RENDERER
+    APPLICATION_ROUTER
 
     Switch
-    ConfigurableMixin
   } = Module::
 
   class MainSwitch extends Switch
     @inheritProtected()
-    @include ConfigurableMixin
-
     @module Module
 
     @public routerName: String,
-      default: 'ApplicationRouter'
+      default: APPLICATION_ROUTER
     @public jsonRendererName: String,
-      default: 'ApplicationRenderer'
+      default: APPLICATION_RENDERER
 
     ipoExpressApp = @private expressApp: Object
     ipoHttpServer = @private httpServer: Object

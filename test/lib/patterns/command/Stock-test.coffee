@@ -146,6 +146,7 @@ describe 'Stock', ->
         Test.initialize()
         class Test::TestStock extends LeanRC::Stock
           @inheritProtected()
+          @include LeanRC::BulkActionsStockMixin
           @module Test
           @public entityName: String,
             default: 'TestEntity'
@@ -240,6 +241,7 @@ describe 'Stock', ->
         Test.initialize()
         class Test::TestStock extends LeanRC::Stock
           @inheritProtected()
+          @include LeanRC::BulkActionsStockMixin
           @module Test
           @public entityName: String,
             default: 'TestEntity'
@@ -341,6 +343,9 @@ describe 'Stock', ->
           @module Test
           @public parseQuery: Object,
             default: (aoQuery) -> aoQuery
+          @public @async takeAll: Function,
+            default: ->
+              yield LeanRC::Cursor.new @, @getData().data
           @public @async executeQuery: Function,
             default: (aoParsedQuery) ->
               data = _.filter @getData().data, aoParsedQuery.$filter
@@ -674,6 +679,7 @@ describe 'Stock', ->
         Test::TestRecord.initialize()
         class Test::TestStock extends LeanRC::Stock
           @inheritProtected()
+          @include LeanRC::BulkActionsStockMixin
           @module Test
           @public entityName: String, { default: 'TestEntity' }
         Test::TestStock.initialize()
@@ -756,6 +762,7 @@ describe 'Stock', ->
         Test::TestRecord.initialize()
         class Test::TestStock extends LeanRC::Stock
           @inheritProtected()
+          @include LeanRC::BulkActionsStockMixin
           @module Test
           @public entityName: String, { default: 'TestEntity' }
         Test::TestStock.initialize()
@@ -838,6 +845,7 @@ describe 'Stock', ->
         Test::TestRecord.initialize()
         class Test::TestStock extends LeanRC::Stock
           @inheritProtected()
+          @include LeanRC::BulkActionsStockMixin
           @module Test
           @public entityName: String, { default: 'TestEntity' }
         Test::TestStock.initialize()
@@ -890,7 +898,7 @@ describe 'Stock', ->
         assert.lengthOf _.filter(collection.getData().data, test: 'test2'), 2
         yield stock.bulkDelete
           queryParams: query: '{"test":{"$eq":"test2"}}'
-          body: test_entity: test: 'test8'
+
         assert.lengthOf collection.getData().data, 1
         assert.lengthOf _.filter(collection.getData().data, test: 'test2'), 0
         yield return
@@ -915,6 +923,7 @@ describe 'Stock', ->
         Test::TestRecord.initialize()
         class Test::TestStock extends LeanRC::Stock
           @inheritProtected()
+          @include LeanRC::BulkActionsStockMixin
           @module Test
           @public entityName: String, { default: 'TestEntity' }
         Test::TestStock.initialize()

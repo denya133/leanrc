@@ -21,7 +21,7 @@
 ###
 
 _             = require 'lodash'
-inflect       = require('i')()
+inflect       = do require 'i'
 
 
 

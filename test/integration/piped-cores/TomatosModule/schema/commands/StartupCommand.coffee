@@ -15,7 +15,7 @@ module.exports = (Module) ->
     @public initializeMacroCommand: Function,
       default: ->
         @addSubCommand PrepareControllerCommand
-        @addSubCommand PrepareViewCommand
         @addSubCommand PrepareModelCommand
+        @addSubCommand PrepareViewCommand
 
   StartupCommand.initialize()
