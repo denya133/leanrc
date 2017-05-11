@@ -1,3 +1,4 @@
+EventEmitter  = require 'events'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 _ = require 'lodash'
@@ -46,6 +47,76 @@ describe 'MemoryResqueExecutor', ->
         stoppedSymbol = _.find executorSymbols, (item) ->
           item.toString() is 'Symbol(_isStopped)'
         assert.isTrue executor[stoppedSymbol]
+        yield return
+  describe '#define', ->
+    it 'should define processor (success)', ->
+      co ->
+        executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
+        viewComponent = { id: 'view-component' }
+        executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
+        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
+        definedProcessorsSymbol = _.find executorSymbols, (item) ->
+          item.toString() is 'Symbol(_definedProcessors)'
+        concurrencyCountSymbol = _.find executorSymbols, (item) ->
+          item.toString() is 'Symbol(_concurrencyCount)'
+        executor[definedProcessorsSymbol] = {}
+        executor[concurrencyCountSymbol] = {}
+        QUEUE_NAME = 'TEST_QUEUE'
+        concurrency = 4
+        testTrigger = new EventEmitter
+        executor.define QUEUE_NAME, { concurrency }, (job, done) ->
+          assert job
+          testTrigger.once 'DONE', (options) -> done options
+        processorData = executor[definedProcessorsSymbol][QUEUE_NAME]
+        assert.equal processorData.concurrency, concurrency
+        { listener, concurrency: processorConcurrency } = processorData
+        assert.equal processorConcurrency, concurrency
+        job = status: 'scheduled'
+        listener job
+        assert.equal executor[concurrencyCountSymbol][QUEUE_NAME], 1
+        assert.propertyVal job, 'status', 'running'
+        assert.isDefined job.startedAt
+        promise = LeanRC::Promise.new (resolve) ->
+          testTrigger.once 'DONE', resolve
+        testTrigger.emit 'DONE'
+        yield promise
+        assert.equal executor[concurrencyCountSymbol][QUEUE_NAME], 0
+        assert.propertyVal job, 'status', 'completed'
+        yield return
+    it 'should define processor (fail)', ->
+      co ->
+        executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
+        viewComponent = { id: 'view-component' }
+        executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
+        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
+        definedProcessorsSymbol = _.find executorSymbols, (item) ->
+          item.toString() is 'Symbol(_definedProcessors)'
+        concurrencyCountSymbol = _.find executorSymbols, (item) ->
+          item.toString() is 'Symbol(_concurrencyCount)'
+        executor[definedProcessorsSymbol] = {}
+        executor[concurrencyCountSymbol] = {}
+        QUEUE_NAME = 'TEST_QUEUE'
+        concurrency = 4
+        testTrigger = new EventEmitter
+        executor.define QUEUE_NAME, { concurrency }, (job, done) ->
+          assert job
+          testTrigger.once 'DONE', (options) -> done options
+        processorData = executor[definedProcessorsSymbol][QUEUE_NAME]
+        assert.equal processorData.concurrency, concurrency
+        { listener, concurrency: processorConcurrency } = processorData
+        assert.equal processorConcurrency, concurrency
+        job = status: 'scheduled'
+        listener job
+        assert.equal executor[concurrencyCountSymbol][QUEUE_NAME], 1
+        assert.propertyVal job, 'status', 'running'
+        assert.isDefined job.startedAt
+        promise = LeanRC::Promise.new (resolve) ->
+          testTrigger.once 'DONE', resolve
+        testTrigger.emit 'DONE', error: 'error'
+        yield promise
+        assert.equal executor[concurrencyCountSymbol][QUEUE_NAME], 0
+        assert.propertyVal job, 'status', 'failed'
+        assert.deepEqual job.reason, error: 'error'
         yield return
   ###
   describe '#getMediatorName', ->
