@@ -108,7 +108,7 @@ module.exports = (Module)->
           [moduleName] = fullQueueName.split '|>'
           if moduleName is @moduleName()
             @define name, {concurrency}, co.wrap (job, done)=>
-              reverse = if isArangoDB
+              reverse = if isArangoDB()
                 crypto.genRandomAlphaNumbers 32
               else
                 crypto.randomBytes 32
@@ -167,7 +167,7 @@ module.exports = (Module)->
       default: ->
         if @[ipbIsStopped]
           yield return
-        if isArangoDB
+        if isArangoDB()
           yield MemoryResqueExecutor.delay(@facade,
             delayUntil: Date.now() + 100
           ).staticRunner @[ipsMultitonKey]
