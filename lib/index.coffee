@@ -156,7 +156,7 @@ Pipes.initialize()
 
 LeanRC.const Pipes: Pipes.freeze()
 
-require('./patterns/facade/Application') LeanRC #needs tests
+require('./patterns/facade/Application') LeanRC
 require('./patterns/command/LogMessageCommand') LeanRC #needs tests
 require('./patterns/data_mapper/LogMessage') LeanRC #needs tests
 require('./patterns/data_mapper/LogFilterMessage') LeanRC #needs tests
