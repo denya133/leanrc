@@ -221,3 +221,13 @@ describe 'Facade', ->
         facade.sendNotification 'TEST_LIST'
         assert handleNotification.called, 'Mediator cannot subscribe interests'
       .to.not.throw Error
+  describe '#remove', ->
+    it 'should remove facade', ->
+      expect ->
+        KEY = 'TEST16'
+        facade = Facade.getInstance KEY
+        instanceMapSymbol = Symbol.for '~instanceMap'
+        assert.equal facade, Facade[instanceMapSymbol][KEY]
+        facade.remove()
+        assert.isUndefined Facade[instanceMapSymbol][KEY]
+      .to.not.throw Error
