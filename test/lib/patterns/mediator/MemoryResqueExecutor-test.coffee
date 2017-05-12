@@ -345,6 +345,74 @@ describe 'MemoryResqueExecutor', ->
         yield promise
         assert.isNotNull test
         yield return
+  describe '#handleNotification', ->
+    it 'should start resque', ->
+      co ->
+        KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_006'
+        facade = LeanRC::Facade.getInstance KEY
+        trigger = new EventEmitter
+        test = null
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+          @inheritProtected()
+          @module Test
+          @public @async start: Function,
+            default: ->
+              test = yes
+              trigger.emit 'CYCLE_PART'
+              yield return
+        Test::MemoryResqueExecutor.initialize()
+        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        resque = facade.retrieveProxy LeanRC::RESQUE
+        resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
+        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
+        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
+        executor = facade.retrieveMediator LeanRC::MEM_RESQUE_EXEC
+        promise = LeanRC::Promise.new (resolve) ->
+          trigger.once 'CYCLE_PART', resolve
+        facade.sendNotification LeanRC::START_RESQUE
+        yield promise
+        assert.isNotNull test
+        yield return
+    it 'should get result', ->
+      co ->
+        KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_007'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+          @inheritProtected()
+          @module Test
+        Test::MemoryResqueExecutor.initialize()
+        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        resque = facade.retrieveProxy LeanRC::RESQUE
+        resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
+        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
+        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
+        executor = facade.retrieveMediator LeanRC::MEM_RESQUE_EXEC
+        type = 'TEST_TYPE'
+        promise = LeanRC::Promise.new (resolve) ->
+          executor.getViewComponent().once type, resolve
+        body = test: 'test'
+        facade.sendNotification LeanRC::JOB_RESULT, body, type
+        data = yield promise
+        assert.deepEqual data, body
+        yield return
   ###
   describe '#getMediatorName', ->
     it 'should get mediator name', ->
