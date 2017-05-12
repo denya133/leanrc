@@ -84,3 +84,6 @@ describe 'PipedCores', ->
   describe 'Create Tomatos app and ...', ->
     it 'должно послать запрос на создание помидора, а потом запрос на получение этого помидора, потом на редактирование этого помидора, потом на удаление этого помидора - тестируем CRUD', ->
       throw new Error 'not implemented'
+  describe 'Create Cucumbers app and Tomatos app and ...', ->
+    it 'после прихождения реквеста на томатос, он должен запросить через CucumbersResource огурец (который пошлет запрос через HttpCollectionMixin), полученный огурец он должен отправить в ответе', ->
+      throw new Error 'not implemented'
