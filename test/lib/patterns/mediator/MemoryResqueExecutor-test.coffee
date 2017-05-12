@@ -374,7 +374,6 @@ describe 'MemoryResqueExecutor', ->
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
         facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
-        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
         executor = facade.retrieveMediator LeanRC::MEM_RESQUE_EXEC
         promise = LeanRC::Promise.new (resolve) ->
           trigger.once 'CYCLE_PART', resolve
@@ -403,7 +402,6 @@ describe 'MemoryResqueExecutor', ->
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
         facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
-        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
         executor = facade.retrieveMediator LeanRC::MEM_RESQUE_EXEC
         type = 'TEST_TYPE'
         promise = LeanRC::Promise.new (resolve) ->
@@ -413,60 +411,45 @@ describe 'MemoryResqueExecutor', ->
         data = yield promise
         assert.deepEqual data, body
         yield return
-  ###
-  describe '#getMediatorName', ->
-    it 'should get mediator name', ->
-      mediatorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
-      viewComponent = { id: 'view-component' }
-      mediator = Mediator.new mediatorName, viewComponent
-      expect mediator.getMediatorName()
-      .to.equal mediatorName
-  describe '#getViewComponent', ->
-    it 'should get mediator view component', ->
-      mediatorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
-      viewComponent = { id: 'view-component' }
-      mediator = Mediator.new mediatorName, viewComponent
-      expect mediator.getViewComponent()
-      .to.equal viewComponent
-  describe '#listNotificationInterests', ->
-    it 'should get mediator motification interests list', ->
-      class TestMediator extends Mediator
-        @inheritProtected()
-        @public listNotificationInterests: Function,
-          default: -> [ 'TEST1' , 'TEST2', 'TEST3' ]
-      mediatorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
-      viewComponent = { id: 'view-component' }
-      mediator = TestMediator.new mediatorName, viewComponent
-      expect mediator.listNotificationInterests()
-      .to.eql [ 'TEST1' , 'TEST2', 'TEST3' ]
-  describe '#handleNotification', ->
-    it 'should call handleNotification', ->
-      expect ->
-        mediatorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
-        viewComponent = { id: 'view-component' }
-        mediator = Mediator.new mediatorName, viewComponent
-        handleNotification = sinon.spy mediator, 'handleNotification'
-        mediator.handleNotification()
-        assert handleNotification.called
-      .to.not.throw Error
-  describe '#onRegister', ->
-    it 'should call onRegister', ->
-      expect ->
-        mediatorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
-        viewComponent = { id: 'view-component' }
-        mediator = Mediator.new mediatorName, viewComponent
-        onRegister = sinon.spy mediator, 'onRegister'
-        mediator.onRegister()
-        assert onRegister.called
-      .to.not.throw Error
-  describe '#onRemove', ->
-    it 'should call onRemove', ->
-      expect ->
-        mediatorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
-        viewComponent = { id: 'view-component' }
-        mediator = Mediator.new mediatorName, viewComponent
-        onRemove = sinon.spy mediator, 'onRemove'
-        mediator.onRemove()
-        assert onRemove.called
-      .to.not.throw Error
-  ###
+  describe '#cyclePart', ->
+    it 'should start cycle part', ->
+      co ->
+        KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_008'
+        facade = LeanRC::Facade.getInstance KEY
+        trigger = new EventEmitter
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+          @inheritProtected()
+          @module Test
+        Test::MemoryResqueExecutor.initialize()
+        class TestScript extends LeanRC::Script
+          @inheritProtected()
+          @module Test
+          @do (body) ->
+            trigger.emit 'CYCLE_PART', body
+            yield return
+        TestScript.initialize()
+        facade.registerCommand 'TEST_SCRIPT', TestScript
+        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        resque = facade.retrieveProxy LeanRC::RESQUE
+        yield resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
+        queue = yield resque.get LeanRC::DELAYED_JOBS_QUEUE
+        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
+        executor = facade.retrieveMediator LeanRC::MEM_RESQUE_EXEC
+        promise = LeanRC::Promise.new (resolve) ->
+          trigger.once 'CYCLE_PART', resolve
+        DELAY_UNTIL = Date.now() + 1000
+        body = arg1: 'ARG_1', arg2: 'ARG_2', arg3: 'ARG_3'
+        yield queue.push 'TEST_SCRIPT', body, DELAY_UNTIL
+        facade.sendNotification LeanRC::START_RESQUE
+        data = yield promise
+        assert.deepEqual data, body
+        yield return

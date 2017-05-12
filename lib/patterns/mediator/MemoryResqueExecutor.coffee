@@ -114,7 +114,7 @@ module.exports = (Module)->
                 crypto.randomBytes 32
               @getViewComponent().once reverse, (aoError)=>
                 done aoError
-              {scriptName, data} = job.attrs.data
+              {scriptName, data} = job.data
               @sendNotification scriptName, data, reverse
               return
           continue
@@ -156,8 +156,6 @@ module.exports = (Module)->
                 listener job
               if currentQC >= concurrency
                 break
-              return
-          return
         @recursion()
         yield return
 
