@@ -47,7 +47,6 @@ module.exports = (Module)->
 
     Mediator
     DelayableMixin
-    Facade
     ConfigurableMixin
     ResqueInterface
   } = Module::
@@ -131,8 +130,8 @@ module.exports = (Module)->
       args: []
       return: NILL
       default: (multitonKey)->
-        facade = Facade.getInstance multitonKey
-        executor = facade.retriveMediator MEM_RESQUE_EXEC
+        facade = Module::Facade.getInstance multitonKey
+        executor = facade.retrieveMediator MEM_RESQUE_EXEC
         yield executor.cyclePart()
         return
 
