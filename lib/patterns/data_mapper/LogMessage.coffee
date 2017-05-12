@@ -40,7 +40,7 @@ module.exports = (Module) ->
         @setHeader header
         logLevel
 
-    @public sender: Number,
+    @public sender: String,
       get: -> @getHeader().sender
       set: (sender)->
         header = @getHeader()
@@ -48,7 +48,7 @@ module.exports = (Module) ->
         @setHeader header
         sender
 
-    @public time: Number,
+    @public time: String,
       get: -> @getHeader().time
       set: (time)->
         header = @getHeader()
@@ -56,12 +56,12 @@ module.exports = (Module) ->
         @setHeader header
         time
 
-    @public message: String,
+    @public message: Module::ANY,
       get: -> @getBody()
 
     @public init: Function,
       default: (logLevel, sender, message)->
-        time = new Date().toTimeString()
+        time = new Date().toISOString()
         headers = {logLevel, sender, time}
         @super PipeMessage.NORMAL, headers, message
         return
