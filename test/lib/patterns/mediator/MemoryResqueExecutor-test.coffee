@@ -159,6 +159,47 @@ describe 'MemoryResqueExecutor', ->
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_1'
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
         yield return
+  describe '#onRegister', ->
+    it 'should setup executor on register', ->
+      co ->
+        KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_002'
+        facade = LeanRC::Facade.getInstance KEY
+        trigger = new EventEmitter
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+          @inheritProtected()
+          @module Test
+          @public @async defineProcessors: Function,
+            default: (args...) ->
+              yield @super args...
+              trigger.emit 'PROCESSORS_DEFINED'
+              yield return
+        Test::MemoryResqueExecutor.initialize()
+        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        resque = facade.retrieveProxy LeanRC::RESQUE
+        resque.create 'TEST_QUEUE_1', 4
+        resque.create 'TEST_QUEUE_2', 4
+        executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
+        viewComponent = { id: 'view-component' }
+        executor = Test::MemoryResqueExecutor.new executorName, viewComponent
+        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
+        definedProcessorsSymbol = _.find executorSymbols, (item) ->
+          item.toString() is 'Symbol(_definedProcessors)'
+        promise = LeanRC::Promise.new (resolve) ->
+          trigger.once 'PROCESSORS_DEFINED', resolve
+        facade.registerMediator executor
+        yield promise
+        assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_1'
+        assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
+        yield return
   ###
   describe '#getMediatorName', ->
     it 'should get mediator name', ->
