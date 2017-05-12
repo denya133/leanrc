@@ -234,7 +234,6 @@ describe 'MemoryResqueExecutor', ->
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create 'TEST_QUEUE_1', 4
         resque.create 'TEST_QUEUE_2', 4
-        executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         executor = Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
         executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
         definedProcessorsSymbol = _.find executorSymbols, (item) ->
@@ -282,7 +281,6 @@ describe 'MemoryResqueExecutor', ->
         facade.registerProxy Test::Resque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
-        executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         executor = Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
         executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
         definedProcessorsSymbol = _.find executorSymbols, (item) ->
@@ -297,6 +295,53 @@ describe 'MemoryResqueExecutor', ->
           trigger.once 'CYCLE_PART', resolve
         executor[isStoppedSymbol] = no
         yield executor.recursion()
+        yield promise
+        assert.isNotNull test
+        yield return
+  describe '#start', ->
+    it 'should call recursion', ->
+      co ->
+        KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_005'
+        facade = LeanRC::Facade.getInstance KEY
+        trigger = new EventEmitter
+        test = null
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Test::Resque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        Test::Resque.initialize()
+        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+          @inheritProtected()
+          @module Test
+          @public @async defineProcessors: Function,
+            default: (args...) ->
+              yield @super args...
+              trigger.emit 'PROCESSORS_DEFINED'
+              yield return
+          @public @async cyclePart: Function,
+            default: ->
+              test = yes
+              trigger.emit 'CYCLE_PART'
+              yield return
+        Test::MemoryResqueExecutor.initialize()
+        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        resque = facade.retrieveProxy LeanRC::RESQUE
+        resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
+        executor = Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
+        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
+        definedProcessorsSymbol = _.find executorSymbols, (item) ->
+          item.toString() is 'Symbol(_definedProcessors)'
+        promise = LeanRC::Promise.new (resolve) ->
+          trigger.once 'PROCESSORS_DEFINED', resolve
+        facade.registerMediator executor
+        yield promise
+        promise = LeanRC::Promise.new (resolve) ->
+          trigger.once 'CYCLE_PART', resolve
+        yield executor.start()
         yield promise
         assert.isNotNull test
         yield return
