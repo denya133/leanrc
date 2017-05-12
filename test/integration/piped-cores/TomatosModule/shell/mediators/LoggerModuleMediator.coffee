@@ -32,6 +32,9 @@ module.exports = (Module) ->
     @public logger: PipeAwareInterface,
       get: -> @getViewComponent()
 
+    @public onRemove: Function,
+      default: -> @logger.finish()
+
     @public listNotificationInterests: Function,
       default: -> [
         CONNECT_MODULE_TO_LOGGER

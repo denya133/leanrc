@@ -16,9 +16,8 @@ UNAUTHORIZED      = status 'unauthorized'
 module.exports = (Module)->
   {
     NILL
-    CONFIGURATION
-    APPLICATION_ROUTER
     APPLICATION_RENDERER
+    APPLICATION_ROUTER
 
     Switch
     Utils

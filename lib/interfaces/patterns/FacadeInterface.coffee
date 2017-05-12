@@ -8,6 +8,10 @@ module.exports = (Module)->
       @inheritProtected()
       @include Module::NotifierInterface
 
+      @public @virtual remove: Function,
+        args: []
+        return: NILL
+
       @public @virtual registerCommand: Function,
         args: [String, Module::Class]
         return: NILL

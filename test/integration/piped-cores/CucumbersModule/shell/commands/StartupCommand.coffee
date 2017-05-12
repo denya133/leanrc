@@ -3,7 +3,7 @@
 module.exports = (Module) ->
   {
     MacroCommand
-    PrepareViewCommand    
+    PrepareViewCommand
   } = Module::
 
   class StartupCommand extends MacroCommand

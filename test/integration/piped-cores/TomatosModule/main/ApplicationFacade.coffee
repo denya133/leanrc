@@ -3,11 +3,6 @@
 module.exports = (Module) ->
   {
     STARTUP
-    DELAYED_JOBS_SCRIPT
-    CONFIGURATION
-    RESQUE
-    APPLICATION_RENDERER
-    APPLICATION_ROUTER
 
     Facade
     StartupCommand
@@ -19,8 +14,7 @@ module.exports = (Module) ->
 
     vpbIsInitialized = @private isInitialized: Boolean,
       default: no
-    cphInstanceMap  = @protected @static instanceMap: Object,
-      default: {}
+    cphInstanceMap  = Symbol.for '~instanceMap'
 
     @protected initializeController: Function,
       default: (args...)->
@@ -33,22 +27,6 @@ module.exports = (Module) ->
         unless @[vpbIsInitialized]
           @[vpbIsInitialized] = yes
           @sendNotification STARTUP, aoApplication
-
-    @public finish: Function,
-      default: ->
-        @removeCommand STARTUP
-        @removeCommand DELAYED_JOBS_SCRIPT
-        @removeCommand 'TomatosStock'
-
-        @removeProxy CONFIGURATION
-        @removeProxy RESQUE
-        @removeProxy APPLICATION_RENDERER
-        @removeProxy APPLICATION_ROUTER
-        @removeProxy 'TomatosCollection'
-        @removeProxy 'CucumbersResource'
-
-        @removeMediator 'TomatosMainJunctionMediator'
-        @removeMediator 'MainSwitch'
 
     @public @static getInstance: Function,
       default: (asKey)->

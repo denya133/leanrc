@@ -56,7 +56,7 @@ module.exports = (Module)->
                   level = FATAL
                   break
                 when LEVELS[INFO]
-                  level = INFO;
+                  level = INFO
                   break
                 when LEVELS[WARN]
                   level = WARN
@@ -71,11 +71,11 @@ module.exports = (Module)->
               logLevel = note.getBody()
               setLogLevelMessage = LogFilterMessage.new SET_PARAMS, logLevel
 
-              changedLevel = @[ipoJunction].sendMessage STDLOG, setLogLevelMessage
+              @[ipoJunction].sendMessage STDLOG, setLogLevelMessage
               changedLevelMessage = LogMessage.new CHANGE, @[ipoMultitonKey], "
                 Changed Log Level to: #{LogMessage.LEVELS[logLevel]}
               "
-              logChanged = @[ipoJunction].sendMessage STDLOG, changedLevelMessage
+              @[ipoJunction].sendMessage STDLOG, changedLevelMessage
               break
             else
               @super note

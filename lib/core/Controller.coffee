@@ -26,7 +26,12 @@ module.exports = (Module)->
       args: [String]
       return: Module::Class
       default: (asKey)->
-        delete Controller[cphInstanceMap][asKey]
+        if (voController = Controller[cphInstanceMap][asKey])?
+          for own asNotificationName of voController[iphCommandMap]
+            voController.removeCommand asNotificationName
+          Controller[cphInstanceMap][asKey] = undefined
+          delete Controller[cphInstanceMap][asKey]
+        return
 
     @public executeCommand: Function,
       default: (aoNotification)->
@@ -52,6 +57,7 @@ module.exports = (Module)->
       default: (asNotificationName)->
         if @hasCommand(asNotificationName)
           @[ipoView].removeObserver asNotificationName, @
+          @[iphCommandMap][asNotificationName] = undefined
           delete @[iphCommandMap][asNotificationName]
         return
 

@@ -19,6 +19,9 @@ module.exports = (Module) ->
     @public main: PipeAwareInterface,
       get: -> @getViewComponent()
 
+    @public onRemove: Function,
+      default: -> @main.finish()
+
     @public init: Function,
       default: (mainModule)->
         @super MainModuleMediator.name, mainModule

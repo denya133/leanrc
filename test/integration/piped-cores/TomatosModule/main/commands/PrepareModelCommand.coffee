@@ -14,7 +14,6 @@ module.exports = (Module) ->
     MainCollection
     CucumbersResource
     TomatoRecord
-    CucumberEntry
     Renderer
     ApplicationRouter
   } = Module::

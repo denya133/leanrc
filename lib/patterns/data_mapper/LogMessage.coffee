@@ -57,7 +57,7 @@ module.exports = (Module) ->
         time
 
     @public message: String,
-      get: -> @body
+      get: -> @getBody()
 
     @public init: Function,
       default: (logLevel, sender, message)->
