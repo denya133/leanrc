@@ -14,8 +14,7 @@ module.exports = (Module) ->
 
     vpbIsInitialized = @private isInitialized: Boolean,
       default: no
-    cphInstanceMap  = @protected @static instanceMap: Object,
-      default: {}
+    cphInstanceMap  = Symbol.for '~instanceMap'
 
     @protected initializeController: Function,
       default: (args...)->

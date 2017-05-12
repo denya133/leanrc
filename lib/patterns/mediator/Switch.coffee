@@ -37,7 +37,6 @@ module.exports = (Module)->
       get: -> ['json', 'html', 'xml', 'atom']
 
     @public routerName: String,
-      configurable: yes
       default: APPLICATION_ROUTER
 
     # @public jsonRendererName: String
@@ -46,7 +45,6 @@ module.exports = (Module)->
     # @public atomRendererName: String
 
     @public listNotificationInterests: Function,
-      configurable: yes
       default: ->
         [
           Module::HANDLER_RESULT
@@ -78,8 +76,6 @@ module.exports = (Module)->
     ipoRenderers = @private renderers: Object
 
     @public rendererFor: Function,
-      args: [String]
-      return: Module::RendererInterface
       default: (asFormat)->
         @[ipoRenderers] ?= {}
         @[ipoRenderers][asFormat] ?= do (asFormat)=>
@@ -89,14 +85,13 @@ module.exports = (Module)->
           voRenderer
         @[ipoRenderers][asFormat]
 
-    @public sendHttpResponse: Function,
-      args: [Object, Object, Object, Object]
-      return: NILL
+    @public @async sendHttpResponse: Function,
       default: (req, res, aoData, {method, path, resource, action})->
         switch (vsFormat = req.accepts @responseFormats)
           when 'json', 'html', 'xml', 'atom'
             if @["#{vsFormat}RendererName"]?
-              voRendered = @rendererFor vsFormat
+              voRenderer = @rendererFor vsFormat
+              voRendered = yield voRenderer
                 .render aoData, {path, resource, action}
             else
               res.set 'Content-Type', 'text/plain'
@@ -105,11 +100,9 @@ module.exports = (Module)->
           else
             res.set 'Content-Type', 'text/plain'
             res.send JSON.stringify aoData
-        return
+        yield return
 
     @public defineRoutes: Function,
-      args: []
-      return: NILL
       default: ->
         voRouter = @facade.retrieveProxy @routerName ? APPLICATION_ROUTER
         voRouter.routes.forEach (aoRoute)=>
@@ -119,8 +112,6 @@ module.exports = (Module)->
     # этот метод можно переопределить добавив в конкретный медиатор после этого миксина другой, содержащий этот метод.
     # так может быть реализовано например в случае, когда нужно чтобы внутри хендлера открывалась транзакция для работы с базой данных. (и после выполнения закрывалась)
     @public handler: Function,
-      args: []
-      return: NILL
       default: (resourceName, {req, res, reverse}, {method, path, resource, action})->
         queryParams = req.query
         pathPatams = req.params
@@ -140,8 +131,6 @@ module.exports = (Module)->
         return
 
     @public defineSwaggerEndpoint: Function,
-      args: [Object]
-      return: NILL
       default: (aoSwaggerEndpoint, resourceName, action)->
         voGateway = @facade.retrieveProxy "#{resourceName}Gateway"
         {
@@ -177,7 +166,6 @@ module.exports = (Module)->
 
     # должен быть объявлен в унаследованном классе
     @public createNativeRoute: Function,
-      configurable: yes
       default: ->
         throw new Error '`Switch::createNativeRoute` should be implemeted in derived class'
 

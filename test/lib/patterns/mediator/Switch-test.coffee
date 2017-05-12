@@ -209,7 +209,8 @@ describe 'Switch', ->
       .to.not.throw Error
   describe '#sendHttpResponse', ->
     it 'should send http response', ->
-      expect ->
+      # expect ->
+      co ->
         facade = Facade.getInstance 'TEST_SWITCH_5'
         class Test extends RC::Module
           @inheritProtected()
@@ -287,11 +288,12 @@ describe 'Switch', ->
           path: '/test'
           resource: 'test'
           action: 'list'
-        switchMediator.sendHttpResponse voRequest, voResponse, vhData, vhOptions
+        yield switchMediator.sendHttpResponse voRequest, voResponse, vhData, vhOptions
         assert.isTrue spyRendererRender.calledWith(vhData, vhOptions), 'Render not called'
         assert.isTrue spyResponseSend.called, 'Response not sent'
         assert.isTrue spyResponseSend.calledWith(renderedGauge), 'Response data are incorrect'
-      .to.not.throw Error
+        yield return
+      # .to.not.throw Error
   describe '#handler', ->
     it 'should send notification', ->
       expect ->

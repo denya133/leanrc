@@ -17,7 +17,6 @@ class CucumbersSchema extends Cucumbers
 
   require('./mediators/ApplicationMediator') @Module
 
-  require('./proxies/BaseConfiguration') @Module
   require('./proxies/BaseCollection') @Module
   require('./proxies/BaseResque') @Module
   require('./proxies/MigrationsCollection') @Module

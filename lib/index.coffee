@@ -105,7 +105,7 @@ class LeanRC extends RC
 
   require('./patterns/mediator/Mediator') LeanRC
   require('./patterns/mediator/Switch') LeanRC
-  require('./patterns/mediator/MemoryResqueExecutor') LeanRC #needs tests
+  require('./patterns/mediator/MemoryResqueExecutor') LeanRC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC

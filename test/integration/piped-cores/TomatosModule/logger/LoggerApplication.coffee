@@ -10,7 +10,7 @@ module.exports = (Module) ->
     @module Module
 
     @public @static NAME: String,
-      default: 'Logger'
+      default: 'TomatosLogger'
 
 
   LoggerApplication.initialize()

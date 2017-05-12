@@ -20,7 +20,7 @@ module.exports = (Module)->
         args: [String]
         return: Module::RendererInterface
 
-      @public @virtual sendHttpResponse: Function,
+      @public @async @virtual sendHttpResponse: Function,
         args: [Object, Object, Object, Object]
         return: NILL
 
@@ -33,7 +33,7 @@ module.exports = (Module)->
         return: NILL
 
       @public @virtual defineSwaggerEndpoint: Function,
-        args: [Object]
+        args: [Object, String, String]
         return: NILL
 
       @public @virtual createNativeRoute: Function,

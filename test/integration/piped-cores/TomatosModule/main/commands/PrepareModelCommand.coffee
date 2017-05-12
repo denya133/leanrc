@@ -9,12 +9,11 @@ module.exports = (Module) ->
     APPLICATION_ROUTER
 
     SimpleCommand
-    MainConfiguration
+    Configuration
     MainResque
     MainCollection
     CucumbersResource
     TomatoRecord
-    CucumberEntry
     Renderer
     ApplicationRouter
   } = Module::
@@ -25,7 +24,7 @@ module.exports = (Module) ->
 
     @public execute: Function,
       default: ->
-        @facade.registerProxy MainConfiguration.new CONFIGURATION, @Module::ROOT
+        @facade.registerProxy Configuration.new CONFIGURATION, @Module::ROOT
         @facade.registerProxy MainResque.new RESQUE
         @facade.registerProxy MainCollection.new 'TomatosCollection',
           delegate: TomatoRecord

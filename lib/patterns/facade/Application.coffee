@@ -5,6 +5,7 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
+    @const LOGGER_PROXY: Symbol 'LoggerProxy'
     @const CONNECT_MODULE_TO_LOGGER: Symbol 'connectModuleToLogger'
     @const CONNECT_SHELL_TO_LOGGER: Symbol 'connectShellToLogger'
     @const CONNECT_MODULE_TO_SHELL: Symbol 'connectModuleToShell'
@@ -12,7 +13,10 @@ module.exports = (Module)->
     @public @static NAME: String
 
     @public finish: Function,
-      default: -> @facade.finish()
+      default: ->
+        @facade.remove()
+        @facade = undefined
+        return
 
     @public init: Function,
       default: ->

@@ -3,12 +3,6 @@
 module.exports = (Module) ->
   {
     STARTUP
-    MIGRATE
-    ROLLBACK
-    CONFIGURATION
-    RESQUE
-    MIGRATIONS
-    APPLICATION_MEDIATOR
 
     Facade
     StartupCommand
@@ -20,8 +14,7 @@ module.exports = (Module) ->
 
     vpbIsInitialized = @private isInitialized: Boolean,
       default: no
-    cphInstanceMap  = @protected @static instanceMap: Object,
-      default: {}
+    cphInstanceMap  = Symbol.for '~instanceMap'
 
     @protected initializeController: Function,
       default: (args...)->
@@ -34,19 +27,6 @@ module.exports = (Module) ->
         unless @[vpbIsInitialized]
           @[vpbIsInitialized] = yes
           @sendNotification STARTUP, aoApplication
-
-    @public finish: Function,
-      default: ->
-        @removeCommand STARTUP
-        @removeCommand MIGRATE
-        @removeCommand ROLLBACK
-
-        @removeProxy CONFIGURATION
-        @removeProxy RESQUE
-        @removeProxy MIGRATIONS
-        @removeProxy 'CucumbersCollection'
-
-        @removeMediator APPLICATION_MEDIATOR
 
     @public @static getInstance: Function,
       default: (asKey)->

@@ -21,7 +21,11 @@ module.exports = (Module)->
 
     @public @static removeModel: Function,
       default: (asKey)->
-        delete Model[cphInstanceMap][asKey]
+        if (voModel = Model[cphInstanceMap][asKey])?
+          for own asProxyName of voModel[iphProxyMap]
+            voModel.removeProxy asProxyName
+          Model[cphInstanceMap][asKey] = undefined
+          delete Model[cphInstanceMap][asKey]
         return
 
     @public registerProxy: Function,
@@ -35,6 +39,7 @@ module.exports = (Module)->
       default: (asProxyName)->
         voProxy = @[iphProxyMap][asProxyName]
         if voProxy
+          @[iphProxyMap][asProxyName] = undefined
           delete @[iphProxyMap][asProxyName]
           voProxy.onRemove()
         return voProxy

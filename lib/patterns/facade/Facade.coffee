@@ -8,9 +8,9 @@ module.exports = (Module)->
 
     @const MULTITON_MSG: "Facade instance for this multiton key already constructed!"
 
-    ipoModel        = @private model: Module::ModelInterface
-    ipoView         = @private view: Module::ViewInterface
-    ipoController   = @private controller: Module::ControllerInterface
+    ipoModel        = @protected model: Module::ModelInterface
+    ipoView         = @protected view: Module::ViewInterface
+    ipoController   = @protected controller: Module::ControllerInterface
     ipsMultitonKey  = @protected multitonKey: String
     cphInstanceMap  = @protected @static instanceMap: Object,
       default: {}
@@ -44,6 +44,18 @@ module.exports = (Module)->
         unless Facade[cphInstanceMap][asKey]?
           Facade[cphInstanceMap][asKey] = Facade.new asKey
         Facade[cphInstanceMap][asKey]
+
+    @public remove: Function,
+      default: ->
+        Module::Model.removeModel @[ipsMultitonKey]
+        Module::Controller.removeController @[ipsMultitonKey]
+        Module::View.removeView @[ipsMultitonKey]
+        @[ipoModel] = undefined
+        @[ipoView] = undefined
+        @[ipoController] = undefined
+        Module::Facade[cphInstanceMap][@[ipsMultitonKey]] = undefined
+        delete Module::Facade[cphInstanceMap][@[ipsMultitonKey]]
+        return
 
     @public registerCommand: Function,
       default: (asNotificationName, aCommand)->

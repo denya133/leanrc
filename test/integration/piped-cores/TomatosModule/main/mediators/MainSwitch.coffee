@@ -16,12 +16,15 @@ UNAUTHORIZED      = status 'unauthorized'
 module.exports = (Module)->
   {
     NILL
-    CONFIGURATION
-    APPLICATION_ROUTER
     APPLICATION_RENDERER
+    APPLICATION_ROUTER
 
     Switch
+    Utils
   } = Module::
+  {
+    co
+  } = Utils
 
   class MainSwitch extends Switch
     @inheritProtected()
@@ -77,8 +80,9 @@ module.exports = (Module)->
 
         @[ipoExpressApp][method]? path, (req, res)=>
           reverse = crypto.randomBytes 32
-          @getViewComponent().once reverse, (voData)=>
-            @sendHttpResponse req, res, voData, {method, path, resource, action}
+          @getViewComponent().once reverse, co.wrap (voData)=>
+            yield @sendHttpResponse req, res, voData, {method, path, resource, action}
+            yield return
           @handler resourceName, {req, res, reverse}, {method, path, resource, action}
 
         # это надо будет заиспользовать когда решится вопрос "как подрубить свайгер к экспрессу"

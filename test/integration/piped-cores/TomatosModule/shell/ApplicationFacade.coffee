@@ -3,7 +3,6 @@
 module.exports = (Module) ->
   {
     STARTUP
-    APPLICATION_MEDIATOR
 
     Facade
     StartupCommand
@@ -15,8 +14,7 @@ module.exports = (Module) ->
 
     vpbIsInitialized = @private isInitialized: Boolean,
       default: no
-    cphInstanceMap  = @protected @static instanceMap: Object,
-      default: {}
+    cphInstanceMap  = Symbol.for '~instanceMap'
 
     @protected initializeController: Function,
       default: (args...)->
@@ -29,17 +27,6 @@ module.exports = (Module) ->
         unless @[vpbIsInitialized]
           @[vpbIsInitialized] = yes
           @sendNotification STARTUP, aoApplication
-
-    @public finish: Function,
-      default: ->
-        @removeCommand STARTUP
-
-        # @removeProxy CONFIGURATION
-
-        @removeMediator 'LoggerModuleMediator'
-        @removeMediator 'TomatosShellJunctionMediator'
-        @removeMediator APPLICATION_MEDIATOR
-        @removeMediator 'MainModuleMediator'
 
     @public @static getInstance: Function,
       default: (asKey)->

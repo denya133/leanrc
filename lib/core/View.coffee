@@ -22,7 +22,11 @@ module.exports = (Module)->
 
     @public @static removeView: Function,
       default: (asKey)->
-        delete View[cphInstanceMap][asKey]
+        if (voView = View[cphInstanceMap][asKey])?
+          for own asMediatorName of voView[iphMediatorMap]
+            voView.removeMediator asMediatorName
+          View[cphInstanceMap][asKey] = undefined
+          delete View[cphInstanceMap][asKey]
         return
 
     @public registerObserver: Function,
@@ -99,6 +103,7 @@ module.exports = (Module)->
             @removeObserver vsInterest, voMediator
 
         # remove the mediator from the map
+        @[iphMediatorMap][asMediatorName] = undefined
         delete @[iphMediatorMap][asMediatorName]
 
         # Alert the mediator that it has been removed
