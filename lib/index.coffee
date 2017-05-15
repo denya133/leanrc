@@ -157,6 +157,6 @@ require('./patterns/facade/Application') LeanRC
 require('./patterns/command/LogMessageCommand') LeanRC
 require('./patterns/data_mapper/LogMessage') LeanRC
 require('./patterns/data_mapper/LogFilterMessage') LeanRC
-require('./mixins/LoggingJunctionMixin') LeanRC #needs tests
+require('./mixins/LoggingJunctionMixin') LeanRC
 
 module.exports = LeanRC.freeze()

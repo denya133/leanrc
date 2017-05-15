@@ -22,7 +22,8 @@ module.exports = (Module) ->
 
     @public writeMessages: Function,
       default: (messages...) ->
-        console.log messages...
+        # Commented out to prevent terminal pollution
+        # console.log messages...
         @[ipoEventEmitter].emit Module::ConsoleComponent::MESSAGE_WRITTEN
 
     @public sendRequest: Function,
