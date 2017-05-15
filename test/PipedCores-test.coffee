@@ -136,6 +136,11 @@ describe 'PipedCores', ->
               description: 'tomato2 long description'
         console.log '?????res5 after PUT with res2.body.tomato.id', res5
         tomatos.finish()
-  describe 'Create Cucumbers app and Tomatos app and ...', ->
-    it 'после прихождения реквеста на томатос, он должен запросить через CucumbersResource огурец (который пошлет запрос через HttpCollectionMixin), полученный огурец он должен отправить в ответе', ->
-      throw new Error 'not implemented'
+  describe 'Create Cucumbers app and Tomatos app and test its interaction', ->
+    it 'should create two apps and get cucumber from tomato', ->
+      co ->
+        cucumbers = CucumbersApp::ShellApplication.new()
+        tomatos = TomatosApp::ShellApplication.new()
+        console.log '>>>^^^^^'
+        tomatos.finish()
+        cucumbers.finish()
