@@ -50,6 +50,8 @@ module.exports = (Module) ->
     @include Module::ConfigurableMixin
     @module Module
 
+    iplMigrationNames = @private migrationNames: Module::PromiseInterface
+
     @public migrationsCollection: Module::CollectionInterface
     @public migrationNames: Module::PromiseInterface,
       get: ->
@@ -57,10 +59,10 @@ module.exports = (Module) ->
         @[iplMigrationNames] ?= co =>
           files = yield filesList @migrationsDir
           yield return _.orderBy _.compact (files ? []).map (i)=>
-            migrationName = i.replace '.js', ''
+            migrationName = i.replace /\.js|\.coffee/, ''
             if migrationName isnt 'BaseMigration'
               vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
-              require(vsMigrationPath) Module
+              require(vsMigrationPath) @Module
               migrationName
             else
               null
@@ -89,25 +91,21 @@ module.exports = (Module) ->
           throw new Error 'Not valid steps params'
           yield return
 
-        yield @migrationNames
+        migrationNames = yield @migrationNames
 
-        executedMigrations = (yield @migrationsCollection.takeAll()).toArray()
+        executedMigrations = yield (yield @migrationsCollection.takeAll()).toArray()
         executedMigrations = _.orderBy executedMigrations, ['id', 'desc']
         executedMigrations = executedMigrations[0...(options.steps ? 1)]
 
         for executedMigration in executedMigrations
           try
-            clearedMigrationName = executedMigration.replace /^\d{14}[_]/, ''
-            migrationClassName = inflect.camelize clearedMigrationName
-            vcMigration = Module::[migrationClassName]
-            voMigration = vcMigration.new {}, @migrationsCollection
-            yield voMigration.migrate Module::Migration::DOWN
-            yield voMigration.destroy()
+            yield executedMigration.migrate Module::Migration::DOWN
+            yield executedMigration.destroy()
           catch err
             error = "!!! Error in migration #{executedMigration}"
             console.error error, err.message, err.stack
             break
-          if options?.until? and options.until is migrationName
+          if options?.until? and options.until is executedMigration.id
             break
         yield return
 

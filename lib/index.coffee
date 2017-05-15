@@ -75,8 +75,8 @@ class LeanRC extends RC
   require('./mixins/QueryableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
-  require('./mixins/DelayableMixin') LeanRC #needs tests
-  require('./mixins/BulkActionsStockMixin') LeanRC #needs tests
+  require('./mixins/DelayableMixin') LeanRC
+  require('./mixins/BulkActionsStockMixin') LeanRC
 
   require('./patterns/data_mapper/Transform') LeanRC
   require('./patterns/data_mapper/StringTransform') LeanRC
@@ -105,15 +105,15 @@ class LeanRC extends RC
 
   require('./patterns/mediator/Mediator') LeanRC
   require('./patterns/mediator/Switch') LeanRC
-  require('./patterns/mediator/MemoryResqueExecutor') LeanRC #needs tests
+  require('./patterns/mediator/MemoryResqueExecutor') LeanRC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
   require('./patterns/command/Stock') LeanRC
-  require('./patterns/command/MigrateCommand') LeanRC #needs tests
-  require('./patterns/command/RollbackCommand') LeanRC #needs tests
-  require('./patterns/command/Script') LeanRC #needs tests
-  require('./patterns/command/DelayedJobScript') LeanRC #needs tests
+  require('./patterns/command/MigrateCommand') LeanRC
+  require('./patterns/command/RollbackCommand') LeanRC
+  require('./patterns/command/Script') LeanRC
+  require('./patterns/command/DelayedJobScript') LeanRC
 
   require('./patterns/migration/Migration') LeanRC
 
@@ -156,10 +156,10 @@ Pipes.initialize()
 
 LeanRC.const Pipes: Pipes.freeze()
 
-require('./patterns/facade/Application') LeanRC #needs tests
-require('./patterns/command/LogMessageCommand') LeanRC #needs tests
-require('./patterns/data_mapper/LogMessage') LeanRC #needs tests
-require('./patterns/data_mapper/LogFilterMessage') LeanRC #needs tests
+require('./patterns/facade/Application') LeanRC
+require('./patterns/command/LogMessageCommand') LeanRC
+require('./patterns/data_mapper/LogMessage') LeanRC
+require('./patterns/data_mapper/LogFilterMessage') LeanRC
 require('./mixins/LoggingJunctionMixin') LeanRC #needs tests
 
 module.exports = LeanRC.freeze()

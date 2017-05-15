@@ -47,7 +47,6 @@ module.exports = (Module)->
 
     Mediator
     DelayableMixin
-    Facade
     ConfigurableMixin
     ResqueInterface
   } = Module::
@@ -69,7 +68,7 @@ module.exports = (Module)->
     ipbIsStopped = @private isStopped: Boolean
     ipoDefinedProcessors = @private definedProcessors: Object
     ipoConcurrencyCount = @private concurrencyCount: Object
-    ipoResque = @private resqie: ResqueInterface
+    ipoResque = @private resque: ResqueInterface
 
     @public listNotificationInterests: Function,
       default: ->
@@ -105,16 +104,17 @@ module.exports = (Module)->
       return: NILL
       default: ->
         for {name, concurrency} in yield @[ipoResque].allQueues()
-          [moduleName] = name.split '|>'
-          if moduleName is @moduleName
+          fullQueueName = @[ipoResque].fullQueueName name
+          [moduleName] = fullQueueName.split '|>'
+          if moduleName is @moduleName()
             @define name, {concurrency}, co.wrap (job, done)=>
-              reverse = if isArangoDB
+              reverse = if isArangoDB()
                 crypto.genRandomAlphaNumbers 32
               else
                 crypto.randomBytes 32
               @getViewComponent().once reverse, (aoError)=>
                 done aoError
-              {scriptName, data} = job.attrs.data
+              {scriptName, data} = job.data
               @sendNotification scriptName, data, reverse
               return
           continue
@@ -130,8 +130,8 @@ module.exports = (Module)->
       args: []
       return: NILL
       default: (multitonKey)->
-        facade = Facade.getInstance multitonKey
-        executor = facade.retriveMediator MEM_RESQUE_EXEC
+        facade = Module::Facade.getInstance multitonKey
+        executor = facade.retrieveMediator MEM_RESQUE_EXEC
         yield executor.cyclePart()
         return
 
@@ -156,8 +156,6 @@ module.exports = (Module)->
                 listener job
               if currentQC >= concurrency
                 break
-              return
-          return
         @recursion()
         yield return
 
@@ -167,7 +165,7 @@ module.exports = (Module)->
       default: ->
         if @[ipbIsStopped]
           yield return
-        if isArangoDB
+        if isArangoDB()
           yield MemoryResqueExecutor.delay(@facade,
             delayUntil: Date.now() + 100
           ).staticRunner @[ipsMultitonKey]

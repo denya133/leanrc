@@ -4,17 +4,17 @@ sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 { co } = LeanRC::Utils
 
-describe 'MigrateCommand', ->
+describe 'RollbackCommand', ->
   describe '.new', ->
     it 'should create new command', ->
       co ->
-        command = LeanRC::MigrateCommand.new()
-        assert.instanceOf command, LeanRC::MigrateCommand
+        command = LeanRC::RollbackCommand.new()
+        assert.instanceOf command, LeanRC::RollbackCommand
         yield return
   describe '#initializeNotifier', ->
     it 'should initialize command', ->
       co ->
-        KEY = 'TEST_MIGRATE_COMMAND_001'
+        KEY = 'TEST_ROLLBACK_COMMAND_001'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -37,7 +37,7 @@ describe 'MigrateCommand', ->
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
           delegate: TestRecord
           serializer: LeanRC::Serializer
-        command = LeanRC::MigrateCommand.new()
+        command = LeanRC::RollbackCommand.new()
         command.initializeNotifier KEY
         assert.equal command.migrationsCollection, facade.retrieveProxy LeanRC::MIGRATIONS
         assert.isNotNull command.migrationsCollection
@@ -46,7 +46,7 @@ describe 'MigrateCommand', ->
   describe '#migrationsDir', ->
     it 'should get migrations directory path', ->
       co ->
-        KEY = 'TEST_MIGRATE_COMMAND_002'
+        KEY = 'TEST_ROLLBACK_COMMAND_002'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -74,7 +74,7 @@ describe 'MigrateCommand', ->
           delegate: TestRecord
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
-        command = LeanRC::MigrateCommand.new()
+        command = LeanRC::RollbackCommand.new()
         command.initializeNotifier KEY
         { migrationsDir } = command
         assert.equal migrationsDir, "#{Test::ROOT}/compiled_migrations"
@@ -82,7 +82,7 @@ describe 'MigrateCommand', ->
   describe '#migrationNames', ->
     it 'should get migration names', ->
       co ->
-        KEY = 'TEST_MIGRATE_COMMAND_003'
+        KEY = 'TEST_ROLLBACK_COMMAND_003'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -110,15 +110,15 @@ describe 'MigrateCommand', ->
           delegate: TestRecord
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
-        command = LeanRC::MigrateCommand.new()
+        command = LeanRC::RollbackCommand.new()
         command.initializeNotifier KEY
         migrationNames = yield command.migrationNames
         assert.deepEqual migrationNames, [ '01_migration', '02_migration', '03_migration' ]
         yield return
-  describe '#migrate', ->
+  describe '#rollback', ->
     it 'should run migrations', ->
       co ->
-        KEY = 'TEST_MIGRATE_COMMAND_004'
+        KEY = 'TEST_ROLLBACK_COMMAND_004'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -143,38 +143,46 @@ describe 'MigrateCommand', ->
           @include LeanRC::MemoryCollectionMixin
           @module Test
         TestMemoryCollection.initialize()
-        class TestCommand extends LeanRC::MigrateCommand
+        class TestCommand extends LeanRC::RollbackCommand
           @inheritProtected()
           @module Test
         TestCommand.initialize()
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
-          delegate: LeanRC::Migration
+          delegate: Test::TestMigration
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
+        class TestMigrateCommand extends LeanRC::MigrateCommand
+          @inheritProtected()
+          @module Test
+        TestMigrateCommand.initialize()
+        forward = TestMigrateCommand.new()
+        forward.initializeNotifier KEY
         command = TestCommand.new()
         command.initializeNotifier KEY
         migrationNames = yield command.migrationNames
         untilName = '00000000000002_second_migration'
-        yield command.migrate until: untilName
+        yield forward.migrate until: untilName
         collectionData = facade.retrieveProxy(LeanRC::MIGRATIONS)[Symbol.for '~collection']
-        for migrationName in migrationNames
+        for migrationName, index in migrationNames
           assert.property collectionData, migrationName
-          break  if migrationName is untilName
+          if migrationName is untilName
+            steps = index + 1
+            break
+        steps ?= migrationNames.length
+        yield command.rollback { steps }
+        collectionData = facade.retrieveProxy(LeanRC::MIGRATIONS)[Symbol.for '~collection']
+        assert.deepEqual collectionData, {}
         yield return
   describe '#execute', ->
-    it 'should run migrations via "execute"', ->
+    it 'should run rollback migrations via "execute"', ->
       co ->
-        KEY = 'TEST_MIGRATE_COMMAND_005'
+        KEY = 'TEST_ROLLBACK_COMMAND_005'
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
         class Test extends LeanRC::Module
           @inheritProtected()
           @root "#{__dirname}/config/root2"
         Test.initialize()
-        class TestConfiguration extends LeanRC::Configuration
-          @inheritProtected()
-          @module Test
-        TestConfiguration.initialize()
         class TestMigration extends LeanRC::Migration
           @inheritProtected()
           @module Test
@@ -185,31 +193,49 @@ describe 'MigrateCommand', ->
               @super args...
               @_type = 'Test::TestMigration'
         TestMigration.initialize()
+        class TestConfiguration extends LeanRC::Configuration
+          @inheritProtected()
+          @module Test
+        TestConfiguration.initialize()
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @module Test
         TestMemoryCollection.initialize()
-        class TestCommand extends LeanRC::MigrateCommand
+        class TestCommand extends LeanRC::RollbackCommand
           @inheritProtected()
           @module Test
-          @public @async migrate: Function,
+          @public @async rollback: Function,
             default: (options) ->
               result = yield @super options
-              trigger.emit 'MIGRATE', options
+              trigger.emit 'ROLLBACK', options
               yield return result
         TestCommand.initialize()
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
-          delegate: LeanRC::Migration
+          delegate: Test::TestMigration
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
+        class TestMigrateCommand extends LeanRC::MigrateCommand
+          @inheritProtected()
+          @module Test
+        TestMigrateCommand.initialize()
+        forward = TestMigrateCommand.new()
+        forward.initializeNotifier KEY
         command = TestCommand.new()
         command.initializeNotifier KEY
+        migrationNames = yield command.migrationNames
         untilName = '00000000000002_second_migration'
         promise = LeanRC::Promise.new (resolve, reject) ->
-          trigger.once 'MIGRATE', (options) -> resolve options
+          trigger.once 'ROLLBACK', (options) -> resolve options
           return
-        command.execute until: untilName
+        yield forward.migrate until: untilName
+        collectionData = facade.retrieveProxy(LeanRC::MIGRATIONS)[Symbol.for '~collection']
+        for migrationName, index in migrationNames
+          if migrationName is untilName
+            steps = index + 1
+            break
+        steps ?= migrationNames.length
+        command.execute { steps }
         options = yield promise
-        assert.deepEqual options, until: untilName
+        assert.deepEqual options, steps: 2
         yield return
