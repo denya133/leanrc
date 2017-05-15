@@ -87,7 +87,17 @@ describe 'PipedCores', ->
       co ->
         cucumbers = CucumbersApp::ShellApplication.new()
         res = yield request.get 'http://localhost:3002/0.1/cucumbers'
-        console.log '?????', res
+        { body: rawBody, status, message } = res
+        assert.equal status, 200
+        assert.equal message, 'OK'
+        body = JSON.parse rawBody ? null
+        assert.isTrue body?
+        { meta, cucumbers: data } = body
+        assert.deepEqual meta, pagination:
+          total: 'not defined'
+          limit: 'not defined'
+          offset: 'not defined'
+        assert.lengthOf data, 0
         # здесь можно проверить сколько объектов вернулось в {cucumbers} = res
         cucumbers.finish()
   describe 'Create Tomatos app instance and send request', ->
