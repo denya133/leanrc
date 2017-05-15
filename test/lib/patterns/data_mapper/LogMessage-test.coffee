@@ -30,7 +30,6 @@ describe 'LogMessage', ->
         vsSender = 'TEST_SENDER'
         vsMessage = 'TEST_MESSAGE'
         message = LeanRC::LogMessage.new vnLevel, vsSender, vsMessage
-        assert.instanceOf message, LeanRC::LogMessage
         assert.equal message[Symbol.for '~header'].logLevel, vnLevel
         message.logLevel = LeanRC::LogMessage.CHANGE
         assert.equal message.logLevel, LeanRC::LogMessage.CHANGE
@@ -53,4 +52,18 @@ describe 'LogMessage', ->
         message.logLevel = LeanRC::LogMessage.DEBUG
         assert.equal message.logLevel, LeanRC::LogMessage.DEBUG
         assert.equal message[Symbol.for '~header'].logLevel, LeanRC::LogMessage.DEBUG
+        yield return
+  describe '#sender', ->
+    it 'should test sender', ->
+      co ->
+        vnLevel = LeanRC::LogMessage.NONE
+        vsSender = 'TEST_SENDER'
+        vsMessage = 'TEST_MESSAGE'
+        message = LeanRC::LogMessage.new vnLevel, vsSender, vsMessage
+        assert.equal message[Symbol.for '~header'].sender, vsSender
+        assert.equal message.sender, vsSender
+        vsSender = 'TEST_ANOTHER_SENDER'
+        message.sender = vsSender
+        assert.equal message[Symbol.for '~header'].sender, vsSender
+        assert.equal message.sender, vsSender
         yield return
