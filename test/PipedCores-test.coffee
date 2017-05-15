@@ -35,13 +35,25 @@ describe 'PipedCores', ->
   describe 'Create Cucumbers app and test pipes', ->
     it 'should create new CucumbersApp and test pipes from shell to logger', ->
       expect ->
+        { CHANGE, DEBUG } = CucumbersApp::Pipes::LogMessage
+        { NAME } = CucumbersApp::ShellApplication
+        { NORMAL } = CucumbersApp::Pipes::PipeMessage
         app = CucumbersApp::ShellApplication.new()
         app.facade.sendNotification(CucumbersApp::LogMessage.SEND_TO_LOG, "TEST log message", CucumbersApp::LogMessage.LEVELS[CucumbersApp::LogMessage.DEBUG])
 
         facade = CucumbersApp::Facade.getInstance 'CucumbersLogger'
 
         logs = facade.retrieveProxy CucumbersApp::Application::LOGGER_PROXY
-        console.log 'Logs', logs.messages, logs.messages.map (m)-> [m.getHeader(), m.getBody()]
+        assert.equal logs.messages[0].getHeader().logLevel, CHANGE
+        assert.equal logs.messages[0].getHeader().sender, NAME
+        assert.doesNotThrow -> Date.parse logs.messages[0].getHeader().time
+        assert.equal logs.messages[0].getBody(), 'Changed Log Level to: DEBUG'
+        assert.equal logs.messages[0].getType(), NORMAL
+        assert.equal logs.messages[1].getHeader().logLevel, DEBUG
+        assert.equal logs.messages[1].getHeader().sender, NAME
+        assert.doesNotThrow -> Date.parse logs.messages[1].getHeader().time
+        assert.equal logs.messages[1].getBody(), 'TEST log message'
+        assert.equal logs.messages[1].getType(), NORMAL
         app.finish()
       .to.not.throw Error
   describe 'Create Tomatos app and test pipes', ->
