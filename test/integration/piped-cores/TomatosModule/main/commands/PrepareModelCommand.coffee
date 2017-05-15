@@ -1,4 +1,3 @@
-{CucumberEntry} = require('../../../CucumbersModule')::
 
 
 module.exports = (Module) ->
@@ -12,8 +11,9 @@ module.exports = (Module) ->
     Configuration
     MainResque
     MainCollection
-    CucumbersResource
+    ThinHttpCollection
     TomatoRecord
+    CucumberRecord
     Renderer
     ApplicationRouter
   } = Module::
@@ -28,8 +28,8 @@ module.exports = (Module) ->
         @facade.registerProxy MainResque.new RESQUE
         @facade.registerProxy MainCollection.new 'TomatosCollection',
           delegate: TomatoRecord
-        @facade.registerProxy CucumbersResource.new 'CucumbersResource',
-          delegate: CucumberEntry
+        @facade.registerProxy ThinHttpCollection.new 'CucumbersCollection',
+          delegate: CucumberRecord
         @facade.registerProxy Renderer.new APPLICATION_RENDERER
         @facade.registerProxy ApplicationRouter.new APPLICATION_ROUTER
 

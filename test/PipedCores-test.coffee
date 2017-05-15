@@ -142,5 +142,6 @@ describe 'PipedCores', ->
         cucumbers = CucumbersApp::ShellApplication.new()
         tomatos = TomatosApp::ShellApplication.new()
         console.log '>>>^^^^^'
+
         tomatos.finish()
         cucumbers.finish()
