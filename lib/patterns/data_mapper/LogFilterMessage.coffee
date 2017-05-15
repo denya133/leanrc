@@ -11,11 +11,11 @@ module.exports = (Module) ->
     @module Module
 
     @public @static BASE: String,
-      get: -> FilterControlMessage.BASE + '/LoggerModule/'
+      get: -> "#{FilterControlMessage.BASE}LoggerModule/"
     @public @static LOG_FILTER_NAME: String,
-      get: -> @BASE + '/LoggerModule/logFilter/'
+      get: -> "#{@BASE}logFilter/"
     @public @static SET_LOG_LEVEL: String,
-      get: -> @BASE + '/LoggerModule/setLogLevel/'
+      get: -> "#{@BASE}setLogLevel/"
 
     @public logLevel: Number
 
