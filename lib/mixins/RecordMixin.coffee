@@ -27,20 +27,28 @@ module.exports = (Module)->
       @public @static parseRecordName: Function,
         default: (asName)->
           if /.*[:][:].*/.test(asName)
-            [vsModuleName, vsModel] = asName.split '::'
+            [vsModuleName, vsRecordName] = asName.split '::'
           else
-            [vsModuleName, vsModel] = [@moduleName(), inflect.camelize inflect.underscore asName]
-          [vsModuleName, vsModel]
+            [vsModuleName, vsRecordName] = [@moduleName(), inflect.camelize inflect.underscore asName]
+          [vsModuleName, vsRecordName]
 
       @public parseRecordName: Function,
         default: -> @constructor.parseRecordName arguments...
 
+      @public @static findRecordByName: Function,
+        args: [String]
+        return: Module::Class
+        default: (asName)->
+          [vsModuleName, vsRecordName] = @parseRecordName asName
+          @Module::[vsRecordName]
+
+      @public findRecordByName: Function,
+        args: [String]
+        return: Module::Class
+        default: (asName)->
+          @constructor.findRecordByName asName
 
       ############################################################################
-
-      # # под вопросом ?????? возможно надо искать через (из) модуля
-      # @public @static findModelByName: Function, [String], -> Array
-      # @public findModelByName: Function, [String], -> Array
 
       # # под вопросом ??????
       # @public updateEdges: Function, [ANY], -> ANY # any type
@@ -122,7 +130,7 @@ module.exports = (Module)->
             if aoAttributes._type is "#{@moduleName()}::#{@name}"
               @super arguments...
             else
-              RecordClass = @findModelByName aoAttributes._type
+              RecordClass = @findRecordByName aoAttributes._type
               RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
           else
             @super arguments...

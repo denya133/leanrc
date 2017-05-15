@@ -359,7 +359,7 @@ describe 'Switch', ->
           'test'
           {
             queryParams: a: 1, b: 2, c: 'abc'
-            pathPatams: test: 'test'
+            pathParams: test: 'test'
             currentUserId: 'CURRENT_USER_COOKIE'
             headers: accept: 'json'
             body: test: 'test'

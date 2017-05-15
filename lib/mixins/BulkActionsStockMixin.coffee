@@ -73,6 +73,7 @@ module.exports = (Module)->
         'bulkUpdate', 'bulkPatch', 'bulkDelete'
       ]
       @beforeHook 'parseBody', only: ['bulkUpdate', 'bulkPatch']
+      @beforeHook 'omitBody', only: ['bulkUpdate', 'bulkPatch']
 
       @public parseQuery: Function,
         args: [Object]

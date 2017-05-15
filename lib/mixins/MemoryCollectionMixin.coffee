@@ -34,7 +34,7 @@ module.exports = (Module)->
 
       @public @async take: Function,
         default: (id)->
-          yield return Module::Cursor.new @, [@[ipoCollection][id]]
+          yield return Module::Cursor.new(@, [@[ipoCollection][id]]).first()
 
       @public @async takeMany: Function,
         default: (ids)->
@@ -48,12 +48,12 @@ module.exports = (Module)->
       @public @async override: Function,
         default: (id, aoRecord)->
           @[ipoCollection][id] = @serializer.serialize aoRecord
-          yield return Module::Cursor.new @, [@[ipoCollection][id]]
+          yield return Module::Cursor.new(@, [@[ipoCollection][id]]).first()
 
       @public @async patch: Function,
         default: (id, aoRecord)->
           @[ipoCollection][id] = @serializer.serialize aoRecord
-          yield return Module::Cursor.new @, [@[ipoCollection][id]]
+          yield return Module::Cursor.new(@, [@[ipoCollection][id]]).first()
 
       @public @async includes: Function,
         default: (id)->

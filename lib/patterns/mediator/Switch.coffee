@@ -114,14 +114,14 @@ module.exports = (Module)->
     @public handler: Function,
       default: (resourceName, {req, res, reverse}, {method, path, resource, action})->
         queryParams = req.query
-        pathPatams = req.params
+        pathParams = req.params
         configurationProxy = @facade.retrieveProxy Module::CONFIGURATION
         currentUserId = req.cookies[configurationProxy.currentUserCookie]
         headers = req.headers
         body = req.body
         voMessage = {
           queryParams
-          pathPatams
+          pathParams
           currentUserId
           headers
           body

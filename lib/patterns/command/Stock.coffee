@@ -1,5 +1,5 @@
-inflect = do require 'i'
-# по сути здесь надо повторить (скопипастить) код из FoxxMC::Controller
+_             = require 'lodash'
+inflect       = do require 'i'
 
 
 module.exports = (Module)->
@@ -94,6 +94,7 @@ module.exports = (Module)->
 
     @beforeHook 'parsePathParams', only: ['detail', 'update', 'delete']
     @beforeHook 'parseBody', only: ['create', 'update']
+    @beforeHook 'omitBody', only: ['create', 'update']
     @beforeHook 'beforeUpdate', only: ['update']
 
     @public beforeActionHook: Function,
@@ -115,6 +116,20 @@ module.exports = (Module)->
       return: ANY
       default: (args...)->
         @recordBody = @body?[@itemEntityName]
+        return args
+
+    @public omitBody: Function,
+      args: [Object]
+      return: ANY
+      default: (args...)->
+        @recordBody = _.omit @recordBody, [
+          '_id', '_rev', 'rev', 'type', '_type'
+          '_owner', '_space',
+          '_from', '_to'
+        ]
+        moduleName = @collection.delegate.moduleName()
+        name = @collection.delegate.name
+        @recordBody._type = "#{moduleName}::#{name}"
         return args
 
     @public beforeUpdate: Function,

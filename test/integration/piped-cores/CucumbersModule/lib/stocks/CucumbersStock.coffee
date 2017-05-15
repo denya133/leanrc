@@ -12,9 +12,5 @@ module.exports = (Module)->
     @public entityName: String,
       default: 'cucumber'
 
-    @public @async list: Function,
-      default: (args...)->
-        yield @super args...
-
 
   CucumbersStock.initialize()

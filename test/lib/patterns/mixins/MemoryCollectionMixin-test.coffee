@@ -224,7 +224,7 @@ describe 'MemoryCollectionMixin', ->
         raw = collection.build
           _key: record.id
           test: 'test2'
-        updatedRecord = yield (yield collection.override record.id, raw).first()
+        updatedRecord = yield collection.override record.id, raw
         assert.isDefined updatedRecord
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'
@@ -261,7 +261,7 @@ describe 'MemoryCollectionMixin', ->
         raw = collection.build
           _key: record.id
           test: 'test2'
-        updatedRecord = yield (yield collection.patch record.id, raw).first()
+        updatedRecord = yield collection.patch record.id, raw
         assert.isDefined updatedRecord
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'

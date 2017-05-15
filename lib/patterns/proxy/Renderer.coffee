@@ -49,21 +49,14 @@ module.exports = (Module)->
     # may be redefine at inheritance
     @public @async render: Function,
       default: (aoData, {path, resource, action} = {})->
-        vhData = if _.isArray aoData
-          Module::Utils.extend [], aoData
-        else
-          Module::Utils.extend {}, aoData
         if path? and resource? and action?
-          # открытый вопрос - как определить какой темплейт рендерить
-          # вопрос в том еще - как должен выглядить путь до темплейта
-          # и как он должен соотноситься с path
           templatePath = resource + action
           templates = yield @templates
-          renderedResult = templates[templatePath]? resource, action, vhData
-          res = JSON.stringify renderedResult ? vhData ? null
+          renderedResult = templates[templatePath]? resource, action, aoData
+          res = JSON.stringify renderedResult ? aoData ? null
           yield return res
         else
-          yield return JSON.stringify vhData
+          yield return JSON.stringify aoData
 
 
   Renderer.initialize()
