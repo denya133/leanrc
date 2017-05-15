@@ -24,9 +24,5 @@ module.exports = (Module)->
     @public collectionName: String,
       get: -> 'TomatosCollection'
 
-    @public @async list: Function,
-      default: (args...)->
-        yield @super args...
-
 
   TomatosStock.initialize()
