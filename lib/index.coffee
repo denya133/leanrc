@@ -159,7 +159,7 @@ LeanRC.const Pipes: Pipes.freeze()
 require('./patterns/facade/Application') LeanRC
 require('./patterns/command/LogMessageCommand') LeanRC
 require('./patterns/data_mapper/LogMessage') LeanRC
-require('./patterns/data_mapper/LogFilterMessage') LeanRC #needs tests
+require('./patterns/data_mapper/LogFilterMessage') LeanRC
 require('./mixins/LoggingJunctionMixin') LeanRC #needs tests
 
 module.exports = LeanRC.freeze()
