@@ -67,3 +67,15 @@ describe 'LogMessage', ->
         assert.equal message[Symbol.for '~header'].sender, vsSender
         assert.equal message.sender, vsSender
         yield return
+  describe '#time', ->
+    it 'should test time', ->
+      co ->
+        vnLevel = LeanRC::LogMessage.NONE
+        vsSender = 'TEST_SENDER'
+        vsMessage = 'TEST_MESSAGE'
+        message = LeanRC::LogMessage.new vnLevel, vsSender, vsMessage
+        vsTime = new Date().toISOString()
+        message.time = vsTime
+        assert.equal message[Symbol.for '~header'].time, vsTime
+        assert.equal message.time, vsTime
+        yield return
