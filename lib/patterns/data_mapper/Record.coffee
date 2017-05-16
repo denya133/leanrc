@@ -94,6 +94,7 @@ module.exports = (Module)->
       return: NILL
       default: ->
         @_key ?= @collection.generateId()
+        @createdAt ?= new Date().toISOString()
         yield return
 
     @public @async afterUpdate: Function,
