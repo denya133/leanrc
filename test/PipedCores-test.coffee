@@ -214,28 +214,80 @@ describe 'PipedCores', ->
             tomato:
               name: 'tomato1'
               description: 'tomato1 description'
-        console.log '?????res1 after POST', res1
+        assert.propertyVal res1, 'status', 201
+        assert.propertyVal res1, 'message', 'Created'
+        body = JSON.parse res1.body ? null
+        { tomato: item } = body
+        assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
+        assert.propertyVal item, 'name', 'tomato1'
+        assert.propertyVal item, 'description', 'tomato1 description'
+        assert.propertyVal item, 'isHidden', no
+        assert.isUndefined item.deletedAt
         res2 = yield request.post 'http://localhost:3001/0.1/tomatos',
           body:
             tomato:
               name: 'tomato2'
               description: 'tomato2 description'
-        console.log '?????res2 after POST', res2
+        assert.propertyVal res2, 'status', 201
+        assert.propertyVal res2, 'message', 'Created'
+        body = JSON.parse res2.body ? null
+        { tomato: item } = body
+        assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
+        assert.propertyVal item, 'name', 'tomato2'
+        assert.propertyVal item, 'description', 'tomato2 description'
+        assert.propertyVal item, 'isHidden', no
+        assert.isUndefined item.deletedAt
         res3 = yield request.post 'http://localhost:3001/0.1/tomatos',
           body:
             tomato:
               name: 'tomato3'
               description: 'tomato3 description'
-        console.log '?????res3 after POST', res3
+        assert.propertyVal res3, 'status', 201
+        assert.propertyVal res3, 'message', 'Created'
+        body = JSON.parse res3.body ? null
+        { tomato: item } = body
+        assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
+        assert.propertyVal item, 'name', 'tomato3'
+        assert.propertyVal item, 'description', 'tomato3 description'
+        assert.propertyVal item, 'isHidden', no
+        assert.isUndefined item.deletedAt
         res4 = yield request.get 'http://localhost:3001/0.1/tomatos'
-        console.log '?????res4 after GET all', res4
+        assert.propertyVal res4, 'status', 200
+        assert.propertyVal res4, 'message', 'OK'
+        body = JSON.parse res4.body ? null
+        { tomatos: items } = body
+        assert.lengthOf items, 3
+        for item, index in items
+          assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
+          assert.propertyVal item, 'name', "tomato#{index + 1}"
+          assert.propertyVal item, 'description', "tomato#{index + 1} description"
+          assert.propertyVal item, 'isHidden', no
+          assert.isNull item.deletedAt
         {tomato:{id:tomato2Id}} = JSON.parse res2.body
         res5 = yield request.put "http://localhost:3001/0.1/tomatos/#{tomato2Id}",
           body:
             tomato:
               name: 'tomato2'
               description: 'tomato2 long description'
-        console.log '?????res5 after PUT with res2.body.tomato.id', res5
+        assert.propertyVal res5, 'status', 200
+        assert.propertyVal res5, 'message', 'OK'
+        body = JSON.parse res5.body ? null
+        { tomato: item } = body
+        assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
+        assert.propertyVal item, 'name', 'tomato2'
+        assert.propertyVal item, 'description', 'tomato2 long description'
+        assert.propertyVal item, 'isHidden', no
+        assert.isNull item.deletedAt
+        res6 = yield request.delete "http://localhost:3001/0.1/tomatos/#{tomato2Id}"
+        assert.propertyVal res6, 'status', 200
+        assert.propertyVal res6, 'message', 'OK'
+        body = JSON.parse res6.body ? null
+        { tomato: item } = body
+        assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
+        assert.propertyVal item, 'name', 'tomato2'
+        assert.propertyVal item, 'description', 'tomato2 description'
+        assert.propertyVal item, 'isHidden', yes
+        assert.isNotNull item.deletedAt
         tomatos.finish()
   describe 'Create Cucumbers app and Tomatos app and ...', ->
     it 'после прихождения реквеста на томатос, он должен запросить через CucumbersResource огурец (который пошлет запрос через HttpCollectionMixin), полученный огурец он должен отправить в ответе', ->
