@@ -113,7 +113,9 @@ module.exports = (Module)->
       return: NILL
       default: ->
         @id ?= @collection.generateId()
-        @createdAt ?= new Date().toISOString()
+        now = new Date().toISOString()
+        @createdAt ?= now
+        @updatedAt ?= now
         yield return
 
     @public @async afterUpdate: Function,
@@ -128,8 +130,9 @@ module.exports = (Module)->
       return: NILL
       default: ->
         @isHidden = yes
-        @updatedAt = new Date().toISOString()
-        @deletedAt = new Date().toISOString()
+        now = new Date().toISOString()
+        @updatedAt = now
+        @deletedAt = now
         return
 
     @public afterDelete: Function,
