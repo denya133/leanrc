@@ -129,29 +129,82 @@ describe 'PipedCores', ->
             cucumber:
               name: 'cucumber1'
               description: 'cucumber1 description'
-        console.log '?????res1 after POST', res1
+        assert.propertyVal res1, 'status', 201
+        assert.propertyVal res1, 'message', 'Created'
+        body = JSON.parse res1.body ? null
+        { cucumber: item } = body
+        assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
+        assert.propertyVal item, 'name', 'cucumber1'
+        assert.propertyVal item, 'description', 'cucumber1 description'
+        assert.propertyVal item, 'isHidden', no
+        assert.isUndefined item.deletedAt
         res2 = yield request.post 'http://localhost:3002/0.1/cucumbers',
           body:
             cucumber:
               name: 'cucumber2'
               description: 'cucumber2 description'
-        console.log '?????res2 after POST', res2
+        assert.propertyVal res2, 'status', 201
+        assert.propertyVal res2, 'message', 'Created'
+        body = JSON.parse res2.body ? null
+        { cucumber: item } = body
+        assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
+        assert.propertyVal item, 'name', 'cucumber2'
+        assert.propertyVal item, 'description', 'cucumber2 description'
+        assert.propertyVal item, 'isHidden', no
+        assert.isUndefined item.deletedAt
         res3 = yield request.post 'http://localhost:3002/0.1/cucumbers',
           body:
             cucumber:
               name: 'cucumber3'
               description: 'cucumber3 description'
-        console.log '?????res3 after POST', res3
+        assert.propertyVal res3, 'status', 201
+        assert.propertyVal res3, 'message', 'Created'
+        body = JSON.parse res3.body ? null
+        { cucumber: item } = body
+        assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
+        assert.propertyVal item, 'name', 'cucumber3'
+        assert.propertyVal item, 'description', 'cucumber3 description'
+        assert.propertyVal item, 'isHidden', no
+        assert.isUndefined item.deletedAt
         res4 = yield request.get 'http://localhost:3002/0.1/cucumbers'
-        console.log '?????res4 after GET all', res4
+        assert.propertyVal res4, 'status', 200
+        assert.propertyVal res4, 'message', 'OK'
+        body = JSON.parse res4.body ? null
+        { cucumbers: items } = body
+        assert.lengthOf items, 3
+        for item, index in items
+          assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
+          assert.propertyVal item, 'name', "cucumber#{index + 1}"
+          assert.propertyVal item, 'description', "cucumber#{index + 1} description"
+          assert.propertyVal item, 'isHidden', no
+          assert.isNull item.deletedAt
         {cucumber:{id:cucumber2Id}} = JSON.parse res2.body
         res5 = yield request.put "http://localhost:3002/0.1/cucumbers/#{cucumber2Id}",
           body:
             cucumber:
               name: 'cucumber2'
               description: 'cucumber2 long description'
-        console.log '?????res5 after PUT with res2.body.cucumber.id', res5
+        assert.propertyVal res5, 'status', 200
+        assert.propertyVal res5, 'message', 'OK'
+        body = JSON.parse res5.body ? null
+        { cucumber: item } = body
+        assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
+        assert.propertyVal item, 'name', 'cucumber2'
+        assert.propertyVal item, 'description', 'cucumber2 long description'
+        assert.propertyVal item, 'isHidden', no
+        assert.isNull item.deletedAt
+        res6 = yield request.delete "http://localhost:3002/0.1/cucumbers/#{cucumber2Id}"
+        assert.propertyVal res6, 'status', 200
+        assert.propertyVal res6, 'message', 'OK'
+        body = JSON.parse res6.body ? null
+        { cucumber: item } = body
+        assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
+        assert.propertyVal item, 'name', 'cucumber2'
+        assert.propertyVal item, 'description', 'cucumber2 description'
+        assert.propertyVal item, 'isHidden', yes
+        assert.isNotNull item.deletedAt
         cucumbers.finish()
+        yield return
   describe 'Create Tomatos app and test CRUD', ->
     it 'should create new TomatosApp and send CRUD requests', ->
       co ->

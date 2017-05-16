@@ -87,6 +87,8 @@ module.exports = (Module)->
 
     @public @async sendHttpResponse: Function,
       default: (req, res, aoData, {method, path, resource, action})->
+        if action is 'create'
+          res.status 201
         switch (vsFormat = req.accepts @responseFormats)
           when 'json', 'html', 'xml', 'atom'
             if @["#{vsFormat}RendererName"]?
