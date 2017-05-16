@@ -22,7 +22,7 @@ describe 'Serializer', ->
         Test::TestRecord.initialize()
         serializer = Serializer.new()
         record = serializer.normalize Test::TestRecord,
-          _type: 'Test::TestRecord'
+          type: 'Test::TestRecord'
           string: 'string'
           number: 123
           boolean: yes
@@ -49,12 +49,12 @@ describe 'Serializer', ->
         Test::TestRecord.initialize()
         serializer = Serializer.new()
         data = serializer.serialize Test::TestRecord.new
-          _type: 'Test::TestRecord'
+          type: 'Test::TestRecord'
           string: 'string'
           number: 123
           boolean: yes
         assert.instanceOf data, Object, 'Serialize is incorrect'
-        assert.equal data._type, 'Test::TestRecord', '`type` is incorrect'
+        assert.equal data.type, 'Test::TestRecord', '`type` is incorrect'
         assert.equal data.string, 'string', '`string` is incorrect'
         assert.equal data.number, 123, '`number` is incorrect'
         assert.equal data.boolean, yes, '`boolean` is incorrect'

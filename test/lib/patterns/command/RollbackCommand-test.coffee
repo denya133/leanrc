@@ -27,7 +27,7 @@ describe 'RollbackCommand', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'TestRecord'
+              @type = 'TestRecord'
         TestRecord.initialize()
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -63,7 +63,7 @@ describe 'RollbackCommand', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'TestRecord'
+              @type = 'TestRecord'
         TestRecord.initialize()
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -99,7 +99,7 @@ describe 'RollbackCommand', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'TestRecord'
+              @type = 'TestRecord'
         TestRecord.initialize()
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -132,7 +132,7 @@ describe 'RollbackCommand', ->
           @public init: Function,
             default: (args...) ->
               @super args...
-              @_type = 'Test::TestMigration'
+              @type = 'Test::TestMigration'
         TestMigration.initialize()
         class TestConfiguration extends LeanRC::Configuration
           @inheritProtected()
@@ -191,7 +191,7 @@ describe 'RollbackCommand', ->
           @public init: Function,
             default: (args...) ->
               @super args...
-              @_type = 'Test::TestMigration'
+              @type = 'Test::TestMigration'
         TestMigration.initialize()
         class TestConfiguration extends LeanRC::Configuration
           @inheritProtected()

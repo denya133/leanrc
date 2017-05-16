@@ -62,19 +62,9 @@ class LeanRC extends RC
   require('./interfaces/core/ViewInterface') LeanRC
 
   require('./mixins/ConfigurableMixin') LeanRC
-  require('./mixins/CrudEndpointsMixin') LeanRC
-  require('./mixins/HttpCollectionMixin') LeanRC
-  require('./mixins/MemoryCollectionMixin') LeanRC
-  require('./mixins/MemoryMigrationMixin') LeanRC
-  require('./mixins/MemoryResqueMixin') LeanRC
-  require('./mixins/MemoryConfigurationMixin') LeanRC
-  require('./mixins/IterableMixin') LeanRC
-  require('./mixins/QueryableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
   require('./mixins/DelayableMixin') LeanRC
-  require('./mixins/BulkActionsStockMixin') LeanRC
-  require('./mixins/ThinHttpCollectionMixin') LeanRC # need test it
 
   require('./patterns/data_mapper/Transform') LeanRC
   require('./patterns/data_mapper/StringTransform') LeanRC
@@ -83,7 +73,6 @@ class LeanRC extends RC
   require('./patterns/data_mapper/BooleanTransform') LeanRC
   require('./patterns/data_mapper/Serializer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
-  require('./patterns/data_mapper/Entry') LeanRC
   require('./patterns/data_mapper/DelayedQueue') LeanRC
 
   require('./patterns/query_object/Query') LeanRC
@@ -97,9 +86,17 @@ class LeanRC extends RC
   require('./patterns/proxy/Configuration') LeanRC
   require('./patterns/proxy/Gateway') LeanRC
   require('./patterns/proxy/Renderer') LeanRC
-  require('./patterns/proxy/Resource') LeanRC
   require('./patterns/proxy/Router') LeanRC
   require('./patterns/proxy/Resque') LeanRC
+
+  require('./mixins/CrudEndpointsMixin') LeanRC
+  require('./mixins/HttpCollectionMixin') LeanRC
+  require('./mixins/MemoryCollectionMixin') LeanRC
+  require('./mixins/MemoryResqueMixin') LeanRC
+  require('./mixins/MemoryConfigurationMixin') LeanRC
+  require('./mixins/IterableMixin') LeanRC
+  require('./mixins/QueryableMixin') LeanRC
+  require('./mixins/ThinHttpCollectionMixin') LeanRC # need test it
 
   require('./patterns/mediator/Mediator') LeanRC
   require('./patterns/mediator/Switch') LeanRC
@@ -113,7 +110,10 @@ class LeanRC extends RC
   require('./patterns/command/Script') LeanRC
   require('./patterns/command/DelayedJobScript') LeanRC
 
+  require('./mixins/BulkActionsStockMixin') LeanRC
+
   require('./patterns/migration/Migration') LeanRC
+  require('./mixins/MemoryMigrationMixin') LeanRC
 
   require('./patterns/gateway/Endpoint') LeanRC
 

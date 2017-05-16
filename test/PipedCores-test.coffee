@@ -141,7 +141,26 @@ describe 'PipedCores', ->
       co ->
         cucumbers = CucumbersApp::ShellApplication.new()
         tomatos = TomatosApp::ShellApplication.new()
-        console.log '>>>^^^^^'
+        res1 = yield request.post 'http://localhost:3002/0.1/cucumbers',
+          body:
+            cucumber:
+              name: 'cucumber1'
+              description: 'cucumber1 description'
+        # console.log '?????res1 after POST', res1
+        res2 = yield request.post 'http://localhost:3002/0.1/cucumbers',
+          body:
+            cucumber:
+              name: 'cucumber2'
+              description: 'cucumber2 description'
+        # console.log '?????res2 after POST', res2
+        res3 = yield request.post 'http://localhost:3002/0.1/cucumbers',
+          body:
+            cucumber:
+              name: 'cucumber3'
+              description: 'cucumber3 description'
+        # console.log '?????res3 after POST', res3
+        res4 = yield request.get 'http://localhost:3001/0.1/cucumbers'
+        console.log '?????res4 after GET', res4
 
         tomatos.finish()
         cucumbers.finish()

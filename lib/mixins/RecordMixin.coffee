@@ -4,7 +4,7 @@ inflect = do require 'i'
 
 
 module.exports = (Module)->
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::CoreObject, (BaseClass) ->
     class RecordMixin extends BaseClass
       @inheritProtected()
 
@@ -126,11 +126,11 @@ module.exports = (Module)->
 
       @public @static new: Function,
         default: (aoAttributes, aoCollection)->
-          if '_type' of (aoAttributes ? {})
-            if aoAttributes._type is "#{@moduleName()}::#{@name}"
+          if (aoAttributes ? {}).type?
+            if @name is aoAttributes.type.split('::')[1]
               @super arguments...
             else
-              RecordClass = @findRecordByName aoAttributes._type
+              RecordClass = @findRecordByName aoAttributes.type
               RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
           else
             @super arguments...
@@ -149,8 +149,8 @@ module.exports = (Module)->
             throw new Error 'Document is exist in collection'
           response = yield @collection.push @
           if response?
-            { _key, id } = response
-            @_key ?= id ? _key  if _key or id
+            { id } = response
+            @id ?= id if id
           vhAttributes = {}
           for own key of @constructor.attributes
             vhAttributes[key] = @[key]
@@ -161,7 +161,7 @@ module.exports = (Module)->
         default: ->
           if yield @isNew()
             throw new Error 'Document does not exist in collection'
-          yield @collection.patch {'@doc._key': $eq: @id}, @
+          yield @collection.patch @id, @
           vhAttributes = {}
           for own key of @constructor.attributes
             vhAttributes[key] = @[key]

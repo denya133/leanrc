@@ -36,7 +36,7 @@ module.exports = (Module)->
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::Resque, (BaseClass) ->
     class MemoryResqueMixin extends BaseClass
       @inheritProtected()
 

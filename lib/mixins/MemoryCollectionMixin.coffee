@@ -5,7 +5,7 @@ inflect       = do require 'i'
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::Collection, (BaseClass) ->
     class MemoryCollectionMixin extends BaseClass
       @inheritProtected()
 
@@ -25,7 +25,7 @@ module.exports = (Module)->
           vsKey = aoRecord.id
           return no  unless vsKey?
           @[ipoCollection][vsKey] = @serializer.serialize aoRecord
-          yield return yes
+          yield return Module::Cursor.new(@, [@[ipoCollection][vsKey]]).first()
 
       @public @async remove: Function,
         default: (id)->

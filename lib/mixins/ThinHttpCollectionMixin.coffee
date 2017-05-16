@@ -5,7 +5,7 @@ inflect       = do require 'i'
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::Collection, (BaseClass) ->
     class ThinHttpCollectionMixin extends BaseClass
       @inheritProtected()
 
@@ -19,6 +19,7 @@ module.exports = (Module)->
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
+          body = JSON.parse body ? "{}"
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async remove: Function,
@@ -41,13 +42,14 @@ module.exports = (Module)->
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
+          body = JSON.parse body ? "{}"
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async takeMany: Function,
         default: (ids)->
           records = yield ids.map (id)=>
             @take id
-          yield Module::Cursor.new @, records
+          yield return Module::Cursor.new @, records
 
       @public @async takeAll: Function,
         default: ->
@@ -55,9 +57,13 @@ module.exports = (Module)->
             requestType: 'list'
             recordName: @delegate.name
 
-          { body } = yield @[ipmMakeRequest] request
+          voData = yield @[ipmMakeRequest] request
+          { body } = voData
           pluralKey = @collectionName()
-          yield Module::Cursor.new @, [body[pluralKey]]
+          # console.log '>>>>>MMMDDD', voData, body, pluralKey, '=====', body[pluralKey]
+          body = JSON.parse body ? "{\"#{pluralKey}\":[]}"
+          # console.log '>>>>>MMMDDD222', body, body[pluralKey]
+          yield return Module::Cursor.new @, body[pluralKey]
 
       @public @async override: Function,
         default: (id, aoRecord)->
@@ -70,6 +76,7 @@ module.exports = (Module)->
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
+          body = JSON.parse body ? "{}"
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async patch: Function,
@@ -83,12 +90,13 @@ module.exports = (Module)->
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
+          body = JSON.parse body ? "{}"
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async includes: Function,
         default: (id)->
           record = yield @take id
-          record?
+          yield return record?
 
       @public @async length: Function,
         default: ->
@@ -137,7 +145,7 @@ module.exports = (Module)->
         args: [String]
         return: String
         default: (recordName)->
-          inflect.pluralize inflect.underscore recordName
+          inflect.pluralize inflect.underscore recordName.replace /Record$/, ''
 
       ipmUrlPrefix = @protected urlPrefix: Function,
         args: [String, String]

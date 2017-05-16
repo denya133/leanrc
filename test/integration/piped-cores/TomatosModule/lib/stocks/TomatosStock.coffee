@@ -24,5 +24,10 @@ module.exports = (Module)->
     @public collectionName: String,
       get: -> 'TomatosCollection'
 
+    @action @async getCucumbers: Function,
+      default: ->
+        cucucmbers = @facade.retrieveProxy 'CucumbersCollection'
+        yield (yield cucucmbers.takeAll()).toArray()
+
 
   TomatosStock.initialize()

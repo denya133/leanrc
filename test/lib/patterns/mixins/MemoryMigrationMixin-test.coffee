@@ -72,7 +72,7 @@ describe 'MemoryMigrationMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
@@ -90,9 +90,9 @@ describe 'MemoryMigrationMixin', ->
           delegate: Test::TestRecord
           serializer: LeanRC::Serializer
         collection = facade.retrieveProxy 'TestCollection'
-        yield collection.create _key: 1
-        yield collection.create _key: 2
-        yield collection.create _key: 3
+        yield collection.create id: 1
+        yield collection.create id: 2
+        yield collection.create id: 3
         migration = Test::BaseMigration.new {}, collection
         yield migration.up()
         for own id, doc of collection[Symbol.for '~collection']
@@ -132,7 +132,7 @@ describe 'MemoryMigrationMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -149,9 +149,9 @@ describe 'MemoryMigrationMixin', ->
           delegate: Test::TestRecord
           serializer: LeanRC::Serializer
         collection = facade.retrieveProxy 'TestCollection'
-        yield collection.create _key: 1
-        yield collection.create _key: 2
-        yield collection.create _key: 3
+        yield collection.create id: 1
+        yield collection.create id: 2
+        yield collection.create id: 3
         migration = Test::BaseMigration.new {}, collection
         yield migration.up()
         for own id, doc of collection[Symbol.for '~collection']
@@ -193,7 +193,7 @@ describe 'MemoryMigrationMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -234,7 +234,7 @@ describe 'MemoryMigrationMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -312,7 +312,7 @@ describe 'MemoryMigrationMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -352,7 +352,7 @@ describe 'MemoryMigrationMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -392,7 +392,7 @@ describe 'MemoryMigrationMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -451,7 +451,7 @@ describe 'MemoryMigrationMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()

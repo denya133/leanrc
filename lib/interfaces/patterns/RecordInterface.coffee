@@ -22,13 +22,16 @@ module.exports = (Module)->
         args: [String]
         return: Array
 
-      # # под вопросом ?????? возможно надо искать через (из) модуля
-      # @public @static findModelByName: Function, [String], -> Array
-      # @public findModelByName: Function, [String], -> Array
+      @public @static @virtual findRecordByName: Function,
+        args: [String]
+        return: RecordInterface
+
+      @public @virtual findRecordByName: Function,
+        args: [String]
+        return: RecordInterface
 
       # # под вопросом ??????
       # @public updateEdges: Function, [ANY], -> ANY # any type
-
 
       @public @static @virtual parentClassNames: Function,
         args: [[Module::Class, NILL]]

@@ -71,14 +71,13 @@ describe 'QueryableMixin', ->
           @public @async executeQuery: LeanRC::Cursor,
             default: (aoParsedQuery) -> yield _.filter @getData(), aoParsedQuery.$filter
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @getData().push record
               yield return
         Test::Queryable.initialize()
@@ -121,14 +120,13 @@ describe 'QueryableMixin', ->
               data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @delegate, data
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @getData().push record
               yield return
         Test::Queryable.initialize()
@@ -157,7 +155,7 @@ describe 'QueryableMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
@@ -172,14 +170,13 @@ describe 'QueryableMixin', ->
               data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @delegate, data
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @getData().push @delegate.serialize record
               yield return
         Test::Queryable.initialize()
@@ -211,7 +208,7 @@ describe 'QueryableMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
@@ -226,9 +223,8 @@ describe 'QueryableMixin', ->
               data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
-              data = _.filter @getData(), { _key: id }
+            default: (id, item) ->
+              data = _.filter @getData(), { id }
               if _.isArray data
                 for datum in data
                   if item.constructor.attributes?
@@ -240,12 +236,12 @@ describe 'QueryableMixin', ->
               yield return data.length > 0
           @public take: Function,
             default: (id) ->
-              data = _.find @getData(), { _key: id }
+              data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @getData().push @delegate.serialize record
               yield return
         Test::Queryable.initialize()
@@ -282,7 +278,7 @@ describe 'QueryableMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
@@ -303,9 +299,8 @@ describe 'QueryableMixin', ->
                   data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, []
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
-              data = _.filter @getData(), { _key: id }
+            default: (id, item) ->
+              data = _.filter @getData(), { id }
               if _.isArray data
                 for datum in data
                   if item.constructor.attributes?
@@ -317,12 +312,12 @@ describe 'QueryableMixin', ->
               yield return data.length > 0
           @public take: Function,
             default: (id) ->
-              data = _.find @getData(), { _key: id }
+              data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @getData().push @delegate.serialize record
               yield return
         Test::Queryable.initialize()
@@ -353,7 +348,7 @@ describe 'QueryableMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
@@ -375,17 +370,17 @@ describe 'QueryableMixin', ->
               yield LeanRC::Cursor.new @, data
           @public take: Function,
             default: (id) ->
-              data = _.find @getData(), { _key: id }
+              data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @getData().push @delegate.serialize record
               yield return
           @public @async remove: Function,
             default: (id) ->
-              _.remove @getData(), { _key: id }
+              _.remove @getData(), { id }
               yield return
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
@@ -416,7 +411,7 @@ describe 'QueryableMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
@@ -442,12 +437,12 @@ describe 'QueryableMixin', ->
               yield LeanRC::Cursor.new @, data
           @public take: Function,
             default: (id) ->
-              data = _.find @getData(), { _key: id }
+              data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @getData().push @delegate.serialize record
               yield return
         Test::Queryable.initialize()
@@ -494,7 +489,7 @@ describe 'QueryableMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
@@ -509,9 +504,8 @@ describe 'QueryableMixin', ->
               data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
-              data = _.filter @getData(), { _key: id }
+            default: (id, item) ->
+              data = _.filter @getData(), { id }
               if _.isArray data
                 for datum in data
                   if item.constructor.attributes?
@@ -523,12 +517,12 @@ describe 'QueryableMixin', ->
               yield return data.length > 0
           @public take: Function,
             default: (id) ->
-              data = _.find @getData(), { _key: id }
+              data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @getData().push @delegate.serialize record
               yield return
         Test::Queryable.initialize()
@@ -563,7 +557,7 @@ describe 'QueryableMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
@@ -578,9 +572,8 @@ describe 'QueryableMixin', ->
               data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
-              data = _.filter @getData(), { _key: id }
+            default: (id, item) ->
+              data = _.filter @getData(), { id }
               if _.isArray data
                 for datum in data
                   if item.constructor.attributes?
@@ -592,12 +585,12 @@ describe 'QueryableMixin', ->
               yield return data.length > 0
           @public take: Function,
             default: (id) ->
-              data = _.find @getData(), { _key: id }
+              data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @getData().push @delegate.serialize record
               yield return
         Test::Queryable.initialize()
@@ -632,7 +625,7 @@ describe 'QueryableMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
@@ -658,12 +651,12 @@ describe 'QueryableMixin', ->
               yield LeanRC::Cursor.new @, data
           @public take: Function,
             default: (id) ->
-              data = _.find @getData(), { _key: id }
+              data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @getData().push @delegate.serialize record
               yield return
         Test::Queryable.initialize()

@@ -21,5 +21,7 @@ module.exports =
 
   cucumbersServer:
     description: "URL for cucumbers server"
-    type: "string"
-    default: "http://127.0.0.1:3002/"
+    type: "json"
+    default:
+      host: "http://127.0.0.1:3002"
+      namespace: '0.1'

@@ -5,7 +5,7 @@ inflect       = do require 'i'
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::Collection, (BaseClass) ->
     class HttpCollectionMixin extends BaseClass
       @inheritProtected()
       @implements Module::QueryableMixinInterface
@@ -126,7 +126,7 @@ module.exports = (Module)->
         args: [String]
         return: String
         default: (recordName)->
-          inflect.pluralize inflect.underscore recordName
+          inflect.pluralize inflect.underscore recordName.replace /Record$/, ''
 
       ipmUrlPrefix = @protected urlPrefix: Function,
         args: [String, String]

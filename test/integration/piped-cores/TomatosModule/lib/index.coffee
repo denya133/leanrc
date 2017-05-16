@@ -8,7 +8,7 @@ class Tomatos extends LeanRC
 
   @root __dirname
 
-  require('./entries/TomatoEntry') @Module
+  require('./mixins/TomatoEntryMixin') @Module
 
   require('./records/TomatoRecord') @Module
   require('./records/CucumberRecord') @Module

@@ -272,8 +272,7 @@ describe 'RecordMixin', ->
               @[iphData][item.id] = item
               @[iphData][item.id]?
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               if (yield @find id)?
                 @[iphData][item.id] = @clone item
               else
@@ -532,8 +531,7 @@ describe 'RecordMixin', ->
               @[iphData][item.id] = item
               @[iphData][item.id]?
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
               @[iphData][item.id] = item
               @[iphData][item.id]?
@@ -592,8 +590,7 @@ describe 'RecordMixin', ->
               @[iphData][item.id] = item
               @[iphData][item.id]?
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
               @[iphData][item.id] = item
               @[iphData][item.id]?
@@ -655,8 +652,7 @@ describe 'RecordMixin', ->
               @[iphData][item.id] = item
               @[iphData][item.id]?
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
               @[iphData][item.id] = item
               @[iphData][item.id]?
@@ -717,8 +713,7 @@ describe 'RecordMixin', ->
               @[iphData][item.id] = item
               @[iphData][item.id]?
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
               @[iphData][item.id] = item
               @[iphData][item.id]?

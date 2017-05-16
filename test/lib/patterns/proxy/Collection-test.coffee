@@ -45,7 +45,7 @@ describe 'Collection', ->
             default: Test::TestRecord
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new {}
-        assert.equal collection.collectionName(), 'test_records'
+        assert.equal collection.collectionName(), 'tests'
       .to.not.throw Error
   describe '#collectionPrefix', ->
     it 'should get collection prefix', ->
@@ -85,7 +85,7 @@ describe 'Collection', ->
             default: Test::TestRecord
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new {}
-        assert.equal collection.collectionFullName(), 'test_test_records'
+        assert.equal collection.collectionFullName(), 'test_tests'
       .to.not.throw Error
   describe '#recordHasBeenChanged', ->
     it 'should send notification about record changed', ->
@@ -213,8 +213,7 @@ describe 'Collection', ->
           @public data: Array,
             default: []
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
@@ -222,7 +221,7 @@ describe 'Collection', ->
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @data.push record
               yield return
         Test::TestCollection.initialize()
@@ -253,8 +252,7 @@ describe 'Collection', ->
           @public data: Array,
             default: []
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
@@ -262,7 +260,7 @@ describe 'Collection', ->
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @data.push record
               yield return
         Test::TestCollection.initialize()
@@ -298,7 +296,7 @@ describe 'Collection', ->
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @data.push record
               yield return
         Test::TestCollection.initialize()
@@ -331,7 +329,7 @@ describe 'Collection', ->
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @data.push record
               yield return
         Test::TestCollection.initialize()
@@ -366,7 +364,7 @@ describe 'Collection', ->
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @data.push record
               yield return
         Test::TestCollection.initialize()
@@ -404,12 +402,11 @@ describe 'Collection', ->
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @data.push record
               yield return
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
@@ -444,12 +441,11 @@ describe 'Collection', ->
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
             default: (record) ->
-              record._key = RC::Utils.uuid.v4()
+              record.id = RC::Utils.uuid.v4()
               @data.push record
               yield return
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
@@ -475,7 +471,7 @@ describe 'Collection', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
@@ -510,7 +506,7 @@ describe 'Collection', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
@@ -523,12 +519,11 @@ describe 'Collection', ->
             default: (id) -> yield RC::Promise.resolve _.find @data, { id }
           @public push: Function,
             default: (record) ->
-              record._key ?= RC::Utils.uuid.v4()
+              record.id ?= RC::Utils.uuid.v4()
               @data.push record
               yield return
           @public patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?

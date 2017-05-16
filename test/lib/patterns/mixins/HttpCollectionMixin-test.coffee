@@ -43,7 +43,7 @@ describe 'HttpCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
@@ -82,7 +82,7 @@ describe 'HttpCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
@@ -173,7 +173,7 @@ describe 'HttpCollectionMixin', ->
         url = collection.pathForType 'Type'
         assert.equal url, 'types'
         url = collection.pathForType 'TestRecord'
-        assert.equal url, 'test_records'
+        assert.equal url, 'tests'
         url = collection.pathForType 'test-info'
         assert.equal url, 'test_infos'
         yield return
@@ -215,7 +215,7 @@ describe 'HttpCollectionMixin', ->
         url = collection.urlForFind 'Test', {}
         assert.equal url, 'http://localhost:8000/v1/tests'
         url = collection.urlForFind 'TestRecord', {}
-        assert.equal url, 'http://localhost:8000/v1/test_records'
+        assert.equal url, 'http://localhost:8000/v1/tests'
         yield return
   describe '#urlForInsert', ->
     it 'should get url for insert request', ->
@@ -235,7 +235,7 @@ describe 'HttpCollectionMixin', ->
         url = collection.urlForInsert 'Test', {}
         assert.equal url, 'http://localhost:8000/v1/tests'
         url = collection.urlForInsert 'TestRecord', {}
-        assert.equal url, 'http://localhost:8000/v1/test_records'
+        assert.equal url, 'http://localhost:8000/v1/tests'
         yield return
   describe '#urlForUpdate', ->
     it 'should get url for insert request', ->
@@ -255,7 +255,7 @@ describe 'HttpCollectionMixin', ->
         url = collection.urlForUpdate 'Test', {}
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         url = collection.urlForUpdate 'TestRecord', {}
-        assert.equal url, 'http://localhost:8000/v1/test_records/bulk'
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         yield return
   describe '#urlForReplace', ->
     it 'should get url for insert request', ->
@@ -275,7 +275,7 @@ describe 'HttpCollectionMixin', ->
         url = collection.urlForReplace 'Test', {}
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         url = collection.urlForReplace 'TestRecord', {}
-        assert.equal url, 'http://localhost:8000/v1/test_records/bulk'
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         yield return
   describe '#urlForRemove', ->
     it 'should get url for insert request', ->
@@ -295,7 +295,7 @@ describe 'HttpCollectionMixin', ->
         url = collection.urlForRemove 'Test', {}
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         url = collection.urlForRemove 'TestRecord', {}
-        assert.equal url, 'http://localhost:8000/v1/test_records/bulk'
+        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         yield return
   describe '#buildURL', ->
     it 'should get url from request params', ->
@@ -447,7 +447,7 @@ describe 'HttpCollectionMixin', ->
           query: test: 'test'
         assert.deepEqual request,
           method: 'GET'
-          url: 'http://localhost:8000/v1/test_records'
+          url: 'http://localhost:8000/v1/tests'
           headers: {}
           data: sampleData
           query: test: 'test'
@@ -458,7 +458,7 @@ describe 'HttpCollectionMixin', ->
           query: test: 'test'
         assert.deepEqual request,
           method: 'POST'
-          url: 'http://localhost:8000/v1/test_records'
+          url: 'http://localhost:8000/v1/tests'
           headers: {}
           data: sampleData
           query: test: 'test'
@@ -469,7 +469,7 @@ describe 'HttpCollectionMixin', ->
           query: test: 'test'
         assert.deepEqual request,
           method: 'PATCH'
-          url: 'http://localhost:8000/v1/test_records/bulk'
+          url: 'http://localhost:8000/v1/tests/bulk'
           headers: {}
           data: sampleData
           query: test: 'test'
@@ -480,7 +480,7 @@ describe 'HttpCollectionMixin', ->
           query: test: 'test'
         assert.deepEqual request,
           method: 'PUT'
-          url: 'http://localhost:8000/v1/test_records/bulk'
+          url: 'http://localhost:8000/v1/tests/bulk'
           headers: {}
           data: sampleData
           query: test: 'test'
@@ -491,7 +491,7 @@ describe 'HttpCollectionMixin', ->
           query: test: 'test'
         assert.deepEqual request,
           method: 'DELETE'
-          url: 'http://localhost:8000/v1/test_records/bulk'
+          url: 'http://localhost:8000/v1/tests/bulk'
           headers: {}
           data: sampleData
           query: test: 'test'
@@ -515,7 +515,7 @@ describe 'HttpCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
@@ -556,7 +556,7 @@ describe 'HttpCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
@@ -574,7 +574,7 @@ describe 'HttpCollectionMixin', ->
         record = yield collection.create test: 'test1'
         spyQuery = sinon.spy collection, 'query'
         yield record.destroy()
-        assert.deepEqual spyQuery.args[1][0].$forIn, { '@doc': 'test_test_records' }
+        assert.deepEqual spyQuery.args[1][0].$forIn, { '@doc': 'test_tests' }
         assert.deepEqual spyQuery.args[1][0].$filter, { '@doc._key': { '$eq': record.id } }
         assert.isTrue spyQuery.args[1][0].$remove
         yield return
@@ -597,7 +597,7 @@ describe 'HttpCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
@@ -637,7 +637,7 @@ describe 'HttpCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
@@ -682,7 +682,7 @@ describe 'HttpCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
@@ -727,7 +727,7 @@ describe 'HttpCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
@@ -768,7 +768,7 @@ describe 'HttpCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
@@ -809,7 +809,7 @@ describe 'HttpCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
@@ -848,7 +848,7 @@ describe 'HttpCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()

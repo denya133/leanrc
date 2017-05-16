@@ -1,3 +1,4 @@
+inflect = do require 'i'
 
 
 module.exports = (Module)->
@@ -16,8 +17,10 @@ module.exports = (Module)->
     # @include IterableMixin
     @module Module
 
-    @public namespace: String,
-      default: '0.1'
+    @public host: String,
+      get: -> @configs.cucumbersServer.host
 
+    @public namespace: String,
+      get: -> @configs.cucumbersServer.namespace
 
   ThinHttpCollection.initialize()

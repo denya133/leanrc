@@ -27,7 +27,7 @@ module.exports = (Module)->
     CHANGE
   } = LogMessage
 
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::Pipes::JunctionMediator, (BaseClass) ->
     class LoggingJunctionMixin extends BaseClass
       @inheritProtected()
 

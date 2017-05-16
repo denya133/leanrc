@@ -28,7 +28,7 @@ module.exports = (App)->
 ###
 
 module.exports = (Module)->
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::Gateway, (BaseClass) ->
     class CrudEndpointsMixin extends BaseClass
       @inheritProtected()
       @implements Module::CrudEndpointsMixinInterface

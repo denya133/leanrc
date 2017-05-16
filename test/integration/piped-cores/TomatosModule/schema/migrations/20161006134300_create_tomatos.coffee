@@ -11,21 +11,21 @@ module.exports = (Module)->
 
     @change ->
       @createCollection 'tomatos'
-      @addField 'tomatos', '_id', 'string'
-      @addField 'tomatos', '_key', 'string'
-      @addField 'tomatos', '_type', 'string'
-      @addField 'tomatos', '_rev', 'string'
+      @addField 'tomatos', 'id', 'string'
+      @addField 'tomatos', 'key', 'string'
+      @addField 'tomatos', 'type', 'string'
+      @addField 'tomatos', 'rev', 'string'
       @addField 'tomatos', 'isHidden', 'boolean'
       @addTimestamps()
 
       @addField 'tomatos', 'name', 'string'
       @addField 'tomatos', 'description', 'text'
 
-      @addIndex 'tomatos', ['_id'], type: 'hash', unique: yes
-      @addIndex 'tomatos', ['_key'], type: 'hash', unique: yes
-      @addIndex 'tomatos', ['_key', '_type'], type: 'hash'
-      @addIndex 'tomatos', ['_key', '_type', 'isHidden'], type: 'hash'
-      @addIndex 'tomatos', ['_rev'], type: 'hash'
+      @addIndex 'tomatos', ['id'], type: 'hash', unique: yes
+      @addIndex 'tomatos', ['key'], type: 'hash', unique: yes
+      @addIndex 'tomatos', ['key', 'type'], type: 'hash'
+      @addIndex 'tomatos', ['key', 'type', 'isHidden'], type: 'hash'
+      @addIndex 'tomatos', ['rev'], type: 'hash'
       @addIndex 'tomatos', ['name'], type: 'hash', unique: yes
       @addIndex 'tomatos', ['name'], type: 'skiplist'
       @addIndex 'tomatos', ['description'], type: 'skiplist', sparse: yes

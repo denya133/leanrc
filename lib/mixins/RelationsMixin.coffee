@@ -9,7 +9,7 @@ inflect = do require 'i'
 
 
 module.exports = (Module)->
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::CoreObject, (BaseClass) ->
     class RelationsMixin extends BaseClass
       @inheritProtected()
       @implements Module::RelationsMixinInterface
@@ -19,7 +19,7 @@ module.exports = (Module)->
           # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
           [vsAttr] = Object.keys typeDefinition
           attr ?= "#{vsAttr}Id"
-          refKey ?= '_key'
+          refKey ?= 'id'
           @attribute "#{attr}": String
           if attr isnt "#{vsAttr}Id"
             @computed "#{vsAttr}Id": String,
@@ -69,7 +69,7 @@ module.exports = (Module)->
       @public @static hasMany: Function,
         default: (typeDefinition, opts={})->
           [vsAttr] = Object.keys typeDefinition
-          opts.refKey ?= '_key'
+          opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
           opts.relation = 'hasMany'
           opts.transform ?= =>
@@ -98,7 +98,7 @@ module.exports = (Module)->
         default: (typeDefinition, opts={})->
           # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
           [vsAttr] = Object.keys typeDefinition
-          opts.refKey ?= '_key'
+          opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
           opts.relation = 'hasOne'
           opts.transform ?= =>

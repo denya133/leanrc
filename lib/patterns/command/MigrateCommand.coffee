@@ -95,7 +95,7 @@ module.exports = (Module) ->
             migrationClassName = inflect.camelize clearedMigrationName
             vcMigration = @Module::[migrationClassName]
             try
-              voMigration = vcMigration.new { _key: id }, @migrationsCollection
+              voMigration = vcMigration.new { id }, @migrationsCollection
               yield voMigration.migrate Module::Migration::UP
               yield voMigration.save()
             catch err

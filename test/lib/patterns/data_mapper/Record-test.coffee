@@ -42,12 +42,11 @@ describe 'Record', ->
             default: []
           @public @async push: Function,
             default: (record) ->
-              record._key ?= RC::Utils.uuid.v4()
+              record.id ?= RC::Utils.uuid.v4()
               @data.push record
               yield return
           @public @async patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
@@ -59,7 +58,7 @@ describe 'Record', ->
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_01'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
-        record = collection.build {_key: 123}
+        record = collection.build {id: 123}
         yield record.save()
         assert.isTrue spyRunNotitfication.calledWith('createdRecord'), '`afterCreate` run incorrect'
   describe '#beforeUpdate', ->
@@ -82,12 +81,11 @@ describe 'Record', ->
             default: []
           @public @async push: Function,
             default: (record) ->
-              record._key ?= RC::Utils.uuid.v4()
+              record.id ?= RC::Utils.uuid.v4()
               @data.push record
               yield return
           @public @async patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
@@ -98,7 +96,7 @@ describe 'Record', ->
         collection = Test::TestCollection.new 'TEST_COLLECTION_03'
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_02'
         facade.registerProxy collection
-        record = collection.build {_key: 123}
+        record = collection.build {id: 123}
         yield record.save()
         oldUpdatedAt = record.updatedAt
         updated = yield record.save()
@@ -130,8 +128,7 @@ describe 'Record', ->
               @data.push record
               yield return
           @public @async patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
@@ -166,12 +163,11 @@ describe 'Record', ->
             default: []
           @public @async push: Function,
             default: (record) ->
-              record._key ?= RC::Utils.uuid.v4()
+              record.id ?= RC::Utils.uuid.v4()
               @data.push record
               yield return
           @public @async patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
@@ -183,7 +179,7 @@ describe 'Record', ->
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_03'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
-        record = collection.build {_key: 123}
+        record = collection.build {id: 123}
         yield record.save()
         updated = yield record.save()
         assert.isTrue spyRunNotitfication.calledWith('updatedRecord'), '`afterUpdate` run incorrect'
@@ -207,12 +203,11 @@ describe 'Record', ->
             default: []
           @public @async push: Function,
             default: (record) ->
-              record._key ?= RC::Utils.uuid.v4()
+              record.id ?= RC::Utils.uuid.v4()
               @data.push record
               yield return
           @public @async patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
@@ -223,7 +218,7 @@ describe 'Record', ->
         collection = Test::TestCollection.new 'TEST_COLLECTION_05'
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_04'
         facade.registerProxy collection
-        record = collection.build {_key: 123}
+        record = collection.build {id: 123}
         yield record.save()
         oldUpdatedAt = record.updatedAt
         deleted = yield record.delete()
@@ -251,12 +246,11 @@ describe 'Record', ->
             default: []
           @public @async push: Function,
             default: (record) ->
-              record._key ?= RC::Utils.uuid.v4()
+              record.id ?= RC::Utils.uuid.v4()
               @data.push record
               yield return
           @public @async patch: Function,
-            default: (query, item) ->
-              { '@doc._key': { '$eq': id }} = query
+            default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
@@ -268,7 +262,7 @@ describe 'Record', ->
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_03'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
-        record = collection.build {_key: 123}
+        record = collection.build {id: 123}
         yield record.save()
         deleted = yield record.delete()
         assert.isTrue spyRunNotitfication.calledWith('deletedRecord'), '`afterDelete` run incorrect'
@@ -292,7 +286,7 @@ describe 'Record', ->
             default: []
           @public @async push: Function,
             default: (record) ->
-              record._key ?= RC::Utils.uuid.v4()
+              record.id ?= RC::Utils.uuid.v4()
               @data.push record
               yield return
           @public @async take: Function,
@@ -306,7 +300,7 @@ describe 'Record', ->
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_03'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
-        record = collection.build {_key: 123}
+        record = collection.build {id: 123}
         yield record.save()
         yield record.destroy()
         assert.isTrue spyRunNotitfication.calledWith('destroyedRecord'), '`afterDestroy` run incorrect'

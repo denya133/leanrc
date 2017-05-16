@@ -3,9 +3,11 @@
 module.exports = (Module)->
   {
     CONFIGURATION
+
+    CoreObject
   } = Module::
 
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin CoreObject, (BaseClass) ->
     class ConfigurableMixin extends BaseClass
       @inheritProtected()
 

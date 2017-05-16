@@ -3,14 +3,15 @@
 module.exports = (Module)->
   {
     Record
+    TomatoEntryMixin
   } = Module::
 
   class TomatoRecord extends Record
     @inheritProtected()
+    @include TomatoEntryMixin
     @module Module
 
-    @attribute name: String
-    @attribute description: String
+    # business logic and before-, after- colbacks
 
 
   TomatoRecord.initialize()

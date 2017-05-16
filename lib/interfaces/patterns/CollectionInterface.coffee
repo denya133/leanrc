@@ -44,7 +44,7 @@ module.exports = (Module)->
         return: Module::RecordInterface
       @public @async @virtual push: Function, # обращается к БД
         args: [Module::RecordInterface]
-        return: Boolean
+        return: Module::RecordInterface
 
       @public @async @virtual delete: Function,
         args: [String]
@@ -65,7 +65,7 @@ module.exports = (Module)->
         return: Module::CursorInterface
       @public @async @virtual take: Function, # обращается к БД
         args: [String]
-        return: Module::CursorInterface
+        return: Module::RecordInterface
       @public @async @virtual takeMany: Function, # обращается к БД
         args: [Array]
         return: Module::CursorInterface

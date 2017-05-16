@@ -8,7 +8,7 @@ class Cucumbers extends LeanRC
 
   @root __dirname
 
-  require('./entries/CucumberEntry') @Module
+  require('./mixins/CucumberEntryMixin') @Module
 
   require('./records/CucumberRecord') @Module
 

@@ -4,7 +4,7 @@
 
 
 module.exports = (Module)->
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::CoreObject, (BaseClass) ->
     class DelayableMixin extends BaseClass
       @inheritProtected()
       @implements Module::DelayableMixinInterface
