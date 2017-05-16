@@ -1,9 +1,9 @@
+{CucumberEntryMixin} = require('../../../CucumbersModule')::
 
 
 module.exports = (Module)->
   {
     Record
-    CucumberEntryMixin
   } = Module::
 
   class CucumberRecord extends Record
@@ -12,6 +12,5 @@ module.exports = (Module)->
     @module Module
 
     # business logic and before-, after- colbacks
-
 
   CucumberRecord.initialize()

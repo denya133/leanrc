@@ -68,7 +68,7 @@ module.exports = (options) ->
               switch method.data
                 when 'SELF'
                   if req.method is 'POST'
-                    body._key = RC::Utils.uuid.v4()
+                    body.id = RC::Utils.uuid.v4()
                     resp = "#{path.single}": body
                     server.data["test_#{path.plural}"] ?= []
                     server.data["test_#{path.plural}"].push body
@@ -83,6 +83,8 @@ module.exports = (options) ->
                   filter = (item) ->
                     for k, v of query.$filter
                       key = k.replace '@doc.', ''
+                      if key is '_key'
+                        key = 'id'
                       property = _.get item, key
                       if _.isString v
                         return no  unless property is v

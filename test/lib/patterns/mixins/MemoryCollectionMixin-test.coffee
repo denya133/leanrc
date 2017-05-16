@@ -34,7 +34,7 @@ describe 'MemoryCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -48,7 +48,7 @@ describe 'MemoryCollectionMixin', ->
         spyPush = sinon.spy collection, 'push'
         assert.instanceOf collection, Test::MemoryCollection
         record = Test::TestRecord.new test: 'test1', collection
-        record._key = collection.generateId()
+        record.id = collection.generateId()
         yield collection.push record
         assert.equal record, spyPush.args[0][0]
         assert.deepEqual record.toJSON(), collection[Symbol.for '~collection'][record.id]
@@ -68,7 +68,7 @@ describe 'MemoryCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -100,7 +100,7 @@ describe 'MemoryCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -133,7 +133,7 @@ describe 'MemoryCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -171,7 +171,7 @@ describe 'MemoryCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -208,7 +208,7 @@ describe 'MemoryCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -222,7 +222,7 @@ describe 'MemoryCollectionMixin', ->
         assert.instanceOf collection, Test::MemoryCollection
         record = yield collection.create test: 'test1'
         raw = collection.build
-          _key: record.id
+          id: record.id
           test: 'test2'
         updatedRecord = yield collection.override record.id, raw
         assert.isDefined updatedRecord
@@ -245,7 +245,7 @@ describe 'MemoryCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -259,7 +259,7 @@ describe 'MemoryCollectionMixin', ->
         assert.instanceOf collection, Test::MemoryCollection
         record = yield collection.create test: 'test1'
         raw = collection.build
-          _key: record.id
+          id: record.id
           test: 'test2'
         updatedRecord = yield collection.patch record.id, raw
         assert.isDefined updatedRecord
@@ -282,7 +282,7 @@ describe 'MemoryCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -314,7 +314,7 @@ describe 'MemoryCollectionMixin', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()

@@ -11,7 +11,7 @@ class TomatosMain extends Tomatos
 
   require('./proxies/MainCollection') @Module
   require('./proxies/MainResque') @Module
-  require('./proxies/CucumbersResource') @Module
+  require('./proxies/ThinHttpCollection') @Module
 
   require('./commands/PrepareControllerCommand') @Module
   require('./commands/PrepareViewCommand') @Module

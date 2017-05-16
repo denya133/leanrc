@@ -8,7 +8,7 @@ _ = require 'lodash'
 
 
 module.exports = (Module)->
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::Collection, (BaseClass) ->
     class QueryableMixin extends BaseClass
       @inheritProtected()
       @implements Module::QueryableMixinInterface

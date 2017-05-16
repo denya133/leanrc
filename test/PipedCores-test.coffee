@@ -200,7 +200,7 @@ describe 'PipedCores', ->
         { cucumber: item } = body
         assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
         assert.propertyVal item, 'name', 'cucumber2'
-        assert.propertyVal item, 'description', 'cucumber2 description'
+        assert.propertyVal item, 'description', 'cucumber2 long description'
         assert.propertyVal item, 'isHidden', yes
         assert.isNotNull item.deletedAt
         cucumbers.finish()
@@ -285,10 +285,35 @@ describe 'PipedCores', ->
         { tomato: item } = body
         assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
         assert.propertyVal item, 'name', 'tomato2'
-        assert.propertyVal item, 'description', 'tomato2 description'
+        assert.propertyVal item, 'description', 'tomato2 long description'
         assert.propertyVal item, 'isHidden', yes
         assert.isNotNull item.deletedAt
         tomatos.finish()
-  describe 'Create Cucumbers app and Tomatos app and ...', ->
-    it 'после прихождения реквеста на томатос, он должен запросить через CucumbersResource огурец (который пошлет запрос через HttpCollectionMixin), полученный огурец он должен отправить в ответе', ->
-      throw new Error 'not implemented'
+  describe 'Create Cucumbers app and Tomatos app and test its interaction', ->
+    it 'should create two apps and get cucumber from tomato', ->
+      co ->
+        cucumbers = CucumbersApp::ShellApplication.new()
+        tomatos = TomatosApp::ShellApplication.new()
+        res1 = yield request.post 'http://localhost:3002/0.1/cucumbers',
+          body:
+            cucumber:
+              name: 'cucumber1'
+              description: 'cucumber1 description'
+        # console.log '?????res1 after POST', res1
+        res2 = yield request.post 'http://localhost:3002/0.1/cucumbers',
+          body:
+            cucumber:
+              name: 'cucumber2'
+              description: 'cucumber2 description'
+        # console.log '?????res2 after POST', res2
+        res3 = yield request.post 'http://localhost:3002/0.1/cucumbers',
+          body:
+            cucumber:
+              name: 'cucumber3'
+              description: 'cucumber3 description'
+        # console.log '?????res3 after POST', res3
+        res4 = yield request.get 'http://localhost:3001/0.1/cucumbers'
+        console.log '?????res4 after GET', res4
+
+        tomatos.finish()
+        cucumbers.finish()

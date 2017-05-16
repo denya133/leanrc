@@ -47,7 +47,7 @@ module.exports = (Module)->
       default: ->
         firstClassName = _.first _.remove @delegate.parentClassNames(), (name)->
           not /Mixin$|Interface$|^CoreObject$|^Record$/.test name
-        inflect.pluralize inflect.underscore firstClassName
+        inflect.pluralize inflect.underscore firstClassName.replace /Record$/, ''
 
     @public collectionPrefix: Function,
       default: ->
@@ -137,7 +137,7 @@ module.exports = (Module)->
         for key in vlAttributes
           vhAttributes[key] = aoRecord[key]
         voRecord = @delegate.new vhAttributes, @
-        voRecord._key = @generateId()
+        voRecord.id = @generateId()
         return voRecord
 
     @public @async copy: Function,

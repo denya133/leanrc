@@ -9,26 +9,13 @@ module.exports = (Module)->
     ANY
     ASYNC
 
+    Stock
     ChainsMixin
   } = Module::
 
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Stock, (BaseClass) ->
     class BulkActionsStockMixin extends BaseClass
       @inheritProtected()
-
-      cpmChains = Symbol.for '~getChains'
-
-      unless @classMethods.action?
-        @public @static action: Function,
-          default: (nameDefinition, config)->
-            [actionName] = Object.keys nameDefinition
-            if nameDefinition.attr? and not config?
-              @metaObject.addMetaData 'actions', nameDefinition.attr, nameDefinition
-            else
-              @metaObject.addMetaData 'actions', actionName, config
-            @public arguments...
-      unless @classMethods.chains?
-        @include ChainsMixin
 
       @action @async list: Function,
         default: ->

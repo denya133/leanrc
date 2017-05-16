@@ -3,7 +3,7 @@
 
 
 module.exports = (Module)->
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::Collection, (BaseClass) ->
     class IterableMixin extends BaseClass
       @inheritProtected()
       @implements Module::IterableMixinInterface

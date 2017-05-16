@@ -332,9 +332,9 @@ describe 'Stock', ->
               yield LeanRC::Cursor.new @, data
           @public @async push: Function,
             default: (aoRecord) ->
-              isExist = (id) => (_.find @getData().data, _key: id)?
+              isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
-              aoRecord._key = key
+              aoRecord.id = key
               @getData().data.push aoRecord.toJSON()
               yield yes
         Test::Collection.initialize()
@@ -398,15 +398,15 @@ describe 'Stock', ->
               yield LeanRC::Cursor.new @, data
           @public @async push: Function,
             default: (aoRecord) ->
-              isExist = (id) => (_.find @getData().data, _key: id)?
+              isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
-              aoRecord._key = key
+              aoRecord.id = key
               @getData().data.push aoRecord.toJSON()
               yield yes
           @public @async take: Function,
             default: (id) ->
               result = []
-              if (data = _.find @getData().data, _key: id)?
+              if (data = _.find @getData().data, {id})?
                 result.push data
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()
@@ -468,15 +468,15 @@ describe 'Stock', ->
               yield LeanRC::Cursor.new @, data
           @public @async push: Function,
             default: (aoRecord) ->
-              isExist = (id) => (_.find @getData().data, _key: id)?
+              isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
-              aoRecord._key = key
+              aoRecord.id = key
               @getData().data.push aoRecord.toJSON()
               yield yes
           @public @async take: Function,
             default: (id) ->
               result = []
-              if (data = _.find @getData().data, _key: id)?
+              if (data = _.find @getData().data, {id})?
                 result.push data
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()
@@ -529,15 +529,14 @@ describe 'Stock', ->
               yield LeanRC::Cursor.new @, data
           @public @async push: Function,
             default: (aoRecord) ->
-              isExist = (id) => (_.find @getData().data, _key: id)?
+              isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
-              aoRecord._key = key
+              aoRecord.id = key
               @getData().data.push aoRecord.toJSON()
               yield yes
           @public @async patch: Function,
             default: (id, aoRecord) ->
-              { '@doc._key': { '$eq': id } } = id
-              item = _.find @getData().data, _key: id
+              item = _.find @getData().data, {id}
               if item?
                 FORBIDDEN = [ '_key', 'id', '_type', '_rev' ]
                 snapshot = _.omit (aoRecord.toJSON?() ? aoRecord ? {}), FORBIDDEN
@@ -546,7 +545,7 @@ describe 'Stock', ->
           @public @async take: Function,
             default: (id) ->
               result = []
-              if (data = _.find @getData().data, _key: id)?
+              if (data = _.find @getData().data, {id})?
                 result.push data
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()
@@ -602,15 +601,14 @@ describe 'Stock', ->
               yield LeanRC::Cursor.new @, data
           @public @async push: Function,
             default: (aoRecord) ->
-              isExist = (id) => (_.find @getData().data, _key: id)?
+              isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
-              aoRecord._key = key
+              aoRecord.id = key
               @getData().data.push aoRecord.toJSON()
               yield yes
           @public @async patch: Function,
             default: (id, aoRecord) ->
-              { '@doc._key': { '$eq': id } } = id
-              item = _.find @getData().data, _key: id
+              item = _.find @getData().data, {id}
               if item?
                 FORBIDDEN = [ '_key', 'id', '_type', '_rev' ]
                 snapshot = _.omit (aoRecord.toJSON?() ? aoRecord ? {}), FORBIDDEN
@@ -619,7 +617,7 @@ describe 'Stock', ->
           @public @async take: Function,
             default: (id) ->
               result = []
-              if (data = _.find @getData().data, _key: id)?
+              if (data = _.find @getData().data, {id})?
                 result.push data
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()
@@ -679,19 +677,19 @@ describe 'Stock', ->
               yield LeanRC::Cursor.new @, data
           @public @async push: Function,
             default: (aoRecord) ->
-              isExist = (id) => (_.find @getData().data, _key: id)?
+              isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
-              aoRecord._key = key
+              aoRecord.id = key
               @getData().data.push aoRecord.toJSON()
               yield yes
           @public @async remove: Function,
             default: (id) ->
-              _.remove @getData().data, _key: id
+              _.remove @getData().data, {id}
               yield return yes
           @public @async take: Function,
             default: (id) ->
               result = []
-              if (data = _.find @getData().data, _key: id)?
+              if (data = _.find @getData().data, {id})?
                 result.push data
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()

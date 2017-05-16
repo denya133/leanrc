@@ -77,11 +77,11 @@ describe 'Renderer', ->
         facade.registerProxy renderer
         templates = yield renderer.templates
         items = [
-          id: 1, _key: 1, test: 'test1'
+          id: 1, test: 'test1'
         ,
-          id: 2, _key: 2, test: 'test2'
+          id: 2, test: 'test2'
         ,
-          id: 3, _key: 3, test: 'test3'
+          id: 3, test: 'test3'
         ]
         output = templates['TestRecord/find'] 'TestRecord', 'find', items
         assert.property output, 'test_records'
@@ -121,7 +121,7 @@ describe 'Renderer', ->
           @inheritProtected()
           @module Test
         Test::TestRenderer.initialize()
-        data = id: 1, _key: 1, test: 'test1', data: 'data1'
+        data = id: 1, test: 'test1', data: 'data1'
         renderer = Test::TestRenderer.new 'TEST_RENDERER'
         facade.registerProxy renderer
         renderResult = yield renderer.render data,

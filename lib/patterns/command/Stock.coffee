@@ -129,7 +129,7 @@ module.exports = (Module)->
         ]
         moduleName = @collection.delegate.moduleName()
         name = @collection.delegate.name
-        @recordBody._type = "#{moduleName}::#{name}"
+        @recordBody.type = "#{moduleName}::#{name}"
         return args
 
     @public beforeUpdate: Function,

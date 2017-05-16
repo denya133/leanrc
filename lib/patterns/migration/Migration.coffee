@@ -300,7 +300,7 @@ module.exports = (Module)->
             db._createDocumentCollection 'cucumbers', waitForSync: yes
           db._collection('cucumbers').ensureIndex
             type: 'hash'
-            fields: ['_type']
+            fields: ['type']
           yield return
         yield return
       @down ->

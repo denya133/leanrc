@@ -65,9 +65,9 @@
       "statusMessage": "Found"
     }
   },
-  "/v1/test_records": {
-    "single": "test_record",
-    "plural": "test_records",
+  "/v1/tests": {
+    "single": "test",
+    "plural": "tests",
     "POST": {
       "statusCode": 200,
       "statusMessage": "OK",
@@ -79,9 +79,9 @@
       "data": "QUERY"
     }
   },
-  "/v1/test_records/bulk": {
-    "single": "test_record",
-    "plural": "test_records",
+  "/v1/tests/bulk": {
+    "single": "test",
+    "plural": "tests",
     "DELETE": {
       "statusCode": 204,
       "statusMessage": "No Content",

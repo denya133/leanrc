@@ -5,7 +5,7 @@ inflect       = do require 'i'
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineMixin (BaseClass) ->
+  Module.defineMixin Module::Migration, (BaseClass) ->
     class MemoryMigrationMixin extends BaseClass
       @inheritProtected()
 
