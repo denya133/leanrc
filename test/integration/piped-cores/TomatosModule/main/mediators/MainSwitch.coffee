@@ -70,8 +70,12 @@ module.exports = (Module)->
       return: NILL
       default: ->
         {port} = @configs
+        { facade } = @
         @[ipoHttpServer].listen port, ->
-          console.log "listening on port #{port}"
+          { SEND_TO_LOG } = Module::LogMessage
+          { DEBUG, LEVELS } = Module::Pipes::LogMessage
+          # console.log "listening on port #{port}"
+          facade.sendNotification SEND_TO_LOG, "listening on port #{port}", LEVELS[DEBUG]
         return
 
     @public createNativeRoute: Function,

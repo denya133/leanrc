@@ -100,14 +100,26 @@ describe 'PipedCores', ->
         assert.lengthOf data, 0
         # здесь можно проверить сколько объектов вернулось в {cucumbers} = res
         cucumbers.finish()
+        yield return
   describe 'Create Tomatos app instance and send request', ->
     it 'should create new TomatosApp and respond on request', ->
       co ->
         tomatos = TomatosApp::ShellApplication.new()
         res = yield request.get 'http://localhost:3001/0.1/tomatos'
-        console.log '?????', res
+        { body: rawBody, status, message } = res
+        assert.equal status, 200
+        assert.equal message, 'OK'
+        body = JSON.parse rawBody ? null
+        assert.isTrue body?
+        { meta, tomatos: data } = body
+        assert.deepEqual meta, pagination:
+          total: 'not defined'
+          limit: 'not defined'
+          offset: 'not defined'
+        assert.lengthOf data, 0
         # здесь можно проверить сколько объектов вернулось в {tomatos} = res
         tomatos.finish()
+        yield return
   describe 'Create Cucumbers app and test CRUD', ->
     it 'should create new CucumbersApp and send CRUD requests', ->
       co ->
