@@ -12,7 +12,7 @@ class Cucumbers extends LeanRC
 
   require('./records/CucumberRecord') @Module
 
-  require('./stocks/CucumbersStock') @Module
+  require('./resources/CucumbersResource') @Module
 
   require('./ApplicationRouter') @Module
 

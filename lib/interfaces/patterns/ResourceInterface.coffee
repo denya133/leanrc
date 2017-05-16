@@ -1,5 +1,5 @@
 # комманда эквивалентная контролеру в рельсах
-# в зависимости от сингала, будет запускаться нужный ресурс CucumbersStock
+# в зависимости от сингала, будет запускаться нужный ресурс CucumbersResource
 # а в зависимости от типа нотификейшена внутри инстанса ресурса
 # будет выполняться нужный экшен (метод) create, update, detail, list, delete
 
@@ -10,7 +10,7 @@ module.exports = (Module)->
   {ANY, NILL} = Module::
 
   Module.defineInterface (BaseClass) ->
-    class StockInterface extends BaseClass
+    class ResourceInterface extends BaseClass
       @inheritProtected()
 
       @public @virtual entityName: String
@@ -64,4 +64,4 @@ module.exports = (Module)->
         return: NILL # без return. данные посылаем сигналом
 
 
-    StockInterface.initializeInterface()
+    ResourceInterface.initializeInterface()

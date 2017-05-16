@@ -1,4 +1,4 @@
-# миксин может подмешиваться в наследники класса Stock
+# миксин может подмешиваться в наследники класса Resource
 
 # !!! Необходимое условие использования миксина - Коллекция должна имплементировать QueryableMixinInterface
 
@@ -9,12 +9,12 @@ module.exports = (Module)->
     ANY
     ASYNC
 
-    Stock
+    Resource
     ChainsMixin
   } = Module::
 
-  Module.defineMixin Stock, (BaseClass) ->
-    class BulkActionsStockMixin extends BaseClass
+  Module.defineMixin Resource, (BaseClass) ->
+    class BulkActionsResourceMixin extends BaseClass
       @inheritProtected()
 
       @action @async list: Function,
@@ -70,4 +70,4 @@ module.exports = (Module)->
           return args
 
 
-    BulkActionsStockMixin.initializeMixin()
+    BulkActionsResourceMixin.initializeMixin()
