@@ -8,9 +8,8 @@ module.exports = (Module)->
 
   class BaseMigration extends Migration
     @inheritProtected()
-    @module Module
-
     @include MemoryMigrationMixin
+    @module Module
 
 
   BaseMigration.initialize()
