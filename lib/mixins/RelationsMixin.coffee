@@ -44,10 +44,10 @@ module.exports = (Module)->
             relation: 'belongsTo'
             set: (aoData)->
               if (id = aoData?[refKey])?
-                @[attr] = id
+                @[attr] = set?.apply(@, [id]) ? id #id
                 return
               else
-                @[attr] = null
+                @[attr] = set?.apply(@, [null]) ? null #null
                 return
             get: ->
               Module::Utils.co =>
@@ -55,7 +55,7 @@ module.exports = (Module)->
                 vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
                 voCollection = @collection.facade.retrieveProxy vsCollectionName
                 unless through
-                  cursor = yield voCollection.takeBy "@doc.#{refKey}": @[attr]
+                  cursor = yield voCollection.takeBy "@doc.#{refKey}": get?.apply(@, [@[attr]]) ? @[attr]
                   cursor.first()
                 else
                   if @[through[0]]?[0]?
