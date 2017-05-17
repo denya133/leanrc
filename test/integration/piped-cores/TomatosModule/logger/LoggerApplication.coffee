@@ -9,8 +9,5 @@ module.exports = (Module) ->
     @inheritProtected()
     @module Module
 
-    @public @static NAME: String,
-      default: 'TomatosLogger'
-
 
   LoggerApplication.initialize()

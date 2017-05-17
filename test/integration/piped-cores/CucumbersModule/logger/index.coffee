@@ -1,7 +1,7 @@
 # Это может быть сторонний модуль, который может подключаться как Cucumbers
 LeanRC = require.main.require 'lib'
 
-class Logger extends LeanRC
+class CucumbersLogger extends LeanRC
   @inheritProtected()
 
   @root __dirname
@@ -20,4 +20,4 @@ class Logger extends LeanRC
   require('./LoggerApplication') @Module
 
 
-module.exports = Logger.initialize().freeze()
+module.exports = CucumbersLogger.initialize().freeze()

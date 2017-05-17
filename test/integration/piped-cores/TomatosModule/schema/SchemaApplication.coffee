@@ -9,8 +9,5 @@ module.exports = (Module) ->
     @inheritProtected()
     @module Module
 
-    @public @static NAME: String,
-      default: 'TomatosSchema'
-
 
   SchemaApplication.initialize()

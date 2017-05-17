@@ -10,8 +10,5 @@ module.exports = (Module) ->
     @inheritProtected()
     @module Module
 
-    @public @static NAME: String,
-      default: 'TomatosMain'
-
 
   MainApplication.initialize()
