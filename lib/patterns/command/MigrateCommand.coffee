@@ -50,27 +50,13 @@ module.exports = (Module) ->
     @include Module::ConfigurableMixin
     @module Module
 
-    iplMigrationNames = @private migrationNames: Module::PromiseInterface
-
     @public migrationsCollection: Module::CollectionInterface
     @public migrationNames: Module::PromiseInterface,
-      get: ->
-        {co, filesList} = Module::Utils
-        @[iplMigrationNames] ?= co =>
-          files = yield filesList @migrationsDir
-          yield return _.orderBy _.compact (files ? []).map (i)=>
-            migrationName = i.replace /\.js|\.coffee/, ''
-            if migrationName isnt 'BaseMigration'
-              vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
-              require(vsMigrationPath) @Module
-              migrationName
-            else
-              null
-        @[iplMigrationNames]
+      get: -> @Module::MIGRATION_NAMES ? []
 
     @public migrationsDir: String,
       get: ->
-        "#{@configs.ROOT}/compiled_migrations"
+        "#{@configs.ROOT}/migrations"
 
     @public initializeNotifier: Function,
       default: (args...)->
@@ -87,8 +73,7 @@ module.exports = (Module) ->
       args: []
       return: NILL
       default: (options)->
-        migrationNames = yield @migrationNames
-        for migrationName in migrationNames
+        for migrationName in @migrationNames
           unless yield @migrationsCollection.includes migrationName
             id = String migrationName
             clearedMigrationName = migrationName.replace /^\d{14}[_]/, ''
