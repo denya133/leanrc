@@ -7,13 +7,13 @@ module.exports = (Module)->
   } = Module::
   {wrap} = Module::Utils.co
 
-  class CreateCucumbersMigration extends BaseMigration
+  class CreateTomatosMigration extends BaseMigration
     @inheritProtected()
     @module Module
 
     @change ->
       @reversible wrap (dir)->
-        CucumbersCollection = @collection.facade.retriveProxy 'CucumbersCollection'
+        TomatosCollection = @collection.facade.retrieveProxy 'TomatosCollection'
         items = [
           id: '1'
           name: '1-test'
@@ -37,13 +37,13 @@ module.exports = (Module)->
         ]
         for item in items
           yield dir.up   wrap ->
-            yield CucumbersCollection.create item
+            yield TomatosCollection.create item
             yield return
           yield dir.down wrap ->
-            yield CucumbersCollection.destroy item.id
+            yield TomatosCollection.destroy item.id
             yield return
           yield return
         yield return
 
 
-  CreateCucumbersMigration.initialize()
+  CreateTomatosMigration.initialize()

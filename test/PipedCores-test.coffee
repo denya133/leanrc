@@ -1,16 +1,52 @@
+EventEmitter = require 'events'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 # request = require 'request'
 LeanRC = require.main.require 'lib'
 CucumbersApp = require './integration/piped-cores/CucumbersModule/shell'
+CucumbersSchema = require './integration/piped-cores/CucumbersModule/schema'
 TomatosApp = require './integration/piped-cores/TomatosModule/shell'
 { co, request } = LeanRC::Utils
 
 
 describe 'PipedCores', ->
-  describe 'Create CucumbersSchema app and ...', ->
-    it 'должно выполнить все миграции в прямом направлении', ->
-      throw new Error 'not implemented'
+  describe 'Create CucumbersSchema app instance', ->
+    it 'should apply all migrations', ->
+      co ->
+        trigger = new EventEmitter
+        class Test extends CucumbersSchema
+          @inheritProtected()
+        Test.initialize()
+        class TestCommand extends LeanRC::SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function,
+            default: ->
+              trigger.emit 'STOPPED'
+              return
+        TestCommand.initialize()
+        app = Test::SchemaApplication.new()
+        app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
+        cucumbersCollection = app.facade.retrieveProxy 'CucumbersCollection'
+        migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
+        resque = app.facade.retrieveProxy Test::RESQUE
+        for name in Test::MIGRATION_NAMES
+          promise = Test::Promise.new (resolve) ->
+            trigger.once 'STOPPED', resolve
+          app.facade.sendNotification Test::MIGRATE, until: name
+          res = yield promise
+          assert.property migrationsCollection[Symbol.for '~collection'], name
+          switch name
+            when '20161006133500_create_default_queue_migration'
+              assert.property resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>default'
+            when '20161006133800_create_signals_queue_migration'
+              assert.property resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>signals'
+            when '20161006133900_create_delayed_jobs_queue_migration'
+              assert.property resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>delayed_jobs'
+            # when '20161006134300_create_cucumbers_migration'
+            when '20170206165146_generate_defaults_in_cucumbers_migration'
+              assert.property cucumbersCollection[Symbol.for '~collection'], '1'
+        yield return
   describe 'Create CucumbersSchema app and ...', ->
     it 'должно выполнить все миграции в обратном направлении', ->
       throw new Error 'not implemented'

@@ -43,7 +43,7 @@ module.exports = (Module)->
 
 
 module.exports = (Module) ->
-  {ANY, NILL} = Module::
+  {ANY, NILL, STOPPED_MIGRATE} = Module::
 
   class MigrateCommand extends Module::SimpleCommand
     @inheritProtected()
@@ -73,6 +73,8 @@ module.exports = (Module) ->
       args: []
       return: NILL
       default: (options)->
+        if options instanceof Module::Notification
+          options = options.getBody() ? {}
         for migrationName in @migrationNames
           unless yield @migrationsCollection.includes migrationName
             id = String migrationName
@@ -80,15 +82,18 @@ module.exports = (Module) ->
             migrationClassName = inflect.camelize clearedMigrationName
             vcMigration = @Module::[migrationClassName]
             try
-              voMigration = vcMigration.new { id }, @migrationsCollection
-              yield voMigration.migrate Module::Migration::UP
-              yield voMigration.save()
+              voMigration = yield @migrationsCollection.find id
+              unless voMigration?
+                voMigration = vcMigration.new { id }, @migrationsCollection
+                yield voMigration.migrate Module::Migration::UP
+                yield voMigration.save()
             catch err
               error = "!!! Error in migration #{migrationName}"
               console.error error, err.message, err.stack
               break
           if options?.until? and options.until is migrationName
             break
+        @facade.sendNotification STOPPED_MIGRATE, err
         yield return
 
 
