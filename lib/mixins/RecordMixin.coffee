@@ -20,7 +20,10 @@ module.exports = (Module)->
             vhAttrs = {}
             for own asAttrName, ahAttrValue of @attributes
               do (asAttrName, ahAttrValue)=>
-                vhAttrs[asAttrName] = ahAttrValue.validate?() ? ahAttrValue.validate
+                if _.isFunction ahAttrValue.validate
+                  vhAttrs[asAttrName] = ahAttrValue.validate.call(@)
+                else
+                  vhAttrs[asAttrName] = ahAttrValue.validate
             joi.object vhAttrs
           _data[@name]
 
@@ -92,7 +95,7 @@ module.exports = (Module)->
               -> joi.object()
           {set} = opts
           opts.set = (aoData)->
-            {value:voData} = opts.validate().validate aoData
+            {value:voData} = opts.validate.call(@).validate aoData
             if _.isFunction set
               set.apply @, [voData]
             else
@@ -271,8 +274,8 @@ module.exports = (Module)->
             return null
           vhResult = {}
           for own asAttrName, ahAttrValue of @attributes
-            do (asAttrName, {transform} = ahAttrValue)->
-              vhResult[asAttrName] = transform().normalize ahPayload[asAttrName]
+            do (asAttrName, {transform} = ahAttrValue)=>
+              vhResult[asAttrName] = transform.call(@).normalize ahPayload[asAttrName]
           result = @new vhResult, aoCollection
           vhAttributes = {}
           for own key of @attributes
@@ -286,8 +289,8 @@ module.exports = (Module)->
             return null
           vhResult = {}
           for own asAttrName, ahAttrValue of @attributes
-            do (asAttrName, {transform} = ahAttrValue)->
-              vhResult[asAttrName] = transform().serialize aoRecord[asAttrName]
+            do (asAttrName, {transform} = ahAttrValue)=>
+              vhResult[asAttrName] = transform.call(@).serialize aoRecord[asAttrName]
           vhResult
 
 
