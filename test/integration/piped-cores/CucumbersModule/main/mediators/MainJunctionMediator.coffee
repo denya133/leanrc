@@ -22,7 +22,7 @@ module.exports = (Module) ->
     ipoMultitonKey = Symbol.for '~multitonKey'
 
     @public @static NAME: String,
-      default: 'CucumbersMainJunctionMediator'
+      get: -> "#{@Module.name}JunctionMediator"
 
     @public listNotificationInterests: Function,
       default: (args...)->

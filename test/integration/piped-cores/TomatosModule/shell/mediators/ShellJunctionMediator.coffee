@@ -47,7 +47,7 @@ module.exports = (Module) ->
     ipoJunction = Symbol.for '~junction'
 
     @public @static NAME: String,
-      default: 'TomatosShellJunctionMediator'
+      get: -> "#{@Module.name}JunctionMediator"
 
     @public listNotificationInterests: Function,
       default: (args...)->
