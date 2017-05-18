@@ -7,7 +7,7 @@ module.exports = (Module)->
   } = Module::
   {wrap} = Module::Utils.co
 
-  class CreateTomatosMigration extends BaseMigration
+  class GenerateDefaultsInTomatosMigration extends BaseMigration
     @inheritProtected()
     @module Module
 
@@ -45,4 +45,4 @@ module.exports = (Module)->
         yield return
 
 
-  CreateTomatosMigration.initialize()
+  GenerateDefaultsInTomatosMigration.initialize()
