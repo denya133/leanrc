@@ -81,10 +81,11 @@ module.exports = (Module) ->
             clearedMigrationName = migrationName.replace /^\d{14}[_]/, ''
             migrationClassName = inflect.camelize clearedMigrationName
             vcMigration = @Module::[migrationClassName]
+            type = "#{@Module.name}::#{migrationClassName}"
             try
               voMigration = yield @migrationsCollection.find id
               unless voMigration?
-                voMigration = vcMigration.new { id }, @migrationsCollection
+                voMigration = vcMigration.new { id, type }, @migrationsCollection
                 yield voMigration.migrate Module::Migration::UP
                 yield voMigration.save()
             catch err

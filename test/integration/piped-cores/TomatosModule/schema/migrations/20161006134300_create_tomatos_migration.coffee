@@ -16,7 +16,7 @@ module.exports = (Module)->
       @addField 'tomatos', 'type', 'string'
       @addField 'tomatos', 'rev', 'string'
       @addField 'tomatos', 'isHidden', 'boolean'
-      @addTimestamps()
+      @addTimestamps 'tomatos'
 
       @addField 'tomatos', 'name', 'string'
       @addField 'tomatos', 'description', 'text'

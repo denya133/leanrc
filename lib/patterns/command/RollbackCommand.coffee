@@ -43,7 +43,7 @@ module.exports = (Module)->
 
 
 module.exports = (Module) ->
-  {ANY, NILL } = Module::
+  { ANY, NILL, STOPPED_ROLLBACK } = Module::
 
   class RollbackCommand extends Module::SimpleCommand
     @inheritProtected()
@@ -73,12 +73,14 @@ module.exports = (Module) ->
       args: []
       return: NILL
       default: (options)->
+        if options instanceof Module::Notification
+          options = options.getBody() ? {}
         if options?.steps? and not _.isNumber options.steps
           throw new Error 'Not valid steps params'
           yield return
 
         executedMigrations = yield (yield @migrationsCollection.takeAll()).toArray()
-        executedMigrations = _.orderBy executedMigrations, ['id', 'desc']
+        executedMigrations = _.orderBy executedMigrations, ['id'], ['desc']
         executedMigrations = executedMigrations[0...(options.steps ? 1)]
 
         for executedMigration in executedMigrations
@@ -91,6 +93,7 @@ module.exports = (Module) ->
             break
           if options?.until? and options.until is executedMigration.id
             break
+        @facade.sendNotification STOPPED_ROLLBACK, err
         yield return
 
 

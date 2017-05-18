@@ -42,7 +42,6 @@ module.exports = (Module)->
           yield dir.down wrap ->
             yield TomatosCollection.destroy item.id
             yield return
-          yield return
         yield return
 
 
