@@ -4,22 +4,27 @@ Cucumbers = require '../lib'
 
 class CucumbersSchema extends Cucumbers
   @inheritProtected()
+  @include Cucumbers::SchemaModuleMixin
 
   @root __dirname
 
+  require.main.require('lib/patterns/command/MigrateCommand') @Module
+  require.main.require('lib/patterns/command/RollbackCommand') @Module
   require('./migrations/BaseMigration') @Module
+
+  @defineMigrations()
+
+  require('./proxies/BaseCollection') @Module
+  require('./proxies/BaseResque') @Module
+  require('./proxies/MigrationsCollection') @Module
+
+  require('./mediators/ApplicationMediator') @Module
 
   require('./commands/PrepareControllerCommand') @Module
   require('./commands/PrepareViewCommand') @Module
   require('./commands/PrepareModelCommand') @Module
   require('./commands/StartupCommand') @Module
   # под вопросом - надо ли здесь объявлять команды migrate и rollback ???
-
-  require('./mediators/ApplicationMediator') @Module
-
-  require('./proxies/BaseCollection') @Module
-  require('./proxies/BaseResque') @Module
-  require('./proxies/MigrationsCollection') @Module
 
   require('./ApplicationFacade') @Module
 

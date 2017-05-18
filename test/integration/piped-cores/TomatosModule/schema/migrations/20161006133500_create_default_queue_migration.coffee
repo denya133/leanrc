@@ -14,14 +14,14 @@ module.exports = (Module)->
 
     @up ->
       yield @execute wrap ->
-        resque = @facade.retriveProxy RESQUE
+        resque = @collection.facade.retrieveProxy RESQUE
         yield resque.create 'default', 1
         yield return
       yield return
 
     @down ->
       yield @execute wrap ->
-        resque = @facade.retriveProxy RESQUE
+        resque = @collection.facade.retrieveProxy RESQUE
         yield resque.remove 'default'
         yield return
       yield return

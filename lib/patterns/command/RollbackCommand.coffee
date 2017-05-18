@@ -43,34 +43,20 @@ module.exports = (Module)->
 
 
 module.exports = (Module) ->
-  {ANY, NILL} = Module::
+  {ANY, NILL } = Module::
 
   class RollbackCommand extends Module::SimpleCommand
     @inheritProtected()
     @include Module::ConfigurableMixin
     @module Module
 
-    iplMigrationNames = @private migrationNames: Module::PromiseInterface
-
     @public migrationsCollection: Module::CollectionInterface
-    @public migrationNames: Module::PromiseInterface,
-      get: ->
-        {co, filesList} = Module::Utils
-        @[iplMigrationNames] ?= co =>
-          files = yield filesList @migrationsDir
-          yield return _.orderBy _.compact (files ? []).map (i)=>
-            migrationName = i.replace /\.js|\.coffee/, ''
-            if migrationName isnt 'BaseMigration'
-              vsMigrationPath = "#{@migrationsDir}/#{migrationName}"
-              require(vsMigrationPath) @Module
-              migrationName
-            else
-              null
-        @[iplMigrationNames]
+    @public migrationNames: Array,
+      get: -> @Module::MIGRATION_NAMES ? []
 
     @public migrationsDir: String,
       get: ->
-        "#{@configs.ROOT}/compiled_migrations"
+        "#{@configs.ROOT}/migrations"
 
     @public initializeNotifier: Function,
       default: (args...)->
@@ -90,8 +76,6 @@ module.exports = (Module) ->
         if options?.steps? and not _.isNumber options.steps
           throw new Error 'Not valid steps params'
           yield return
-
-        migrationNames = yield @migrationNames
 
         executedMigrations = yield (yield @migrationsCollection.takeAll()).toArray()
         executedMigrations = _.orderBy executedMigrations, ['id', 'desc']

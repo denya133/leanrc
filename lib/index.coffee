@@ -14,6 +14,8 @@ class LeanRC extends RC
   @const STARTUP: Symbol 'startup' # для сигнала
   @const MIGRATE: Symbol 'migrate' # для сигнала
   @const ROLLBACK: Symbol 'rollback' # для сигнала
+  @const STOPPED_MIGRATE: Symbol 'stopped_migrate' # для сигнала
+  @const STOPPED_ROLLBACK: Symbol 'stopped_rollback' # для сигнала
   @const MIGRATIONS: Symbol 'MigrationsCollection'
   @const RESQUE: Symbol 'ResqueProxy'
   @const START_RESQUE: Symbol 'start_resque'
@@ -97,6 +99,7 @@ class LeanRC extends RC
   require('./mixins/IterableMixin') LeanRC
   require('./mixins/QueryableMixin') LeanRC
   require('./mixins/ThinHttpCollectionMixin') LeanRC # need test it
+  require('./mixins/SchemaModuleMixin') LeanRC
 
   require('./patterns/mediator/Mediator') LeanRC
   require('./patterns/mediator/Switch') LeanRC
