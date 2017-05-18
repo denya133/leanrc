@@ -27,5 +27,4 @@ module.exports = (Module)->
       yield return
 
 
-
   CreateDefaultQueueMigration.initialize()
