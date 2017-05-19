@@ -6,6 +6,7 @@ class TomatosMain extends Tomatos
 
   @root __dirname
 
+  require.main.require('lib/patterns/command/DelayedJobScript') @Module
   require('./mediators/MainJunctionMediator') @Module
   require('./mediators/MainSwitch') @Module
 
