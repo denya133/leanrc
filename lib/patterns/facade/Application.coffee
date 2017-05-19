@@ -10,7 +10,8 @@ module.exports = (Module)->
     @const CONNECT_SHELL_TO_LOGGER: Symbol 'connectShellToLogger'
     @const CONNECT_MODULE_TO_SHELL: Symbol 'connectModuleToShell'
 
-    @public @static NAME: String
+    @public @static NAME: String,
+      get: -> @Module.name
 
     @public finish: Function,
       default: ->

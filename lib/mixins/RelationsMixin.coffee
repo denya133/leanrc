@@ -36,26 +36,26 @@ module.exports = (Module)->
             sortable: sortable
             groupable: groupable
             filterable: filterable
-            transform: transform ? =>
+            transform: transform ? ->
               [vsModuleName, vsRecordName] = @parseRecordName vsAttr
               @Module::[vsRecordName]
-            validate: -> opts.transform().schema
+            validate: -> opts.transform.call(@).schema
             inverse: inverse ? "#{inflect.pluralize inflect.camelize @name, no}"
             relation: 'belongsTo'
             set: (aoData)->
               if (id = aoData?[refKey])?
-                @[attr] = id
+                @[attr] = set?.apply(@, [id]) ? id #id
                 return
               else
-                @[attr] = null
+                @[attr] = set?.apply(@, [null]) ? null #null
                 return
             get: ->
               Module::Utils.co =>
-                vcRecord = opts.transform()
+                vcRecord = opts.transform.call(@)
                 vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
                 voCollection = @collection.facade.retrieveProxy vsCollectionName
                 unless through
-                  cursor = yield voCollection.takeBy "@doc.#{refKey}": @[attr]
+                  cursor = yield voCollection.takeBy "@doc.#{refKey}": get?.apply(@, [@[attr]]) ? @[attr]
                   cursor.first()
                 else
                   if @[through[0]]?[0]?
@@ -72,13 +72,13 @@ module.exports = (Module)->
           opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
           opts.relation = 'hasMany'
-          opts.transform ?= =>
+          opts.transform ?= ->
               [vsModuleName, vsRecordName] = @parseRecordName vsAttr
               @Module::[vsRecordName]
-          opts.validate = -> joi.array().items opts.transform().schema
+          opts.validate = -> joi.array().items opts.transform.call(@).schema
           opts.get = ->
             Module::Utils.co =>
-              vcRecord = opts.transform()
+              vcRecord = opts.transform.call(@)
               vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
               voCollection = @collection.facade.retrieveProxy vsCollectionName
               unless opts.through
@@ -101,13 +101,13 @@ module.exports = (Module)->
           opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
           opts.relation = 'hasOne'
-          opts.transform ?= =>
+          opts.transform ?= ->
               [vsModuleName, vsRecordName] = @parseRecordName vsAttr
               @Module::[vsRecordName]
-          opts.validate = -> opts.transform().schema
+          opts.validate = -> opts.transform.call(@).schema
           opts.get = ->
             Module::Utils.co =>
-              vcRecord = opts.transform()
+              vcRecord = opts.transform.call(@)
               vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
               voCollection = @collection.facade.retrieveProxy vsCollectionName
               cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
@@ -120,7 +120,7 @@ module.exports = (Module)->
       @public @static inverseFor: Function,
         default: (asAttrName)->
           vhRelationConfig = @relations[asAttrName]
-          recordClass = vhRelationConfig.transform()
+          recordClass = vhRelationConfig.transform.call(@)
           {inverse:attrName} = vhRelationConfig
           {relation} = recordClass.relations[attrName]
           return {recordClass, attrName, relation}

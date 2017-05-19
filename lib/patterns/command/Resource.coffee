@@ -5,9 +5,9 @@ inflect       = do require 'i'
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  class Stock extends Module::SimpleCommand
+  class Resource extends Module::SimpleCommand
     @inheritProtected()
-    @implements Module::StockInterface
+    @implements Module::ResourceInterface
     @include Module::ConfigurableMixin
     @include Module::ChainsMixin
     @module Module
@@ -149,4 +149,4 @@ module.exports = (Module)->
         yield return
 
 
-  Stock.initialize()
+  Resource.initialize()

@@ -2,10 +2,10 @@
 
 module.exports = (Module)->
   {
-    Stock
+    Resource
   } = Module::
 
-  class CucumbersStock extends Stock
+  class CucumbersResource extends Resource
     @inheritProtected()
     @module Module
 
@@ -13,4 +13,4 @@ module.exports = (Module)->
       default: 'cucumber'
 
 
-  CucumbersStock.initialize()
+  CucumbersResource.initialize()

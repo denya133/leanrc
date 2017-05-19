@@ -2,10 +2,10 @@
 
 module.exports = (Module)->
   {
-    Stock
+    Resource
   } = Module::
 
-  class TomatosStock extends Stock
+  class TomatosResource extends Resource
     @inheritProtected()
     @module Module
 
@@ -30,4 +30,4 @@ module.exports = (Module)->
         yield (yield cucucmbers.takeAll()).toArray()
 
 
-  TomatosStock.initialize()
+  TomatosResource.initialize()

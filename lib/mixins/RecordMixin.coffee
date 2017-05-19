@@ -20,7 +20,10 @@ module.exports = (Module)->
             vhAttrs = {}
             for own asAttrName, ahAttrValue of @attributes
               do (asAttrName, ahAttrValue)=>
-                vhAttrs[asAttrName] = ahAttrValue.validate?() ? ahAttrValue.validate
+                if _.isFunction ahAttrValue.validate
+                  vhAttrs[asAttrName] = ahAttrValue.validate.call(@)
+                else
+                  vhAttrs[asAttrName] = ahAttrValue.validate
             joi.object vhAttrs
           _data[@name]
 
@@ -30,6 +33,8 @@ module.exports = (Module)->
             [vsModuleName, vsRecordName] = asName.split '::'
           else
             [vsModuleName, vsRecordName] = [@moduleName(), inflect.camelize inflect.underscore asName]
+          unless /(Record$)|(Migration$)/.test vsRecordName
+            vsRecordName += 'Record'
           [vsModuleName, vsRecordName]
 
       @public parseRecordName: Function,
@@ -92,7 +97,7 @@ module.exports = (Module)->
               -> joi.object()
           {set} = opts
           opts.set = (aoData)->
-            {value:voData} = opts.validate().validate aoData
+            {value:voData} = opts.validate.call(@).validate aoData
             if _.isFunction set
               set.apply @, [voData]
             else
@@ -126,14 +131,16 @@ module.exports = (Module)->
 
       @public @static new: Function,
         default: (aoAttributes, aoCollection)->
-          if (aoAttributes ? {}).type?
+          aoAttributes ?= {}
+          if aoAttributes.type?
             if @name is aoAttributes.type.split('::')[1]
               @super arguments...
             else
               RecordClass = @findRecordByName aoAttributes.type
               RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
           else
-            @super arguments...
+            aoAttributes.type = "#{@moduleName()}::#{@name}"
+            @super aoAttributes, aoCollection
 
       @public @async save: Function,
         default: ->
@@ -271,8 +278,8 @@ module.exports = (Module)->
             return null
           vhResult = {}
           for own asAttrName, ahAttrValue of @attributes
-            do (asAttrName, {transform} = ahAttrValue)->
-              vhResult[asAttrName] = transform().normalize ahPayload[asAttrName]
+            do (asAttrName, {transform} = ahAttrValue)=>
+              vhResult[asAttrName] = transform.call(@).normalize ahPayload[asAttrName]
           result = @new vhResult, aoCollection
           vhAttributes = {}
           for own key of @attributes
@@ -286,8 +293,8 @@ module.exports = (Module)->
             return null
           vhResult = {}
           for own asAttrName, ahAttrValue of @attributes
-            do (asAttrName, {transform} = ahAttrValue)->
-              vhResult[asAttrName] = transform().serialize aoRecord[asAttrName]
+            do (asAttrName, {transform} = ahAttrValue)=>
+              vhResult[asAttrName] = transform.call(@).serialize aoRecord[asAttrName]
           vhResult
 
 

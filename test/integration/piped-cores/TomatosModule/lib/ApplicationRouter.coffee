@@ -12,7 +12,7 @@ module.exports = (Module)->
     @map ->
       @namespace 'version', module: '', prefix: ':v', ->
         @resource 'tomatos'
-        @get 'cucumbers', resource: 'tomatos', action: 'getCucumbers'
+        @get 'cucumbers', to: 'tomatos#getCucumbers'
 
 
   ApplicationRouter.initialize()

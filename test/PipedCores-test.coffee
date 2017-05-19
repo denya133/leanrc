@@ -609,7 +609,8 @@ describe 'PipedCores', ->
         res5 = yield request.get 'http://localhost:3001/0.1/cucumbers'
         assert.propertyVal res5, 'status', 200
         assert.propertyVal res5, 'message', 'OK'
-        items = JSON.parse res5.body ? null
+        body = JSON.parse res5.body ? null
+        { cucumbers: items } = body
         assert.lengthOf items, 3
         for item, index in items
           assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'

@@ -80,7 +80,7 @@ module.exports = (Module)->
 
     @public createNativeRoute: Function,
       default: ({method, path, resource, action})->
-        resourceName = inflect.camelize inflect.underscore "#{resource.replace /[/]/g, '_'}Stock"
+        resourceName = inflect.camelize inflect.underscore "#{resource.replace /[/]/g, '_'}Resource"
 
         @[ipoExpressApp][method]? path, (req, res)=>
           reverse = crypto.randomBytes 32

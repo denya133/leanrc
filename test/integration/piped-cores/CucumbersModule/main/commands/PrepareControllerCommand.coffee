@@ -6,7 +6,7 @@ module.exports = (Module) ->
 
     SimpleCommand
     DelayedJobScript
-    CucumbersStock
+    CucumbersResource
     TestScript
   } = Module::
 
@@ -17,7 +17,7 @@ module.exports = (Module) ->
     @public execute: Function,
       default: ->
         @facade.registerCommand DELAYED_JOBS_SCRIPT, DelayedJobScript
-        @facade.registerCommand 'CucumbersStock', CucumbersStock
+        @facade.registerCommand 'CucumbersResource', CucumbersResource
         @facade.registerCommand 'TestScript', TestScript
 
 

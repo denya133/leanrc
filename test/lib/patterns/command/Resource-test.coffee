@@ -2,14 +2,14 @@
 sinon = require 'sinon'
 _ = require 'lodash'
 LeanRC = require.main.require 'lib'
-Stock = LeanRC::Stock
+Resource = LeanRC::Resource
 { co } = LeanRC::Utils
 
-describe 'Stock', ->
+describe 'Resource', ->
   describe '.new', ->
     it 'should create new command', ->
       expect ->
-        stock = Stock.new()
+        resource = Resource.new()
       .to.not.throw Error
   describe '#keyName', ->
     it 'should get key name using entity name', ->
@@ -18,14 +18,14 @@ describe 'Stock', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestStock.initialize()
-        stock = Test::TestStock.new()
-        { keyName } = stock
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        { keyName } = resource
         assert.equal keyName, 'test_entity'
         yield return
   describe '#itemEntityName', ->
@@ -35,14 +35,14 @@ describe 'Stock', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestStock.initialize()
-        stock = Test::TestStock.new()
-        { itemEntityName } = stock
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        { itemEntityName } = resource
         assert.equal itemEntityName, 'test_entity'
         yield return
   describe '#listEntityName', ->
@@ -52,14 +52,14 @@ describe 'Stock', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestStock.initialize()
-        stock = Test::TestStock.new()
-        { listEntityName } = stock
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        { listEntityName } = resource
         assert.equal listEntityName, 'test_entities'
         yield return
   describe '#collectionName', ->
@@ -69,14 +69,14 @@ describe 'Stock', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestStock.initialize()
-        stock = Test::TestStock.new()
-        { collectionName } = stock
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        { collectionName } = resource
         assert.equal collectionName, 'TestEntitiesCollection'
         yield return
   describe '#collection', ->
@@ -87,19 +87,19 @@ describe 'Stock', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestStock.initialize()
+        Test::TestResource.initialize()
         facade = LeanRC::Facade.getInstance TEST_FACADE
-        stock = Test::TestStock.new()
-        stock.initializeNotifier TEST_FACADE
-        { collectionName } = stock
+        resource = Test::TestResource.new()
+        resource.initializeNotifier TEST_FACADE
+        { collectionName } = resource
         boundCollection = LeanRC::Collection.new collectionName
         facade.registerProxy boundCollection
-        { collection } = stock
+        { collection } = resource
         assert.equal collection, boundCollection
         yield return
   describe '#action', ->
@@ -109,7 +109,7 @@ describe 'Stock', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
@@ -120,33 +120,33 @@ describe 'Stock', ->
             default: 'test2'
           @action test3: String,
             default: 'test3'
-        Test::TestStock.initialize()
-        assert.deepEqual Test::TestStock.metaObject.data.actions.test1,
+        Test::TestResource.initialize()
+        assert.deepEqual Test::TestResource.metaObject.data.actions.test1,
           default: 'test1'
           attr: 'test1'
           attrType: String
           level: LeanRC::PUBLIC
-        assert.deepEqual Test::TestStock.metaObject.data.actions.test2,
+        assert.deepEqual Test::TestResource.metaObject.data.actions.test2,
           default: 'test2'
           attr: 'test2'
           attrType: String
           level: LeanRC::PUBLIC
-        assert.deepEqual Test::TestStock.metaObject.data.actions.test3,
+        assert.deepEqual Test::TestResource.metaObject.data.actions.test3,
           default: 'test3'
           attr: 'test3'
           attrType: String
           level: LeanRC::PUBLIC
         yield return
   describe '#actions', ->
-    it 'should get stock actions', ->
+    it 'should get resource actions', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
-          @include LeanRC::BulkActionsStockMixin
+          @include LeanRC::BulkActionsResourceMixin
           @module Test
           @public entityName: String,
             default: 'TestEntity'
@@ -156,23 +156,23 @@ describe 'Stock', ->
             default: 'test2'
           @action test3: String,
             default: 'test3'
-        Test::TestStock.initialize()
-        assert.deepEqual Test::TestStock.actions.test1,
+        Test::TestResource.initialize()
+        assert.deepEqual Test::TestResource.actions.test1,
           default: 'test1'
           attr: 'test1'
           attrType: String
           level: LeanRC::PUBLIC
-        assert.deepEqual Test::TestStock.actions.test2,
+        assert.deepEqual Test::TestResource.actions.test2,
           default: 'test2'
           attr: 'test2'
           attrType: String
           level: LeanRC::PUBLIC
-        assert.deepEqual Test::TestStock.actions.test3,
+        assert.deepEqual Test::TestResource.actions.test3,
           default: 'test3'
           attr: 'test3'
           attrType: String
           level: LeanRC::PUBLIC
-        { actions } = Test::TestStock
+        { actions } = Test::TestResource
         assert.propertyVal actions.list, 'attr', 'list'
         assert.propertyVal actions.list, 'attrType', Function
         assert.propertyVal actions.list, 'level', LeanRC::PUBLIC
@@ -213,43 +213,43 @@ describe 'Stock', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestStock.initialize()
-        stock = Test::TestStock.new()
-        stock.beforeActionHook
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.beforeActionHook
           queryParams: query: '{"test":"test123"}'
           pathParams: testParam: 'testParamValue'
           currentUserId: 'ID'
           headers: 'test-header': 'test-header-value'
           body: test: 'test678'
-        assert.deepPropertyVal stock, 'queryParams.query', '{"test":"test123"}'
-        assert.deepPropertyVal stock, 'pathParams.testParam', 'testParamValue'
-        assert.propertyVal stock, 'currentUserId', 'ID'
-        assert.deepPropertyVal stock, 'headers.test-header', 'test-header-value'
-        assert.deepPropertyVal stock, 'body.test', 'test678'
+        assert.deepPropertyVal resource, 'queryParams.query', '{"test":"test123"}'
+        assert.deepPropertyVal resource, 'pathParams.testParam', 'testParamValue'
+        assert.propertyVal resource, 'currentUserId', 'ID'
+        assert.deepPropertyVal resource, 'headers.test-header', 'test-header-value'
+        assert.deepPropertyVal resource, 'body.test', 'test678'
         yield return
   describe '#parsePathParams', ->
-    it 'should get stock record ID', ->
+    it 'should get resource record ID', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestStock.initialize()
-        stock = Test::TestStock.new()
-        stock.beforeActionHook
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.beforeActionHook
           pathParams: test_entity: 'ID123456'
-        stock.parsePathParams()
-        assert.propertyVal stock, 'recordId', 'ID123456'
+        resource.parsePathParams()
+        assert.propertyVal resource, 'recordId', 'ID123456'
         yield return
   describe '#parseBody', ->
     it 'should get body', ->
@@ -258,17 +258,17 @@ describe 'Stock', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestStock.initialize()
-        stock = Test::TestStock.new()
-        stock.beforeActionHook
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.beforeActionHook
           body: test_entity: test: 'test9'
-        stock.parseBody()
-        assert.deepEqual stock.recordBody, test: 'test9'
+        resource.parseBody()
+        assert.deepEqual resource.recordBody, test: 'test9'
         yield return
   describe '#beforeUpdate', ->
     it 'should get body with ID', ->
@@ -277,25 +277,25 @@ describe 'Stock', ->
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestStock.initialize()
-        stock = Test::TestStock.new()
-        stock.beforeActionHook
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.beforeActionHook
           pathParams: test_entity: 'ID123456'
           body: test_entity: test: 'test9'
-        stock.parsePathParams()
-        stock.parseBody()
-        stock.beforeUpdate()
-        assert.deepEqual stock.recordBody, id: 'ID123456', test: 'test9'
+        resource.parsePathParams()
+        resource.parseBody()
+        resource.beforeUpdate()
+        assert.deepEqual resource.recordBody, id: 'ID123456', test: 'test9'
         yield return
   describe '#list', ->
-    it 'should list of stock items', ->
+    it 'should list of resource items', ->
       co ->
-        KEY = 'TEST_STOCK_001'
+        KEY = 'TEST_RESOURCE_001'
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
@@ -304,19 +304,19 @@ describe 'Stock', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
               @super arguments...
               @_type = 'Test::TestRecord'
         Test::TestRecord.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestStock.initialize()
+        Test::TestResource.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableMixin
@@ -347,9 +347,9 @@ describe 'Stock', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         yield collection.create test: 'test1'
         yield collection.create test: 'test2'
-        stock = Test::TestStock.new()
-        stock.initializeNotifier KEY
-        { items, meta } = yield stock.list
+        resource = Test::TestResource.new()
+        resource.initializeNotifier KEY
+        { items, meta } = yield resource.list
           queryParams: query: '{}'
           pathParams: {}
           currentUserId: 'ID'
@@ -363,9 +363,9 @@ describe 'Stock', ->
         assert.propertyVal items[1], 'test', 'test2'
         yield return
   describe '#detail', ->
-    it 'should get stock single item', ->
+    it 'should get resource single item', ->
       co ->
-        KEY = 'TEST_STOCK_002'
+        KEY = 'TEST_RESOURCE_002'
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
@@ -374,18 +374,18 @@ describe 'Stock', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
               @super arguments...
               @_type = 'Test::TestRecord'
         Test::TestRecord.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String, { default: 'TestEntity' }
-        Test::TestStock.initialize()
+        Test::TestResource.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableMixin
@@ -420,22 +420,22 @@ describe 'Stock', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         yield collection.create test: 'test1'
         record = yield collection.create test: 'test2'
-        stock = Test::TestStock.new()
-        stock.initializeNotifier KEY
+        resource = Test::TestResource.new()
+        resource.initializeNotifier KEY
         params =
           queryParams: {}
-          pathParams: "#{stock.keyName}": record.id
+          pathParams: "#{resource.keyName}": record.id
           currentUserId: 'ID'
           headers: {}
           body: {}
-        result = yield stock.detail params
+        result = yield resource.detail params
         assert.propertyVal result, 'id', record.id
         assert.propertyVal result, 'test', 'test2'
         yield return
   describe '#create', ->
-    it 'should create stock single item', ->
+    it 'should create resource single item', ->
       co ->
-        KEY = 'TEST_STOCK_003'
+        KEY = 'TEST_RESOURCE_003'
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
@@ -444,18 +444,18 @@ describe 'Stock', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
               @super arguments...
               @_type = 'Test::TestRecord'
         Test::TestRecord.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String, { default: 'TestEntity' }
-        Test::TestStock.initialize()
+        Test::TestResource.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableMixin
@@ -488,15 +488,15 @@ describe 'Stock', ->
           serializer: LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
-        stock = Test::TestStock.new()
-        stock.initializeNotifier KEY
-        result = yield stock.create body: test_entity: test: 'test3'
+        resource = Test::TestResource.new()
+        resource.initializeNotifier KEY
+        result = yield resource.create body: test_entity: test: 'test3'
         assert.propertyVal result, 'test', 'test3'
         yield return
   describe '#update', ->
-    it 'should update stock single item', ->
+    it 'should update resource single item', ->
       co ->
-        KEY = 'TEST_STOCK_004'
+        KEY = 'TEST_RESOURCE_004'
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
@@ -505,18 +505,18 @@ describe 'Stock', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
               @super arguments...
               @_type = 'Test::TestRecord'
         Test::TestRecord.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String, { default: 'TestEntity' }
-        Test::TestStock.initialize()
+        Test::TestResource.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableMixin
@@ -557,18 +557,18 @@ describe 'Stock', ->
           serializer: LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
-        stock = Test::TestStock.new()
-        stock.initializeNotifier KEY
-        record = yield stock.create body: test_entity: test: 'test3'
-        result = yield stock.update
+        resource = Test::TestResource.new()
+        resource.initializeNotifier KEY
+        record = yield resource.create body: test_entity: test: 'test3'
+        result = yield resource.update
           pathParams: test_entity: record.id
           body: test_entity: test: 'test8'
         assert.propertyVal result, 'test', 'test8'
         yield return
   describe '#delete', ->
-    it 'should remove stock single item', ->
+    it 'should remove resource single item', ->
       co ->
-        KEY = 'TEST_STOCK_005'
+        KEY = 'TEST_RESOURCE_005'
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
@@ -577,18 +577,18 @@ describe 'Stock', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
               @super arguments...
               @_type = 'Test::TestRecord'
         Test::TestRecord.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String, { default: 'TestEntity' }
-        Test::TestStock.initialize()
+        Test::TestResource.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableMixin
@@ -629,17 +629,17 @@ describe 'Stock', ->
           serializer: LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
-        stock = Test::TestStock.new()
-        stock.initializeNotifier KEY
-        record = yield stock.create body: test_entity: test: 'test3'
-        result = yield stock.delete
+        resource = Test::TestResource.new()
+        resource.initializeNotifier KEY
+        record = yield resource.create body: test_entity: test: 'test3'
+        result = yield resource.delete
           pathParams: test_entity: record.id
         assert.propertyVal result, 'isHidden', yes
         yield return
   describe '#execute', ->
     it 'should call execution', ->
       co ->
-        KEY = 'TEST_STOCK_008'
+        KEY = 'TEST_RESOURCE_008'
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
@@ -648,19 +648,19 @@ describe 'Stock', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
               @super arguments...
               @_type = 'Test::TestRecord'
         Test::TestRecord.initialize()
-        class Test::TestStock extends LeanRC::Stock
+        class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
-          @include LeanRC::BulkActionsStockMixin
+          @include LeanRC::BulkActionsResourceMixin
           @module Test
           @public entityName: String, { default: 'TestEntity' }
-        Test::TestStock.initialize()
+        Test::TestResource.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableMixin
@@ -701,17 +701,17 @@ describe 'Stock', ->
           serializer: LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
-        stock = Test::TestStock.new()
-        stock.initializeNotifier KEY
-        yield stock.create body: test_entity: test: 'test1'
-        yield stock.create body: test_entity: test: 'test2'
-        yield stock.create body: test_entity: test: 'test2'
-        spySendNotitfication = sinon.spy stock, 'sendNotification'
+        resource = Test::TestResource.new()
+        resource.initializeNotifier KEY
+        yield resource.create body: test_entity: test: 'test1'
+        yield resource.create body: test_entity: test: 'test2'
+        yield resource.create body: test_entity: test: 'test2'
+        spySendNotitfication = sinon.spy resource, 'sendNotification'
         testBody =
           queryParams: query: '{"test":{"$eq":"test2"}}'
           reverse: 'TEST_REVERSE'
         notification = LeanRC::Notification.new 'TEST_NAME', testBody, 'list'
-        yield stock.execute notification
+        yield resource.execute notification
         [ name, body, type ] = spySendNotitfication.args[0]
         assert.equal name, LeanRC::HANDLER_RESULT
         { meta, items } = body

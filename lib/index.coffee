@@ -46,7 +46,7 @@ class LeanRC extends RC
   require('./interfaces/patterns/EndpointInterface') LeanRC
   require('./interfaces/patterns/GatewayInterface') LeanRC
   require('./interfaces/patterns/RendererInterface') LeanRC
-  require('./interfaces/patterns/StockInterface') LeanRC
+  require('./interfaces/patterns/ResourceInterface') LeanRC
   require('./interfaces/patterns/RouterInterface') LeanRC
   require('./interfaces/patterns/SwitchInterface') LeanRC
 
@@ -108,13 +108,13 @@ class LeanRC extends RC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
-  require('./patterns/command/Stock') LeanRC
+  require('./patterns/command/Resource') LeanRC
   require('./patterns/command/MigrateCommand') LeanRC
   require('./patterns/command/RollbackCommand') LeanRC
   require('./patterns/command/Script') LeanRC
   require('./patterns/command/DelayedJobScript') LeanRC
 
-  require('./mixins/BulkActionsStockMixin') LeanRC
+  require('./mixins/BulkActionsResourceMixin') LeanRC
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC

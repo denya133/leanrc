@@ -18,7 +18,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) ->
               Test::TestRecord
         Test::TestRecord.initialize()
@@ -36,14 +36,14 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) ->
               Test::TestRecord
         Test::TestRecord.initialize()
         parsedName = Test::TestRecord.parseRecordName 'test-record'
         assert.deepEqual parsedName, ['Test', 'TestRecord'], 'Parsed incorrectly'
         parsedName = Test::TestRecord.parseRecordName 'Tester::Test'
-        assert.deepEqual parsedName, ['Tester', 'Test'], 'Parsed incorrectly'
+        assert.deepEqual parsedName, ['Tester', 'TestRecord'], 'Parsed incorrectly'
       .to.not.throw Error
   describe '#parseRecordName', ->
     it 'should record name in instance from text', ->
@@ -56,7 +56,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) ->
               Test::TestRecord
         Test::TestRecord.initialize()
@@ -64,7 +64,7 @@ describe 'RecordMixin', ->
         parsedName = vsRecord.parseRecordName 'test-record'
         assert.deepEqual parsedName, ['Test', 'TestRecord'], 'Parsed incorrectly'
         parsedName = vsRecord.parseRecordName 'Tester::Test'
-        assert.deepEqual parsedName, ['Tester', 'Test'], 'Parsed incorrectly'
+        assert.deepEqual parsedName, ['Tester', 'TestRecord'], 'Parsed incorrectly'
       .to.not.throw Error
   describe '.parentClassNames', ->
     it 'should get records class parent class names', ->
@@ -77,7 +77,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) ->
               Test::TestRecord
         Test::TestRecord.initialize()
@@ -95,7 +95,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attribute string: String
           @attr number: Number
@@ -120,7 +120,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @computed string: String,
             get: (aoData) -> aoData
@@ -176,7 +176,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include TestsModule::RecordMixin
           @module TestsModule
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> TestsModule::TestRecord
         TestRecord.initialize()
         collection = TestsModule::TestsCollection.new KEY
@@ -227,7 +227,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include TestsModule::RecordMixin
           @module TestsModule
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> TestsModule::TestRecord
         TestRecord.initialize()
         collection = TestsModule::TestsCollection.new KEY
@@ -286,7 +286,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include TestsModule::RecordMixin
           @module TestsModule
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> TestsModule::TestRecord
           @attr test: String
         TestRecord.initialize()
@@ -339,7 +339,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: String
         Test::TestRecord.initialize()
@@ -390,7 +390,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: String
         Test::TestRecord.initialize()
@@ -435,7 +435,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: String
         Test::TestRecord.initialize()
@@ -492,7 +492,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: String
         Test::TestRecord.initialize()
@@ -543,7 +543,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: Number
           @attr has: Boolean
@@ -602,7 +602,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: Number
           @attr has: Boolean
@@ -664,7 +664,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::BasicTestRecord
           @attribute updatedAt: Date
           @attribute test: Number
@@ -674,7 +674,7 @@ describe 'RecordMixin', ->
         class Test::TestRecord extends Test::BasicTestRecord
           @inheritProtected()
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
         Test::TestRecord.initialize()
         collection = Test::Collection.new KEY
@@ -725,7 +725,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: Number
           @attr has: Boolean
@@ -758,7 +758,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: Number
           @attr has: Boolean

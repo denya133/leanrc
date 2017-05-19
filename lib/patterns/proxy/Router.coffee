@@ -87,6 +87,8 @@ module.exports = (Module)->
           throw new Error 'options `to` or `resource` must be defined'
         unless action?
           action = path
+        unless /[/]$/.test resource
+          resource += '/'
 
         path = switch at ? @[ipsAt]
           when 'member'

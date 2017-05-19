@@ -134,7 +134,7 @@ describe 'RollbackCommand', ->
           class TestMigration extends LeanRC::Migration
             @inheritProtected()
             @module Module
-            @public @static findModelByName: Function,
+            @public @static findRecordByName: Function,
               default: -> Test::TestMigration
             @public init: Function,
               default: (args...) ->
@@ -197,7 +197,7 @@ describe 'RollbackCommand', ->
           class TestMigration extends LeanRC::Migration
             @inheritProtected()
             @module Module
-            @public @static findModelByName: Function,
+            @public @static findRecordByName: Function,
               default: -> Test::TestMigration
             @public init: Function,
               default: (args...) ->

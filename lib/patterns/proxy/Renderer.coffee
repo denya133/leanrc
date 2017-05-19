@@ -52,7 +52,10 @@ module.exports = (Module)->
         if path? and resource? and action?
           templatePath = resource + action
           templates = yield @templates
-          renderedResult = templates[templatePath]? resource, action, aoData
+          renderedResult = if templates[templatePath]?
+            yield templates[templatePath] resource, action, aoData
+          else
+            null
           res = JSON.stringify renderedResult ? aoData ? null
           yield return res
         else
