@@ -337,7 +337,6 @@ describe 'ThinHttpCollectionMixin', ->
         url = collection.buildURL 'Test', 'SNAP', 'test', 'QUE'
         assert.equal url, 'TEST_Test_SNAP_test_QUE'
         yield return
-  ###
   describe '#urlForRequest', ->
     it 'should get url from request params', ->
       co ->
@@ -358,40 +357,45 @@ describe 'ThinHttpCollectionMixin', ->
         url = collection.urlForRequest
           recordName: 'Test'
           snapshot: {}
-          requestType: 'find'
-          query: {}
+          requestType: 'list'
         assert.equal url, 'http://localhost:8000/v1/tests'
         url = collection.urlForRequest
           recordName: 'Test'
           snapshot: {}
-          requestType: 'insert'
-          query: {}
+          requestType: 'detail'
+          id: 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
+        url = collection.urlForRequest
+          recordName: 'Test'
+          snapshot: {}
+          requestType: 'create'
         assert.equal url, 'http://localhost:8000/v1/tests'
         url = collection.urlForRequest
           recordName: 'Test'
           snapshot: {}
           requestType: 'update'
-          query: {}
-        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+          id: 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
         url = collection.urlForRequest
           recordName: 'Test'
           snapshot: {}
           requestType: 'replace'
-          query: {}
-        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+          id: 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
         url = collection.urlForRequest
           recordName: 'Test'
           snapshot: {}
-          requestType: 'remove'
-          query: {}
-        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+          requestType: 'delete'
+          id: 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
         url = collection.urlForRequest
           recordName: 'Test'
           snapshot: 'SNAP'
           requestType: 'test'
-          query: 'QUE'
+          id: 'QUE'
         assert.equal url, 'TEST_Test_SNAP_test_QUE'
         yield return
+  ###
   describe '#headersForRequest', ->
     it 'should get headers for collection', ->
       co ->
