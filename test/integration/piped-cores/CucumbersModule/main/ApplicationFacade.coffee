@@ -22,6 +22,7 @@ module.exports = (Module) ->
         @super args...
         @registerCommand STARTUP, StartupCommand
         # ... здесь могут быть регистрации и других команд
+        return
 
     @public startup: Function,
       default: (aoApplication)->
@@ -29,6 +30,7 @@ module.exports = (Module) ->
           @[vpbIsInitialized] = yes
           @sendNotification STARTUP, aoApplication
           @sendNotification START_RESQUE
+        return
 
     @public @static getInstance: Function,
       default: (asKey)->

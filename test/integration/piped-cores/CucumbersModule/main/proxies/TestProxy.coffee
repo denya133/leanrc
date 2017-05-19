@@ -3,8 +3,6 @@
 
 module.exports = (Module)->
   {
-    CUSTOM_COMMAND
-
     Proxy
     DelayableMixin
   } = Module::
@@ -14,9 +12,6 @@ module.exports = (Module)->
     @include DelayableMixin
     @module Module
     @public @static test: Function,
-      default: (multitonKey)->
-        facade = @Module::Facade.getInstance multitonKey
-        facade.sendNotification CUSTOM_COMMAND
-        return
+      default: ->
 
   TestProxy.initialize()

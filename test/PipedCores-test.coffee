@@ -299,7 +299,7 @@ describe 'PipedCores', ->
         app = CucumbersApp::ShellApplication.new()
         app.facade.sendNotification(CucumbersApp::LogMessage.SEND_TO_LOG, TEST_LOG_MESSAGE, CucumbersApp::LogMessage.LEVELS[CucumbersApp::LogMessage.DEBUG])
 
-        facade = CucumbersApp::Facade.getInstance 'CucumbersLogger'
+        facade = CucumbersApp::ApplicationFacade.getInstance 'CucumbersLogger'
 
         logs = facade.retrieveProxy CucumbersApp::Application::LOGGER_PROXY
         assert.equal logs.messages[0].getHeader().logLevel, CHANGE
@@ -324,7 +324,7 @@ describe 'PipedCores', ->
         app = TomatosApp::ShellApplication.new()
         app.facade.sendNotification(TomatosApp::LogMessage.SEND_TO_LOG, TEST_LOG_MESSAGE, TomatosApp::LogMessage.LEVELS[TomatosApp::LogMessage.DEBUG])
 
-        facade = TomatosApp::Facade.getInstance 'TomatosLogger'
+        facade = TomatosApp::ApplicationFacade.getInstance 'TomatosLogger'
 
         logs = facade.retrieveProxy TomatosApp::Application::LOGGER_PROXY
         assert.equal logs.messages[0].getHeader().logLevel, CHANGE
@@ -631,19 +631,46 @@ describe 'PipedCores', ->
         class TestCommand extends Test::SimpleCommand
           @inheritProtected()
           @module Test
-          @public execute: Function, { default: ->  trigger.emit 'STOPPED', 'ARG' }
+          @public execute: Function,
+            default: (note) ->  trigger.emit 'STOPPED', note.getBody() ? 'ARG'
         TestCommand.initialize()
         app = Test::ShellApplication.new()
         { main } = app.facade.retrieveMediator Test::MainModuleMediator.name
-        mainMultitonKey = main.facade[Symbol.for '~multitonKey']
-        main.facade.registerCommand main.Module::CUSTOM_COMMAND, Test::TestCommand
+        main.facade.registerCommand Test::JOB_RESULT, Test::TestCommand
         proxy = main.facade.retrieveProxy main.Module::TEST_PROXY_NAME
-        promise = waitForStop()
         UNTIL_TIME = Date.now() + 1000
         yield proxy.constructor.delay main.facade,
           queue: Test::DEFAULT_QUEUE
           delayUntil: UNTIL_TIME
-        .test mainMultitonKey
+        .test()
+        promise = waitForStop()
+        res = yield promise
+        assert.equal res, 'ARG'
+        assert.isAtMost UNTIL_TIME, Date.now()
+        app.finish()
+        yield return
+  describe 'Start script', ->
+    it 'should run operation asynchroniously', ->
+      co ->
+        trigger = new EventEmitter
+        waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
+        class Test extends CucumbersApp
+          @inheritProtected()
+        Test.initialize()
+        class TestCommand extends Test::SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function,
+            default: (note) ->  trigger.emit 'STOPPED', note.getBody() ? 'ARG'
+        TestCommand.initialize()
+        app = Test::ShellApplication.new()
+        { main } = app.facade.retrieveMediator Test::MainModuleMediator.name
+        main.facade.registerCommand Test::JOB_RESULT, Test::TestCommand
+        resque = main.facade.retrieveProxy Test::RESQUE
+        queue = yield resque.get Test::DEFAULT_QUEUE
+        promise = waitForStop()
+        UNTIL_TIME = Date.now() + 1000
+        queue.push 'TestScript', {}, UNTIL_TIME
         res = yield promise
         assert.equal res, 'ARG'
         assert.isAtMost UNTIL_TIME, Date.now()
