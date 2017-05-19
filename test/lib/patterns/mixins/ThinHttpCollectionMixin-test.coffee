@@ -434,7 +434,6 @@ describe 'ThinHttpCollectionMixin', ->
         data = collection.dataForRequest snapshot: test: 'test2'
         assert.deepEqual data, { test: 'test2' }
         yield return
-  ###
   describe '#~requestFor', ->
     it 'should request params', ->
       co ->
@@ -453,59 +452,69 @@ describe 'ThinHttpCollectionMixin', ->
         request = collection[Symbol.for '~requestFor']
           recordName: 'TestRecord'
           snapshot: sampleData
-          requestType: 'find'
-          query: test: 'test'
+          requestType: 'list'
         assert.deepEqual request,
           method: 'GET'
           url: 'http://localhost:8000/v1/tests'
           headers: {}
           data: sampleData
-          query: test: 'test'
+          id: undefined
         request = collection[Symbol.for '~requestFor']
           recordName: 'TestRecord'
           snapshot: sampleData
-          requestType: 'insert'
-          query: test: 'test'
+          requestType: 'detail'
+          id: 'id-123'
+        assert.deepEqual request,
+          method: 'GET'
+          url: 'http://localhost:8000/v1/tests/id-123'
+          headers: {}
+          data: sampleData
+          id: 'id-123'
+        request = collection[Symbol.for '~requestFor']
+          recordName: 'TestRecord'
+          snapshot: sampleData
+          requestType: 'create'
         assert.deepEqual request,
           method: 'POST'
           url: 'http://localhost:8000/v1/tests'
           headers: {}
           data: sampleData
-          query: test: 'test'
+          id: undefined
         request = collection[Symbol.for '~requestFor']
           recordName: 'TestRecord'
           snapshot: sampleData
           requestType: 'update'
-          query: test: 'test'
+          id: 'id-123'
         assert.deepEqual request,
           method: 'PATCH'
-          url: 'http://localhost:8000/v1/tests/bulk'
+          url: 'http://localhost:8000/v1/tests/id-123'
           headers: {}
           data: sampleData
-          query: test: 'test'
+          id: 'id-123'
         request = collection[Symbol.for '~requestFor']
           recordName: 'TestRecord'
           snapshot: sampleData
           requestType: 'replace'
-          query: test: 'test'
+          id: 'id-123'
         assert.deepEqual request,
           method: 'PUT'
-          url: 'http://localhost:8000/v1/tests/bulk'
+          url: 'http://localhost:8000/v1/tests/id-123'
           headers: {}
           data: sampleData
-          query: test: 'test'
+          id: 'id-123'
         request = collection[Symbol.for '~requestFor']
           recordName: 'TestRecord'
           snapshot: sampleData
-          requestType: 'remove'
-          query: test: 'test'
+          requestType: 'delete'
+          id: 'id-123'
         assert.deepEqual request,
           method: 'DELETE'
-          url: 'http://localhost:8000/v1/tests/bulk'
+          url: 'http://localhost:8000/v1/tests/id-123'
           headers: {}
           data: sampleData
-          query: test: 'test'
+          id: 'id-123'
         yield return
+  ###
   describe '#push', ->
     before ->
       server.listen 8000
