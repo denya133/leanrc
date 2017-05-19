@@ -24,7 +24,6 @@ describe 'ThinHttpCollectionMixin', ->
         collection = Test::HttpCollection.new()
         assert.instanceOf collection, Test::HttpCollection
         yield return
-  ###
   describe '#~sendRequest', ->
     before ->
       server.listen 8000
@@ -32,7 +31,7 @@ describe 'ThinHttpCollectionMixin', ->
       server.close()
     it 'should make simple request', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_000'
+        KEY = 'FACADE_TEST_THIN_HTTP_COLLECTION_000'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -63,7 +62,9 @@ describe 'ThinHttpCollectionMixin', ->
           options: json: yes
         assert.equal data.status, 200
         assert.equal data.body?.message, 'OK'
+        facade.remove()
         yield return
+  ###
   describe '#~requestToHash, #~makeRequest', ->
     before ->
       server.listen 8000
@@ -71,7 +72,7 @@ describe 'ThinHttpCollectionMixin', ->
       server.close()
     it 'should make simple request', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_001'
+        KEY = 'FACADE_TEST_THIN_HTTP_COLLECTION_001'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -107,6 +108,7 @@ describe 'ThinHttpCollectionMixin', ->
           url: 'http://localhost:8000'
         assert.equal data.status, 200, 'Request received not OK status'
         assert.equal data?.body?.message, 'OK', 'Incorrect body'
+        facade.remove()
         yield return
   describe '#methodForRequest', ->
     it 'should get method name from request params', ->
@@ -133,6 +135,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal method, 'DELETE', 'Remove method is incorrect'
         method = collection.methodForRequest requestType: 'someOther'
         assert.equal method, 'GET', 'Any other method is incorrect'
+        facade.remove()
         yield return
   describe '#~urlPrefix', ->
     it 'should get url prefix', ->
@@ -155,6 +158,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/Test'
         url = collection[Symbol.for '~urlPrefix']()
         assert.equal url, 'http://localhost:8000/v1'
+        facade.remove()
         yield return
   describe '#pathForType', ->
     it 'should get url for type', ->
@@ -177,6 +181,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'tests'
         url = collection.pathForType 'test-info'
         assert.equal url, 'test_infos'
+        facade.remove()
         yield return
   describe '#~buildURL', ->
     it 'should get url from request params', ->
@@ -197,6 +202,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         url = collection[Symbol.for '~buildURL'] 'Test', {}, no
         assert.equal url, 'http://localhost:8000/v1/tests'
+        facade.remove()
         yield return
   describe '#urlForFind', ->
     it 'should get url for find request', ->
@@ -217,6 +223,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/tests'
         url = collection.urlForFind 'TestRecord', {}
         assert.equal url, 'http://localhost:8000/v1/tests'
+        facade.remove()
         yield return
   describe '#urlForInsert', ->
     it 'should get url for insert request', ->
@@ -237,6 +244,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/tests'
         url = collection.urlForInsert 'TestRecord', {}
         assert.equal url, 'http://localhost:8000/v1/tests'
+        facade.remove()
         yield return
   describe '#urlForUpdate', ->
     it 'should get url for insert request', ->
@@ -257,6 +265,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         url = collection.urlForUpdate 'TestRecord', {}
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        facade.remove()
         yield return
   describe '#urlForReplace', ->
     it 'should get url for insert request', ->
@@ -277,6 +286,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         url = collection.urlForReplace 'TestRecord', {}
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        facade.remove()
         yield return
   describe '#urlForRemove', ->
     it 'should get url for insert request', ->
@@ -297,6 +307,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         url = collection.urlForRemove 'TestRecord', {}
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        facade.remove()
         yield return
   describe '#buildURL', ->
     it 'should get url from request params', ->
@@ -328,6 +339,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         url = collection.buildURL 'Test', 'SNAP', 'test', 'QUE'
         assert.equal url, 'TEST_Test_SNAP_test_QUE'
+        facade.remove()
         yield return
   describe '#urlForRequest', ->
     it 'should get url from request params', ->
@@ -383,6 +395,7 @@ describe 'ThinHttpCollectionMixin', ->
           requestType: 'test'
           query: 'QUE'
         assert.equal url, 'TEST_Test_SNAP_test_QUE'
+        facade.remove()
         yield return
   describe '#headersForRequest', ->
     it 'should get headers for collection', ->
@@ -404,6 +417,7 @@ describe 'ThinHttpCollectionMixin', ->
         collection.headers = 'Allow': 'GET'
         headers = collection.headersForRequest()
         assert.deepEqual headers, { 'Allow': 'GET' }
+        facade.remove()
         yield return
   describe '#dataForRequest', ->
     it 'should get data for request', ->
@@ -424,6 +438,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.deepEqual data, { test: 'test1' }
         data = collection.dataForRequest snapshot: test: 'test2'
         assert.deepEqual data, { test: 'test2' }
+        facade.remove()
         yield return
   describe '#~requestFor', ->
     it 'should request params', ->
@@ -496,6 +511,7 @@ describe 'ThinHttpCollectionMixin', ->
           headers: {}
           data: sampleData
           query: test: 'test'
+        facade.remove()
         yield return
   describe '#push', ->
     before ->
@@ -504,7 +520,7 @@ describe 'ThinHttpCollectionMixin', ->
       server.close()
     it 'should put data into collection', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_002'
+        KEY = 'FACADE_TEST_THIN_HTTP_COLLECTION_002'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -537,6 +553,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal record, spyPush.args[0][0]
         assert.equal spyQuery.args[0][0].$insert, record
         assert.equal spyQuery.args[0][0].$into, collection.collectionFullName()
+        facade.remove()
         yield return
   describe '#remove', ->
     before ->
@@ -545,7 +562,7 @@ describe 'ThinHttpCollectionMixin', ->
       server.close()
     it 'should remove data from collection', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_003'
+        KEY = 'FACADE_TEST_THIN_HTTP_COLLECTION_003'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -578,6 +595,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.deepEqual spyQuery.args[1][0].$forIn, { '@doc': 'test_tests' }
         assert.deepEqual spyQuery.args[1][0].$filter, { '@doc._key': { '$eq': record.id } }
         assert.isTrue spyQuery.args[1][0].$remove
+        facade.remove()
         yield return
   describe '#take', ->
     before ->
@@ -586,7 +604,7 @@ describe 'ThinHttpCollectionMixin', ->
       server.close()
     it 'should get data item by id from collection', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_004'
+        KEY = 'FACADE_TEST_THIN_HTTP_COLLECTION_004'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -618,6 +636,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.notEqual record, recordDuplicate
         for attribute in Test::TestRecord.attributes
           assert.equal record[attribute], recordDuplicate[attribute]
+        facade.remove()
         yield return
   describe '#takeMany', ->
     before ->
@@ -626,7 +645,7 @@ describe 'ThinHttpCollectionMixin', ->
       server.close()
     it 'should get data items by id list from collection', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_005'
+        KEY = 'FACADE_TEST_THIN_HTTP_COLLECTION_005'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -663,6 +682,7 @@ describe 'ThinHttpCollectionMixin', ->
         for i in [ 1 .. count ]
           for attribute in Test::TestRecord.attributes
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
+        facade.remove()
         yield return
   describe '#takeAll', ->
     before ->
@@ -671,7 +691,7 @@ describe 'ThinHttpCollectionMixin', ->
       server.close()
     it 'should get all data items from collection', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_006'
+        KEY = 'FACADE_TEST_THIN_HTTP_COLLECTION_006'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -708,6 +728,7 @@ describe 'ThinHttpCollectionMixin', ->
         for i in [ 1 .. count ]
           for attribute in Test::TestRecord.attributes
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
+        facade.remove()
         yield return
   describe '#override', ->
     before ->
@@ -716,7 +737,7 @@ describe 'ThinHttpCollectionMixin', ->
       server.close()
     it 'should replace data item by id in collection', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_007'
+        KEY = 'FACADE_TEST_THIN_HTTP_COLLECTION_007'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -749,6 +770,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'
         assert.propertyVal updatedRecord, 'test', 'test2'
+        facade.remove()
         yield return
   describe '#patch', ->
     before ->
@@ -757,7 +779,7 @@ describe 'ThinHttpCollectionMixin', ->
       server.close()
     it 'should update data item by id in collection', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_008'
+        KEY = 'FACADE_TEST_THIN_HTTP_COLLECTION_008'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -790,6 +812,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'
         assert.propertyVal updatedRecord, 'test', 'test2'
+        facade.remove()
         yield return
   describe '#includes', ->
     before ->
@@ -798,7 +821,7 @@ describe 'ThinHttpCollectionMixin', ->
       server.close()
     it 'should test if item is included in the collection', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_009'
+        KEY = 'FACADE_TEST_THIN_HTTP_COLLECTION_009'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -829,6 +852,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.isDefined record
         includes = yield collection.includes record.id
         assert.isTrue includes
+        facade.remove()
         yield return
   describe '#length', ->
     before ->
@@ -837,7 +861,7 @@ describe 'ThinHttpCollectionMixin', ->
       server.close()
     it 'should count items in the collection', ->
       co ->
-        KEY = 'FACADE_TEST_HTTP_COLLECTION_010'
+        KEY = 'FACADE_TEST_THIN_HTTP_COLLECTION_010'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -869,5 +893,6 @@ describe 'ThinHttpCollectionMixin', ->
           yield collection.create test: 'test1'
         length = yield collection.length()
         assert.equal count, length
+        facade.remove()
         yield return
   ###
