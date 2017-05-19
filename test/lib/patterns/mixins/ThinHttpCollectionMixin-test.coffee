@@ -194,7 +194,6 @@ describe 'ThinHttpCollectionMixin', ->
         url = collection[Symbol.for '~buildURL'] 'Test', 'test123'
         assert.equal url, 'http://localhost:8000/v1/tests/test123'
         yield return
-  ###
   describe '#urlForFind', ->
     it 'should get url for find request', ->
       co ->
@@ -209,12 +208,16 @@ describe 'ThinHttpCollectionMixin', ->
           @public namespace: String, { default: 'v1' }
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
-        url = collection.urlForFind 'Test', {}
+        url = collection.urlForFind 'Test'
         assert.equal url, 'http://localhost:8000/v1/tests'
-        url = collection.urlForFind 'TestRecord', {}
+        url = collection.urlForFind 'Test', 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
+        url = collection.urlForFind 'TestRecord'
         assert.equal url, 'http://localhost:8000/v1/tests'
-        facade.remove()
+        url = collection.urlForFind 'TestRecord', 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
         yield return
+  ###
   describe '#urlForInsert', ->
     it 'should get url for insert request', ->
       co ->
