@@ -6,6 +6,7 @@ module.exports = (Module) ->
     PrepareControllerCommand
     PrepareViewCommand
     PrepareModelCommand
+    StartMainResqueExecutorCommand
   } = Module::
 
   class StartupCommand extends MacroCommand
@@ -17,5 +18,6 @@ module.exports = (Module) ->
         @addSubCommand PrepareControllerCommand
         @addSubCommand PrepareModelCommand
         @addSubCommand PrepareViewCommand
+        # @addSubCommand StartMainResqueExecutorCommand
 
   StartupCommand.initialize()

@@ -6,6 +6,7 @@ module.exports = (Module) ->
     RESQUE
     APPLICATION_RENDERER
     APPLICATION_ROUTER
+    TEST_PROXY_NAME
 
     SimpleCommand
     Configuration
@@ -14,6 +15,7 @@ module.exports = (Module) ->
     CucumberRecord
     Renderer
     ApplicationRouter
+    TestProxy
   } = Module::
 
   class PrepareModelCommand extends SimpleCommand
@@ -28,6 +30,7 @@ module.exports = (Module) ->
           delegate: CucumberRecord
         @facade.registerProxy Renderer.new APPLICATION_RENDERER
         @facade.registerProxy ApplicationRouter.new APPLICATION_ROUTER
+        @facade.registerProxy TestProxy.new TEST_PROXY_NAME
 
 
   PrepareModelCommand.initialize()

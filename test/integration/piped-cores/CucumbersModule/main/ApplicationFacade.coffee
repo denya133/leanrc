@@ -3,6 +3,7 @@
 module.exports = (Module) ->
   {
     STARTUP
+    START_RESQUE
 
     Facade
     StartupCommand
@@ -27,6 +28,7 @@ module.exports = (Module) ->
         unless @[vpbIsInitialized]
           @[vpbIsInitialized] = yes
           @sendNotification STARTUP, aoApplication
+          @sendNotification START_RESQUE
 
     @public @static getInstance: Function,
       default: (asKey)->

@@ -34,7 +34,7 @@ module.exports = (Module)->
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  { ANY, NILL, DEFAULT_QUEUE } = Module::
 
   Module.defineMixin Module::Resque, (BaseClass) ->
     class MemoryResqueMixin extends BaseClass
@@ -48,17 +48,18 @@ module.exports = (Module)->
           @super args...
           @[ipoDelayedQueues] = {}
           @[ipoDelayedJobs] = {}
+          fullName = @fullQueueName DEFAULT_QUEUE
+          @[ipoDelayedQueues][fullName] = name: DEFAULT_QUEUE, concurrency: 1
           return
 
       @public onRemove: Function,
         default: (args...)->
           @super args...
-          for own queueName, queuedJobs of @[ipoDelayedQueues]
-            for own jobId, job of queuedJobs
-              delete queuedJobs.jobId
-              return
-            delete @[ipoDelayedQueues].queueName
-            return
+          for queueName in Reflect.ownKeys @[ipoDelayedQueues]
+            queuedJobs = @[ipoDelayedQueues][queueName]
+            for jobId in Reflect.ownKeys queuedJobs
+              delete queuedJobs[jobId]
+            delete @[ipoDelayedQueues][queueName]
           @[ipoDelayedQueues] = undefined
           @[ipoDelayedJobs] = undefined
           return

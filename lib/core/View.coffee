@@ -23,7 +23,7 @@ module.exports = (Module)->
     @public @static removeView: Function,
       default: (asKey)->
         if (voView = View[cphInstanceMap][asKey])?
-          for own asMediatorName of voView[iphMediatorMap]
+          for asMediatorName in Reflect.ownKeys voView[iphMediatorMap]
             voView.removeMediator asMediatorName
           View[cphInstanceMap][asKey] = undefined
           delete View[cphInstanceMap][asKey]

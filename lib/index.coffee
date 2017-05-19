@@ -21,6 +21,7 @@ class LeanRC extends RC
   @const START_RESQUE: Symbol 'start_resque'
   @const DELAYED_JOBS_QUEUE: 'delayed_jobs'
   @const DELAYED_JOBS_SCRIPT: 'DelayedJobScript'
+  @const DEFAULT_QUEUE: 'default'
   @const JOB_RESULT:  Symbol 'JOB_RESULT'
   @const SHELL:  Symbol 'ShellApplication'
   @const APPLICATION_MEDIATOR:  Symbol 'ApplicationMediator'
