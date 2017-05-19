@@ -175,7 +175,6 @@ describe 'ThinHttpCollectionMixin', ->
         url = collection.pathForType 'test-info'
         assert.equal url, 'test_infos'
         yield return
-  ###
   describe '#~buildURL', ->
     it 'should get url from request params', ->
       co ->
@@ -190,12 +189,12 @@ describe 'ThinHttpCollectionMixin', ->
           @public namespace: String, { default: 'v1' }
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
-        url = collection[Symbol.for '~buildURL'] 'Test', {}
-        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
-        url = collection[Symbol.for '~buildURL'] 'Test', {}, no
+        url = collection[Symbol.for '~buildURL'] 'Test'
         assert.equal url, 'http://localhost:8000/v1/tests'
-        facade.remove()
+        url = collection[Symbol.for '~buildURL'] 'Test', 'test123'
+        assert.equal url, 'http://localhost:8000/v1/tests/test123'
         yield return
+  ###
   describe '#urlForFind', ->
     it 'should get url for find request', ->
       co ->
