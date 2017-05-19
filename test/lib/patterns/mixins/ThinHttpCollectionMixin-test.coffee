@@ -64,7 +64,6 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal data.body?.message, 'OK'
         facade.remove()
         yield return
-  ###
   describe '#~requestToHash, #~makeRequest', ->
     before ->
       server.listen 8000
@@ -110,6 +109,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal data?.body?.message, 'OK', 'Incorrect body'
         facade.remove()
         yield return
+  ###
   describe '#methodForRequest', ->
     it 'should get method name from request params', ->
       co ->
