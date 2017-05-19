@@ -49,6 +49,7 @@ module.exports = (Module)->
     # may be redefine at inheritance
     @public @async render: Function,
       default: (aoData, {path, resource, action} = {})->
+        # TODO: надо решить вопрос с рендерингом темплейта Ошибка (404, 4хх, 500, 5хх)
         if path? and resource? and action?
           templatePath = resource + action
           templates = yield @templates

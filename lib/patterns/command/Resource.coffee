@@ -14,6 +14,105 @@ module.exports = (Module)->
 
     # @public entityName: String # Имя сущности должно быть установлено при объявлении дочернего класса
 
+    # TODO: надо будет в будущем решить вопрос где должны быть эти вещи:
+    ###
+
+    @initialHook 'initializeDependencies'
+    @initialHook 'checkApiVersion'
+
+    @beforeHook 'permitBody',       only: ['create', 'update']
+    @beforeHook 'setOwnerId',       only: ['create']
+    @beforeHook 'protectOwnerId',   only: ['update']
+    @beforeHook 'protectSpaceId',   only: ['update']
+
+    initializeDependencies: (args...)->
+      console.log '???? test @Module', @Module
+      @constructor.Module.initializeModules()
+      args
+
+    checkApiVersion: (args...)->
+      vVersion = @req.pathParams.v
+      vCurrentVersion = @constructor.Module.context.manifest.version
+      [vNeedVersion] = vCurrentVersion.match /^\d{1,}[.]\d{1,}/
+      sendError = =>
+        @res.throw UPGRADE_REQUIRED, "Upgrade: v#{vNeedVersion}"
+      unless /^[v]\d{1,}[.]\d{1,}/.test vVersion
+        sendError()
+      unless new RegExp(vVersion).test "v#{vCurrentVersion}"
+        sendError()
+      args
+
+    setOwnerId: ->
+      @isValid()
+      @body.ownerId = @currentUser?._key ? null
+      return
+
+    protectOwnerId: ->
+      @isValid()
+      @body = _.omit @body, ['ownerId']
+      return
+
+    protectSpaceId: ->
+      @isValid()
+      @body = _.omit @body, ['spaceId']
+      return
+
+    beforeLimitedList: (query = {}) ->
+      { currentUser } = @req
+      if currentUser? and not currentUser.isAdmin
+        query.ownerId = currentUser._key
+      {@query, @currentUser} = {query, currentUser}
+      return
+
+    _checkHeader: (req) ->
+      { apiKey }        = @Module.context.configuration
+      {
+        authorization: authHeader
+      } = req.headers
+      return no   unless authHeader?
+      [..., key] = (/^Bearer\s+(.+)$/.exec authHeader) ? []
+      return no   unless key?
+      encryptedApiKey = crypto.sha512 apiKey
+      crypto.constantEquals encryptedApiKey, key
+
+    checkSession: (args...)->
+      # Must be implemented CheckSessionMixin and inclede in all controllers
+      @req.currentUser = {}
+      args
+
+    checkOwner: @method [], ->
+      @isValid()
+      read: [ @Model.collectionName() ]
+    , (args...) ->
+      @isValid()
+      unless @req.session?.uid? and @req.currentUser?
+        @res.throw UNAUTHORIZED
+        return
+      if @req.currentUser.isAdmin
+        return args
+      unless (key = @req.pathParams[@constructor.keyName()])?
+        return args
+      doc = @Model.find key, @req.currentUser
+      unless doc?
+        @res.throw HTTP_NOT_FOUND
+      unless doc._owner
+        return args
+      if @req.currentUser._key isnt doc._owner
+        @res.throw FORBIDDEN
+        return
+      args
+
+    adminOnly: (args...) ->
+      unless @req.session?.uid? and @req.currentUser?
+        @res.throw UNAUTHORIZED
+        return
+      unless @req.currentUser.isAdmin
+        @res.throw FORBIDDEN
+        return
+      args
+
+    ###
+
     @public keyName: String,
       get: ->
         inflect.singularize inflect.underscore @entityName
