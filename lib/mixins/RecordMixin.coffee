@@ -131,14 +131,16 @@ module.exports = (Module)->
 
       @public @static new: Function,
         default: (aoAttributes, aoCollection)->
-          if (aoAttributes ? {}).type?
+          aoAttributes ?= {}
+          if aoAttributes.type?
             if @name is aoAttributes.type.split('::')[1]
               @super arguments...
             else
               RecordClass = @findRecordByName aoAttributes.type
               RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
           else
-            @super arguments...
+            aoAttributes.type = "#{@moduleName()}::#{@name}"
+            @super aoAttributes, aoCollection
 
       @public @async save: Function,
         default: ->
