@@ -19,7 +19,7 @@ module.exports = (Module)->
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
-          body = JSON.parse body ? "{}"
+          body = (try JSON.parse body ? "{}") ? body
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async remove: Function,
@@ -42,7 +42,7 @@ module.exports = (Module)->
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
-          body = JSON.parse body ? "{}"
+          body = (try JSON.parse body ? "{}") ? body
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async takeMany: Function,
@@ -61,7 +61,7 @@ module.exports = (Module)->
           { body } = voData
           pluralKey = @collectionName()
           # console.log '>>>>>MMMDDD', voData, body, pluralKey, '=====', body[pluralKey]
-          body = JSON.parse body ? "{\"#{pluralKey}\":[]}"
+          body = (try JSON.parse body ? "{\"#{pluralKey}\":[]}") ? body
           # console.log '>>>>>MMMDDD222', body, body[pluralKey]
           yield return Module::Cursor.new @, body[pluralKey]
 
@@ -76,7 +76,7 @@ module.exports = (Module)->
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
-          body = JSON.parse body ? "{}"
+          body = (try JSON.parse body ? "{}") ? body
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async patch: Function,
@@ -90,7 +90,7 @@ module.exports = (Module)->
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
-          body = JSON.parse body ? "{}"
+          body = (try JSON.parse body ? "{}") ? body
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async includes: Function,

@@ -514,7 +514,6 @@ describe 'ThinHttpCollectionMixin', ->
           data: sampleData
           id: 'id-123'
         yield return
-  ###
   describe '#push', ->
     before ->
       server.listen 8000
@@ -548,14 +547,12 @@ describe 'ThinHttpCollectionMixin', ->
           serializer: LeanRC::Serializer
         collection = facade.retrieveProxy KEY
         spyPush = sinon.spy collection, 'push'
-        spyQuery = sinon.spy collection, 'query'
         assert.instanceOf collection, Test::HttpCollection
         record = yield collection.create test: 'test1'
         assert.equal record, spyPush.args[0][0]
-        assert.equal spyQuery.args[0][0].$insert, record
-        assert.equal spyQuery.args[0][0].$into, collection.collectionFullName()
         facade.remove()
         yield return
+  ###
   describe '#remove', ->
     before ->
       server.listen 8000
