@@ -154,7 +154,6 @@ describe 'ThinHttpCollectionMixin', ->
         url = collection[Symbol.for '~urlPrefix']()
         assert.equal url, 'http://localhost:8000/v1'
         yield return
-  ###
   describe '#pathForType', ->
     it 'should get url for type', ->
       co ->
@@ -175,8 +174,8 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'tests'
         url = collection.pathForType 'test-info'
         assert.equal url, 'test_infos'
-        facade.remove()
         yield return
+  ###
   describe '#~buildURL', ->
     it 'should get url from request params', ->
       co ->
