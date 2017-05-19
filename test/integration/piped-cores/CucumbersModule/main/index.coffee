@@ -6,7 +6,6 @@ class CucumbersMain extends Cucumbers
 
   @root __dirname
 
-  @const CUSTOM_COMMAND: 'CUSTOM_COMMAND'
   @const TEST_PROXY_NAME: 'TEST_PROXY_NAME'
 
   require.main.require('lib/patterns/mediator/MemoryResqueExecutor') @Module
@@ -18,6 +17,7 @@ class CucumbersMain extends Cucumbers
   require('./proxies/MainResque') @Module
   require('./proxies/TestProxy') @Module
 
+  require('./commands/TestScript') @Module
   require('./commands/PrepareControllerCommand') @Module
   require('./commands/PrepareViewCommand') @Module
   require('./commands/PrepareModelCommand') @Module
