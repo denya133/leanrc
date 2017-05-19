@@ -19,7 +19,7 @@ describe 'RelationsMixin', ->
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) ->
               Test::TestRecord
         Test::TestRecord.initialize()
@@ -38,7 +38,7 @@ describe 'RelationsMixin', ->
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @belongsTo relation: LeanRC::Record,
             attr: 'relation_attr'
@@ -75,7 +75,7 @@ describe 'RelationsMixin', ->
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @hasMany manyRelation: LeanRC::Record,
             attr: 'relation_attr_many'
@@ -110,7 +110,7 @@ describe 'RelationsMixin', ->
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @hasOne oneRelation: LeanRC::Record,
             attr: 'relation_attr_one'
@@ -153,7 +153,7 @@ describe 'RelationsMixin', ->
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @belongsTo relation: LeanRC::RecordInterface,
             attr: 'relation_attr'

@@ -304,7 +304,7 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
@@ -374,7 +374,7 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
@@ -444,7 +444,7 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
@@ -505,7 +505,7 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
@@ -577,7 +577,7 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
@@ -648,7 +648,7 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->

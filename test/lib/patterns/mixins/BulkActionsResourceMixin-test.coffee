@@ -38,7 +38,7 @@ describe 'BulkActionsResourceMixin', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
@@ -108,7 +108,7 @@ describe 'BulkActionsResourceMixin', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
@@ -190,7 +190,7 @@ describe 'BulkActionsResourceMixin', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
@@ -272,7 +272,7 @@ describe 'BulkActionsResourceMixin', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findModelByName: Function,
+          @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @public init: Function,
             default: ->
