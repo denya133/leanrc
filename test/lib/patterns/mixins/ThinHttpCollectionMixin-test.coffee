@@ -236,7 +236,6 @@ describe 'ThinHttpCollectionMixin', ->
         url = collection.urlForInsert 'TestRecord'
         assert.equal url, 'http://localhost:8000/v1/tests'
         yield return
-  ###
   describe '#urlForUpdate', ->
     it 'should get url for insert request', ->
       co ->
@@ -251,12 +250,16 @@ describe 'ThinHttpCollectionMixin', ->
           @public namespace: String, { default: 'v1' }
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
-        url = collection.urlForUpdate 'Test', {}
-        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
-        url = collection.urlForUpdate 'TestRecord', {}
-        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
-        facade.remove()
+        url = collection.urlForUpdate 'Test'
+        assert.equal url, 'http://localhost:8000/v1/tests'
+        url = collection.urlForUpdate 'Test', 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
+        url = collection.urlForUpdate 'TestRecord'
+        assert.equal url, 'http://localhost:8000/v1/tests'
+        url = collection.urlForUpdate 'TestRecord', 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
         yield return
+  ###
   describe '#urlForReplace', ->
     it 'should get url for insert request', ->
       co ->
@@ -275,7 +278,6 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         url = collection.urlForReplace 'TestRecord', {}
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
-        facade.remove()
         yield return
   describe '#urlForRemove', ->
     it 'should get url for insert request', ->
@@ -295,7 +297,6 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         url = collection.urlForRemove 'TestRecord', {}
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
-        facade.remove()
         yield return
   describe '#buildURL', ->
     it 'should get url from request params', ->
@@ -326,7 +327,6 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal url, 'http://localhost:8000/v1/tests/bulk'
         url = collection.buildURL 'Test', 'SNAP', 'test', 'QUE'
         assert.equal url, 'TEST_Test_SNAP_test_QUE'
-        facade.remove()
         yield return
   describe '#urlForRequest', ->
     it 'should get url from request params', ->
@@ -381,7 +381,6 @@ describe 'ThinHttpCollectionMixin', ->
           requestType: 'test'
           query: 'QUE'
         assert.equal url, 'TEST_Test_SNAP_test_QUE'
-        facade.remove()
         yield return
   describe '#headersForRequest', ->
     it 'should get headers for collection', ->
@@ -402,7 +401,6 @@ describe 'ThinHttpCollectionMixin', ->
         collection.headers = 'Allow': 'GET'
         headers = collection.headersForRequest()
         assert.deepEqual headers, { 'Allow': 'GET' }
-        facade.remove()
         yield return
   describe '#dataForRequest', ->
     it 'should get data for request', ->
@@ -423,7 +421,6 @@ describe 'ThinHttpCollectionMixin', ->
         assert.deepEqual data, { test: 'test1' }
         data = collection.dataForRequest snapshot: test: 'test2'
         assert.deepEqual data, { test: 'test2' }
-        facade.remove()
         yield return
   describe '#~requestFor', ->
     it 'should request params', ->
@@ -495,7 +492,6 @@ describe 'ThinHttpCollectionMixin', ->
           headers: {}
           data: sampleData
           query: test: 'test'
-        facade.remove()
         yield return
   describe '#push', ->
     before ->
