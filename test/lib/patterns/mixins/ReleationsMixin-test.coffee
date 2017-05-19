@@ -140,14 +140,14 @@ describe 'RelationsMixin', ->
           @inheritProtected()
         Test.initialize()
 
-        class Test::Relation extends RC::CoreObject
+        class Test::RelationRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @hasOne test: LeanRC::Record,
+          @hasOne test: LeanRC::RecordInterface,
             inverse: 'relation'
-        Test::Relation.initialize()
+        Test::RelationRecord.initialize()
         class Test::TestRecord extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
@@ -155,13 +155,13 @@ describe 'RelationsMixin', ->
           @module Test
           @public @static findModelByName: Function,
             default: (asType) -> Test::TestRecord
-          @belongsTo relation: LeanRC::Record,
+          @belongsTo relation: LeanRC::RecordInterface,
             attr: 'relation_attr'
             refKey: 'id'
             inverse: 'test'
         Test::TestRecord.initialize()
         inverseInfo = Test::TestRecord.inverseFor 'relation'
-        assert.equal inverseInfo.recordClass, Test::Relation, 'Record class is incorrect'
+        assert.equal inverseInfo.recordClass, Test::RelationRecord, 'Record class is incorrect'
         assert.equal inverseInfo.attrName,'test', 'Record class is incorrect'
         assert.equal inverseInfo.relation, 'hasOne', 'Record class is incorrect'
       .to.not.throw Error
