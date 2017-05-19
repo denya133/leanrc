@@ -37,7 +37,8 @@ describe 'MemoryResqueMixin', ->
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         assert.deepEqual resque[Symbol.for '~delayedJobs'], {}
-        assert.deepEqual resque[Symbol.for '~delayedQueues'], {}
+        assert.deepEqual resque[Symbol.for '~delayedQueues'],
+          'Test|>default': concurrency: 1, name: 'default'
         yield return
   describe '#onRemove', ->
     it 'should unregister resque instance', ->
@@ -54,7 +55,8 @@ describe 'MemoryResqueMixin', ->
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         assert.deepEqual resque[Symbol.for '~delayedJobs'], {}
-        assert.deepEqual resque[Symbol.for '~delayedQueues'], {}
+        assert.deepEqual resque[Symbol.for '~delayedQueues'],
+          'Test|>default': concurrency: 1, name: 'default'
         resque.onRemove()
         assert.isUndefined resque[Symbol.for '~delayedJobs']
         assert.isUndefined resque[Symbol.for '~delayedQueues']
@@ -139,8 +141,10 @@ describe 'MemoryResqueMixin', ->
         resque.ensureQueue 'TEST_QUEUE_5', 5
         resque.ensureQueue 'TEST_QUEUE_6', 6
         queues = yield resque.allQueues()
-        assert.lengthOf queues, 6
+        assert.lengthOf queues, 7
         assert.includeDeepMembers queues, [
+          name: 'default', concurrency: 1
+        ,
           name: 'TEST_QUEUE_1', concurrency: 1
         ,
           name: 'TEST_QUEUE_2', concurrency: 2

@@ -279,19 +279,19 @@ describe 'PipedCores', ->
         yield return
   describe 'Create Cucumbers app instance', ->
     it 'should create new CucumbersApp', ->
-      expect ->
+      co ->
         app = CucumbersApp::ShellApplication.new()
         app.finish()
-      .to.not.throw Error
+        yield return
   describe 'Create Tomatos app instance', ->
     it 'should create new TomatosApp', ->
-      expect ->
+      co ->
         app = TomatosApp::ShellApplication.new()
         app.finish()
-      .to.not.throw Error
+        yield return
   describe 'Create Cucumbers app and test pipes', ->
     it 'should create new CucumbersApp and test pipes from shell to logger', ->
-      expect ->
+      co ->
         { CHANGE, DEBUG } = CucumbersApp::Pipes::LogMessage
         { NAME } = CucumbersApp::ShellApplication
         { NORMAL } = CucumbersApp::Pipes::PipeMessage
@@ -313,7 +313,7 @@ describe 'PipedCores', ->
         assert.equal logs.messages[1].getBody(), TEST_LOG_MESSAGE
         assert.equal logs.messages[1].getType(), NORMAL
         app.finish()
-      .to.not.throw Error
+        yield return
   describe 'Create Tomatos app and test pipes', ->
     it 'should create new TomatosApp and test pipes from shell to logger', ->
       expect ->
@@ -546,6 +546,7 @@ describe 'PipedCores', ->
         assert.propertyVal item, 'isHidden', yes
         assert.isNotNull item.deletedAt
         tomatos.finish()
+        yield return
   describe 'Create Cucumbers app and Tomatos app and test its interaction', ->
     it 'should create two apps and get cucumber from tomato', ->
       co ->
@@ -617,6 +618,35 @@ describe 'PipedCores', ->
           assert.propertyVal item, 'description', "cucumber#{index + 1} description"
           assert.propertyVal item, 'isHidden', no
           assert.isNull item.deletedAt
-
         tomatos.finish()
         cucumbers.finish()
+        yield return
+  describe 'Start delayed job', ->
+    it 'should run operation asynchroniously', ->
+      co ->
+        trigger = new EventEmitter
+        waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
+        class Test extends CucumbersApp
+          @inheritProtected()
+        Test.initialize()
+        class TestCommand extends Test::SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function, { default: ->  trigger.emit 'STOPPED', 'ARG' }
+        TestCommand.initialize()
+        app = Test::ShellApplication.new()
+        { main } = app.facade.retrieveMediator Test::MainModuleMediator.name
+        mainMultitonKey = main.facade[Symbol.for '~multitonKey']
+        main.facade.registerCommand main.Module::CUSTOM_COMMAND, Test::TestCommand
+        proxy = main.facade.retrieveProxy main.Module::TEST_PROXY_NAME
+        promise = waitForStop()
+        UNTIL_TIME = Date.now() + 1000
+        yield proxy.constructor.delay main.facade,
+          queue: Test::DEFAULT_QUEUE
+          delayUntil: UNTIL_TIME
+        .test mainMultitonKey
+        res = yield promise
+        assert.equal res, 'ARG'
+        assert.isAtMost UNTIL_TIME, Date.now()
+        app.finish()
+        yield return

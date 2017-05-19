@@ -22,7 +22,7 @@ module.exports = (Module)->
     @public @static removeModel: Function,
       default: (asKey)->
         if (voModel = Model[cphInstanceMap][asKey])?
-          for own asProxyName of voModel[iphProxyMap]
+          for asProxyName in Reflect.ownKeys voModel[iphProxyMap]
             voModel.removeProxy asProxyName
           Model[cphInstanceMap][asKey] = undefined
           delete Model[cphInstanceMap][asKey]

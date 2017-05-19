@@ -6,11 +6,17 @@ class CucumbersMain extends Cucumbers
 
   @root __dirname
 
+  @const CUSTOM_COMMAND: 'CUSTOM_COMMAND'
+  @const TEST_PROXY_NAME: 'TEST_PROXY_NAME'
+
+  require.main.require('lib/patterns/mediator/MemoryResqueExecutor') @Module
+  require.main.require('lib/patterns/command/DelayedJobScript') @Module
   require('./mediators/MainJunctionMediator') @Module
   require('./mediators/MainSwitch') @Module
 
   require('./proxies/MainCollection') @Module
   require('./proxies/MainResque') @Module
+  require('./proxies/TestProxy') @Module
 
   require('./commands/PrepareControllerCommand') @Module
   require('./commands/PrepareViewCommand') @Module

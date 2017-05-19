@@ -99,6 +99,15 @@ module.exports = (Module)->
         @defineProcessors()
         return
 
+    @public @async reDefineProcessors: Function,
+      args: []
+      return: NILL
+      default: ->
+        @stop()
+        @[ipoDefinedProcessors] = {}
+        yield @defineProcessors()
+        yield return
+
     @public @async defineProcessors: Function,
       args: []
       return: NILL
@@ -189,6 +198,8 @@ module.exports = (Module)->
       return: NILL
       default: ->
         @[ipbIsStopped] = yes
+        unless isArangoDB()
+          clearTimeout @[ipoTimer]
         return
 
     @public define: Function,

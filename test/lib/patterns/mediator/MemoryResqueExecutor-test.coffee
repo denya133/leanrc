@@ -158,6 +158,7 @@ describe 'MemoryResqueExecutor', ->
         yield executor.defineProcessors()
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_1'
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
+        facade.remove()
         yield return
   describe '#onRegister', ->
     it 'should setup executor on register', ->
@@ -199,6 +200,7 @@ describe 'MemoryResqueExecutor', ->
         yield promise
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_1'
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
+        facade.remove()
         yield return
   describe '.staticRunner', ->
     it 'should call cycle part', ->
@@ -247,6 +249,7 @@ describe 'MemoryResqueExecutor', ->
         yield Test::MemoryResqueExecutor.staticRunner KEY
         yield promise
         assert.isNotNull test
+        facade.remove()
         yield return
   describe '#recursion', ->
     it 'should recursively call cycle part', ->
@@ -297,6 +300,7 @@ describe 'MemoryResqueExecutor', ->
         yield executor.recursion()
         yield promise
         assert.isNotNull test
+        facade.remove()
         yield return
   describe '#start', ->
     it 'should call recursion', ->
@@ -344,6 +348,7 @@ describe 'MemoryResqueExecutor', ->
         yield executor.start()
         yield promise
         assert.isNotNull test
+        facade.remove()
         yield return
   describe '#handleNotification', ->
     it 'should start resque', ->
@@ -380,6 +385,7 @@ describe 'MemoryResqueExecutor', ->
         facade.sendNotification LeanRC::START_RESQUE
         yield promise
         assert.isNotNull test
+        facade.remove()
         yield return
     it 'should get result', ->
       co ->
@@ -410,6 +416,7 @@ describe 'MemoryResqueExecutor', ->
         facade.sendNotification LeanRC::JOB_RESULT, body, type
         data = yield promise
         assert.deepEqual data, body
+        facade.remove()
         yield return
   describe '#cyclePart', ->
     it 'should start cycle part', ->
@@ -452,4 +459,5 @@ describe 'MemoryResqueExecutor', ->
         facade.sendNotification LeanRC::START_RESQUE
         data = yield promise
         assert.deepEqual data, body
+        facade.remove()
         yield return

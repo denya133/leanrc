@@ -27,7 +27,7 @@ module.exports = (Module)->
       return: Module::Class
       default: (asKey)->
         if (voController = Controller[cphInstanceMap][asKey])?
-          for own asNotificationName of voController[iphCommandMap]
+          for asNotificationName in Reflect.ownKeys voController[iphCommandMap]
             voController.removeCommand asNotificationName
           Controller[cphInstanceMap][asKey] = undefined
           delete Controller[cphInstanceMap][asKey]
