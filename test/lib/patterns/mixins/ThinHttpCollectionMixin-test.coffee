@@ -305,7 +305,6 @@ describe 'ThinHttpCollectionMixin', ->
         url = collection.urlForRemove 'TestRecord', 'id-123'
         assert.equal url, 'http://localhost:8000/v1/tests/id-123'
         yield return
-  ###
   describe '#buildURL', ->
     it 'should get url from request params', ->
       co ->
@@ -323,19 +322,22 @@ describe 'ThinHttpCollectionMixin', ->
               "TEST_#{recordName ? 'RECORD_NAME'}_#{snapshot ? 'SNAPSHOT'}_#{requestType ? 'REQUEST_TYPE'}_#{query ? 'QUERY'}"
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
-        url = collection.buildURL 'Test', {}, 'find', {}
+        url = collection.buildURL 'Test', {}, 'list'
         assert.equal url, 'http://localhost:8000/v1/tests'
-        url = collection.buildURL 'Test', {}, 'insert', {}
+        url = collection.buildURL 'Test', {}, 'detail', 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
+        url = collection.buildURL 'Test', {}, 'create'
         assert.equal url, 'http://localhost:8000/v1/tests'
-        url = collection.buildURL 'Test', {}, 'update', {}
-        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
-        url = collection.buildURL 'Test', {}, 'replace', {}
-        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
-        url = collection.buildURL 'Test', {}, 'remove', {}
-        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection.buildURL 'Test', {}, 'update', 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
+        url = collection.buildURL 'Test', {}, 'replace', 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
+        url = collection.buildURL 'Test', {}, 'delete', 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
         url = collection.buildURL 'Test', 'SNAP', 'test', 'QUE'
         assert.equal url, 'TEST_Test_SNAP_test_QUE'
         yield return
+  ###
   describe '#urlForRequest', ->
     it 'should get url from request params', ->
       co ->
