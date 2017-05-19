@@ -109,7 +109,6 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal data?.body?.message, 'OK', 'Incorrect body'
         facade.remove()
         yield return
-  ###
   describe '#methodForRequest', ->
     it 'should get method name from request params', ->
       co ->
@@ -123,20 +122,22 @@ describe 'ThinHttpCollectionMixin', ->
           @module Test
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
-        method = collection.methodForRequest requestType: 'find'
-        assert.equal method, 'GET', 'Find method is incorrect'
-        method = collection.methodForRequest requestType: 'insert'
+        method = collection.methodForRequest requestType: 'list'
+        assert.equal method, 'GET', 'List method is incorrect'
+        method = collection.methodForRequest requestType: 'detail'
+        assert.equal method, 'GET', 'Detail method is incorrect'
+        method = collection.methodForRequest requestType: 'create'
         assert.equal method, 'POST', 'Insert method is incorrect'
         method = collection.methodForRequest requestType: 'update'
         assert.equal method, 'PATCH', 'Update method is incorrect'
         method = collection.methodForRequest requestType: 'replace'
         assert.equal method, 'PUT', 'Replace method is incorrect'
-        method = collection.methodForRequest requestType: 'remove'
+        method = collection.methodForRequest requestType: 'delete'
         assert.equal method, 'DELETE', 'Remove method is incorrect'
         method = collection.methodForRequest requestType: 'someOther'
         assert.equal method, 'GET', 'Any other method is incorrect'
-        facade.remove()
         yield return
+  ###
   describe '#~urlPrefix', ->
     it 'should get url prefix', ->
       co ->
