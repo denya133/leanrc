@@ -395,7 +395,6 @@ describe 'ThinHttpCollectionMixin', ->
           id: 'QUE'
         assert.equal url, 'TEST_Test_SNAP_test_QUE'
         yield return
-  ###
   describe '#headersForRequest', ->
     it 'should get headers for collection', ->
       co ->
@@ -416,6 +415,7 @@ describe 'ThinHttpCollectionMixin', ->
         headers = collection.headersForRequest()
         assert.deepEqual headers, { 'Allow': 'GET' }
         yield return
+  ###
   describe '#dataForRequest', ->
     it 'should get data for request', ->
       co ->
