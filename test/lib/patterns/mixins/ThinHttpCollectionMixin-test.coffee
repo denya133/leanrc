@@ -282,7 +282,6 @@ describe 'ThinHttpCollectionMixin', ->
         url = collection.urlForReplace 'TestRecord', 'id-123'
         assert.equal url, 'http://localhost:8000/v1/tests/id-123'
         yield return
-  ###
   describe '#urlForRemove', ->
     it 'should get url for insert request', ->
       co ->
@@ -297,11 +296,16 @@ describe 'ThinHttpCollectionMixin', ->
           @public namespace: String, { default: 'v1' }
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
-        url = collection.urlForRemove 'Test', {}
-        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
-        url = collection.urlForRemove 'TestRecord', {}
-        assert.equal url, 'http://localhost:8000/v1/tests/bulk'
+        url = collection.urlForRemove 'Test'
+        assert.equal url, 'http://localhost:8000/v1/tests'
+        url = collection.urlForRemove 'Test', 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
+        url = collection.urlForRemove 'TestRecord'
+        assert.equal url, 'http://localhost:8000/v1/tests'
+        url = collection.urlForRemove 'TestRecord', 'id-123'
+        assert.equal url, 'http://localhost:8000/v1/tests/id-123'
         yield return
+  ###
   describe '#buildURL', ->
     it 'should get url from request params', ->
       co ->
