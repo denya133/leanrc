@@ -27,8 +27,7 @@ module.exports = (Module)->
           request = @[ipmRequestFor]
             requestType: 'delete'
             recordName: @delegate.name
-            id
-
+            id: id
           { body } = yield @[ipmMakeRequest] request
           yield return yes
 
@@ -37,8 +36,7 @@ module.exports = (Module)->
           request = @[ipmRequestFor]
             requestType: 'detail'
             recordName: @delegate.name
-            id
-
+            id: id
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
@@ -71,7 +69,7 @@ module.exports = (Module)->
             requestType: 'replace'
             recordName: @delegate.name
             snapshot: @serializer.serialize aoRecord
-            id
+            id: id
 
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
@@ -85,7 +83,7 @@ module.exports = (Module)->
             requestType: 'update'
             recordName: @delegate.name
             snapshot: @serializer.serialize aoRecord
-            id
+            id: id
 
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()

@@ -552,7 +552,6 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal record, spyPush.args[0][0]
         facade.remove()
         yield return
-  ###
   describe '#remove', ->
     before ->
       server.listen 8000
@@ -587,13 +586,12 @@ describe 'ThinHttpCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, Test::HttpCollection
         record = yield collection.create test: 'test1'
-        spyQuery = sinon.spy collection, 'query'
+        spyRemove = sinon.spy collection, 'remove'
         yield record.destroy()
-        assert.deepEqual spyQuery.args[1][0].$forIn, { '@doc': 'test_tests' }
-        assert.deepEqual spyQuery.args[1][0].$filter, { '@doc._key': { '$eq': record.id } }
-        assert.isTrue spyQuery.args[1][0].$remove
+        assert.equal record.id, spyRemove.args[0][0]
         facade.remove()
         yield return
+  ###
   describe '#take', ->
     before ->
       server.listen 8000

@@ -79,13 +79,18 @@
       "data": "QUERY"
     }
   },
-  "/v1/tests/bulk": {
+  "/v1/tests/:test_id": {
     "single": "test",
     "plural": "tests",
+    "GET": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "GET"
+    },
     "DELETE": {
       "statusCode": 204,
       "statusMessage": "No Content",
-      "data": "QUERY"
+      "data": "DELETE"
     },
     "PUT,PATCH": {
       "statusCode": 200,
