@@ -631,7 +631,6 @@ describe 'ThinHttpCollectionMixin', ->
           assert.equal record[attribute], recordDuplicate[attribute]
         facade.remove()
         yield return
-  ###
   describe '#takeMany', ->
     before ->
       server.listen 8000
@@ -722,6 +721,7 @@ describe 'ThinHttpCollectionMixin', ->
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
         facade.remove()
         yield return
+  ###
   describe '#override', ->
     before ->
       server.listen 8000

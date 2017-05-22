@@ -117,29 +117,30 @@ module.exports = (options) ->
                 when 'QUERY'
                   { query } = querystring.parse url.query
                   { query } = JSON.parse query  unless _.isEmpty query
-                  collection = server.data[query['$forIn']?['@doc']] ? []
+                  collection = server.data[query?['$forIn']?['@doc'] ? "test_#{path.plural}"] ? []
                   filter = (item) ->
-                    for k, v of query.$filter
-                      key = k.replace '@doc.', ''
-                      if key is '_key'
-                        key = 'id'
-                      property = _.get item, key
-                      if _.isString v
-                        return no  unless property is v
-                      else
-                        for type, cond of v
-                          switch type
-                            when '$eq'
-                              return no  unless property is cond
-                            when '$in'
-                              return no  unless property in cond
-                            else
-                              return no
+                    if query?.$filter?
+                      for k, v of query.$filter
+                        key = k.replace '@doc.', ''
+                        if key is '_key'
+                          key = 'id'
+                        property = _.get item, key
+                        if _.isString v
+                          return no  unless property is v
+                        else
+                          for type, cond of v
+                            switch type
+                              when '$eq'
+                                return no  unless property is cond
+                              when '$in'
+                                return no  unless property in cond
+                              else
+                                return no
                     yes
                   switch req.method
                     when 'GET'
                       records = _.filter collection, filter
-                      if query['$count']
+                      if query?['$count']
                         response = JSON.stringify count: records.length
                       else
                         response = JSON.stringify "#{path.plural}": records
