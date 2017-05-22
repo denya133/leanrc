@@ -2,6 +2,7 @@ http = require 'http'
 URL = require 'url'
 querystring = require 'querystring'
 _ = require 'lodash'
+inflect = do require 'i'
 RC = require 'RC'
 
 module.exports = (options) ->
@@ -38,6 +39,7 @@ module.exports = (options) ->
   server.server = http.createServer (req, res) ->
     res.setHeader 'Content-Type', req.headers['accept'] ? 'text/plain'
     url = URL.parse req.url
+    # console.log 'REQ:', url
     # console.log 'METHOD:', req.method
     # console.log 'URL:', req.url
     req.rawBody = Buffer.from []
@@ -49,7 +51,22 @@ module.exports = (options) ->
       req.body = req.rawBody.toString 'utf8'
       # console.log 'BODY:', req.body
       body = if _.isEmpty(req.body) then {} else (try JSON.parse req.body) ? {}
-      path = FIXTURE[url.pathname]
+      pathname = _.findKey FIXTURE, (value, key) ->
+        if /\:/.test key
+          mask = key.replace /(\:[\w\_]+)/g, '([\\w\\-]+)'
+          regExp = new RegExp mask
+          matches = regExp.test url.pathname
+          if matches
+            list1 = key.split '/'
+            list2 = url.pathname.split '/'
+            for i in [ 0 ... list1.length ]
+              if list1[i] isnt list2[i]
+                url.params ?= {}
+                url.params[list1[i]] = list2[i]
+          matches
+        else
+          key is url.pathname
+      path = FIXTURE[pathname ? url.pathname]
       if path?
         if (method = path[req.method])?
           if method.redirect?
@@ -76,32 +93,66 @@ module.exports = (options) ->
                     body = [ body ]  unless _.isArray body
                     resp = "#{path.plural}": body
                   response = JSON.stringify resp
+                when 'GET'
+                  key = Object.keys(url.params)[0]
+                  collectionId = inflect.pluralize key.replace /(^\:|_id$)/g, ''
+                  collection = server.data["test_#{path.plural}"] ? []
+                  record = _.find collection, id: url.params[key]
+                  if record?
+                    response = JSON.stringify "#{path.single}": record
+                  else
+                    res.statusCode = 404
+                    res.statusMessage = 'Not Found'
+                when 'DELETE'
+                  key = Object.keys(url.params)[0]
+                  collectionId = inflect.pluralize key.replace /(^\:|_id$)/g, ''
+                  collection = server.data["test_#{path.plural}"] ? []
+                  record = _.find collection, id: url.params[key]
+                  if record?
+                    response = JSON.stringify "#{path.single}": record
+                    _.remove collection, id: url.params[key]
+                  else
+                    res.statusCode = 404
+                    res.statusMessage = 'Not Found'
+                when 'PUT', 'PATCH'
+                  key = Object.keys(url.params)[0]
+                  collectionId = inflect.pluralize key.replace /(^\:|_id$)/g, ''
+                  collection = server.data["test_#{path.plural}"] ? []
+                  record = _.find collection, id: url.params[key]
+                  if record?
+                    for key, value of body when value?
+                      record[key] = value
+                    response = JSON.stringify "#{path.single}": record
+                  else
+                    res.statusCode = 404
+                    res.statusMessage = 'Not Found'
                 when 'QUERY'
                   { query } = querystring.parse url.query
                   { query } = JSON.parse query  unless _.isEmpty query
-                  collection = server.data[query['$forIn']['@doc']] ? []
+                  collection = server.data[query?['$forIn']?['@doc'] ? "test_#{path.plural}"] ? []
                   filter = (item) ->
-                    for k, v of query.$filter
-                      key = k.replace '@doc.', ''
-                      if key is '_key'
-                        key = 'id'
-                      property = _.get item, key
-                      if _.isString v
-                        return no  unless property is v
-                      else
-                        for type, cond of v
-                          switch type
-                            when '$eq'
-                              return no  unless property is cond
-                            when '$in'
-                              return no  unless property in cond
-                            else
-                              return no
+                    if query?.$filter?
+                      for k, v of query.$filter
+                        key = k.replace '@doc.', ''
+                        if key is '_key'
+                          key = 'id'
+                        property = _.get item, key
+                        if _.isString v
+                          return no  unless property is v
+                        else
+                          for type, cond of v
+                            switch type
+                              when '$eq'
+                                return no  unless property is cond
+                              when '$in'
+                                return no  unless property in cond
+                              else
+                                return no
                     yes
                   switch req.method
                     when 'GET'
                       records = _.filter collection, filter
-                      if query['$count']
+                      if query?['$count']
                         response = JSON.stringify count: records.length
                       else
                         response = JSON.stringify "#{path.plural}": records

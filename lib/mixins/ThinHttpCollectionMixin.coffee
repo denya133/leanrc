@@ -19,7 +19,7 @@ module.exports = (Module)->
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
-          body = JSON.parse body ? "{}"
+          body = (try JSON.parse body ? "{}") ? body
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async remove: Function,
@@ -27,8 +27,7 @@ module.exports = (Module)->
           request = @[ipmRequestFor]
             requestType: 'delete'
             recordName: @delegate.name
-            id
-
+            id: id
           { body } = yield @[ipmMakeRequest] request
           yield return yes
 
@@ -37,12 +36,11 @@ module.exports = (Module)->
           request = @[ipmRequestFor]
             requestType: 'detail'
             recordName: @delegate.name
-            id
-
+            id: id
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
-          body = JSON.parse body ? "{}"
+          body = (try JSON.parse body ? "{}") ? body
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async takeMany: Function,
@@ -60,9 +58,7 @@ module.exports = (Module)->
           voData = yield @[ipmMakeRequest] request
           { body } = voData
           pluralKey = @collectionName()
-          # console.log '>>>>>MMMDDD', voData, body, pluralKey, '=====', body[pluralKey]
-          body = JSON.parse body ? "{\"#{pluralKey}\":[]}"
-          # console.log '>>>>>MMMDDD222', body, body[pluralKey]
+          body = (try JSON.parse body ? "{\"#{pluralKey}\":[]}") ? body
           yield return Module::Cursor.new @, body[pluralKey]
 
       @public @async override: Function,
@@ -71,12 +67,12 @@ module.exports = (Module)->
             requestType: 'replace'
             recordName: @delegate.name
             snapshot: @serializer.serialize aoRecord
-            id
+            id: id
 
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
-          body = JSON.parse body ? "{}"
+          body = (try JSON.parse body ? "{}") ? body
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async patch: Function,
@@ -85,12 +81,12 @@ module.exports = (Module)->
             requestType: 'update'
             recordName: @delegate.name
             snapshot: @serializer.serialize aoRecord
-            id
+            id: id
 
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
           singularKey = inflect.singularize pluralKey
-          body = JSON.parse body ? "{}"
+          body = (try JSON.parse body ? "{}") ? body
           yield Module::Cursor.new(@, [body[singularKey]]).first()
 
       @public @async includes: Function,
@@ -101,7 +97,7 @@ module.exports = (Module)->
       @public @async length: Function,
         default: ->
           records = yield @takeAll()
-          yield return records.length()
+          yield return records.count()
 
       @public headers: Object
       @public host: String,
