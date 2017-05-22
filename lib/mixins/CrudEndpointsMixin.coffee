@@ -80,6 +80,7 @@ module.exports = (Module)->
           @swaggerDefinition 'list', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              # TODO: что делать, если ресурс внутри еще одного неймспейса - например /:space/
               .queryParam 'query', @querySchema, "
                 The query for finding
                 #{@listEntityName}.
