@@ -99,7 +99,7 @@ class LeanRC extends RC
   require('./mixins/MemoryConfigurationMixin') LeanRC
   require('./mixins/IterableMixin') LeanRC
   require('./mixins/QueryableMixin') LeanRC
-  require('./mixins/ThinHttpCollectionMixin') LeanRC # need test it
+  require('./mixins/ThinHttpCollectionMixin') LeanRC
   require('./mixins/SchemaModuleMixin') LeanRC
 
   require('./patterns/mediator/Mediator') LeanRC

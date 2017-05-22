@@ -842,7 +842,6 @@ describe 'ThinHttpCollectionMixin', ->
         assert.isTrue includes
         facade.remove()
         yield return
-  ###
   describe '#length', ->
     before ->
       server.listen 8000
@@ -883,4 +882,3 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal count, length
         facade.remove()
         yield return
-  ###

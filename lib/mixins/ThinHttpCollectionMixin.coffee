@@ -58,9 +58,7 @@ module.exports = (Module)->
           voData = yield @[ipmMakeRequest] request
           { body } = voData
           pluralKey = @collectionName()
-          # console.log '>>>>>MMMDDD', voData, body, pluralKey, '=====', body[pluralKey]
           body = (try JSON.parse body ? "{\"#{pluralKey}\":[]}") ? body
-          # console.log '>>>>>MMMDDD222', body, body[pluralKey]
           yield return Module::Cursor.new @, body[pluralKey]
 
       @public @async override: Function,
@@ -99,7 +97,7 @@ module.exports = (Module)->
       @public @async length: Function,
         default: ->
           records = yield @takeAll()
-          yield return records.length()
+          yield return records.count()
 
       @public headers: Object
       @public host: String,
