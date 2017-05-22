@@ -803,7 +803,6 @@ describe 'ThinHttpCollectionMixin', ->
         assert.propertyVal updatedRecord, 'test', 'test2'
         facade.remove()
         yield return
-  ###
   describe '#includes', ->
     before ->
       server.listen 8000
@@ -843,6 +842,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.isTrue includes
         facade.remove()
         yield return
+  ###
   describe '#length', ->
     before ->
       server.listen 8000
