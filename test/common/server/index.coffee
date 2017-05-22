@@ -94,7 +94,6 @@ module.exports = (options) ->
                     resp = "#{path.plural}": body
                   response = JSON.stringify resp
                 when 'GET'
-                  console.log 'SINGLE GET'
                   key = Object.keys(url.params)[0]
                   collectionId = inflect.pluralize key.replace /(^\:|_id$)/g, ''
                   collection = server.data["test_#{path.plural}"] ? []
@@ -105,7 +104,6 @@ module.exports = (options) ->
                     res.statusCode = 404
                     res.statusMessage = 'Not Found'
                 when 'DELETE'
-                  console.log 'SINGLE DELETE'
                   key = Object.keys(url.params)[0]
                   collectionId = inflect.pluralize key.replace /(^\:|_id$)/g, ''
                   collection = server.data["test_#{path.plural}"] ? []

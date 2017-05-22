@@ -591,7 +591,6 @@ describe 'ThinHttpCollectionMixin', ->
         assert.equal record.id, spyRemove.args[0][0]
         facade.remove()
         yield return
-  ###
   describe '#take', ->
     before ->
       server.listen 8000
@@ -632,6 +631,7 @@ describe 'ThinHttpCollectionMixin', ->
           assert.equal record[attribute], recordDuplicate[attribute]
         facade.remove()
         yield return
+  ###
   describe '#takeMany', ->
     before ->
       server.listen 8000
