@@ -87,15 +87,20 @@
       "statusMessage": "OK",
       "data": "GET"
     },
+    "PUT": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "PUT"
+    },
+    "PATCH": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "PATCH"
+    },
     "DELETE": {
       "statusCode": 204,
       "statusMessage": "No Content",
       "data": "DELETE"
-    },
-    "PUT,PATCH": {
-      "statusCode": 200,
-      "statusMessage": "OK",
-      "data": "QUERY"
     }
   },
   "/v1/unique_test_records": {

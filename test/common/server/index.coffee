@@ -114,6 +114,18 @@ module.exports = (options) ->
                   else
                     res.statusCode = 404
                     res.statusMessage = 'Not Found'
+                when 'PUT', 'PATCH'
+                  key = Object.keys(url.params)[0]
+                  collectionId = inflect.pluralize key.replace /(^\:|_id$)/g, ''
+                  collection = server.data["test_#{path.plural}"] ? []
+                  record = _.find collection, id: url.params[key]
+                  if record?
+                    for key, value of body when value?
+                      record[key] = value
+                    response = JSON.stringify "#{path.single}": record
+                  else
+                    res.statusCode = 404
+                    res.statusMessage = 'Not Found'
                 when 'QUERY'
                   { query } = querystring.parse url.query
                   { query } = JSON.parse query  unless _.isEmpty query
