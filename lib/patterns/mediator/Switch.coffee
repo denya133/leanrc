@@ -117,8 +117,7 @@ module.exports = (Module)->
       default: (resourceName, {req, res, reverse}, {method, path, resource, action})->
         queryParams = req.query
         pathParams = req.params
-        configurationProxy = @facade.retrieveProxy Module::CONFIGURATION
-        currentUserId = req.cookies[configurationProxy.currentUserCookie]
+        currentUserId = req.cookies[@configs.currentUserCookie]
         headers = req.headers
         body = req.body
         voMessage = {
