@@ -1,8 +1,17 @@
 
 
 module.exports = (Module)->
-  class Application extends Module::Pipes::PipeAwareModule
+  {
+    Pipes
+    ConfigurableMixin
+  } = Module::
+  {
+    PipeAwareModule
+  } = Pipes::
+
+  class Application extends PipeAwareModule
     @inheritProtected()
+    @include ConfigurableMixin
     @module Module
 
     @const LOGGER_PROXY: Symbol 'LoggerProxy'
