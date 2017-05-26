@@ -1,16 +1,16 @@
-_ = require 'lodash'
-contentDisposition = require 'content-disposition'
-ensureErrorHandler = require('error-inject'
-getType = require('mime-types').contentType
-onFinish = require 'on-finished'
-# isJSON = require 'koa-is-json'
-escape = require 'escape-html'
-typeis = require('type-is').is
-statuses = require 'statuses'
-destroy = require 'destroy'
-assert = require 'assert'
-extname = require('path').extname
-vary = require 'vary'
+_                   = require 'lodash'
+contentDisposition  = require 'content-disposition'
+ensureErrorHandler  = require 'error-inject'
+getType             = require('mime-types').contentType
+onFinish            = require 'on-finished'
+escape              = require 'escape-html'
+typeis              = require('type-is').is
+statuses            = require 'statuses'
+destroy             = require 'destroy'
+assert              = require 'assert'
+extname             = require('path').extname
+vary                = require 'vary'
+Stream              = require 'stream'
 
 ###
 Идеи взяты из https://github.com/koajs/koa/blob/master/lib/response.js
@@ -262,6 +262,7 @@ module.exports = (Module)->
     @public remove: Function,
       default: (field)->
         @res.removeHeader field
+        return
 
     @public writable: Function,
       default: ->

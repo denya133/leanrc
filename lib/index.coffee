@@ -30,6 +30,7 @@ class LeanRC extends RC
   @const MEM_RESQUE_EXEC:  Symbol 'MemoryResqueExecutor'
   @const LOG_MSG: Symbol 'logMessage'
 
+  require('./interfaces/patterns/ApplicationInterface') LeanRC
   require('./interfaces/patterns/TransformInterface') LeanRC
   require('./interfaces/patterns/NotificationInterface') LeanRC
   require('./interfaces/patterns/NotifierInterface') LeanRC
@@ -49,6 +50,9 @@ class LeanRC extends RC
   require('./interfaces/patterns/ResourceInterface') LeanRC
   require('./interfaces/patterns/RouterInterface') LeanRC
   require('./interfaces/patterns/SwitchInterface') LeanRC
+  require('./interfaces/patterns/RequestInterface') LeanRC
+  require('./interfaces/patterns/ResponseInterface') LeanRC
+  require('./interfaces/patterns/ContextInterface') LeanRC
 
   require('./interfaces/mixins/CrudEndpointsMixinInterface') LeanRC
   require('./interfaces/mixins/IterableMixinInterface') LeanRC
@@ -102,8 +106,12 @@ class LeanRC extends RC
   require('./mixins/ThinHttpCollectionMixin') LeanRC
   require('./mixins/SchemaModuleMixin') LeanRC
 
+  require('./patterns/switch/Request') LeanRC # need test it
+  require('./patterns/switch/Response') LeanRC # need test it
+  require('./patterns/switch/Context') LeanRC # need test it
+
   require('./patterns/mediator/Mediator') LeanRC
-  require('./patterns/mediator/Switch') LeanRC
+  require('./patterns/mediator/Switch') LeanRC # need retest it
   require('./patterns/mediator/MemoryResqueExecutor') LeanRC
 
   require('./patterns/command/SimpleCommand') LeanRC

@@ -234,7 +234,7 @@ describe 'Switch', ->
           @inheritProtected()
           @module Test
         Test::TestRouter.initialize()
-        class Test::Request extends RC::CoreObject
+        class Test::TestRequest extends RC::CoreObject
           @inheritProtected()
           @module Test
           @public format: String,
@@ -245,17 +245,17 @@ describe 'Switch', ->
           constructor: (args...) ->
             super args...
             [@format] = args
-        Test::Request.initialize()
+        Test::TestRequest.initialize()
         spyResponseSet = sinon.spy ->
         spyResponseSend = sinon.spy ->
-        class Test::Response extends RC::CoreObject
+        class Test::TestResponse extends RC::CoreObject
           @inheritProtected()
           @module Test
           @public set: Function,
             default: spyResponseSet
           @public send: Function,
             default: spyResponseSend
-        Test::Response.initialize()
+        Test::TestResponse.initialize()
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
         class Test::TestSwitch extends Switch
           @inheritProtected()
@@ -282,8 +282,8 @@ describe 'Switch', ->
           updated: new Date()
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         renderedGauge = JSON.stringify vhData
-        voRequest = Test::Request.new 'json'
-        voResponse = Test::Response.new()
+        voRequest = Test::TestRequest.new 'json'
+        voResponse = Test::TestResponse.new()
         vhOptions =
           path: '/test'
           resource: 'test'
@@ -326,7 +326,7 @@ describe 'Switch', ->
             configurable: yes
             default: ->
         Test::TestSwitch.initialize()
-        class Test::Request extends RC::CoreObject
+        class Test::TestRequest extends RC::CoreObject
           @inheritProtected()
           @module Test
           constructor: (args...) ->
@@ -336,17 +336,17 @@ describe 'Switch', ->
             @cookies = cuc: 'CURRENT_USER_COOKIE'
             @headers = accept: 'json'
             @body = test: 'test'
-        Test::Request.initialize()
-        class Test::Response extends RC::CoreObject
+        Test::TestRequest.initialize()
+        class Test::TestResponse extends RC::CoreObject
           @inheritProtected()
           @module Test
-        Test::Response.initialize()
+        Test::TestResponse.initialize()
         switchMediator = Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator.initializeNotifier 'TEST_SWITCH_6'
         spySwitchSendNotification = sinon.spy switchMediator, 'sendNotification'
         vhParams =
-          req: Test::Request.new()
-          res: Test::Response.new()
+          req: Test::TestRequest.new()
+          res: Test::TestResponse.new()
           reverse: 'TEST_REVERSE'
         vhOptions =
           method: 'GET'

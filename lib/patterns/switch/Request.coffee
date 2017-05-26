@@ -155,7 +155,7 @@ module.exports = (Module)->
           return ''
         type.parameters.charset ? ''
 
-    @public length: Object,
+    @public length: Number,
       get: ->
         if (contentLength = @get 'Content-Length')?
           return if contentLength is ''

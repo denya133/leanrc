@@ -70,7 +70,7 @@ module.exports = (Module)->
           @res.end msg
         else
           @res.send msg
-
+        return
 
     # Request aliases
     @public header: Object,
@@ -146,8 +146,8 @@ module.exports = (Module)->
     @public type: String,
       get: -> @response.type
       set: (type)-> @response.type = type
-    # @public headerSent: Boolean,
-    #   get: -> @response.headerSent # под вопросом
+    @public headerSent: Boolean,
+      get: -> @response.headerSent
     @public redirect: Function,
       default: (args...)-> @response.redirect args...
     @public attachment: Function,

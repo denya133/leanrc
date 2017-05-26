@@ -4,6 +4,7 @@ module.exports = (Module)->
   {
     Pipes
     ConfigurableMixin
+    ApplicationInterface
   } = Module::
   {
     PipeAwareModule
@@ -11,6 +12,7 @@ module.exports = (Module)->
 
   class Application extends PipeAwareModule
     @inheritProtected()
+    @implements ApplicationInterface
     @include ConfigurableMixin
     @module Module
 
