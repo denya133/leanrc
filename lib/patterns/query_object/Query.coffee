@@ -205,8 +205,8 @@ module.exports = (Module)->
         @$distinct = yes
         return @
     @public remove: Function,
-      default: ->
-        @$remove = yes
+      default: (expr = yes)->
+        @$remove = expr
         return @
     @public insert: Function,
       default: (aoDefinition)->
