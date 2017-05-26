@@ -16,7 +16,7 @@ module.exports = (Module)->
     ContextInterface
     RequestInterface
     ResponseInterface
-    ApplicationInterface
+    SwitchInterface
     Request
     Response
   } = Module::
@@ -31,7 +31,8 @@ module.exports = (Module)->
     @public request: RequestInterface
     @public response: ResponseInterface
     @public state: Object
-    @public app: ApplicationInterface
+    @public switch: SwitchInterface
+    @public respond: Boolean
 
     @public throw: Function,
       default: (args...)-> throw createError args...
@@ -47,7 +48,7 @@ module.exports = (Module)->
         headerSent = no
         if @headerSent or not @writable
           headerSent = err.headerSent = yes
-        @app.emit 'error', err, @ # TODO: это под вопросом, т.к. app не эмиттер
+        @switch.getViewComponent().emit 'error', err, @
 
         return if headerSent
         {res} = @
@@ -167,7 +168,7 @@ module.exports = (Module)->
       default: ->
         request: @request.toJSON()
         response: @response.toJSON()
-        app: @app.constructor.NAME
+        app: @switch.constructor.NAME
         originalUrl: @originalUrl
         req: '<original req>'
         res: '<original res>'
@@ -177,11 +178,12 @@ module.exports = (Module)->
       default: -> @toJSON()
 
     @public init: Function,
-      default: (req, res, app)->
+      default: (req, res, reverse, switchInstanse)->
         @super()
         @req = req
         @res = res
-        @app = app
+        @reverse = reverse
+        @switch = switchInstanse
         @originalUrl = req.url
         @accept = accepts req
         @request = Request.new(@)

@@ -5,7 +5,7 @@ module.exports = (Module)->
   {
     ANY
     NILL
-    ApplicationInterface
+    SwitchInterface
   } = Module::
 
   Module.defineInterface (BaseClass) ->
@@ -13,7 +13,7 @@ module.exports = (Module)->
       @inheritProtected()
 
       @public @virtual res: Object
-      @public @virtual app: ApplicationInterface
+      @public @virtual switch: SwitchInterface
 
       @public @virtual socket: Object
       @public @virtual header: Object

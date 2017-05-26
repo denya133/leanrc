@@ -22,7 +22,7 @@ module.exports = (Module)->
 
     CoreObject
     ResponseInterface
-    ApplicationInterface
+    SwitchInterface
     ContextInterface
   } = Module::
 
@@ -34,8 +34,8 @@ module.exports = (Module)->
     @public res: Object, # native response object
       get: -> @ctx.res
 
-    @public app: ApplicationInterface,
-      get: -> @ctx.app
+    @public switch: SwitchInterface,
+      get: -> @ctx.switch
 
     @public ctx: ContextInterface
 

@@ -1,15 +1,26 @@
 _             = require 'lodash'
 inflect       = do require 'i'
 
+# TODO: Надо изготовить bodyParseMixin - который будет распарсивать тело в ctx - за основу можно взять https://github.com/cojs/co-body
+# TODO: Надо изготовить cookieParseMixin - который будет распарсивать куки.
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    ANY
+    NILL
 
-  class Resource extends Module::SimpleCommand
+    SimpleCommand
+    ResourceInterface
+    ConfigurableMixin
+    ChainsMixin
+    ContextInterface
+  } = Module::
+
+  class Resource extends SimpleCommand
     @inheritProtected()
-    @implements Module::ResourceInterface
-    @include Module::ConfigurableMixin
-    @include Module::ChainsMixin
+    @implements ResourceInterface
+    @include ConfigurableMixin
+    @include ChainsMixin
     @module Module
 
     # @public entityName: String # Имя сущности должно быть установлено при объявлении дочернего класса
@@ -133,6 +144,7 @@ module.exports = (Module)->
       get: ->
         @facade.retrieveProxy @collectionName
 
+    @public context: ContextInterface
     @public queryParams: Object
     @public pathParams: Object
     @public currentUserId: String
@@ -200,7 +212,7 @@ module.exports = (Module)->
       args: [Object]
       return: NILL
       default: (args...)->
-        [{ @queryParams, @pathParams, @currentUserId, @headers, @body }] = args
+        [@context] = args
         return args
 
     @public parsePathParams: Function,
@@ -243,7 +255,7 @@ module.exports = (Module)->
       return: Module::NILL
       default: (aoNotification)->
         voBody = aoNotification.getBody()
-        voResult = yield @[aoNotification.getType()]? voBody
+        voResult = yield @[aoNotification.getType()]? voBody.context
         @sendNotification Module::HANDLER_RESULT, voResult, voBody.reverse
         yield return
 

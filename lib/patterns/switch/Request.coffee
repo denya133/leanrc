@@ -17,7 +17,7 @@ module.exports = (Module)->
 
     CoreObject
     RequestInterface
-    ApplicationInterface
+    SwitchInterface
     ContextInterface
   } = Module::
 
@@ -29,8 +29,8 @@ module.exports = (Module)->
     @public req: Object, # native request object
       get: -> @ctx.req
 
-    @public app: ApplicationInterface,
-      get: -> @ctx.app
+    @public switch: SwitchInterface,
+      get: -> @ctx.switch
 
     @public ctx: ContextInterface
 
@@ -98,7 +98,7 @@ module.exports = (Module)->
 
     @public host: String,
       get: ->
-        {trustProxy} = @ctx.app.configs
+        {trustProxy} = @ctx.switch.configs
         host = trustProxy and @get 'X-Forwarded-Host'
         host = host or @get 'Host'
         return '' unless host
@@ -163,7 +163,7 @@ module.exports = (Module)->
 
     @public protocol: String,
       get: ->
-        {trustProxy} = @ctx.app.configs
+        {trustProxy} = @ctx.switch.configs
         if @socket?.encrypted
           return 'https'
         if @req.secure
@@ -184,7 +184,7 @@ module.exports = (Module)->
 
     @public ips: Array,
       get: ->
-        {trustProxy} = @ctx.app.configs
+        {trustProxy} = @ctx.switch.configs
         value = @get 'X-Forwarded-For'
         if trustProxy and value
           value.split /\s*,\s*/
@@ -193,7 +193,7 @@ module.exports = (Module)->
 
     @public subdomains: Array,
       get: ->
-        {subdomainOffset:offset} = @ctx.app.configs
+        {subdomainOffset:offset} = @ctx.switch.configs
         hostname = @hostname
         return [] if net.isIP
         hostname

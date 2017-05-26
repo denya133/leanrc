@@ -56,11 +56,11 @@ module.exports = (Module)->
       return: NILL
       default: ->
         @[ipoExpressApp] = do express
-        @[ipoExpressApp].use expressCookieParser @configs.cookieSecret
-        @[ipoExpressApp].use expressBodyParser.json
-          extended: yes
-        @[ipoExpressApp].use expressBodyParser.urlencoded
-          extended: yes
+        # @[ipoExpressApp].use expressCookieParser @configs.cookieSecret
+        # @[ipoExpressApp].use expressBodyParser.json
+        #   extended: yes
+        # @[ipoExpressApp].use expressBodyParser.urlencoded
+        #   extended: yes
         # запихнуть сюда и другие миделвари
         @[ipoHttpServer] = http.createServer @[ipoExpressApp]
         return
@@ -72,8 +72,7 @@ module.exports = (Module)->
         {port} = @configs
         { facade } = @
         @[ipoHttpServer].listen port, ->
-          { SEND_TO_LOG } = Module::LogMessage
-          { DEBUG, LEVELS } = Module::Pipes::LogMessage
+          { DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
           # console.log "listening on port #{port}"
           facade.sendNotification SEND_TO_LOG, "listening on port #{port}", LEVELS[DEBUG]
         return

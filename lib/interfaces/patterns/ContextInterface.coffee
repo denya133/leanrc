@@ -7,7 +7,7 @@ module.exports = (Module)->
 
     RequestInterface
     ResponseInterface
-    ApplicationInterface
+    SwitchInterface
   } = Module::
 
   Module.defineInterface (BaseClass) ->
@@ -19,7 +19,7 @@ module.exports = (Module)->
       @public @virtual request: RequestInterface
       @public @virtual response: ResponseInterface
       @public @virtual state: Object
-      @public @virtual app: ApplicationInterface
+      @public @virtual switch: SwitchInterface
 
       @public @virtual throw: Function,
         args: [[String, Number], [String, NILL], [Object, NILL]]
