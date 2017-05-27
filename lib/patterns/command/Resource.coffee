@@ -145,11 +145,11 @@ module.exports = (Module)->
         @facade.retrieveProxy @collectionName
 
     @public context: ContextInterface
-    @public queryParams: Object
-    @public pathParams: Object
+    # @public queryParams: Object
+    # @public pathParams: Object
     @public currentUserId: String
-    @public headers: Object
-    @public body: Object
+    # @public headers: Object
+    # @public body: Object
 
     @public query: Object
     @public recordId: String
@@ -203,8 +203,8 @@ module.exports = (Module)->
 
     @beforeHook 'beforeActionHook'
 
-    @beforeHook 'parsePathParams', only: ['detail', 'update', 'delete']
-    @beforeHook 'parseBody', only: ['create', 'update']
+    @beforeHook 'getRecordId', only: ['detail', 'update', 'delete']
+    @beforeHook 'getRecordBody', only: ['create', 'update']
     @beforeHook 'omitBody', only: ['create', 'update']
     @beforeHook 'beforeUpdate', only: ['update']
 
@@ -215,18 +215,18 @@ module.exports = (Module)->
         [@context] = args
         return args
 
-    @public parsePathParams: Function,
+    @public getRecordId: Function,
       args: [Object]
       return: ANY
       default: (args...)->
-        @recordId = @pathParams[@keyName]
+        @recordId = @context.pathParams[@keyName]
         return args
 
-    @public parseBody: Function,
+    @public getRecordBody: Function,
       args: [Object]
       return: ANY
       default: (args...)->
-        @recordBody = @body?[@itemEntityName]
+        @recordBody = @context.request.body?[@itemEntityName]
         return args
 
     @public omitBody: Function,

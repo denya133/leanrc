@@ -33,6 +33,8 @@ module.exports = (Module)->
     @public state: Object
     @public switch: SwitchInterface
     @public respond: Boolean
+    @public routePath: String
+    @public pathParams: Object
 
     @public throw: Function,
       default: (args...)-> throw createError args...

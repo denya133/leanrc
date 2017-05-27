@@ -15,6 +15,7 @@ module.exports = (Module)->
       @public @virtual req: Object
       @public @virtual switch: SwitchInterface
 
+      @public @virtual body: ANY
       @public @virtual header: Object
       @public @virtual headers: Object
       @public @virtual method: String
@@ -26,7 +27,7 @@ module.exports = (Module)->
       @public @virtual query: Object
       @public @virtual querystring: String
       @public @virtual host: String
-      @public @virtual port: Number
+      # @public @virtual port: Number
       @public @virtual hostname: String
       @public @virtual fresh: Boolean
       @public @virtual stale: Boolean
@@ -35,7 +36,7 @@ module.exports = (Module)->
       @public @virtual charset: String
       @public @virtual length: Number
       @public @virtual protocol: String
-      @public @virtual xhr: Boolean
+      # @public @virtual xhr: Boolean
       @public @virtual secure: Boolean
       @public @virtual ip: String
       @public @virtual ips: Array

@@ -1,7 +1,5 @@
 _             = require 'lodash'
 EventEmitter  = require 'events'
-http          = require 'http'
-crypto        = require 'crypto' # под вопросом???
 statuses      = require 'statuses'
 methods       = require 'methods'
 pathToRegexp  = require 'path-to-regexp'
@@ -10,9 +8,6 @@ Stream        = require 'stream'
 inflect       = do require 'i'
 onFinished    = require 'on-finished'
 
-HTTP_NOT_FOUND    = statuses 'not found'
-HTTP_CONFLICT     = statuses 'conflict'
-UNAUTHORIZED      = statuses 'unauthorized'
 
 ###
 ```coffee
@@ -50,9 +45,10 @@ module.exports = (Module)->
   } = Module::
   {
     co
+    isGeneratorFunction
     isArangoDB
   } = Utils
-  {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
+
 
   class Switch extends Mediator
     @inheritProtected()
@@ -102,13 +98,17 @@ module.exports = (Module)->
         originMethodName = method
         if method
           method = method.toUpperCase()
+        else
+          originMethodName = 'all'
 
         @public "#{originMethodName}": Function,
           args: [String, LAMBDA]
           return: NILL
           default: (path, fn)->
             { facade } = @
-            re = pathToRegexp path
+            {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
+            keys = []
+            re = pathToRegexp path, keys
             facade.sendNotification SEND_TO_LOG, "#{method ? 'ALL'} #{path} -> #{re}", LEVELS[DEBUG]
 
             createRoute = (routeFunc)->
@@ -117,18 +117,23 @@ module.exports = (Module)->
                   return next()
                 m = re.exec ctx.path
                 if m
-                  args = m.slice(1).map decode
+                  pathParams = m.slice(1)
+                    .map decode
+                    .reduce (prev, item, index)->
+                      prev[keys[index].name] = item
+                      prev
+                    , {}
                   ctx.routePath = path
-                  facade.sendNotification SEND_TO_LOG, "#{ctx.method} #{path} matches #{ctx.path} #{args}", LEVELS[DEBUG]
-                  args.unshift ctx
-                  args.push next
-                  # TODO: решть проблему с передачей распарсенных pathParams
-                  return Module::Promise.resolve routeFunc.apply ctx, args
+                  facade.sendNotification SEND_TO_LOG, "#{ctx.method} #{path} matches #{ctx.path} #{pathParams}", LEVELS[DEBUG]
+                  ctx.pathParams = pathParams
+                  return Module::Promise.resolve routeFunc.apply ctx, next
                 return next
             @use if fn
-              return createRoute fn
+              createRoute fn
             else
-              return createRoute
+              createRoute
+            # это надо будет заиспользовать когда решится вопрос "как подрубить свайгер"
+            #@defineSwaggerEndpoint voEndpoint
             return
         return
 
@@ -139,8 +144,7 @@ module.exports = (Module)->
       default: (args...)->
         @delete args...
 
-    @public all: Function,
-      default: @createMethod()
+    @createMethod() # create @public all:...
     ##########################################################################
 
     @public responseFormats: Array,
@@ -193,6 +197,8 @@ module.exports = (Module)->
       default: ->
         {port} = @configs
         { facade } = @
+        {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
+        http = require 'http'
         @[ipoHttpServer] = http.createServer @callback()
         @[ipoHttpServer].listen port, ->
           # console.log "listening on port #{port}"
@@ -207,9 +213,10 @@ module.exports = (Module)->
       default: (middleware)->
         unless _.isFunction middleware
           throw new Error 'middleware must be a function!'
-        if co.isGeneratorFunction middleware
+        if isGeneratorFunction middleware
           middleware = co.wrap middleware
         middlewareName = middleware._name ? middleware.name ? '-'
+        {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         @facade.sendNotification SEND_TO_LOG, "use #{middlewareName}", LEVELS[DEBUG]
         @middlewares.push middleware
         return @
@@ -240,6 +247,7 @@ module.exports = (Module)->
         return if 404 is err.status or err.expose
         return if @configs.silent
         msg = err.stack ? String err
+        {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         @facade.sendNotification SEND_TO_LOG, msg.replace(/^/gm, '  '), LEVELS[ERROR]
         return
 
@@ -289,7 +297,7 @@ module.exports = (Module)->
       default: (ctx, aoData, {method, path, resource, action})->
         if action is 'create'
           ctx.status = 201
-        switch (vsFormat = req.accepts @responseFormats)
+        switch (vsFormat = ctx.accepts @responseFormats)
           when 'json', 'html', 'xml', 'atom'
             if @["#{vsFormat}RendererName"]?
               voRenderer = @rendererFor vsFormat
@@ -367,21 +375,19 @@ module.exports = (Module)->
     # должен быть объявлен в унаследованном классе
     @public createNativeRoute: Function,
       default: ({method, path, resource, action})->
-        # throw new Error '`Switch::createNativeRoute` should be implemeted in derived class'
         resourceName = inflect.camelize inflect.underscore "#{resource.replace /[/]/g, '_'}Resource"
 
         @[method]? path, (context, next)=>
           reverse = if isArangoDB()
+            crypto = require '@arangodb/crypto'
             crypto.genRandomAlphaNumbers 32
           else
+            crypto = require 'crypto'
             crypto.randomBytes 32
           @getViewComponent().once reverse, co.wrap (aoData)=>
             yield @sendHttpResponse context, aoData, {method, path, resource, action}
             return yield next()
           @sender resourceName, {context, reverse}, {method, path, resource, action}
-
-        # это надо будет заиспользовать когда решится вопрос "как подрубить свайгер к экспрессу"
-        # @defineSwaggerEndpoint voEndpoint
         return
 
     @public init: Function,

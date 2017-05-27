@@ -20,6 +20,9 @@ module.exports = (Module)->
       @public @virtual response: ResponseInterface
       @public @virtual state: Object
       @public @virtual switch: SwitchInterface
+      @public @virtual respond: Boolean
+      @public @virtual routePath: String
+      @public @virtual pathParams: Object
 
       @public @virtual throw: Function,
         args: [[String, Number], [String, NILL], [Object, NILL]]

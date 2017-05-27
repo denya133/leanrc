@@ -34,13 +34,14 @@ module.exports = (Module)->
 
     @public ctx: ContextInterface
 
-    # @public baseUrl: String # под вопросом?
-    # @public body: ANY # тело должен предоставлять миксин из отдельного модуля
+    # @public baseUrl: String # под вопросом?    
     # @public database: String # возможно это тоже надо получать из метода из отдельного модуля
     # @public pathname: String
     # @public pathParams: Object # вынести в отдельный модуль, который будет подключаться как миксин, а в чейнинге будет вызваться метод, который будет распарсивать парамсы
     # @public cookie: Function,
     #   default: (name, options)->
+
+    @public body: ANY # тело должен предоставлять миксин из отдельного модуля
 
     @public header: Object,
       get: -> @headers
@@ -104,17 +105,18 @@ module.exports = (Module)->
         return '' unless host
         host.split(/\s*,\s*/)[0]
 
-    @public port: Number,
-      get: ->
-        host = @host
-        port = if host
-          host.split(':')[1]
-        unless port
-          port = if @protocol is 'https'
-            443
-          else
-            80
-        Number port
+    # port отсутствует в интерфейсе koa - возможно лучше его и здесь не делать, чтобы не ломать интерфейс koa
+    # @public port: Number,
+    #   get: ->
+    #     host = @host
+    #     port = if host
+    #       host.split(':')[1]
+    #     unless port
+    #       port = if @protocol is 'https'
+    #         443
+    #       else
+    #         80
+    #     Number port
 
     @public hostname: String,
       get: ->
@@ -173,9 +175,10 @@ module.exports = (Module)->
         proto = @get('X-Forwarded-Proto') ? 'http'
         proto.split(/\s*,\s*/)[0]
 
-    @public xhr: Boolean,
-      get: ->
-        'xmlhttprequest' is String(@headers['X-Requested-With']).toLowerCase()
+    # xhr отсутствует в интерфейсе koa - возможно лучше его и здесь не делать, чтобы не ломать интерфейс koa
+    # @public xhr: Boolean,
+    #   get: ->
+    #     'xmlhttprequest' is String(@headers['X-Requested-With']).toLowerCase()
 
     @public secure: Boolean,
       get: -> @protocol is 'https'

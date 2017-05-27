@@ -47,12 +47,12 @@ class LeanRC extends RC
   require('./interfaces/patterns/EndpointInterface') LeanRC
   require('./interfaces/patterns/GatewayInterface') LeanRC
   require('./interfaces/patterns/RendererInterface') LeanRC
-  require('./interfaces/patterns/ResourceInterface') LeanRC
-  require('./interfaces/patterns/RouterInterface') LeanRC
-  require('./interfaces/patterns/SwitchInterface') LeanRC
   require('./interfaces/patterns/RequestInterface') LeanRC
   require('./interfaces/patterns/ResponseInterface') LeanRC
   require('./interfaces/patterns/ContextInterface') LeanRC
+  require('./interfaces/patterns/ResourceInterface') LeanRC
+  require('./interfaces/patterns/RouterInterface') LeanRC
+  require('./interfaces/patterns/SwitchInterface') LeanRC
 
   require('./interfaces/mixins/CrudEndpointsMixinInterface') LeanRC
   require('./interfaces/mixins/IterableMixinInterface') LeanRC
@@ -123,6 +123,7 @@ class LeanRC extends RC
   require('./patterns/command/DelayedJobScript') LeanRC
 
   require('./mixins/BulkActionsResourceMixin') LeanRC
+  require('./mixins/BodyParseMixin') LeanRC # need test it
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC

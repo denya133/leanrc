@@ -7,7 +7,13 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    ANY
+    NILL
+
+    CollectionInterface
+    ContextInterface
+  } = Module::
 
   Module.defineInterface (BaseClass) ->
     class ResourceInterface extends BaseClass
@@ -18,13 +24,14 @@ module.exports = (Module)->
       @public @virtual itemEntityName: String
       @public @virtual listEntityName: String
       @public @virtual collectionName: String
-      @public @virtual collection: Module::CollectionInterface
+      @public @virtual collection: CollectionInterface
 
-      @public @virtual queryParams: Object
-      @public @virtual pathParams: Object
+      @public @virtual context: ContextInterface
+      # @public @virtual queryParams: Object
+      # @public @virtual pathParams: Object
       @public @virtual currentUserId: String
-      @public @virtual headers: Object
-      @public @virtual body: Object
+      # @public @virtual headers: Object
+      # @public @virtual body: Object
 
       @public @virtual query: Object
       @public @virtual recordId: String

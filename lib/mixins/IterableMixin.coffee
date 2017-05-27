@@ -27,7 +27,7 @@ module.exports = (Module)->
       @public @async reduce: Function,
         default: (lambda, initialValue)->
           cursor = yield @takeAll()
-          yield cursor.reduce ((item, prev)-> yield lambda item, prev), initialValue
+          yield cursor.reduce ((prev, item)-> yield lambda prev, item), initialValue
 
 
     IterableMixin.initializeMixin()
