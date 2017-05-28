@@ -147,6 +147,8 @@ module.exports = (Module)->
     @public length: Number,
       get: -> @response.length
       set: (length)-> @response.length = length
+    @public writable: Boolean,
+      get: -> @response.writable
     @public type: String,
       get: -> @response.type
       set: (type)-> @response.type = type
@@ -160,6 +162,10 @@ module.exports = (Module)->
       default: (args...)-> @response.set args...
     @public append: Function,
       default: (args...)-> @response.append args...
+    @public vary: Function,
+      default: (args...)-> @response.vary args...
+    @public flushHeaders: Function,
+      default: (args...)-> @response.flushHeaders args...
     @public remove: Function,
       default: (args...)-> @response.remove args...
     @public lastModified: Date,

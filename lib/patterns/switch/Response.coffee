@@ -274,8 +274,8 @@ module.exports = (Module)->
         @res.removeHeader field
         return
 
-    @public writable: Function,
-      default: ->
+    @public writable: Boolean,
+      get: ->
         return no if @res.finished
         socket = @res.socket
         return yes unless socket

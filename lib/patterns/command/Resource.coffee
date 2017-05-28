@@ -212,7 +212,7 @@ module.exports = (Module)->
       args: [Object]
       return: NILL
       default: (args...)->
-        console.log '>>>222', args
+        console.log '>>>>>222 IN beforeActionHook', args
         [@context] = args
         return args
 

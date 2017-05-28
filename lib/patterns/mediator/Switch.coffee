@@ -68,21 +68,24 @@ module.exports = (Module)->
             throw new Error 'Middleware must be composed of functions!'
         (context, next)->
           index = -1
-          dispatch = (i)->
+          dispatch = co.wrap (i)->
             console.log 'IN >>> compose|dispatch'
             if i <= index
-              return Module::Promise.reject new Error 'next() called multiple times'
+              throw new Error 'next() called multiple times'
             index = i
             middleware = middlewares[i]
             if i is middlewares.length
               console.log '!!!!!!!!!!!!!!!@@@@@@@@@@@@@ next', next
               middleware = next
-            return Module::Promise.resolve() unless middleware?
-            try
-              return Module::Promise.resolve middleware context, -> dispatch i+1
-            catch err
-              return Module::Promise.reject err
-          dispatch 0
+            unless middleware?
+              console.log '!!!!!!!!!!!!END'
+              yield return
+            return yield middleware context, -> dispatch i+1
+          r = dispatch 0
+          console.log 'IIIIIIIIIIIIIIiiiiiiiiiiiiiiiiiii', r.then (data)->
+            console.log 'IIIIIIii2222222', data
+            data
+          return r
     ##########################################################################
 
     # from https://github.com/koajs/route/blob/master/index.js ###############
@@ -108,7 +111,9 @@ module.exports = (Module)->
         @public "#{originMethodName}": Function,
           args: [String, LAMBDA]
           return: NILL
-          default: (path, fn)->
+          default: (path, routeFunc)->
+            unless routeFunc
+              throw new Error 'handler is required'
             { facade } = @
             self = @
             {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
@@ -116,29 +121,24 @@ module.exports = (Module)->
             re = pathToRegexp path, keys
             facade.sendNotification SEND_TO_LOG, "#{method ? 'ALL'} #{path} -> #{re}", LEVELS[DEBUG]
 
-            createRoute = (routeFunc)->
-              (ctx, next)->
-                console.log 'IN createRoute >>>>', ctx.method, method, path, ctx.path, matches ctx, method
-                unless matches ctx, method
-                  return next()
-                m = re.exec ctx.path
-                if m
-                  pathParams = m.slice(1)
-                    .map decode
-                    .reduce (prev, item, index)->
-                      prev[keys[index].name] = item
-                      prev
-                    , {}
-                  ctx.routePath = path
-                  facade.sendNotification SEND_TO_LOG, "#{ctx.method} #{path} matches #{ctx.path} #{pathParams}", LEVELS[DEBUG]
-                  ctx.pathParams = pathParams
-                  return Module::Promise.resolve routeFunc.apply self, [ctx, next]
-                  # return Module::Promise.resolve routeFunc ctx, next
-                return next()
-            @use if fn
-              createRoute fn
-            else
-              createRoute
+            @use co.wrap (ctx, next)->
+              console.log 'IN createRoute >>>>', ctx.method, method, path, ctx.path, matches ctx, method
+              unless matches ctx, method
+                yield return next()
+              m = re.exec ctx.path
+              if m
+                pathParams = m.slice(1)
+                  .map decode
+                  .reduce (prev, item, index)->
+                    prev[keys[index].name] = item
+                    prev
+                  , {}
+                ctx.routePath = path
+                facade.sendNotification SEND_TO_LOG, "#{ctx.method} #{path} matches #{ctx.path} #{pathParams}", LEVELS[DEBUG]
+                ctx.pathParams = pathParams
+                return yield routeFunc.apply self, [ctx, next]
+              yield return next()
+
             # это надо будет заиспользовать когда решится вопрос "как подрубить свайгер"
             #@defineSwaggerEndpoint voEndpoint
             return
@@ -236,17 +236,22 @@ module.exports = (Module)->
         voEmitter = @getViewComponent()
         if voEmitter.listeners('error').length is 0
           voEmitter.on 'error', @onerror.bind @
-        handleRequest = (req, res)=>
+        handleRequest = co.wrap (req, res)=>
           res.statusCode = 404
           voContext = Context.new req, res, @
-          onerror = (err)=>
-            console.log 'IN Switch::callback|handleRequest|onerror', err
-            voContext.onerror err
-          handleResponse = =>
+          try
+            yield fn voContext
             console.log 'IN Switch::callback|handleRequest|handleResponse'
             @respond voContext
-          onFinished res, onerror
-          fn(voContext).then(handleResponse).catch(onerror)
+          catch err
+            console.log 'IN Switch::callback|handleRequest|onerror', err
+            voContext.onerror err
+
+          onFinished res, (err)=>
+            console.log 'IN Switch::callback|handleRequest|onFinished', err
+            voContext.onerror err
+            return
+          yield return
         handleRequest
 
     # Default error handler
@@ -391,25 +396,32 @@ module.exports = (Module)->
       default: ({method, path, resource, action})->
         resourceName = inflect.camelize inflect.underscore "#{resource.replace /[/]/g, '_'}Resource"
 
-        @[method]? path, (context, next)=>
-          console.log '>>>!!! 000'
-          reverse = if isArangoDB()
-            crypto = require '@arangodb/crypto'
-            crypto.genRandomAlphaNumbers 32
-          else
-            crypto = require 'crypto'
-            crypto.randomBytes 32
-          console.log '>>>!!! 111'
-          @getViewComponent().once reverse, co.wrap (aoData)=>
-            console.log '>>>!!! 222', aoData
-            yield @sendHttpResponse context, aoData, {method, path, resource, action}
-            console.log '>>> after @sendHttpResponse'
-            yield return next()
-            # return yield next()
-          console.log '>>>!!! before sender ', resourceName, method, path, resource, action, context
-          @sender resourceName, {context, reverse}, {method, path, resource, action}
-          console.log '>>>!!! after sender '
-          return
+        @[method]? path, co.wrap (context, next)=>
+          yield Module::Promise.new (resolve, reject)=>
+            try
+              console.log '>>>!!! 000'
+              reverse = if isArangoDB()
+                crypto = require '@arangodb/crypto'
+                crypto.genRandomAlphaNumbers 32
+              else
+                crypto = require 'crypto'
+                crypto.randomBytes 32
+              console.log '>>>!!! 111'
+              @getViewComponent().once reverse, co.wrap (aoData)=>
+                try
+                  console.log '>>>!!! 222', aoData
+                  yield @sendHttpResponse context, aoData, {method, path, resource, action}
+                  console.log '>>> after @sendHttpResponse'
+                  yield return resolve()
+                catch error
+                  reject error
+              console.log '>>>!!! before sender ', resourceName, method, path, resource, action, context
+              @sender resourceName, {context, reverse}, {method, path, resource, action}
+              console.log '>>>!!! after sender '
+            catch err
+              reject err
+            return
+          yield return next()
         return
 
     @public init: Function,
