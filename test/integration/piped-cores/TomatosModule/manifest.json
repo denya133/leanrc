@@ -47,6 +47,16 @@
       "type": "number",
       "default": 3000
     },
+    "trustProxy": {
+      "description": "trustProxy for start tomatos server",
+      "type": "boolean",
+      "default": false
+    },
+    "subdomainOffset": {
+      "description": "subdomainOffset for start tomatos server",
+      "type": "number",
+      "default": 2
+    },
     "secret": {
       "description": "Secret key for encoding and decoding tokens.",
       "type": "string",

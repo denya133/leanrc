@@ -212,6 +212,7 @@ module.exports = (Module)->
       args: [Object]
       return: NILL
       default: (args...)->
+        console.log '>>>222', args
         [@context] = args
         return args
 
@@ -226,6 +227,7 @@ module.exports = (Module)->
       args: [Object]
       return: ANY
       default: (args...)->
+        console.log '>>>>> 111', @context, @context?.request
         @recordBody = @context.request.body?[@itemEntityName]
         return args
 
@@ -255,6 +257,7 @@ module.exports = (Module)->
       return: Module::NILL
       default: (aoNotification)->
         voBody = aoNotification.getBody()
+        console.log '>>>>>3333', voBody
         voResult = yield @[aoNotification.getType()]? voBody.context
         @sendNotification Module::HANDLER_RESULT, voResult, voBody.reverse
         yield return

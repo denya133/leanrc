@@ -1,7 +1,8 @@
-accepts = require 'accepts'
-createError = require 'http-errors'
-httpAssert = require 'http-assert'
-statuses = require 'statuses'
+_             = require 'lodash'
+accepts       = require 'accepts'
+createError   = require 'http-errors'
+httpAssert    = require 'http-assert'
+statuses      = require 'statuses'
 
 ###
 Идеи взяты из https://github.com/koajs/koa/blob/master/lib/context.js
@@ -136,7 +137,7 @@ module.exports = (Module)->
     # Response aliases
     @public body: [String, Buffer, Object, Array, Number, Boolean],
       get: -> @response.body
-      set: (body)-> @response.body = body
+      set: (body)-> console.log('IN Context::body.setter', body); @response.body = body
     @public status: [String, Number],
       get: -> @response.status
       set: (status)-> @response.status = status
@@ -166,25 +167,24 @@ module.exports = (Module)->
     @public etag: String,
       set: (etag)-> @response.etag = etag
 
-    @public toJSON: Function,
-      default: ->
-        request: @request.toJSON()
-        response: @response.toJSON()
-        app: @switch.constructor.NAME
-        originalUrl: @originalUrl
-        req: '<original req>'
-        res: '<original res>'
-        socket: '<original node socket or undefined>'
+    # @public toJSON: Function,
+    #   default: ->
+    #     # request: @request.toJSON()
+    #     # response: @response.toJSON()
+    #     # app: @switch.constructor.NAME
+    #     originalUrl: @originalUrl
+    #     req: '<original req>'
+    #     res: '<original res>'
+    #     socket: '<original node socket or undefined>'
 
-    @public inspect: Function,
-      default: -> @toJSON()
+    # @public inspect: Function,
+    #   default: -> @toJSON()
 
     @public init: Function,
-      default: (req, res, reverse, switchInstanse)->
+      default: (req, res, switchInstanse)->
         @super()
         @req = req
         @res = res
-        @reverse = reverse
         @switch = switchInstanse
         @originalUrl = req.url
         @accept = accepts req

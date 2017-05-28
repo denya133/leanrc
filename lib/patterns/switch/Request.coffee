@@ -34,7 +34,7 @@ module.exports = (Module)->
 
     @public ctx: ContextInterface
 
-    # @public baseUrl: String # под вопросом?    
+    # @public baseUrl: String # под вопросом?
     # @public database: String # возможно это тоже надо получать из метода из отдельного модуля
     # @public pathname: String
     # @public pathParams: Object # вынести в отдельный модуль, который будет подключаться как миксин, а в чейнинге будет вызваться метод, который будет распарсивать парамсы
@@ -236,13 +236,13 @@ module.exports = (Module)->
           else
             req.headers[field] ? ''
 
-    @public inspect: Function,
-      default: ->
-        return unless @req
-        @toJSON()
+    # @public inspect: Function,
+    #   default: ->
+    #     return unless @req
+    #     @toJSON()
 
-    @public toJSON: Function,
-      default: -> _.pick @, ['method', 'url', 'header']
+    # @public toJSON: Function,
+    #   default: -> _.pick @, ['method', 'url', 'header']
 
     @public init: Function,
       default: (context)->

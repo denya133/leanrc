@@ -69,12 +69,15 @@ module.exports = (Module)->
         (context, next)->
           index = -1
           dispatch = (i)->
+            console.log 'IN >>> compose|dispatch'
             if i <= index
               return Module::Promise.reject new Error 'next() called multiple times'
             index = i
             middleware = middlewares[i]
-            middleware = next if i is middlewares.length
-            return Module::Promise.resolve() unless middleware
+            if i is middlewares.length
+              console.log '!!!!!!!!!!!!!!!@@@@@@@@@@@@@ next', next
+              middleware = next
+            return Module::Promise.resolve() unless middleware?
             try
               return Module::Promise.resolve middleware context, -> dispatch i+1
             catch err
@@ -86,8 +89,9 @@ module.exports = (Module)->
     decode = (val)-> # чистая функция
       decodeURIComponent val if val
     matches = (ctx, method)-> # чистая функция
+      console.log 'IN >>> matches', ctx.method, method
       return yes unless method
-      return yes unless ctx.method is method
+      return yes if ctx.method is method
       if method is 'GET' and ctx.method is 'HEAD'
         return yes
       return no
@@ -106,6 +110,7 @@ module.exports = (Module)->
           return: NILL
           default: (path, fn)->
             { facade } = @
+            self = @
             {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
             keys = []
             re = pathToRegexp path, keys
@@ -113,6 +118,7 @@ module.exports = (Module)->
 
             createRoute = (routeFunc)->
               (ctx, next)->
+                console.log 'IN createRoute >>>>', ctx.method, method, path, ctx.path, matches ctx, method
                 unless matches ctx, method
                   return next()
                 m = re.exec ctx.path
@@ -126,8 +132,9 @@ module.exports = (Module)->
                   ctx.routePath = path
                   facade.sendNotification SEND_TO_LOG, "#{ctx.method} #{path} matches #{ctx.path} #{pathParams}", LEVELS[DEBUG]
                   ctx.pathParams = pathParams
-                  return Module::Promise.resolve routeFunc.apply ctx, next
-                return next
+                  return Module::Promise.resolve routeFunc.apply self, [ctx, next]
+                  # return Module::Promise.resolve routeFunc ctx, next
+                return next()
             @use if fn
               createRoute fn
             else
@@ -232,8 +239,12 @@ module.exports = (Module)->
         handleRequest = (req, res)=>
           res.statusCode = 404
           voContext = Context.new req, res, @
-          onerror = (err)=> voContext.onerror err
-          handleResponse = => @respond voContext
+          onerror = (err)=>
+            console.log 'IN Switch::callback|handleRequest|onerror', err
+            voContext.onerror err
+          handleResponse = =>
+            console.log 'IN Switch::callback|handleRequest|handleResponse'
+            @respond voContext
           onFinished res, onerror
           fn(voContext).then(handleResponse).catch(onerror)
         handleRequest
@@ -253,32 +264,32 @@ module.exports = (Module)->
 
     @public respond: Function,
       default: (ctx)->
+        console.log 'IN Switch::respond', ctx.writable
         return if context.respond is no
-        res = ctx.res
         return unless ctx.writable
         body = ctx.body
         code = ctx.status
         if statuses.empty[code]
           ctx.body = null
-          return res.end()
+          return ctx.res.end()
         if 'HEAD' is ctx.method
-          if not res.headersSent and _.isObjectLike body
+          if not ctx.res.headersSent and _.isObjectLike body
             ctx.length = Buffer.byteLength JSON.stringify body
-          return res.end()
+          return ctx.res.end()
         unless body?
           body = ctx.message ? String code
-          unless res.headersSent
+          unless ctx.res.headersSent
             ctx.type = 'text'
             ctx.length = Buffer.byteLength body
-          return res.end body
+          return ctx.res.end body
         if _.isBuffer(body) or _.isString body
-          return res.end body
+          return ctx.res.end body
         if body instanceof Stream
-          return body.pipe res
+          return body.pipe ctx.res
         body = JSON.stringify body
-        unless res.headersSent
+        unless ctx.res.headersSent
           ctx.length = Buffer.byteLength body
-        res.end body
+        ctx.res.end body
         return
 
     ipoRenderers = @private renderers: Object
@@ -297,6 +308,7 @@ module.exports = (Module)->
       default: (ctx, aoData, {method, path, resource, action})->
         if action is 'create'
           ctx.status = 201
+        console.log 'before switch', ctx.accepts @responseFormats
         switch (vsFormat = ctx.accepts @responseFormats)
           when 'json', 'html', 'xml', 'atom'
             if @["#{vsFormat}RendererName"]?
@@ -306,7 +318,9 @@ module.exports = (Module)->
             else
               ctx.set 'Content-Type', 'text/plain'
               voRendered = JSON.stringify aoData
+            console.log '>>> before ctx.body = voRendered', voRendered
             ctx.body = voRendered
+            console.log '>>> after ctx.body = voRendered'
           else
             ctx.set 'Content-Type', 'text/plain'
             ctx.body = JSON.stringify aoData
@@ -378,16 +392,24 @@ module.exports = (Module)->
         resourceName = inflect.camelize inflect.underscore "#{resource.replace /[/]/g, '_'}Resource"
 
         @[method]? path, (context, next)=>
+          console.log '>>>!!! 000'
           reverse = if isArangoDB()
             crypto = require '@arangodb/crypto'
             crypto.genRandomAlphaNumbers 32
           else
             crypto = require 'crypto'
             crypto.randomBytes 32
+          console.log '>>>!!! 111'
           @getViewComponent().once reverse, co.wrap (aoData)=>
+            console.log '>>>!!! 222', aoData
             yield @sendHttpResponse context, aoData, {method, path, resource, action}
-            return yield next()
+            console.log '>>> after @sendHttpResponse'
+            yield return next()
+            # return yield next()
+          console.log '>>>!!! before sender ', resourceName, method, path, resource, action, context
           @sender resourceName, {context, reverse}, {method, path, resource, action}
+          console.log '>>>!!! after sender '
+          return
         return
 
     @public init: Function,

@@ -24,7 +24,11 @@ module.exports = (Module)->
     ResponseInterface
     SwitchInterface
     ContextInterface
+    Utils
   } = Module::
+  {
+    isArangoDB
+  } = Utils
 
   class Response extends CoreObject
     @inheritProtected()
@@ -46,13 +50,13 @@ module.exports = (Module)->
       get: -> @headers
     @public headers: Object,
       get: ->
-        if _.isFunction @res.getHeaders
-          @res.getHeaders()
+        if isArangoDB()
+          @res.headers
         else
-          if _.isObject @headers
-            @headers
+          if _.isFunction @res.getHeaders
+            @res.getHeaders()
           else
-            {}
+            @res._headers ? {}
 
     @public status: Number,
       get: -> @res.statusCode
@@ -63,7 +67,8 @@ module.exports = (Module)->
         @_explicitStatus = yes
         @res.statusCode = code
         @res.statusMessage = statuses[code]
-        if @body and statuses.empty[code]
+        console.log 'IN Response::status', code, @body, statuses.empty[code], Boolean @body and statuses.empty[code]
+        if Boolean(@body and statuses.empty[code])
           @body = null
         return
 
@@ -76,9 +81,10 @@ module.exports = (Module)->
     @public body: [String, Buffer, Object, Stream],
       get: -> @_body
       set: (val)->
+        console.log 'IN Response::body.setter', @_body, val
         original = @_body
         @_body = val
-        return if res.headersSent
+        return if @res.headersSent
         unless val?
           unless statuses.empty[@status]
             @status = 204
@@ -88,11 +94,13 @@ module.exports = (Module)->
           return
         unless @_explicitStatus
           @status = 200
+        console.log 'IN Response::body.setter 222'
         setType = not @headers['content-type']
+        console.log 'IN Response::body.setter 333', setType
         if _.isString val
           if setType
             @type = if /^\s*</.test val then 'html' else 'text'
-          @length Buffer.byteLength val
+          @length = Buffer.byteLength val
           return
         if _.isBuffer val
           if setType
@@ -109,6 +117,8 @@ module.exports = (Module)->
           return
         @remove 'Content-Length'
         @type = 'json'
+        console.log 'IN Response::body.setter - END'
+        return
 
     # @public body: [String, Buffer]
     # @public locals: Object
@@ -271,15 +281,15 @@ module.exports = (Module)->
         return yes unless socket
         socket.writable
 
-    @public inspect: Function,
-      default: ->
-        return unless @res
-        o = @toJSON()
-        o.body = @body
-        o
+    # @public inspect: Function,
+    #   default: ->
+    #     return unless @res
+    #     o = @toJSON()
+    #     o.body = @body
+    #     o
 
-    @public toJSON: Function,
-      default: -> _.pick @, ['status', 'message', 'header']
+    # @public toJSON: Function,
+    #   default: -> _.pick @, ['status', 'message', 'header']
 
     @public init: Function,
       default: (context)->

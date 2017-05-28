@@ -345,6 +345,7 @@ describe 'PipedCores', ->
         cucumbers = CucumbersApp::ShellApplication.new()
         res = yield request.get 'http://localhost:3002/0.1/cucumbers'
         { body: rawBody, status, message } = res
+        console.log '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', rawBody, status, message
         assert.equal status, 200
         assert.equal message, 'OK'
         body = JSON.parse rawBody ? null

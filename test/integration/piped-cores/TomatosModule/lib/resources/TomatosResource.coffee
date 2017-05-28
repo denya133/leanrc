@@ -3,11 +3,15 @@
 module.exports = (Module)->
   {
     Resource
+    BodyParseMixin
   } = Module::
 
   class TomatosResource extends Resource
     @inheritProtected()
+    @include BodyParseMixin
     @module Module
+
+    @beforeHook 'parseBody', only: ['create', 'update']
 
     @public entityName: String,
       default: 'tomato'
