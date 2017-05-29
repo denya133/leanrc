@@ -18,8 +18,10 @@ module.exports = (Module)->
     RequestInterface
     ResponseInterface
     SwitchInterface
+    CookiesInterface
     Request
     Response
+    Cookies
   } = Module::
 
   class Context extends CoreObject
@@ -31,6 +33,7 @@ module.exports = (Module)->
     @public res: Object # native response object
     @public request: RequestInterface
     @public response: ResponseInterface
+    @public cookies: CookiesInterface
     @public state: Object
     @public switch: SwitchInterface
     @public respond: Boolean
@@ -196,6 +199,9 @@ module.exports = (Module)->
         @accept = accepts req
         @request = Request.new(@)
         @response = Response.new(@)
+        key = @switch.configs.cookieKey
+        secure = req.secure
+        @cookies = Cookies.new req, res, {key, secure}
         @state = {}
         return
 

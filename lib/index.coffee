@@ -49,6 +49,7 @@ class LeanRC extends RC
   require('./interfaces/patterns/RendererInterface') LeanRC
   require('./interfaces/patterns/RequestInterface') LeanRC
   require('./interfaces/patterns/ResponseInterface') LeanRC
+  require('./interfaces/patterns/CookiesInterface') LeanRC
   require('./interfaces/patterns/ContextInterface') LeanRC
   require('./interfaces/patterns/ResourceInterface') LeanRC
   require('./interfaces/patterns/RouterInterface') LeanRC
@@ -108,6 +109,7 @@ class LeanRC extends RC
 
   require('./patterns/switch/Request') LeanRC # need test it
   require('./patterns/switch/Response') LeanRC # need test it
+  require('./patterns/switch/Cookies') LeanRC # need test it
   require('./patterns/switch/Context') LeanRC # need test it
 
   require('./patterns/mediator/Mediator') LeanRC

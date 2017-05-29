@@ -57,6 +57,11 @@
       "type": "string",
       "default": "secret"
     },
+    "cookieKey": {
+      "description": "Secret key for sign cookies.",
+      "type": "string",
+      "default": "secret"
+    },
     "resetTokenTTL": {
       "description": "Reset token time-to-live (in seconds)",
       "type": "number",
