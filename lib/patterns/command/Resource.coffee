@@ -201,7 +201,7 @@ module.exports = (Module)->
       'list', 'detail', 'create', 'update', 'delete'
     ]
 
-    @beforeHook 'beforeActionHook'
+    @initialHook 'beforeActionHook'
 
     @beforeHook 'getRecordId', only: ['detail', 'update', 'delete']
     @beforeHook 'getRecordBody', only: ['create', 'update']
@@ -212,7 +212,6 @@ module.exports = (Module)->
       args: [Object]
       return: NILL
       default: (args...)->
-        console.log '>>>>>222 IN beforeActionHook', args
         [@context] = args
         return args
 
@@ -227,7 +226,6 @@ module.exports = (Module)->
       args: [Object]
       return: ANY
       default: (args...)->
-        console.log '>>>>> 111', @context, @context?.request
         @recordBody = @context.request.body?[@itemEntityName]
         return args
 
@@ -257,7 +255,6 @@ module.exports = (Module)->
       return: Module::NILL
       default: (aoNotification)->
         voBody = aoNotification.getBody()
-        console.log '>>>>>3333', voBody
         voResult = yield @[aoNotification.getType()]? voBody.context
         @sendNotification Module::HANDLER_RESULT, voResult, voBody.reverse
         yield return

@@ -11,7 +11,7 @@ module.exports = (Module)->
     @include BodyParseMixin
     @module Module
 
-    @beforeHook 'parseBody', only: ['create', 'update']
+    @initialHook 'parseBody', only: ['create', 'update']
 
     @public entityName: String,
       default: 'cucumber'

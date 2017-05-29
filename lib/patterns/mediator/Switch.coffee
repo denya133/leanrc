@@ -69,30 +69,22 @@ module.exports = (Module)->
         (context, next)->
           index = -1
           dispatch = co.wrap (i)->
-            console.log 'IN >>> compose|dispatch'
             if i <= index
               throw new Error 'next() called multiple times'
             index = i
             middleware = middlewares[i]
             if i is middlewares.length
-              console.log '!!!!!!!!!!!!!!!@@@@@@@@@@@@@ next', next
               middleware = next
             unless middleware?
-              console.log '!!!!!!!!!!!!END'
               yield return
             return yield middleware context, -> dispatch i+1
-          r = dispatch 0
-          console.log 'IIIIIIIIIIIIIIiiiiiiiiiiiiiiiiiii', r.then (data)->
-            console.log 'IIIIIIii2222222', data
-            data
-          return r
+          return dispatch 0
     ##########################################################################
 
     # from https://github.com/koajs/route/blob/master/index.js ###############
     decode = (val)-> # чистая функция
       decodeURIComponent val if val
-    matches = (ctx, method)-> # чистая функция
-      console.log 'IN >>> matches', ctx.method, method
+    matches = (ctx, method)->
       return yes unless method
       return yes if ctx.method is method
       if method is 'GET' and ctx.method is 'HEAD'
@@ -122,7 +114,6 @@ module.exports = (Module)->
             facade.sendNotification SEND_TO_LOG, "#{method ? 'ALL'} #{path} -> #{re}", LEVELS[DEBUG]
 
             @use co.wrap (ctx, next)->
-              console.log 'IN createRoute >>>>', ctx.method, method, path, ctx.path, matches ctx, method
               unless matches ctx, method
                 yield return next()
               m = re.exec ctx.path
@@ -241,14 +232,11 @@ module.exports = (Module)->
           voContext = Context.new req, res, @
           try
             yield fn voContext
-            console.log 'IN Switch::callback|handleRequest|handleResponse'
             @respond voContext
           catch err
-            console.log 'IN Switch::callback|handleRequest|onerror', err
             voContext.onerror err
 
           onFinished res, (err)=>
-            console.log 'IN Switch::callback|handleRequest|onFinished', err
             voContext.onerror err
             return
           yield return
@@ -269,7 +257,6 @@ module.exports = (Module)->
 
     @public respond: Function,
       default: (ctx)->
-        console.log 'IN Switch::respond', ctx.writable
         return if context.respond is no
         return unless ctx.writable
         body = ctx.body
@@ -313,7 +300,6 @@ module.exports = (Module)->
       default: (ctx, aoData, {method, path, resource, action})->
         if action is 'create'
           ctx.status = 201
-        console.log 'before switch', ctx.accepts @responseFormats
         switch (vsFormat = ctx.accepts @responseFormats)
           when 'json', 'html', 'xml', 'atom'
             if @["#{vsFormat}RendererName"]?
@@ -323,9 +309,7 @@ module.exports = (Module)->
             else
               ctx.set 'Content-Type', 'text/plain'
               voRendered = JSON.stringify aoData
-            console.log '>>> before ctx.body = voRendered', voRendered
             ctx.body = voRendered
-            console.log '>>> after ctx.body = voRendered'
           else
             ctx.set 'Content-Type', 'text/plain'
             ctx.body = JSON.stringify aoData
@@ -399,25 +383,19 @@ module.exports = (Module)->
         @[method]? path, co.wrap (context, next)=>
           yield Module::Promise.new (resolve, reject)=>
             try
-              console.log '>>>!!! 000'
               reverse = if isArangoDB()
                 crypto = require '@arangodb/crypto'
                 crypto.genRandomAlphaNumbers 32
               else
                 crypto = require 'crypto'
                 crypto.randomBytes 32
-              console.log '>>>!!! 111'
               @getViewComponent().once reverse, co.wrap (aoData)=>
                 try
-                  console.log '>>>!!! 222', aoData
                   yield @sendHttpResponse context, aoData, {method, path, resource, action}
-                  console.log '>>> after @sendHttpResponse'
                   yield return resolve()
                 catch error
                   reject error
-              console.log '>>>!!! before sender ', resourceName, method, path, resource, action, context
               @sender resourceName, {context, reverse}, {method, path, resource, action}
-              console.log '>>>!!! after sender '
             catch err
               reject err
             return

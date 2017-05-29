@@ -67,7 +67,6 @@ module.exports = (Module)->
         @_explicitStatus = yes
         @res.statusCode = code
         @res.statusMessage = statuses[code]
-        console.log 'IN Response::status', code, @body, statuses.empty[code], Boolean @body and statuses.empty[code]
         if Boolean(@body and statuses.empty[code])
           @body = null
         return
@@ -81,7 +80,6 @@ module.exports = (Module)->
     @public body: [String, Buffer, Object, Stream],
       get: -> @_body
       set: (val)->
-        console.log 'IN Response::body.setter', @_body, val
         original = @_body
         @_body = val
         return if @res.headersSent
@@ -94,9 +92,7 @@ module.exports = (Module)->
           return
         unless @_explicitStatus
           @status = 200
-        console.log 'IN Response::body.setter 222'
         setType = not @headers['content-type']
-        console.log 'IN Response::body.setter 333', setType
         if _.isString val
           if setType
             @type = if /^\s*</.test val then 'html' else 'text'
@@ -117,7 +113,6 @@ module.exports = (Module)->
           return
         @remove 'Content-Length'
         @type = 'json'
-        console.log 'IN Response::body.setter - END'
         return
 
     # @public body: [String, Buffer]

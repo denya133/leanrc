@@ -137,7 +137,7 @@ module.exports = (Module)->
     # Response aliases
     @public body: [String, Buffer, Object, Array, Number, Boolean],
       get: -> @response.body
-      set: (body)-> console.log('IN Context::body.setter', body); @response.body = body
+      set: (body)-> @response.body = body
     @public status: [String, Number],
       get: -> @response.status
       set: (status)-> @response.status = status
