@@ -6,7 +6,7 @@ Resource = LeanRC::Resource
 { co } = LeanRC::Utils
 
 describe 'BulkActionsResourceMixin', ->
-  describe '#parseQuery', ->
+  describe '#getQuery', ->
     it 'should resource query', ->
       co ->
         class Test extends LeanRC::Module
@@ -21,9 +21,9 @@ describe 'BulkActionsResourceMixin', ->
             default: 'TestEntity'
         Test::TestResource.initialize()
         resource = Test::TestResource.new()
-        resource.beforeActionHook
-          queryParams: query: '{"test":"test123"}'
-        resource.parseQuery()
+        resource.context =
+          query: query: '{"test":"test123"}'
+        resource.getQuery()
         assert.deepEqual resource.query, test: 'test123'
         yield return
   describe '#list', ->
@@ -83,12 +83,7 @@ describe 'BulkActionsResourceMixin', ->
         yield collection.create test: 'test2'
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        { items, meta } = yield resource.list
-          queryParams: query: '{}'
-          pathParams: {}
-          currentUserId: 'ID'
-          headers: {}
-          body: {}
+        { items, meta } = yield resource.list query: query: '{}'
         assert.deepEqual meta, pagination:
           total: 'not defined'
           limit: 'not defined'
@@ -167,13 +162,13 @@ describe 'BulkActionsResourceMixin', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        record1 = yield resource.create body: test_entity: test: 'test1'
-        record2 = yield resource.create body: test_entity: test: 'test2'
-        record3 = yield resource.create body: test_entity: test: 'test2'
+        record1 = yield collection.create test: 'test1'
+        record2 = yield collection.create test: 'test2'
+        record3 = yield collection.create test: 'test2'
         yield resource.bulkUpdate
-          queryParams: query: '{"test":{"$eq":"test2"}}'
-          body: test_entity: test: 'test8'
-        { items } = yield resource.list queryParams: query: '{"test":{"$eq":"test8"}}'
+          query: query: '{"test":{"$eq":"test2"}}'
+          request: body: test_entity: test: 'test8'
+        { items } = yield resource.list query: query: '{"test":{"$eq":"test8"}}'
         assert.lengthOf items, 2
         for record in items
           assert.propertyVal record, 'test', 'test8'
@@ -249,13 +244,13 @@ describe 'BulkActionsResourceMixin', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        record1 = yield resource.create body: test_entity: test: 'test1'
-        record2 = yield resource.create body: test_entity: test: 'test2'
-        record3 = yield resource.create body: test_entity: test: 'test2'
+        record1 = yield collection.create test: 'test1'
+        record2 = yield collection.create test: 'test2'
+        record3 = yield collection.create test: 'test2'
         yield resource.bulkPatch
-          queryParams: query: '{"test":{"$eq":"test2"}}'
-          body: test_entity: test: 'test8'
-        { items } = yield resource.list queryParams: query: '{"test":{"$eq":"test8"}}'
+          query: query: '{"test":{"$eq":"test2"}}'
+          request: body: test_entity: test: 'test8'
+        { items } = yield resource.list query: query: '{"test":{"$eq":"test8"}}'
         assert.lengthOf items, 2
         for record in items
           assert.propertyVal record, 'test', 'test8'
@@ -327,13 +322,12 @@ describe 'BulkActionsResourceMixin', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        record1 = yield resource.create body: test_entity: test: 'test1'
-        record2 = yield resource.create body: test_entity: test: 'test2'
-        record3 = yield resource.create body: test_entity: test: 'test2'
+        record1 = yield collection.create test: 'test1'
+        record2 = yield collection.create test: 'test2'
+        record3 = yield collection.create test: 'test2'
         assert.lengthOf collection.getData().data, 3
         assert.lengthOf _.filter(collection.getData().data, test: 'test2'), 2
-        yield resource.bulkDelete
-          queryParams: query: '{"test":{"$eq":"test2"}}'
+        yield resource.bulkDelete query: query: '{"test":{"$eq":"test2"}}'
 
         assert.lengthOf collection.getData().data, 1
         assert.lengthOf _.filter(collection.getData().data, test: 'test2'), 0

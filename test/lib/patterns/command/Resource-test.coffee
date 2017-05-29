@@ -221,18 +221,16 @@ describe 'Resource', ->
         Test::TestResource.initialize()
         resource = Test::TestResource.new()
         resource.beforeActionHook
-          queryParams: query: '{"test":"test123"}'
+          query: query: '{"test":"test123"}'
           pathParams: testParam: 'testParamValue'
-          currentUserId: 'ID'
           headers: 'test-header': 'test-header-value'
-          body: test: 'test678'
-        assert.deepPropertyVal resource, 'queryParams.query', '{"test":"test123"}'
-        assert.deepPropertyVal resource, 'pathParams.testParam', 'testParamValue'
-        assert.propertyVal resource, 'currentUserId', 'ID'
-        assert.deepPropertyVal resource, 'headers.test-header', 'test-header-value'
-        assert.deepPropertyVal resource, 'body.test', 'test678'
+          request: body: test: 'test678'
+        assert.deepPropertyVal resource, 'context.query.query', '{"test":"test123"}'
+        assert.deepPropertyVal resource, 'context.pathParams.testParam', 'testParamValue'
+        assert.deepPropertyVal resource, 'context.headers.test-header', 'test-header-value'
+        assert.deepPropertyVal resource, 'context.request.body.test', 'test678'
         yield return
-  describe '#parsePathParams', ->
+  describe '#getRecordId', ->
     it 'should get resource record ID', ->
       co ->
         class Test extends LeanRC::Module
@@ -246,28 +244,28 @@ describe 'Resource', ->
             default: 'TestEntity'
         Test::TestResource.initialize()
         resource = Test::TestResource.new()
-        resource.beforeActionHook
+        resource.context =
           pathParams: test_entity: 'ID123456'
-        resource.parsePathParams()
+        resource.getRecordId()
         assert.propertyVal resource, 'recordId', 'ID123456'
         yield return
-  describe '#parseBody', ->
+  describe '#getRecordBody', ->
     it 'should get body', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
           @root __dirname
         Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
-        resource.beforeActionHook
-          body: test_entity: test: 'test9'
-        resource.parseBody()
+        TestResource.initialize()
+        resource = TestResource.new()
+        resource.context =
+          request: body: test_entity: test: 'test9'
+        resource.getRecordBody()
         assert.deepEqual resource.recordBody, test: 'test9'
         yield return
   describe '#beforeUpdate', ->
@@ -284,11 +282,11 @@ describe 'Resource', ->
             default: 'TestEntity'
         Test::TestResource.initialize()
         resource = Test::TestResource.new()
-        resource.beforeActionHook
+        resource.context =
           pathParams: test_entity: 'ID123456'
-          body: test_entity: test: 'test9'
-        resource.parsePathParams()
-        resource.parseBody()
+          request: body: test_entity: test: 'test9'
+        resource.getRecordId()
+        resource.getRecordBody()
         resource.beforeUpdate()
         assert.deepEqual resource.recordBody, id: 'ID123456', test: 'test9'
         yield return
@@ -309,7 +307,7 @@ describe 'Resource', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -379,7 +377,7 @@ describe 'Resource', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -422,13 +420,9 @@ describe 'Resource', ->
         record = yield collection.create test: 'test2'
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        params =
-          queryParams: {}
+        context =
           pathParams: "#{resource.keyName}": record.id
-          currentUserId: 'ID'
-          headers: {}
-          body: {}
-        result = yield resource.detail params
+        result = yield resource.detail context
         assert.propertyVal result, 'id', record.id
         assert.propertyVal result, 'test', 'test2'
         yield return
@@ -449,7 +443,7 @@ describe 'Resource', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -490,7 +484,7 @@ describe 'Resource', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        result = yield resource.create body: test_entity: test: 'test3'
+        result = yield resource.create request: body: test_entity: test: 'test3'
         assert.propertyVal result, 'test', 'test3'
         yield return
   describe '#update', ->
@@ -510,7 +504,7 @@ describe 'Resource', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -538,7 +532,7 @@ describe 'Resource', ->
             default: (id, aoRecord) ->
               item = _.find @getData().data, {id}
               if item?
-                FORBIDDEN = [ '_key', 'id', '_type', '_rev' ]
+                FORBIDDEN = [ '_key', '_id', '_type', '_rev' ]
                 snapshot = _.omit (aoRecord.toJSON?() ? aoRecord ? {}), FORBIDDEN
                 item[key] = value  for own key, value of snapshot
               yield @take id
@@ -559,10 +553,10 @@ describe 'Resource', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        record = yield resource.create body: test_entity: test: 'test3'
+        record = yield collection.create test: 'test3'
         result = yield resource.update
           pathParams: test_entity: record.id
-          body: test_entity: test: 'test8'
+          request: body: test_entity: test: 'test8'
         assert.propertyVal result, 'test', 'test8'
         yield return
   describe '#delete', ->
@@ -582,7 +576,7 @@ describe 'Resource', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -610,7 +604,7 @@ describe 'Resource', ->
             default: (id, aoRecord) ->
               item = _.find @getData().data, {id}
               if item?
-                FORBIDDEN = [ '_key', 'id', '_type', '_rev' ]
+                FORBIDDEN = [ '_key', '_id', '_type', '_rev' ]
                 snapshot = _.omit (aoRecord.toJSON?() ? aoRecord ? {}), FORBIDDEN
                 item[key] = value  for own key, value of snapshot
               yield @take id
@@ -631,7 +625,7 @@ describe 'Resource', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        record = yield resource.create body: test_entity: test: 'test3'
+        record = yield collection.create test: 'test3'
         result = yield resource.delete
           pathParams: test_entity: record.id
         assert.propertyVal result, 'isHidden', yes
@@ -653,7 +647,7 @@ describe 'Resource', ->
           @public init: Function,
             default: ->
               @super arguments...
-              @_type = 'Test::TestRecord'
+              @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -703,12 +697,15 @@ describe 'Resource', ->
         collection = facade.retrieveProxy COLLECTION_NAME
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        yield resource.create body: test_entity: test: 'test1'
-        yield resource.create body: test_entity: test: 'test2'
-        yield resource.create body: test_entity: test: 'test2'
+        yield collection.create test: 'test1'
+        yield collection.create test: 'test2'
+        yield collection.create test: 'test2'
+        # yield resource.create body: test_entity: test: 'test1'
+        # yield resource.create body: test_entity: test: 'test2'
+        # yield resource.create body: test_entity: test: 'test2'
         spySendNotitfication = sinon.spy resource, 'sendNotification'
         testBody =
-          queryParams: query: '{"test":{"$eq":"test2"}}'
+          context: query: query: '{"test":{"$eq":"test2"}}'
           reverse: 'TEST_REVERSE'
         notification = LeanRC::Notification.new 'TEST_NAME', testBody, 'list'
         yield resource.execute notification

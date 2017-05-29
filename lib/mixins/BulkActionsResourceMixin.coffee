@@ -55,18 +55,18 @@ module.exports = (Module)->
         'bulkUpdate', 'bulkPatch', 'bulkDelete'
       ]
 
-      @beforeHook 'parseQuery', only: [
+      @beforeHook 'getQuery', only: [
         'list'
         'bulkUpdate', 'bulkPatch', 'bulkDelete'
       ]
-      @beforeHook 'parseBody', only: ['bulkUpdate', 'bulkPatch']
+      @beforeHook 'getRecordBody', only: ['bulkUpdate', 'bulkPatch']
       @beforeHook 'omitBody', only: ['bulkUpdate', 'bulkPatch']
 
-      @public parseQuery: Function,
+      @public getQuery: Function,
         args: [Object]
         return: ANY
         default: (args...)->
-          @query = JSON.parse @queryParams['query'] ? "{}"
+          @query = JSON.parse @context.query['query'] ? "{}"
           return args
 
 

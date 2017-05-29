@@ -151,7 +151,7 @@ module.exports = (Module)->
     # @public headers: Object
     # @public body: Object
 
-    @public query: Object
+    @public query: Object # used in BulkActionsResourceMixin::getQuery
     @public recordId: String
     @public recordBody: Object
 
