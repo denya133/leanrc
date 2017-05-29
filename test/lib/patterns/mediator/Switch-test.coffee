@@ -292,31 +292,29 @@ describe 'Switch', ->
         facade = Facade.getInstance 'TEST_SWITCH_6'
         class Test extends LeanRC
           @inheritProtected()
+          @root "#{__dirname}/config/root"
         Test.initialize()
-
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
         class Test::TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
         Test::TestRouter.initialize()
         facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
-        class AppConfiguration extends LeanRC::Configuration
-          @inheritProtected()
-          @module Test
-          @public defineConfigProperties: Function,
-            default: ->
-          @public currentUserCookie: String,
-            default: 'cuc'
-        AppConfiguration.initialize()
-        facade.registerProxy AppConfiguration.new LeanRC::CONFIGURATION
+        # class AppConfiguration extends LeanRC::Configuration
+        #   @inheritProtected()
+        #   @module Test
+        #   @public defineConfigProperties: Function,
+        #     default: ->
+        #   @public currentUserCookie: String,
+        #     default: 'cuc'
+        # AppConfiguration.initialize()
+        # facade.registerProxy AppConfiguration.new LeanRC::CONFIGURATION
         class Test::TestSwitch extends Switch
           @inheritProtected()
           @module Test
           @public routerName: String,
-            configurable: yes
             default: 'TEST_SWITCH_ROUTER'
-          @public createNativeRoute: Function,
-            configurable: yes
-            default: ->
         Test::TestSwitch.initialize()
         switchMediator = Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator.initializeNotifier 'TEST_SWITCH_6'

@@ -347,12 +347,7 @@ describe 'Resource', ->
         yield collection.create test: 'test2'
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        { items, meta } = yield resource.list
-          queryParams: query: '{}'
-          pathParams: {}
-          currentUserId: 'ID'
-          headers: {}
-          body: {}
+        { items, meta } = yield resource.list query: query: '{}'
         assert.deepEqual meta, pagination:
           total: 'not defined'
           limit: 'not defined'

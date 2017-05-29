@@ -1,8 +1,11 @@
 _             = require 'lodash'
 inflect       = do require 'i'
+statuses      = require 'statuses'
 
-# TODO: Надо изготовить bodyParseMixin - который будет распарсивать тело в ctx - за основу можно взять https://github.com/cojs/co-body
-# TODO: Надо изготовить cookieParseMixin - который будет распарсивать куки.
+HTTP_NOT_FOUND    = statuses 'not found'
+UNAUTHORIZED      = statuses 'unauthorized'
+FORBIDDEN         = statuses 'forbidden'
+UPGRADE_REQUIRED  = statuses 'upgrade required'
 
 module.exports = (Module)->
   {
@@ -25,104 +28,83 @@ module.exports = (Module)->
 
     # @public entityName: String # Имя сущности должно быть установлено при объявлении дочернего класса
 
-    # TODO: надо будет в будущем решить вопрос где должны быть эти вещи:
+    # example of usage
     ###
-
-    @initialHook 'initializeDependencies'
     @initialHook 'checkApiVersion'
+    @initialHook 'checkSession'
+    @initialHook 'adminOnly', only: ['create'] # required checkSession before
+    @initialHook 'checkOwner', only: ['detail', 'update', 'delete'] # required checkSession before
 
-    @beforeHook 'permitBody',       only: ['create', 'update']
+    @beforeHook 'beforeLimitedList', only: ['list']
     @beforeHook 'setOwnerId',       only: ['create']
     @beforeHook 'protectOwnerId',   only: ['update']
     @beforeHook 'protectSpaceId',   only: ['update']
 
-    initializeDependencies: (args...)->
-      console.log '???? test @Module', @Module
-      @constructor.Module.initializeModules()
-      args
-
-    checkApiVersion: (args...)->
-      vVersion = @req.pathParams.v
-      vCurrentVersion = @constructor.Module.context.manifest.version
-      [vNeedVersion] = vCurrentVersion.match /^\d{1,}[.]\d{1,}/
-      sendError = =>
-        @res.throw UPGRADE_REQUIRED, "Upgrade: v#{vNeedVersion}"
-      unless /^[v]\d{1,}[.]\d{1,}/.test vVersion
-        sendError()
-      unless new RegExp(vVersion).test "v#{vCurrentVersion}"
-        sendError()
-      args
-
-    setOwnerId: ->
-      @isValid()
-      @body.ownerId = @currentUser?._key ? null
-      return
-
-    protectOwnerId: ->
-      @isValid()
-      @body = _.omit @body, ['ownerId']
-      return
-
-    protectSpaceId: ->
-      @isValid()
-      @body = _.omit @body, ['spaceId']
-      return
-
-    beforeLimitedList: (query = {}) ->
-      { currentUser } = @req
-      if currentUser? and not currentUser.isAdmin
-        query.ownerId = currentUser._key
-      {@query, @currentUser} = {query, currentUser}
-      return
-
-    _checkHeader: (req) ->
-      { apiKey }        = @Module.context.configuration
-      {
-        authorization: authHeader
-      } = req.headers
-      return no   unless authHeader?
-      [..., key] = (/^Bearer\s+(.+)$/.exec authHeader) ? []
-      return no   unless key?
-      encryptedApiKey = crypto.sha512 apiKey
-      crypto.constantEquals encryptedApiKey, key
-
-    checkSession: (args...)->
-      # Must be implemented CheckSessionMixin and inclede in all controllers
-      @req.currentUser = {}
-      args
-
-    checkOwner: @method [], ->
-      @isValid()
-      read: [ @Model.collectionName() ]
-    , (args...) ->
-      @isValid()
-      unless @req.session?.uid? and @req.currentUser?
-        @res.throw UNAUTHORIZED
-        return
-      if @req.currentUser.isAdmin
-        return args
-      unless (key = @req.pathParams[@constructor.keyName()])?
-        return args
-      doc = @Model.find key, @req.currentUser
-      unless doc?
-        @res.throw HTTP_NOT_FOUND
-      unless doc._owner
-        return args
-      if @req.currentUser._key isnt doc._owner
-        @res.throw FORBIDDEN
-        return
-      args
-
-    adminOnly: (args...) ->
-      unless @req.session?.uid? and @req.currentUser?
-        @res.throw UNAUTHORIZED
-        return
-      unless @req.currentUser.isAdmin
-        @res.throw FORBIDDEN
-        return
-      args
-
     ###
+
+    @public @async checkApiVersion: Function,
+      default: (args...)->
+        vVersion = @context.pathParams.v
+        vCurrentVersion = @configs.version
+        [vNeedVersion] = vCurrentVersion.match /^\d{1,}[.]\d{1,}/
+        sendError = =>
+          @context.throw UPGRADE_REQUIRED, "Upgrade: v#{vNeedVersion}"
+        unless /^[v]\d{1,}[.]\d{1,}/.test vVersion
+          sendError()
+        unless new RegExp(vVersion).test "v#{vCurrentVersion}"
+          sendError()
+        yield return args
+
+    @public @async setOwnerId: Function,
+      default: (args...)->
+        @recordBody.ownerId = @currentUser?.id ? null
+        yield return args
+
+    @public @async protectOwnerId: Function,
+      default: (args...)->
+        @recordBody = _.omit @recordBody, ['ownerId']
+        yield return args
+
+    @public @async protectSpaceId: Function,
+      default: (args...)->
+        @recordBody = _.omit @recordBody, ['spaceId']
+        yield return args
+
+    @public @async beforeLimitedList: Function,
+      default: (args...)->
+        if @currentUser? and not @currentUser.isAdmin
+          @query ?= {}
+          @query.ownerId = @currentUser.id
+        yield return args
+
+    @public @async checkOwner: Function,
+      default: (args...) ->
+        unless @session?.uid? and @currentUser?
+          @context.throw UNAUTHORIZED
+          return
+        if @currentUser.isAdmin
+          return args
+        unless (key = @context.pathParams[@keyName])?
+          return args
+        doc = yield @collection.find key
+        unless doc?
+          @context.throw HTTP_NOT_FOUND
+        unless doc.ownerId
+          return args
+        if @currentUser.id isnt doc.ownerId
+          @context.throw FORBIDDEN
+          return
+        yield return args
+
+    @public @async adminOnly: Function,
+      default: (args...) ->
+        unless @session?.uid? and @currentUser?
+          @context.throw UNAUTHORIZED
+          return
+        unless @currentUser.isAdmin
+          @context.throw FORBIDDEN
+          return
+        yield return args
 
     @public keyName: String,
       get: ->
@@ -145,13 +127,7 @@ module.exports = (Module)->
         @facade.retrieveProxy @collectionName
 
     @public context: ContextInterface
-    # @public queryParams: Object
-    # @public pathParams: Object
-    @public currentUserId: String
-    # @public headers: Object
-    # @public body: Object
 
-    @public query: Object # used in BulkActionsResourceMixin::getQuery
     @public recordId: String
     @public recordBody: Object
 

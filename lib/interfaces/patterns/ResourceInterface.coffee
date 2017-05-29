@@ -27,13 +27,7 @@ module.exports = (Module)->
       @public @virtual collection: CollectionInterface
 
       @public @virtual context: ContextInterface
-      # @public @virtual queryParams: Object
-      # @public @virtual pathParams: Object
-      @public @virtual currentUserId: String
-      # @public @virtual headers: Object
-      # @public @virtual body: Object
 
-      @public @virtual query: Object
       @public @virtual recordId: String
       @public @virtual recordBody: Object
 
@@ -45,29 +39,19 @@ module.exports = (Module)->
 
 
       @public @async @virtual list: Function,
-        args: [Object] # {queryParams, pathParams, currentUserId, headers, body }
+        args: [Object]
         return: NILL # без return. данные посылаем сигналом
       @public @async @virtual detail: Function,
-        args: [Object] # {queryParams, pathParams, currentUserId, headers, body }
+        args: [Object]
         return: NILL # без return. данные посылаем сигналом
       @public @async @virtual create: Function,
-        args: [Object] # {queryParams, pathParams, currentUserId, headers, body }
+        args: [Object]
         return: NILL # без return. данные посылаем сигналом
       @public @async @virtual update: Function,
-        args: [Object] # {queryParams, pathParams, currentUserId, headers, body }
+        args: [Object]
         return: NILL # без return. данные посылаем сигналом
       @public @async @virtual delete: Function,
-        args: [Object] # {queryParams, pathParams, currentUserId, headers, body }
-        return: NILL # без return. данные посылаем сигналом
-
-      @public @async @virtual bulkUpdate: Function,
-        args: [Object] # {queryParams, pathParams, currentUserId, headers, body }
-        return: NILL # без return. данные посылаем сигналом
-      @public @async @virtual bulkPatch: Function,
-        args: [Object] # {queryParams, pathParams, currentUserId, headers, body }
-        return: NILL # без return. данные посылаем сигналом
-      @public @async @virtual bulkDelete: Function,
-        args: [Object] # {queryParams, pathParams, currentUserId, headers, body }
+        args: [Object]
         return: NILL # без return. данные посылаем сигналом
 
 

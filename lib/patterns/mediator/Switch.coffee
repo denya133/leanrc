@@ -324,20 +324,6 @@ module.exports = (Module)->
 
     @public sender: Function,
       default: (resourceName, aoMessage, {method, path, resource, action})->
-        # queryParams = req.query
-        # pathParams = req.params
-        # currentUserId = req.cookies[@configs.currentUserCookie]
-        # headers = req.headers
-        # body = req.body
-        # voMessage = {
-        #   queryParams
-        #   pathParams
-        #   currentUserId
-        #   headers
-        #   body
-        #   reverse
-        # }
-
         @sendNotification resourceName, aoMessage, action
         return
 

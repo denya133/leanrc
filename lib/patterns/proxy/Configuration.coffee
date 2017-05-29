@@ -125,7 +125,13 @@ module.exports = (Module)->
       return: NILL
       default: ->
         manifestPath = "#{@ROOT}/../manifest.json"
-        configFromManifest = require(manifestPath).configuration
+        manifest = require manifestPath
+        Reflect.defineProperty @, 'version',
+          enumerable: yes
+          configurable: yes
+          writable: no
+          value: manifest.version
+        configFromManifest = manifest.configuration
         filePath = "#{@ROOT}/../configs/#{@environment}"
         configFromFile = require filePath
         configs = extend {}, configFromManifest, configFromFile

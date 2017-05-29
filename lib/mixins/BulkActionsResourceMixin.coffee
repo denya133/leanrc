@@ -17,6 +17,8 @@ module.exports = (Module)->
     class BulkActionsResourceMixin extends BaseClass
       @inheritProtected()
 
+      @public query: Object
+
       @action @async list: Function,
         default: ->
           vlItems = yield (yield @collection.query @query).toArray()
