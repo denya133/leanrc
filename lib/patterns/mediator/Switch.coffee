@@ -374,7 +374,7 @@ module.exports = (Module)->
                 crypto.genRandomAlphaNumbers 32
               else
                 crypto = require 'crypto'
-                crypto.randomBytes 32
+                crypto.randomBytes(32).toString 'hex'
               @getViewComponent().once reverse, co.wrap (aoData)=>
                 try
                   yield @sendHttpResponse context, aoData, {method, path, resource, action}

@@ -8,6 +8,8 @@ class LeanRC extends RC
 
   @root __dirname
 
+  Utils: RC::Utils.extend {}, RC::Utils
+
   @const HANDLER_RESULT:  0
   @const RECORD_CHANGED:  1
   @const CONFIGURATION:  Symbol 'ConfigurationProxy'
@@ -68,6 +70,8 @@ class LeanRC extends RC
   require('./interfaces/core/ControllerInterface') LeanRC
   require('./interfaces/core/ModelInterface') LeanRC
   require('./interfaces/core/ViewInterface') LeanRC
+
+  require('./utils/auth') LeanRC
 
   require('./mixins/ConfigurableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC
