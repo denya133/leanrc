@@ -172,7 +172,8 @@ module.exports = (Module)->
           return 'https'
         unless trustProxy
           return 'http'
-        proto = @get('X-Forwarded-Proto') ? 'http'
+        proto = @get 'X-Forwarded-Proto'
+        proto = 'http'  unless proto
         proto.split(/\s*,\s*/)[0]
 
     # xhr отсутствует в интерфейсе koa - возможно лучше его и здесь не делать, чтобы не ломать интерфейс koa

@@ -153,3 +153,55 @@ describe 'Request', ->
         assert.equal request.url, 'http://localhost:9999'
         assert.equal context.req.url, 'http://localhost:9999'
         yield return
+  describe '#socket', ->
+    it 'should get request socket', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+
+        context =
+          switch:
+            configs:
+              trustProxy: yes
+          req:
+            url: 'http://localhost:8888'
+            headers: 'x-forwarded-for': '192.168.0.1'
+            socket: {}
+        request = Request.new context
+        assert.equal request.socket, context.req.socket
+        yield return
+  describe '#protocol', ->
+    it 'should get request protocol name', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        # context =
+        #   switch: configs: trustProxy: no#yes
+        #   req:
+        #     url: 'http://localhost:8888'
+        #     headers: 'x-forwarded-for': '192.168.0.1'
+        request = Request.new
+          switch: configs: trustProxy: no#yes
+          req:
+            url: 'http://localhost:8888'
+            headers: 'x-forwarded-for': '192.168.0.1'
+        assert.equal request.protocol, 'http'
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            url: 'http://localhost:8888'
+            headers: 'x-forwarded-for': '192.168.0.1'
+        assert.equal request.protocol, 'http'
+        yield return
