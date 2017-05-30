@@ -129,3 +129,27 @@ describe 'Request', ->
         request = Request.new context
         assert.equal request.originalUrl, context.originalUrl
         yield return
+  describe '#url', ->
+    it 'should set and get native request URL', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        context =
+          switch:
+            configs:
+              trustProxy: yes
+          req:
+            url: 'http://localhost:8888'
+            headers: 'x-forwarded-for': '192.168.0.1'
+        request = Request.new context
+        assert.equal request.url, 'http://localhost:8888'
+        request.url = 'http://localhost:9999'
+        assert.equal request.url, 'http://localhost:9999'
+        assert.equal context.req.url, 'http://localhost:9999'
+        yield return
