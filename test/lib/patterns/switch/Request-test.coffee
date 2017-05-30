@@ -506,3 +506,37 @@ describe 'Request', ->
               'if-none-match': '"foo"'
         assert.isTrue request.fresh
         yield return
+  describe '#stale', ->
+    it 'should test inverted request freshness', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        request = Request.new
+          status: 200
+          switch: configs: trustProxy: yes
+          response:
+            headers: 'etag': '"bar"'
+          req:
+            method: 'GET'
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'if-none-match': '"foo"'
+        assert.isTrue request.stale
+        request = Request.new
+          status: 200
+          switch: configs: trustProxy: yes
+          response:
+            headers: 'etag': '"foo"'
+          req:
+            method: 'GET'
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'if-none-match': '"foo"'
+        assert.isFalse request.stale
+        yield return
