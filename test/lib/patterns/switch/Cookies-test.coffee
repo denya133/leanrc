@@ -75,3 +75,36 @@ describe 'Cookies', ->
           "#{COOKIE_NAME}.sig=#{keys.sign "#{COOKIE_NAME}=#{COOKIE_VALUE}"}; path=/; expires=#{expires.toUTCString()}; domain=#{DOMAIN}; httponly"
         ]
         yield return
+  describe '#get', ->
+    before ->
+      server.listen 8888
+    after ->
+      server.close()
+    it 'should set to cookie value', ->
+      co ->
+        COOKIE_KEY = 'KEY'
+        COOKIE_NAME = 'TEST_COOKIE'
+        COOKIE_VALUE = 'TEST_COOKIE_VALUE'
+        MAX_AGE = 100000
+        DOMAIN = 'example.com'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Cookies extends LeanRC::Cookies
+          @inheritProtected()
+          @module Test
+        Cookies.initialize()
+        promise = LeanRC::Promise.new (resolve) -> trigger.once 'REQUEST', resolve
+        keys = new Keygrip [ COOKIE_KEY ], 'sha256', 'hex'
+        LeanRC::Utils.request.get 'http://localhost:8888/',
+          headers:
+            'Cookie': "#{COOKIE_NAME}=#{COOKIE_VALUE}; #{COOKIE_NAME}.sig=#{keys.sign "#{COOKIE_NAME}=#{COOKIE_VALUE}"}"
+        { res: response, req: request } = yield promise
+        options = key: COOKIE_KEY
+        cookies = Cookies.new request, response, options
+        cookieValue = cookies.get COOKIE_NAME
+        assert.equal cookieValue, COOKIE_VALUE
+        encriptedCookieValue = cookies.get "#{COOKIE_NAME}.sig"
+        assert.equal encriptedCookieValue, keys.sign "#{COOKIE_NAME}=#{COOKIE_VALUE}"
+        yield return
