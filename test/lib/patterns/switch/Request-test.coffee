@@ -326,3 +326,26 @@ describe 'Request', ->
               'x-forwarded-host': 'localhost:9999'
         assert.equal request.href, 'https://localhost:9999/test'
         yield return
+  describe '#method', ->
+    it 'should get request method', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        req =
+          method: 'POST'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        request = Request.new
+          originalUrl: '/test'
+          switch: configs: trustProxy: yes
+          req: req
+        assert.equal request.method, 'POST'
+        request.method = 'PUT'
+        assert.equal request.method, 'PUT'
+        assert.equal req.method, 'PUT'
+        yield return
