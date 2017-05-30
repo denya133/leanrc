@@ -108,3 +108,24 @@ describe 'Request', ->
         request = Request.new context
         assert.equal request.header, context.req.headers
         yield return
+  describe '#originalUrl', ->
+    it 'should get original URL', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        context =
+          originalUrl: 'http://localhost:8888'
+          switch:
+            configs:
+              trustProxy: yes
+          req:
+            headers: 'x-forwarded-for': '192.168.0.1'
+        request = Request.new context
+        assert.equal request.originalUrl, context.originalUrl
+        yield return
