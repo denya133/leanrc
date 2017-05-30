@@ -540,3 +540,29 @@ describe 'Request', ->
               'if-none-match': '"foo"'
         assert.isFalse request.stale
         yield return
+  describe '#idempotent', ->
+    it 'should test if method is idempotent', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            method: 'GET'
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+        assert.isTrue request.idempotent
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            method: 'POST'
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+        assert.isFalse request.idempotent
+        yield return
