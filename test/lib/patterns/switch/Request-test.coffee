@@ -566,3 +566,23 @@ describe 'Request', ->
               'x-forwarded-for': '192.168.0.1'
         assert.isFalse request.idempotent
         yield return
+  describe '#charset', ->
+    it 'should get charset of request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            method: 'GET'
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'content-type': 'image/svg+xml; charset=utf-8'
+        assert.equal request.charset, 'utf-8'
+        yield return
