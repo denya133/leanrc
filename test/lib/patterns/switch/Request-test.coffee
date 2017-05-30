@@ -441,3 +441,34 @@ describe 'Request', ->
         assert.deepEqual request.query, a: 'aaa'
         assert.equal req.url, 'https://localhost:8888/test?a=aaa'
         yield return
+  describe '#hostname', ->
+    it 'should get host name without port', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'host': 'localhost:9999'
+        assert.equal request.hostname, 'localhost'
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'x-forwarded-host': 'localhost1:8888, localhost2:9999'
+        assert.equal request.hostname, 'localhost1'
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            headers: 'x-forwarded-for': '192.168.0.1'
+        assert.equal request.hostname, ''
+        yield return
