@@ -27,7 +27,7 @@ module.exports = (Module)->
       @public @virtual collection: CollectionInterface
 
       @public @virtual context: ContextInterface
-
+      @public @virtual query: Object
       @public @virtual recordId: String
       @public @virtual recordBody: Object
 

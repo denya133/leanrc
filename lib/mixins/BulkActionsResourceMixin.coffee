@@ -17,8 +17,6 @@ module.exports = (Module)->
     class BulkActionsResourceMixin extends BaseClass
       @inheritProtected()
 
-      @public query: Object
-
       @action @async list: Function,
         default: ->
           vlItems = yield (yield @collection.query @query).toArray()
@@ -53,23 +51,14 @@ module.exports = (Module)->
 
       # ------------ Chains definitions ---------
       @chains [
-        'list'
         'bulkUpdate', 'bulkPatch', 'bulkDelete'
       ]
 
       @beforeHook 'getQuery', only: [
-        'list'
         'bulkUpdate', 'bulkPatch', 'bulkDelete'
       ]
       @beforeHook 'getRecordBody', only: ['bulkUpdate', 'bulkPatch']
       @beforeHook 'omitBody', only: ['bulkUpdate', 'bulkPatch']
-
-      @public getQuery: Function,
-        args: [Object]
-        return: ANY
-        default: (args...)->
-          @query = JSON.parse @context.query['query'] ? "{}"
-          return args
 
 
     BulkActionsResourceMixin.initializeMixin()

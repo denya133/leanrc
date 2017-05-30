@@ -128,6 +128,7 @@ module.exports = (Module)->
 
     @public context: ContextInterface
 
+    @public query: Object
     @public recordId: String
     @public recordBody: Object
 
@@ -179,6 +180,7 @@ module.exports = (Module)->
 
     @initialHook 'beforeActionHook'
 
+    @beforeHook 'getQuery', only: ['list']
     @beforeHook 'getRecordId', only: ['detail', 'update', 'delete']
     @beforeHook 'getRecordBody', only: ['create', 'update']
     @beforeHook 'omitBody', only: ['create', 'update']
@@ -186,9 +188,16 @@ module.exports = (Module)->
 
     @public beforeActionHook: Function,
       args: [Object]
-      return: NILL
+      return: ANY
       default: (args...)->
         [@context] = args
+        return args
+
+    @public getQuery: Function,
+      args: [Object]
+      return: ANY
+      default: (args...)->
+        @query = JSON.parse @context.query['query'] ? "{}"
         return args
 
     @public getRecordId: Function,
