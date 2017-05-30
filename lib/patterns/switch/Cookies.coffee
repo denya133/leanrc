@@ -52,7 +52,7 @@ module.exports = (Module)->
         return @
 
     @public init: Function,
-      default: (request, response, {key, secure})->
+      default: (request, response, {key, secure} = {})->
         @super()
         @request = request
         @response = response
