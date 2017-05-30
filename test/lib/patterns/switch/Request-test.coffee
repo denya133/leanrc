@@ -248,3 +248,34 @@ describe 'Request', ->
         assert.equal request.get('Abc'), 'def'
         assert.equal request.get('123'), ''
         yield return
+  describe '#host', ->
+    it 'should get full host name with port', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'host': 'localhost:9999'
+        assert.equal request.host, 'localhost:9999'
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'x-forwarded-host': 'localhost:8888, localhost:9999'
+        assert.equal request.host, 'localhost:8888'
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            headers: 'x-forwarded-for': '192.168.0.1'
+        assert.equal request.host, ''
+        yield return
