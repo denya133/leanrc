@@ -71,7 +71,8 @@ class LeanRC extends RC
   require('./interfaces/core/ModelInterface') LeanRC
   require('./interfaces/core/ViewInterface') LeanRC
 
-  require('./utils/auth') LeanRC
+  require('./utils/jwt') LeanRC
+  require('./utils/crypto') LeanRC
 
   require('./mixins/ConfigurableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC

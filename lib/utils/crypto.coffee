@@ -1,7 +1,4 @@
 
-# _ = require 'lodash'
-# fs = require 'fs'
-
 
 module.exports = (Module) ->
   isArango = Module::Utils.isArangoDB()
