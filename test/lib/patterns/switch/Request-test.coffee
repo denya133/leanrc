@@ -48,3 +48,23 @@ describe 'Request', ->
         request = Request.new context
         assert.equal request.req, context.req
         yield return
+  describe '#switch', ->
+    it 'should get switch internal value', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        context =
+          switch:
+            configs:
+              trustProxy: yes
+          req:
+            headers: 'x-forwarded-for': '192.168.0.1'
+        request = Request.new context
+        assert.equal request.switch, context.switch
+        yield return
