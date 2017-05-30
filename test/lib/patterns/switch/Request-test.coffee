@@ -418,3 +418,26 @@ describe 'Request', ->
         assert.equal request.search, '?a=aaa'
         assert.equal req.url, 'https://localhost:8888/test?a=aaa'
         yield return
+  describe '#query', ->
+    it 'should get and set query params', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        req =
+          url: 'https://localhost:8888/test?t=ttt'
+          method: 'POST'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req: req
+        assert.deepEqual request.query, t: 'ttt'
+        request.query = a: 'aaa'
+        assert.deepEqual request.query, a: 'aaa'
+        assert.equal req.url, 'https://localhost:8888/test?a=aaa'
+        yield return
