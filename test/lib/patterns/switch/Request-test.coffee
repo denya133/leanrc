@@ -187,13 +187,8 @@ describe 'Request', ->
           @inheritProtected()
           @module Test
         Request.initialize()
-        # context =
-        #   switch: configs: trustProxy: no#yes
-        #   req:
-        #     url: 'http://localhost:8888'
-        #     headers: 'x-forwarded-for': '192.168.0.1'
         request = Request.new
-          switch: configs: trustProxy: no#yes
+          switch: configs: trustProxy: no
           req:
             url: 'http://localhost:8888'
             headers: 'x-forwarded-for': '192.168.0.1'
@@ -204,4 +199,26 @@ describe 'Request', ->
             url: 'http://localhost:8888'
             headers: 'x-forwarded-for': '192.168.0.1'
         assert.equal request.protocol, 'http'
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            url: 'http://localhost:8888'
+            headers: 'x-forwarded-for': '192.168.0.1'
+            socket: encrypted: yes
+        assert.equal request.protocol, 'https'
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            url: 'http://localhost:8888'
+            headers: 'x-forwarded-for': '192.168.0.1'
+            secure: yes
+        assert.equal request.protocol, 'https'
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            url: 'http://localhost:8888'
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'x-forwarded-proto': 'https'
+        assert.equal request.protocol, 'https'
         yield return
