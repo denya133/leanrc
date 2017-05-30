@@ -327,7 +327,7 @@ describe 'Request', ->
         assert.equal request.href, 'https://localhost:9999/test'
         yield return
   describe '#method', ->
-    it 'should get request method', ->
+    it 'should get and set request method', ->
       co ->
         class Test extends LeanRC
           @inheritProtected()
@@ -348,4 +348,27 @@ describe 'Request', ->
         request.method = 'PUT'
         assert.equal request.method, 'PUT'
         assert.equal req.method, 'PUT'
+        yield return
+  describe '#path', ->
+    it 'should get and set request path', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        req =
+          url: 'https://localhost:8888/test?t=ttt'
+          method: 'POST'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req: req
+        assert.equal request.path, '/test'
+        request.path = '/test1'
+        assert.equal request.path, '/test1'
+        assert.equal req.url, 'https://localhost:8888/test1?t=ttt'
         yield return
