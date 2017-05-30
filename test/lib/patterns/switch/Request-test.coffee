@@ -164,7 +164,6 @@ describe 'Request', ->
           @inheritProtected()
           @module Test
         Request.initialize()
-
         context =
           switch:
             configs:
@@ -221,4 +220,31 @@ describe 'Request', ->
               'x-forwarded-for': '192.168.0.1'
               'x-forwarded-proto': 'https'
         assert.equal request.protocol, 'https'
+        yield return
+  describe '#get', ->
+    it 'should get single header', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        context =
+          switch: configs: trustProxy: yes
+          req:
+            url: 'http://localhost:8888'
+            headers:
+              'referrer': 'localhost'
+              'x-forwarded-for': '192.168.0.1'
+              'x-forwarded-proto': 'https'
+              'abc': 'def'
+        request = Request.new context
+        assert.equal request.get('Referrer'), 'localhost'
+        assert.equal request.get('X-Forwarded-For'), '192.168.0.1'
+        assert.equal request.get('X-Forwarded-Proto'), 'https'
+        assert.equal request.get('Abc'), 'def'
+        assert.equal request.get('123'), ''
         yield return
