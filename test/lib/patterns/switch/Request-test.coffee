@@ -299,3 +299,30 @@ describe 'Request', ->
               'x-forwarded-host': 'localhost:9999'
         assert.equal request.origin, 'https://localhost:9999'
         yield return
+  describe '#href', ->
+    it 'should get request hyper reference', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        request = Request.new
+          originalUrl: 'http://localhost:8888/test'
+          switch: configs: trustProxy: yes
+          req:
+            headers: 'x-forwarded-for': '192.168.0.1'
+        assert.equal request.href, 'http://localhost:8888/test'
+        request = Request.new
+          originalUrl: '/test'
+          switch: configs: trustProxy: yes
+          req:
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'x-forwarded-proto': 'https'
+              'x-forwarded-host': 'localhost:9999'
+        assert.equal request.href, 'https://localhost:9999/test'
+        yield return
