@@ -279,3 +279,23 @@ describe 'Request', ->
             headers: 'x-forwarded-for': '192.168.0.1'
         assert.equal request.host, ''
         yield return
+  describe '#origin', ->
+    it 'should get request origin', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'x-forwarded-proto': 'https'
+              'x-forwarded-host': 'localhost:9999'
+        assert.equal request.origin, 'https://localhost:9999'
+        yield return
