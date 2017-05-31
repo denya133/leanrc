@@ -729,3 +729,27 @@ describe 'Request', ->
           'utf-8', 'iso-8859-1', '*'
         ]
         yield return
+  describe '#acceptsEncodings', ->
+    it 'should get acceptable encodings from request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        req =
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'accept-encoding': 'compress, gzip, deflate, sdch, identity'
+        context =
+          switch: configs: trustProxy: yes
+          req: req
+          accept: accepts req
+        request = Request.new context
+        assert.deepEqual request.acceptsEncodings(), [
+          'compress', 'gzip', 'deflate', 'sdch', 'identity'
+        ]
+        yield return
