@@ -184,3 +184,21 @@ describe 'Response', ->
         assert.equal response.message, 'TEST'
         assert.equal res.statusMessage, 'TEST'
         yield return
+  describe '#get', ->
+    it 'should get specified response header', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          _headers: 'foo': 'Bar'
+          getHeaders: -> LeanRC::Utils.copy @_headers
+        context = { res }
+        response = Response.new context
+        assert.deepEqual response.get('Foo'), 'Bar'
+        yield return
