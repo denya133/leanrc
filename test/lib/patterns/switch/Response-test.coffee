@@ -119,3 +119,21 @@ describe 'Response', ->
         response = Response.new context
         assert.deepEqual response.headers, 'Foo': 'Bar'
         yield return
+  describe '#header', ->
+    it 'should get response headers', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          _headers: 'Foo': 'Bar'
+          getHeaders: -> LeanRC::Utils.copy @_headers
+        context = { res }
+        response = Response.new context
+        assert.deepEqual response.header, 'Foo': 'Bar'
+        yield return
