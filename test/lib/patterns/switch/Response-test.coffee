@@ -69,3 +69,19 @@ describe 'Response', ->
         response = Response.new context
         assert.equal response.switch, switchObject
         yield return
+  describe '#socket', ->
+    it 'should get socket object', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        socket = {}
+        context = req: { socket }
+        response = Response.new context
+        assert.equal response.socket, socket
+        yield return
