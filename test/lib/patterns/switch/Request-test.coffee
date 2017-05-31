@@ -586,3 +586,23 @@ describe 'Request', ->
               'content-type': 'image/svg+xml; charset=utf-8'
         assert.equal request.charset, 'utf-8'
         yield return
+  describe '#length', ->
+    it 'should get content length of request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            method: 'GET'
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'content-length': '123456'
+        assert.equal request.length, 123456
+        yield return
