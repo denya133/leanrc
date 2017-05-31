@@ -606,3 +606,29 @@ describe 'Request', ->
               'content-length': '123456'
         assert.equal request.length, 123456
         yield return
+  describe '#secure', ->
+    it 'should if request protocol is secure', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        request = Request.new
+          switch: configs: trustProxy: no
+          req:
+            url: 'http://localhost:8888'
+            headers: 'x-forwarded-for': '192.168.0.1'
+        assert.isFalse request.secure
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            url: 'http://localhost:8888'
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'x-forwarded-proto': 'https'
+        assert.isTrue request.secure
+        yield return
