@@ -137,3 +137,29 @@ describe 'Response', ->
         response = Response.new context
         assert.deepEqual response.header, 'Foo': 'Bar'
         yield return
+  describe '#status', ->
+    it 'should get and set response status', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          statusCode: 200
+          statusMessage: 'OK'
+        context = { res }
+        response = Response.new context
+        assert.equal response.status, 200
+        response.status = 400
+        assert.equal response.status, 400
+        assert.equal res.statusCode, 400
+        assert.throws -> response.status = 'TEST'
+        assert.throws -> response.status = 0
+        assert.doesNotThrow -> response.status = 200
+        res.headersSent = yes
+        assert.throws -> response.status = 200
+        yield return
