@@ -409,6 +409,38 @@ describe 'Response', ->
         assert.equal response.type, 'application/javascript'
         assert.equal response.get('Content-Disposition'), 'attachment; filename="attachment.js"'
         yield return
+  describe '#writable', ->
+    it 'should check is response is writable', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res = finished: yes
+        context = { res }
+        response = Response.new context
+        assert.isFalse response.writable
+        res = finished: no
+        context = { res }
+        response = Response.new context
+        assert.isTrue response.writable
+        res = {}
+        context = { res }
+        response = Response.new context
+        assert.isTrue response.writable
+        res = socket: writable: yes
+        context = { res }
+        response = Response.new context
+        assert.isTrue response.writable
+        res = socket: writable: no
+        context = { res }
+        response = Response.new context
+        assert.isFalse response.writable
+        yield return
   describe '#is', ->
     it 'should check `Content-Type` header', ->
       co ->
