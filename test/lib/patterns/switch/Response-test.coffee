@@ -533,3 +533,34 @@ describe 'Response', ->
         assert.equal response.get('Content-Type'), 'application/json; charset=utf-8'
         assert.equal response.get('Content-Length'), ''
         yield return
+  describe '#length', ->
+    it 'should get response data length', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          _headers: 'foo': 'Bar'
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = { res }
+        response = Response.new context
+        assert.isUndefined response.length
+        response.length = 10
+        assert.equal response.length, 10
+        response.remove 'Content-Length'
+        response.body = '<html></html>'
+        assert.equal response.length, 13
+        response.remove 'Content-Length'
+        response.body = Buffer.from '7468697320697320612074c3a97374', 'hex'
+        assert.equal response.length, 15
+        response.remove 'Content-Length'
+        response.body = test: 'TEST123'
+        assert.equal response.length, 18
+        yield return
