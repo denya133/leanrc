@@ -352,3 +352,35 @@ describe 'Response', ->
         assert.equal res._headers['etag'], etag
         assert.deepEqual response.etag, etag
         yield return
+  describe '#type', ->
+    it 'should get, set and remove `Content-Type` header', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          _headers: 'foo': 'Bar'
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = { res }
+        response = Response.new context
+        assert.equal response.type, ''
+        response.type = 'markdown'
+        assert.equal response.type, 'text/x-markdown'
+        assert.equal res._headers['content-type'], 'text/x-markdown; charset=utf-8'
+        response.type = 'file.json'
+        assert.equal response.type, 'application/json'
+        assert.equal res._headers['content-type'], 'application/json; charset=utf-8'
+        response.type = 'text/html'
+        assert.equal response.type, 'text/html'
+        assert.equal res._headers['content-type'], 'text/html; charset=utf-8'
+        response.type = null
+        assert.equal response.type, ''
+        assert.isUndefined res._headers['content-type']
+        yield return
