@@ -632,3 +632,21 @@ describe 'Request', ->
               'x-forwarded-proto': 'https'
         assert.isTrue request.secure
         yield return
+  describe '#ips', ->
+    it 'should get request IPs', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        request = Request.new
+          switch: configs: trustProxy: yes
+          req:
+            url: 'http://localhost:8888'
+            headers: 'x-forwarded-for': '192.168.0.1, 192.168.1.1, 123.222.12.21'
+        assert.deepEqual request.ips, [ '192.168.0.1', '192.168.1.1', '123.222.12.21' ]
+        yield return
