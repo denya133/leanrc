@@ -705,3 +705,27 @@ describe 'Request', ->
           'application/json', 'text/plain', 'image/png'
         ]
         yield return
+  describe '#acceptsCharsets', ->
+    it 'should get acceptable charsets from request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        req =
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'accept-charset': 'utf-8, iso-8859-1;q=0.5, *;q=0.1'
+        context =
+          switch: configs: trustProxy: yes
+          req: req
+          accept: accepts req
+        request = Request.new context
+        assert.deepEqual request.acceptsCharsets(), [
+          'utf-8', 'iso-8859-1', '*'
+        ]
+        yield return
