@@ -753,3 +753,27 @@ describe 'Request', ->
           'compress', 'gzip', 'deflate', 'sdch', 'identity'
         ]
         yield return
+  describe '#acceptsLanguages', ->
+    it 'should get acceptable languages from request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        req =
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'accept-language': 'en, ru, cn, fr'
+        context =
+          switch: configs: trustProxy: yes
+          req: req
+          accept: accepts req
+        request = Request.new context
+        assert.deepEqual request.acceptsLanguages(), [
+          'en', 'ru', 'cn', 'fr'
+        ]
+        yield return
