@@ -326,3 +326,29 @@ describe 'Response', ->
         assert.equal res._headers['last-modified'], now.toUTCString()
         assert.deepEqual response.lastModified, new Date now.toUTCString()
         yield return
+  describe '#etag', ->
+    it 'should get and set `ETag` header', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          _headers: 'foo': 'Bar'
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+        context = { res }
+        response = Response.new context
+        etag = '123456789'
+        response.etag = etag
+        assert.equal res._headers['etag'], "\"#{etag}\""
+        assert.deepEqual response.etag, "\"#{etag}\""
+        etag = 'W/"123456789"'
+        response.etag = etag
+        assert.equal res._headers['etag'], etag
+        assert.deepEqual response.etag, etag
+        yield return
