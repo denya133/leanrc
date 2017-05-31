@@ -38,3 +38,19 @@ describe 'Response', ->
         response = Response.new context
         assert.equal response.res, res
         yield return
+  describe '#switch', ->
+    it 'should get switch object', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        switchObject = {}
+        context = switch: switchObject
+        response = Response.new context
+        assert.equal response.switch, switchObject
+        yield return
