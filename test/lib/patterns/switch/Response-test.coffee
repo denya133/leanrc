@@ -384,3 +384,28 @@ describe 'Response', ->
         assert.equal response.type, ''
         assert.isUndefined res._headers['content-type']
         yield return
+  describe '#attachment', ->
+    it 'should get, set and remove `Content-Type` header', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          _headers: 'foo': 'Bar'
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = { res }
+        response = Response.new context
+        response.attachment "#{__dirname}/#{__filename}"
+        assert.equal response.type, 'text/coffeescript'
+        assert.equal response.get('Content-Disposition'), 'attachment; filename="Response-test.coffee"'
+        response.attachment 'attachment.js'
+        assert.equal response.type, 'application/javascript'
+        assert.equal response.get('Content-Disposition'), 'attachment; filename="attachment.js"'
+        yield return
