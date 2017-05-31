@@ -236,3 +236,27 @@ describe 'Response', ->
         assert.equal response.get('Last-Date'), "#{now}"
         assert.equal response.get('New-Test'), 'Test'
         yield return
+  describe '#append', ->
+    it 'should add specified response header value', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          _headers: 'foo': 'Bar'
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+        context = { res }
+        response = Response.new context
+        response.append 'Test', 'data'
+        assert.equal response.get('Test'), 'data'
+        response.append 'Test', 'Test'
+        assert.deepEqual response.get('Test'), [ 'data', 'Test' ]
+        response.append 'Test', 'Test'
+        assert.deepEqual response.get('Test'), [ 'data', 'Test', 'Test' ]
+        yield return

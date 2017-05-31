@@ -259,9 +259,9 @@ module.exports = (Module)->
         prev = @get field
         if prev
           if _.isArray prev
-            prev.concat val
+            val = prev.concat val
           else
-            [prev].concat val
+            val = [prev].concat val
         @set field, val
 
     @public remove: Function,
