@@ -1,3 +1,4 @@
+{ Readable } = require 'stream'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 _ = require 'lodash'
@@ -462,4 +463,73 @@ describe 'Response', ->
         response.type = 'data.json'
         assert.equal response.is('html' , 'application/*'), 'application/json'
         assert.isFalse response.is 'html'
+        yield return
+  describe '#body', ->
+    it 'should get and set response body', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          _headers: 'foo': 'Bar'
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = { res }
+        response = Response.new context
+        assert.isUndefined response.body
+        response.body = 'TEST'
+        assert.equal response.status, 200
+        assert.equal response.message, 'OK'
+        assert.equal response.get('Content-Type'), 'text/plain; charset=utf-8'
+        assert.equal response.get('Content-Length'), '4'
+        response.body = null
+        assert.equal response.status, 204
+        assert.equal response.message, 'No Content'
+        assert.equal response.get('Content-Type'), ''
+        assert.equal response.get('Content-Length'), ''
+        response._explicitStatus = no
+        response.body = Buffer.from '7468697320697320612074c3a97374', 'hex'
+        assert.equal response.status, 200
+        assert.equal response.message, 'OK'
+        assert.equal response.get('Content-Type'), 'application/octet-stream'
+        assert.equal response.get('Content-Length'), '15'
+        response.body = null
+        response._explicitStatus = no
+        response.body = '<html></html>'
+        assert.equal response.status, 200
+        assert.equal response.message, 'OK'
+        assert.equal response.get('Content-Type'), 'text/html; charset=utf-8'
+        assert.equal response.get('Content-Length'), '13'
+        data = 'asdfsdzdfvhasdvsjvcsdvcivsiubcuibdsubs\nbszdbiszdbvibdivbsdibvsd'
+        class MyStream extends Readable
+          constructor: (options = {}) ->
+            super options
+            @__data = options.data
+            return
+          _read:(size) ->
+            @push @__data[0 ... size]
+            @push null
+            return
+        stream = new MyStream { data }
+        response.body = null
+        response._explicitStatus = no
+        response.body = stream
+        stream.read()
+        assert.equal response.status, 200
+        assert.equal response.message, 'OK'
+        assert.equal response.get('Content-Type'), 'application/octet-stream'
+        assert.equal response.get('Content-Length'), ''
+        response.body = null
+        response._explicitStatus = no
+        response.body = { test: 'TEST' }
+        assert.equal response.status, 200
+        assert.equal response.message, 'OK'
+        assert.equal response.get('Content-Type'), 'application/json; charset=utf-8'
+        assert.equal response.get('Content-Length'), ''
         yield return
