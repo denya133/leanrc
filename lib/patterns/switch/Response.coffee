@@ -181,12 +181,12 @@ module.exports = (Module)->
     @public redirect: Function,
       default: (url, alt)->
         if 'back' is url
-          url = @ctx.get('Referrer') ? alt ? '/'
+          url = @ctx.get('Referrer') or alt or '/'
         @set 'Location', url
         unless statuses.redirect[@status]
           @status = 302
         if @ctx.accepts 'html'
-          utl = escape url
+          url = escape url
           @type = 'text/html; charset=utf-8'
           @body = "Redirecting to <a href=\"#{url}\">#{url}</a>."
           return

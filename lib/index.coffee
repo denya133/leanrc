@@ -113,7 +113,7 @@ class LeanRC extends RC
   require('./mixins/SchemaModuleMixin') LeanRC
 
   require('./patterns/switch/Request') LeanRC
-  require('./patterns/switch/Response') LeanRC # need test it
+  require('./patterns/switch/Response') LeanRC
   require('./patterns/switch/Cookies') LeanRC
   require('./patterns/switch/Context') LeanRC # need test it
 
