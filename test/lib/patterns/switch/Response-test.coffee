@@ -22,6 +22,21 @@ describe 'Response', ->
         response = Response.new context
         assert.instanceOf response, Response
         yield return
+  describe '#ctx', ->
+    it 'should get context object', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        context = {}
+        response = Response.new context
+        assert.equal response.ctx, context
+        yield return
   describe '#res', ->
     it 'should get native resource object', ->
       co ->
