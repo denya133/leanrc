@@ -798,3 +798,25 @@ describe 'Request', ->
         request = Request.new context
         assert.equal request.type, 'application/json'
         yield return
+  describe '#is', ->
+    it 'should test types from request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        req =
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'content-type': 'application/json'
+            'content-length': '0'
+        context =
+          switch: configs: trustProxy: yes
+          req: req
+        request = Request.new context
+        assert.equal request.is('html' , 'application/*'), 'application/json'
+        yield return

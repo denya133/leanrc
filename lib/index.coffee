@@ -112,18 +112,18 @@ class LeanRC extends RC
   require('./mixins/ThinHttpCollectionMixin') LeanRC
   require('./mixins/SchemaModuleMixin') LeanRC
 
-  require('./patterns/switch/Request') LeanRC # need test it
+  require('./patterns/switch/Request') LeanRC
   require('./patterns/switch/Response') LeanRC # need test it
   require('./patterns/switch/Cookies') LeanRC
   require('./patterns/switch/Context') LeanRC # need test it
 
   require('./patterns/mediator/Mediator') LeanRC
-  require('./patterns/mediator/Switch') LeanRC
+  require('./patterns/mediator/Switch') LeanRC # needs retest
   require('./patterns/mediator/MemoryResqueExecutor') LeanRC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
-  require('./patterns/command/Resource') LeanRC
+  require('./patterns/command/Resource') LeanRC # needs retest
   require('./patterns/command/MigrateCommand') LeanRC
   require('./patterns/command/RollbackCommand') LeanRC
   require('./patterns/command/Script') LeanRC
