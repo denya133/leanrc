@@ -19,6 +19,22 @@ describe 'Response', ->
           @module Test
         Response.initialize()
         context = {}
-        request = Response.new context
-        assert.instanceOf request, Response
+        response = Response.new context
+        assert.instanceOf response, Response
+        yield return
+  describe '#res', ->
+    it 'should get native resource object', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res = {}
+        context = { res }
+        response = Response.new context
+        assert.equal response.res, res
         yield return
