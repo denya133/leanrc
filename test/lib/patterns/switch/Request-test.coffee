@@ -650,3 +650,33 @@ describe 'Request', ->
             headers: 'x-forwarded-for': '192.168.0.1, 192.168.1.1, 123.222.12.21'
         assert.deepEqual request.ips, [ '192.168.0.1', '192.168.1.1', '123.222.12.21' ]
         yield return
+  describe '#subdomains', ->
+    it 'should get request URL subdomains', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        request = Request.new
+          switch: configs:
+            trustProxy: yes
+            subdomainOffset: 1
+          req:
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'host': 'www.test.localhost:9999'
+        assert.deepEqual request.subdomains, [ 'test', 'www' ]
+        request = Request.new
+          switch: configs:
+            trustProxy: yes
+            subdomainOffset: 1
+          req:
+            headers:
+              'x-forwarded-for': '192.168.0.1'
+              'host': '192.168.0.2:9999'
+        assert.deepEqual request.subdomains, []
+        yield return
