@@ -85,3 +85,19 @@ describe 'Response', ->
         response = Response.new context
         assert.equal response.socket, socket
         yield return
+  describe '#headerSent', ->
+    it 'should get res.headersSent value', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res = headersSent: yes
+        context = { res }
+        response = Response.new context
+        assert.equal response.headerSent, res.headersSent
+        yield return
