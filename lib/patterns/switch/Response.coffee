@@ -228,7 +228,7 @@ module.exports = (Module)->
         else
           @remove 'Content-Type'
 
-    @public is: Function,
+    @public 'is': Function,
       default: (args...)->
         [types] = args
         return @type or no unless types
