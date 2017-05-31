@@ -163,3 +163,24 @@ describe 'Response', ->
         res.headersSent = yes
         assert.throws -> response.status = 200
         yield return
+  describe '#message', ->
+    it 'should get and set response message', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          statusCode: 200
+          statusMessage: 'OK'
+        context = { res }
+        response = Response.new context
+        assert.equal response.message, 'OK'
+        response.message = 'TEST'
+        assert.equal response.message, 'TEST'
+        assert.equal res.statusMessage, 'TEST'
+        yield return
