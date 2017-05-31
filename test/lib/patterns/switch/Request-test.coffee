@@ -1,6 +1,7 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 _ = require 'lodash'
+accepts = require 'accepts'
 LeanRC = require.main.require 'lib'
 { co } = LeanRC::Utils
 
@@ -679,4 +680,28 @@ describe 'Request', ->
               'x-forwarded-for': '192.168.0.1'
               'host': '192.168.0.2:9999'
         assert.deepEqual request.subdomains, []
+        yield return
+  describe '#accepts', ->
+    it 'should get acceptable types from request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Request extends LeanRC::Request
+          @inheritProtected()
+          @module Test
+        Request.initialize()
+        req =
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'accept': 'application/json, text/plain, image/png'
+        context =
+          switch: configs: trustProxy: yes
+          req: req
+          accept: accepts req
+        request = Request.new context
+        assert.deepEqual request.accepts(), [
+          'application/json', 'text/plain', 'image/png'
+        ]
         yield return
