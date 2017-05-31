@@ -283,3 +283,24 @@ describe 'Response', ->
         response.remove 'Test', 'Test'
         assert.equal response.get('Test'), ''
         yield return
+  describe '#vary', ->
+    it 'should set `Vary` header', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          _headers: 'foo': 'Bar'
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+        context = { res }
+        response = Response.new context
+        response.vary 'Origin'
+        assert.equal response.get('Vary'), 'Origin'
+        yield return
