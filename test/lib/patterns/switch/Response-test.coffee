@@ -304,3 +304,25 @@ describe 'Response', ->
         response.vary 'Origin'
         assert.equal response.get('Vary'), 'Origin'
         yield return
+  describe '#lastModified', ->
+    it 'should get and set `Last-Modified` header', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          _headers: 'foo': 'Bar'
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+        context = { res }
+        response = Response.new context
+        now = new Date
+        response.lastModified = now
+        assert.equal res._headers['last-modified'], now.toUTCString()
+        assert.deepEqual response.lastModified, new Date now.toUTCString()
+        yield return
