@@ -801,3 +801,33 @@ describe 'Context', ->
           'en', 'ru', 'cn', 'fr'
         ]
         yield return
+  describe '#get', ->
+    it 'should get single header from request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers:
+            'referrer': 'localhost'
+            'x-forwarded-for': '192.168.0.1'
+            'x-forwarded-proto': 'https'
+            'abc': 'def'
+        res = _headers: {}
+        context = Context.new req, res, switchInstance
+        assert.equal context.get('Referrer'), 'localhost'
+        assert.equal context.get('X-Forwarded-For'), '192.168.0.1'
+        assert.equal context.get('X-Forwarded-Proto'), 'https'
+        assert.equal context.get('Abc'), 'def'
+        assert.equal context.get('123'), ''
+        yield return
