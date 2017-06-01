@@ -14,6 +14,7 @@ describe 'Switch', ->
       expect ->
         mediatorName = 'TEST_MEDIATOR'
         switchMediator = Switch.new mediatorName
+        assert.isArray switchMediator.middlewares
       .to.not.throw Error
   describe '#responseFormats', ->
     it 'should check allowed response formats', ->

@@ -57,7 +57,7 @@ module.exports = (Module)->
     @module Module
 
     # from https://github.com/koajs/compose/blob/master/index.js #############
-    @public @static compose: Function,
+    @public @static compose: Function, # NEEDS TEST
       args: [Array]
       return: LAMBDA
       default: (middlewares)->
@@ -90,7 +90,7 @@ module.exports = (Module)->
       if method is 'GET' and ctx.method is 'HEAD'
         return yes
       return no
-    @public @static createMethod: Function,
+    @public @static createMethod: Function, # NEEDS TEST
       args: [String]
       return: NILL
       default: (method)->
@@ -138,7 +138,7 @@ module.exports = (Module)->
     methods.forEach (method)=>
       @createMethod method
 
-    @public del: Function,
+    @public del: Function, # NEEDS TEST
       default: (args...)->
         @delete args...
 
@@ -192,7 +192,7 @@ module.exports = (Module)->
         @[ipoHttpServer].close()
         return
 
-    @public serverListen: Function,
+    @public serverListen: Function, # NEEDS TEST
       args: []
       return: NILL
       default: ->
@@ -206,9 +206,9 @@ module.exports = (Module)->
           facade.sendNotification SEND_TO_LOG, "listening on port #{port}", LEVELS[DEBUG]
         return
 
-    @public middlewares: Array
+    @public middlewares: Array # NEEDS TEST
 
-    @public use: Function,
+    @public use: Function, # NEEDS TEST
       args: [LAMBDA]
       return: SwitchInterface
       default: (middleware)->
@@ -222,7 +222,7 @@ module.exports = (Module)->
         @middlewares.push middleware
         return @
 
-    @public callback: Function,
+    @public callback: Function, # NEEDS TEST
       args: []
       return: LAMBDA
       default: ->
@@ -243,7 +243,7 @@ module.exports = (Module)->
         handleRequest
 
     # Default error handler
-    @public onerror: Function,
+    @public onerror: Function, # NEEDS TEST
       args: [Error]
       return: LAMBDA
       default: (err)->
@@ -255,7 +255,7 @@ module.exports = (Module)->
         @facade.sendNotification SEND_TO_LOG, msg.replace(/^/gm, '  '), LEVELS[ERROR]
         return
 
-    @public respond: Function,
+    @public respond: Function, # NEEDS TEST
       default: (ctx)->
         return if context.respond is no
         return unless ctx.writable
@@ -361,7 +361,7 @@ module.exports = (Module)->
         aoSwaggerEndpoint.deprecated isDeprecated  if isDeprecated?
         return
 
-    @public createNativeRoute: Function,
+    @public createNativeRoute: Function, # NEEDS TEST
       default: ({method, path, resource, action})->
         resourceName = inflect.camelize inflect.underscore "#{resource.replace /[/]/g, '_'}Resource"
 
