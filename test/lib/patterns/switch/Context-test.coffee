@@ -432,3 +432,39 @@ describe 'Context', ->
         context = Context.new req, res, switchInstance
         assert.equal context.hostname, ''
         yield return
+  describe '#fresh', ->
+    it 'should test request freshness', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          method: 'GET'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'if-none-match': '"foo"'
+        res =
+          _headers: 'etag': '"bar"'
+        context = Context.new req, res, switchInstance
+        context.status = 200
+        assert.isFalse context.fresh
+        req =
+          method: 'GET'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'if-none-match': '"foo"'
+        res =
+          _headers: 'etag': '"foo"'
+        context = Context.new req, res, switchInstance
+        context.status = 200
+        assert.isTrue context.fresh
+        yield return
