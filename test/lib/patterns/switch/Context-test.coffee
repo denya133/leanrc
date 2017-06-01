@@ -974,3 +974,42 @@ describe 'Context', ->
         assert.equal context.message, 'TEST'
         assert.equal res.statusMessage, 'TEST'
         yield return
+  describe '#length', ->
+    it 'should get and set response body length', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          statusCode: 200
+          statusMessage: 'OK'
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        assert.isUndefined context.length
+        context.length = 10
+        assert.equal context.length, 10
+        context.response.remove 'Content-Length'
+        context.body = '<html></html>'
+        assert.equal context.length, 13
+        context.response.remove 'Content-Length'
+        context.body = Buffer.from '7468697320697320612074c3a97374', 'hex'
+        assert.equal context.length, 15
+        context.response.remove 'Content-Length'
+        context.body = test: 'TEST123'
+        assert.equal context.length, 18
+        yield return
