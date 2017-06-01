@@ -612,3 +612,44 @@ describe 'Response', ->
         assert.equal response.type, 'text/plain'
         assert.equal response.body, 'Redirecting to http://localhost:8888/test2'
         yield return
+  describe '#flushHeaders', ->
+    it 'should clear all headers', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Response extends LeanRC::Response
+          @inheritProtected()
+          @module Test
+        Response.initialize()
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = { res }
+        response = Response.new context
+        now = new Date
+        array = [ 1, now, 'TEST']
+        response.set
+          'Content-Type': 'text/plain'
+          'Date': now
+          'Abc': 123
+          'Last-Date': now
+          'New-Test': 'Test'
+          'Test': array
+        assert.equal response.get('Content-Type'), 'text/plain'
+        assert.equal response.get('Date'), "#{now}"
+        assert.equal response.get('Abc'), '123'
+        assert.equal response.get('Last-Date'), "#{now}"
+        assert.equal response.get('New-Test'), 'Test'
+        assert.deepEqual response.get('Test'), [ '1', "#{now}", 'TEST']
+        response.flushHeaders()
+        assert.equal response.get('Content-Type'), ''
+        assert.equal response.get('Date'), ''
+        assert.equal response.get('Abc'), ''
+        assert.equal response.get('Last-Date'), ''
+        assert.equal response.get('New-Test'), ''
+        assert.equal response.get('Test'), ''
+        yield return

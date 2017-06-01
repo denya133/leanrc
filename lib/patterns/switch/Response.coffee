@@ -276,6 +276,19 @@ module.exports = (Module)->
         return yes unless socket
         socket.writable
 
+    @public flushHeaders: Function,
+      default: ->
+        if _.isFunction @res.flushHeaders
+          @res.flushHeaders()
+        else
+          headerNames = if _.isFunction @res.getHeaderNames
+            @res.getHeaderNames()
+          else
+            Object.keys @res._headers
+          for header in headerNames
+            @res.removeHeader header
+        return
+
     # @public inspect: Function,
     #   default: ->
     #     return unless @res
