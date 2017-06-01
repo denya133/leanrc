@@ -1087,3 +1087,27 @@ describe 'Context', ->
         assert.equal context.type, ''
         assert.isUndefined res._headers['content-type']
         yield return
+  describe '#headerSent', ->
+    it 'should get res.headersSent value', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          headersSent: yes
+          _headers: {}
+        context = Context.new req, res, switchInstance
+        assert.equal context.headerSent, res.headersSent
+        yield return
