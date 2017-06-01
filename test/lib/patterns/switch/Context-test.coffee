@@ -723,3 +723,29 @@ describe 'Context', ->
           'application/json', 'text/plain', 'image/png'
         ]
         yield return
+  describe '#acceptsEncodings', ->
+    it 'should get acceptable encodings from request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'accept-encoding': 'compress, gzip, deflate, sdch, identity'
+        res = _headers: {}
+        context = Context.new req, res, switchInstance
+        assert.deepEqual context.acceptsEncodings(), [
+          'compress', 'gzip', 'deflate', 'sdch', 'identity'
+        ]
+        yield return
