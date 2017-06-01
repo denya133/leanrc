@@ -565,3 +565,40 @@ describe 'Context', ->
         context = Context.new req, res, switchInstance
         assert.equal context.protocol, 'https'
         yield return
+  describe '#secure', ->
+    it 'should check if request secure', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: no
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: 'etag': '"bar"'
+        context = Context.new req, res, switchInstance
+        assert.isFalse context.secure
+        switchInstance.configs.trustProxy = yes
+        context = Context.new req, res, switchInstance
+        assert.isFalse context.secure
+        req.socket = encrypted: yes
+        context = Context.new req, res, switchInstance
+        assert.isTrue context.secure
+        delete req.socket
+        req.secure = yes
+        context = Context.new req, res, switchInstance
+        assert.isTrue context.secure
+        delete req.secure
+        req.headers['x-forwarded-proto'] = 'https'
+        context = Context.new req, res, switchInstance
+        assert.isTrue context.secure
+        yield return
