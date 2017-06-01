@@ -648,3 +648,32 @@ describe 'Context', ->
         context = Context.new req, res, switchInstance
         assert.deepEqual context.ip, '192.168.0.1'
         yield return
+  describe '#subdomains', ->
+    it 'should get request subdomains', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+            subdomainOffset: 1
+        req =
+          url: 'http://localhost:8888'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'host': 'www.test.localhost:9999'
+        res =
+          _headers: 'etag': '"bar"'
+        context = Context.new req, res, switchInstance
+        assert.deepEqual context.subdomains, [ 'test', 'www' ]
+        req.headers.host = '192.168.0.2:9999'
+        context = Context.new req, res, switchInstance
+        assert.deepEqual context.subdomains, []
+        yield return
