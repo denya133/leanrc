@@ -385,3 +385,44 @@ describe 'Switch', ->
         assert.deepEqual listEndpoint, voEndpoint, 'Endpoints are not equivalent'
         facade.remove()
       .to.not.throw Error
+  describe '.compose', ->
+    it 'should dispatch middlewares', ->
+      co ->
+        facade = Facade.getInstance 'TEST_SWITCH_8'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+        voContext = Test::Context.new req, res, switchMediator
+        spyMiddlewares = []
+        middlewares = []
+        COUNT = 4
+        for i in [ 0 .. COUNT ]
+          middlewares.push sinon.spy (ctx, next) -> yield return next()
+        fn = TestSwitch.compose middlewares
+        yield fn voContext
+        for i in [ 0 .. COUNT ]
+          assert.isTrue middlewares[i].calledWith voContext
+        facade.remove()
+        yield return
