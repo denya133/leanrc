@@ -336,3 +336,31 @@ describe 'Context', ->
         assert.deepEqual context.query, a: 'aaa'
         assert.equal req.url, 'http://localhost:8888/test1?a=aaa'
         yield return
+  describe '#querystring', ->
+    it 'should get and set request query string', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          method: 'POST'
+          url: 'http://localhost:8888/test1?t=ttt'
+          headers: 'x-forwarded-for': '192.168.0.1'
+          secure: no
+        res =
+          _headers: 'Foo': 'Bar'
+        context = Context.new req, res, switchInstance
+        assert.equal context.querystring, 't=ttt'
+        context.querystring = 'a=aaa'
+        assert.equal context.querystring, 'a=aaa'
+        assert.equal req.url, 'http://localhost:8888/test1?a=aaa'
+        yield return
