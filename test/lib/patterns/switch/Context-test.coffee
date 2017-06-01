@@ -250,3 +250,33 @@ describe 'Context', ->
         req.secure = yes
         assert.equal context.origin, 'https://localhost:8888'
         yield return
+  describe '#href', ->
+    it 'should get request hyper reference', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          method: 'POST'
+          url: '/test1'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'host': 'localhost:8888'
+          secure: no
+        res =
+          _headers: 'Foo': 'Bar'
+        context = Context.new req, res, switchInstance
+        assert.equal context.href, 'http://localhost:8888/test1'
+        req.url = 'http://localhost1:9999/test2'
+        context = Context.new req, res, switchInstance
+        assert.equal context.href, 'http://localhost1:9999/test2'
+        yield return
