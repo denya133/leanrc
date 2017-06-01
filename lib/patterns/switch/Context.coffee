@@ -124,7 +124,7 @@ module.exports = (Module)->
       get: -> @request.ips
     @public subdomains: Array,
       get: -> @request.subdomains
-    @public is: Function,
+    @public 'is': Function,
       default: (args...)-> @request.is args...
     @public accepts: Function,
       default: (args...)-> @request.accepts args...
