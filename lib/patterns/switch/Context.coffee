@@ -1,7 +1,7 @@
 _             = require 'lodash'
 accepts       = require 'accepts'
 createError   = require 'http-errors'
-{ assert }    = require 'chai'
+assert        = require 'assert'
 statuses      = require 'statuses'
 
 ###
@@ -40,6 +40,8 @@ module.exports = (Module)->
     @public respond: Boolean
     @public routePath: String
     @public pathParams: Object
+
+    # @public database: String # возможно это тоже надо получать из метода из отдельного модуля
 
     @public throw: Function,
       default: (args...)-> throw createError args...
