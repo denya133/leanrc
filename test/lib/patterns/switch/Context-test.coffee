@@ -943,3 +943,34 @@ describe 'Context', ->
         res.headersSent = yes
         assert.throws -> context.status = 200
         yield return
+  describe '#message', ->
+    it 'should get and set response message', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          statusCode: 200
+          statusMessage: 'OK'
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        assert.equal context.message, 'OK'
+        context.message = 'TEST'
+        assert.equal context.message, 'TEST'
+        assert.equal res.statusMessage, 'TEST'
+        yield return
