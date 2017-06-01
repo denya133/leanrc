@@ -1188,3 +1188,44 @@ describe 'Context', ->
         assert.equal context.type, 'application/javascript'
         assert.equal context.response.get('Content-Disposition'), 'attachment; filename="attachment.js"'
         yield return
+  describe '#set', ->
+    it 'should set specified response header', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        context.set 'Content-Type', 'text/plain'
+        assert.equal res._headers['content-type'], 'text/plain'
+        assert.equal context.response.get('Content-Type'), 'text/plain'
+        now = new Date
+        context.set 'Date', now
+        assert.equal context.response.get('Date'), "#{now}"
+        array = [ 1, now, 'TEST']
+        context.set 'Test', array
+        assert.deepEqual context.response.get('Test'), [ '1', "#{now}", 'TEST']
+        context.set
+          'Abc': 123
+          'Last-Date': now
+          'New-Test': 'Test'
+        assert.equal context.response.get('Abc'), '123'
+        assert.equal context.response.get('Last-Date'), "#{now}"
+        assert.equal context.response.get('New-Test'), 'Test'
+        yield return
