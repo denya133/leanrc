@@ -775,3 +775,29 @@ describe 'Context', ->
           'utf-8', 'iso-8859-1', '*'
         ]
         yield return
+  describe '#acceptsLanguages', ->
+    it 'should get acceptable languages from request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'accept-language': 'en, ru, cn, fr'
+        res = _headers: {}
+        context = Context.new req, res, switchInstance
+        assert.deepEqual context.acceptsLanguages(), [
+          'en', 'ru', 'cn', 'fr'
+        ]
+        yield return
