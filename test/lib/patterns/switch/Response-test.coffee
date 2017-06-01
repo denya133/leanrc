@@ -281,7 +281,7 @@ describe 'Response', ->
         response = Response.new context
         response.set 'Test', 'data'
         assert.equal response.get('Test'), 'data'
-        response.remove 'Test', 'Test'
+        response.remove 'Test'
         assert.equal response.get('Test'), ''
         yield return
   describe '#vary', ->

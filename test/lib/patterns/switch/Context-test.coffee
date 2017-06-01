@@ -1336,3 +1336,33 @@ describe 'Context', ->
         assert.equal context.response.get('New-Test'), ''
         assert.equal context.response.get('Test'), ''
         yield return
+  describe '#remove', ->
+    it 'should remove specified response header', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        context.set 'Test', 'data'
+        assert.equal context.response.get('Test'), 'data'
+        context.remove 'Test'
+        assert.equal context.response.get('Test'), ''
+        yield return
