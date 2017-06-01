@@ -34,6 +34,7 @@ module.exports = (Module)->
     @public request: RequestInterface
     @public response: ResponseInterface
     @public cookies: CookiesInterface
+    @public accept: Object
     @public state: Object
     @public switch: SwitchInterface
     @public respond: Boolean
