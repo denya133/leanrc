@@ -221,3 +221,32 @@ describe 'Context', ->
         context = Context.new req, res, switchInstance
         assert.equal context.originalUrl, 'http://localhost:8888/test1'
         yield return
+  describe '#origin', ->
+    it 'should get request origin data', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          method: 'POST'
+          url: 'http://localhost:8888/test1'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'host': 'localhost:8888'
+          secure: no
+        res =
+          _headers: 'Foo': 'Bar'
+        context = Context.new req, res, switchInstance
+        assert.equal context.origin, 'http://localhost:8888'
+        req.secure = yes
+        assert.equal context.origin, 'https://localhost:8888'
+        yield return
