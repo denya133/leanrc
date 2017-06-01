@@ -468,3 +468,39 @@ describe 'Context', ->
         context.status = 200
         assert.isTrue context.fresh
         yield return
+  describe '#stale', ->
+    it 'should test request non-freshness', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          method: 'GET'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'if-none-match': '"foo"'
+        res =
+          _headers: 'etag': '"bar"'
+        context = Context.new req, res, switchInstance
+        context.status = 200
+        assert.isTrue context.stale
+        req =
+          method: 'GET'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'if-none-match': '"foo"'
+        res =
+          _headers: 'etag': '"foo"'
+        context = Context.new req, res, switchInstance
+        context.status = 200
+        assert.isFalse context.stale
+        yield return
