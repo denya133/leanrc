@@ -523,8 +523,7 @@ describe 'Context', ->
           headers:
             'x-forwarded-for': '192.168.0.1'
           socket: {}
-        res =
-          _headers: 'etag': '"bar"'
+        res = _headers: {}
         context = Context.new req, res, switchInstance
         assert.equal context.socket, req.socket
         yield return
@@ -546,8 +545,7 @@ describe 'Context', ->
         req =
           url: 'http://localhost:8888'
           headers: 'x-forwarded-for': '192.168.0.1'
-        res =
-          _headers: 'etag': '"bar"'
+        res = _headers: {}
         context = Context.new req, res, switchInstance
         assert.equal context.protocol, 'http'
         switchInstance.configs.trustProxy = yes
@@ -583,8 +581,7 @@ describe 'Context', ->
         req =
           url: 'http://localhost:8888'
           headers: 'x-forwarded-for': '192.168.0.1'
-        res =
-          _headers: 'etag': '"bar"'
+        res = _headers: {}
         context = Context.new req, res, switchInstance
         assert.isFalse context.secure
         switchInstance.configs.trustProxy = yes
@@ -620,8 +617,7 @@ describe 'Context', ->
         req =
           url: 'http://localhost:8888'
           headers: 'x-forwarded-for': '192.168.0.1, 192.168.1.1, 123.222.12.21'
-        res =
-          _headers: 'etag': '"bar"'
+        res = _headers: {}
         context = Context.new req, res, switchInstance
         assert.deepEqual context.ips, [ '192.168.0.1', '192.168.1.1', '123.222.12.21' ]
         yield return
@@ -643,8 +639,7 @@ describe 'Context', ->
         req =
           url: 'http://localhost:8888'
           headers: 'x-forwarded-for': '192.168.0.1, 192.168.1.1, 123.222.12.21'
-        res =
-          _headers: 'etag': '"bar"'
+        res = _headers: {}
         context = Context.new req, res, switchInstance
         assert.deepEqual context.ip, '192.168.0.1'
         yield return
@@ -669,8 +664,7 @@ describe 'Context', ->
           headers:
             'x-forwarded-for': '192.168.0.1'
             'host': 'www.test.localhost:9999'
-        res =
-          _headers: 'etag': '"bar"'
+        res = _headers: {}
         context = Context.new req, res, switchInstance
         assert.deepEqual context.subdomains, [ 'test', 'www' ]
         req.headers.host = '192.168.0.2:9999'
@@ -702,4 +696,30 @@ describe 'Context', ->
           _headers: 'etag': '"bar"'
         context = Context.new req, res, switchInstance
         assert.equal context.is('html' , 'application/*'), 'application/json'
+        yield return
+  describe '#accepts', ->
+    it 'should get acceptable types from request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'accept': 'application/json, text/plain, image/png'
+        res = _headers: {}
+        context = Context.new req, res, switchInstance
+        assert.deepEqual context.accepts(), [
+          'application/json', 'text/plain', 'image/png'
+        ]
         yield return
