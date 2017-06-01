@@ -398,3 +398,37 @@ describe 'Context', ->
         context = Context.new req, res, switchInstance
         assert.equal context.host, ''
         yield return
+  describe '#hostname', ->
+    it 'should get request host name', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'host': 'localhost:9999'
+        res =
+          _headers: 'Foo': 'Bar'
+        context = Context.new req, res, switchInstance
+        assert.equal context.hostname, 'localhost'
+        req =
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'x-forwarded-host': 'localhost1:8888, localhost:9999'
+        context = Context.new req, res, switchInstance
+        assert.equal context.hostname, 'localhost1'
+        req =
+          headers: 'x-forwarded-for': '192.168.0.1'
+        context = Context.new req, res, switchInstance
+        assert.equal context.hostname, ''
+        yield return
