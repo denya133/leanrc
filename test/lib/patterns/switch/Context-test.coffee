@@ -1229,3 +1229,34 @@ describe 'Context', ->
         assert.equal context.response.get('Last-Date'), "#{now}"
         assert.equal context.response.get('New-Test'), 'Test'
         yield return
+  describe '#append', ->
+    it 'should add specified response header value', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        context.append 'Test', 'data'
+        assert.equal context.response.get('Test'), 'data'
+        context.append 'Test', 'Test'
+        assert.deepEqual context.response.get('Test'), [ 'data', 'Test' ]
+        context.append 'Test', 'Test'
+        assert.deepEqual context.response.get('Test'), [ 'data', 'Test', 'Test' ]
+        yield return
