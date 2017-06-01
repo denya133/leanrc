@@ -115,7 +115,7 @@ module.exports = (Module)->
 
             @use co.wrap (ctx, next)->
               unless matches ctx, method
-                yield return next()
+                yield return next?()
               m = re.exec ctx.path
               if m
                 pathParams = m.slice(1)
@@ -128,7 +128,7 @@ module.exports = (Module)->
                 facade.sendNotification SEND_TO_LOG, "#{ctx.method} #{path} matches #{ctx.path} #{pathParams}", LEVELS[DEBUG]
                 ctx.pathParams = pathParams
                 return yield routeFunc.apply self, [ctx, next]
-              yield return next()
+              yield return next?()
 
             # это надо будет заиспользовать когда решится вопрос "как подрубить свайгер"
             #@defineSwaggerEndpoint voEndpoint
@@ -384,7 +384,7 @@ module.exports = (Module)->
             catch err
               reject err
             return
-          yield return next()
+          yield return next?()
         return
 
     @public init: Function,
