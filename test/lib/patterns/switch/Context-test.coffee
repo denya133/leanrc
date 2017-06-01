@@ -907,3 +907,39 @@ describe 'Context', ->
         assert.equal context.response.get('Content-Type'), 'application/json; charset=utf-8'
         assert.equal context.response.get('Content-Length'), ''
         yield return
+  describe '#status', ->
+    it 'should get and set response status', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          statusCode: 200
+          statusMessage: 'OK'
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        assert.equal context.status, 200
+        context.status = 400
+        assert.equal context.status, 400
+        assert.equal res.statusCode, 400
+        assert.throws -> context.status = 'TEST'
+        assert.throws -> context.status = 0
+        assert.doesNotThrow -> context.status = 200
+        res.headersSent = yes
+        assert.throws -> context.status = 200
+        yield return
