@@ -168,3 +168,31 @@ describe 'Context', ->
         assert.equal context.method, 'PUT'
         assert.equal req.method, 'PUT'
         yield return
+  describe '#url', ->
+    it 'should get and set request URL', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          method: 'POST'
+          url: 'http://localhost:8888/test1'
+          headers: 'x-forwarded-for': '192.168.0.1'
+          secure: no
+        res =
+          _headers: 'Foo': 'Bar'
+        context = Context.new req, res, switchInstance
+        assert.equal context.url, 'http://localhost:8888/test1'
+        context.url = 'http://localhost:8888/test2'
+        assert.equal context.url, 'http://localhost:8888/test2'
+        assert.equal req.url, 'http://localhost:8888/test2'
+        yield return
