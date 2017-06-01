@@ -17,5 +17,5 @@ test/lib/patterns/migration/
 test/lib/patterns/data_mapper/
 test/lib/patterns/proxy/
 test/lib/patterns/mixins/
-test/
 test/lib/patterns/switch/
+test/
