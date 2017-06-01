@@ -1288,3 +1288,51 @@ describe 'Context', ->
         context.vary 'Origin'
         assert.equal context.response.get('Vary'), 'Origin'
         yield return
+  describe '#flushHeaders', ->
+    it 'should clear all headers', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        now = new Date
+        array = [ 1, now, 'TEST']
+        context.set
+          'Content-Type': 'text/plain'
+          'Date': now
+          'Abc': 123
+          'Last-Date': now
+          'New-Test': 'Test'
+          'Test': array
+        assert.equal context.response.get('Content-Type'), 'text/plain'
+        assert.equal context.response.get('Date'), "#{now}"
+        assert.equal context.response.get('Abc'), '123'
+        assert.equal context.response.get('Last-Date'), "#{now}"
+        assert.equal context.response.get('New-Test'), 'Test'
+        assert.deepEqual context.response.get('Test'), [ '1', "#{now}", 'TEST']
+        context.flushHeaders()
+        assert.equal context.response.get('Content-Type'), ''
+        assert.equal context.response.get('Date'), ''
+        assert.equal context.response.get('Abc'), ''
+        assert.equal context.response.get('Last-Date'), ''
+        assert.equal context.response.get('New-Test'), ''
+        assert.equal context.response.get('Test'), ''
+        yield return
