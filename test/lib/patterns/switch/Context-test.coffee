@@ -993,8 +993,6 @@ describe 'Context', ->
           url: 'http://localhost:8888'
           headers: 'x-forwarded-for': '192.168.0.1'
         res =
-          statusCode: 200
-          statusMessage: 'OK'
           _headers: {}
           getHeaders: -> LeanRC::Utils.copy @_headers
           setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
@@ -1012,4 +1010,42 @@ describe 'Context', ->
         context.response.remove 'Content-Length'
         context.body = test: 'TEST123'
         assert.equal context.length, 18
+        yield return
+  describe '#writable', ->
+    it 'should check if response is writable', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          finished: yes
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        assert.isFalse context.writable
+        res.finished = no
+        context = Context.new req, res, switchInstance
+        assert.isTrue context.writable
+        delete res.finished
+        context = Context.new req, res, switchInstance
+        assert.isTrue context.writable
+        res.socket = writable: yes
+        assert.isTrue context.writable
+        res.socket.writable = no
+        context = Context.new req, res, switchInstance
+        assert.isFalse context.writable
         yield return

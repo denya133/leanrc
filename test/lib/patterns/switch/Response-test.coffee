@@ -411,7 +411,7 @@ describe 'Response', ->
         assert.equal response.get('Content-Disposition'), 'attachment; filename="attachment.js"'
         yield return
   describe '#writable', ->
-    it 'should check is response is writable', ->
+    it 'should check if response is writable', ->
       co ->
         class Test extends LeanRC
           @inheritProtected()
