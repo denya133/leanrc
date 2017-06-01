@@ -677,3 +677,29 @@ describe 'Context', ->
         context = Context.new req, res, switchInstance
         assert.deepEqual context.subdomains, []
         yield return
+  describe '#is', ->
+    it 'should test types from request', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'content-type': 'application/json'
+            'content-length': '0'
+        res =
+          _headers: 'etag': '"bar"'
+        context = Context.new req, res, switchInstance
+        assert.equal context.is('html' , 'application/*'), 'application/json'
+        yield return
