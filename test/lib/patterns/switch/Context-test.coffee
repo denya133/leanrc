@@ -364,3 +364,37 @@ describe 'Context', ->
         assert.equal context.querystring, 'a=aaa'
         assert.equal req.url, 'http://localhost:8888/test1?a=aaa'
         yield return
+  describe '#host', ->
+    it 'should get request host', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'host': 'localhost:9999'
+        res =
+          _headers: 'Foo': 'Bar'
+        context = Context.new req, res, switchInstance
+        assert.equal context.host, 'localhost:9999'
+        req =
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'x-forwarded-host': 'localhost:8888, localhost:9999'
+        context = Context.new req, res, switchInstance
+        assert.equal context.host, 'localhost:8888'
+        req =
+          headers: 'x-forwarded-for': '192.168.0.1'
+        context = Context.new req, res, switchInstance
+        assert.equal context.host, ''
+        yield return
