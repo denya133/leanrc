@@ -1,7 +1,7 @@
 _             = require 'lodash'
 accepts       = require 'accepts'
 createError   = require 'http-errors'
-httpAssert    = require 'http-assert'
+{ assert }    = require 'chai'
 statuses      = require 'statuses'
 
 ###
@@ -44,7 +44,7 @@ module.exports = (Module)->
       default: (args...)-> throw createError args...
 
     @public assert: Function,
-      default: httpAssert
+      default: assert
 
     @public onerror: Function,
       default: (err)->
