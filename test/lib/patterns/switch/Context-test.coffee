@@ -1366,3 +1366,33 @@ describe 'Context', ->
         context.remove 'Test'
         assert.equal context.response.get('Test'), ''
         yield return
+  describe '#lastModified', ->
+    it 'should set `Last-Modified` header', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        now = new Date
+        context.lastModified = now
+        assert.equal res._headers['last-modified'], now.toUTCString()
+        assert.deepEqual context.response.lastModified, new Date now.toUTCString()
+        yield return
