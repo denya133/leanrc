@@ -504,3 +504,27 @@ describe 'Context', ->
         context.status = 200
         assert.isFalse context.stale
         yield return
+  describe '#socket', ->
+    it 'should get request socket', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+          socket: {}
+        res =
+          _headers: 'etag': '"bar"'
+        context = Context.new req, res, switchInstance
+        assert.equal context.socket, req.socket
+        yield return
