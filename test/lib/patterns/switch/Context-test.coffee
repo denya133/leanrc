@@ -1111,3 +1111,49 @@ describe 'Context', ->
         context = Context.new req, res, switchInstance
         assert.equal context.headerSent, res.headersSent
         yield return
+  describe '#redirect', ->
+    it 'should send redirect', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'accept': 'application/json, text/plain, image/png'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        context.redirect 'back', 'http://localhost:8888/test1'
+        assert.equal context.response.get('Location'), 'http://localhost:8888/test1'
+        assert.equal context.status, 302
+        assert.equal context.message, 'Found'
+        assert.equal context.type, 'text/plain'
+        assert.equal context.body, 'Redirecting to http://localhost:8888/test1'
+        req.headers.referrer = 'http://localhost:8888/test3'
+        context.redirect 'back'
+        assert.equal context.response.get('Location'), 'http://localhost:8888/test3'
+        assert.equal context.status, 302
+        assert.equal context.message, 'Found'
+        assert.equal context.type, 'text/plain'
+        assert.equal context.body, 'Redirecting to http://localhost:8888/test3'
+        context.redirect 'http://localhost:8888/test2'
+        assert.equal context.response.get('Location'), 'http://localhost:8888/test2'
+        assert.equal context.status, 302
+        assert.equal context.message, 'Found'
+        assert.equal context.type, 'text/plain'
+        assert.equal context.body, 'Redirecting to http://localhost:8888/test2'
+        yield return
