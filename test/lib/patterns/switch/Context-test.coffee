@@ -1049,3 +1049,41 @@ describe 'Context', ->
         context = Context.new req, res, switchInstance
         assert.isFalse context.writable
         yield return
+  describe '#type', ->
+    it 'should get, set and remove `Content-Type` header', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        assert.equal context.type, ''
+        context.type = 'markdown'
+        assert.equal context.type, 'text/x-markdown'
+        assert.equal res._headers['content-type'], 'text/x-markdown; charset=utf-8'
+        context.type = 'file.json'
+        assert.equal context.type, 'application/json'
+        assert.equal res._headers['content-type'], 'application/json; charset=utf-8'
+        context.type = 'text/html'
+        assert.equal context.type, 'text/html'
+        assert.equal res._headers['content-type'], 'text/html; charset=utf-8'
+        context.type = null
+        assert.equal context.type, ''
+        assert.isUndefined res._headers['content-type']
+        yield return
