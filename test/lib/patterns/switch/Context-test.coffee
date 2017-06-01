@@ -1,3 +1,4 @@
+{ Readable } = require 'stream'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 _ = require 'lodash'
@@ -830,4 +831,79 @@ describe 'Context', ->
         assert.equal context.get('X-Forwarded-Proto'), 'https'
         assert.equal context.get('Abc'), 'def'
         assert.equal context.get('123'), ''
+        yield return
+  describe '#body', ->
+    it 'should get and set response body', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        assert.isUndefined context.body
+        context.body = 'TEST'
+        assert.equal context.status, 200
+        assert.equal context.message, 'OK'
+        assert.equal context.response.get('Content-Type'), 'text/plain; charset=utf-8'
+        assert.equal context.response.get('Content-Length'), '4'
+        context.body = null
+        assert.equal context.status, 204
+        assert.equal context.message, 'No Content'
+        assert.equal context.response.get('Content-Type'), ''
+        assert.equal context.response.get('Content-Length'), ''
+        context.response._explicitStatus = no
+        context.body = Buffer.from '7468697320697320612074c3a97374', 'hex'
+        assert.equal context.status, 200
+        assert.equal context.message, 'OK'
+        assert.equal context.response.get('Content-Type'), 'application/octet-stream'
+        assert.equal context.response.get('Content-Length'), '15'
+        context.body = null
+        context.response._explicitStatus = no
+        context.body = '<html></html>'
+        assert.equal context.status, 200
+        assert.equal context.message, 'OK'
+        assert.equal context.response.get('Content-Type'), 'text/html; charset=utf-8'
+        assert.equal context.response.get('Content-Length'), '13'
+        data = 'asdfsdzdfvhasdvsjvcsdvcivsiubcuibdsubs\nbszdbiszdbvibdivbsdibvsd'
+        class MyStream extends Readable
+          constructor: (options = {}) ->
+            super options
+            @__data = options.data
+            return
+          _read:(size) ->
+            @push @__data[0 ... size]
+            @push null
+            return
+        stream = new MyStream { data }
+        context.body = null
+        context.response._explicitStatus = no
+        context.body = stream
+        stream.read()
+        assert.equal context.status, 200
+        assert.equal context.message, 'OK'
+        assert.equal context.response.get('Content-Type'), 'application/octet-stream'
+        assert.equal context.response.get('Content-Length'), ''
+        context.body = null
+        context.response._explicitStatus = no
+        context.body = { test: 'TEST' }
+        assert.equal context.status, 200
+        assert.equal context.message, 'OK'
+        assert.equal context.response.get('Content-Type'), 'application/json; charset=utf-8'
+        assert.equal context.response.get('Content-Length'), ''
         yield return
