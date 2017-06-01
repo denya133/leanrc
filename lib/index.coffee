@@ -19,6 +19,10 @@ class LeanRC extends RC
   @const STOPPED_MIGRATE: Symbol 'stopped_migrate' # для сигнала
   @const STOPPED_ROLLBACK: Symbol 'stopped_rollback' # для сигнала
   @const MIGRATIONS: Symbol 'MigrationsCollection'
+  @const SESSIONS: Symbol 'SessionsCollection'
+  @const USERS: Symbol 'UsersCollection'
+  @const SPACES: Symbol 'SpacesCollection'
+  @const ROLES: Symbol 'RolesCollection'
   @const RESQUE: Symbol 'ResqueProxy'
   @const START_RESQUE: Symbol 'start_resque'
   @const DELAYED_JOBS_QUEUE: 'delayed_jobs'
@@ -131,6 +135,8 @@ class LeanRC extends RC
 
   require('./mixins/BulkActionsResourceMixin') LeanRC
   require('./mixins/BodyParseMixin') LeanRC # need test it
+  require('./mixins/CheckSessionsMixin') LeanRC # need test it
+  require('./mixins/CheckPermissionsMixin') LeanRC # need test it
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC

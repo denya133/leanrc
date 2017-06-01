@@ -176,7 +176,10 @@ module.exports = (Module)->
 
     @public onRegister: Function,
       default: ->
-        @setViewComponent new EventEmitter()
+        voEmitter = new EventEmitter()
+        if voEmitter.listeners('error').length is 0
+          voEmitter.on 'error', @onerror.bind @
+        @setViewComponent voEmitter
         @defineRoutes()
         @serverListen()
         return
@@ -224,9 +227,6 @@ module.exports = (Module)->
       return: LAMBDA
       default: ->
         fn = @constructor.compose @middlewares
-        voEmitter = @getViewComponent()
-        if voEmitter.listeners('error').length is 0
-          voEmitter.on 'error', @onerror.bind @
         handleRequest = co.wrap (req, res)=>
           res.statusCode = 404
           voContext = Context.new req, res, @
@@ -361,7 +361,6 @@ module.exports = (Module)->
         aoSwaggerEndpoint.deprecated isDeprecated  if isDeprecated?
         return
 
-    # должен быть объявлен в унаследованном классе
     @public createNativeRoute: Function,
       default: ({method, path, resource, action})->
         resourceName = inflect.camelize inflect.underscore "#{resource.replace /[/]/g, '_'}Resource"
