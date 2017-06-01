@@ -1157,3 +1157,34 @@ describe 'Context', ->
         assert.equal context.type, 'text/plain'
         assert.equal context.body, 'Redirecting to http://localhost:8888/test2'
         yield return
+  describe '#attachment', ->
+    it 'should setup attachment', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        context = Context.new req, res, switchInstance
+        context.attachment "#{__dirname}/#{__filename}"
+        assert.equal context.type, 'text/coffeescript'
+        assert.equal context.response.get('Content-Disposition'), 'attachment; filename="Context-test.coffee"'
+        context.attachment 'attachment.js'
+        assert.equal context.type, 'application/javascript'
+        assert.equal context.response.get('Content-Disposition'), 'attachment; filename="attachment.js"'
+        yield return
