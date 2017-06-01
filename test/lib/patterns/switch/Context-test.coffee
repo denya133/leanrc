@@ -1,4 +1,5 @@
 { Readable } = require 'stream'
+EventEmitter = require 'events'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 _ = require 'lodash'
@@ -1429,4 +1430,69 @@ describe 'Context', ->
         context.etag = etag
         assert.equal res._headers['etag'], etag
         assert.deepEqual context.response.etag, etag
+        yield return
+  describe '#onerror', ->
+    it 'should run error handler', ->
+      co ->
+        trigger = new EventEmitter
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class Context extends LeanRC::Context
+          @inheritProtected()
+          @module Test
+        Context.initialize()
+        switchInstance =
+          getViewComponent: -> trigger
+          configs:
+            trustProxy: yes
+            cookieKey: 'COOKIE_KEY'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data) -> trigger.emit 'end', data
+        context = Context.new req, res, switchInstance
+        errorPromise = LeanRC::Promise.new (resolve) ->
+          trigger.once 'error', resolve
+        endPromise = LeanRC::Promise.new (resolve) ->
+          trigger.once 'end', resolve
+        context.onerror 'TEST_ERROR'
+        err = yield errorPromise
+        data = yield endPromise
+        assert.instanceOf err, Error
+        assert.equal err.message, 'non-error thrown: TEST_ERROR'
+        assert.equal err.status, 500
+        assert.equal data, 'Internal Server Error'
+        context = Context.new req, res, switchInstance
+        errorPromise = LeanRC::Promise.new (resolve) ->
+          trigger.once 'error', resolve
+        endPromise = LeanRC::Promise.new (resolve) ->
+          trigger.once 'end', resolve
+        context.onerror new Error 'TEST_ERROR'
+        err = yield errorPromise
+        data = yield endPromise
+        assert.instanceOf err, Error
+        assert.equal err.message, 'TEST_ERROR'
+        assert.equal err.status, 500
+        assert.equal data, 'Internal Server Error'
+        context = Context.new req, res, switchInstance
+        errorPromise = LeanRC::Promise.new (resolve) ->
+          trigger.once 'error', resolve
+        endPromise = LeanRC::Promise.new (resolve) ->
+          trigger.once 'end', resolve
+        context.onerror httpErrors 400, 'TEST_ERROR'
+        err = yield errorPromise
+        data = yield endPromise
+        assert.instanceOf err, httpErrors.BadRequest
+        assert.isTrue err.expose
+        assert.equal err.message, 'TEST_ERROR'
+        assert.equal err.status, 400
+        assert.equal data, 'TEST_ERROR'
         yield return

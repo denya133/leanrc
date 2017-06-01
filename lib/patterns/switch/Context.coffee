@@ -49,7 +49,7 @@ module.exports = (Module)->
     @public onerror: Function,
       default: (err)->
         return unless err?
-        if _.isError err
+        unless _.isError err
           err = new Error "non-error thrown: #{err}"
         headerSent = no
         if @headerSent or not @writable
@@ -62,13 +62,13 @@ module.exports = (Module)->
           res.getHeaderNames().forEach (name)-> res.removeHeader name
         if (vlHeaderNames = Object.keys res.headers ? {}).length > 0
           vlHeaderNames.forEach (name)-> res.removeHeader name
-        @set err.headers
+        @set err.headers ? {}
         @type = 'text'
         err.status = 404 if 'ENOENT' is err.code
-        err.status = 500 if _.isNumber(err.status) or not statuses[err.status]
+        err.status = 500 if not _.isNumber(err.status) or not statuses[err.status]
         code = statuses[err.status]
         msg = if err.expose
-           err.message
+          err.message
         else
           code
         @status = err.status
