@@ -74,10 +74,7 @@ module.exports = (Module)->
           code
         @status = err.status
         @length = Buffer.byteLength msg
-        if _.isFunction @res.end
-          @res.end msg
-        else
-          @res.send msg
+        @res.end msg
         return
 
     # Request aliases
