@@ -206,16 +206,18 @@ module.exports = (Module)->
           facade.sendNotification SEND_TO_LOG, "listening on port #{port}", LEVELS[DEBUG]
         return
 
-    @public middlewares: Array # NEEDS TEST
+    @public middlewares: Array
 
-    @public use: Function, # NEEDS TEST
+    @public use: Function,
       args: [LAMBDA]
       return: SwitchInterface
       default: (middleware)->
         unless _.isFunction middleware
           throw new Error 'middleware must be a function!'
         if isGeneratorFunction middleware
+          { name: oldName } = middleware
           middleware = co.wrap middleware
+          middleware._name = oldName
         middlewareName = middleware._name ? middleware.name ? '-'
         {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         @facade.sendNotification SEND_TO_LOG, "use #{middlewareName}", LEVELS[DEBUG]
