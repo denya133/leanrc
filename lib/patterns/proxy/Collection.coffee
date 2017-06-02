@@ -61,7 +61,7 @@ module.exports = (Module)->
       default: (aoType, aoData)->
         @sendNotification Module::RECORD_CHANGED, aoData, aoType
         return
-
+    # TODO: надо перенести в Record в виде статических методов, т.к. в Рекорды создаются на все сущности в виде классов, а Collection создается в приложении 1-3 раза, а потом уже создаются его инстансы с разными именами и разными делегатами (Рекордами)
     @public customFilters: Object, # возвращает установленные кастомные фильтры с учетом наследования
       default: {}
       get: (__customFilters)->
