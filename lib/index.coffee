@@ -61,7 +61,7 @@ class LeanRC extends RC
   require('./interfaces/patterns/RouterInterface') LeanRC
   require('./interfaces/patterns/SwitchInterface') LeanRC
 
-  require('./interfaces/mixins/CrudEndpointsMixinInterface') LeanRC
+  require('./interfaces/mixins/CrudGatewayMixinInterface') LeanRC
   require('./interfaces/mixins/IterableMixinInterface') LeanRC
   require('./interfaces/mixins/QueryableMixinInterface') LeanRC
   require('./interfaces/mixins/RelationsMixinInterface') LeanRC
@@ -106,7 +106,7 @@ class LeanRC extends RC
   require('./patterns/proxy/Router') LeanRC
   require('./patterns/proxy/Resque') LeanRC
 
-  require('./mixins/CrudEndpointsMixin') LeanRC
+  require('./mixins/CrudGatewayMixin') LeanRC
   require('./mixins/HttpCollectionMixin') LeanRC
   require('./mixins/MemoryCollectionMixin') LeanRC
   require('./mixins/MemoryResqueMixin') LeanRC

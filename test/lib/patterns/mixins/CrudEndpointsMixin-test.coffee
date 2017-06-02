@@ -6,7 +6,7 @@ LeanRC = require.main.require 'lib'
 RC = require 'RC'
 { co } = RC::Utils
 
-describe 'CrudEndpointsMixin', ->
+describe 'CrudGatewayMixin', ->
   describe '.new', ->
     it 'should create CRUD gateway instance', ->
       co ->
@@ -15,7 +15,7 @@ describe 'CrudEndpointsMixin', ->
         Test.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudEndpointsMixin
+          @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         gateway = TestCrudGateway.new()
@@ -29,7 +29,7 @@ describe 'CrudEndpointsMixin', ->
         Test.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudEndpointsMixin
+          @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         gateway = TestCrudGateway.new 'CucumberGateway',
@@ -45,7 +45,7 @@ describe 'CrudEndpointsMixin', ->
         Test.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudEndpointsMixin
+          @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         gateway = TestCrudGateway.new 'CucumberGateway',
@@ -61,7 +61,7 @@ describe 'CrudEndpointsMixin', ->
         Test.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudEndpointsMixin
+          @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         gateway = TestCrudGateway.new 'CucumberGateway',
@@ -81,7 +81,7 @@ describe 'CrudEndpointsMixin', ->
         TestRecord.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudEndpointsMixin
+          @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         gateway = TestCrudGateway.new 'CucumberGateway',
@@ -102,7 +102,7 @@ describe 'CrudEndpointsMixin', ->
         TestRecord.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudEndpointsMixin
+          @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         gateway = TestCrudGateway.new 'CucumberGateway',
@@ -124,7 +124,7 @@ describe 'CrudEndpointsMixin', ->
         TestRecord.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudEndpointsMixin
+          @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         gateway = TestCrudGateway.new 'CucumberGateway',
@@ -146,7 +146,7 @@ describe 'CrudEndpointsMixin', ->
         TestRecord.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudEndpointsMixin
+          @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         gateway = TestCrudGateway.new 'CucumberGateway',
@@ -169,7 +169,7 @@ describe 'CrudEndpointsMixin', ->
         TestRecord.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudEndpointsMixin
+          @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         gateway = TestCrudGateway.new 'CucumberGateway',
@@ -190,7 +190,7 @@ describe 'CrudEndpointsMixin', ->
         TestRecord.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudEndpointsMixin
+          @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         gateway = TestCrudGateway.new 'CucumberGateway',
@@ -213,7 +213,7 @@ describe 'CrudEndpointsMixin', ->
         TestRecord.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudEndpointsMixin
+          @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         gateway = TestCrudGateway.new 'CucumberGateway',

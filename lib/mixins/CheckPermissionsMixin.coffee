@@ -86,7 +86,8 @@ module.exports = (Module)->
 
       @public @async checkPermission: Function,
         default: checkPermission = (args...)->
-          yield return args if @currentUser.role is 'admin'
+          if @currentUser.role is 'admin'
+            yield return args 
           space = @context.pathParams['space'] ? '_default'
           if checkPermission.wrapper.chainName is 'list'
             spaces = space.split '-'
