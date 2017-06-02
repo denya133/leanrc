@@ -106,7 +106,10 @@ class LeanRC extends RC
   require('./patterns/proxy/Router') LeanRC
   require('./patterns/proxy/Resque') LeanRC
 
+  require('./patterns/gateway/Endpoint') LeanRC
+
   require('./mixins/CrudGatewayMixin') LeanRC
+  require('./mixins/CrudEndpointMixin') LeanRC
   require('./mixins/HttpCollectionMixin') LeanRC
   require('./mixins/MemoryCollectionMixin') LeanRC
   require('./mixins/MemoryResqueMixin') LeanRC
@@ -140,8 +143,6 @@ class LeanRC extends RC
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC
-
-  require('./patterns/gateway/Endpoint') LeanRC
 
   require('./patterns/iterator/Cursor') LeanRC
 
