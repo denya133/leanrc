@@ -415,7 +415,6 @@ describe 'Switch', ->
         res =
           _headers: {}
         voContext = Test::Context.new req, res, switchMediator
-        spyMiddlewares = []
         middlewares = []
         COUNT = 4
         for i in [ 0 .. COUNT ]
@@ -424,5 +423,74 @@ describe 'Switch', ->
         yield fn voContext
         for i in [ 0 .. COUNT ]
           assert.isTrue middlewares[i].calledWith voContext
+        facade.remove()
+        yield return
+  describe '.respond', ->
+    it 'should run responding request handler', ->
+      co ->
+        trigger = new EventEmitter
+        facade = Facade.getInstance 'TEST_SWITCH_9'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        req =
+          method: 'POST'
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data) -> trigger.emit 'end', data
+        voContext = Test::Context.new req, res, switchMediator
+        endPromise = LeanRC::Promise.new (resolve) -> trigger.once 'end', resolve
+        voContext.status = 201
+        switchMediator.respond voContext
+        data = yield endPromise
+        assert.equal data, 'Created'
+        assert.equal voContext.status, 201
+        assert.equal voContext.message, 'Created'
+        assert.equal voContext.length, 7
+        assert.equal voContext.type, 'text/plain'
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data) -> trigger.emit 'end', data
+        voContext = Test::Context.new req, res, switchMediator
+        endPromise = LeanRC::Promise.new (resolve) -> trigger.once 'end', resolve
+        voContext.body = data: 'data'
+        switchMediator.respond voContext
+        data = yield endPromise
+        assert.equal data, '{"data":"data"}'
+        assert.equal voContext.status, 200
+        assert.equal voContext.message, 'OK'
+        assert.equal voContext.length, 15
+        assert.equal voContext.type, 'application/json'
         facade.remove()
         yield return

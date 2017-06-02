@@ -278,7 +278,7 @@ module.exports = (Module)->
           return ctx.res.end body
         if body instanceof Stream
           return body.pipe ctx.res
-        body = JSON.stringify body
+        body = JSON.stringify body ? null
         unless ctx.res.headersSent
           ctx.length = Buffer.byteLength body
         ctx.res.end body
