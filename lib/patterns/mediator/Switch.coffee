@@ -222,7 +222,7 @@ module.exports = (Module)->
         @middlewares.push middleware
         return @
 
-    @public callback: Function, # NEEDS TEST
+    @public callback: Function,
       args: []
       return: LAMBDA
       default: ->
@@ -255,7 +255,7 @@ module.exports = (Module)->
         @facade.sendNotification SEND_TO_LOG, msg.replace(/^/gm, '  '), LEVELS[ERROR]
         return
 
-    @public respond: Function, # NEEDS TEST
+    @public respond: Function,
       default: (ctx)->
         return if context.respond is no
         return unless ctx.writable

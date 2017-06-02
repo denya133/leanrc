@@ -2,6 +2,7 @@ EventEmitter = require 'events'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 Feed = require 'feed'
+# httpErrors = require 'http-errors'
 LeanRC = require.main.require 'lib'
 RC = require 'RC'
 Facade = LeanRC::Facade
@@ -492,5 +493,73 @@ describe 'Switch', ->
         assert.equal voContext.message, 'OK'
         assert.equal voContext.length, 15
         assert.equal voContext.type, 'application/json'
+        facade.remove()
+        yield return
+  describe '#callback', ->
+    it 'should run request handler', ->
+      co ->
+        facade = Facade.getInstance 'TEST_SWITCH_10'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            @finished = no
+            @_headers = {}
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        switchMediator.middlewares = []
+        switchMediator.middlewares.push (ctx, next) ->
+          ctx.body = Buffer.from JSON.stringify data: 'data'
+          yield return next()
+        endPromise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
+        yield switchMediator.callback() req, res
+        data = yield endPromise
+        assert.equal data, '{"data":"data"}'
+        res = new MyResponse
+        switchMediator.middlewares.push (ctx, next) ->
+          ctx.throw 404
+          yield return next()
+        endPromise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
+        yield switchMediator.callback() req, res
+        data = yield endPromise
+        assert.equal data, 'Not Found'
+        res = new MyResponse
+        switchMediator.middlewares = []
+        switchMediator.middlewares.push (ctx, next) ->
+          return ctx.res.emit 'error', new Error 'TEST'
+          yield return next()
+        endPromise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
+        yield switchMediator.callback() req, res
+        data = yield endPromise
         facade.remove()
         yield return
