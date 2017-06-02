@@ -1,7 +1,7 @@
 _             = require 'lodash'
 accepts       = require 'accepts'
 createError   = require 'http-errors'
-httpAssert    = require 'http-assert'
+assert        = require 'assert'
 statuses      = require 'statuses'
 
 ###
@@ -34,17 +34,20 @@ module.exports = (Module)->
     @public request: RequestInterface
     @public response: ResponseInterface
     @public cookies: CookiesInterface
+    @public accept: Object
     @public state: Object
     @public switch: SwitchInterface
     @public respond: Boolean
     @public routePath: String
     @public pathParams: Object
 
+    # @public database: String # возможно это тоже надо получать из метода из отдельного модуля
+
     @public throw: Function,
       default: (args...)-> throw createError args...
 
     @public assert: Function,
-      default: httpAssert
+      default: assert
 
     @public onerror: Function,
       default: (err)->
@@ -73,10 +76,7 @@ module.exports = (Module)->
           code
         @status = err.status
         @length = Buffer.byteLength msg
-        if _.isFunction @res.end
-          @res.end msg
-        else
-          @res.send msg
+        @res.end msg
         return
 
     # Request aliases

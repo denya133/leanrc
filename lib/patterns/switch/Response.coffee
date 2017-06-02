@@ -24,11 +24,7 @@ module.exports = (Module)->
     ResponseInterface
     SwitchInterface
     ContextInterface
-    Utils
   } = Module::
-  {
-    isArangoDB
-  } = Utils
 
   class Response extends CoreObject
     @inheritProtected()
@@ -50,13 +46,10 @@ module.exports = (Module)->
       get: -> @headers
     @public headers: Object,
       get: ->
-        if isArangoDB()
-          @res.headers
+        if _.isFunction @res.getHeaders
+          @res.getHeaders()
         else
-          if _.isFunction @res.getHeaders
-            @res.getHeaders()
-          else
-            @res._headers ? {}
+          @res._headers ? {}
 
     @public status: Number,
       get: -> @res.statusCode
