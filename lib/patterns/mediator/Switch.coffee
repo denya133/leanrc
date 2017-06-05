@@ -90,7 +90,7 @@ module.exports = (Module)->
       if method is 'GET' and ctx.method is 'HEAD'
         return yes
       return no
-    @public @static createMethod: Function, # NEEDS TEST
+    @public @static createMethod: Function,
       args: [String]
       return: NILL
       default: (method)->
@@ -118,7 +118,7 @@ module.exports = (Module)->
                 yield return next?()
               m = re.exec ctx.path
               if m
-                pathParams = m.slice(1)
+                pathParams = m[1..]
                   .map decode
                   .reduce (prev, item, index)->
                     prev[keys[index].name] = item

@@ -660,3 +660,73 @@ describe 'Switch', ->
         assert.equal message.getType(), Test::LogMessage.LEVELS[Test::LogMessage.ERROR]
         facade.remove()
         yield return
+  describe '#createMethod', ->
+    it 'should create method handler', ->
+      co ->
+        trigger = new EventEmitter
+        facade = Facade.getInstance 'TEST_SWITCH_13'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+          @createMethod 'get'
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        assert.isFunction switchMediator.get.body
+        lastMiddlewareIndex = switchMediator.middlewares.length
+        spyMethod = sinon.spy ->
+        switchMediator.get '/test/:id', (ctx, next) ->
+          spyMethod JSON.stringify ctx.pathParams
+          yield return next?()
+        assert.isDefined switchMediator.middlewares[lastMiddlewareIndex]
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            @finished = no
+            @_headers = {}
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/test2'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        voContext = Test::Context.new req, res, switchMediator
+        promise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
+        yield switchMediator.middlewares[lastMiddlewareIndex] voContext, -> res.end()
+        yield promise
+        assert.isFalse spyMethod.called
+        spyMethod.reset()
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/test/123'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        voContext = Test::Context.new req, res, switchMediator
+        promise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
+        yield switchMediator.middlewares[lastMiddlewareIndex] voContext, -> res.end()
+        yield promise
+        assert.isTrue spyMethod.calledWith '{"id":"123"}'
+        facade.remove()
+        yield return
