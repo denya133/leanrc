@@ -245,7 +245,7 @@ module.exports = (Module)->
         handleRequest
 
     # Default error handler
-    @public onerror: Function, # NEEDS TEST
+    @public onerror: Function,
       args: [Error]
       return: LAMBDA
       default: (err)->

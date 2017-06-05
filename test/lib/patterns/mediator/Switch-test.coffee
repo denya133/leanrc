@@ -620,3 +620,43 @@ describe 'Switch', ->
         compareMiddlewares testMiddlewareSecond, usedMiddleware
         facade.remove()
         yield return
+  describe '#onerror', ->
+    it 'should handle error', ->
+      co ->
+        trigger = new EventEmitter
+        facade = Facade.getInstance 'TEST_SWITCH_12'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+        TestSwitch.initialize()
+        class TestLogCommand extends LeanRC::SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function,
+            default: (aoNotification) -> trigger.emit 'log', aoNotification
+        TestLogCommand.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        facade.registerCommand Test::LogMessage.SEND_TO_LOG, TestLogCommand
+        promise = LeanRC::Promise.new (resolve) -> trigger.once 'log', resolve
+        switchMediator.onerror new Error 'TEST_ERROR'
+        message = yield promise
+        assert.equal message.getName(), Test::LogMessage.SEND_TO_LOG
+        assert.include message.getBody(), 'TEST_ERROR'
+        assert.equal message.getType(), Test::LogMessage.LEVELS[Test::LogMessage.ERROR]
+        facade.remove()
+        yield return
