@@ -46,7 +46,7 @@ module.exports = (Module)->
   {
     co
     isGeneratorFunction
-    isArangoDB
+    genRandomAlphaNumbers
   } = Utils
 
 
@@ -363,19 +363,14 @@ module.exports = (Module)->
         aoSwaggerEndpoint.deprecated isDeprecated  if isDeprecated?
         return
 
-    @public createNativeRoute: Function, # NEEDS TEST
+    @public createNativeRoute: Function,
       default: ({method, path, resource, action})->
         resourceName = inflect.camelize inflect.underscore "#{resource.replace /[/]/g, '_'}Resource"
 
         @[method]? path, co.wrap (context, next)=>
           yield Module::Promise.new (resolve, reject)=>
             try
-              reverse = if isArangoDB()
-                crypto = require '@arangodb/crypto'
-                crypto.genRandomAlphaNumbers 32
-              else
-                crypto = require 'crypto'
-                crypto.randomBytes(32).toString 'hex'
+              reverse = genRandomAlphaNumbers 32
               @getViewComponent().once reverse, co.wrap (aoData)=>
                 try
                   yield @sendHttpResponse context, aoData, {method, path, resource, action}

@@ -49,7 +49,7 @@
     "qs": "^6.4.0"
   },
   "dependencies": {
-    "RC": "git+ssh://git@bitbucket.org/webbasis/rc.git#v1.0.0-rc.40",
+    "RC": "git+ssh://git@bitbucket.org/webbasis/rc.git#v1.0.0-rc.41",
     "accepts": "^1.3.3",
     "change-case": "3.0.0",
     "co-body": "^5.1.1",
