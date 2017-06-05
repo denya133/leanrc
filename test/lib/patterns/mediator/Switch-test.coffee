@@ -660,6 +660,35 @@ describe 'Switch', ->
         assert.equal message.getType(), Test::LogMessage.LEVELS[Test::LogMessage.ERROR]
         facade.remove()
         yield return
+  describe '#del', ->
+    it 'should alias to #delete', ->
+      co ->
+        spyDelete = sinon.spy ->
+        facade = Facade.getInstance 'TEST_SWITCH_13'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+          @public delete: Function, { default: spyDelete }
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        switchMediator.del 'TEST'
+        assert.isTrue spyDelete.calledWith 'TEST'
+        yield return
   describe '#createMethod', ->
     it 'should create method handler', ->
       co ->

@@ -138,7 +138,7 @@ module.exports = (Module)->
     methods.forEach (method)=>
       @createMethod method
 
-    @public del: Function, # NEEDS TEST
+    @public del: Function,
       default: (args...)->
         @delete args...
 
