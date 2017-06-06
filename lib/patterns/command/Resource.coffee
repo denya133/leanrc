@@ -69,12 +69,12 @@ module.exports = (Module)->
         @recordBody = _.omit @recordBody, ['ownerId']
         yield return args
 
-    @public @async setSpaceId: Function, # NEEDS TEST
+    @public @async setSpaceId: Function,
       default: (args...)->
         @recordBody.spaceId = @context.pathParams.space ? '_default'
         yield return args
 
-    @public @async protectSpaceId: Function, # NEEDS TEST
+    @public @async protectSpaceId: Function,
       default: (args...)->
         @recordBody = _.omit @recordBody, ['spaceId']
         yield return args
