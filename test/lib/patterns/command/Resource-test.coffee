@@ -101,6 +101,7 @@ describe 'Resource', ->
         facade.registerProxy boundCollection
         { collection } = resource
         assert.equal collection, boundCollection
+        facade.remove()
         yield return
   describe '#action', ->
     it 'should create actions', ->
@@ -287,6 +288,46 @@ describe 'Resource', ->
         resource.getRecordBody()
         assert.deepEqual resource.recordBody, test: 'test9'
         yield return
+  describe '#omitBody', ->
+    it 'should clean body from unneeded properties', ->
+      co ->
+        TEST_FACADE = 'TEST_FACADE_002'
+        facade = LeanRC::Facade.getInstance TEST_FACADE
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        TestResource.initialize()
+        class TestEntity extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @public @static findRecordByName: Function,
+            default: (asType) -> Test::TestEntity
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @type = 'Test::TestEntity'
+        TestEntity.initialize()
+        resource = TestResource.new()
+        resource.initializeNotifier TEST_FACADE
+        { collectionName } = resource
+        boundCollection = LeanRC::Collection.new collectionName,
+          delegate: TestEntity
+        facade.registerProxy boundCollection
+        resource.context =
+          request: body: test_entity:
+            _id: '123', test: 'test9', _space: 'test', type: 'TestEntity'
+        resource.getRecordBody()
+        resource.omitBody()
+        assert.deepEqual resource.recordBody, test: 'test9', type: 'Test::TestEntity'
+        facade.remove()
+        yield return
   describe '#beforeUpdate', ->
     it 'should get body with ID', ->
       co ->
@@ -373,6 +414,7 @@ describe 'Resource', ->
           offset: 'not defined'
         assert.propertyVal items[0], 'test', 'test1'
         assert.propertyVal items[1], 'test', 'test2'
+        facade.remove()
         yield return
   describe '#detail', ->
     it 'should get resource single item', ->
@@ -439,6 +481,7 @@ describe 'Resource', ->
         result = yield resource.detail context
         assert.propertyVal result, 'id', record.id
         assert.propertyVal result, 'test', 'test2'
+        facade.remove()
         yield return
   describe '#create', ->
     it 'should create resource single item', ->
@@ -500,6 +543,7 @@ describe 'Resource', ->
         resource.initializeNotifier KEY
         result = yield resource.create request: body: test_entity: test: 'test3'
         assert.propertyVal result, 'test', 'test3'
+        facade.remove()
         yield return
   describe '#update', ->
     it 'should update resource single item', ->
@@ -572,6 +616,7 @@ describe 'Resource', ->
           pathParams: test_entity: record.id
           request: body: test_entity: test: 'test8'
         assert.propertyVal result, 'test', 'test8'
+        facade.remove()
         yield return
   describe '#delete', ->
     it 'should remove resource single item', ->
@@ -643,6 +688,7 @@ describe 'Resource', ->
         result = yield resource.delete
           pathParams: test_entity: record.id
         assert.propertyVal result, 'isHidden', yes
+        facade.remove()
         yield return
   describe '#execute', ->
     it 'should call execution', ->
@@ -732,4 +778,5 @@ describe 'Resource', ->
           offset: 'not defined'
         assert.lengthOf items, 2
         assert.equal type, 'TEST_REVERSE'
+        facade.remove()
         yield return

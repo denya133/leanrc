@@ -223,7 +223,7 @@ module.exports = (Module)->
         @recordBody = @context.request.body?[@itemEntityName]
         return args
 
-    @public omitBody: Function, # NEEDS TEST
+    @public omitBody: Function,
       args: [Object]
       return: ANY
       default: (args...)->
