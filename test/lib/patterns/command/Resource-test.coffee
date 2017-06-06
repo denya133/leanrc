@@ -907,3 +907,30 @@ describe 'Resource', ->
           test: 'test9'
           id: 'ID123456'
         yield return
+  describe '#setSpaceId', ->
+    it 'should set space ID for body', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.currentUser = id: 'ID123'
+        resource.context =
+          pathParams: test_entity: 'ID123456', space: 'SPACE123'
+          request: body: test_entity: test: 'test9'
+        resource.getRecordId()
+        resource.getRecordBody()
+        resource.beforeUpdate()
+        resource.setSpaceId()
+        assert.deepEqual resource.recordBody,
+          test: 'test9'
+          id: 'ID123456'
+          spaceId: 'SPACE123'
+        yield return
