@@ -9,7 +9,8 @@ module.exports = (Module)->
       @inheritProtected()
       @implements Module::DelayableMixinInterface
 
-      iphDelayableMap = @private @static delayableMap: Object
+      cphDelayableMap = @private @static delayableMap: Object
+      iphDelayableMap = @private delayableMap: Object
 
       cpmDelayJob = @private @static @async delayJob: Function,
         default: (facade, data, options = {})->
@@ -39,7 +40,7 @@ module.exports = (Module)->
       # т.к. статические методы объявлены на классах, а следовательно нет проблемы в том, чтобы найти в неймспейсе нужный класс и вызвать его статический метод.
       @public @static delay: Function,
         default: (facade, opts = null)->
-          @[iphDelayableMap] ?= do =>
+          @[cphDelayableMap] ?= do =>
             obj = {}
             for own methodName of @classMethods
               if methodName isnt 'delay'
@@ -47,10 +48,27 @@ module.exports = (Module)->
                   obj[methodName] = (args...)=>
                     data =
                       moduleName: @moduleName()
-                      className:  @name
+                      replica: @constructor.replicateObject @
                       methodName: methodName
                       args: args
                     Module::Utils.co @[cpmDelayJob], facade, data, opts
+            obj
+          @[cphDelayableMap]
+
+      @public delay: Function,
+        default: (facade, opts = null)->
+          @[iphDelayableMap] ?= do =>
+            obj = {}
+            for own methodName of @constructor.instanceMethods
+              if methodName isnt 'delay'
+                do (methodName)=>
+                  obj[methodName] = (args...)=>
+                    data =
+                      moduleName: @moduleName()
+                      replica: @constructor.replicateObject @
+                      methodName: methodName
+                      args: args
+                    Module::Utils.co @constructor[cpmDelayJob], facade, data, opts
             obj
           @[iphDelayableMap]
 

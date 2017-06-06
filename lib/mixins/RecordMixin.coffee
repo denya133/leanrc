@@ -297,6 +297,33 @@ module.exports = (Module)->
               vhResult[asAttrName] = transform.call(@).serialize aoRecord[asAttrName]
           vhResult
 
+      # need test it
+      @public @static @async restoreObject: Function,
+        default: (Module, replica)->
+          if replica?.class is @name and replica?.type is 'instance'
+            facade = Module::ApplicationFacade.getInstance replica.multitonKey
+            collection = facade.retrieveProxy replica.collectionName
+            instance = if replica.isNew
+              collection.build replica.attributes
+            else
+              yield collection.find replica.id
+            yield return instance
+          else
+            return yield @super Module, replica
+
+      # need test it
+      @public @static @async replicateObject: Function,
+        default: (instance)->
+          replica = @super instance
+          ipsMultitonKey = Symbol.for '~multitonKey'
+          replica.multitonKey = instance.collection[ipsMultitonKey]
+          replica.collectionName = instance.collection.getProxyName()
+          replica.isNew = yield instance.isNew()
+          if replica.isNew
+            replica.attributes = @serialize instance
+          else
+            replica.id = instance.id
+          yield return replica
 
       @public init: Function,
         default: (aoProperties, aoCollection) ->

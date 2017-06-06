@@ -87,6 +87,27 @@ module.exports = (Module)->
       default: (scriptName)->
         yield return @resque.failedJobs @name, scriptName
 
+    # need test it
+    @public @static @async restoreObject: Function,
+      default: (Module, replica)->
+        if replica?.class is @name and replica?.type is 'instance'
+          facade = Module::ApplicationFacade.getInstance replica.multitonKey
+          resque = facade.retrieveProxy replica.resqueName
+          instance = yield resque.get replica.name
+          yield return instance
+        else
+          return yield @super Module, replica
+
+    # need test it
+    @public @static @async replicateObject: Function,
+      default: (instance)->
+        replica = @super instance
+        ipsMultitonKey = Symbol.for '~multitonKey'
+        replica.multitonKey = instance.resque[ipsMultitonKey]
+        replica.resqueName = instance.resque.getProxyName()
+        replica.name = instance.name
+        yield return replica
+
     @public init: Function,
       default: (aoProperties, aoResque) ->
         @super arguments...

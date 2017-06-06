@@ -40,6 +40,16 @@ module.exports = (Module)->
             vbSuccess = no
         vbSuccess
 
+    @public @static @async restoreObject: Function,
+      default: ->
+        throw new Error "restoreObject method not supported for #{@name}"
+        yield return
+
+    @public @static @async replicateObject: Function,
+      default: ->
+        throw new Error "replicateObject method not supported for #{@name}"
+        yield return
+
     @public init: Function,
       default: (output1=null, output2=null)->
         @super arguments...

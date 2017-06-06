@@ -23,5 +23,15 @@ module.exports = (Module)->
           transformed = Number deserialized
           return if _.isNumber(transformed) then transformed else null
 
+    @public @static @async restoreObject: Function,
+      default: ->
+        throw new Error "restoreObject method not supported for #{@name}"
+        yield return
+
+    @public @static @async replicateObject: Function,
+      default: ->
+        throw new Error "replicateObject method not supported for #{@name}"
+        yield return
+
 
   NumberTransform.initialize()

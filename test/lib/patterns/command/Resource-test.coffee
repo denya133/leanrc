@@ -126,16 +126,19 @@ describe 'Resource', ->
           attr: 'test1'
           attrType: String
           level: LeanRC::PUBLIC
+          pointer: 'test1'
         assert.deepEqual Test::TestResource.metaObject.data.actions.test2,
           default: 'test2'
           attr: 'test2'
           attrType: String
           level: LeanRC::PUBLIC
+          pointer: 'test2'
         assert.deepEqual Test::TestResource.metaObject.data.actions.test3,
           default: 'test3'
           attr: 'test3'
           attrType: String
           level: LeanRC::PUBLIC
+          pointer: 'test3'
         yield return
   describe '#actions', ->
     it 'should get resource actions', ->
@@ -162,16 +165,19 @@ describe 'Resource', ->
           attr: 'test1'
           attrType: String
           level: LeanRC::PUBLIC
+          pointer: 'test1'
         assert.deepEqual Test::TestResource.actions.test2,
           default: 'test2'
           attr: 'test2'
           attrType: String
           level: LeanRC::PUBLIC
+          pointer: 'test2'
         assert.deepEqual Test::TestResource.actions.test3,
           default: 'test3'
           attr: 'test3'
           attrType: String
           level: LeanRC::PUBLIC
+          pointer: 'test3'
         { actions } = Test::TestResource
         assert.propertyVal actions.list, 'attr', 'list'
         assert.propertyVal actions.list, 'attrType', Function

@@ -57,6 +57,16 @@ module.exports = (Module)->
         @[ipoBody] = aoBody
         return
 
+    @public @static @async restoreObject: Function,
+      default: ->
+        throw new Error "restoreObject method not supported for #{@name}"
+        yield return
+
+    @public @static @async replicateObject: Function,
+      default: ->
+        throw new Error "replicateObject method not supported for #{@name}"
+        yield return
+
     @public init: Function,
       default: (asType, aoHeader=null, aoBody=null, anPriority=5)->
         @super arguments...

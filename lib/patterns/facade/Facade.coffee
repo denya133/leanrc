@@ -1,6 +1,10 @@
 
 
 module.exports = (Module)->
+  {
+    APPLICATION_MEDIATOR
+  } = Module::
+
   class Facade extends Module::CoreObject
     @inheritProtected()
     @implements Module::FacadeInterface
@@ -124,6 +128,27 @@ module.exports = (Module)->
       default: (asKey)->
         @[ipsMultitonKey] = asKey
         return
+
+    # need test it
+    @public @static @async restoreObject: Function,
+      default: (Module, replica)->
+        if replica?.class is @name and replica?.type is 'instance'
+          unless Facade[cphInstanceMap][replica.multitonKey]?
+            Module::[replica.application].new()
+          facade = Module::ApplicationFacade.getInstance replica.multitonKey
+          yield return facade
+        else
+          return yield @super Module, replica
+
+    # need test it
+    @public @static @async replicateObject: Function,
+      default: (instance)->
+        replica = @super instance
+        replica.multitonKey = instance[ipsMultitonKey]
+        applicationMediator = instance.retrieveMediator APPLICATION_MEDIATOR
+        application = applicationMediator.getViewComponent().constructor.name
+        replica.application = application
+        yield return replica
 
     @public init: Function,
       default: (asKey)->

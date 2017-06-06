@@ -245,6 +245,22 @@ module.exports = (Module)->
         @$sum = asDefinition
         return @
 
+    # need test it
+    @public @static @async restoreObject: Function,
+      default: (Module, replica)->
+        if replica?.class is @name and replica?.type is 'instance'
+          instance = @new replica.query
+          yield return instance
+        else
+          return yield @super Module, replica
+
+    # need test it
+    @public @static @async replicateObject: Function,
+      default: (instance)->
+        replica = @super instance
+        replica.query = instance.toJSON()
+        yield return replica
+
     @public init: Function,
       default: (aoQuery)->
         @super arguments...

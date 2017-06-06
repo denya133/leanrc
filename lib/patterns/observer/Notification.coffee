@@ -39,6 +39,26 @@ module.exports = (Module)->
           Type: #{if @getType()? then @getType() else 'null'}
         """
 
+    # need test it
+    @public @static @async restoreObject: Function,
+      default: (Module, replica)->
+        if replica?.class is @name and replica?.type is 'instance'
+          {name, body, type} = replica.notification
+          instance = @new name, body, type
+          yield return instance
+        else
+          return yield @super Module, replica
+
+    # need test it
+    @public @static @async replicateObject: Function,
+      default: (instance)->
+        replica = @super instance
+        replica.notification =
+          name: instance.getName()
+          body: instance.getBody()
+          type: instance.getType()
+        yield return replica
+
     @public init: Function,
       default: (asName, aoBody, asType)->
         @super arguments...

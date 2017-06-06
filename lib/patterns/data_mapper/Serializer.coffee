@@ -19,6 +19,25 @@ module.exports = (Module)->
         vcRecord = aoRecord.constructor
         vcRecord.serialize aoRecord, options
 
+    # need test it
+    @public @static @async restoreObject: Function,
+      default: (Module, replica)->
+        if replica?.class is @name and replica?.type is 'instance'
+          facade = Module::ApplicationFacade.getInstance replica.multitonKey
+          collection = facade.retrieveProxy replica.collectionName
+          yield return collection.serializer
+        else
+          return yield @super Module, replica
+
+    # need test it
+    @public @static @async replicateObject: Function,
+      default: (instance)->
+        replica = @super instance
+        ipsMultitonKey = Symbol.for '~multitonKey'
+        replica.multitonKey = instance.collection[ipsMultitonKey]
+        replica.collectionName = instance.collection.getProxyName()
+        yield return replica
+
     @public init: Function,
       default: (args...)->
         @super args...
