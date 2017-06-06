@@ -870,7 +870,7 @@ describe 'Resource', ->
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
-        resource.setOwnerId()
+        yield resource.setOwnerId()
         assert.deepEqual resource.recordBody,
           test: 'test9'
           id: 'ID123456'
@@ -897,12 +897,12 @@ describe 'Resource', ->
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
-        resource.setOwnerId()
+        yield resource.setOwnerId()
         assert.deepEqual resource.recordBody,
           test: 'test9'
           id: 'ID123456'
           ownerId: 'ID123'
-        resource.protectOwnerId()
+        yield resource.protectOwnerId()
         assert.deepEqual resource.recordBody,
           test: 'test9'
           id: 'ID123456'
@@ -928,7 +928,7 @@ describe 'Resource', ->
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
-        resource.setSpaceId()
+        yield resource.setSpaceId()
         assert.deepEqual resource.recordBody,
           test: 'test9'
           id: 'ID123456'
@@ -955,13 +955,37 @@ describe 'Resource', ->
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
-        resource.setSpaceId()
+        yield resource.setSpaceId()
         assert.deepEqual resource.recordBody,
           test: 'test9'
           id: 'ID123456'
           spaceId: 'SPACE123'
-        resource.protectSpaceId()
+        yield resource.protectSpaceId()
         assert.deepEqual resource.recordBody,
           test: 'test9'
           id: 'ID123456'
+        yield return
+  describe '#beforeLimitedList', ->
+    it 'should update query if caller user is not admin', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.currentUser = id: 'ID123', isAdmin: no
+        resource.context =
+          pathParams: test_entity: 'ID123456', space: 'SPACE123'
+          request: body: test_entity: test: 'test9'
+        resource.getRecordId()
+        resource.getRecordBody()
+        resource.beforeUpdate()
+        yield resource.beforeLimitedList()
+        assert.deepEqual resource.query, ownerId: 'ID123'
         yield return

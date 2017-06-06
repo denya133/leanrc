@@ -79,7 +79,7 @@ module.exports = (Module)->
         @recordBody = _.omit @recordBody, ['spaceId']
         yield return args
 
-    @public @async beforeLimitedList: Function, # NEEDS TEST
+    @public @async beforeLimitedList: Function,
       default: (args...)->
         if @currentUser? and not @currentUser.isAdmin
           @query ?= {}
