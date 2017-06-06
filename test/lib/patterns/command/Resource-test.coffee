@@ -1,3 +1,4 @@
+EventEmitter = require 'events'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 _ = require 'lodash'
@@ -778,5 +779,73 @@ describe 'Resource', ->
           offset: 'not defined'
         assert.lengthOf items, 2
         assert.equal type, 'TEST_REVERSE'
+        facade.remove()
+        yield return
+  describe '#checkApiVersion', ->
+    it 'should check API version', ->
+      co ->
+        KEY = 'TEST_RESOURCE_001'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+          @action test: Function,
+            default: ->
+        Test::TestResource.initialize()
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/v/v2.0/test_entity/ID123456'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends LeanRC::Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        resource = Test::TestResource.new()
+        resource.initializeNotifier KEY
+        resource.context = Test::Context.new req, res, switchMediator
+        try
+          resource.context.pathParams =
+            v: 'v1.0'
+            test_entity: 'ID123456'
+          yield resource.checkApiVersion()
+        catch e
+        assert.isDefined e
+        try
+          resource.context.pathParams =
+            v: 'v2.0'
+            test_entity: 'ID123456'
+          yield resource.checkApiVersion()
+        catch e
+          assert.isDefined e
         facade.remove()
         yield return

@@ -42,7 +42,7 @@ module.exports = (Module)->
 
     ###
 
-    @public @async checkApiVersion: Function, # NEEDS TEST
+    @public @async checkApiVersion: Function,
       default: (args...)->
         vVersion = @context.pathParams.v
         vCurrentVersion = @configs.version
