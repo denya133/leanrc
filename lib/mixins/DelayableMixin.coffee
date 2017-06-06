@@ -4,6 +4,11 @@
 
 
 module.exports = (Module)->
+  {
+    Utils
+  } = Module::
+  {co} = Utils
+
   Module.defineMixin Module::CoreObject, (BaseClass) ->
     class DelayableMixin extends BaseClass
       @inheritProtected()
@@ -45,13 +50,13 @@ module.exports = (Module)->
             for own methodName of @classMethods
               if methodName isnt 'delay'
                 do (methodName)=>
-                  obj[methodName] = (args...)=>
+                  obj[methodName] = co.wrap (args...)=>
                     data =
                       moduleName: @moduleName()
-                      replica: @constructor.replicateObject @
+                      replica: yield @constructor.replicateObject @
                       methodName: methodName
                       args: args
-                    Module::Utils.co @[cpmDelayJob], facade, data, opts
+                    return yield @[cpmDelayJob] facade, data, opts
             obj
           @[cphDelayableMap]
 
@@ -62,13 +67,13 @@ module.exports = (Module)->
             for own methodName of @constructor.instanceMethods
               if methodName isnt 'delay'
                 do (methodName)=>
-                  obj[methodName] = (args...)=>
+                  obj[methodName] = co.wrap (args...)=>
                     data =
                       moduleName: @moduleName()
-                      replica: @constructor.replicateObject @
+                      replica: yield @constructor.replicateObject @
                       methodName: methodName
                       args: args
-                    Module::Utils.co @constructor[cpmDelayJob], facade, data, opts
+                    return yield @constructor[cpmDelayJob] facade, data, opts
             obj
           @[iphDelayableMap]
 

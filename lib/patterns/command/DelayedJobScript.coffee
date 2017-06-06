@@ -25,14 +25,14 @@ module.exports = (Module)->
         throw new Error "Job was defined with moduleName = `#{moduleName}`, but its Module = `#{@Module.name}`"
         yield return
       if replica.type is 'class'
-        replicated = Class.restoreObject @Module, replica
+        replicated = yield Class.restoreObject @Module, replica
         if (config = replicated.classMethods[methodName]).async is ASYNC
           yield replicated[config.pointer]? args...
         else
           replicated[config.pointer]? args...
         yield return
       else if replica.type is 'instance'
-        replicated = @Module.restoreObject @Module, replica
+        replicated = yield @Module.restoreObject @Module, replica
         if (config = replicated.instanceMethods[methodName]).async is ASYNC
           yield replicated[config.pointer]? args...
         else
