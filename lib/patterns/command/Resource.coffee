@@ -42,11 +42,15 @@ module.exports = (Module)->
 
     ###
 
-    @public @async checkApiVersion: Function,
+    @public @async checkApiVersion: Function, # NEEDS TEST
       default: (args...)->
         vVersion = @context.pathParams.v
         vCurrentVersion = @configs.version
-        [vNeedVersion] = vCurrentVersion.match /^\d{1,}[.]\d{1,}/
+        unless vCurrentVersion?
+          throw new Error 'No `version` specified in the configuration'
+        [vNeedVersion] = vCurrentVersion.match(/^\d{1,}[.]\d{1,}/) ? []
+        unless vNeedVersion?
+          throw new Error 'Incorrect `version` specified in the configuration'
         sendError = =>
           @context.throw UPGRADE_REQUIRED, "Upgrade: v#{vNeedVersion}"
         unless /^[v]\d{1,}[.]\d{1,}/.test vVersion
@@ -55,34 +59,34 @@ module.exports = (Module)->
           sendError()
         yield return args
 
-    @public @async setOwnerId: Function,
+    @public @async setOwnerId: Function, # NEEDS TEST
       default: (args...)->
         @recordBody.ownerId = @currentUser?.id ? null
         yield return args
 
-    @public @async protectOwnerId: Function,
+    @public @async protectOwnerId: Function, # NEEDS TEST
       default: (args...)->
         @recordBody = _.omit @recordBody, ['ownerId']
         yield return args
 
-    @public @async setSpaceId: Function,
+    @public @async setSpaceId: Function, # NEEDS TEST
       default: (args...)->
         @recordBody.spaceId = @context.pathParams.space ? '_default'
         yield return args
 
-    @public @async protectSpaceId: Function,
+    @public @async protectSpaceId: Function, # NEEDS TEST
       default: (args...)->
         @recordBody = _.omit @recordBody, ['spaceId']
         yield return args
 
-    @public @async beforeLimitedList: Function,
+    @public @async beforeLimitedList: Function, # NEEDS TEST
       default: (args...)->
         if @currentUser? and not @currentUser.isAdmin
           @query ?= {}
           @query.ownerId = @currentUser.id
         yield return args
 
-    @public @async checkOwner: Function,
+    @public @async checkOwner: Function, # NEEDS TEST
       default: (args...) ->
         unless @session?.uid? and @currentUser?
           @context.throw UNAUTHORIZED
@@ -101,7 +105,7 @@ module.exports = (Module)->
           return
         yield return args
 
-    @public @async adminOnly: Function,
+    @public @async adminOnly: Function, # NEEDS TEST
       default: (args...) ->
         unless @session?.uid? and @currentUser?
           @context.throw UNAUTHORIZED
@@ -219,7 +223,7 @@ module.exports = (Module)->
         @recordBody = @context.request.body?[@itemEntityName]
         return args
 
-    @public omitBody: Function,
+    @public omitBody: Function, # NEEDS TEST
       args: [Object]
       return: ANY
       default: (args...)->

@@ -207,7 +207,7 @@ describe 'Resource', ->
         assert.propertyVal actions.bulkDelete, 'async', LeanRC::ASYNC
         yield return
   describe '#beforeActionHook', ->
-    it 'should parse action params as argumants', ->
+    it 'should parse action params as arguments', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -229,6 +229,25 @@ describe 'Resource', ->
         assert.deepPropertyVal resource, 'context.pathParams.testParam', 'testParamValue'
         assert.deepPropertyVal resource, 'context.headers.test-header', 'test-header-value'
         assert.deepPropertyVal resource, 'context.request.body.test', 'test678'
+        yield return
+  describe '#getQuery', ->
+    it 'should get resource query', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.context =
+          query: query: '{"test":"test123"}'
+        resource.getQuery()
+        assert.deepEqual resource.query, test: 'test123'
         yield return
   describe '#getRecordId', ->
     it 'should get resource record ID', ->

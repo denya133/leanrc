@@ -122,7 +122,7 @@ class LeanRC extends RC
   require('./patterns/switch/Context') LeanRC
 
   require('./patterns/mediator/Mediator') LeanRC
-  require('./patterns/mediator/Switch') LeanRC # needs retest
+  require('./patterns/mediator/Switch') LeanRC
   require('./patterns/mediator/MemoryResqueExecutor') LeanRC
 
   require('./patterns/command/SimpleCommand') LeanRC

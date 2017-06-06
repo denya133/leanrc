@@ -192,7 +192,7 @@ module.exports = (Module)->
         @[ipoHttpServer].close()
         return
 
-    @public serverListen: Function, # NEEDS TEST
+    @public serverListen: Function,
       args: []
       return: NILL
       default: ->
