@@ -821,3 +821,61 @@ describe 'Switch', ->
         assert.isTrue spyTestAction.calledWith voContext
         facade.remove()
         yield return
+  describe '#serverListen', ->
+    it 'should create HTTP server', ->
+      co ->
+        trigger = new EventEmitter
+        facade = Facade.getInstance 'TEST_SWITCH_14'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        spyTestAction = sinon.spy (ctx) ->
+          ctx.body = 'TEST'
+          yield return
+        class TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @action test: Function,
+            default: (ctx) -> yield return test: 'TEST'
+        TestResource.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+          @createMethod 'get'
+        TestSwitch.initialize()
+        class TestLogCommand extends LeanRC::SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function,
+            default: (aoNotification) -> trigger.emit 'log', aoNotification
+        TestLogCommand.initialize()
+        facade.registerCommand Test::LogMessage.SEND_TO_LOG, TestLogCommand
+        facade.registerCommand 'TestResource', TestResource
+        result = yield LeanRC::Utils.request.get 'http://localhost:8888/test/123'
+        assert.equal result.status, 500
+        assert.equal result.message, 'connect ECONNREFUSED 127.0.0.1:8888'
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        voRouter = facade.retrieveProxy switchMediator.routerName
+        voRouter.get '/test/:id', resource: 'test', action: 'test'
+        switchMediator.createNativeRoute voRouter.routes[0]
+        result = yield LeanRC::Utils.request.get 'http://localhost:8888/test/123'
+        assert.equal result.status, 200
+        assert.equal result.message, 'OK'
+        assert.equal result.body, '{"test":"TEST"}'
+        facade.remove()
+        result = yield LeanRC::Utils.request.get 'http://localhost:8888/test/123'
+        assert.equal result.status, 500
+        assert.equal result.message, 'connect ECONNREFUSED 127.0.0.1:8888'
+        yield return
