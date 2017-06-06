@@ -86,7 +86,7 @@ module.exports = (Module)->
           @query.ownerId = @currentUser.id
         yield return args
 
-    @public @async checkOwner: Function, # NEEDS TEST
+    @public @async checkOwner: Function,
       default: (args...) ->
         unless @session?.uid? and @currentUser?
           @context.throw UNAUTHORIZED
