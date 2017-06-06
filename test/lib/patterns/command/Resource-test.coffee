@@ -876,3 +876,34 @@ describe 'Resource', ->
           id: 'ID123456'
           ownerId: 'ID123'
         yield return
+  describe '#protectOwnerId', ->
+    it 'should omit owner ID from body', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.currentUser = id: 'ID123'
+        resource.context =
+          pathParams: test_entity: 'ID123456'
+          request: body: test_entity: test: 'test9'
+        resource.getRecordId()
+        resource.getRecordBody()
+        resource.beforeUpdate()
+        resource.setOwnerId()
+        assert.deepEqual resource.recordBody,
+          test: 'test9'
+          id: 'ID123456'
+          ownerId: 'ID123'
+        resource.protectOwnerId()
+        assert.deepEqual resource.recordBody,
+          test: 'test9'
+          id: 'ID123456'
+        yield return

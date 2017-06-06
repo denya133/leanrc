@@ -59,12 +59,12 @@ module.exports = (Module)->
           sendError()
         yield return args
 
-    @public @async setOwnerId: Function, # NEEDS TEST
+    @public @async setOwnerId: Function,
       default: (args...)->
         @recordBody.ownerId = @currentUser?.id ? null
         yield return args
 
-    @public @async protectOwnerId: Function, # NEEDS TEST
+    @public @async protectOwnerId: Function,
       default: (args...)->
         @recordBody = _.omit @recordBody, ['ownerId']
         yield return args
