@@ -56,10 +56,10 @@ module.exports = (Module)->
           { apiKey }        = @configs
           {
             authorization: authHeader
-          } = @headers
-          return args   unless authHeader?
+          } = @context.headers
+          return no   unless authHeader?
           [..., key] = (/^Bearer\s+(.+)$/.exec authHeader) ? []
-          return args   unless key?
+          return no   unless key?
           return apiKey is key
 
       @public @async makeSession: Function,

@@ -7,3 +7,7 @@ module.exports =
     description: 'test4 test'
     type: 'string'
     default: 'test'
+  apiKey:
+    description: 'API key'
+    type: 'string'
+    default: 'TESTTESTTESTTESTTEST123'

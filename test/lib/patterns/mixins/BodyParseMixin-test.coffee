@@ -23,7 +23,7 @@ describe 'BodyParseMixin', ->
         resource = Test::TestResource.new()
       .to.not.throw Error
   describe '#parseBody', ->
-    it 'should create new resource', ->
+    it 'should parse request body', ->
       co ->
         KEY = 'TEST_BODY_PARSE_MIXIN_001'
         class Test extends LeanRC

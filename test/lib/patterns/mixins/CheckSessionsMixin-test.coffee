@@ -22,11 +22,10 @@ describe 'CheckSessionsMixin', ->
         Test::TestResource.initialize()
         resource = Test::TestResource.new()
       .to.not.throw Error
-  ###
-  describe '#parseBody', ->
-    it 'should create new resource', ->
+  describe '#checkHeader', ->
+    it 'should check if authorization header is present and correct', ->
       co ->
-        KEY = 'TEST_BODY_PARSE_MIXIN_001'
+        KEY = 'TEST_CHECK_SESSIONS_MIXIN_001'
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
@@ -72,8 +71,14 @@ describe 'CheckSessionsMixin', ->
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         resource = Test::TestResource.new()
         resource.context = Test::Context.new req, res, switchMediator
-        yield resource.parseBody()
-        assert.deepEqual resource.context.request.body, test: 'test'
+        resource.initializeNotifier KEY
+        check = resource.checkHeader()
+        assert.isFalse check
+        req.headers.authorization = 'Bearer TESTTESTTESTTESTTEST'
+        check = resource.checkHeader()
+        assert.isFalse check
+        req.headers.authorization = 'Bearer TESTTESTTESTTESTTEST123'
+        check = resource.checkHeader()
+        assert.isTrue check
         facade.remove()
         yield return
-  ###
