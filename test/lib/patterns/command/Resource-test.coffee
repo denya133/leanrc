@@ -1,6 +1,8 @@
+EventEmitter = require 'events'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 _ = require 'lodash'
+httpErrors = require 'http-errors'
 LeanRC = require.main.require 'lib'
 Resource = LeanRC::Resource
 { co } = LeanRC::Utils
@@ -101,6 +103,7 @@ describe 'Resource', ->
         facade.registerProxy boundCollection
         { collection } = resource
         assert.equal collection, boundCollection
+        facade.remove()
         yield return
   describe '#action', ->
     it 'should create actions', ->
@@ -213,7 +216,7 @@ describe 'Resource', ->
         assert.propertyVal actions.bulkDelete, 'async', LeanRC::ASYNC
         yield return
   describe '#beforeActionHook', ->
-    it 'should parse action params as argumants', ->
+    it 'should parse action params as arguments', ->
       co ->
         class Test extends LeanRC::Module
           @inheritProtected()
@@ -235,6 +238,25 @@ describe 'Resource', ->
         assert.deepPropertyVal resource, 'context.pathParams.testParam', 'testParamValue'
         assert.deepPropertyVal resource, 'context.headers.test-header', 'test-header-value'
         assert.deepPropertyVal resource, 'context.request.body.test', 'test678'
+        yield return
+  describe '#getQuery', ->
+    it 'should get resource query', ->
+      co ->
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.context =
+          query: query: '{"test":"test123"}'
+        resource.getQuery()
+        assert.deepEqual resource.query, test: 'test123'
         yield return
   describe '#getRecordId', ->
     it 'should get resource record ID', ->
@@ -273,6 +295,46 @@ describe 'Resource', ->
           request: body: test_entity: test: 'test9'
         resource.getRecordBody()
         assert.deepEqual resource.recordBody, test: 'test9'
+        yield return
+  describe '#omitBody', ->
+    it 'should clean body from unneeded properties', ->
+      co ->
+        TEST_FACADE = 'TEST_FACADE_002'
+        facade = LeanRC::Facade.getInstance TEST_FACADE
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        TestResource.initialize()
+        class TestEntity extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @public @static findRecordByName: Function,
+            default: (asType) -> Test::TestEntity
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @type = 'Test::TestEntity'
+        TestEntity.initialize()
+        resource = TestResource.new()
+        resource.initializeNotifier TEST_FACADE
+        { collectionName } = resource
+        boundCollection = LeanRC::Collection.new collectionName,
+          delegate: TestEntity
+        facade.registerProxy boundCollection
+        resource.context =
+          request: body: test_entity:
+            _id: '123', test: 'test9', _space: 'test', type: 'TestEntity'
+        resource.getRecordBody()
+        resource.omitBody()
+        assert.deepEqual resource.recordBody, test: 'test9', type: 'Test::TestEntity'
+        facade.remove()
         yield return
   describe '#beforeUpdate', ->
     it 'should get body with ID', ->
@@ -360,6 +422,7 @@ describe 'Resource', ->
           offset: 'not defined'
         assert.propertyVal items[0], 'test', 'test1'
         assert.propertyVal items[1], 'test', 'test2'
+        facade.remove()
         yield return
   describe '#detail', ->
     it 'should get resource single item', ->
@@ -426,6 +489,7 @@ describe 'Resource', ->
         result = yield resource.detail context
         assert.propertyVal result, 'id', record.id
         assert.propertyVal result, 'test', 'test2'
+        facade.remove()
         yield return
   describe '#create', ->
     it 'should create resource single item', ->
@@ -487,6 +551,7 @@ describe 'Resource', ->
         resource.initializeNotifier KEY
         result = yield resource.create request: body: test_entity: test: 'test3'
         assert.propertyVal result, 'test', 'test3'
+        facade.remove()
         yield return
   describe '#update', ->
     it 'should update resource single item', ->
@@ -559,6 +624,7 @@ describe 'Resource', ->
           pathParams: test_entity: record.id
           request: body: test_entity: test: 'test8'
         assert.propertyVal result, 'test', 'test8'
+        facade.remove()
         yield return
   describe '#delete', ->
     it 'should remove resource single item', ->
@@ -630,6 +696,7 @@ describe 'Resource', ->
         result = yield resource.delete
           pathParams: test_entity: record.id
         assert.propertyVal result, 'isHidden', yes
+        facade.remove()
         yield return
   describe '#execute', ->
     it 'should call execution', ->
@@ -719,4 +786,312 @@ describe 'Resource', ->
           offset: 'not defined'
         assert.lengthOf items, 2
         assert.equal type, 'TEST_REVERSE'
+        facade.remove()
+        yield return
+  describe '#checkApiVersion', ->
+    it 'should check API version', ->
+      co ->
+        KEY = 'TEST_RESOURCE_001'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+          @action test: Function,
+            default: ->
+        Test::TestResource.initialize()
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/v/v2.0/test_entity/ID123456'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends LeanRC::Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        resource = Test::TestResource.new()
+        resource.initializeNotifier KEY
+        resource.context = Test::Context.new req, res, switchMediator
+        try
+          resource.context.pathParams =
+            v: 'v1.0'
+            test_entity: 'ID123456'
+          yield resource.checkApiVersion()
+        catch e
+        assert.isDefined e
+        try
+          resource.context.pathParams =
+            v: 'v2.0'
+            test_entity: 'ID123456'
+          yield resource.checkApiVersion()
+        catch e
+          assert.isDefined e
+        facade.remove()
+        yield return
+  describe '#setOwnerId', ->
+    it 'should get owner ID for body', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.currentUser = id: 'ID123'
+        resource.context =
+          pathParams: test_entity: 'ID123456'
+          request: body: test_entity: test: 'test9'
+        resource.getRecordId()
+        resource.getRecordBody()
+        resource.beforeUpdate()
+        yield resource.setOwnerId()
+        assert.deepEqual resource.recordBody,
+          test: 'test9'
+          id: 'ID123456'
+          ownerId: 'ID123'
+        yield return
+  describe '#protectOwnerId', ->
+    it 'should omit owner ID from body', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.currentUser = id: 'ID123'
+        resource.context =
+          pathParams: test_entity: 'ID123456'
+          request: body: test_entity: test: 'test9'
+        resource.getRecordId()
+        resource.getRecordBody()
+        resource.beforeUpdate()
+        yield resource.setOwnerId()
+        assert.deepEqual resource.recordBody,
+          test: 'test9'
+          id: 'ID123456'
+          ownerId: 'ID123'
+        yield resource.protectOwnerId()
+        assert.deepEqual resource.recordBody,
+          test: 'test9'
+          id: 'ID123456'
+        yield return
+  describe '#setSpaceId', ->
+    it 'should set space ID for body', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.currentUser = id: 'ID123'
+        resource.context =
+          pathParams: test_entity: 'ID123456', space: 'SPACE123'
+          request: body: test_entity: test: 'test9'
+        resource.getRecordId()
+        resource.getRecordBody()
+        resource.beforeUpdate()
+        yield resource.setSpaceId()
+        assert.deepEqual resource.recordBody,
+          test: 'test9'
+          id: 'ID123456'
+          spaceId: 'SPACE123'
+        yield return
+  describe '#protectSpaceId', ->
+    it 'should omit space ID from body', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.currentUser = id: 'ID123'
+        resource.context =
+          pathParams: test_entity: 'ID123456', space: 'SPACE123'
+          request: body: test_entity: test: 'test9'
+        resource.getRecordId()
+        resource.getRecordBody()
+        resource.beforeUpdate()
+        yield resource.setSpaceId()
+        assert.deepEqual resource.recordBody,
+          test: 'test9'
+          id: 'ID123456'
+          spaceId: 'SPACE123'
+        yield resource.protectSpaceId()
+        assert.deepEqual resource.recordBody,
+          test: 'test9'
+          id: 'ID123456'
+        yield return
+  describe '#beforeLimitedList', ->
+    it 'should update query if caller user is not admin', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root __dirname
+        Test.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        Test::TestResource.initialize()
+        resource = Test::TestResource.new()
+        resource.currentUser = id: 'ID123', isAdmin: no
+        resource.context =
+          pathParams: test_entity: 'ID123456', space: 'SPACE123'
+          request: body: test_entity: test: 'test9'
+        resource.getRecordId()
+        resource.getRecordBody()
+        resource.beforeUpdate()
+        yield resource.beforeLimitedList()
+        assert.deepEqual resource.query, ownerId: 'ID123'
+        yield return
+  describe '#checkOwner', ->
+    it 'should check if user is resource owner', ->
+      co ->
+        KEY = 'TEST_RESOURCE_002'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        TestResource.initialize()
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/space/SPACE123/test_entity/ID123456'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends LeanRC::Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
+        TestSwitch.initialize()
+        class TestEntity extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @attribute ownerId: String
+          @public @static findRecordByName: Function,
+            default: (asType) -> Test::TestEntity
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @type = 'Test::TestEntity'
+        TestEntity.initialize()
+        class TestCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+        TestCollection.initialize()
+        resource = TestResource.new()
+        resource.initializeNotifier KEY
+        { collectionName } = resource
+        boundCollection = TestCollection.new collectionName,
+          delegate: TestEntity
+        facade.registerProxy boundCollection
+        yield boundCollection.create id: 'ID123456', test: 'test', ownerId: 'ID124'
+        yield boundCollection.create id: 'ID123457', test: 'test', ownerId: 'ID123'
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        resource = Test::TestResource.new()
+        resource.initializeNotifier KEY
+        resource.currentUser = id: 'ID123', isAdmin: no
+        resource.context = Test::Context.new req, res, switchMediator
+        resource.context.pathParams = test_entity: 'ID123455', space: 'SPACE123'
+        resource.context.request = body: test_entity: test: 'test9'
+        resource.getRecordId()
+        resource.getRecordBody()
+        resource.beforeUpdate()
+        try
+          yield resource.checkOwner()
+        catch e
+        assert.instanceOf e, httpErrors.Unauthorized
+        resource.session = uid: '123456789'
+        try
+          yield resource.checkOwner()
+        catch e
+        assert.instanceOf e, httpErrors.NotFound
+        resource.context.pathParams.test_entity = 'ID123456'
+        try
+          yield resource.checkOwner()
+        catch e
+        assert.instanceOf e, httpErrors.Forbidden
+        resource.context.pathParams.test_entity = 'ID123457'
+        yield resource.checkOwner()
+        facade.remove()
         yield return

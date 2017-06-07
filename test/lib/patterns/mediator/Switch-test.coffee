@@ -2,6 +2,7 @@ EventEmitter = require 'events'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 Feed = require 'feed'
+# httpErrors = require 'http-errors'
 LeanRC = require.main.require 'lib'
 RC = require 'RC'
 Facade = LeanRC::Facade
@@ -14,6 +15,7 @@ describe 'Switch', ->
       expect ->
         mediatorName = 'TEST_MEDIATOR'
         switchMediator = Switch.new mediatorName
+        assert.isArray switchMediator.middlewares
       .to.not.throw Error
   describe '#responseFormats', ->
     it 'should check allowed response formats', ->
@@ -384,3 +386,496 @@ describe 'Switch', ->
         assert.deepEqual listEndpoint, voEndpoint, 'Endpoints are not equivalent'
         facade.remove()
       .to.not.throw Error
+  describe '.compose', ->
+    it 'should dispatch middlewares', ->
+      co ->
+        facade = Facade.getInstance 'TEST_SWITCH_8'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+        voContext = Test::Context.new req, res, switchMediator
+        middlewares = []
+        COUNT = 4
+        for i in [ 0 .. COUNT ]
+          middlewares.push sinon.spy (ctx, next) -> yield return next()
+        fn = TestSwitch.compose middlewares
+        yield fn voContext
+        for i in [ 0 .. COUNT ]
+          assert.isTrue middlewares[i].calledWith voContext
+        facade.remove()
+        yield return
+  describe '.respond', ->
+    it 'should run responding request handler', ->
+      co ->
+        trigger = new EventEmitter
+        facade = Facade.getInstance 'TEST_SWITCH_9'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        req =
+          method: 'POST'
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data) -> trigger.emit 'end', data
+        voContext = Test::Context.new req, res, switchMediator
+        endPromise = LeanRC::Promise.new (resolve) -> trigger.once 'end', resolve
+        voContext.status = 201
+        switchMediator.respond voContext
+        data = yield endPromise
+        assert.equal data, 'Created'
+        assert.equal voContext.status, 201
+        assert.equal voContext.message, 'Created'
+        assert.equal voContext.length, 7
+        assert.equal voContext.type, 'text/plain'
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res =
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data) -> trigger.emit 'end', data
+        voContext = Test::Context.new req, res, switchMediator
+        endPromise = LeanRC::Promise.new (resolve) -> trigger.once 'end', resolve
+        voContext.body = data: 'data'
+        switchMediator.respond voContext
+        data = yield endPromise
+        assert.equal data, '{"data":"data"}'
+        assert.equal voContext.status, 200
+        assert.equal voContext.message, 'OK'
+        assert.equal voContext.length, 15
+        assert.equal voContext.type, 'application/json'
+        facade.remove()
+        yield return
+  describe '#callback', ->
+    it 'should run request handler', ->
+      co ->
+        facade = Facade.getInstance 'TEST_SWITCH_10'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            @finished = no
+            @_headers = {}
+        req =
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        switchMediator.middlewares = []
+        switchMediator.middlewares.push (ctx, next) ->
+          ctx.body = Buffer.from JSON.stringify data: 'data'
+          yield return next()
+        endPromise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
+        yield switchMediator.callback() req, res
+        data = yield endPromise
+        assert.equal data, '{"data":"data"}'
+        res = new MyResponse
+        switchMediator.middlewares.push (ctx, next) ->
+          ctx.throw 404
+          yield return next()
+        endPromise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
+        yield switchMediator.callback() req, res
+        data = yield endPromise
+        assert.equal data, 'Not Found'
+        res = new MyResponse
+        switchMediator.middlewares = []
+        switchMediator.middlewares.push (ctx, next) ->
+          return ctx.res.emit 'error', new Error 'TEST'
+          yield return next()
+        endPromise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
+        yield switchMediator.callback() req, res
+        data = yield endPromise
+        facade.remove()
+        yield return
+  describe '#use', ->
+    it 'should append middlewares', ->
+      co ->
+        trigger = new EventEmitter
+        facade = Facade.getInstance 'TEST_SWITCH_11'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+        TestSwitch.initialize()
+        class TestLogCommand extends LeanRC::SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function,
+            default: (aoNotification) -> trigger.emit 'log', aoNotification
+        TestLogCommand.initialize()
+        compareMiddlewares = (original, used) ->
+          if used.__generatorFunction__?
+            assert.equal used.__generatorFunction__, original
+          else
+            assert.equal used, original
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        facade.registerCommand Test::LogMessage.SEND_TO_LOG, TestLogCommand
+        promise = LeanRC::Promise.new (resolve) -> trigger.once 'log', resolve
+        testMiddlewareFirst = (ctx, next) -> yield return next?()
+        middlewaresCount = switchMediator.middlewares.length
+        switchMediator.use testMiddlewareFirst
+        notification = yield promise
+        assert.lengthOf switchMediator.middlewares, middlewaresCount + 1
+        assert.equal notification.getBody(), 'use testMiddlewareFirst'
+        usedMiddleware = switchMediator.middlewares[middlewaresCount]
+        compareMiddlewares testMiddlewareFirst, usedMiddleware
+        promise = LeanRC::Promise.new (resolve) -> trigger.once 'log', resolve
+        testMiddlewareSecond = (ctx, next) -> return next?()
+        middlewaresCount = switchMediator.middlewares.length
+        switchMediator.use testMiddlewareSecond
+        notification = yield promise
+        assert.lengthOf switchMediator.middlewares, middlewaresCount + 1
+        assert.equal notification.getBody(), 'use testMiddlewareSecond'
+        usedMiddleware = switchMediator.middlewares[middlewaresCount]
+        compareMiddlewares testMiddlewareSecond, usedMiddleware
+        facade.remove()
+        yield return
+  describe '#onerror', ->
+    it 'should handle error', ->
+      co ->
+        trigger = new EventEmitter
+        facade = Facade.getInstance 'TEST_SWITCH_12'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+        TestSwitch.initialize()
+        class TestLogCommand extends LeanRC::SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function,
+            default: (aoNotification) -> trigger.emit 'log', aoNotification
+        TestLogCommand.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        facade.registerCommand Test::LogMessage.SEND_TO_LOG, TestLogCommand
+        promise = LeanRC::Promise.new (resolve) -> trigger.once 'log', resolve
+        switchMediator.onerror new Error 'TEST_ERROR'
+        message = yield promise
+        assert.equal message.getName(), Test::LogMessage.SEND_TO_LOG
+        assert.include message.getBody(), 'TEST_ERROR'
+        assert.equal message.getType(), Test::LogMessage.LEVELS[Test::LogMessage.ERROR]
+        facade.remove()
+        yield return
+  describe '#del', ->
+    it 'should alias to #delete', ->
+      co ->
+        spyDelete = sinon.spy ->
+        facade = Facade.getInstance 'TEST_SWITCH_13'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+          @public delete: Function, { default: spyDelete }
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        switchMediator.del 'TEST'
+        assert.isTrue spyDelete.calledWith 'TEST'
+        yield return
+  describe '#createMethod', ->
+    it 'should create method handler', ->
+      co ->
+        trigger = new EventEmitter
+        facade = Facade.getInstance 'TEST_SWITCH_13'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+          @createMethod 'get'
+        TestSwitch.initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        assert.isFunction switchMediator.get.body
+        lastMiddlewareIndex = switchMediator.middlewares.length
+        spyMethod = sinon.spy ->
+        switchMediator.get '/test/:id', (ctx, next) ->
+          spyMethod JSON.stringify ctx.pathParams
+          yield return next?()
+        assert.isDefined switchMediator.middlewares[lastMiddlewareIndex]
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            @finished = no
+            @_headers = {}
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/test2'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        voContext = Test::Context.new req, res, switchMediator
+        promise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
+        yield switchMediator.middlewares[lastMiddlewareIndex] voContext, -> res.end()
+        yield promise
+        assert.isFalse spyMethod.called
+        spyMethod.reset()
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/test/123'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        voContext = Test::Context.new req, res, switchMediator
+        promise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
+        yield switchMediator.middlewares[lastMiddlewareIndex] voContext, -> res.end()
+        yield promise
+        assert.isTrue spyMethod.calledWith '{"id":"123"}'
+        facade.remove()
+        yield return
+  describe '#createNativeRoute', ->
+    it 'should create method handler', ->
+      co ->
+        trigger = new EventEmitter
+        facade = Facade.getInstance 'TEST_SWITCH_14'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        spyTestAction = sinon.spy -> yield return
+        class TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @action test: Function, { default: spyTestAction }
+        TestResource.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+          @createMethod 'get'
+        TestSwitch.initialize()
+        facade.registerCommand 'TestResource', TestResource
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        voRouter = facade.retrieveProxy switchMediator.routerName
+        voRouter.get '/test/:id', resource: 'test', action: 'test'
+        switchMediator.createNativeRoute voRouter.routes[0]
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            @finished = no
+            @_headers = {}
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/test/123'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        voContext = Test::Context.new req, res, switchMediator
+        promise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
+        yield switchMediator.middlewares[0] voContext, -> res.end()
+        yield promise
+        assert.isTrue spyTestAction.calledWith voContext
+        facade.remove()
+        yield return
+  describe '#serverListen', ->
+    it 'should create HTTP server', ->
+      co ->
+        trigger = new EventEmitter
+        facade = Facade.getInstance 'TEST_SWITCH_14'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        spyTestAction = sinon.spy (ctx) ->
+          ctx.body = 'TEST'
+          yield return
+        class TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @action test: Function,
+            default: (ctx) -> yield return test: 'TEST'
+        TestResource.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+          @createMethod 'get'
+        TestSwitch.initialize()
+        class TestLogCommand extends LeanRC::SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function,
+            default: (aoNotification) -> trigger.emit 'log', aoNotification
+        TestLogCommand.initialize()
+        facade.registerCommand Test::LogMessage.SEND_TO_LOG, TestLogCommand
+        facade.registerCommand 'TestResource', TestResource
+        result = yield LeanRC::Utils.request.get 'http://localhost:8888/test/123'
+        assert.equal result.status, 500
+        assert.equal result.message, 'connect ECONNREFUSED 127.0.0.1:8888'
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        voRouter = facade.retrieveProxy switchMediator.routerName
+        voRouter.get '/test/:id', resource: 'test', action: 'test'
+        switchMediator.createNativeRoute voRouter.routes[0]
+        result = yield LeanRC::Utils.request.get 'http://localhost:8888/test/123'
+        assert.equal result.status, 200
+        assert.equal result.message, 'OK'
+        assert.equal result.body, '{"test":"TEST"}'
+        facade.remove()
+        result = yield LeanRC::Utils.request.get 'http://localhost:8888/test/123'
+        assert.equal result.status, 500
+        assert.equal result.message, 'connect ECONNREFUSED 127.0.0.1:8888'
+        yield return

@@ -46,7 +46,7 @@ module.exports = (Module)->
   {
     co
     isGeneratorFunction
-    isArangoDB
+    genRandomAlphaNumbers
   } = Utils
 
 
@@ -118,7 +118,7 @@ module.exports = (Module)->
                 yield return next?()
               m = re.exec ctx.path
               if m
-                pathParams = m.slice(1)
+                pathParams = m[1..]
                   .map decode
                   .reduce (prev, item, index)->
                     prev[keys[index].name] = item
@@ -215,7 +215,9 @@ module.exports = (Module)->
         unless _.isFunction middleware
           throw new Error 'middleware must be a function!'
         if isGeneratorFunction middleware
+          { name: oldName } = middleware
           middleware = co.wrap middleware
+          middleware._name = oldName
         middlewareName = middleware._name ? middleware.name ? '-'
         {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         @facade.sendNotification SEND_TO_LOG, "use #{middlewareName}", LEVELS[DEBUG]
@@ -278,7 +280,7 @@ module.exports = (Module)->
           return ctx.res.end body
         if body instanceof Stream
           return body.pipe ctx.res
-        body = JSON.stringify body
+        body = JSON.stringify body ? null
         unless ctx.res.headersSent
           ctx.length = Buffer.byteLength body
         ctx.res.end body
@@ -368,12 +370,7 @@ module.exports = (Module)->
         @[method]? path, co.wrap (context, next)=>
           yield Module::Promise.new (resolve, reject)=>
             try
-              reverse = if isArangoDB()
-                crypto = require '@arangodb/crypto'
-                crypto.genRandomAlphaNumbers 32
-              else
-                crypto = require 'crypto'
-                crypto.randomBytes(32).toString 'hex'
+              reverse = genRandomAlphaNumbers 32
               @getViewComponent().once reverse, co.wrap (aoData)=>
                 try
                   yield @sendHttpResponse context, aoData, {method, path, resource, action}

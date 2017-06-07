@@ -75,8 +75,8 @@ class LeanRC extends RC
   require('./interfaces/core/ModelInterface') LeanRC
   require('./interfaces/core/ViewInterface') LeanRC
 
-  require('./utils/jwt') LeanRC
-  require('./utils/crypto') LeanRC
+  require('./utils/jwt') LeanRC # needs testing
+  require('./utils/crypto') LeanRC # needs testing
 
   require('./mixins/ConfigurableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC # need retest it
@@ -119,18 +119,18 @@ class LeanRC extends RC
   require('./mixins/ThinHttpCollectionMixin') LeanRC
   require('./mixins/SchemaModuleMixin') LeanRC
 
-  require('./patterns/switch/Request') LeanRC # need test it
-  require('./patterns/switch/Response') LeanRC # need test it
-  require('./patterns/switch/Cookies') LeanRC # need test it
-  require('./patterns/switch/Context') LeanRC # need test it
+  require('./patterns/switch/Request') LeanRC
+  require('./patterns/switch/Response') LeanRC
+  require('./patterns/switch/Cookies') LeanRC
+  require('./patterns/switch/Context') LeanRC
 
   require('./patterns/mediator/Mediator') LeanRC
-  require('./patterns/mediator/Switch') LeanRC # need retest it
+  require('./patterns/mediator/Switch') LeanRC
   require('./patterns/mediator/MemoryResqueExecutor') LeanRC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
-  require('./patterns/command/Resource') LeanRC # need retest it
+  require('./patterns/command/Resource') LeanRC # needs retest
   require('./patterns/command/MigrateCommand') LeanRC
   require('./patterns/command/RollbackCommand') LeanRC
   require('./patterns/command/Script') LeanRC

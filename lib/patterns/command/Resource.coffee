@@ -46,7 +46,11 @@ module.exports = (Module)->
       default: (args...)->
         vVersion = @context.pathParams.v
         vCurrentVersion = @configs.version
-        [vNeedVersion] = vCurrentVersion.match /^\d{1,}[.]\d{1,}/
+        unless vCurrentVersion?
+          throw new Error 'No `version` specified in the configuration'
+        [vNeedVersion] = vCurrentVersion.match(/^\d{1,}[.]\d{1,}/) ? []
+        unless vNeedVersion?
+          throw new Error 'Incorrect `version` specified in the configuration'
         sendError = =>
           @context.throw UPGRADE_REQUIRED, "Upgrade: v#{vNeedVersion}"
         unless /^[v]\d{1,}[.]\d{1,}/.test vVersion
@@ -101,7 +105,7 @@ module.exports = (Module)->
           return
         yield return args
 
-    @public @async adminOnly: Function,
+    @public @async adminOnly: Function, # NEEDS TEST
       default: (args...) ->
         unless @session?.uid? and @currentUser?
           @context.throw UNAUTHORIZED

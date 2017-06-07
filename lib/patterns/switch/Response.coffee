@@ -174,7 +174,7 @@ module.exports = (Module)->
     @public redirect: Function,
       default: (url, alt)->
         if 'back' is url
-          url = @ctx.get('Referrer') ? alt ? '/'
+          url = @ctx.get('Referrer') or alt or '/'
         @set 'Location', url
         unless statuses.redirect[@status]
           @status = 302
@@ -221,7 +221,7 @@ module.exports = (Module)->
         else
           @remove 'Content-Type'
 
-    @public is: Function,
+    @public 'is': Function,
       default: (args...)->
         [types] = args
         return @type or no unless types
@@ -252,9 +252,9 @@ module.exports = (Module)->
         prev = @get field
         if prev
           if _.isArray prev
-            prev.concat val
+            val = prev.concat val
           else
-            [prev].concat val
+            val = [prev].concat val
         @set field, val
 
     @public remove: Function,
@@ -268,6 +268,19 @@ module.exports = (Module)->
         socket = @res.socket
         return yes unless socket
         socket.writable
+
+    @public flushHeaders: Function,
+      default: ->
+        if _.isFunction @res.flushHeaders
+          @res.flushHeaders()
+        else
+          headerNames = if _.isFunction @res.getHeaderNames
+            @res.getHeaderNames()
+          else
+            Object.keys @res._headers
+          for header in headerNames
+            @res.removeHeader header
+        return
 
     # @public inspect: Function,
     #   default: ->

@@ -2,7 +2,6 @@
 
 _             = require 'lodash'
 EventEmitter  = require 'events'
-crypto        = require 'crypto'
 
 
 ###
@@ -50,7 +49,7 @@ module.exports = (Module)->
     ConfigurableMixin
     ResqueInterface
   } = Module::
-  {co, isArangoDB} = Module::Utils
+  {co, isArangoDB, genRandomAlphaNumbers} = Module::Utils
 
   class MemoryResqueExecutor extends Mediator
     @inheritProtected()
@@ -117,10 +116,7 @@ module.exports = (Module)->
           [moduleName] = fullQueueName.split '|>'
           if moduleName is @moduleName()
             @define name, {concurrency}, co.wrap (job, done)=>
-              reverse = if isArangoDB()
-                crypto.genRandomAlphaNumbers 32
-              else
-                crypto.randomBytes 32
+              reverse = genRandomAlphaNumbers 32
               @getViewComponent().once reverse, (aoError)=>
                 done aoError
               {scriptName, data} = job.data

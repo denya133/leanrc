@@ -172,7 +172,8 @@ module.exports = (Module)->
           return 'https'
         unless trustProxy
           return 'http'
-        proto = @get('X-Forwarded-Proto') ? 'http'
+        proto = @get 'X-Forwarded-Proto'
+        proto = 'http'  unless proto
         proto.split(/\s*,\s*/)[0]
 
     # xhr отсутствует в интерфейсе koa - возможно лучше его и здесь не делать, чтобы не ломать интерфейс koa
@@ -198,7 +199,7 @@ module.exports = (Module)->
       get: ->
         {subdomainOffset:offset} = @ctx.switch.configs
         hostname = @hostname
-        return [] if net.isIP
+        return []  if net.isIP(hostname) isnt 0
         hostname
           .split('.')
           .reverse()
