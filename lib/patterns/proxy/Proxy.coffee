@@ -26,6 +26,25 @@ module.exports = (Module)->
     @public onRemove: Function,
       default: -> return
 
+    # need test it
+    @public @static @async restoreObject: Function,
+      default: (Module, replica)->
+        if replica?.class is @name and replica?.type is 'instance'
+          facade = Module::ApplicationFacade.getInstance replica.multitonKey
+          proxy = facade.retrieveProxy replica.proxyName
+          yield return proxy
+        else
+          return yield @super Module, replica
+
+    # need test it
+    @public @static @async replicateObject: Function,
+      default: (instance)->
+        replica = @super instance
+        ipsMultitonKey = Symbol.for '~multitonKey'
+        replica.multitonKey = instance[ipsMultitonKey]
+        replica.proxyName = instance.getProxyName()
+        yield return replica
+
     @public init: Function,
       default: (asProxyName, ahData)->
         @super arguments...

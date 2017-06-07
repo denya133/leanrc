@@ -18,5 +18,15 @@ module.exports = (Module)->
           return null
         deserialized
 
+    @public @static @async restoreObject: Function,
+      default: ->
+        throw new Error "restoreObject method not supported for #{@name}"
+        yield return
+
+    @public @static @async replicateObject: Function,
+      default: ->
+        throw new Error "replicateObject method not supported for #{@name}"
+        yield return
+
 
   Transform.initialize()

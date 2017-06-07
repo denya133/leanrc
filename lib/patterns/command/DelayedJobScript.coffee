@@ -3,25 +3,44 @@
 # написать пример использования в приложении
 
 module.exports = (Module)->
-  {ASYNC} = Module::
+  {
+    ASYNC
 
-  class DelayedJobScript extends Module::Script
+    Script
+    Class
+  } = Module::
+
+  class DelayedJobScript extends Script
     @inheritProtected()
     @module Module
 
     @do (aoData)->
       {
         moduleName
-        className
+        replica
         methodName
         args
       } = aoData
-      LocalClass = @Module::[className]
-      if LocalClass.classMethods[methodName].async is ASYNC
-        yield LocalClass[methodName]? args...
+      unless moduleName is @Module.name
+        throw new Error "Job was defined with moduleName = `#{moduleName}`, but its Module = `#{@Module.name}`"
+        yield return
+      if replica.type is 'class'
+        replicated = yield Class.restoreObject @Module, replica
+        if (config = replicated.classMethods[methodName]).async is ASYNC
+          yield replicated[config.pointer]? args...
+        else
+          replicated[config.pointer]? args...
+        yield return
+      else if replica.type is 'instance'
+        replicated = yield @Module.restoreObject @Module, replica
+        if (config = replicated.instanceMethods[methodName]).async is ASYNC
+          yield replicated[config.pointer]? args...
+        else
+          replicated[config.pointer]? args...
+        yield return
       else
-        LocalClass[methodName]? args...
-      yield return
+        throw new Error 'Replica type must be `instance` or `class`'
+        yield return
 
 
   DelayedJobScript.initialize()

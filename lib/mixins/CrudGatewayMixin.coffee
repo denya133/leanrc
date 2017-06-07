@@ -1,14 +1,14 @@
 _             = require 'lodash'
 joi           = require 'joi'
-inflect       = require('i')()
-status        = require 'statuses'
+inflect       = do require 'i'
+statuses      = require 'statuses'
 
 
-HTTP_NOT_FOUND    = status 'not found'
-HTTP_CONFLICT     = status 'conflict'
-UNAUTHORIZED      = status 'unauthorized'
-FORBIDDEN         = status 'forbidden'
-UPGRADE_REQUIRED  = status 'upgrade required'
+HTTP_NOT_FOUND    = statuses 'not found'
+HTTP_CONFLICT     = statuses 'conflict'
+UNAUTHORIZED      = statuses 'unauthorized'
+FORBIDDEN         = statuses 'forbidden'
+UPGRADE_REQUIRED  = statuses 'upgrade required'
 
 
 ###
@@ -18,7 +18,7 @@ Module = require 'Module'
 module.exports = (App)->
   App::CrudGateway extends Module::Gateway
     @inheritProtected()
-    @include Module::CrudEndpointsMixin
+    @include Module::CrudGatewayMixin
 
     @module App
 
@@ -29,9 +29,9 @@ module.exports = (App)->
 
 module.exports = (Module)->
   Module.defineMixin Module::Gateway, (BaseClass) ->
-    class CrudEndpointsMixin extends BaseClass
+    class CrudGatewayMixin extends BaseClass
       @inheritProtected()
-      @implements Module::CrudEndpointsMixinInterface
+      @implements Module::CrudGatewayMixinInterface
 
       @public keyName: String,
         get: ->
@@ -280,4 +280,4 @@ module.exports = (Module)->
           return
 
 
-    CrudEndpointsMixin.initializeMixin()
+    CrudGatewayMixin.initializeMixin()

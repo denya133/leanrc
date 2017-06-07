@@ -85,7 +85,7 @@ describe 'DelayableMixin', ->
             scriptName: 'DelayedJobScript'
             data:
               moduleName: 'Test'
-              className: 'Test'
+              replica: {class: 'Test', type: 'class'}
               methodName: 'test'
               args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
           delayUntil: DELAY_UNTIL

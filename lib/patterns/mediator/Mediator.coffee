@@ -33,6 +33,25 @@ module.exports = (Module)->
     @public onRemove: Function,
       default: -> return
 
+    # need test it
+    @public @static @async restoreObject: Function,
+      default: (Module, replica)->
+        if replica?.class is @name and replica?.type is 'instance'
+          facade = Module::ApplicationFacade.getInstance replica.multitonKey
+          mediator = facade.retrieveMediator replica.mediatorName
+          yield return mediator
+        else
+          return yield @super Module, replica
+
+    # need test it
+    @public @static @async replicateObject: Function,
+      default: (instance)->
+        replica = @super instance
+        ipsMultitonKey = Symbol.for '~multitonKey'
+        replica.multitonKey = instance[ipsMultitonKey]
+        replica.mediatorName = instance.getMediatorName()
+        yield return replica
+
     @public init: Function,
       default: (asMediatorName, aoViewComponent)->
         @super arguments...

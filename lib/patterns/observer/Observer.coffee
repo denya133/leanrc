@@ -36,6 +36,16 @@ module.exports = (Module)->
         @getNotifyMethod().call @getNotifyContext(), notification
         return
 
+    @public @static @async restoreObject: Function,
+      default: ->
+        throw new Error "restoreObject method not supported for #{@name}"
+        yield return
+
+    @public @static @async replicateObject: Function,
+      default: ->
+        throw new Error "replicateObject method not supported for #{@name}"
+        yield return
+
     @public init: Function,
       default: (amNotifyMethod, aoNotifyContext)->
         @super arguments...

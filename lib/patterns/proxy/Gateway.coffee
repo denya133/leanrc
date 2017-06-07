@@ -7,7 +7,7 @@ Module = require 'Module'
 module.exports = (App)->
   App::CrudGateway extends Module::Gateway
     @inheritProtected()
-    @include Module::CrudEndpointsMixin
+    @include Module::CrudGatewayMixin
 
     @module App
 

@@ -22,6 +22,16 @@ module.exports = (Module)->
         @[ipmListener].apply @[ipoContext], [aoMessage]
         return yes
 
+    @public @static @async restoreObject: Function,
+      default: ->
+        throw new Error "restoreObject method not supported for #{@name}"
+        yield return
+
+    @public @static @async replicateObject: Function,
+      default: ->
+        throw new Error "replicateObject method not supported for #{@name}"
+        yield return
+
     @public init: Function,
       default: (aoContext, amListener)->
         @super arguments...

@@ -40,7 +40,7 @@ describe 'DelayedJobScript', ->
           return
         body =
           moduleName: 'Test'
-          className: 'TestClass'
+          replica: yield TestClass.constructor.replicateObject TestClass
           methodName: 'test'
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
         command.execute LeanRC::Notification.new 'TEST', body, 'TEST_TYPE'
@@ -75,7 +75,7 @@ describe 'DelayedJobScript', ->
           return
         body =
           moduleName: 'Test'
-          className: 'TestClass'
+          replica: yield TestClass.constructor.replicateObject TestClass
           methodName: 'test'
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
         command.execute LeanRC::Notification.new 'TEST', body, 'TEST_TYPE'
