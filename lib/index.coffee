@@ -130,15 +130,15 @@ class LeanRC extends RC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
-  require('./patterns/command/Resource') LeanRC # needs retest
+  require('./patterns/command/Resource') LeanRC
   require('./patterns/command/MigrateCommand') LeanRC
   require('./patterns/command/RollbackCommand') LeanRC
   require('./patterns/command/Script') LeanRC
   require('./patterns/command/DelayedJobScript') LeanRC # need retest it
 
   require('./mixins/BulkActionsResourceMixin') LeanRC
-  require('./mixins/BodyParseMixin') LeanRC # need test it
-  require('./mixins/CheckSessionsMixin') LeanRC # need test it
+  require('./mixins/BodyParseMixin') LeanRC
+  require('./mixins/CheckSessionsMixin') LeanRC
   require('./mixins/CheckPermissionsMixin') LeanRC # need test it
 
   require('./patterns/migration/Migration') LeanRC
