@@ -97,6 +97,7 @@ describe 'MemoryMigrationMixin', ->
         yield migration.up()
         for own id, doc of collection[Symbol.for '~collection']
           assert.propertyVal doc, 'test', 'Test1'
+        facade.remove()
         yield return
   describe '#addIndex', ->
     it 'should apply step to add index in collection', ->
@@ -158,6 +159,7 @@ describe 'MemoryMigrationMixin', ->
           assert.property doc, 'createdAt'
           assert.property doc, 'updatedAt'
           assert.property doc, 'updatedAt'
+        facade.remove()
         yield return
   describe '#changeCollection', ->
     it 'should apply step to change collection', ->
@@ -217,6 +219,7 @@ describe 'MemoryMigrationMixin', ->
         yield migration.up()
         for own id, doc of collection[Symbol.for '~collection']
           assert.propertyVal doc, 'test', 42
+        facade.remove()
         yield return
   describe '#renameField', ->
     it 'should apply step to rename field in collection', ->
@@ -259,6 +262,7 @@ describe 'MemoryMigrationMixin', ->
         for own id, doc of collection[Symbol.for '~collection']
           assert.notProperty doc, 'test'
           assert.property doc, 'test1'
+        facade.remove()
         yield return
   describe '#renameIndex', ->
     it 'should apply step to rename index in collection', ->
@@ -335,6 +339,7 @@ describe 'MemoryMigrationMixin', ->
         migration = Test::BaseMigration.new {}, collection
         yield migration.up()
         assert.deepEqual collection[Symbol.for '~collection'], {}
+        facade.remove()
         yield return
   describe '#dropEdgeCollection', ->
     it 'should apply step to drop edge collection', ->
@@ -375,6 +380,7 @@ describe 'MemoryMigrationMixin', ->
         migration = Test::BaseMigration.new {}, collection
         yield migration.up()
         assert.deepEqual collection[Symbol.for '~collection'], {}
+        facade.remove()
         yield return
   describe '#removeField', ->
     it 'should apply step to remove field in collection', ->
@@ -416,6 +422,7 @@ describe 'MemoryMigrationMixin', ->
         yield migration.up()
         for own id, doc of collection[Symbol.for '~collection']
           assert.notProperty doc, 'test'
+        facade.remove()
         yield return
   describe '#removeIndex', ->
     it 'should apply step to remove index in collection', ->
@@ -482,4 +489,5 @@ describe 'MemoryMigrationMixin', ->
           assert.notProperty doc, 'createdAt'
           assert.notProperty doc, 'updatedAt'
           assert.notProperty doc, 'deletedAt'
+        facade.remove()
         yield return

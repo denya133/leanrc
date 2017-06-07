@@ -120,6 +120,7 @@ describe 'Collection', ->
         mediator = facade.retrieveMediator 'TEST_MEDIATOR'
         collection.recordHasBeenChanged { test: 'test' }, Test::TestRecord.new()
         assert.isTrue spyHandleNotitfication.called, 'Notification did not received'
+        facade.remove()
       .to.not.throw Error
   describe '#generateId', ->
     it 'should get dummy generated ID', ->

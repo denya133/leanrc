@@ -61,6 +61,7 @@ describe 'Record', ->
         record = collection.build {id: 123}
         yield record.save()
         assert.isTrue spyRunNotitfication.calledWith('createdRecord'), '`afterCreate` run incorrect'
+        facade.remove()
   describe '#beforeUpdate', ->
     it 'should be called before update', ->
       co ->
@@ -102,6 +103,7 @@ describe 'Record', ->
         updated = yield record.save()
         newUpdatedAt = record.updatedAt
         assert.notEqual oldUpdatedAt, newUpdatedAt, 'Record not updated'
+        facade.remove()
   describe '#beforeCreate', ->
     it 'should be called before create', ->
       co ->
@@ -143,6 +145,7 @@ describe 'Record', ->
         assert.isUndefined record.id
         yield record.save()
         assert.isDefined record.id
+        facade.remove()
   describe '#afterUpdate', ->
     it 'should be called after update', ->
       co ->
@@ -183,6 +186,7 @@ describe 'Record', ->
         yield record.save()
         updated = yield record.save()
         assert.isTrue spyRunNotitfication.calledWith('updatedRecord'), '`afterUpdate` run incorrect'
+        facade.remove()
   describe '#beforeDelete', ->
     it 'should be called before delete', ->
       co ->
@@ -226,6 +230,7 @@ describe 'Record', ->
         assert.notEqual oldUpdatedAt, newUpdatedAt, 'Record not updated'
         assert.isDefined deleted.deletedAt, 'Record not deleted'
         assert.isTrue deleted.isHidden, 'Record not hidden'
+        facade.remove()
   describe '#afterDelete', ->
     it 'should be called after delete', ->
       co ->
@@ -266,6 +271,7 @@ describe 'Record', ->
         yield record.save()
         deleted = yield record.delete()
         assert.isTrue spyRunNotitfication.calledWith('deletedRecord'), '`afterDelete` run incorrect'
+        facade.remove()
   describe '#afterDestroy', ->
     it 'should be called after destroy', ->
       co ->
@@ -304,3 +310,4 @@ describe 'Record', ->
         yield record.save()
         yield record.destroy()
         assert.isTrue spyRunNotitfication.calledWith('destroyedRecord'), '`afterDestroy` run incorrect'
+        facade.remove()

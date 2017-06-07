@@ -32,6 +32,7 @@ describe 'Renderer', ->
         renderer = Test::TestRenderer.new()
         facade.registerProxy renderer
         assert.equal renderer.templatesDir, "#{__dirname}/config/root/../lib/templates"
+        facade.remove()
       .to.not.throw Error
   describe '#templates', ->
     it 'should get templates from scripts', ->
@@ -55,6 +56,7 @@ describe 'Renderer', ->
         facade.registerProxy renderer
         templates = yield renderer.templates
         assert.property templates, 'TestRecord/find'
+        facade.remove()
         yield return
     it 'should run test template from script', ->
       co ->
@@ -100,6 +102,7 @@ describe 'Renderer', ->
         ,
           id: 3, test: 'test3'
         ]
+        facade.remove()
         yield return
   describe '#render', ->
     it 'should render the data', ->
@@ -111,6 +114,7 @@ describe 'Renderer', ->
         facade.registerProxy renderer
         renderResult = yield renderer.render {}, data, {}, {}
         assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
+        facade.remove()
         yield return
     it 'should render the data with template', ->
       co ->
@@ -145,6 +149,7 @@ describe 'Renderer', ->
           resource: 'TestRecord/'
           action: 'find'
         assert.deepEqual renderResult, JSON.stringify test_records: data
+        facade.remove()
         yield return
     it 'should render the data in customized renderer', ->
       co ->

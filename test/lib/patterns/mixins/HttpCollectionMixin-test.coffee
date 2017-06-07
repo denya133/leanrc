@@ -62,6 +62,7 @@ describe 'HttpCollectionMixin', ->
           options: json: yes
         assert.equal data.status, 200
         assert.equal data.body?.message, 'OK'
+        facade.remove()
         yield return
   describe '#~requestToHash, #~makeRequest', ->
     before ->
@@ -106,6 +107,7 @@ describe 'HttpCollectionMixin', ->
           url: 'http://localhost:8000'
         assert.equal data.status, 200, 'Request received not OK status'
         assert.equal data?.body?.message, 'OK', 'Incorrect body'
+        facade.remove()
         yield return
   describe '#methodForRequest', ->
     it 'should get method name from request params', ->
@@ -536,6 +538,7 @@ describe 'HttpCollectionMixin', ->
         assert.equal record, spyPush.args[0][0]
         assert.equal spyQuery.args[0][0].$insert, record
         assert.equal spyQuery.args[0][0].$into, collection.collectionFullName()
+        facade.remove()
         yield return
   describe '#remove', ->
     before ->
@@ -577,6 +580,7 @@ describe 'HttpCollectionMixin', ->
         assert.deepEqual spyQuery.args[1][0].$forIn, { '@doc': 'test_tests' }
         assert.deepEqual spyQuery.args[1][0].$filter, { '@doc._key': { '$eq': record.id } }
         assert.isTrue spyQuery.args[1][0].$remove
+        facade.remove()
         yield return
   describe '#take', ->
     before ->
@@ -617,6 +621,7 @@ describe 'HttpCollectionMixin', ->
         assert.notEqual record, recordDuplicate
         for attribute in Test::TestRecord.attributes
           assert.equal record[attribute], recordDuplicate[attribute]
+        facade.remove()
         yield return
   describe '#takeMany', ->
     before ->
@@ -662,6 +667,7 @@ describe 'HttpCollectionMixin', ->
         for i in [ 1 .. count ]
           for attribute in Test::TestRecord.attributes
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
+        facade.remove()
         yield return
   describe '#takeAll', ->
     before ->
@@ -707,6 +713,7 @@ describe 'HttpCollectionMixin', ->
         for i in [ 1 .. count ]
           for attribute in Test::TestRecord.attributes
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
+        facade.remove()
         yield return
   describe '#override', ->
     before ->
@@ -748,6 +755,7 @@ describe 'HttpCollectionMixin', ->
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'
         assert.propertyVal updatedRecord, 'test', 'test2'
+        facade.remove()
         yield return
   describe '#patch', ->
     before ->
@@ -789,6 +797,7 @@ describe 'HttpCollectionMixin', ->
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'
         assert.propertyVal updatedRecord, 'test', 'test2'
+        facade.remove()
         yield return
   describe '#includes', ->
     before ->
@@ -828,6 +837,7 @@ describe 'HttpCollectionMixin', ->
         assert.isDefined record
         includes = yield collection.includes record.id
         assert.isTrue includes
+        facade.remove()
         yield return
   describe '#length', ->
     before ->
@@ -868,4 +878,5 @@ describe 'HttpCollectionMixin', ->
           yield collection.create test: 'test1'
         length = yield collection.length()
         assert.equal count, length
+        facade.remove()
         yield return

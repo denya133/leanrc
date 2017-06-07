@@ -46,6 +46,7 @@ describe 'DelayedJobScript', ->
         command.execute LeanRC::Notification.new 'TEST', body, 'TEST_TYPE'
         data = yield promise
         assert.deepEqual data, [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+        facade.remove()
         yield return
     it 'should run delayed job script (async)', ->
       co ->
@@ -81,4 +82,5 @@ describe 'DelayedJobScript', ->
         command.execute LeanRC::Notification.new 'TEST', body, 'TEST_TYPE'
         data = yield promise
         assert.deepEqual data, [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+        facade.remove()
         yield return

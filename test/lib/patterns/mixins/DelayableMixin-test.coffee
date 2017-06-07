@@ -48,6 +48,7 @@ describe 'DelayableMixin', ->
           status: 'scheduled'
           lockLifetime: 5000
           lockLimit: 2
+        facade.remove()
         yield return
   describe '.delay', ->
     it 'should get delayed function wrapper', ->
@@ -92,4 +93,5 @@ describe 'DelayableMixin', ->
           status: 'scheduled'
           lockLifetime: 5000
           lockLimit: 2
+        facade.remove()
         yield return

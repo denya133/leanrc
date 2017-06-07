@@ -44,6 +44,7 @@ describe 'RollbackCommand', ->
         assert.equal command.migrationsCollection, facade.retrieveProxy LeanRC::MIGRATIONS
         assert.isNotNull command.migrationsCollection
         assert.isDefined command.migrationsCollection
+        facade.remove()
         yield return
   describe '#migrationsDir', ->
     it 'should get migrations directory path', ->
@@ -82,6 +83,7 @@ describe 'RollbackCommand', ->
         command.initializeNotifier KEY
         { migrationsDir } = command
         assert.equal migrationsDir, "#{Test::ROOT}/migrations"
+        facade.remove()
         yield return
   describe '#migrationNames', ->
     it 'should get migration names', ->
@@ -124,6 +126,7 @@ describe 'RollbackCommand', ->
         command.initializeNotifier KEY
         migrationNames = command.migrationNames
         assert.deepEqual migrationNames, [ '01_migration', '02_migration', '03_migration' ]
+        facade.remove()
         yield return
   describe '#rollback', ->
     it 'should run migrations', ->
@@ -186,6 +189,7 @@ describe 'RollbackCommand', ->
         yield command.rollback { steps }
         collectionData = facade.retrieveProxy(LeanRC::MIGRATIONS)[Symbol.for '~collection']
         assert.deepEqual collectionData, {}
+        facade.remove()
         yield return
   describe '#execute', ->
     it 'should run rollback migrations via "execute"', ->
@@ -256,4 +260,5 @@ describe 'RollbackCommand', ->
         command.execute { steps }
         options = yield promise
         assert.deepEqual options, steps: 2
+        facade.remove()
         yield return

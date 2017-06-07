@@ -15,6 +15,7 @@ describe 'Facade', ->
         assert facade instanceof Facade, 'The `facade` is not an instance of Facade'
         facade1 = Facade.getInstance 'TEST1'
         assert facade is facade1, 'Instances of facade not equal'
+        facade.remove()
       .to.not.throw Error
   describe '#initializeNotifier', ->
     it 'should initialize notifier', ->
@@ -22,6 +23,7 @@ describe 'Facade', ->
       ipsMultitonKey  = Symbol.for '~multitonKey'
       expect facade[ipsMultitonKey]
       .to.equal 'TEST2'
+      facade.remove()
   describe '#registerCommand', ->
     it 'should register new command', ->
       expect ->
@@ -30,6 +32,7 @@ describe 'Facade', ->
           @inheritProtected()
         facade.registerCommand 'TEST_COMMAND', TestCommand
         assert facade.hasCommand 'TEST_COMMAND'
+        facade.remove()
         return
       .to.not.throw Error
   describe '#removeCommand', ->
@@ -42,6 +45,7 @@ describe 'Facade', ->
         assert facade.hasCommand 'TEST_COMMAND'
         facade.removeCommand 'TEST_COMMAND'
         assert not facade.hasCommand 'TEST_COMMAND'
+        facade.remove()
         return
       .to.not.throw Error
   describe '#hasCommand', ->
@@ -53,6 +57,7 @@ describe 'Facade', ->
         facade.registerCommand 'TEST_COMMAND', TestCommand
         assert facade.hasCommand 'TEST_COMMAND'
         assert not facade.hasCommand 'TEST_COMMAND_ABSENT'
+        facade.remove()
         return
       .to.not.throw Error
   describe '#registerProxy', ->
@@ -71,6 +76,7 @@ describe 'Facade', ->
         onRegister.reset()
         hasProxy = facade.hasProxy 'TEST_PROXY'
         assert hasProxy, 'Proxy is not registered'
+        facade.remove()
       .to.not.throw Error
   describe '#retrieveProxy', ->
     it 'should retrieve registred proxy', ->
@@ -86,6 +92,7 @@ describe 'Facade', ->
         retrievedAbsentProxy = facade.retrieveProxy 'TEST_PROXY_ABSENT'
         hasNoAbsentProxy = not retrievedAbsentProxy?
         assert hasNoAbsentProxy, 'Absent proxy can be retrieved'
+        facade.remove()
       .to.not.throw Error
   describe '#removeProxy', ->
     it 'should create new proxy and regiter it, after that remove it', ->
@@ -105,6 +112,7 @@ describe 'Facade', ->
         assert onRemove.called, 'Proxy is still registered'
         hasNoProxy = not facade.hasProxy 'TEST_PROXY2'
         assert hasNoProxy, 'Proxy is still registered'
+        facade.remove()
       .to.not.throw Error
   describe '#hasProxy', ->
     it 'should retrieve registred proxy', ->
@@ -119,6 +127,7 @@ describe 'Facade', ->
         assert hasProxy, 'Proxy is absent'
         hasNoAbsentProxy = not facade.hasProxy 'TEST_PROXY_ABSENT'
         assert hasNoAbsentProxy, 'Absent proxy is accessible'
+        facade.remove()
       .to.not.throw Error
   describe '#registerMediator', ->
     it 'should register new mediator', ->
@@ -141,6 +150,7 @@ describe 'Facade', ->
         onRegister.reset()
         facade.notifyObservers Notification.new 'TEST_LIST'
         assert handleNotification.called, 'Mediator cannot subscribe interests'
+        facade.remove()
       .to.not.throw Error
   describe '#retrieveMediator', ->
     it 'should retrieve registred mediator', ->
@@ -155,6 +165,7 @@ describe 'Facade', ->
         assert retrievedMediator is mediator, 'Cannot retrieve mediator'
         retrievedAbsentMediator = facade.retrieveMediator 'TEST_MEDIATOR_ABSENT'
         assert not retrievedAbsentMediator?, 'Retrieve absent mediator'
+        facade.remove()
       .to.not.throw Error
   describe '#removeMediator', ->
     it 'should remove mediator', ->
@@ -172,6 +183,7 @@ describe 'Facade', ->
         assert onRemove.called, 'Mediator onRemove hook not called'
         hasMediator = facade.hasMediator 'TEST_MEDIATOR'
         assert not hasMediator, 'Mediator didn\'t removed'
+        facade.remove()
       .to.not.throw Error
   describe '#hasMediator', ->
     it 'should retrieve registred proxy', ->
@@ -186,6 +198,7 @@ describe 'Facade', ->
         assert hasMediator, 'Proxy is absent'
         hasNoAbsentsMediator = not facade.hasMediator 'TEST_MEDIATOR_ABSENT'
         assert hasNoAbsentsMediator, 'Absent proxy is accessible'
+        facade.remove()
       .to.not.throw Error
   describe '#notifyObservers', ->
     it 'should call notification for all observers', ->
@@ -203,6 +216,7 @@ describe 'Facade', ->
         facade.registerMediator mediator
         facade.notifyObservers Notification.new 'TEST_LIST'
         assert handleNotification.called, 'Mediator cannot subscribe interests'
+        facade.remove()
       .to.not.throw Error
   describe '#sendNotification', ->
     it 'should send single notification', ->
@@ -220,6 +234,7 @@ describe 'Facade', ->
         facade.registerMediator mediator
         facade.sendNotification 'TEST_LIST'
         assert handleNotification.called, 'Mediator cannot subscribe interests'
+        facade.remove()
       .to.not.throw Error
   describe '#remove', ->
     it 'should remove facade', ->
@@ -230,4 +245,5 @@ describe 'Facade', ->
         assert.equal facade, Facade[instanceMapSymbol][KEY]
         facade.remove()
         assert.isUndefined Facade[instanceMapSymbol][KEY]
+        facade.remove()
       .to.not.throw Error
