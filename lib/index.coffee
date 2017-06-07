@@ -127,7 +127,7 @@ class LeanRC extends RC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
-  require('./patterns/command/Resource') LeanRC # needs retest
+  require('./patterns/command/Resource') LeanRC
   require('./patterns/command/MigrateCommand') LeanRC
   require('./patterns/command/RollbackCommand') LeanRC
   require('./patterns/command/Script') LeanRC

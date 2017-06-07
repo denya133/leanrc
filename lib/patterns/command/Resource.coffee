@@ -105,7 +105,7 @@ module.exports = (Module)->
           return
         yield return args
 
-    @public @async adminOnly: Function, # NEEDS TEST
+    @public @async adminOnly: Function,
       default: (args...) ->
         unless @session?.uid? and @currentUser?
           @context.throw UNAUTHORIZED
