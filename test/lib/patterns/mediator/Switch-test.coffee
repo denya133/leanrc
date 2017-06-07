@@ -225,7 +225,7 @@ describe 'Switch', ->
           @inheritProtected()
           @module Test
           @public render: Function,
-            default: (aoData, aoOptions) ->
+            default: (ctx, aoData, aoResource, aoOptions) ->
               spyRendererRender aoData, aoOptions
               vhData = RC::Utils.extend {}, aoData
               JSON.stringify vhData ? null
@@ -283,7 +283,8 @@ describe 'Switch', ->
           path: '/test'
           resource: 'test'
           action: 'list'
-        yield switchMediator.sendHttpResponse voContext, vhData, vhOptions
+        voResource = {}
+        yield switchMediator.sendHttpResponse voContext, vhData, voResource, vhOptions
         assert.isTrue spyRendererRender.calledWith(vhData, vhOptions), 'Render not called'
         assert.deepEqual voContext.body, renderedGauge
         facade.remove()

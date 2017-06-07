@@ -68,6 +68,12 @@ describe 'Renderer', ->
           @inheritProtected()
           @module Test
         Test::Configuration.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @include LeanRC::BulkActionsResourceMixin
+          @module Test
+          @public entityName: String, { default: 'TestRecord' }
+        Test::TestResource.initialize()
         facade.registerProxy Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
@@ -83,7 +89,9 @@ describe 'Renderer', ->
         ,
           id: 3, test: 'test3'
         ]
-        output = templates['TestRecord/find'] 'TestRecord', 'find', items
+        resource = Test::TestResource.new()
+        resource.initializeNotifier KEY
+        output = yield templates['TestRecord/find'].call resource, 'TestRecord', 'find', items
         assert.property output, 'test_records'
         assert.sameDeepMembers output.test_records, [
           id: 1, test: 'test1'
@@ -101,7 +109,7 @@ describe 'Renderer', ->
         data = test: 'test1', data: 'data1'
         renderer = LeanRC::Renderer.new 'TEST_RENDERER'
         facade.registerProxy renderer
-        renderResult = yield renderer.render data
+        renderResult = yield renderer.render {}, data, {}, {}
         assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
         yield return
     it 'should render the data with template', ->
@@ -116,21 +124,27 @@ describe 'Renderer', ->
           @inheritProtected()
           @module Test
         Test::Configuration.initialize()
+        class Test::TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @include LeanRC::BulkActionsResourceMixin
+          @module Test
+          @public entityName: String, { default: 'TestRecord' }
+        Test::TestResource.initialize()
         facade.registerProxy Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
           @module Test
         Test::TestRenderer.initialize()
-        data = id: 1, test: 'test1', data: 'data1'
+        data = [id: 1, test: 'test1', data: 'data1']
         renderer = Test::TestRenderer.new 'TEST_RENDERER'
         facade.registerProxy renderer
-        renderResult = yield renderer.render data,
+        resource = Test::TestResource.new()
+        resource.initializeNotifier KEY
+        renderResult = yield renderer.render {}, data, resource,
           path: 'test'
           resource: 'TestRecord/'
           action: 'find'
-        assert.deepEqual renderResult, JSON.stringify test_records: [
-          id: 1, test: "test1", data: "data1"
-        ]
+        assert.deepEqual renderResult, JSON.stringify test_records: data
         yield return
     it 'should render the data in customized renderer', ->
       co ->

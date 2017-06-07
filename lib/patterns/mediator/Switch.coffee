@@ -299,15 +299,15 @@ module.exports = (Module)->
         @[ipoRenderers][asFormat]
 
     @public @async sendHttpResponse: Function,
-      default: (ctx, aoData, {method, path, resource, action})->
-        if action is 'create'
+      default: (ctx, aoData, resource, opts)->
+        if opts.action is 'create'
           ctx.status = 201
         switch (vsFormat = ctx.accepts @responseFormats)
           when 'json', 'html', 'xml', 'atom'
             if @["#{vsFormat}RendererName"]?
               voRenderer = @rendererFor vsFormat
               voRendered = yield voRenderer
-                .render aoData, {path, resource, action}
+                .render ctx, aoData, resource, opts
             else
               ctx.set 'Content-Type', 'text/plain'
               voRendered = JSON.stringify aoData
@@ -364,20 +364,21 @@ module.exports = (Module)->
         return
 
     @public createNativeRoute: Function,
-      default: ({method, path, resource, action})->
-        resourceName = inflect.camelize inflect.underscore "#{resource.replace /[/]/g, '_'}Resource"
+      default: (opts)->
+        {method, path} = opts
+        resourceName = inflect.camelize inflect.underscore "#{opts.resource.replace /[/]/g, '_'}Resource"
 
         @[method]? path, co.wrap (context, next)=>
           yield Module::Promise.new (resolve, reject)=>
             try
               reverse = genRandomAlphaNumbers 32
-              @getViewComponent().once reverse, co.wrap (aoData)=>
+              @getViewComponent().once reverse, co.wrap ({result, resource})=>
                 try
-                  yield @sendHttpResponse context, aoData, {method, path, resource, action}
+                  yield @sendHttpResponse context, result, resource, opts
                   yield return resolve()
                 catch error
                   reject error
-              @sender resourceName, {context, reverse}, {method, path, resource, action}
+              @sender resourceName, {context, reverse}, opts
             catch err
               reject err
             return

@@ -1,8 +1,9 @@
-inflect = do require 'i'
 _ = require 'lodash'
+LeanRC = require.main.require 'lib'
+{co, map} = LeanRC::Utils
 
-module.exports = (resource, action, aoData)->
-  voData = if _.isArray aoData then aoData else [ aoData ]
-  resource = resource.replace(/[/]/g, '_').replace /[_]$/g, ''
-  "#{inflect.pluralize inflect.underscore resource}": voData.map (i)->
-    _.omit i, '_key', '_type', '_owner'
+
+module.exports = co.wrap (resource, action, aoData)->
+  "#{@listEntityName}": yield map aoData, (i)->
+    res = _.omit i, '_key', '_type', '_owner'
+    yield return res

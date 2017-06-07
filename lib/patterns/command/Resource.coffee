@@ -249,7 +249,9 @@ module.exports = (Module)->
       return: Module::NILL
       default: (aoNotification)->
         voBody = aoNotification.getBody()
-        voResult = yield @[aoNotification.getType()]? voBody.context
+        voResult =
+          result: yield @[aoNotification.getType()]? voBody.context
+          resource: @
         @sendNotification Module::HANDLER_RESULT, voResult, voBody.reverse
         yield return
 

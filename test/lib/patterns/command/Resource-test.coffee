@@ -779,11 +779,13 @@ describe 'Resource', ->
         yield resource.execute notification
         [ name, body, type ] = spySendNotitfication.args[0]
         assert.equal name, LeanRC::HANDLER_RESULT
-        { meta, items } = body
+        {result, resource:voResource} = body
+        { meta, items } = result
         assert.deepEqual meta, pagination:
           total: 'not defined'
           limit: 'not defined'
           offset: 'not defined'
+        assert.deepEqual voResource, resource
         assert.lengthOf items, 2
         assert.equal type, 'TEST_REVERSE'
         facade.remove()
