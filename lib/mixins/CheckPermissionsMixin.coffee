@@ -59,7 +59,7 @@ module.exports = (Module)->
         default: (spaceId, userId)->
           SpacesCollection = @facade.retrieveProxy SPACES
           space = yield SpacesCollection.find spaceId
-          yield return space.ownerId is userId
+          yield return space?.ownerId is userId
 
       ipoCheckRole = @private @async checkRole: Function,
         default: (spaceId, userId, action)->
