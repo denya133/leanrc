@@ -11,3 +11,7 @@ module.exports =
     description: 'API key'
     type: 'string'
     default: 'TESTTESTTESTTESTTEST123'
+  sessionCookie:
+    description: 'session cookie name'
+    type: 'string'
+    default: 'sid'
