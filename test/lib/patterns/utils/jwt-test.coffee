@@ -213,3 +213,163 @@ describe 'Utils.jwt*', ->
         { test: decoded } = JSON.parse b64_to_utf8 token.split('.')[1]
         assert.equal decoded, 'test'
         yield return
+  describe 'Utils.jwtDecode', ->
+    it 'should decode token with JWT (algorithm HS256)', ->
+      co ->
+        key = 'KEY'
+        algorithm = 'HS256'
+        message = 'TEST'
+        token = yield LeanRC::Utils.jwtEncode key, message, algorithm
+        data = yield LeanRC::Utils.jwtDecode key, token, yes
+        assert.equal data, message
+        data = yield LeanRC::Utils.jwtDecode key, token, no
+        assert.equal data, message
+        message = test: 'test'
+        token = yield LeanRC::Utils.jwtEncode key, message, algorithm
+        { test: decoded } = yield LeanRC::Utils.jwtDecode key, token, yes
+        assert.equal decoded, 'test'
+        { test: decoded } = yield LeanRC::Utils.jwtDecode key, token, no
+        assert.equal decoded, 'test'
+        yield return
+    it 'should decode token with JWT (algorithm HS384)', ->
+      co ->
+        key = 'KEY'
+        algorithm = 'HS384'
+        message = 'TEST'
+        token = yield LeanRC::Utils.jwtEncode key, message, algorithm
+        data = yield LeanRC::Utils.jwtDecode key, token, yes
+        assert.equal data, message
+        data = yield LeanRC::Utils.jwtDecode key, token, no
+        assert.equal data, message
+        message = test: 'test'
+        token = yield LeanRC::Utils.jwtEncode key, message, algorithm
+        { test: decoded } = yield LeanRC::Utils.jwtDecode key, token, yes
+        assert.equal decoded, 'test'
+        { test: decoded } = yield LeanRC::Utils.jwtDecode key, token, no
+        assert.equal decoded, 'test'
+        yield return
+    it 'should decode token with JWT (algorithm HS512)', ->
+      co ->
+        key = 'KEY'
+        algorithm = 'HS512'
+        message = 'TEST'
+        token = yield LeanRC::Utils.jwtEncode key, message, algorithm
+        data = yield LeanRC::Utils.jwtDecode key, token, yes
+        assert.equal data, message
+        data = yield LeanRC::Utils.jwtDecode key, token, no
+        assert.equal data, message
+        message = test: 'test'
+        token = yield LeanRC::Utils.jwtEncode key, message, algorithm
+        { test: decoded } = yield LeanRC::Utils.jwtDecode key, token, yes
+        assert.equal decoded, 'test'
+        { test: decoded } = yield LeanRC::Utils.jwtDecode key, token, no
+        assert.equal decoded, 'test'
+        yield return
+    it 'should decode token with JWT (algorithm RS256)', ->
+      co ->
+        privateKey = jwtRS256_private
+        publicKey = jwtRS256_public
+        algorithm = 'RS256'
+        message = 'TEST'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal data, message
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal data, message
+        message = test: 'test'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal decoded, 'test'
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal decoded, 'test'
+        yield return
+    it 'should decode token with JWT (algorithm RS384)', ->
+      co ->
+        privateKey = jwtRS256_private
+        publicKey = jwtRS256_public
+        algorithm = 'RS384'
+        message = 'TEST'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal data, message
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal data, message
+        message = test: 'test'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal decoded, 'test'
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal decoded, 'test'
+        yield return
+    it 'should decode token with JWT (algorithm RS512)', ->
+      co ->
+        privateKey = jwtRS256_private
+        publicKey = jwtRS256_public
+        algorithm = 'RS512'
+        message = 'TEST'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal data, message
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal data, message
+        message = test: 'test'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal decoded, 'test'
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal decoded, 'test'
+        yield return
+    it 'should decode token with JWT (algorithm ES256)', ->
+      co ->
+        privateKey = jwtES256_private
+        publicKey = jwtES256_public
+        algorithm = 'ES256'
+        message = 'TEST'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal data, message
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal data, message
+        message = test: 'test'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal decoded, 'test'
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal decoded, 'test'
+        yield return
+    it 'should decode token with JWT (algorithm ES384)', ->
+      co ->
+        privateKey = jwtES256_private
+        publicKey = jwtES256_public
+        algorithm = 'ES384'
+        message = 'TEST'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal data, message
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal data, message
+        message = test: 'test'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal decoded, 'test'
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal decoded, 'test'
+        yield return
+    it 'should decode token with JWT (algorithm ES512)', ->
+      co ->
+        privateKey = jwtES256_private
+        publicKey = jwtES256_public
+        algorithm = 'ES512'
+        message = 'TEST'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal data, message
+        data = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal data, message
+        message = test: 'test'
+        token = yield LeanRC::Utils.jwtEncode privateKey, message, algorithm
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, yes
+        assert.equal decoded, 'test'
+        { test: decoded } = yield LeanRC::Utils.jwtDecode publicKey, token, no
+        assert.equal decoded, 'test'
+        yield return
