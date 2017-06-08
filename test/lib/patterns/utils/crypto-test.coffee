@@ -30,3 +30,19 @@ describe 'Utils.crypto*', ->
           saltLength: 32
         assert.equal hash, crypto.createHash(method).update(salt + password).digest 'hex'
         yield return
+  describe 'Utils.verifyPassword', ->
+    it 'should verify password with auth data', ->
+      co ->
+        password = 'PASSWORD'
+        authData = LeanRC::Utils.hashPassword password
+        assert.isTrue LeanRC::Utils.verifyPassword authData, password
+        assert.isFalse LeanRC::Utils.verifyPassword authData, 'password'
+        authData = LeanRC::Utils.hashPassword password, hashMethod: 'sha512'
+        assert.isTrue LeanRC::Utils.verifyPassword authData, password
+        assert.isFalse LeanRC::Utils.verifyPassword authData, 'password'
+        authData = LeanRC::Utils.hashPassword password,
+          hashMethod: 'sha512'
+          saltLength: 32
+        assert.isTrue LeanRC::Utils.verifyPassword authData, password
+        assert.isFalse LeanRC::Utils.verifyPassword authData, 'password'
+        yield return
