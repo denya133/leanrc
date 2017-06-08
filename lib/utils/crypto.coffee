@@ -2,13 +2,17 @@
 
 module.exports = (Module) ->
   isArango = Module::Utils.isArangoDB()
+  crypto = if isArango
+    require '@arangodb/crypto'
+  else
+    require 'crypto'
   Module::Utils.genRandomAlphaNumbers = (length) ->
     if isArango
       # Is ArangoDB !!!
-      return require('@arangodb/crypto').genRandomAlphaNumbers length
+      return crypto.genRandomAlphaNumbers length
     else
       # Is Node.js !!!
-      return require('crypto').randomBytes(length).toString 'hex'
+      return crypto.randomBytes(length).toString 'hex'
 
   Module::Utils.hashPassword = (password, opts = {}) ->
     {hashMethod, saltLength} = opts
@@ -17,13 +21,13 @@ module.exports = (Module) ->
     method = hashMethod
     if isArango
       # Is ArangoDB !!!
-      crypto = require '@arangodb/crypto'
+      # crypto = require '@arangodb/crypto'
       salt = crypto.genRandomAlphaNumbers saltLength
       hash = crypto[method] salt + password
       return {method, salt, hash}
     else
       # Is Node.js !!!
-      crypto = require 'crypto'
+      # crypto = require 'crypto'
       salt = crypto.randomBytes(saltLength).toString 'hex'
       hash = crypto.createHash(method).update(salt + password).digest 'hex'
       return {method, salt, hash}
@@ -34,11 +38,11 @@ module.exports = (Module) ->
     storedHash = authData.hash ? ''
     if isArango
       # Is ArangoDB !!!
-      crypto = require '@arangodb/crypto'
+      # crypto = require '@arangodb/crypto'
       generatedHash = crypto[method] salt + password
       return crypto.constantEquals storedHash, generatedHash
     else
       # Is Node.js !!!
-      crypto = require 'crypto'
+      # crypto = require 'crypto'
       generatedHash = crypto.createHash(method).update(salt + password).digest 'hex'
       return storedHash is generatedHash
