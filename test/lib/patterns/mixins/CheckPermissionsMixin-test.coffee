@@ -195,11 +195,10 @@ describe 'CheckPermissionsMixin', ->
         assert.isTrue isRole
         facade.remove()
         yield return
-  ###
-  describe '#checkSession', ->
-    it 'should check if session valid', ->
+  describe '#_checkPermission', ->
+    it 'should check if permission is enough', ->
       co ->
-        KEY = 'TEST_CHECK_SESSIONS_MIXIN_003'
+        KEY = 'TEST_CHECK_PERMISSIONS_MIXIN_003'
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
@@ -230,40 +229,32 @@ describe 'CheckPermissionsMixin', ->
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @module Test
+          @public @async findBy: Function,
+            default: (query) ->
+              item = _.chain @[Symbol.for '~collection']
+                .values()
+                .find query
+                .value()
+              result = if item? then [ item ] else []
+              yield return LeanRC::Cursor.new @, result
         MemoryCollection.initialize()
-        class Session extends Test::CoreObject
-          @inheritProtected()
-          @include Test::ChainsMixin
-          @include Test::RecordMixin
-          @module Test
-          @attribute id: String
-          @attribute rev: String
-          @attribute type: String
-          @attribute uid: String
-          @attribute created: Number
-          @attribute expires: Number
-          @attribute data: Test::ANY
-          @chains ['create']
-          @beforeHook 'beforeCreate', only: [ 'create' ]
-          @public @async beforeCreate: Function,
-            default: ->
-              @id ?= Test::Utils.genRandomAlphaNumbers 64
-              now = Date.now()
-              @created ?= now
-              @expires ?= now + 108000
-              @uid ?= Test::Utils.uuid.v4()
-              yield return
-        Session.initialize()
-        class User extends Test::Record
+        class Role extends Test::Record
           @inheritProtected()
           @module Test
-          @attribute verified: Boolean, { default: no }
-        User.initialize()
-        facade.registerProxy MemoryCollection.new Test::SESSIONS,
-          delegate: Session
+          @attribute spaceId: String
+          @attribute userId: String
+          @attribute rules: Object
+        Role.initialize()
+        class Space extends Test::Record
+          @inheritProtected()
+          @module Test
+          @attribute ownerId: String
+        Space.initialize()
+        facade.registerProxy MemoryCollection.new Test::SPACES,
+          delegate: Space
           serializer: Test::Serializer
-        facade.registerProxy MemoryCollection.new Test::USERS,
-          delegate: User
+        facade.registerProxy MemoryCollection.new Test::ROLES,
+          delegate: Role
           serializer: Test::Serializer
         body = '{"test":"test"}'
         class MyRequest extends IncomingMessage
@@ -282,34 +273,187 @@ describe 'CheckPermissionsMixin', ->
         res = new MyResponse req
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        try
-          resource = Test::TestResource.new()
-          resource.context = Test::Context.new req, res, switchMediator
-          resource.initializeNotifier KEY
-          yield resource.checkSession()
-        catch error1
-        assert.instanceOf error1, httpErrors.Unauthorized
-        users = facade.retrieveProxy Test::USERS
-        user = yield users.create()
-        sessions = facade.retrieveProxy Test::SESSIONS
-        try
-          session = yield sessions.create uid: user.id
-          req.headers.cookie = "#{configs.sessionCookie}=#{session.id}"
-          resource = Test::TestResource.new()
-          resource.context = Test::Context.new req, res, switchMediator
-          resource.initializeNotifier KEY
-          yield resource.checkSession()
-        catch error2
-        assert.instanceOf error2, httpErrors.Unauthorized
-        assert.propertyVal error2, 'message', 'Unverified'
-        user.verified = yes
-        yield user.save()
-        req.headers.cookie = "#{configs.sessionCookie}=#{session.id}"
+        spaces = facade.retrieveProxy Test::SPACES
+        space = yield spaces.create id: 'XXX', ownerId: 'YYY'
+        roles = facade.retrieveProxy Test::ROLES
+        yield roles.create
+          id: 'AAA1'
+          spaceId: 'XXX'
+          userId: 'YYY1'
+          rules: system: administrator: yes
+        yield roles.create
+          id: 'AAA2'
+          spaceId: 'XXX'
+          userId: 'YYY2'
+          rules: moderator: TestResource: yes
+        yield roles.create
+          id: 'AAA3'
+          spaceId: 'XXX'
+          userId: 'YYY3'
+          rules: TestResource: create: yes
         resource = Test::TestResource.new()
         resource.context = Test::Context.new req, res, switchMediator
+        resource.currentUser = id: 'YYY2'
         resource.initializeNotifier KEY
-        yield resource.checkSession()
-        assert.equal resource.currentUser.id, user.id
+        { pointer: key } = Test::TestResource.instanceMethods['_checkPermission']
+        try
+          hasPermissions = yield resource[key] 'XXX', 'ZZZ'
+        catch e1
+          hasPermissions = no
+        assert.isTrue hasPermissions
+        assert.isUndefined e1
+        try
+          resource.currentUser.id = 'YYY4'
+          hasPermissions = yield resource[key] 'XXX', 'ZZZ'
+        catch e2
+          hasPermissions = no
+        assert.isFalse hasPermissions
+        assert.instanceOf e2, httpErrors.Forbidden
+        assert.propertyVal e2, 'message', 'Current user has no access'
         facade.remove()
         yield return
-  ###
+  describe '#checkPermission', ->
+    facade = null
+    KEY = 'TEST_CHECK_PERMISSIONS_MIXIN_004'
+    after ->
+      facade?.remove?()
+    it 'should check if permission is enough', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        facade = Test::Facade.getInstance KEY
+        configs = Test::Configuration.new Test::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestResource extends Test::Resource
+          @inheritProtected()
+          @include Test::CheckPermissionsMixin
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+          @initialHook 'checkPermission'
+        TestResource.initialize()
+        class TestRouter extends Test::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Test::Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+        TestSwitch.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+          @public @async findBy: Function,
+            default: (query) ->
+              item = _.chain @[Symbol.for '~collection']
+                .values()
+                .find query
+                .value()
+              result = if item? then [ item ] else []
+              yield return LeanRC::Cursor.new @, result
+        MemoryCollection.initialize()
+        class Role extends Test::Record
+          @inheritProtected()
+          @module Test
+          @attribute spaceId: String
+          @attribute userId: String
+          @attribute rules: Object
+        Role.initialize()
+        class Space extends Test::Record
+          @inheritProtected()
+          @module Test
+          @attribute ownerId: String
+        Space.initialize()
+        facade.registerProxy MemoryCollection.new Test::SPACES,
+          delegate: Space
+          serializer: Test::Serializer
+        facade.registerProxy MemoryCollection.new Test::ROLES,
+          delegate: Role
+          serializer: Test::Serializer
+        body = '{"test":"test"}'
+        class MyRequest extends IncomingMessage
+          constructor: (socket) ->
+            super socket
+            @method = 'POST'
+            @url = 'http://localhost:8888/space/SPACE123/test_entity'
+            @headers =
+              'x-forwarded-for': '192.168.0.1'
+              'content-type': 'application/json'
+              'content-length': "#{body.length}"
+            @push body
+            @push null
+        class MyResponse extends ServerResponse
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        class TestEntity extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @attribute ownerId: String
+          @public @static findRecordByName: Function,
+            default: (asType) -> Test::TestEntity
+          @public init: Function,
+            default: ->
+              @super arguments...
+              @type = 'Test::TestEntity'
+        TestEntity.initialize()
+        spaces = facade.retrieveProxy Test::SPACES
+        space = yield spaces.create id: 'XXX', ownerId: 'YYY3'
+        roles = facade.retrieveProxy Test::ROLES
+        yield roles.create
+          id: 'AAA1'
+          spaceId: 'XXX'
+          userId: 'YYY1'
+          rules: system: administrator: yes
+        yield roles.create
+          id: 'AAA2'
+          spaceId: 'XXX'
+          userId: 'YYY2'
+          rules: moderator: TestResource: yes
+        yield roles.create
+          id: 'AAA3'
+          spaceId: 'XXX'
+          userId: 'YYY3'
+          rules: TestResource: list: yes
+        resource = Test::TestResource.new()
+        { collectionName } = resource
+        boundCollection = MemoryCollection.new collectionName,
+          delegate: TestEntity
+        facade.registerProxy boundCollection
+        req = new MyRequest
+        res = new MyResponse req
+        voContext = Test::Context.new req, res, switchMediator
+        voContext.pathParams = space: 'XXX'
+        resource.context = voContext
+        resource.currentUser = id: 'YYY', role: 'user'
+        resource.initializeNotifier KEY
+        try
+          yield resource.checkPermission()
+        catch error1
+        assert.instanceOf error1, httpErrors.Forbidden
+        assert.propertyVal error1, 'message', 'Current user has no access'
+        resource.currentUser.role = 'admin'
+        yield resource.checkPermission()
+        resource.currentUser.role = 'user'
+        try
+          yield resource.list voContext
+        catch error2
+        assert.instanceOf error2, httpErrors.Forbidden
+        assert.propertyVal error2, 'message', 'Current user has no access'
+        req = new MyRequest
+        res = new MyResponse req
+        voContext = Test::Context.new req, res, switchMediator
+        voContext.pathParams = space: 'XXX'
+        resource.currentUser = id: 'YYY3', role: 'user'
+        try
+          yield resource.list voContext
+        catch error3
+        assert.isUndefined error3
+        yield return

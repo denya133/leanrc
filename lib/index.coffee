@@ -139,7 +139,7 @@ class LeanRC extends RC
   require('./mixins/BulkActionsResourceMixin') LeanRC
   require('./mixins/BodyParseMixin') LeanRC
   require('./mixins/CheckSessionsMixin') LeanRC
-  require('./mixins/CheckPermissionsMixin') LeanRC # need test it
+  require('./mixins/CheckPermissionsMixin') LeanRC
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC
