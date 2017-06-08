@@ -95,6 +95,106 @@ describe 'CheckPermissionsMixin', ->
         assert.isFalse isOwner
         facade.remove()
         yield return
+  describe '#_checkRole', ->
+    it 'should check if resource owner is matched', ->
+      co ->
+        KEY = 'TEST_CHECK_PERMISSIONS_MIXIN_002'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        facade = Test::Facade.getInstance KEY
+        configs = Test::Configuration.new Test::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestResource extends Test::Resource
+          @inheritProtected()
+          @include Test::CheckPermissionsMixin
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+        TestResource.initialize()
+        class TestRouter extends Test::Router
+          @inheritProtected()
+          @module Test
+        TestRouter.initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Test::Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String,
+            configurable: yes
+            default: 'TEST_SWITCH_ROUTER'
+        TestSwitch.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+          @public @async findBy: Function,
+            default: (query) ->
+              item = _.chain @[Symbol.for '~collection']
+                .values()
+                .find query
+                .value()
+              result = if item? then [ item ] else []
+              yield return LeanRC::Cursor.new @, result
+        MemoryCollection.initialize()
+        class Role extends Test::Record
+          @inheritProtected()
+          @module Test
+          @attribute spaceId: String
+          @attribute userId: String
+          @attribute rules: Object
+        Role.initialize()
+        facade.registerProxy MemoryCollection.new Test::ROLES,
+          delegate: Role
+          serializer: Test::Serializer
+        body = '{"test":"test"}'
+        class MyRequest extends IncomingMessage
+          constructor: (socket) ->
+            super socket
+            @method = 'POST'
+            @url = 'http://localhost:8888/space/SPACE123/test_entity'
+            @headers =
+              'x-forwarded-for': '192.168.0.1'
+              'content-type': 'application/json'
+              'content-length': "#{body.length}"
+            @push body
+            @push null
+        class MyResponse extends ServerResponse
+        req = new MyRequest
+        res = new MyResponse req
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        roles = facade.retrieveProxy Test::ROLES
+        yield roles.create
+          id: 'AAA1'
+          spaceId: 'XXX'
+          userId: 'YYY1'
+          rules: system: administrator: yes
+        yield roles.create
+          id: 'AAA2'
+          spaceId: 'XXX'
+          userId: 'YYY2'
+          rules: moderator: TestResource: yes
+        yield roles.create
+          id: 'AAA3'
+          spaceId: 'XXX'
+          userId: 'YYY3'
+          rules: TestResource: create: yes
+        resource = Test::TestResource.new()
+        resource.context = Test::Context.new req, res, switchMediator
+        resource.initializeNotifier KEY
+        { pointer: key } = Test::TestResource.instanceMethods['_checkRole']
+        isRole = yield resource[key] 'XXX', 'YYY', 'ZZZ'
+        assert.isFalse isRole
+        isRole = yield resource[key] 'XXX', 'YYY1', 'ZZZ'
+        assert.isTrue isRole
+        isRole = yield resource[key] 'XXX', 'YYY2', 'ZZZ'
+        assert.isTrue isRole
+        isRole = yield resource[key] 'XXX', 'YYY3', 'create'
+        assert.isTrue isRole
+        facade.remove()
+        yield return
   ###
   describe '#checkSession', ->
     it 'should check if session valid', ->
