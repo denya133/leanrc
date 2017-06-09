@@ -6,6 +6,7 @@ SimpleCommand = LeanRC::SimpleCommand
 Notification = LeanRC::Notification
 Proxy = LeanRC::Proxy
 Mediator = LeanRC::Mediator
+{ co } = LeanRC::Utils
 
 describe 'Facade', ->
   describe '.getInstance', ->
@@ -247,3 +248,69 @@ describe 'Facade', ->
         assert.isUndefined Facade[instanceMapSymbol][KEY]
         facade.remove()
       .to.not.throw Error
+  describe '.replicateObject', ->
+    application = null
+    KEY = 'TEST17'
+    after -> application?.finish?()
+    it 'should create replica for delayed queue', ->
+      co ->
+        class Test extends LeanRC
+          @inheritProtected()
+        Test.initialize()
+        class ApplicationFacade extends LeanRC::Facade
+          @inheritProtected()
+          @module Test
+          cphInstanceMap  = @protected @static instanceMap: Object
+          @public startup: Function,
+            default: (application) ->
+              @registerCommand LeanRC::STARTUP, Test::PrepareViewCommand
+              @sendNotification LeanRC::STARTUP, application
+          @public finish: Function,
+            default: ->
+          @public @static getInstance: Function,
+            default: (asKey)->
+              vhInstanceMap = Test::Facade[cphInstanceMap]
+              unless vhInstanceMap[asKey]?
+                vhInstanceMap[asKey] = ApplicationFacade.new asKey
+              vhInstanceMap[asKey]
+        ApplicationFacade.initialize()
+        class ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+        ApplicationMediator.initialize()
+        class TestApplication extends LeanRC::Application
+          @inheritProtected()
+          @module Test
+          @public @static NAME: String, { get: -> KEY }
+        TestApplication.initialize()
+        class PrepareViewCommand extends SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function,
+            default: (aoNotification)->
+              voApplication = aoNotification.getBody()
+              @facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, voApplication
+        PrepareViewCommand.initialize()
+        application = TestApplication.new()
+        replica = yield ApplicationFacade.replicateObject application.facade
+        assert.deepEqual replica,
+          type: 'instance'
+          class: 'ApplicationFacade'
+          multitonKey: KEY
+          application: 'TestApplication'
+        yield return
+  ###
+  describe '.restoreObject', ->
+    facade = null
+    KEY = 'TEST18'
+    after -> facade?.remove?()
+    it 'should restore delayed queue from replica', ->
+      co ->
+        facade = Facade.getInstance KEY
+        instanceMapSymbol = Symbol.for '~instanceMap'
+        assert.equal facade, Facade[instanceMapSymbol][KEY]
+        facade.remove()
+        assert.isUndefined Facade[instanceMapSymbol][KEY]
+        # facade.remove()
+        yield return
+  ###

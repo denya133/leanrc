@@ -143,7 +143,7 @@ module.exports = (Module)->
     # need test it
     @public @static @async replicateObject: Function,
       default: (instance)->
-        replica = @super instance
+        replica = yield @super instance
         replica.multitonKey = instance[ipsMultitonKey]
         applicationMediator = instance.retrieveMediator APPLICATION_MEDIATOR
         application = applicationMediator.getViewComponent().constructor.name
