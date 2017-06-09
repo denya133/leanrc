@@ -245,7 +245,6 @@ module.exports = (Module)->
         @$sum = asDefinition
         return @
 
-    # need test it
     @public @static @async restoreObject: Function,
       default: (Module, replica)->
         if replica?.class is @name and replica?.type is 'instance'
