@@ -2,6 +2,7 @@
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 Query = LeanRC::Query
+{ co } = LeanRC::Utils
 
 describe 'Query', ->
   describe '.new', ->
@@ -157,3 +158,53 @@ describe 'Query', ->
         $into: '@groups': {name: '@doc.name', isActive: '@doc.active'}
         $having: '@country': {$nin: ['Australia', 'Ukraine']}
         $return: {country: '@country', city: '@city', usersInCity: '@groups'}
+  describe '.replicateObject', ->
+    it 'should create replica for query', ->
+      co ->
+        query = Query.new()
+          .forIn '@doc': 'users'
+          .filter '@doc.active': {$eq: yes}
+          .collect '@country': '@doc.country', '@city': '@doc.city'
+          .into '@groups': {name: '@doc.name', isActive: '@doc.active'}
+          .having '@country': {$nin: ['Australia', 'Ukraine']}
+          .return {country: '@country', city: '@city', usersInCity: '@groups'}
+        replica = yield LeanRC::Query.replicateObject query
+        assert.deepEqual replica,
+          type: 'instance'
+          class: 'Query'
+          query:
+            '$forIn': '@doc': 'users'
+            '$join': undefined
+            '$let': undefined
+            '$filter': '@doc.active': '$eq': yes
+            '$collect': '@country': '@doc.country', '@city': '@doc.city'
+            '$into': '@groups': name: '@doc.name', isActive: '@doc.active'
+            '$having': '@country': '$nin': ['Australia', 'Ukraine']
+            '$sort': undefined,
+            '$limit': undefined,
+            '$offset': undefined,
+            '$avg': undefined,
+            '$sum': undefined,
+            '$min': undefined,
+            '$max': undefined,
+            '$count': undefined,
+            '$distinct': undefined,
+            '$remove': undefined,
+            '$insert': undefined,
+            '$update': undefined,
+            '$replace': undefined,
+            '$return': country: '@country', city: '@city', usersInCity: '@groups'
+        yield return
+  ###
+  describe '.restoreObject', ->
+    it 'should restore query from replica', ->
+      co ->
+        notification = yield LeanRC::Notification.restoreObject LeanRC,
+          type: 'instance'
+          class: 'Notification'
+          notification: name: 'XXX', body: 'YYY', type: 'ZZZ'
+        assert.equal notification.getName(), 'XXX'
+        assert.equal notification.getBody(), 'YYY'
+        assert.equal notification.getType(), 'ZZZ'
+        yield return
+  ###
