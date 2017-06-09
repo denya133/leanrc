@@ -94,7 +94,7 @@ class LeanRC extends RC
 
   require('./patterns/query_object/Query') LeanRC # need retest it
 
-  require('./patterns/observer/Notification') LeanRC # need retest it
+  require('./patterns/observer/Notification') LeanRC
   require('./patterns/observer/Notifier') LeanRC
   require('./patterns/observer/Observer') LeanRC
 
