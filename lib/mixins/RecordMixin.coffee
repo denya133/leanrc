@@ -297,11 +297,11 @@ module.exports = (Module)->
               vhResult[asAttrName] = transform.call(@).serialize aoRecord[asAttrName]
           vhResult
 
-      # need test it
       @public @static @async restoreObject: Function,
         default: (Module, replica)->
           if replica?.class is @name and replica?.type is 'instance'
-            facade = Module::ApplicationFacade.getInstance replica.multitonKey
+            Facade = Module::ApplicationFacade ? Module::Facade
+            facade = Facade.getInstance replica.multitonKey
             collection = facade.retrieveProxy replica.collectionName
             instance = if replica.isNew
               collection.build replica.attributes

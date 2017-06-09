@@ -822,7 +822,7 @@ describe 'RecordMixin', ->
           collectionName: COLLECTION
           isNew: no
           id: record.id
-        record = yield collection.build
+        record = collection.build
           test: 1000
           has: true
           word: 'test'
@@ -835,8 +835,69 @@ describe 'RecordMixin', ->
           isNew: yes
           attributes: id: null, test: 1000, has: yes, word: 'test'
         yield return
-  ###
   describe '.restoreObject', ->
+    facade = null
+    KEY = 'TEST_RECORD_13'
+    after -> facade?.remove?()
     it 'should restore record from replica', ->
-      yield return
-  ###
+      co ->
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+        Test.initialize()
+        class MyCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+        MyCollection.initialize()
+        class TestRecord extends LeanRC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @include LeanRC::ChainsMixin
+          @module Test
+          @public @static findRecordByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attr id: String
+          @attr test: Number
+          @attr has: Boolean
+          @attr word: String
+          @chains [ 'create' ]
+          @beforeHook 'beforeCreate', only: [ 'create' ]
+          @public beforeCreate: Function,
+            default: (args...) ->
+              @id ?= LeanRC::Utils.uuid.v4()
+              args
+        TestRecord.initialize()
+        COLLECTION = 'COLLECTION'
+        collection = facade.registerProxy MyCollection.new COLLECTION,
+          delegate: TestRecord
+          serializer: Test::Serializer
+        collection = facade.retrieveProxy COLLECTION
+        record = yield collection.create
+          test: 1000
+          has: true
+          word: 'test'
+        restoredRecord = yield TestRecord.restoreObject Test,
+          type: 'instance'
+          class: 'TestRecord'
+          multitonKey: KEY
+          collectionName: COLLECTION
+          isNew: no
+          id: record.id
+        assert.notEqual record, restoredRecord
+        assert.deepEqual record, restoredRecord
+        record = collection.build
+          id: '123'
+          test: 1000
+          has: true
+          word: 'test'
+        restoredRecord = yield TestRecord.restoreObject Test,
+          type: 'instance'
+          class: 'TestRecord'
+          multitonKey: KEY
+          collectionName: COLLECTION
+          isNew: yes
+          attributes: id: '123', test: 1000, has: yes, word: 'test'
+        assert.notEqual record, restoredRecord
+        assert.deepEqual record, restoredRecord
+        yield return
