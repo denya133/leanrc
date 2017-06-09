@@ -79,7 +79,7 @@ class LeanRC extends RC
   require('./utils/crypto') LeanRC
 
   require('./mixins/ConfigurableMixin') LeanRC
-  require('./mixins/RecordMixin') LeanRC # need retest it
+  require('./mixins/RecordMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
   require('./mixins/DelayableMixin') LeanRC # need retest it
 
@@ -88,7 +88,7 @@ class LeanRC extends RC
   require('./patterns/data_mapper/NumberTransform') LeanRC
   require('./patterns/data_mapper/DateTransform') LeanRC
   require('./patterns/data_mapper/BooleanTransform') LeanRC
-  require('./patterns/data_mapper/Serializer') LeanRC # need retest it
+  require('./patterns/data_mapper/Serializer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
   require('./patterns/data_mapper/DelayedQueue') LeanRC # need retest it
 
