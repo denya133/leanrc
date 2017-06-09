@@ -146,7 +146,7 @@ class LeanRC extends RC
 
   require('./patterns/iterator/Cursor') LeanRC
 
-  require('./patterns/facade/Facade') LeanRC # need retest it
+  require('./patterns/facade/Facade') LeanRC
 
   require('./core/View') LeanRC
   require('./core/Model') LeanRC
