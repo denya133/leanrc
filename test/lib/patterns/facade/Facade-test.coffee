@@ -252,7 +252,7 @@ describe 'Facade', ->
     application = null
     KEY = 'TEST17'
     after -> application?.finish?()
-    it 'should create replica for delayed queue', ->
+    it 'should create replica for facade', ->
       co ->
         class Test extends LeanRC
           @inheritProtected()
@@ -303,7 +303,7 @@ describe 'Facade', ->
     application = null
     KEY = 'TEST18'
     after -> application?.finish?()
-    it 'should create replica for delayed queue', ->
+    it 'should create replica for facade', ->
       co ->
         class Test extends LeanRC
           @inheritProtected()

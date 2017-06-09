@@ -2,6 +2,7 @@
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 Notification = LeanRC::Notification
+{ co } = LeanRC::Utils
 
 NOTIFICATION_NAME = 'TEST_NOTIFICATION'
 NOTIFICATION_BODY =
@@ -41,3 +42,43 @@ describe 'Notification', ->
       notification.setType NOTIFICATION_TYPE
       expect notification.getType()
       .to.equal NOTIFICATION_TYPE
+  describe '.replicateObject', ->
+    it 'should create replica for notification', ->
+      co ->
+        notification = LeanRC::Notification.new 'XXX', 'YYY', 'ZZZ'
+        replica = yield LeanRC::Notification.replicateObject notification
+        assert.deepEqual replica, type: 'instance', class: 'Notification'
+        yield return
+  ###
+  describe '.restoreObject', ->
+    facade = null
+    KEY = 'TEST_SERIALIZER_002'
+    after -> facade?.remove?()
+    it 'should restore notification from replica', ->
+      co ->
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+        Test.initialize()
+        class MyCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+        MyCollection.initialize()
+        class MySerializer extends LeanRC::Serializer
+          @inheritProtected()
+          @module Test
+        MySerializer.initialize()
+        COLLECTION = 'COLLECTION'
+        collection = facade.registerProxy MyCollection.new COLLECTION,
+          delegate: Test::Record
+          serializer: MySerializer
+        collection = facade.retrieveProxy COLLECTION
+        restoredRecord = yield MySerializer.restoreObject Test,
+          type: 'instance'
+          class: 'MySerializer'
+          multitonKey: KEY
+          collectionName: COLLECTION
+        assert.deepEqual collection.serializer, restoredRecord
+        yield return
+  ###
