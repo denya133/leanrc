@@ -64,7 +64,7 @@ describe 'Serializer', ->
     facade = null
     KEY = 'TEST_SERIALIZER_001'
     after -> facade?.remove?()
-    it 'should create replica for record', ->
+    it 'should create replica for serializer', ->
       co ->
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
@@ -95,7 +95,7 @@ describe 'Serializer', ->
     facade = null
     KEY = 'TEST_SERIALIZER_002'
     after -> facade?.remove?()
-    it 'should restore record from replica', ->
+    it 'should restore serializer from replica', ->
       co ->
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
