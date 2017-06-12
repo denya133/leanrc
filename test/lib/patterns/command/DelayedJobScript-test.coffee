@@ -12,7 +12,7 @@ describe 'DelayedJobScript', ->
         assert.instanceOf command, LeanRC::DelayedJobScript
         yield return
   describe '#body', ->
-    it 'should run delayed job script (sync)', ->
+    it 'should run delayed job script (class, sync)', ->
       co ->
         KEY = 'TEST_DELAYED_JOB_SCRIPT_001'
         facade = LeanRC::Facade.getInstance KEY
@@ -48,9 +48,45 @@ describe 'DelayedJobScript', ->
         assert.deepEqual data, [ 'ARG_1', 'ARG_2', 'ARG_3' ]
         facade.remove()
         yield return
-    it 'should run delayed job script (async)', ->
+    it 'should run delayed job script (instance, sync)', ->
       co ->
         KEY = 'TEST_DELAYED_JOB_SCRIPT_002'
+        facade = LeanRC::Facade.getInstance KEY
+        trigger = new EventEmitter
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root2"
+        Test.initialize()
+        class TestScript extends LeanRC::DelayedJobScript
+          @inheritProtected()
+          @module Test
+        TestScript.initialize()
+        class TestClass extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+          @public test: Function,
+            default: (args...) ->
+              trigger.emit 'RUN_SCRIPT', args
+              return
+        TestClass.initialize()
+        command = TestScript.new()
+        command.initializeNotifier KEY
+        promise = LeanRC::Promise.new (resolve, reject) ->
+          trigger.once 'RUN_SCRIPT', (options) -> resolve options
+          return
+        body =
+          moduleName: 'Test'
+          replica: yield TestClass.replicateObject TestClass.new()
+          methodName: 'test'
+          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+        command.execute LeanRC::Notification.new 'TEST', body, 'TEST_TYPE'
+        data = yield promise
+        assert.deepEqual data, [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+        facade.remove()
+        yield return
+    it 'should run delayed job script (class, async)', ->
+      co ->
+        KEY = 'TEST_DELAYED_JOB_SCRIPT_003'
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
         class Test extends LeanRC::Module
@@ -77,6 +113,42 @@ describe 'DelayedJobScript', ->
         body =
           moduleName: 'Test'
           replica: yield TestClass.constructor.replicateObject TestClass
+          methodName: 'test'
+          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+        command.execute LeanRC::Notification.new 'TEST', body, 'TEST_TYPE'
+        data = yield promise
+        assert.deepEqual data, [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+        facade.remove()
+        yield return
+    it 'should run delayed job script (instance, async)', ->
+      co ->
+        KEY = 'TEST_DELAYED_JOB_SCRIPT_004'
+        facade = LeanRC::Facade.getInstance KEY
+        trigger = new EventEmitter
+        class Test extends LeanRC::Module
+          @inheritProtected()
+          @root "#{__dirname}/config/root2"
+        Test.initialize()
+        class TestScript extends LeanRC::DelayedJobScript
+          @inheritProtected()
+          @module Test
+        TestScript.initialize()
+        class TestClass extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+          @public @async test: Function,
+            default: (args...) ->
+              trigger.emit 'RUN_SCRIPT', args
+              yield return
+        TestClass.initialize()
+        command = TestScript.new()
+        command.initializeNotifier KEY
+        promise = LeanRC::Promise.new (resolve, reject) ->
+          trigger.once 'RUN_SCRIPT', (options) -> resolve options
+          return
+        body =
+          moduleName: 'Test'
+          replica: yield TestClass.replicateObject TestClass.new()
           methodName: 'test'
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
         command.execute LeanRC::Notification.new 'TEST', body, 'TEST_TYPE'
