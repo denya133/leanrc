@@ -3,19 +3,22 @@ sinon = require 'sinon'
 crypto = require 'crypto'
 LeanRC = require.main.require 'lib'
 { co } = LeanRC::Utils
+_ = require 'lodash'
 
 describe 'Utils.crypto*', ->
   describe 'Utils.genRandomAlphaNumbers', ->
     it 'should generate random alphanumeric string', ->
       co ->
-        NUMBER = 12000
+        NUMBER = 1000
         LENGTH = 16
         codes = []
         for i in [ 1 .. NUMBER ]
           code = LeanRC::Utils.genRandomAlphaNumbers LENGTH
-          assert.isFalse code in codes, 'Collision detected'
+          # assert.isFalse code in codes, 'Collision detected'
           codes.push code
+        u_codes = _.uniq codes
         assert.lengthOf codes, NUMBER
+        assert.equal codes.length, u_codes.length
         yield return
   describe 'Utils.hashPassword', ->
     it 'should get password hash and salt', ->
