@@ -109,7 +109,7 @@ class LeanRC extends RC
   require('./patterns/gateway/Endpoint') LeanRC
 
   require('./mixins/CrudGatewayMixin') LeanRC
-  require('./mixins/CrudEndpointMixin') LeanRC # needs test
+  require('./mixins/CrudEndpointMixin') LeanRC
   require('./mixins/HttpCollectionMixin') LeanRC
   require('./mixins/MemoryCollectionMixin') LeanRC
   require('./mixins/MemoryResqueMixin') LeanRC
