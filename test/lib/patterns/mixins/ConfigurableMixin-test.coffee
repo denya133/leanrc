@@ -31,4 +31,5 @@ describe 'ConfigurableMixin', ->
         assert.deepPropertyVal object, 'configs.test2', 42
         assert.deepPropertyVal object, 'configs.test3', yes
         assert.deepPropertyVal object, 'configs.test4', 'test'
+        facade.remove()
         yield return

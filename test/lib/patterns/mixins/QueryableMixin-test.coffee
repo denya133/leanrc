@@ -93,6 +93,7 @@ describe 'QueryableMixin', ->
         assert.isDefined record1
         assert.equal record1.test, 'test2'
         assert.isUndefined record2
+        facade.remove()
         yield return
   describe '#exists', ->
     it 'should check data existance by query', ->
@@ -139,6 +140,7 @@ describe 'QueryableMixin', ->
         yield queryable.create test: 'test4'
         assert.isTrue yield queryable.exists { test: 'test2' }
         assert.isFalse yield queryable.exists { test: 'test5' }
+        facade.remove()
         yield return
   describe '#findBy', ->
     it 'should find data by query', ->
@@ -192,6 +194,7 @@ describe 'QueryableMixin', ->
         assert.equal record1.test, 'test2'
         record2 = yield (yield queryable.findBy { test: 'test5' }).next()
         assert.isUndefined record2
+        facade.remove()
         yield return
   describe '#deleteBy', ->
     it 'should mark data as deleted by query', ->
@@ -262,6 +265,7 @@ describe 'QueryableMixin', ->
           else
             assert.propertyVal rawData, 'isHidden', no, 'Record was removed'
             assert.isNull rawData.deletedAt, 'Record deleted data is not null'
+        facade.remove()
         yield return
   describe '#removeBy', ->
     it 'should remove data by query', ->
@@ -332,6 +336,7 @@ describe 'QueryableMixin', ->
         data = queryable.getData()
         assert.lengthOf data, 2, 'Records did not removed'
         assert.lengthOf _.filter(data, { test: 'test2' }), 0, 'Found removed records'
+        facade.remove()
         yield return
   describe '#destroyBy', ->
     it 'should remove records by query', ->
@@ -394,6 +399,7 @@ describe 'QueryableMixin', ->
         data = queryable.getData()
         assert.lengthOf data, 2, 'Records did not removed'
         assert.lengthOf _.filter(data, { test: 'test2' }), 0, 'Found removed records'
+        facade.remove()
         yield return
   describe '#overrideBy', ->
     it 'should update data in records by query', ->
@@ -472,6 +478,7 @@ describe 'QueryableMixin', ->
             assert.propertyVal rawData, 'updated', yes, 'Record was not overriden'
           else
             assert.propertyVal rawData, 'updated', no, 'Record was overriden'
+        facade.remove()
         yield return
   describe '#replaceBy', ->
     it 'should update data in records by query', ->
@@ -540,6 +547,7 @@ describe 'QueryableMixin', ->
             assert.propertyVal rawData, 'updated', yes, 'Record was not replaced'
           else
             assert.propertyVal rawData, 'updated', no, 'Record was replaced'
+        facade.remove()
         yield return
   describe '#updateBy', ->
     it 'should update data in records by query', ->
@@ -608,6 +616,7 @@ describe 'QueryableMixin', ->
             assert.propertyVal rawData, 'updated', yes, 'Record was not updated'
           else
             assert.propertyVal rawData, 'updated', no, 'Record was updated'
+        facade.remove()
         yield return
   describe '#patchBy', ->
     it 'should update data in records by query', ->
@@ -674,4 +683,5 @@ describe 'QueryableMixin', ->
             assert.propertyVal rawData, 'updated', yes, 'Record was not patched'
           else
             assert.propertyVal rawData, 'updated', no, 'Record was patched'
+        facade.remove()
         yield return

@@ -90,6 +90,7 @@ describe 'BulkActionsResourceMixin', ->
           offset: 'not defined'
         assert.propertyVal items[0], 'test', 'test1'
         assert.propertyVal items[1], 'test', 'test2'
+        facade.remove()
         yield return
   describe '#bulkUpdate', ->
     it 'should update resource multiple items', ->
@@ -172,6 +173,7 @@ describe 'BulkActionsResourceMixin', ->
         assert.lengthOf items, 2
         for record in items
           assert.propertyVal record, 'test', 'test8'
+        facade.remove()
         yield return
   describe '#bulkPatch', ->
     it 'should update resource multiple items', ->
@@ -254,6 +256,7 @@ describe 'BulkActionsResourceMixin', ->
         assert.lengthOf items, 2
         for record in items
           assert.propertyVal record, 'test', 'test8'
+        facade.remove()
         yield return
   describe '#bulkDelete', ->
     it 'should remove resource multiple items', ->
@@ -331,4 +334,5 @@ describe 'BulkActionsResourceMixin', ->
 
         assert.lengthOf collection.getData().data, 1
         assert.lengthOf _.filter(collection.getData().data, test: 'test2'), 0
+        facade.remove()
         yield return

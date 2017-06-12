@@ -44,6 +44,7 @@ describe 'MigrateCommand', ->
         assert.equal command.migrationsCollection, facade.retrieveProxy LeanRC::MIGRATIONS
         assert.isNotNull command.migrationsCollection
         assert.isDefined command.migrationsCollection
+        facade.remove()
         yield return
   describe '#migrationsDir', ->
     it 'should get migrations directory path', ->
@@ -82,6 +83,7 @@ describe 'MigrateCommand', ->
         command.initializeNotifier KEY
         { migrationsDir } = command
         assert.equal migrationsDir, "#{Test::ROOT}/migrations"
+        facade.remove()
         yield return
   describe '#migrationNames', ->
     it 'should get migration names', ->
@@ -124,6 +126,7 @@ describe 'MigrateCommand', ->
         command.initializeNotifier KEY
         migrationNames = command.migrationNames
         assert.deepEqual migrationNames, [ '01_migration', '02_migration', '03_migration' ]
+        facade.remove()
         yield return
   describe '#migrate', ->
     it 'should run migrations', ->
@@ -174,6 +177,7 @@ describe 'MigrateCommand', ->
         for migrationName in migrationNames
           assert.property collectionData, migrationName
           break  if migrationName is untilName
+        facade.remove()
         yield return
   describe '#execute', ->
     it 'should run migrations via "execute"', ->
@@ -230,4 +234,5 @@ describe 'MigrateCommand', ->
         command.execute until: untilName
         options = yield promise
         assert.deepEqual options, until: untilName
+        facade.remove()
         yield return

@@ -52,6 +52,7 @@ describe 'MemoryCollectionMixin', ->
         yield collection.push record
         assert.equal record, spyPush.args[0][0]
         assert.deepEqual record.toJSON(), collection[Symbol.for '~collection'][record.id]
+        facade.remove()
         yield return
   describe '#remove', ->
     it 'should remove data from collection', ->
@@ -84,6 +85,7 @@ describe 'MemoryCollectionMixin', ->
         assert.deepEqual record.toJSON(), collection[Symbol.for '~collection'][record.id]
         yield record.destroy()
         assert.isUndefined collection[Symbol.for '~collection'][record.id]
+        facade.remove()
         yield return
   describe '#take', ->
     it 'should get data item by id from collection', ->
@@ -117,6 +119,7 @@ describe 'MemoryCollectionMixin', ->
         assert.notEqual record, recordDuplicate
         for attribute in Test::TestRecord.attributes
           assert.equal record[attribute], recordDuplicate[attribute]
+        facade.remove()
         yield return
   describe '#takeMany', ->
     it 'should get data items by id list from collection', ->
@@ -155,6 +158,7 @@ describe 'MemoryCollectionMixin', ->
         for i in [ 1 .. count ]
           for attribute in Test::TestRecord.attributes
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
+        facade.remove()
         yield return
   describe '#takeAll', ->
     it 'should get all data items from collection', ->
@@ -192,6 +196,7 @@ describe 'MemoryCollectionMixin', ->
         for i in [ 1 .. count ]
           for attribute in Test::TestRecord.attributes
             assert.equal originalRecords[i][attribute], recordDuplicates[i][attribute]
+        facade.remove()
         yield return
   describe '#override', ->
     it 'should replace data item by id in collection', ->
@@ -229,6 +234,7 @@ describe 'MemoryCollectionMixin', ->
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'
         assert.propertyVal updatedRecord, 'test', 'test2'
+        facade.remove()
         yield return
   describe '#patch', ->
     it 'should update data item by id in collection', ->
@@ -266,6 +272,7 @@ describe 'MemoryCollectionMixin', ->
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'
         assert.propertyVal updatedRecord, 'test', 'test2'
+        facade.remove()
         yield return
   describe '#includes', ->
     it 'should test if item is included in the collection', ->
@@ -298,6 +305,7 @@ describe 'MemoryCollectionMixin', ->
         assert.isDefined record
         includes = yield collection.includes record.id
         assert.isTrue includes
+        facade.remove()
         yield return
   describe '#length', ->
     it 'should count items in the collection', ->
@@ -331,4 +339,5 @@ describe 'MemoryCollectionMixin', ->
           yield collection.create test: 'test1'
         length = yield collection.length()
         assert.equal count, length
+        facade.remove()
         yield return

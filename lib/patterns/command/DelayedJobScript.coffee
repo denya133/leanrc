@@ -24,23 +24,23 @@ module.exports = (Module)->
       unless moduleName is @Module.name
         throw new Error "Job was defined with moduleName = `#{moduleName}`, but its Module = `#{@Module.name}`"
         yield return
-      if replica.type is 'class'
-        replicated = yield Class.restoreObject @Module, replica
-        if (config = replicated.classMethods[methodName]).async is ASYNC
-          yield replicated[config.pointer]? args...
+      switch replica.type
+        when 'class'
+          replicated = yield Class.restoreObject @Module, replica
+          if (config = replicated.classMethods[methodName]).async is ASYNC
+            yield replicated[config.pointer]? args...
+          else
+            replicated[config.pointer]? args...
+        when 'instance'
+          vcInstanceClass = @Module::[replica.class]
+          replicated = yield vcInstanceClass.restoreObject @Module, replica
+          if (config = vcInstanceClass.instanceMethods[methodName]).async is ASYNC
+            yield replicated[config.pointer]? args...
+          else
+            replicated[config.pointer]? args...
         else
-          replicated[config.pointer]? args...
-        yield return
-      else if replica.type is 'instance'
-        replicated = yield @Module.restoreObject @Module, replica
-        if (config = replicated.instanceMethods[methodName]).async is ASYNC
-          yield replicated[config.pointer]? args...
-        else
-          replicated[config.pointer]? args...
-        yield return
-      else
-        throw new Error 'Replica type must be `instance` or `class`'
-        yield return
+          throw new Error 'Replica type must be `instance` or `class`'
+      yield return
 
 
   DelayedJobScript.initialize()

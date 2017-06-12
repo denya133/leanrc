@@ -2,6 +2,7 @@
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 Notification = LeanRC::Notification
+{ co } = LeanRC::Utils
 
 NOTIFICATION_NAME = 'TEST_NOTIFICATION'
 NOTIFICATION_BODY =
@@ -41,3 +42,24 @@ describe 'Notification', ->
       notification.setType NOTIFICATION_TYPE
       expect notification.getType()
       .to.equal NOTIFICATION_TYPE
+  describe '.replicateObject', ->
+    it 'should create replica for notification', ->
+      co ->
+        notification = LeanRC::Notification.new 'XXX', 'YYY', 'ZZZ'
+        replica = yield LeanRC::Notification.replicateObject notification
+        assert.deepEqual replica,
+          type: 'instance'
+          class: 'Notification'
+          notification: name: 'XXX', body: 'YYY', type: 'ZZZ'
+        yield return
+  describe '.restoreObject', ->
+    it 'should restore notification from replica', ->
+      co ->
+        notification = yield LeanRC::Notification.restoreObject LeanRC,
+          type: 'instance'
+          class: 'Notification'
+          notification: name: 'XXX', body: 'YYY', type: 'ZZZ'
+        assert.equal notification.getName(), 'XXX'
+        assert.equal notification.getBody(), 'YYY'
+        assert.equal notification.getType(), 'ZZZ'
+        yield return

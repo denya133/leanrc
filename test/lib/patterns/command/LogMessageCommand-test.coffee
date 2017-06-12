@@ -32,4 +32,5 @@ describe 'LogMessageCommand', ->
         body = data: 'data'
         command.execute LeanRC::Notification.new 'TEST', body, 'TYPE'
         assert.isTrue spyAddLogEntry.calledWith body
+        facade.remove()
         yield return

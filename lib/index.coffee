@@ -75,26 +75,26 @@ class LeanRC extends RC
   require('./interfaces/core/ModelInterface') LeanRC
   require('./interfaces/core/ViewInterface') LeanRC
 
-  require('./utils/jwt') LeanRC # needs testing
-  require('./utils/crypto') LeanRC # needs testing
+  require('./utils/jwt') LeanRC
+  require('./utils/crypto') LeanRC
 
   require('./mixins/ConfigurableMixin') LeanRC
-  require('./mixins/RecordMixin') LeanRC # need retest it
+  require('./mixins/RecordMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
-  require('./mixins/DelayableMixin') LeanRC # need retest it
+  require('./mixins/DelayableMixin') LeanRC
 
   require('./patterns/data_mapper/Transform') LeanRC
   require('./patterns/data_mapper/StringTransform') LeanRC
   require('./patterns/data_mapper/NumberTransform') LeanRC
   require('./patterns/data_mapper/DateTransform') LeanRC
   require('./patterns/data_mapper/BooleanTransform') LeanRC
-  require('./patterns/data_mapper/Serializer') LeanRC # need retest it
+  require('./patterns/data_mapper/Serializer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
-  require('./patterns/data_mapper/DelayedQueue') LeanRC # need retest it
+  require('./patterns/data_mapper/DelayedQueue') LeanRC
 
-  require('./patterns/query_object/Query') LeanRC # need retest it
+  require('./patterns/query_object/Query') LeanRC
 
-  require('./patterns/observer/Notification') LeanRC # need retest it
+  require('./patterns/observer/Notification') LeanRC
   require('./patterns/observer/Notifier') LeanRC
   require('./patterns/observer/Observer') LeanRC
 
@@ -134,19 +134,19 @@ class LeanRC extends RC
   require('./patterns/command/MigrateCommand') LeanRC
   require('./patterns/command/RollbackCommand') LeanRC
   require('./patterns/command/Script') LeanRC
-  require('./patterns/command/DelayedJobScript') LeanRC # need retest it
+  require('./patterns/command/DelayedJobScript') LeanRC
 
   require('./mixins/BulkActionsResourceMixin') LeanRC
   require('./mixins/BodyParseMixin') LeanRC
   require('./mixins/CheckSessionsMixin') LeanRC
-  require('./mixins/CheckPermissionsMixin') LeanRC # need test it
+  require('./mixins/CheckPermissionsMixin') LeanRC
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC
 
   require('./patterns/iterator/Cursor') LeanRC
 
-  require('./patterns/facade/Facade') LeanRC # need retest it
+  require('./patterns/facade/Facade') LeanRC
 
   require('./core/View') LeanRC
   require('./core/Model') LeanRC

@@ -289,3 +289,59 @@ describe 'DelayedQueue', ->
         assert.equal spyMethod.args[0][0], 'TEST_QUEUE'
         assert.equal spyMethod.args[0][1], 'TEST_SCRIPT'
         yield return
+  describe '.replicateObject', ->
+    facade = null
+    KEY = 'TEST_DELAYED_QUEUE_001'
+    after -> facade?.remove?()
+    it 'should create replica for delayed queue', ->
+      co ->
+        RESQUE = 'RESQUE'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+        Test.initialize()
+        class TestResque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        TestResque.initialize()
+        facade.registerProxy TestResque.new RESQUE
+        resque = facade.retrieveProxy RESQUE
+        NAME = 'TEST_QUEUE'
+        queue = yield resque.create NAME, 4
+        replica = yield Test::DelayedQueue.replicateObject queue
+        assert.deepEqual replica,
+          type: 'instance'
+          class: 'DelayedQueue'
+          multitonKey: KEY
+          resqueName: RESQUE
+          name: NAME
+        yield return
+  describe '.restoreObject', ->
+    facade = null
+    KEY = 'TEST_DELAYED_QUEUE_002'
+    after -> facade?.remove?()
+    it 'should restore delayed queue from replica', ->
+      co ->
+        RESQUE = 'RESQUE'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+        Test.initialize()
+        class TestResque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        TestResque.initialize()
+        facade.registerProxy TestResque.new RESQUE
+        resque = facade.retrieveProxy RESQUE
+        NAME = 'TEST_QUEUE'
+        queue = yield resque.create NAME, 4
+        restoredQueue = yield Test::DelayedQueue.restoreObject Test,
+          type: 'instance'
+          class: 'DelayedQueue'
+          multitonKey: KEY
+          resqueName: RESQUE
+          name: NAME
+        assert.deepEqual queue, restoredQueue
+        yield return
