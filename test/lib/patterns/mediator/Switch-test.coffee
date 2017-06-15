@@ -689,6 +689,7 @@ describe 'Switch', ->
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         switchMediator.del 'TEST'
         assert.isTrue spyDelete.calledWith 'TEST'
+        facade.remove()
         yield return
   describe '#createMethod', ->
     it 'should create method handler', ->
