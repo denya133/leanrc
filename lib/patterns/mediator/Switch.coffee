@@ -196,7 +196,7 @@ module.exports = (Module)->
       args: []
       return: NILL
       default: ->
-        {port} = @configs
+        port = process?.env?.PORT ? @configs.port
         { facade } = @
         {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         http = require 'http'
