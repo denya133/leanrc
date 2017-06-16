@@ -29,7 +29,7 @@ module.exports = (Module)->
           yield vlRecords.forEach (aoRecord)-> yield aoRecord.destroy()
           return
 
-      @public @async @async removeBy: Function,
+      @public @async removeBy: Function,
         default: (query)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
