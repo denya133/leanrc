@@ -32,6 +32,7 @@ module.exports = (Module)->
     ANY
     NILL
     LAMBDA
+    MIGRATIONS
     APPLICATION_ROUTER
     APPLICATION_MEDIATOR
     HANDLER_RESULT
@@ -319,6 +320,15 @@ module.exports = (Module)->
 
     @public defineRoutes: Function,
       default: ->
+        @all '/*', co.wrap (context, next)=>
+          voMigrations = @facade.retrieveProxy MIGRATIONS
+          [..., lastMigration] = @Module::MIGRATION_NAMES
+          includes = yield voMigrations.includes lastMigration
+          if includes
+            yield return next?()
+          else
+            throw new Error 'Code schema version is not equal current DB version'
+            yield return
         voRouter = @facade.retrieveProxy @routerName ? APPLICATION_ROUTER
         voRouter.routes.forEach (aoRoute)=>
           @createNativeRoute aoRoute
