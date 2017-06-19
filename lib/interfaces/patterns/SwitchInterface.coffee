@@ -32,9 +32,9 @@ module.exports = (Module)->
         args: [String, Object, Object]
         return: NILL
 
-      @public @virtual defineSwaggerEndpoint: Function,
-        args: [Object, String, String]
-        return: NILL
+      # @public @virtual defineSwaggerEndpoint: Function,
+      #   args: [Object, String, String]
+      #   return: NILL
 
       @public @virtual createNativeRoute: Function,
         args: [Object]

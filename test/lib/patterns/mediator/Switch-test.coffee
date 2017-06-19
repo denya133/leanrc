@@ -342,50 +342,50 @@ describe 'Switch', ->
         ]
         facade.remove()
       .to.not.throw Error
-  describe '#defineSwaggerEndpoint', ->
-    it 'should define swagger endpoint', ->
-      expect ->
-        RESOURCE = 'test'
-        facade = Facade.getInstance 'TEST_SWITCH_7'
-        gateway = LeanRC::Gateway.new "#{RESOURCE}Gateway"
-        listEndpoint = LeanRC::Endpoint.new { gateway }
-        listEndpoint.tag 'TAG'
-        listEndpoint.header 'header', {}, 'test header'
-        listEndpoint.pathParam 'path-param', {}, 'test path param'
-        listEndpoint.queryParam 'query-param', {}, 'test query param'
-        listEndpoint.body {}, ['text/plain'], 'DESCRIPTION'
-        listEndpoint.response 200, {}, ['text/plain'], 'DESCRIPTION'
-        listEndpoint.error 500, {}, ['text/plain'], 'DESCRIPTION'
-        listEndpoint.summary 'TEST_SUMMARY'
-        listEndpoint.description 'DESCRIPTION'
-        listEndpoint.deprecated yes
-        gateway.registerEndpoints list: listEndpoint
-        facade.registerProxy gateway
-        class Test extends LeanRC
-          @inheritProtected()
-          @root "#{__dirname}/config/root"
-        Test.initialize()
-        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
-        facade.registerProxy configs
-        class TestRouter extends LeanRC::Router
-          @inheritProtected()
-          @module Test
-        TestRouter.initialize()
-        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
-        class TestSwitch extends Switch
-          @inheritProtected()
-          @module Test
-          @public routerName: String,
-            configurable: yes
-            default: 'TEST_SWITCH_ROUTER'
-        TestSwitch.initialize()
-        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
-        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        voEndpoint = LeanRC::Endpoint.new { gateway }
-        switchMediator.defineSwaggerEndpoint voEndpoint, RESOURCE, 'list'
-        assert.deepEqual listEndpoint, voEndpoint, 'Endpoints are not equivalent'
-        facade.remove()
-      .to.not.throw Error
+  # describe '#defineSwaggerEndpoint', ->
+  #   it 'should define swagger endpoint', ->
+  #     expect ->
+  #       RESOURCE = 'test'
+  #       facade = Facade.getInstance 'TEST_SWITCH_7'
+  #       gateway = LeanRC::Gateway.new "#{RESOURCE}Gateway"
+  #       listEndpoint = LeanRC::Endpoint.new { gateway }
+  #       listEndpoint.tag 'TAG'
+  #       listEndpoint.header 'header', {}, 'test header'
+  #       listEndpoint.pathParam 'path-param', {}, 'test path param'
+  #       listEndpoint.queryParam 'query-param', {}, 'test query param'
+  #       listEndpoint.body {}, ['text/plain'], 'DESCRIPTION'
+  #       listEndpoint.response 200, {}, ['text/plain'], 'DESCRIPTION'
+  #       listEndpoint.error 500, {}, ['text/plain'], 'DESCRIPTION'
+  #       listEndpoint.summary 'TEST_SUMMARY'
+  #       listEndpoint.description 'DESCRIPTION'
+  #       listEndpoint.deprecated yes
+  #       gateway.registerEndpoints list: listEndpoint
+  #       facade.registerProxy gateway
+  #       class Test extends LeanRC
+  #         @inheritProtected()
+  #         @root "#{__dirname}/config/root"
+  #       Test.initialize()
+  #       configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+  #       facade.registerProxy configs
+  #       class TestRouter extends LeanRC::Router
+  #         @inheritProtected()
+  #         @module Test
+  #       TestRouter.initialize()
+  #       facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+  #       class TestSwitch extends Switch
+  #         @inheritProtected()
+  #         @module Test
+  #         @public routerName: String,
+  #           configurable: yes
+  #           default: 'TEST_SWITCH_ROUTER'
+  #       TestSwitch.initialize()
+  #       facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+  #       switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+  #       voEndpoint = LeanRC::Endpoint.new { gateway }
+  #       switchMediator.defineSwaggerEndpoint voEndpoint, RESOURCE, 'list'
+  #       assert.deepEqual listEndpoint, voEndpoint, 'Endpoints are not equivalent'
+  #       facade.remove()
+  #     .to.not.throw Error
   describe '.compose', ->
     it 'should dispatch middlewares', ->
       co ->

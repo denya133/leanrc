@@ -330,39 +330,39 @@ module.exports = (Module)->
         @sendNotification resourceName, aoMessage, action
         return
 
-    @public defineSwaggerEndpoint: Function,
-      default: (aoSwaggerEndpoint, resourceName, action)->
-        voGateway = @facade.retrieveProxy "#{resourceName}Gateway"
-        {
-          tags
-          headers
-          pathParams
-          queryParams
-          payload
-          responses
-          errors
-          title
-          synopsis
-          isDeprecated
-        } = voGateway.swaggerDefinitionFor action
-        tags?.forEach (tag)->
-          aoSwaggerEndpoint.tag tag
-        headers?.forEach ({name, schema, description})->
-          aoSwaggerEndpoint.header name, schema, description
-        pathParams?.forEach ({name, schema, description})->
-          aoSwaggerEndpoint.pathParam name, schema, description
-        queryParams?.forEach ({name, schema, description})->
-          aoSwaggerEndpoint.queryParam name, schema, description
-        if payload?
-          aoSwaggerEndpoint.body payload.schema, payload.mimes, payload.description
-        responses?.forEach ({status, schema, mimes, description})->
-          aoSwaggerEndpoint.response status, schema, mimes, description
-        errors?.forEach ({status, description})->
-          aoSwaggerEndpoint.error status, description
-        aoSwaggerEndpoint.summary title            if title?
-        aoSwaggerEndpoint.description synopsis     if synopsis?
-        aoSwaggerEndpoint.deprecated isDeprecated  if isDeprecated?
-        return
+    # @public defineSwaggerEndpoint: Function,
+    #   default: (aoSwaggerEndpoint, resourceName, action)->
+    #     voGateway = @facade.retrieveProxy "#{resourceName}Gateway"
+    #     {
+    #       tags
+    #       headers
+    #       pathParams
+    #       queryParams
+    #       payload
+    #       responses
+    #       errors
+    #       title
+    #       synopsis
+    #       isDeprecated
+    #     } = voGateway.swaggerDefinitionFor action
+    #     tags?.forEach (tag)->
+    #       aoSwaggerEndpoint.tag tag
+    #     headers?.forEach ({name, schema, description})->
+    #       aoSwaggerEndpoint.header name, schema, description
+    #     pathParams?.forEach ({name, schema, description})->
+    #       aoSwaggerEndpoint.pathParam name, schema, description
+    #     queryParams?.forEach ({name, schema, description})->
+    #       aoSwaggerEndpoint.queryParam name, schema, description
+    #     if payload?
+    #       aoSwaggerEndpoint.body payload.schema, payload.mimes, payload.description
+    #     responses?.forEach ({status, schema, mimes, description})->
+    #       aoSwaggerEndpoint.response status, schema, mimes, description
+    #     errors?.forEach ({status, description})->
+    #       aoSwaggerEndpoint.error status, description
+    #     aoSwaggerEndpoint.summary title            if title?
+    #     aoSwaggerEndpoint.description synopsis     if synopsis?
+    #     aoSwaggerEndpoint.deprecated isDeprecated  if isDeprecated?
+    #     return
 
     @public createNativeRoute: Function,
       default: (opts)->
