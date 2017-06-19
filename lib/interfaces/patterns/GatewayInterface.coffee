@@ -9,6 +9,10 @@ module.exports = (Module)->
         args: [String, Function]
         return: Module::NILL
 
+      @public registerEndpoints: Function,
+        args: [Object]
+        return: Module::NILL
+
       @public @virtual swaggerDefinitionFor: Function,
         args: [String]
         return: Module::EndpointInterface

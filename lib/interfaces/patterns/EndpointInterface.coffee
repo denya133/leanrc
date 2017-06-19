@@ -7,7 +7,7 @@ module.exports = (Module)->
     class EndpointInterface extends BaseClass
       @inheritProtected()
 
-      @public @virtual gateway: Module::GatewayInterface
+      @public @virtual gateway: Module::ProxyInterface
 
       @public @virtual tags: Array
       @public @virtual headers: Array

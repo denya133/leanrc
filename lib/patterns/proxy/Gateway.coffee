@@ -29,14 +29,14 @@ module.exports = (App)->
           entityName: 'tomato'
           schema: App::TomatoRecord.schema
           endpoints: {
-            changeColor: App::TomatosChangeColorEndpoint.new()
+            changeColor: App::TomatosChangeColorEndpoint
           }
         @facade.registerProxy Module::Gateway.new 'AuthGateway',
           entityName: 'user'
           endpoints: {
-            signin: App::AuthSigninEndpoint.new()
-            signout: App::AuthSignoutEndpoint.new()
-            whoami: App::AuthWhoamiEndpoint.new()
+            signin: App::AuthSigninEndpoint
+            signout: App::AuthSignoutEndpoint
+            whoami: App::AuthWhoamiEndpoint
           }
         #...
         return
@@ -54,24 +54,30 @@ module.exports = (Module)->
     ipoEndpoints = @private endpoints: Object
 
     @public swaggerDefinition: Function,
-      args: [String, Function]
-      return: Module::NILL
       default: (asAction, lambda = (aoData)-> aoData)->
         voEndpoint = lambda.apply @, [Module::Endpoint.new(gateway: @)]
         @[ipoEndpoints] ?= {}
         @[ipoEndpoints][asAction] = voEndpoint
         return
 
+    @public registerEndpoints: Function,
+      default: (ahConfig)->
+        @[ipoEndpoints] ?= {}
+        for own asAction, aoEndpoint of ahConfig
+          @[ipoEndpoints][asAction] = aoEndpoint
+        return
+
     @public swaggerDefinitionFor: Function,
-      args: [String]
-      return: Module::EndpointInterface
       default: (asAction)-> @[ipoEndpoints]?[asAction]
 
     @public onRegister: Function,
       default: (args...)->
         @super args...
-        {endpoints} = @getData()
-        @[ipoEndpoints] = Module::Utils.extend {}, (@[ipoEndpoints] ? {}), endpoints
+        {endpoints} = @getData() ? {}
+        if endpoints?
+          @[ipoEndpoints] ?= {}
+          for own asAction, acEndpoint of endpoints
+            @[ipoEndpoints][asAction] = acEndpoint.new gateway: @
         return
 
 

@@ -98,6 +98,8 @@ class LeanRC extends RC
   require('./patterns/observer/Notifier') LeanRC
   require('./patterns/observer/Observer') LeanRC
 
+  require('./patterns/gateway/Endpoint') LeanRC
+
   require('./patterns/proxy/Proxy') LeanRC
   require('./patterns/proxy/Collection') LeanRC
   require('./patterns/proxy/Configuration') LeanRC
@@ -105,8 +107,6 @@ class LeanRC extends RC
   require('./patterns/proxy/Renderer') LeanRC
   require('./patterns/proxy/Router') LeanRC
   require('./patterns/proxy/Resque') LeanRC
-
-  require('./patterns/gateway/Endpoint') LeanRC
 
   require('./mixins/CrudGatewayMixin') LeanRC
   require('./mixins/CrudEndpointMixin') LeanRC
@@ -140,6 +140,7 @@ class LeanRC extends RC
   require('./mixins/BodyParseMixin') LeanRC
   require('./mixins/CheckSessionsMixin') LeanRC
   require('./mixins/CheckPermissionsMixin') LeanRC
+  require('./mixins/CheckSchemaVersionMixin') LeanRC # needs test
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC

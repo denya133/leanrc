@@ -33,17 +33,16 @@ describe 'Gateway', ->
   describe '#onRegister', ->
     it 'should test register as proxy', ->
       expect ->
-        gateway = Gateway.new 'TEST_GATEWAY'
         endpoints =
-          list: LeanRC::Endpoint.new { gateway }
-          detail: LeanRC::Endpoint.new { gateway }
-          patch: LeanRC::Endpoint.new { gateway }
-        gateway.setData { endpoints }
+          list: LeanRC::Endpoint
+          detail: LeanRC::Endpoint
+          patch: LeanRC::Endpoint
+        gateway = Gateway.new 'TEST_GATEWAY', {endpoints}
         gateway.onRegister()
         listDefinition = gateway.swaggerDefinitionFor 'list'
         detailDefinition = gateway.swaggerDefinitionFor 'detail'
         patchDefinition = gateway.swaggerDefinitionFor 'patch'
-        assert.equal listDefinition, endpoints.list, 'No `list` endpoint created'
-        assert.equal detailDefinition, endpoints.detail, 'No `detail` endpoint created'
-        assert.equal patchDefinition, endpoints.patch, 'No `patch` endpoint created'
+        assert.equal listDefinition?.constructor, endpoints.list, 'No `list` endpoint created'
+        assert.equal detailDefinition?.constructor, endpoints.detail, 'No `detail` endpoint created'
+        assert.equal patchDefinition?.constructor, endpoints.patch, 'No `patch` endpoint created'
       .to.not.throw Error

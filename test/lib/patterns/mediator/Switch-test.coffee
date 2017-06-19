@@ -359,8 +359,7 @@ describe 'Switch', ->
         listEndpoint.summary 'TEST_SUMMARY'
         listEndpoint.description 'DESCRIPTION'
         listEndpoint.deprecated yes
-        gateway.setData endpoints:
-          list: listEndpoint
+        gateway.registerEndpoints list: listEndpoint
         facade.registerProxy gateway
         class Test extends LeanRC
           @inheritProtected()
