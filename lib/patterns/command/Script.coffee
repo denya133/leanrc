@@ -29,6 +29,7 @@ module.exports = (Module)->
           catch err
             voResult = err
           @sendNotification Module::JOB_RESULT, voResult, reverse
+        .catch (err)-> throw err
         return
 
   Script.initialize()
