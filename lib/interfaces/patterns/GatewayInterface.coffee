@@ -9,7 +9,7 @@ module.exports = (Module)->
         args: [String, Function]
         return: Module::NILL
 
-      @public registerEndpoints: Function,
+      @public @virtual registerEndpoints: Function,
         args: [Object]
         return: Module::NILL
 
