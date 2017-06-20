@@ -7,16 +7,20 @@ module.exports = (Module)->
     class CursorInterface extends BaseClass
       @inheritProtected()
 
-      @public @virtual setRecord: Function,
-        args: [Module::Class]
-        return: Module::CursorInterface
+      @public @virtual setCollection: Function,
+        args: [Module::ProxyInterface]
+        return: CursorInterface
+
+      @public @virtual setArray: Function,
+        args: [Array]
+        return: CursorInterface
 
       @public @async @virtual toArray: Function,
-        args: [[Module::Class, NILL]]
+        args: []
         return: Array
 
       @public @async @virtual next: Function,
-        args: [[Module::Class, NILL]]
+        args: []
         return: ANY
 
       @public @async @virtual hasNext: Function,
@@ -32,31 +36,31 @@ module.exports = (Module)->
         return: Number
 
       @public @async @virtual forEach: Function,
-        args: [Function, [Module::Class, NILL]]
+        args: [Function]
         return: NILL
 
       @public @async @virtual map: Function,
-        args: [Function, [Module::Class, NILL]]
+        args: [Function]
         return: Array
 
       @public @async @virtual filter: Function,
-        args: [Function, [Module::Class, NILL]]
+        args: [Function]
         return: Array
 
       @public @async @virtual find: Function,
-        args: [Function, [Module::Class, NILL]]
+        args: [Function]
         return: ANY
 
       @public @async @virtual compact: Function,
-        args: [[Module::Class, NILL]]
+        args: []
         return: Array
 
       @public @async @virtual reduce: Function,
-        args: [Function, ANY, [Module::Class, NILL]]
+        args: [Function, ANY]
         return: ANY
 
       @public @async @virtual first: Function,
-        args: [[Module::Class, NILL]]
+        args: []
         return: ANY
 
 

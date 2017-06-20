@@ -12,25 +12,41 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ {}, {}, {} ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
       .to.not.throw Error
-  describe '#setRecord', ->
+  describe '#setCollection', ->
     it 'should setup record', ->
       expect ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         cursor = Cursor.new()
-        cursor.setRecord Test::TestRecord
+        cursor.setCollection voMemoryCollection
       .to.not.throw Error
   describe '#next', ->
     it 'should get next values one by one', ->
@@ -38,13 +54,21 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute data: String, { default: '' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
+        cursor = Cursor.new voMemoryCollection, array
         assert.equal (yield cursor.next()).data, 'three', 'First item is incorrect'
         assert.equal (yield cursor.next()).data, 'men', 'Second item is incorrect'
         assert.equal (yield cursor.next()).data, 'in', 'Third item is incorrect'
@@ -56,13 +80,21 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute data: String, { default: '' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ { data: 'data' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         assert.isTrue (yield cursor.hasNext()), 'There is no next value'
         data = yield cursor.next()
         assert.isFalse (yield cursor.hasNext()), 'There is something else'
@@ -72,13 +104,21 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute data: String, { default: '' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         records = yield cursor.toArray()
         assert.equal records.length, array.length, 'Counts of input and output data are different'
         for record, index in records
@@ -91,13 +131,21 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute data: String, { default: '' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         assert.isTrue (yield cursor.hasNext()), 'There is no next value'
         yield cursor.close()
         assert.isFalse (yield cursor.hasNext()), 'There is something else'
@@ -108,13 +156,21 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute data: String, { default: '' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         assert.equal (yield cursor.count()), 4, 'Count works incorrectly'
         return
   describe '#forEach', ->
@@ -123,13 +179,21 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute data: String, { default: '' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         spyLambda = sinon.spy -> yield return
         yield cursor.forEach spyLambda
         assert.isTrue spyLambda.called, 'Lambda never called'
@@ -145,13 +209,21 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute data: String, { default: '' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         records = yield cursor.map (record) ->
           record.data = '+' + record.data + '+'
           yield RC::Promise.resolve record
@@ -167,13 +239,21 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute data: String, { default: '' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         records = yield cursor.filter (record) ->
           yield RC::Promise.resolve record.data.length > 3
         assert.lengthOf records, 2, 'Records count is not match'
@@ -186,13 +266,21 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute name: String, { default: 'Unknown' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ { name: 'Jerome' }, { name: 'George' }, { name: 'Harris' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         record = yield cursor.find (record) ->
           yield RC::Promise.resolve record.name is 'George'
         assert.equal record.name, 'George', 'Record is not match'
@@ -203,13 +291,21 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute data: String, { default: '' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ null, { data: 'men' }, undefined, { data: 'a boat' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         records = yield cursor.compact()
         assert.lengthOf records, 2, 'Records count not match'
         assert.equal records[0].data, 'men', '1st record is not match'
@@ -221,13 +317,21 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute data: String, { default: '' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         records = yield cursor.reduce (accumulator, item) ->
           accumulator[item.data] = item
           yield RC::Promise.resolve accumulator
@@ -243,17 +347,25 @@ describe 'Cursor', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute data: String, { default: '' }
-        Test::TestRecord.initialize()
+        TestRecord.initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+        MemoryCollection.initialize()
+        voMemoryCollection = MemoryCollection.new 'MemoryCollection',
+          delegate: TestRecord
         array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         record = yield cursor.first()
         assert.equal record.data, 'three', '1st record is not match'
         array = [ { data: 'Jerome' }, { data: 'George' }, { data: 'Harris' } ]
-        cursor = Cursor.new delegate: Test::TestRecord, array
+        cursor = Cursor.new voMemoryCollection, array
         record = yield cursor.first()
         assert.equal record.data, 'Jerome', 'Another 1st record is not match'
         return

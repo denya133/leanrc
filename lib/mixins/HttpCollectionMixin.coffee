@@ -332,7 +332,7 @@ module.exports = (Module)->
 
           if body?
             if aoQuery.query?['$count']
-              items.push body.count
+              return Module::Cursor.new null, [body.count]
             else
               pluralKey = @collectionName()
               if _.isArray snapshots = body[pluralKey]

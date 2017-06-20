@@ -864,6 +864,7 @@ describe 'HttpCollectionMixin', ->
           @inheritProtected()
           @include LeanRC::QueryableMixin
           @include LeanRC::HttpCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }

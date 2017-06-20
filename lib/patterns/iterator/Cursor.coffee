@@ -14,30 +14,34 @@ module.exports = (Module)->
       default: 0
     iplArray = @private array: Array
 
-    ipoCollection = @private collection: Module::Collection
+    ipoCollection = @private collection: Module::CollectionInterface
 
-    @public setRecord: Function,
-      default: (acRecord)->
-        @[ipoCollection] = acRecord
+    @public setCollection: Function,
+      default: (aoCollection)->
+        @[ipoCollection] = aoCollection
+        return @
+
+    @public setArray: Function,
+      default: (alArray)->
+        @[iplArray] = alArray
         return @
 
     @public @async toArray: Function,
-      default: (acRecord = null)->
+      default: ->
         while yield @hasNext()
-          yield @next acRecord
+          yield @next()
 
     @public @async next: Function,
-      default: (acRecord = null)->
-        acRecord ?= @[ipoCollection].delegate
-        data = @[iplArray][@[ipnCurrentIndex]]
+      default: ->
+        data = yield Module::Promise.resolve @[iplArray][@[ipnCurrentIndex]]
         @[ipnCurrentIndex]++
-        yield Module::Promise.resolve if acRecord?
-          if _.isObject data
-            acRecord.new data, @[ipoCollection]
+        switch
+          when not data?
+            yield return data
+          when @[ipoCollection]?
+            yield return @[ipoCollection].normalize data
           else
-            data
-        else
-          data
+            yield return data
 
     @public @async hasNext: Function,
       default: ->
@@ -56,33 +60,33 @@ module.exports = (Module)->
         yield Module::Promise.resolve array.length?() ? array.length
 
     @public @async forEach: Function,
-      default: (lambda, acRecord = null)->
+      default: (lambda)->
         index = 0
         try
           while yield @hasNext()
-            yield lambda (yield @next acRecord), index++
+            yield lambda (yield @next()), index++
           return
         catch err
           yield @close()
           throw err
 
     @public @async map: Function,
-      default: (lambda, acRecord = null)->
+      default: (lambda)->
         index = 0
         try
           while yield @hasNext()
-            yield lambda (yield @next acRecord), index++
+            yield lambda (yield @next()), index++
         catch err
           yield @close()
           throw err
 
     @public @async filter: Function,
-      default: (lambda, acRecord = null)->
+      default: (lambda)->
         index = 0
         records = []
         try
           while yield @hasNext()
-            record = yield @next acRecord
+            record = yield @next()
             if yield lambda record, index++
               records.push record
           records
@@ -91,12 +95,12 @@ module.exports = (Module)->
           throw err
 
     @public @async find: Function,
-      default: (lambda, acRecord = null)->
+      default: (lambda)->
         index = 0
         _record = null
         try
           while yield @hasNext()
-            record = yield @next acRecord
+            record = yield @next()
             if yield lambda record, index++
               _record = record
               break
@@ -106,43 +110,45 @@ module.exports = (Module)->
           throw err
 
     @public @async compact: Function,
-      default: (acRecord = null)->
-        acRecord ?= @[ipoCollection].delegate
-        records = []
+      default: ->
+        results = []
         try
           while @[ipnCurrentIndex] < yield @count()
-            rawRecord = @[iplArray][@[ipnCurrentIndex]]
+            rawResult = @[iplArray][@[ipnCurrentIndex]]
             ++@[ipnCurrentIndex]
-            unless _.isNil rawRecord
-              if _.isNumber rawRecord
-                record = rawRecord
-              else
-                record = acRecord.new rawRecord
-              records.push record
-          records
+            unless _.isEmpty rawResult
+              result = switch
+                when @[ipoCollection]?
+                  @[ipoCollection].normalize rawResult
+                else
+                  rawResult
+              results.push result
+          yield return results
         catch err
           yield @close()
           throw err
 
     @public @async reduce: Function,
-      default: (lambda, initialValue, acRecord = null)->
+      default: (lambda, initialValue)->
         try
           index = 0
           _initialValue = initialValue
           while yield @hasNext()
-            _initialValue = yield lambda _initialValue, (yield @next acRecord), index++
+            _initialValue = yield lambda _initialValue, (yield @next()), index++
           _initialValue
         catch err
           yield @close()
           throw err
 
     @public @async first: Function,
-      default: (acRecord = null)->
+      default: ->
         try
-          if yield @hasNext()
-            yield @next acRecord
+          result = if yield @hasNext()
+            yield @next()
           else
             null
+          yield @close()
+          yield return result
         catch err
           yield @close()
           throw err
@@ -158,7 +164,7 @@ module.exports = (Module)->
         yield return
 
     @public init: Function,
-      default: (aoCollection, alArray = null)->
+      default: (aoCollection = null, alArray = null)->
         @super arguments...
         @[ipoCollection] = aoCollection
         @[iplArray] = alArray
