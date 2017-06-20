@@ -138,6 +138,7 @@ class LeanRC extends RC
   require('./patterns/command/Script') LeanRC
   require('./patterns/command/DelayedJobScript') LeanRC
 
+  require('./mixins/ApplicationMediatorMixin') LeanRC # needs test
   require('./mixins/BulkActionsResourceMixin') LeanRC
   require('./mixins/BodyParseMixin') LeanRC
   require('./mixins/CheckSessionsMixin') LeanRC

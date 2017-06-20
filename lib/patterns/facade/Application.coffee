@@ -2,6 +2,8 @@
 
 module.exports = (Module)->
   {
+    APPLICATION_MEDIATOR
+
     Pipes
     ConfigurableMixin
     ApplicationInterface
@@ -29,6 +31,21 @@ module.exports = (Module)->
         @facade.remove()
         @facade = undefined
         return
+
+    @public @async migrate: Function,
+      default: (opts)->
+        appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
+        return yield appMediator.migrate opts
+
+    @public @async rollback: Function,
+      default: (opts)->
+        appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
+        return yield appMediator.rollback opts
+
+    @public @async run: Function,
+      default: (scriptName, data)->
+        appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
+        return yield appMediator.run scriptName, data
 
     @public init: Function,
       default: ->
