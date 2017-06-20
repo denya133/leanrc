@@ -64,17 +64,18 @@ module.exports = (Module) ->
         @migrationsCollection = @facade.retrieveProxy Module::MIGRATIONS
         return
 
-    @public execute: Function,
-      default: (options)->
-        @migrate options
-        return
+    @public @async execute: Function,
+      default: (aoNotification)->
+        voBody = aoNotification.getBody()
+        vsType = aoNotification.getType()
+        err = yield @migrate voBody ? {}
+        @facade.sendNotification STOPPED_MIGRATE, err, vsType
+        yield return
 
     @public @async migrate: Function,
       args: []
       return: NILL
       default: (options)->
-        if options instanceof Module::Notification
-          options = options.getBody() ? {}
         for migrationName in @migrationNames
           unless yield @migrationsCollection.includes migrationName
             id = String migrationName
@@ -94,8 +95,7 @@ module.exports = (Module) ->
               break
           if options?.until? and options.until is migrationName
             break
-        @facade.sendNotification STOPPED_MIGRATE, err
-        yield return
+        yield return err
 
 
   MigrateCommand.initialize()

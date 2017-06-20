@@ -257,7 +257,7 @@ describe 'RollbackCommand', ->
             steps = index + 1
             break
         steps ?= migrationNames.length
-        command.execute { steps }
+        yield command.execute LeanRC::Notification.new LeanRC::MIGRATE, { steps }
         options = yield promise
         assert.deepEqual options, steps: 2
         facade.remove()

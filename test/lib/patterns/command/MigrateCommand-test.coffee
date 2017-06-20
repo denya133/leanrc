@@ -231,7 +231,7 @@ describe 'MigrateCommand', ->
         promise = LeanRC::Promise.new (resolve, reject) ->
           trigger.once 'MIGRATE', (options) -> resolve options
           return
-        command.execute until: untilName
+        yield command.execute LeanRC::Notification.new LeanRC::MIGRATE, until: untilName
         options = yield promise
         assert.deepEqual options, until: untilName
         facade.remove()

@@ -64,17 +64,18 @@ module.exports = (Module) ->
         @migrationsCollection = @facade.retrieveProxy Module::MIGRATIONS
         return
 
-    @public execute: Function,
-      default: (options)->
-        @rollback options
-        return
+    @public @async execute: Function,
+      default: (aoNotification)->
+        voBody = aoNotification.getBody()
+        vsType = aoNotification.getType()
+        err = yield @rollback voBody ? {}
+        @facade.sendNotification STOPPED_ROLLBACK, err, vsType
+        yield return
 
     @public @async rollback: Function,
       args: []
       return: NILL
       default: (options)->
-        if options instanceof Module::Notification
-          options = options.getBody() ? {}
         if options?.steps? and not _.isNumber options.steps
           throw new Error 'Not valid steps params'
           yield return
@@ -93,8 +94,7 @@ module.exports = (Module) ->
             break
           if options?.until? and options.until is executedMigration.id
             break
-        @facade.sendNotification STOPPED_ROLLBACK, err
-        yield return
+        yield return err
 
 
   RollbackCommand.initialize()
