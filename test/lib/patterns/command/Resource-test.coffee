@@ -1058,6 +1058,7 @@ describe 'Resource', ->
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         TestCollection.initialize()
         resource = TestResource.new()
@@ -1157,6 +1158,7 @@ describe 'Resource', ->
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         TestCollection.initialize()
         resource = TestResource.new()

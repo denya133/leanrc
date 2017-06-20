@@ -85,8 +85,8 @@ module.exports = (Module)->
         return
 
 
-    @public generateId: Function,
-      default: -> return
+    @public @async generateId: Function,
+      default: -> yield return
 
 
     @public build: Function,
@@ -130,19 +130,19 @@ module.exports = (Module)->
         yield voRecord.updateAttributes properties
         return voRecord
 
-    @public clone: Function,
+    @public @async clone: Function,
       default: (aoRecord)->
         vhAttributes = {}
         vlAttributes = Object.keys @delegate.attributes
         for key in vlAttributes
           vhAttributes[key] = aoRecord[key]
         voRecord = @delegate.new vhAttributes, @
-        voRecord.id = @generateId()
-        return voRecord
+        voRecord.id = yield @generateId()
+        yield return voRecord
 
     @public @async copy: Function,
       default: (aoRecord)->
-        voRecord = @clone aoRecord
+        voRecord = yield @clone aoRecord
         yield voRecord.save()
         return voRecord
 

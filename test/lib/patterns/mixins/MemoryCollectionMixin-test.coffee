@@ -14,6 +14,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         collection = Test::MemoryCollection.new()
@@ -39,6 +40,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
@@ -48,7 +50,7 @@ describe 'MemoryCollectionMixin', ->
         spyPush = sinon.spy collection, 'push'
         assert.instanceOf collection, Test::MemoryCollection
         record = Test::TestRecord.new test: 'test1', collection
-        record.id = collection.generateId()
+        record.id = yield collection.generateId()
         yield collection.push record
         assert.equal record, spyPush.args[0][0]
         assert.deepEqual record.toJSON(), collection[Symbol.for '~collection'][record.id]
@@ -74,6 +76,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
@@ -107,6 +110,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
@@ -141,6 +145,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
@@ -180,6 +185,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
@@ -218,6 +224,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
@@ -256,6 +263,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
@@ -294,6 +302,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,
@@ -327,6 +336,7 @@ describe 'MemoryCollectionMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new KEY,

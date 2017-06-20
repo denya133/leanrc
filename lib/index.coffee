@@ -112,6 +112,8 @@ class LeanRC extends RC
   require('./mixins/CrudEndpointMixin') LeanRC
   require('./mixins/HttpCollectionMixin') LeanRC
   require('./mixins/MemoryCollectionMixin') LeanRC
+  require('./mixins/GenerateAutoincrementIdMixin') LeanRC # needs test
+  require('./mixins/GenerateUuidIdMixin') LeanRC # needs test
   require('./mixins/MemoryResqueMixin') LeanRC
   require('./mixins/MemoryConfigurationMixin') LeanRC
   require('./mixins/IterableMixin') LeanRC

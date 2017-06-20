@@ -56,6 +56,7 @@ describe 'CheckPermissionsMixin', ->
         class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         MemoryCollection.initialize()
         class Space extends Test::Record
@@ -128,6 +129,7 @@ describe 'CheckPermissionsMixin', ->
         class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
           @public @async findBy: Function,
             default: (query) ->
@@ -228,6 +230,7 @@ describe 'CheckPermissionsMixin', ->
         class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
           @public @async findBy: Function,
             default: (query) ->
@@ -349,6 +352,7 @@ describe 'CheckPermissionsMixin', ->
         class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
           @public @async findBy: Function,
             default: (query) ->

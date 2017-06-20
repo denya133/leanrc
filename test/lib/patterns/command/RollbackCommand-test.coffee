@@ -34,6 +34,7 @@ describe 'RollbackCommand', ->
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         TestMemoryCollection.initialize()
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
@@ -73,6 +74,7 @@ describe 'RollbackCommand', ->
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         TestMemoryCollection.initialize()
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
@@ -112,6 +114,7 @@ describe 'RollbackCommand', ->
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         TestMemoryCollection.initialize()
         class TestCommand extends LeanRC::RollbackCommand
@@ -158,6 +161,7 @@ describe 'RollbackCommand', ->
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         TestMemoryCollection.initialize()
         class TestCommand extends LeanRC::RollbackCommand
@@ -222,6 +226,7 @@ describe 'RollbackCommand', ->
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         TestMemoryCollection.initialize()
         class TestCommand extends LeanRC::RollbackCommand

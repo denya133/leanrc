@@ -32,9 +32,9 @@ module.exports = (Module)->
         args: [String, [Object, Function]]
         return: NILL
 
-      @public @virtual generateId: Function,
+      @public @async @virtual generateId: Function,
         args: []
-        return: [String, NILL]
+        return: [String, Number, NILL]
 
       @public @virtual build: Function, # создает инстанс рекорда
         args: [Object]
@@ -87,7 +87,7 @@ module.exports = (Module)->
         args: [String, Module::RecordInterface]
         return: Boolean
 
-      @public @virtual clone: Function,
+      @public @async @virtual clone: Function,
         args: [Module::RecordInterface]
         return: Module::RecordInterface
 

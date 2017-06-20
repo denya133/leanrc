@@ -116,6 +116,7 @@ describe 'CheckSessionsMixin', ->
         class SessionsCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         SessionsCollection.initialize()
         class Session extends Test::CoreObject
@@ -211,6 +212,7 @@ describe 'CheckSessionsMixin', ->
         class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         MemoryCollection.initialize()
         class Session extends Test::CoreObject

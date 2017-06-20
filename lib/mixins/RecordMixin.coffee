@@ -194,8 +194,8 @@ module.exports = (Module)->
         args: []
         return: Array
 
-      @public clone: Function,
-        default: -> @collection.clone @
+      @public @async clone: Function,
+        default: -> yield @collection.clone @
 
       @public @async copy: Function,
         default: -> yield @collection.copy @

@@ -84,6 +84,7 @@ describe 'MemoryMigrationMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         facade.registerProxy Test::MemoryCollection.new 'TestCollection',
@@ -138,6 +139,7 @@ describe 'MemoryMigrationMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         class Test::BaseMigration extends LeanRC::Migration
@@ -200,6 +202,7 @@ describe 'MemoryMigrationMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         class Test::BaseMigration extends LeanRC::Migration
@@ -242,6 +245,7 @@ describe 'MemoryMigrationMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         class Test::BaseMigration extends LeanRC::Migration
@@ -321,6 +325,7 @@ describe 'MemoryMigrationMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         class Test::BaseMigration extends LeanRC::Migration
@@ -362,6 +367,7 @@ describe 'MemoryMigrationMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         class Test::BaseMigration extends LeanRC::Migration
@@ -403,6 +409,7 @@ describe 'MemoryMigrationMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         class Test::BaseMigration extends LeanRC::Migration
@@ -463,6 +470,7 @@ describe 'MemoryMigrationMixin', ->
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::MemoryCollection.initialize()
         class Test::BaseMigration extends LeanRC::Migration

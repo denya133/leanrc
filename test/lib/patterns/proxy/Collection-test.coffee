@@ -124,7 +124,7 @@ describe 'Collection', ->
       .to.not.throw Error
   describe '#generateId', ->
     it 'should get dummy generated ID', ->
-      expect ->
+      co ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
@@ -140,8 +140,7 @@ describe 'Collection', ->
             default: Test::TestRecord
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
-        assert.isUndefined collection.generateId(), 'Generated ID is defined'
-      .to.not.throw Error
+        assert.isUndefined yield collection.generateId(), 'Generated ID is defined'
   describe '#build', ->
     it 'should create record from delegate', ->
       expect ->
@@ -481,13 +480,13 @@ describe 'Collection', ->
             default: Test::TestRecord
           @public data: Array,
             default: []
-          @public generateId: Function,
-            default: -> RC::Utils.uuid.v4()
+          @public @async generateId: Function,
+            default: -> yield return RC::Utils.uuid.v4()
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
         LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_09').registerProxy collection
         original = collection.build test: 'test', data: 123
-        clone = collection.clone original
+        clone = yield collection.clone original
         assert.notEqual original, clone, 'Record is not a copy but a reference'
         assert.equal original.test, clone.test, '`test` values are different'
         assert.equal original.data, clone.data, '`data` values are different'
@@ -528,8 +527,8 @@ describe 'Collection', ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record?
-          @public generateId: Function,
-            default: -> RC::Utils.uuid.v4()
+          @public @async generateId: Function,
+            default: -> yield return RC::Utils.uuid.v4()
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION', {}
         LeanRC::Facade.getInstance('TEST_COLLECTION_FACADE_10').registerProxy collection

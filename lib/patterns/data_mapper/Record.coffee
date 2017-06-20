@@ -112,7 +112,7 @@ module.exports = (Module)->
       args: []
       return: NILL
       default: ->
-        @id ?= @collection.generateId()
+        @id ?= yield @collection.generateId()
         now = new Date().toISOString()
         @createdAt ?= now
         @updatedAt ?= now

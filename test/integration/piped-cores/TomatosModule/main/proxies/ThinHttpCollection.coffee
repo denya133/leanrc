@@ -4,11 +4,13 @@ module.exports = (Module)->
   {
     Collection
     ThinHttpCollectionMixin
+    GenerateUuidIdMixin
   } = Module::
 
   class ThinHttpCollection extends Collection
     @inheritProtected()
     @include ThinHttpCollectionMixin
+    @include GenerateUuidIdMixin
     @module Module
 
     @public host: String,

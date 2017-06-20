@@ -257,12 +257,12 @@ describe 'RecordMixin', ->
             get: -> TestsModule::Facade.getInstance KEY
           @public find: Function,
             default: (id) -> TestsModule::Promise.resolve @[iphData][id]
-          @public clone: Function,
+          @public @async clone: Function,
             default: (item) ->
               result = item.constructor.new item, @
               result[key] = item[key]  for key of item.constructor.attributes
               result.id = TestsModule::Utils.uuid.v4()
-              result
+              yield return result
           @public push: Function,
             default: (item) ->
               throw new Error 'Item is empty'  unless item?
@@ -274,7 +274,7 @@ describe 'RecordMixin', ->
           @public patch: Function,
             default: (id, item) ->
               if (yield @find id)?
-                @[iphData][item.id] = @clone item
+                @[iphData][item.id] = yield @clone item
               else
                 throw new Error "Item '#{id}' is missing"
               @[iphData][item.id]?
@@ -300,7 +300,7 @@ describe 'RecordMixin', ->
         yield return
   describe '#clone', ->
     it 'should clone record', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_04'
         class Test extends RC::Module
           @inheritProtected()
@@ -317,12 +317,12 @@ describe 'RecordMixin', ->
             get: -> LeanRC::Facade.getInstance KEY
           @public find: Function,
             default: (id) -> RC::Promise.resolve @[iphData][id]
-          @public clone: Function,
+          @public @async clone: Function,
             default: (item) ->
               result = item.constructor.new item, @
               result[key] = item[key]  for key of item.constructor.attributes
               result.id = RC::Utils.uuid.v4()
-              result
+              yield return result
           @public push: Function,
             default: (item) ->
               throw new Error 'Item is empty'  unless item?
@@ -345,10 +345,9 @@ describe 'RecordMixin', ->
         Test::TestRecord.initialize()
         collection = Test::Collection.new KEY
         record = Test::TestRecord.new { test: 'test1' }, collection
-        recordCopy = record.clone()
+        recordCopy = yield record.clone()
         assert.equal record.test, recordCopy.test
         assert.notEqual record.id, recordCopy.id
-      .to.not.throw Error
   describe '#save', ->
     it 'should save record', ->
       co ->
@@ -368,12 +367,12 @@ describe 'RecordMixin', ->
             get: -> LeanRC::Facade.getInstance KEY
           @public find: Function,
             default: (id) -> RC::Promise.resolve @[iphData][id]
-          @public clone: Function,
+          @public @async clone: Function,
             default: (item) ->
               result = item.constructor.new item, @
               result[key] = item[key]  for key of item.constructor.attributes
               result.id = RC::Utils.uuid.v4()
-              result
+              yield return result
           @public push: Function,
             default: (item) ->
               throw new Error 'Item is empty'  unless item?
@@ -473,15 +472,15 @@ describe 'RecordMixin', ->
               item.id ?= RC::Utils.uuid.v4()
               @[iphData][item.id] = item
               @[iphData][item.id]?
-          @public clone: Function,
+          @public @async clone: Function,
             default: (item) ->
               result = item.constructor.new item, @
               result[key] = item[key]  for key of item.constructor.attributes
               result.id = RC::Utils.uuid.v4()
-              result
-          @public copy: Function,
+              yield return result
+          @public @async copy: Function,
             default: (item) ->
-              newItem = @clone item
+              newItem = yield @clone item
               yield newItem.save()
               newItem
           constructor: (asKey, asName) ->
@@ -785,6 +784,7 @@ describe 'RecordMixin', ->
         class MyCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         MyCollection.initialize()
         class TestRecord extends LeanRC::CoreObject
@@ -848,6 +848,7 @@ describe 'RecordMixin', ->
         class MyCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         MyCollection.initialize()
         class TestRecord extends LeanRC::CoreObject

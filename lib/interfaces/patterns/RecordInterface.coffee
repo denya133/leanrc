@@ -83,7 +83,7 @@ module.exports = (Module)->
       @public @virtual attributes: Function, # метод должен вернуть список атрибутов данного рекорда.
         args: []
         return: Array
-      @public @virtual clone: Function,
+      @public @async @virtual clone: Function,
         args: []
         return: Module::RecordInterface
       @public @async @virtual copy: Function,

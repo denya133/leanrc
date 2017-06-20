@@ -122,8 +122,8 @@ describe 'Record', ->
             default: Test::TestRecord
           @public data: Array,
             default: []
-          @public generateId: Function,
-            default: -> LeanRC::Utils.uuid.v4()
+          @public @async generateId: Function,
+            default: -> yield return LeanRC::Utils.uuid.v4()
           @public @async push: Function,
             default: (record) ->
               # record._key ?= RC::Utils.uuid.v4()

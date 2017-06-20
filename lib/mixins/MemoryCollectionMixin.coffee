@@ -3,7 +3,12 @@ inflect       = do require 'i'
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    ANY, NILL
+
+    Utils
+  } = Module::
+  {uuid} = Utils
 
   Module.defineMixin Module::Collection, (BaseClass) ->
     class MemoryCollectionMixin extends BaseClass
@@ -16,9 +21,6 @@ module.exports = (Module)->
           @super args...
           @[ipoCollection] = {}
           return
-
-      @public generateId: Function,
-        default: -> Module::Utils.uuid.v4()
 
       @public @async push: Function,
         default: (aoRecord)->

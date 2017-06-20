@@ -73,6 +73,7 @@ describe 'Serializer', ->
         class MyCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         MyCollection.initialize()
         class MySerializer extends LeanRC::Serializer
@@ -104,6 +105,7 @@ describe 'Serializer', ->
         class MyCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         MyCollection.initialize()
         class MySerializer extends LeanRC::Serializer
