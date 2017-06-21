@@ -116,16 +116,16 @@ module.exports = (Module)->
     }
     @const REVERSE_MAP:
       createCollection: 'dropCollection'
-      dropCollection: 'createCollection'
+      dropCollection: 'dropCollection'
 
       createEdgeCollection: 'dropEdgeCollection'
-      dropEdgeCollection: 'createEdgeCollection'
+      dropEdgeCollection: 'dropEdgeCollection'
 
       addField: 'removeField'
-      removeField: 'addField'
+      removeField: 'removeField'
 
       addIndex: 'removeIndex'
-      removeIndex: 'addIndex'
+      removeIndex: 'removeIndex'
 
       addTimestamps: 'removeTimestamps'
       removeTimestamps: 'addTimestamps'
