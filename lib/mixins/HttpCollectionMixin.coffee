@@ -318,6 +318,15 @@ module.exports = (Module)->
               voQuery.requestType = 'find'
               voQuery.recordName = @delegate.name
               voQuery.query = aoQuery
+              voQuery.isCustomReturn = (
+                aoQuery.$collect? or
+                aoQuery.$count? or
+                aoQuery.$sum? or
+                aoQuery.$min? or
+                aoQuery.$max? or
+                aoQuery.$avg? or
+                aoQuery.$return isnt '@doc'
+              )
               voQuery
 
           return voQuery
@@ -333,6 +342,8 @@ module.exports = (Module)->
           if body?
             if aoQuery.query?['$count']
               return Module::Cursor.new null, [body.count]
+            else if aoQuery.isCustomReturn
+              return Module::Cursor.new null, [body]
             else
               pluralKey = @collectionName()
               if _.isArray snapshots = body[pluralKey]
