@@ -11,8 +11,8 @@ module.exports = (Module)->
         args: [Module::ProxyInterface]
         return: CursorInterface
 
-      @public @virtual setArray: Function,
-        args: [Array]
+      @public @virtual setIterable: Function,
+        args: [ANY]
         return: CursorInterface
 
       @public @async @virtual toArray: Function,

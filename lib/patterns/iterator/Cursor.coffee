@@ -4,7 +4,6 @@
 _  = require 'lodash'
 
 # TODO: от Игоря предложение, сделать свойство isClosed
-# TODO: надо переименовать везде по коду setArray в setIterable
 
 module.exports = (Module)->
   class Cursor extends Module::CoreObject
@@ -23,7 +22,7 @@ module.exports = (Module)->
         @[ipoCollection] = aoCollection
         return @
 
-    @public setArray: Function,
+    @public setIterable: Function,
       default: (alArray)->
         @[iplArray] = alArray
         return @
