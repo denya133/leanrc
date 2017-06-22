@@ -239,7 +239,7 @@ module.exports = (Module)->
           catch err
             voContext.onerror err
 
-          onFinished res, (err)=>
+          onFinished res, (err)->
             voContext.onerror err
             return
           yield return
@@ -373,12 +373,18 @@ module.exports = (Module)->
           yield Module::Promise.new (resolve, reject)=>
             try
               reverse = genRandomAlphaNumbers 32
-              @getViewComponent().once reverse, co.wrap ({result, resource})=>
+              @getViewComponent().once reverse, co.wrap ({error, result, resource})=>
+                if error?
+                  console.log '>>>>>> ERROR AFTER RESOURCE', error
+                  reject error
+                  yield return
                 try
                   yield @sendHttpResponse context, result, resource, opts
-                  yield return resolve()
-                catch error
-                  reject error
+                  resolve()
+                  yield return
+                catch err
+                  reject err
+                  yield return
               @sender resourceName, {context, reverse}, opts
             catch err
               reject err
