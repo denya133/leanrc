@@ -113,7 +113,7 @@ describe 'Renderer', ->
         renderer = LeanRC::Renderer.new 'TEST_RENDERER'
         facade.registerProxy renderer
         renderResult = yield renderer.render {}, data, {}, {}
-        assert.equal renderResult, JSON.stringify(data), 'Data not rendered'
+        assert.equal renderResult, data, 'Data not rendered'
         facade.remove()
         yield return
     it 'should render the data with template', ->
@@ -148,7 +148,7 @@ describe 'Renderer', ->
           path: 'test'
           resource: 'TestRecord/'
           action: 'find'
-        assert.deepEqual renderResult, JSON.stringify test_records: data
+        assert.deepEqual renderResult, test_records: data
         facade.remove()
         yield return
     it 'should render the data in customized renderer', ->

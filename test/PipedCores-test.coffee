@@ -344,10 +344,9 @@ describe 'PipedCores', ->
       co ->
         cucumbers = CucumbersApp::ShellApplication.new()
         res = yield request.get 'http://localhost:3002/0.1/cucumbers'
-        { body: rawBody, status, message } = res
+        { body, status, message } = res
         assert.equal status, 200
         assert.equal message, 'OK'
-        body = JSON.parse rawBody ? null
         assert.isTrue body?
         { meta, cucumbers: data } = body
         assert.deepEqual meta, pagination:
@@ -363,10 +362,9 @@ describe 'PipedCores', ->
       co ->
         tomatos = TomatosApp::ShellApplication.new()
         res = yield request.get 'http://localhost:3001/0.1/tomatos'
-        { body: rawBody, status, message } = res
+        { body, status, message } = res
         assert.equal status, 200
         assert.equal message, 'OK'
-        body = JSON.parse rawBody ? null
         assert.isTrue body?
         { meta, tomatos: data } = body
         assert.deepEqual meta, pagination:
@@ -388,7 +386,7 @@ describe 'PipedCores', ->
               description: 'cucumber1 description'
         assert.propertyVal res1, 'status', 201
         assert.propertyVal res1, 'message', 'Created'
-        body = JSON.parse res1.body ? null
+        body = res1.body ? null
         { cucumber: item } = body
         assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
         assert.propertyVal item, 'name', 'cucumber1'
@@ -402,7 +400,7 @@ describe 'PipedCores', ->
               description: 'cucumber2 description'
         assert.propertyVal res2, 'status', 201
         assert.propertyVal res2, 'message', 'Created'
-        body = JSON.parse res2.body ? null
+        body = res2.body ? null
         { cucumber: item } = body
         assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
         assert.propertyVal item, 'name', 'cucumber2'
@@ -416,7 +414,7 @@ describe 'PipedCores', ->
               description: 'cucumber3 description'
         assert.propertyVal res3, 'status', 201
         assert.propertyVal res3, 'message', 'Created'
-        body = JSON.parse res3.body ? null
+        body = res3.body ? null
         { cucumber: item } = body
         assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
         assert.propertyVal item, 'name', 'cucumber3'
@@ -426,7 +424,7 @@ describe 'PipedCores', ->
         res4 = yield request.get 'http://localhost:3002/0.1/cucumbers'
         assert.propertyVal res4, 'status', 200
         assert.propertyVal res4, 'message', 'OK'
-        body = JSON.parse res4.body ? null
+        body = res4.body ? null
         { cucumbers: items } = body
         assert.lengthOf items, 3
         for item, index in items
@@ -435,7 +433,7 @@ describe 'PipedCores', ->
           assert.propertyVal item, 'description', "cucumber#{index + 1} description"
           assert.propertyVal item, 'isHidden', no
           assert.isNull item.deletedAt
-        {cucumber:{id:cucumber2Id}} = JSON.parse res2.body
+        {cucumber:{id:cucumber2Id}} = res2.body
         res5 = yield request.put "http://localhost:3002/0.1/cucumbers/#{cucumber2Id}",
           body:
             cucumber:
@@ -443,7 +441,7 @@ describe 'PipedCores', ->
               description: 'cucumber2 long description'
         assert.propertyVal res5, 'status', 200
         assert.propertyVal res5, 'message', 'OK'
-        body = JSON.parse res5.body ? null
+        body = res5.body ? null
         { cucumber: item } = body
         assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
         assert.propertyVal item, 'name', 'cucumber2'
@@ -453,7 +451,7 @@ describe 'PipedCores', ->
         res6 = yield request.delete "http://localhost:3002/0.1/cucumbers/#{cucumber2Id}"
         assert.propertyVal res6, 'status', 200
         assert.propertyVal res6, 'message', 'OK'
-        body = JSON.parse res6.body ? null
+        body = res6.body ? null
         { cucumber: item } = body
         assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
         assert.propertyVal item, 'name', 'cucumber2'
@@ -473,7 +471,7 @@ describe 'PipedCores', ->
               description: 'tomato1 description'
         assert.propertyVal res1, 'status', 201
         assert.propertyVal res1, 'message', 'Created'
-        body = JSON.parse res1.body ? null
+        body = res1.body ? null
         { tomato: item } = body
         assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
         assert.propertyVal item, 'name', 'tomato1'
@@ -487,7 +485,7 @@ describe 'PipedCores', ->
               description: 'tomato2 description'
         assert.propertyVal res2, 'status', 201
         assert.propertyVal res2, 'message', 'Created'
-        body = JSON.parse res2.body ? null
+        body = res2.body ? null
         { tomato: item } = body
         assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
         assert.propertyVal item, 'name', 'tomato2'
@@ -501,7 +499,7 @@ describe 'PipedCores', ->
               description: 'tomato3 description'
         assert.propertyVal res3, 'status', 201
         assert.propertyVal res3, 'message', 'Created'
-        body = JSON.parse res3.body ? null
+        body = res3.body ? null
         { tomato: item } = body
         assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
         assert.propertyVal item, 'name', 'tomato3'
@@ -511,7 +509,7 @@ describe 'PipedCores', ->
         res4 = yield request.get 'http://localhost:3001/0.1/tomatos'
         assert.propertyVal res4, 'status', 200
         assert.propertyVal res4, 'message', 'OK'
-        body = JSON.parse res4.body ? null
+        body = res4.body ? null
         { tomatos: items } = body
         assert.lengthOf items, 3
         for item, index in items
@@ -520,7 +518,7 @@ describe 'PipedCores', ->
           assert.propertyVal item, 'description', "tomato#{index + 1} description"
           assert.propertyVal item, 'isHidden', no
           assert.isNull item.deletedAt
-        {tomato:{id:tomato2Id}} = JSON.parse res2.body
+        {tomato:{id:tomato2Id}} = res2.body
         res5 = yield request.put "http://localhost:3001/0.1/tomatos/#{tomato2Id}",
           body:
             tomato:
@@ -528,7 +526,7 @@ describe 'PipedCores', ->
               description: 'tomato2 long description'
         assert.propertyVal res5, 'status', 200
         assert.propertyVal res5, 'message', 'OK'
-        body = JSON.parse res5.body ? null
+        body = res5.body ? null
         { tomato: item } = body
         assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
         assert.propertyVal item, 'name', 'tomato2'
@@ -538,7 +536,7 @@ describe 'PipedCores', ->
         res6 = yield request.delete "http://localhost:3001/0.1/tomatos/#{tomato2Id}"
         assert.propertyVal res6, 'status', 200
         assert.propertyVal res6, 'message', 'OK'
-        body = JSON.parse res6.body ? null
+        body = res6.body ? null
         { tomato: item } = body
         assert.propertyVal item, 'type', 'Tomatos::TomatoRecord'
         assert.propertyVal item, 'name', 'tomato2'
@@ -559,7 +557,7 @@ describe 'PipedCores', ->
               description: 'cucumber1 description'
         assert.propertyVal res1, 'status', 201
         assert.propertyVal res1, 'message', 'Created'
-        body = JSON.parse res1.body ? null
+        body = res1.body ? null
         { cucumber: item } = body
         assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
         assert.propertyVal item, 'name', 'cucumber1'
@@ -573,7 +571,7 @@ describe 'PipedCores', ->
               description: 'cucumber2 description'
         assert.propertyVal res2, 'status', 201
         assert.propertyVal res2, 'message', 'Created'
-        body = JSON.parse res2.body ? null
+        body = res2.body ? null
         { cucumber: item } = body
         assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
         assert.propertyVal item, 'name', 'cucumber2'
@@ -587,7 +585,7 @@ describe 'PipedCores', ->
               description: 'cucumber3 description'
         assert.propertyVal res3, 'status', 201
         assert.propertyVal res3, 'message', 'Created'
-        body = JSON.parse res3.body ? null
+        body = res3.body ? null
         { cucumber: item } = body
         assert.propertyVal item, 'type', 'Cucumbers::CucumberRecord'
         assert.propertyVal item, 'name', 'cucumber3'
@@ -597,7 +595,7 @@ describe 'PipedCores', ->
         res4 = yield request.get 'http://localhost:3002/0.1/cucumbers'
         assert.propertyVal res4, 'status', 200
         assert.propertyVal res4, 'message', 'OK'
-        body = JSON.parse res4.body ? null
+        body = res4.body ? null
         { cucumbers: items } = body
         assert.lengthOf items, 3
         for item, index in items
@@ -609,7 +607,7 @@ describe 'PipedCores', ->
         res5 = yield request.get 'http://localhost:3001/0.1/cucumbers'
         assert.propertyVal res5, 'status', 200
         assert.propertyVal res5, 'message', 'OK'
-        body = JSON.parse res5.body ? null
+        body = res5.body ? null
         { cucumbers: items } = body
         assert.lengthOf items, 3
         for item, index in items

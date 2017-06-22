@@ -3,6 +3,8 @@
 
 _  = require 'lodash'
 
+# TODO: от Игоря предложение, сделать свойство isClosed
+# TODO: надо переименовать везде по коду setArray в setIterable
 
 module.exports = (Module)->
   class Cursor extends Module::CoreObject

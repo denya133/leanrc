@@ -57,10 +57,9 @@ module.exports = (Module)->
             yield templates[templatePath].call resource, resourceName, action, aoData
           else
             null
-          res = JSON.stringify renderedResult ? aoData ? null
-          yield return res
+          yield return renderedResult ? aoData ? null
         else
-          yield return JSON.stringify aoData
+          yield return aoData
 
 
   Renderer.initialize()
