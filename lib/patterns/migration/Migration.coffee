@@ -371,10 +371,12 @@ module.exports = (Module)->
           else if _.includes [
             'renameField'
             'renameIndex'
-            'renameCollection'
           ], method
             [collectionName, oldName, newName] = args
             yield @[method] collectionName, newName, oldName
+          else if method is 'renameCollection'
+            [collectionName, newName] = args
+            yield @[method] newName, collectionName
           else
             yield @[Migration::REVERSE_MAP[method]] args...
         , @
