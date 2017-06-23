@@ -23,8 +23,8 @@ module.exports = (Module)->
         default: (id)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
-            .filter '@doc._key': {$eq: id}
-            .remove()
+            .filter '@doc.id': {$eq: id}
+            .remove '@doc'
           yield @query voQuery
           return yes
 
@@ -32,7 +32,7 @@ module.exports = (Module)->
         default: (id)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
-            .filter '@doc._key': {$eq: id}
+            .filter '@doc.id': {$eq: id}
             .return '@doc'
           return yield (yield @query voQuery).first()
 
@@ -40,7 +40,7 @@ module.exports = (Module)->
         default: (ids)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
-            .filter '@doc._key': {$in: ids}
+            .filter '@doc.id': {$in: ids}
             .return '@doc'
           return yield @query voQuery
 
@@ -55,7 +55,7 @@ module.exports = (Module)->
         default: (id, aoRecord)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
-            .filter '@doc._key': {$eq: id}
+            .filter '@doc.id': {$eq: id}
             .replace aoRecord
           return yield (yield @query voQuery).first()
 
@@ -63,7 +63,7 @@ module.exports = (Module)->
         default: (id, aoRecord)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
-            .filter '@doc._key': {$eq: id}
+            .filter '@doc.id': {$eq: id}
             .update aoRecord
           return yield (yield @query voQuery).first()
 
@@ -71,7 +71,7 @@ module.exports = (Module)->
         default: (id)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
-            .filter '@doc._key': {$eq: id}
+            .filter '@doc.id': {$eq: id}
             .limit 1
             .return '@doc'
           return yield (yield @query voQuery).hasNext()
@@ -235,11 +235,11 @@ module.exports = (Module)->
           return {method, url, headers, data, query}
 
       # может быть переопределно другим миксином, который будет посылать запросы через jQuery.ajax например
-      ipmSendRequest = @protected sendRequest: Function,
+      ipmSendRequest = @protected @async sendRequest: Function,
         args: [Object]
-        return: Module::PromiseInterface
+        return: Object
         default: ({method, url, options})->
-          Module::Utils.request method, url, options
+          return yield Module::Utils.request method, url, options
 
       # может быть переопределно другим миксином, который будет посылать запросы через jQuery.ajax например
       ipmRequestToHash = @protected requestToHash: Function,
@@ -247,24 +247,25 @@ module.exports = (Module)->
         return: Object
         default: ({method, url, headers, data, query})->
           if query?
-            query = JSON.stringify { query }
+            query = encodeURIComponent JSON.stringify query ? ''
             url += "?query=#{query}"
-          {
+          options = {
+            json: yes
+            headers
+          }
+          options.body = data if data?
+          return {
             method
             url
-            options: {
-              body: data
-              json: yes
-              headers
-            }
+            options
           }
 
-      ipmMakeRequest = @protected makeRequest: Function,
+      ipmMakeRequest = @protected @async makeRequest: Function,
         args: [Object]
-        return: Module::PromiseInterface
+        return: Object
         default: (request)-> # result of requestFor
           hash = @[ipmRequestToHash] request
-          @[ipmSendRequest] hash
+          return yield @[ipmSendRequest] hash
 
       @public parseQuery: Function,
         default: (aoQuery)->
@@ -276,9 +277,8 @@ module.exports = (Module)->
                 voQuery.requestType = 'remove'
                 voQuery.recordName = @delegate.name
                 voQuery.query = _.pick aoQuery, [
-                  '$forIn', '$join', '$filter', '$let'
+                  '$forIn', '$join', '$filter', '$let', '$remove'
                 ]
-                voQuery.query.$return = '@doc'
                 voQuery
           else if (voRecord = aoQuery.$insert)?
             do =>
@@ -336,6 +336,8 @@ module.exports = (Module)->
           request = @[ipmRequestFor] aoQuery
 
           { body } = yield @[ipmMakeRequest] request
+          if _.isString body
+            body = JSON.parse body
 
           items = []
 
