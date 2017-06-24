@@ -53,6 +53,19 @@ module.exports = (Module)->
               Module::Utils.co =>
                 vcRecord = opts.transform.call(@)
                 vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
+                vsCollectionName = switch vsCollectionName
+                  when 'UsersCollection'
+                    Module::USERS
+                  when 'SessionsCollection'
+                    Module::SESSIONS
+                  when 'SpacesCollection'
+                    Module::SPACES
+                  when 'MigrationsCollection'
+                    Module::MIGRATIONS
+                  when 'RolesCollection'
+                    Module::ROLES
+                  else
+                    vsCollectionName
                 voCollection = @collection.facade.retrieveProxy vsCollectionName
                 unless through
                   cursor = yield voCollection.takeBy "@doc.#{refKey}": get?.apply(@, [@[attr]]) ? @[attr]
