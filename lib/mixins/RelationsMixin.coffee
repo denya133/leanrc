@@ -52,7 +52,7 @@ module.exports = (Module)->
             get: ->
               Module::Utils.co =>
                 vcRecord = opts.transform.call(@)
-                vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
+                vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
                 vsCollectionName = switch vsCollectionName
                   when 'UsersCollection'
                     Module::USERS
@@ -92,7 +92,20 @@ module.exports = (Module)->
           opts.get = ->
             Module::Utils.co =>
               vcRecord = opts.transform.call(@)
-              vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
+              vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
+              vsCollectionName = switch vsCollectionName
+                when 'UsersCollection'
+                  Module::USERS
+                when 'SessionsCollection'
+                  Module::SESSIONS
+                when 'SpacesCollection'
+                  Module::SPACES
+                when 'MigrationsCollection'
+                  Module::MIGRATIONS
+                when 'RolesCollection'
+                  Module::ROLES
+                else
+                  vsCollectionName
               voCollection = @collection.facade.retrieveProxy vsCollectionName
               unless opts.through
                 yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
@@ -121,7 +134,20 @@ module.exports = (Module)->
           opts.get = ->
             Module::Utils.co =>
               vcRecord = opts.transform.call(@)
-              vsCollectionName = "#{inflect.pluralize vcRecord.name}Collection"
+              vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
+              vsCollectionName = switch vsCollectionName
+                when 'UsersCollection'
+                  Module::USERS
+                when 'SessionsCollection'
+                  Module::SESSIONS
+                when 'SpacesCollection'
+                  Module::SPACES
+                when 'MigrationsCollection'
+                  Module::MIGRATIONS
+                when 'RolesCollection'
+                  Module::ROLES
+                else
+                  vsCollectionName
               voCollection = @collection.facade.retrieveProxy vsCollectionName
               cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
               cursor.first()
