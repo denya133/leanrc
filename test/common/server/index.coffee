@@ -85,7 +85,7 @@ module.exports = (options) ->
               switch method.data
                 when 'SELF'
                   if req.method is 'POST'
-                    body.id = RC::Utils.uuid.v4()
+                    body.id ?= RC::Utils.uuid.v4()
                     resp = "#{path.single}": body
                     server.data["test_#{path.plural}"] ?= []
                     server.data["test_#{path.plural}"].push body
@@ -128,7 +128,7 @@ module.exports = (options) ->
                     res.statusMessage = 'Not Found'
                 when 'QUERY'
                   { query } = querystring.parse url.query
-                  { query } = JSON.parse query  unless _.isEmpty query
+                  query = JSON.parse query  unless _.isEmpty query
                   collection = server.data[query?['$forIn']?['@doc'] ? "test_#{path.plural}"] ? []
                   filter = (item) ->
                     if query?.$filter?

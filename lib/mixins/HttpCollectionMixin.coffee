@@ -336,12 +336,12 @@ module.exports = (Module)->
           request = @[ipmRequestFor] aoQuery
 
           { body } = yield @[ipmMakeRequest] request
-          if _.isString body
-            body = JSON.parse body
 
           items = []
 
-          if body?
+          if body? and body isnt ''
+            if _.isString body
+              body = JSON.parse body
             if aoQuery.query?['$count']
               return Module::Cursor.new null, [body.count]
             else if aoQuery.isCustomReturn

@@ -552,7 +552,7 @@ describe 'HttpCollectionMixin', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
@@ -560,26 +560,26 @@ describe 'HttpCollectionMixin', ->
             default: ->
               @super arguments...
               @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::HttpCollection extends LeanRC::Collection
+        TestRecord.initialize()
+        class HttpCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-        Test::HttpCollection.initialize()
-        facade.registerProxy Test::HttpCollection.new KEY,
-          delegate: Test::TestRecord
+        HttpCollection.initialize()
+        facade.registerProxy HttpCollection.new KEY,
+          delegate: TestRecord
           serializer: LeanRC::Serializer
         collection = facade.retrieveProxy KEY
-        assert.instanceOf collection, Test::HttpCollection
+        assert.instanceOf collection, HttpCollection
         record = yield collection.create test: 'test1'
         spyQuery = sinon.spy collection, 'query'
         yield record.destroy()
         assert.deepEqual spyQuery.args[1][0].$forIn, { '@doc': 'test_tests' }
-        assert.deepEqual spyQuery.args[1][0].$filter, { '@doc._key': { '$eq': record.id } }
-        assert.isTrue spyQuery.args[1][0].$remove
+        assert.deepEqual spyQuery.args[1][0].$filter, { '@doc.id': { '$eq': record.id } }
+        assert.equal spyQuery.args[1][0].$remove, '@doc'
         facade.remove()
         yield return
   describe '#take', ->
@@ -851,7 +851,7 @@ describe 'HttpCollectionMixin', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
@@ -859,8 +859,8 @@ describe 'HttpCollectionMixin', ->
             default: ->
               @super arguments...
               @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::HttpCollection extends LeanRC::Collection
+        TestRecord.initialize()
+        class HttpCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableMixin
           @include LeanRC::HttpCollectionMixin
@@ -868,12 +868,12 @@ describe 'HttpCollectionMixin', ->
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-        Test::HttpCollection.initialize()
-        facade.registerProxy Test::HttpCollection.new KEY,
-          delegate: Test::TestRecord
+        HttpCollection.initialize()
+        facade.registerProxy HttpCollection.new KEY,
+          delegate: TestRecord
           serializer: LeanRC::Serializer
         collection = facade.retrieveProxy KEY
-        assert.instanceOf collection, Test::HttpCollection
+        assert.instanceOf collection, HttpCollection
         count = 11
         for i in [ 1 .. count ]
           yield collection.create test: 'test1'
