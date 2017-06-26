@@ -112,10 +112,13 @@ module.exports = (Module)->
       @public dataForRequest: Function,
         args: [Object]
         return: Object
-        default: ({recordName, snapshot})->
-          key = inflect.singularize inflect.underscore recordName.replace /Record$/, ''
+        default: ({recordName, snapshot, requestType})->
           if snapshot?
-            return "#{key}": snapshot
+            if requestType is 'insert'
+              key = inflect.singularize inflect.underscore recordName.replace /Record$/, ''
+              return "#{key}": snapshot
+            else
+              return snapshot
           else
             return
 
@@ -278,17 +281,18 @@ module.exports = (Module)->
             do =>
               if aoQuery.$forIn?
                 voQuery ?= {}
-                voQuery.requestType = 'remove'
+                voQuery.requestType = 'remove' # запрос пойдет на bulk delete
                 voQuery.recordName = @delegate.name
                 voQuery.query = _.pick aoQuery, [
-                  '$forIn', '$join', '$filter', '$let', '$remove'
+                  '$forIn', '$join', '$filter', '$let'
                 ]
+                voQuery.query.$return = '@doc'
                 voQuery
           else if (voRecord = aoQuery.$insert)?
             do =>
               if aoQuery.$into?
                 voQuery ?= {}
-                voQuery.requestType = 'insert'
+                voQuery.requestType = 'insert' # запрос пойдет на create
                 voQuery.recordName = @delegate.name
                 voQuery.snapshot = @serialize voRecord
                 voQuery
@@ -296,7 +300,7 @@ module.exports = (Module)->
             do =>
               if aoQuery.$forIn?
                 voQuery ?= {}
-                voQuery.requestType = 'update'
+                voQuery.requestType = 'update' # запрос пойдет на bulk update
                 voQuery.recordName = @delegate.name
                 voQuery.snapshot = @serialize voRecord
                 voQuery.query = _.pick aoQuery, [
@@ -308,7 +312,7 @@ module.exports = (Module)->
             do =>
               if aoQuery.$forIn?
                 voQuery ?= {}
-                voQuery.requestType = 'replace'
+                voQuery.requestType = 'replace' # запрос пойдет на bulk replace
                 voQuery.recordName = @delegate.name
                 voQuery.snapshot = @serialize voRecord
                 voQuery.query = _.pick aoQuery, [
@@ -319,7 +323,7 @@ module.exports = (Module)->
           else if aoQuery.$forIn?
             do =>
               voQuery ?= {}
-              voQuery.requestType = 'find'
+              voQuery.requestType = 'find' # запрос пойдет на list
               voQuery.recordName = @delegate.name
               voQuery.query = aoQuery
               voQuery.isCustomReturn = (

@@ -421,10 +421,18 @@ describe 'HttpCollectionMixin', ->
           @public namespace: String, { default: 'v1' }
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
-        data = collection.dataForRequest snapshot: test: 'test1'
-        assert.deepEqual data, { test: 'test1' }
-        data = collection.dataForRequest snapshot: test: 'test2'
-        assert.deepEqual data, { test: 'test2' }
+        data = collection.dataForRequest(
+          requestType: 'update'
+          recordName: 'TestRecord'
+          snapshot: name: 'test1'
+        )
+        assert.deepEqual data, { name: 'test1' }
+        data = collection.dataForRequest(
+          requestType: 'insert'
+          recordName: 'TestRecord'
+          snapshot: name: 'test2'
+        )
+        assert.deepEqual data, test: { name: 'test2' }
         yield return
   describe '#~requestFor', ->
     it 'should request params', ->
@@ -441,62 +449,62 @@ describe 'HttpCollectionMixin', ->
           @public namespace: String, { default: 'v1' }
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
-        sampleData = test: 'test'
+        sampleData = name: 'test'
         request = collection[Symbol.for '~requestFor']
           recordName: 'TestRecord'
-          snapshot: sampleData
+          snapshot: undefined
           requestType: 'find'
-          query: test: 'test'
+          query: name: 'test'
         assert.deepEqual request,
           method: 'GET'
           url: 'http://localhost:8000/v1/tests'
           headers: {}
-          data: sampleData
-          query: test: 'test'
+          data: undefined
+          query: name: 'test'
         request = collection[Symbol.for '~requestFor']
           recordName: 'TestRecord'
           snapshot: sampleData
           requestType: 'insert'
-          query: test: 'test'
+          query: undefined
         assert.deepEqual request,
           method: 'POST'
           url: 'http://localhost:8000/v1/tests'
           headers: {}
-          data: sampleData
-          query: test: 'test'
+          data: test: sampleData
+          query: undefined
         request = collection[Symbol.for '~requestFor']
           recordName: 'TestRecord'
           snapshot: sampleData
           requestType: 'update'
-          query: test: 'test'
+          query: name: 'test'
         assert.deepEqual request,
           method: 'PATCH'
           url: 'http://localhost:8000/v1/tests/bulk'
           headers: {}
           data: sampleData
-          query: test: 'test'
+          query: name: 'test'
         request = collection[Symbol.for '~requestFor']
           recordName: 'TestRecord'
           snapshot: sampleData
           requestType: 'replace'
-          query: test: 'test'
+          query: name: 'test'
         assert.deepEqual request,
           method: 'PUT'
           url: 'http://localhost:8000/v1/tests/bulk'
           headers: {}
           data: sampleData
-          query: test: 'test'
+          query: name: 'test'
         request = collection[Symbol.for '~requestFor']
           recordName: 'TestRecord'
-          snapshot: sampleData
+          snapshot: undefined
           requestType: 'remove'
-          query: test: 'test'
+          query: name: 'test'
         assert.deepEqual request,
           method: 'DELETE'
           url: 'http://localhost:8000/v1/tests/bulk'
           headers: {}
-          data: sampleData
-          query: test: 'test'
+          data: undefined
+          query: name: 'test'
         yield return
   describe '#push', ->
     before ->
@@ -727,34 +735,34 @@ describe 'HttpCollectionMixin', ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
-          @attribute test: String
+          @attribute name: String
           @public init: Function,
             default: ->
               @super arguments...
               @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::HttpCollection extends LeanRC::Collection
+        TestRecord.initialize()
+        class HttpCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-        Test::HttpCollection.initialize()
-        facade.registerProxy Test::HttpCollection.new KEY,
-          delegate: Test::TestRecord
+        HttpCollection.initialize()
+        facade.registerProxy HttpCollection.new KEY,
+          delegate: TestRecord
           serializer: LeanRC::Serializer
         collection = facade.retrieveProxy KEY
-        assert.instanceOf collection, Test::HttpCollection
-        record = yield collection.create test: 'test1'
-        updatedRecord = yield collection.override record.id, collection.build test: 'test2'
+        assert.instanceOf collection, HttpCollection
+        record = yield collection.create name: 'test1'
+        updatedRecord = yield collection.override record.id, collection.build name: 'test2'
         assert.isDefined updatedRecord
         assert.equal record.id, updatedRecord.id
-        assert.propertyVal record, 'test', 'test1'
-        assert.propertyVal updatedRecord, 'test', 'test2'
+        assert.propertyVal record, 'name', 'test1'
+        assert.propertyVal updatedRecord, 'name', 'test2'
         facade.remove()
         yield return
   describe '#patch', ->
