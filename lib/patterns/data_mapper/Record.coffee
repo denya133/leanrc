@@ -63,20 +63,20 @@ module.exports = (Module)->
     @module Module
 
     @attribute id: String,
-      validate: -> joi.string().allow(null).default(null)
+      validate: -> joi.string().allow(null).empty('').default(null)
     @attribute rev: String,
-      validate: -> joi.string().allow(null).default(null)
+      validate: -> joi.string().allow(null).empty('').default(null)
     @attribute type: String,
-      validate: -> joi.string().allow(null).default(null)
+      validate: -> joi.string().allow(null).empty('').default(null)
     @attribute isHidden: Boolean,
       validate: -> joi.boolean().allow(null).default((-> no), 'by default')
       default: no
     @attribute createdAt: Date,
-      validate: -> joi.date().allow(null)
+      validate: -> joi.date().allow(null).empty('')
     @attribute updatedAt: Date,
-      validate: -> joi.date().allow(null)
+      validate: -> joi.date().allow(null).empty('')
     @attribute deletedAt: Date,
-      validate: -> joi.date().allow(null)
+      validate: -> joi.date().allow(null).empty('').default(null)
       default: null
 
     ############################################################################
