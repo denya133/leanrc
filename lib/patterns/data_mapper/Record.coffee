@@ -62,13 +62,22 @@ module.exports = (Module)->
     @include RecordMixin
     @module Module
 
-    @attribute id: String
-    @attribute rev: String
-    @attribute type: String
-    @attribute isHidden: Boolean, {default: no}
-    @attribute createdAt: Date
-    @attribute updatedAt: Date
-    @attribute deletedAt: Date
+    @attribute id: String,
+      validate: -> joi.string().empty(null).empty('').default(null)
+    @attribute rev: String,
+      validate: -> joi.string().empty(null).empty('').default(null)
+    @attribute type: String,
+      validate: -> joi.string().empty(null).empty('').default(null)
+    @attribute isHidden: Boolean,
+      validate: -> joi.boolean().empty(null).default((-> no), 'by default')
+      default: no
+    @attribute createdAt: Date,
+      validate: -> joi.string().empty(null).empty('').default(null)
+    @attribute updatedAt: Date,
+      validate: -> joi.string().empty(null).empty('').default(null)
+    @attribute deletedAt: Date,
+      validate: -> joi.string().empty(null).empty('').default(null)
+      default: null
 
     ############################################################################
 

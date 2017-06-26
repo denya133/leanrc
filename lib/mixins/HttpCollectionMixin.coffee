@@ -112,8 +112,12 @@ module.exports = (Module)->
       @public dataForRequest: Function,
         args: [Object]
         return: Object
-        default: ({snapshot})->
-          return snapshot
+        default: ({recordName, snapshot})->
+          key = inflect.singularize inflect.underscore recordName.replace /Record$/, ''
+          if snapshot?
+            return "#{key}": snapshot
+          else
+            return
 
       @public urlForRequest: Function,
         args: [Object]
@@ -286,7 +290,7 @@ module.exports = (Module)->
                 voQuery ?= {}
                 voQuery.requestType = 'insert'
                 voQuery.recordName = @delegate.name
-                voQuery.snapshot = @serializer.serialize voRecord
+                voQuery.snapshot = @serialize voRecord
                 voQuery
           else if (voRecord = aoQuery.$update)?
             do =>
@@ -294,7 +298,7 @@ module.exports = (Module)->
                 voQuery ?= {}
                 voQuery.requestType = 'update'
                 voQuery.recordName = @delegate.name
-                voQuery.snapshot = @serializer.serialize voRecord
+                voQuery.snapshot = @serialize voRecord
                 voQuery.query = _.pick aoQuery, [
                   '$forIn', '$join', '$filter', '$let'
                 ]
@@ -306,7 +310,7 @@ module.exports = (Module)->
                 voQuery ?= {}
                 voQuery.requestType = 'replace'
                 voQuery.recordName = @delegate.name
-                voQuery.snapshot = @serializer.serialize voRecord
+                voQuery.snapshot = @serialize voRecord
                 voQuery.query = _.pick aoQuery, [
                   '$forIn', '$join', '$filter', '$let'
                 ]
