@@ -63,20 +63,20 @@ module.exports = (Module)->
     @module Module
 
     @attribute id: String,
-      validate: -> joi.string().empty(null).empty('').default(null)
+      validate: -> joi.string().allow(null).default(null)
     @attribute rev: String,
-      validate: -> joi.string().empty(null).empty('').default(null)
+      validate: -> joi.string().allow(null).default(null)
     @attribute type: String,
-      validate: -> joi.string().empty(null).empty('').default(null)
+      validate: -> joi.string().allow(null).default(null)
     @attribute isHidden: Boolean,
-      validate: -> joi.boolean().empty(null).default((-> no), 'by default')
+      validate: -> joi.boolean().allow(null).default((-> no), 'by default')
       default: no
     @attribute createdAt: Date,
-      validate: -> joi.string().empty(null).empty('').default(null)
+      validate: -> joi.string().allow(null).default(null)
     @attribute updatedAt: Date,
-      validate: -> joi.string().empty(null).empty('').default(null)
+      validate: -> joi.string().allow(null).default(null)
     @attribute deletedAt: Date,
-      validate: -> joi.string().empty(null).empty('').default(null)
+      validate: -> joi.string().allow(null).default(null)
       default: null
 
     ############################################################################
@@ -114,7 +114,7 @@ module.exports = (Module)->
       args: []
       return: NILL
       default: ->
-        @updatedAt = new Date().toISOString()
+        @updatedAt = new Date()
         yield return
 
     @public @async beforeCreate: Function,
@@ -122,7 +122,7 @@ module.exports = (Module)->
       return: NILL
       default: ->
         @id ?= yield @collection.generateId()
-        now = new Date().toISOString()
+        now = new Date()
         @createdAt ?= now
         @updatedAt ?= now
         yield return
@@ -139,7 +139,7 @@ module.exports = (Module)->
       return: NILL
       default: ->
         @isHidden = yes
-        now = new Date().toISOString()
+        now = new Date()
         @updatedAt = now
         @deletedAt = now
         return
