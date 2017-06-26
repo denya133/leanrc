@@ -72,11 +72,11 @@ module.exports = (Module)->
       validate: -> joi.boolean().allow(null).default((-> no), 'by default')
       default: no
     @attribute createdAt: Date,
-      validate: -> joi.string().allow(null).default(null)
+      validate: -> joi.date().allow(null)
     @attribute updatedAt: Date,
-      validate: -> joi.string().allow(null).default(null)
+      validate: -> joi.date().allow(null)
     @attribute deletedAt: Date,
-      validate: -> joi.string().allow(null).default(null)
+      validate: -> joi.date().allow(null)
       default: null
 
     ############################################################################
