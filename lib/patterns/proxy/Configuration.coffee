@@ -176,11 +176,16 @@ module.exports = (Module)->
                 unless _.isString config.default
                   throw new Error "Default for '#{attr}' must be string"
                   return
-            Reflect.defineProperty @, attr,
+            value = if config.type is 'json'
+              JSON.parse config.default
+            else
+              config.default
+            Reflect.defineProperty @, attr, {
               enumerable: yes
               configurable: yes
               writable: no
-              value: config.default
+              value
+            }
             return
         return
 
