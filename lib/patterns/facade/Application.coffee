@@ -2,6 +2,7 @@
 
 module.exports = (Module)->
   {
+    MIGRATOR
     APPLICATION_MEDIATOR
 
     Pipes
@@ -22,6 +23,8 @@ module.exports = (Module)->
     @const CONNECT_MODULE_TO_LOGGER: Symbol 'connectModuleToLogger'
     @const CONNECT_SHELL_TO_LOGGER: Symbol 'connectShellToLogger'
     @const CONNECT_MODULE_TO_SHELL: Symbol 'connectModuleToShell'
+
+    @public isMigrator: Boolean
 
     @public @static NAME: String,
       get: -> @Module.name
@@ -48,10 +51,11 @@ module.exports = (Module)->
         return yield appMediator.run scriptName, data
 
     @public init: Function,
-      default: ->
+      default: (symbol)->
         {ApplicationFacade} = @constructor.Module::
         {NAME, name} = @constructor
         @super ApplicationFacade.getInstance NAME ? name
+        @isMigrator = symbol is MIGRATOR
         @facade.startup @
         return
 
