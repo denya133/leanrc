@@ -165,9 +165,13 @@ module.exports = (Module)->
                   throw new Error "Default for '#{attr}' must be integer"
                   return
               when 'json'
-                unless _.isObject(config.default) or _.isArray(config.default)
-                  throw new Error "Default for '#{attr}' must be object or array"
+                unless _.isString(config.default)
+                  throw new Error "Default for '#{attr}' must be JSON string"
                   return
+                try
+                  JSON.parse config.default
+                catch err
+                  throw new Error "Default for '#{attr}' is not valid JSON"
               when 'password' #like string but will be displayed as a masked input field in the web frontend
                 unless _.isString config.default
                   throw new Error "Default for '#{attr}' must be string"
