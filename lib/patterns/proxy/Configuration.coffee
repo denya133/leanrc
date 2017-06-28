@@ -115,7 +115,7 @@ module.exports = (Module)->
           else
             'development'
         else
-          if process.env.NODE_ENV is 'production'
+          if process?.env?.NODE_ENV is 'production'
             'production'
           else
             'development'
