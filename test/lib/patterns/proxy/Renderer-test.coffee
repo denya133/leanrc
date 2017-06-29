@@ -72,7 +72,7 @@ describe 'Renderer', ->
         Test::Configuration.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
-          @include LeanRC::BulkActionsResourceMixin
+          @include LeanRC::QueryableResourceMixin
           @module Test
           @public entityName: String, { default: 'TestRecord' }
         Test::TestResource.initialize()
@@ -130,7 +130,7 @@ describe 'Renderer', ->
         Test::Configuration.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
-          @include LeanRC::BulkActionsResourceMixin
+          @include LeanRC::QueryableResourceMixin
           @module Test
           @public entityName: String, { default: 'TestRecord' }
         Test::TestResource.initialize()

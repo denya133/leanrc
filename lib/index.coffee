@@ -12,29 +12,30 @@ class LeanRC extends RC
 
   @const HANDLER_RESULT:  0
   @const RECORD_CHANGED:  1
-  @const CONFIGURATION:  Symbol 'ConfigurationProxy'
+  @const CONFIGURATION:  'ConfigurationProxy'
   @const STARTUP: Symbol 'startup' # для сигнала
   @const MIGRATE: Symbol 'migrate' # для сигнала
   @const ROLLBACK: Symbol 'rollback' # для сигнала
   @const STOPPED_MIGRATE: Symbol 'stopped_migrate' # для сигнала
   @const STOPPED_ROLLBACK: Symbol 'stopped_rollback' # для сигнала
   @const MIGRATOR: Symbol 'MIGRATOR' # для создания инстанса приложения без свича (для проведения миграций)
-  @const MIGRATIONS: Symbol 'MigrationsCollection'
-  @const SESSIONS: Symbol 'SessionsCollection'
-  @const USERS: Symbol 'UsersCollection'
-  @const SPACES: Symbol 'SpacesCollection'
-  @const ROLES: Symbol 'RolesCollection'
-  @const RESQUE: Symbol 'ResqueProxy'
+  @const MIGRATIONS: 'MigrationsCollection'
+  @const SESSIONS: 'SessionsCollection'
+  @const USERS: 'UsersCollection'
+  @const SPACES: 'SpacesCollection'
+  @const ROLES: 'RolesCollection'
+  @const UPLOADS: 'UploadsCollection'
+  @const RESQUE: 'ResqueProxy'
   @const START_RESQUE: Symbol 'start_resque'
   @const DELAYED_JOBS_QUEUE: 'delayed_jobs'
   @const DELAYED_JOBS_SCRIPT: 'DelayedJobScript'
   @const DEFAULT_QUEUE: 'default'
   @const JOB_RESULT:  Symbol 'JOB_RESULT'
   @const SHELL:  Symbol 'ShellApplication'
-  @const APPLICATION_MEDIATOR:  Symbol 'ApplicationMediator'
-  @const APPLICATION_ROUTER:  Symbol 'ApplicationRouter'
-  @const APPLICATION_RENDERER:  Symbol 'ApplicationRenderer'
-  @const MEM_RESQUE_EXEC:  Symbol 'MemoryResqueExecutor'
+  @const APPLICATION_MEDIATOR:  'ApplicationMediator'
+  @const APPLICATION_ROUTER:  'ApplicationRouter'
+  @const APPLICATION_RENDERER:  'ApplicationRenderer'
+  @const MEM_RESQUE_EXEC:  'MemoryResqueExecutor'
   @const LOG_MSG: Symbol 'logMessage'
 
   require('./interfaces/patterns/ApplicationInterface') LeanRC
@@ -140,7 +141,7 @@ class LeanRC extends RC
   require('./patterns/command/DelayedJobScript') LeanRC
 
   require('./mixins/ApplicationMediatorMixin') LeanRC # needs test
-  require('./mixins/BulkActionsResourceMixin') LeanRC
+  require('./mixins/QueryableResourceMixin') LeanRC # needs test
   require('./mixins/BodyParseMixin') LeanRC
   require('./mixins/CheckSessionsMixin') LeanRC
   require('./mixins/CheckPermissionsMixin') LeanRC

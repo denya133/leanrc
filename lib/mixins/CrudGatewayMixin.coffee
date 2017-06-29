@@ -66,6 +66,11 @@ module.exports = (Module)->
           The query for finding objects.
         '
 
+      @public executeQuerySchema: Object,
+        default: joi.object(query: joi.object().required()).required(), '
+          The query for execute.
+        '
+
       @public bulkResponseSchema: Object,
         default: joi.object success: joi.boolean()
 
@@ -80,7 +85,6 @@ module.exports = (Module)->
           @swaggerDefinition 'list', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
-              # TODO: что делать, если ресурс внутри еще одного неймспейса - например /:space/
               .queryParam 'query', @querySchema, "
                 The query for finding
                 #{@listEntityName}.
@@ -203,78 +207,22 @@ module.exports = (Module)->
                 from the database.
               "
 
-          @swaggerDefinition 'bulkUpdate', (endpoint)->
+          @swaggerDefinition 'executeQuery', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
-              .queryParam 'query', @querySchema, "
-                The query for bulk updating
-                #{@listEntityName}.
+              .body @executeQuerySchema, "
+                The query for execute.
               "
-              .body @itemSchema.required(), "
-                The data to replace the
-                #{@itemEntityName} with.
+              .response joi.array().items(joi.any()), "
+                Any result.
               "
-              .response @bulkResponseSchema, "
-                Bulk replace has been realized.
-              "
-              .error HTTP_NOT_FOUND
-              .error HTTP_CONFLICT
               .error UNAUTHORIZED
               .error UPGRADE_REQUIRED
               .summary "
-                Replace some #{@listEntityName}
+                Execute some query
               "
               .description "
-                Replaces some existing
-                #{@listEntityName} with the
-                request body.
-              "
-
-          @swaggerDefinition 'bulkPatch', (endpoint)->
-            endpoint
-              .pathParam 'v', @versionSchema
-              .queryParam 'query', @querySchema, "
-                The query for bulk updating
-                #{@listEntityName}.
-              "
-              .body @itemSchema.required(), "
-                The data to update the
-                #{@itemEntityName} with.
-              "
-              .response @bulkResponseSchema, "
-                Bulk update has been realized.
-              "
-              .error HTTP_NOT_FOUND
-              .error HTTP_CONFLICT
-              .error UNAUTHORIZED
-              .error UPGRADE_REQUIRED
-              .summary "
-                Update some #{@listEntityName}
-              "
-              .description "
-                Patches some existing #{@listEntityName}
-                with the request body.
-              "
-
-          @swaggerDefinition 'bulkDelete', (endpoint)->
-            endpoint
-              .pathParam 'v', @versionSchema
-              .queryParam 'query', @querySchema, "
-                The query for bulk updating
-                #{@listEntityName}.
-              "
-              .error HTTP_NOT_FOUND
-              .error UNAUTHORIZED
-              .error UPGRADE_REQUIRED
-              .response @bulkResponseSchema, "
-                Bulk delete has been realized.
-              "
-              .summary "
-                Remove some #{@listEntityName}
-              "
-              .description "
-                Deletes some existing #{@listEntityName}
-                from the database.
+                This endpoint will been used from HttpCollectionMixin
               "
 
           return

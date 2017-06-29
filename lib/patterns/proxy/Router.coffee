@@ -258,10 +258,7 @@ module.exports = (Module)->
         patch: 'patch'
         update: 'put'
         delete: 'delete'
-
-        bulkPatch: 'patch'
-        bulkUpdate: 'put'
-        bulkDelete: 'delete'
+        executeQuery: 'post'
 
       voPaths =
         list: ''
@@ -270,10 +267,7 @@ module.exports = (Module)->
         patch: null
         update: null
         delete: null
-
-        bulkPatch: 'bulk'
-        bulkUpdate: 'bulk'
-        bulkDelete: 'bulk'
+        executeQuery: 'query'
 
       @[iplRoutes] ?= []
 

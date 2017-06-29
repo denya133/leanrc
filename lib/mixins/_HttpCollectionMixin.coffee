@@ -1,3 +1,5 @@
+# TODO !!!! переименовал файл - но не удаляю существующий код - т.к. код интересный и полезный (многие идеи из emberjs тут реализованы - возможно в будущем может понадобится сделать адаптер как в эмбере но на серверной стороне)
+
 _             = require 'lodash'
 inflect       = do require 'i'
 
@@ -89,7 +91,7 @@ module.exports = (Module)->
       @public namespace: String,
         default: ''
       @public postfix: String,
-        default: 'query'
+        default: 'bulk'
 
       @public headersForRequest: Function,
         args: [Object]
@@ -99,17 +101,35 @@ module.exports = (Module)->
       @public methodForRequest: Function,
         args: [Object]
         return: String
-        default: -> 'POST'
+        default: ({requestType})->
+          switch requestType
+            when 'find' then 'GET'
+            when 'insert' then 'POST'
+            when 'update' then 'PATCH'
+            when 'replace' then 'PUT'
+            when 'remove' then 'DELETE'
+            else
+              'GET'
 
       @public dataForRequest: Function,
         args: [Object]
         return: Object
-        default: ({query})-> {query}
+        default: ({recordName, snapshot, requestType})->
+          if snapshot?
+            if requestType is 'insert'
+              key = inflect.singularize inflect.underscore recordName.replace /Record$/, ''
+              return "#{key}": snapshot
+            else
+              return snapshot
+          else
+            return
 
       @public urlForRequest: Function,
         args: [Object]
         return: String
-        default: (params)-> @buildURL params
+        default: (params)->
+          {recordName, snapshot, requestType, query} = params
+          @buildURL recordName, snapshot, requestType, query
 
       @public pathForType: Function,
         args: [String]
@@ -117,7 +137,7 @@ module.exports = (Module)->
         default: (recordName)->
           inflect.pluralize inflect.underscore recordName.replace /Record$/, ''
 
-      @public urlPrefix: Function,
+      ipmUrlPrefix = @protected urlPrefix: Function,
         args: [String, String]
         return: String
         default: (path, parentURL)->
@@ -143,18 +163,18 @@ module.exports = (Module)->
           if @namespace then url.push @namespace
           return url.join '/'
 
-      @public buildURL: Function,
-        args: [String, String, Object]
+      ipmBuildURL = @protected buildURL: Function,
+        args: [String, [Object, NILL], [Boolean, NILL]]
         return: String
-        default: (recordName)->
+        default: (recordName, query, withPostfix=yes)->
           url = []
-          prefix = @urlPrefix()
+          prefix = @[ipmUrlPrefix]()
 
           if recordName
             path = @pathForType recordName
             url.push path if path
 
-          url.push encodeURIComponent @postfix if @postfix?
+          url.push encodeURIComponent @postfix if withPostfix and @postfix?
           url.unshift prefix if prefix
 
           url = url.join '/'
@@ -163,7 +183,56 @@ module.exports = (Module)->
 
           return url
 
-      @public requestFor: Function,
+      @public urlForFind: Function,
+        args: [String, Object]
+        return: String
+        default: (recordName, query)->
+          @[ipmBuildURL] recordName, query, no
+
+      @public urlForInsert: Function,
+        args: [String, Object]
+        return: String
+        default: (recordName)->
+          @[ipmBuildURL] recordName, null, no
+
+      @public urlForUpdate: Function,
+        args: [String, Object, Object]
+        return: String
+        default: (recordName, query)->
+          @[ipmBuildURL] recordName, query
+
+      @public urlForReplace: Function,
+        args: [String, Object, Object]
+        return: String
+        default: (recordName, query)->
+          @[ipmBuildURL] recordName, query
+
+      @public urlForRemove: Function,
+        args: [String, Object]
+        return: String
+        default: (recordName, query)->
+          @[ipmBuildURL] recordName, query
+
+      @public buildURL: Function,
+        args: [String, [Object, NILL], String, [Object, NILL]]
+        return: String
+        default: (recordName, snapshot, requestType, query)->
+          switch requestType
+            when 'find'
+              @urlForFind recordName, query
+            when 'insert'
+              @urlForInsert recordName, snapshot
+            when 'update'
+              @urlForUpdate recordName, query, snapshot
+            when 'replace'
+              @urlForReplace recordName, query, snapshot
+            when 'remove'
+              @urlForRemove recordName, query
+            else
+              vsMethod = "urlFor#{inflect.camelize requestType}"
+              @[vsMethod]? recordName, snapshot, requestType, query
+
+      ipmRequestFor = @protected requestFor: Function,
         args: [Object]
         return: Object
         default: (params)->
@@ -171,76 +240,92 @@ module.exports = (Module)->
           url     = @urlForRequest params
           headers = @headersForRequest params
           data    = @dataForRequest params
-          return {method, url, headers, data}
+          query   = params.query
+          return {method, url, headers, data, query}
 
       # может быть переопределно другим миксином, который будет посылать запросы через jQuery.ajax например
-      @public @async sendRequest: Function,
+      ipmSendRequest = @protected @async sendRequest: Function,
         args: [Object]
         return: Object
         default: ({method, url, options})->
           return yield Module::Utils.request method, url, options
 
       # может быть переопределно другим миксином, который будет посылать запросы через jQuery.ajax например
-      @public requestToHash: Function,
+      ipmRequestToHash = @protected requestToHash: Function,
         args: [Object]
         return: Object
-        default: ({method, url, headers, data})->
+        default: ({method, url, headers, data, query})->
+          if query?
+            query = encodeURIComponent JSON.stringify query ? ''
+            url += "?query=#{query}"
           options = {
             json: yes
             headers
           }
-          options.body = data
+          options.body = data if data?
           return {
             method
             url
             options
           }
 
-      @public @async makeRequest: Function,
+      ipmMakeRequest = @protected @async makeRequest: Function,
         args: [Object]
         return: Object
         default: (request)-> # result of requestFor
-          hash = @requestToHash request
-          return yield @sendRequest hash
+          hash = @[ipmRequestToHash] request
+          return yield @[ipmSendRequest] hash
 
       @public parseQuery: Function,
         default: (aoQuery)->
           voQuery = null
-          switch
-            when aoQuery.$remove?
+          if aoQuery.$remove?
+            do =>
               if aoQuery.$forIn?
                 voQuery ?= {}
-                voQuery.requestType = 'remove'
+                voQuery.requestType = 'remove' # запрос пойдет на bulk delete
                 voQuery.recordName = @delegate.name
-                voQuery.query = aoQuery
-                return voQuery
-            when (voRecord = aoQuery.$insert)?
+                voQuery.query = _.pick aoQuery, [
+                  '$forIn', '$join', '$filter', '$let'
+                ]
+                voQuery.query.$return = '@doc'
+                voQuery
+          else if (voRecord = aoQuery.$insert)?
+            do =>
               if aoQuery.$into?
                 voQuery ?= {}
-                voQuery.requestType = 'insert'
+                voQuery.requestType = 'insert' # запрос пойдет на create
                 voQuery.recordName = @delegate.name
-                aoQuery.$insert = @delegate.replicateObject voRecord
-                voQuery.query = aoQuery
-                return voQuery
-            when (voRecord = aoQuery.$update)?
+                voQuery.snapshot = @serialize voRecord
+                voQuery
+          else if (voRecord = aoQuery.$update)?
+            do =>
               if aoQuery.$forIn?
                 voQuery ?= {}
-                voQuery.requestType = 'update'
+                voQuery.requestType = 'update' # запрос пойдет на bulk update
                 voQuery.recordName = @delegate.name
-                aoQuery.$update = @delegate.replicateObject voRecord
-                voQuery.query = aoQuery
-                return voQuery
-            when (voRecord = aoQuery.$replace)?
+                voQuery.snapshot = @serialize voRecord
+                voQuery.query = _.pick aoQuery, [
+                  '$forIn', '$join', '$filter', '$let'
+                ]
+                voQuery.query.$return = '@doc'
+                voQuery
+          else if (voRecord = aoQuery.$replace)?
+            do =>
               if aoQuery.$forIn?
                 voQuery ?= {}
-                voQuery.requestType = 'replace'
+                voQuery.requestType = 'replace' # запрос пойдет на bulk replace
                 voQuery.recordName = @delegate.name
-                aoQuery.$replace = @delegate.replicateObject voRecord
-                voQuery.query = aoQuery
-                return voQuery
-            else
+                voQuery.snapshot = @serialize voRecord
+                voQuery.query = _.pick aoQuery, [
+                  '$forIn', '$join', '$filter', '$let'
+                ]
+                voQuery.query.$return = '@doc'
+                voQuery
+          else if aoQuery.$forIn?
+            do =>
               voQuery ?= {}
-              voQuery.requestType = 'find'
+              voQuery.requestType = 'find' # запрос пойдет на list
               voQuery.recordName = @delegate.name
               voQuery.query = aoQuery
               voQuery.isCustomReturn = (
@@ -250,27 +335,38 @@ module.exports = (Module)->
                 aoQuery.$min? or
                 aoQuery.$max? or
                 aoQuery.$avg? or
-                aoQuery.$remove? or
-                aoQuery.$return isnt '@doc' and not aoQuery.$insert?
+                aoQuery.$return isnt '@doc'
               )
-              return voQuery
+              voQuery
 
-      @public @async executeQuery: Function,
+          return voQuery
+
+      @public executeQuery: Function,
         default: (aoQuery, options)->
-          request = @requestFor aoQuery
+          request = @[ipmRequestFor] aoQuery
 
-          { body } = yield @makeRequest request
+          { body } = yield @[ipmMakeRequest] request
+
+          items = []
 
           if body? and body isnt ''
             if _.isString body
               body = JSON.parse body
-            unless _.isArray body
-              body = [body]
-
-            if aoQuery.isCustomReturn
-              return Module::Cursor.new null, body
+            if aoQuery.query?['$count']
+              return Module::Cursor.new null, [body.count]
+            else if aoQuery.isCustomReturn
+              return Module::Cursor.new null, [body]
             else
-              return Module::Cursor.new @, body
+              pluralKey = @collectionName()
+              if _.isArray snapshots = body[pluralKey]
+                items.push snapshots...
+              else
+                singularKey = inflect.singularize pluralKey
+                unless _.isArray snapshot = body[singularKey]
+                  items.push snapshot
+
+          voCursor = Module::Cursor.new @, items
+          return voCursor
 
 
     HttpCollectionMixin.initializeMixin()

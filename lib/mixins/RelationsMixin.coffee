@@ -64,6 +64,8 @@ module.exports = (Module)->
                     Module::MIGRATIONS
                   when 'RolesCollection'
                     Module::ROLES
+                  when 'UploadsCollection'
+                    Module::UPLOADS
                   else
                     vsCollectionName
                 voCollection = @collection.facade.retrieveProxy vsCollectionName
@@ -104,6 +106,8 @@ module.exports = (Module)->
                   Module::MIGRATIONS
                 when 'RolesCollection'
                   Module::ROLES
+                when 'UploadsCollection'
+                  Module::UPLOADS
                 else
                   vsCollectionName
               voCollection = @collection.facade.retrieveProxy vsCollectionName
@@ -146,6 +150,8 @@ module.exports = (Module)->
                   Module::MIGRATIONS
                 when 'RolesCollection'
                   Module::ROLES
+                when 'UploadsCollection'
+                  Module::UPLOADS
                 else
                   vsCollectionName
               voCollection = @collection.facade.retrieveProxy vsCollectionName
