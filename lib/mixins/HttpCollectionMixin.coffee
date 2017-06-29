@@ -144,9 +144,9 @@ module.exports = (Module)->
           return url.join '/'
 
       @public buildURL: Function,
-        args: [String, String, Object]
+        args: [Object]
         return: String
-        default: (recordName)->
+        default: ({recordName})->
           url = []
           prefix = @urlPrefix()
 
@@ -201,10 +201,12 @@ module.exports = (Module)->
         return: Object
         default: (request)-> # result of requestFor
           hash = @requestToHash request
+          console.log '>>>> hash', hash
           return yield @sendRequest hash
 
       @public parseQuery: Function,
         default: (aoQuery)->
+          console.log '>BBBFDFSDFDSF'
           voQuery = null
           switch
             when aoQuery.$remove?
@@ -259,8 +261,9 @@ module.exports = (Module)->
         default: (aoQuery, options)->
           request = @requestFor aoQuery
 
-          { body } = yield @makeRequest request
-
+          res = yield @makeRequest request
+          { body } = res
+          console.log '>>>>>>>>>> IN HttpCollectionMixin res', res
           if body? and body isnt ''
             if _.isString body
               body = JSON.parse body

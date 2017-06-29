@@ -91,7 +91,7 @@ module.exports = (Module)->
       # ------------ Chains definitions ---------
       @chains ['executeQuery']
 
-      @initialHook 'adminOnly', only: ['executeQuery']
+      # @initialHook 'adminOnly', only: ['executeQuery']
       @initialHook 'parseBody', only: ['executeQuery']
       @beforeHook 'getRecordBody', only: ['executeQuery']
 
