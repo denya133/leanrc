@@ -9,6 +9,8 @@ module.exports = (Module)->
   Module.defineMixin Module::Resource, (BaseClass) ->
     class QueryableResourceMixin extends BaseClass
       @inheritProtected()
+      @include Module::BodyParseMixin
+      @include Module::CheckSessionsMixin
 
       MAX_LIMIT   = 50
 
@@ -50,27 +52,28 @@ module.exports = (Module)->
 
       @action @async executeQuery: Function,
         default: ->
-          receivedQuery = _.omit @body.query, [
+          {body} = @context.request
+          receivedQuery = _.omit body.query, [
             '$insert', '$update', '$replace'
           ]
           ipsMultitonKey = Symbol.for '~multitonKey'
           multitonKey = @collection[ipsMultitonKey]
           collectionName = @collection.getProxyName()
           switch
-            when @body.query.$insert?
-              replica = @body.query.$insert
+            when body.query.$insert?
+              replica = body.query.$insert
               replica.multitonKey = multitonKey
               replica.collectionName = collectionName
               voRecord = @collection.delegate.restoreObject @Module, replica
               receivedQuery.$insert = voRecord
-            when @body.query.$update?
-              replica = @body.query.$update
+            when body.query.$update?
+              replica = body.query.$update
               replica.multitonKey = multitonKey
               replica.collectionName = collectionName
               voRecord = @collection.delegate.restoreObject @Module, replica
               receivedQuery.$update = voRecord
-            when @body.query.$replace?
-              replica = @body.query.$replace
+            when body.query.$replace?
+              replica = body.query.$replace
               replica.multitonKey = multitonKey
               replica.collectionName = collectionName
               voRecord = @collection.delegate.restoreObject @Module, replica
@@ -90,10 +93,9 @@ module.exports = (Module)->
 
       # ------------ Chains definitions ---------
       @chains ['executeQuery']
-
-      # @initialHook 'adminOnly', only: ['executeQuery']
+      @initialHook 'checkSession', only: ['executeQuery']
+      @initialHook 'adminOnly', only: ['executeQuery']
       @initialHook 'parseBody', only: ['executeQuery']
-      @beforeHook 'getRecordBody', only: ['executeQuery']
 
 
     QueryableResourceMixin.initializeMixin()
