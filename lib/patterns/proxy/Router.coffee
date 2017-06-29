@@ -1,4 +1,4 @@
-# по сути здесь надо повторить (скопипастить) код из FoxxMC::Router
+
 
 # example in use
 ###
@@ -20,92 +20,6 @@
 ```
 ###
 
-###
-TODO: в старом коде в Module классе был код
-Идея котого в следующем, после того как все роуты задефайнились, мы идем по ним, и суммируем все роуты данного сервиса в метаданные о том, какие пермишены моогут быть объявлены для этого сервиса.
-```coffee
-      applicationRouter = new @::ApplicationRouter()
-      router = FoxxRouter()
-      Mapping = {}
-      applicationRouter._routes.forEach (item)->
-        controllerName = inflect.camelize inflect.underscore "#{item.controller.replace /[/]/g, '_'}Controller"
-        Mapping[controllerName] ?= []
-        Mapping[controllerName].push item.action unless _.includes Mapping[controllerName], item.action
-      allSections = Object.keys Mapping
-      availableSections = []
-      availableSections.push
-        id: 'system'
-        module: @name
-        actions: ['administrator']
-      availableSections.push
-        id: 'moderator'
-        module: @name
-        actions: allSections
-      availableSections = availableSections.concat allSections.map (section)->
-        id: section
-        module: @name
-        actions: Mapping[section]
-      sectionSchema = joi.object
-        id:       joi.string()
-        module:   joi.string()
-        actions:  joi.array().items(joi.string())
-      sectionsSchemaForArray = joi.object
-        availableSections: joi.array().items sectionSchema
-      sectionsSchemaForItem = joi.object
-        availableSection: sectionSchema
-      router.get '/permitted_sections', (req, res)->
-        res.send {availableSections}
-      .response     sectionsSchemaForArray, "
-        The permitted_sections.
-      "
-      .summary      "
-        List of permitted_sections
-      "
-      .description  "
-        Retrieves a list of permitted_sections.
-      "
-      router.get '/permitted_sections/:section', (req, res)=>
-        switch req.pathParams.section
-          when 'system'
-            availableSection =
-              id: 'system'
-              module: @name
-              actions: ['administrator']
-          when 'moderator'
-            availableSection =
-              id: 'moderator'
-              module: @name
-              actions: allSections
-          else
-            availableSection =
-              id: req.pathParams.section
-              module: @name
-              actions: Mapping[req.pathParams.section]
-        res.send {availableSection}
-      .response     sectionsSchemaForItem, "
-        The permitted_section.
-      "
-      .summary      "
-        Fetch the permitted_section
-      "
-      .description  "
-        Retrieves the permitted_section by its key.
-      "
-      router.get '/version', (req, res)=>
-        {version} = @context.manifest
-        res.send {version}
-      .response     joi.object(version: joi.string()), "
-        Version of this service in semver format.
-      "
-      .summary      "
-        Semver version of this service
-      "
-      .description  "
-        Version may will be checked other services for still compatible
-      "
-```
-
-###
 
 _             = require 'lodash'
 inflect       = do require 'i'
