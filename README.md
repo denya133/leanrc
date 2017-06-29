@@ -3,6 +3,9 @@ LeanRC
 
 LeanRC is a lightweight framework for creating applications based upon the classic Model-View-Controller design meta-pattern. It supports modular programming through the use of Multiton Core actors.
 
+## CoffeeScript code guidelines
+https://docs.google.com/a/saifas.com/document/d/114zNDimqXbdF76nnKBUqDfZoKd7xn6c7V14Fb7jOlk0/edit?usp=sharing
+
 
 ## Usefull command in console for creation ssh agent
 ```
