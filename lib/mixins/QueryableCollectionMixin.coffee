@@ -9,9 +9,9 @@ _ = require 'lodash'
 
 module.exports = (Module)->
   Module.defineMixin Module::Collection, (BaseClass) ->
-    class QueryableMixin extends BaseClass
+    class QueryableCollectionMixin extends BaseClass
       @inheritProtected()
-      @implements Module::QueryableMixinInterface
+      @implements Module::QueryableCollectionMixinInterface
 
       @public @async findBy: Function,
         default: (query)->
@@ -96,4 +96,4 @@ module.exports = (Module)->
           yield @executeQuery @parseQuery voQuery
 
 
-    QueryableMixin.initializeMixin()
+    QueryableCollectionMixin.initializeMixin()

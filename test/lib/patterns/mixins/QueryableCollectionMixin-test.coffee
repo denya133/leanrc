@@ -5,7 +5,7 @@ LeanRC = require.main.require 'lib'
 RC = require 'RC'
 { co } = RC::Utils
 
-describe 'QueryableMixin', ->
+describe 'QueryableCollectionMixin', ->
   describe '.new', ->
     it 'should create queryable instance', ->
       co ->
@@ -14,7 +14,7 @@ describe 'QueryableMixin', ->
         Test.initialize()
         class Test::Queryable extends RC::CoreObject
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public parseQuery: Object,
             default: (aoQuery) -> aoQuery
@@ -34,7 +34,7 @@ describe 'QueryableMixin', ->
         spyParseQuery = sinon.spy (aoQuery) -> aoQuery
         class Test::Queryable extends RC::CoreObject
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public parseQuery: Object,
             default: spyParseQuery
@@ -62,7 +62,7 @@ describe 'QueryableMixin', ->
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
@@ -110,7 +110,7 @@ describe 'QueryableMixin', ->
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
@@ -161,7 +161,7 @@ describe 'QueryableMixin', ->
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
@@ -215,7 +215,7 @@ describe 'QueryableMixin', ->
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
@@ -286,7 +286,7 @@ describe 'QueryableMixin', ->
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
@@ -357,7 +357,7 @@ describe 'QueryableMixin', ->
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
@@ -421,7 +421,7 @@ describe 'QueryableMixin', ->
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
@@ -500,7 +500,7 @@ describe 'QueryableMixin', ->
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
@@ -569,7 +569,7 @@ describe 'QueryableMixin', ->
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord
@@ -638,7 +638,7 @@ describe 'QueryableMixin', ->
         Test::TestRecord.initialize()
         class Test::Queryable extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public delegate: RC::Class,
             default: Test::TestRecord

@@ -6,7 +6,7 @@ for example
 module.exports = (Module)->
   {
     Collection
-    QueryableMixin
+    QueryableCollectionMixin
     ArangoCollectionMixin
     IterableMixin
     GenerateAutoincrementIdMixin
@@ -14,7 +14,7 @@ module.exports = (Module)->
 
   class MainCollection extends Collection
     @inheritProtected()
-    @include QueryableMixin
+    @include QueryableCollectionMixin
     @include ArangoCollectionMixin
     @include IterableMixin
     @include GenerateAutoincrementIdMixin

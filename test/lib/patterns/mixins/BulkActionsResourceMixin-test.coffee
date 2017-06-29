@@ -53,7 +53,7 @@ describe 'BulkActionsResourceMixin', ->
         Test::TestResource.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public parseQuery: Object,
             default: (aoQuery) -> aoQuery
@@ -119,7 +119,7 @@ describe 'BulkActionsResourceMixin', ->
         Test::TestResource.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public parseQuery: Object,
             default: (aoQuery) ->
@@ -202,7 +202,7 @@ describe 'BulkActionsResourceMixin', ->
         Test::TestResource.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public parseQuery: Object,
             default: (aoQuery) ->
@@ -285,7 +285,7 @@ describe 'BulkActionsResourceMixin', ->
         Test::TestResource.initialize()
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
           @public parseQuery: Object,
             default: (aoQuery) ->

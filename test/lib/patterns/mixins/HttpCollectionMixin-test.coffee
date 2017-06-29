@@ -17,7 +17,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
         Test::HttpCollection.initialize()
@@ -47,7 +47,7 @@ describe 'HttpCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public delegate: RC::Class,
@@ -87,7 +87,7 @@ describe 'HttpCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public delegate: RC::Class,
@@ -117,7 +117,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
         Test::HttpCollection.initialize()
@@ -143,7 +143,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -165,7 +165,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -187,7 +187,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -207,7 +207,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -227,7 +227,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -247,7 +247,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -267,7 +267,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -287,7 +287,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -307,7 +307,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -338,7 +338,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -393,7 +393,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -414,7 +414,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -442,7 +442,7 @@ describe 'HttpCollectionMixin', ->
         Test.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -529,7 +529,7 @@ describe 'HttpCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -571,7 +571,7 @@ describe 'HttpCollectionMixin', ->
         TestRecord.initialize()
         class HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -613,7 +613,7 @@ describe 'HttpCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -654,7 +654,7 @@ describe 'HttpCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -700,7 +700,7 @@ describe 'HttpCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -746,7 +746,7 @@ describe 'HttpCollectionMixin', ->
         TestRecord.initialize()
         class HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -788,7 +788,7 @@ describe 'HttpCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -830,7 +830,7 @@ describe 'HttpCollectionMixin', ->
         Test::TestRecord.initialize()
         class Test::HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
@@ -870,7 +870,7 @@ describe 'HttpCollectionMixin', ->
         TestRecord.initialize()
         class HttpCollection extends LeanRC::Collection
           @inheritProtected()
-          @include LeanRC::QueryableMixin
+          @include LeanRC::QueryableCollectionMixin
           @include LeanRC::HttpCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test

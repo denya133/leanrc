@@ -8,7 +8,7 @@ module.exports = (Module)->
   Module.defineMixin Module::Collection, (BaseClass) ->
     class HttpCollectionMixin extends BaseClass
       @inheritProtected()
-      @implements Module::QueryableMixinInterface
+      @implements Module::QueryableCollectionMixinInterface
 
       @public @async push: Function,
         default: (aoRecord)->

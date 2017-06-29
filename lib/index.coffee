@@ -64,7 +64,7 @@ class LeanRC extends RC
 
   require('./interfaces/mixins/CrudGatewayMixinInterface') LeanRC
   require('./interfaces/mixins/IterableMixinInterface') LeanRC
-  require('./interfaces/mixins/QueryableMixinInterface') LeanRC
+  require('./interfaces/mixins/QueryableCollectionMixinInterface') LeanRC
   require('./interfaces/mixins/RelationsMixinInterface') LeanRC
   require('./interfaces/patterns/MigrationInterface') LeanRC
   require('./interfaces/patterns/DelayedQueueInterface') LeanRC
@@ -118,7 +118,7 @@ class LeanRC extends RC
   require('./mixins/MemoryResqueMixin') LeanRC
   require('./mixins/MemoryConfigurationMixin') LeanRC
   require('./mixins/IterableMixin') LeanRC
-  require('./mixins/QueryableMixin') LeanRC
+  require('./mixins/QueryableCollectionMixin') LeanRC
   require('./mixins/ThinHttpCollectionMixin') LeanRC
   require('./mixins/SchemaModuleMixin') LeanRC
 
