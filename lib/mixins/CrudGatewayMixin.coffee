@@ -210,6 +210,9 @@ module.exports = (Module)->
           @swaggerDefinition 'executeQuery', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().required(), "
+                Authorization header is required.
+              "
               .body @executeQuerySchema, "
                 The query for execute.
               "

@@ -105,6 +105,21 @@ module.exports = (Module)->
           return
         yield return args
 
+    @public @async requiredAuthorizationHeader: Function,
+      default: (args...) ->
+        { apiKey }        = @configs
+        {
+          authorization: authHeader
+        } = @context.headers
+        unless authHeader?
+          @context.throw UNAUTHORIZED
+        [..., key] = (/^Bearer\s+(.+)$/.exec authHeader) ? []
+        unless key?
+          @context.throw UNAUTHORIZED
+        unless key is apiKey
+          @context.throw UNAUTHORIZED
+        yield return args
+
     @public @async adminOnly: Function,
       default: (args...) ->
         unless @session?.uid? and @currentUser?

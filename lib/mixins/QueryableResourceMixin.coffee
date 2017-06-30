@@ -93,8 +93,8 @@ module.exports = (Module)->
 
       # ------------ Chains definitions ---------
       @chains ['executeQuery']
-      @initialHook 'checkSession', only: ['executeQuery']
-      @initialHook 'adminOnly', only: ['executeQuery']
+      # @initialHook 'checkSession', only: ['executeQuery']
+      @initialHook 'requiredAuthorizationHeader', only: ['executeQuery']
       @initialHook 'parseBody', only: ['executeQuery']
 
 
