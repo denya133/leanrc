@@ -47,6 +47,7 @@ module.exports = (Module)->
       @public listNotificationInterests: Function,
         default: (args...)->
           interests = @super args...
+          interests.push HANDLER_RESULT
           interests.push JOB_RESULT
           interests.push STOPPED_MIGRATE
           interests.push STOPPED_ROLLBACK
@@ -58,7 +59,7 @@ module.exports = (Module)->
           voBody = aoNotification.getBody()
           vsType = aoNotification.getType()
           switch vsName
-            when STOPPED_MIGRATE, STOPPED_ROLLBACK, JOB_RESULT
+            when HANDLER_RESULT, STOPPED_MIGRATE, STOPPED_ROLLBACK, JOB_RESULT
               @[ipoEmitter].emit vsType, voBody
               break
             else
@@ -109,6 +110,21 @@ module.exports = (Module)->
                 resolve()
                 return
               @facade.sendNotification scriptName, data, reverse
+            catch err
+              reject err
+            return
+
+      @public @async execute: Function,
+        default: (resourceName, {context, reverse}, action)->
+          return yield Module::Promise.new (resolve, reject)=>
+            try
+              @[ipoEmitter].once reverse, ({error, result})->
+                if error?
+                  reject error
+                  return
+                resolve result
+                return
+              @facade.sendNotification resourceName, {context, reverse}, action
             catch err
               reject err
             return

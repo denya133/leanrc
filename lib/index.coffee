@@ -18,7 +18,7 @@ class LeanRC extends RC
   @const ROLLBACK: Symbol 'rollback' # для сигнала
   @const STOPPED_MIGRATE: Symbol 'stopped_migrate' # для сигнала
   @const STOPPED_ROLLBACK: Symbol 'stopped_rollback' # для сигнала
-  @const MIGRATOR: Symbol 'MIGRATOR' # для создания инстанса приложения без свича (для проведения миграций)
+  @const LIGHTWEIGHT: Symbol 'LIGHTWEIGHT' # для создания инстанса приложения без свича (для создания изолированной области выполнения)
   @const MIGRATIONS: 'MigrationsCollection'
   @const SESSIONS: 'SessionsCollection'
   @const USERS: 'UsersCollection'

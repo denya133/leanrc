@@ -11,6 +11,8 @@ module.exports = (Module)->
   {
     ANY
     NILL
+    APPLICATION_MEDIATOR
+    HANDLER_RESULT
 
     SimpleCommand
     ResourceInterface
@@ -263,16 +265,28 @@ module.exports = (Module)->
       args: [Module::NotificationInterface]
       return: Module::NILL
       default: (aoNotification)->
+        # TODO: открытие транзакции в аранге тоже должно быть гдето здесь, а не в свиче
+        resourceName = aoNotification.getType()
         voBody = aoNotification.getBody()
+        action = aoNotification.getType()
+        service = @facade.retrieveMediator APPLICATION_MEDIATOR
         try
-          voResult =
-            result: yield @[aoNotification.getType()]? voBody.context
-            resource: @
+          if service.context?
+            voResult =
+              result: yield @[action]? voBody.context
+              resource: @
+          else
+            app = @Module::MainApplication.new Module::LIGHTWEIGHT
+            voResult =
+              result: yield app.execute resourceName, voBody, action
+              resource: @
+            # TODO: тут до финиша приложения надо забрать информацию о том, какие джобы в процессе выполнения появились в RESQUE - чтобы передать их в метод текущего (главного RESQUE) для реального сохранения.
+            app.finish()
         catch err
           voResult =
             error: err
             resource: @
-        @sendNotification Module::HANDLER_RESULT, voResult, voBody.reverse
+        @sendNotification HANDLER_RESULT, voResult, voBody.reverse
         yield return
 
 

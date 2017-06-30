@@ -2,12 +2,14 @@
 
 module.exports = (Module)->
   {
-    MIGRATOR
+    LIGHTWEIGHT
     APPLICATION_MEDIATOR
 
     Pipes
     ConfigurableMixin
     ApplicationInterface
+    ContextInterface
+    Utils: {uuid}
   } = Module::
   {
     PipeAwareModule
@@ -24,7 +26,8 @@ module.exports = (Module)->
     @const CONNECT_SHELL_TO_LOGGER: Symbol 'connectShellToLogger'
     @const CONNECT_MODULE_TO_SHELL: Symbol 'connectModuleToShell'
 
-    @public isMigrator: Boolean
+    @public isLightweight: Boolean
+    @public context: ContextInterface
 
     @public @static NAME: String,
       get: -> @Module.name
@@ -50,12 +53,22 @@ module.exports = (Module)->
         appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
         return yield appMediator.run scriptName, data
 
+    @public @async execute: Function,
+      default: (resourceName, {context, reverse}, action)->
+        @context = context
+        appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
+        return yield appMediator.execute resourceName, {context, reverse}, action
+
     @public init: Function,
       default: (symbol)->
         {ApplicationFacade} = @constructor.Module::
+        isLightweight = symbol is LIGHTWEIGHT
         {NAME, name} = @constructor
-        @super ApplicationFacade.getInstance NAME ? name
-        @isMigrator = symbol is MIGRATOR
+        if isLightweight
+          @super ApplicationFacade.getInstance uuid.v4()
+        else
+          @super ApplicationFacade.getInstance NAME ? name
+        @isLightweight = isLightweight
         @facade.startup @
         return
 
