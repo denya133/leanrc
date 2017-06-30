@@ -79,21 +79,10 @@ module.exports = (Module)->
               voRecord = @collection.delegate.restoreObject @Module, replica
               receivedQuery.$replace = voRecord
 
-          # isCustomReturn = (
-          #   receivedQuery.$collect? or
-          #   receivedQuery.$count? or
-          #   receivedQuery.$sum? or
-          #   receivedQuery.$min? or
-          #   receivedQuery.$max? or
-          #   receivedQuery.$avg? or
-          #   receivedQuery.$remove? or
-          #   receivedQuery.$return isnt '@doc' and not receivedQuery.$insert?
-          # )
           return yield (yield @collection.query receivedQuery).toArray()
 
       # ------------ Chains definitions ---------
       @chains ['executeQuery']
-      # @initialHook 'checkSession', only: ['executeQuery']
       @initialHook 'requiredAuthorizationHeader', only: ['executeQuery']
       @initialHook 'parseBody', only: ['executeQuery']
 
