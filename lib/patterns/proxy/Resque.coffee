@@ -46,6 +46,10 @@ module.exports = (Module)->
     @include Module::ConfigurableMixin
     @module Module
 
+    # TODO: метод pushJob должен запушить джоб в tmp-хранилище
+
+    # TODO: отдельный метод при вызове должен из tmp-хранилища посохранять джобы в базу данных (это уже должно быть реализовано в платформенном коде)
+
     @public fullQueueName: Function,
       default: (queueName)-> "#{@moduleName()}|>#{queueName}"
 

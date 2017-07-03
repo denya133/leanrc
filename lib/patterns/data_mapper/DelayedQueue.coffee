@@ -53,6 +53,8 @@ module.exports = (Module)->
 
     @public @async push: Function,
       default: (scriptName, data, delayUntil)->
+        # TODO: здесь надо вместо реального вызова сохранения джоба в базу данных сохранить его с помощью такого метода, который в tmp-хранилище временно сохранить джобы (в рамках текущей транзакции-контекста)
+        # а затем уже другой метод будет из tmp-хранилища при вызове сохранять джобы в базу
         yield return @resque.pushJob @name, scriptName, data, delayUntil
 
     @public @async get: Function,
