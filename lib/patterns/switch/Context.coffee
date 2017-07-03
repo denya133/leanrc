@@ -7,7 +7,7 @@ statuses      = require 'statuses'
 ###
 Идеи взяты из https://github.com/koajs/koa/blob/master/lib/context.js
 ###
-# TODO: в контексте надо зарезервировать transactionId, чтобы когда понадобтся - им можно было воспользоваться.
+
 
 module.exports = (Module)->
   {
@@ -40,6 +40,7 @@ module.exports = (Module)->
     @public respond: Boolean
     @public routePath: String
     @public pathParams: Object
+    @public transaction: Object
 
     # @public database: String # возможно это тоже надо получать из метода из отдельного модуля
 
