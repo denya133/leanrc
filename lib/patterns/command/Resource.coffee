@@ -289,6 +289,7 @@ module.exports = (Module)->
         voBody = aoNotification.getBody()
         action = aoNotification.getType()
         service = @facade.retrieveMediator APPLICATION_MEDIATOR
+          .getViewComponent()
         console.log '>>>>> IN Resource::execute @context', service.context
         try
           if service.context?
@@ -297,6 +298,9 @@ module.exports = (Module)->
               resource: @
           else
             app = @Module::MainApplication.new Module::LIGHTWEIGHT
+            serviceMed = service.facade.retrieveMediator APPLICATION_MEDIATOR
+            appMed = app.facade.retrieveMediator APPLICATION_MEDIATOR
+            console.log '>>>>>>> AppMediatorsCheck', serviceMed is appMed
             voResult =
               result: yield app.execute resourceName, voBody, action
               resource: @
