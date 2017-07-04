@@ -285,7 +285,7 @@ module.exports = (Module)->
       args: [Module::NotificationInterface]
       return: Module::NILL
       default: (aoNotification)->
-        resourceName = aoNotification.getType()
+        resourceName = aoNotification.getName()
         voBody = aoNotification.getBody()
         action = aoNotification.getType()
         service = @facade.retrieveMediator APPLICATION_MEDIATOR
