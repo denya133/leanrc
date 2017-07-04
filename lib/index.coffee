@@ -10,8 +10,8 @@ class LeanRC extends RC
 
   Utils: RC::Utils.extend {}, RC::Utils
 
-  @const HANDLER_RESULT:  0
-  @const RECORD_CHANGED:  1
+  @const HANDLER_RESULT:  Symbol 'HANDLER_RESULT'
+  @const RECORD_CHANGED:  Symbol 'RECORD_CHANGED'
   @const CONFIGURATION:  'ConfigurationProxy'
   @const STARTUP: Symbol 'startup' # для сигнала
   @const MIGRATE: Symbol 'migrate' # для сигнала

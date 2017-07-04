@@ -30,6 +30,7 @@ module.exports = (Module)->
     MIGRATE
     ROLLBACK
     JOB_RESULT
+    HANDLER_RESULT
     STOPPED_MIGRATE
     STOPPED_ROLLBACK
 
