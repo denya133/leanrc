@@ -55,6 +55,7 @@ module.exports = (Module)->
 
     @public @async execute: Function,
       default: (resourceName, {context, reverse}, action)->
+        console.log '>>>>> IN Application::execute @context', @context
         @context = context
         appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
         return yield appMediator.execute resourceName, {context, reverse}, action

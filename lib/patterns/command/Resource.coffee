@@ -289,6 +289,7 @@ module.exports = (Module)->
         voBody = aoNotification.getBody()
         action = aoNotification.getType()
         service = @facade.retrieveMediator APPLICATION_MEDIATOR
+        console.log '>>>>> IN Resource::execute @context', service.context
         try
           if service.context?
             voResult =
