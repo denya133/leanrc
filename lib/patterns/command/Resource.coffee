@@ -290,19 +290,23 @@ module.exports = (Module)->
         action = aoNotification.getType()
         service = @facade.retrieveMediator APPLICATION_MEDIATOR
           .getViewComponent()
-        console.log '>>>>> IN Resource::execute @context', service.context, resourceName, action, voBody.reverse
+        # console.log '>>>>> IN Resource::execute @context', service.context?, resourceName, action, voBody.reverse
         try
           if service.context?
+            appEx = @doAction action, voBody.context
+            console.log '>>>>>>. appEx if service.context?', appEx
             voResult =
-              result: yield @doAction action, voBody.context
+              result: yield appEx
               resource: @
           else
             app = @Module::MainApplication.new Module::LIGHTWEIGHT
             serviceMed = service.facade.retrieveMediator APPLICATION_MEDIATOR
             appMed = app.facade.retrieveMediator APPLICATION_MEDIATOR
-            console.log '>>>>>>> AppMediatorsCheck', serviceMed is appMed
+            # console.log '>>>>>>> AppMediatorsCheck', serviceMed is appMed
+            appEx = app.execute resourceName, voBody, action
+            console.log '>>>>>>. appEx else service.context?', appEx
             voResult =
-              result: yield app.execute resourceName, voBody, action
+              result: yield appEx
               resource: @
             yield @saveDelayeds app
             app.finish()
@@ -310,6 +314,7 @@ module.exports = (Module)->
           voResult =
             error: err
             resource: @
+        console.log '>>>>>>> IN Resource before HANDLER_RESULT', voResult, voBody.reverse
         @sendNotification HANDLER_RESULT, voResult, voBody.reverse
         yield return
 
