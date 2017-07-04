@@ -117,6 +117,8 @@ module.exports = (Module)->
 
       @public @async execute: Function,
         default: (resourceName, {context, reverse}, action)->
+          app = @getViewComponent()
+          console.log '>>>>>>> IN ApplicationMediatorMixin::execute', app.facade[Symbol.for '~multitonKey'], app.context
           return yield Module::Promise.new (resolve, reject)=>
             try
               @[ipoEmitter].once reverse, ({error, result})->
