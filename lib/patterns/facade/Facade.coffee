@@ -121,7 +121,6 @@ module.exports = (Module)->
 
     @public sendNotification: Function,
       default: (asName, asBody, asType)->
-        console.log '>>>>>>> IN Facade::sendNotification', @[ipsMultitonKey], asName, asBody, asType
         @notifyObservers Module::Notification.new asName, asBody, asType
         return
 
