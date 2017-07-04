@@ -254,6 +254,7 @@ module.exports = (Module)->
         return if 404 is err.status or err.expose
         return if @configs.silent
         msg = err.stack ? String err
+        console.error '>>>> ERROR', msg
         {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         @facade.sendNotification SEND_TO_LOG, msg.replace(/^/gm, '  '), LEVELS[ERROR]
         return
