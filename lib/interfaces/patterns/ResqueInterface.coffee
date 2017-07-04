@@ -7,6 +7,8 @@ module.exports = (Module)->
     class ResqueInterface extends BaseClass
       @inheritProtected()
 
+      @public @virtual tmpJobs: Array
+
       @public @virtual fullQueueName: Function,
         args: [String]
         return: String
@@ -30,6 +32,15 @@ module.exports = (Module)->
       @public @async @virtual update: Function,
         args: [String, Number]
         return: Module::DelayedQueueInterface
+
+      @public @async @virtual delay: Function,
+        args: [String, String, ANY, [NILL, Number]] # queueName, scriptName, data
+        # последний аргумент не обязательный - delay в миллисекундах
+        return: String
+
+      @public @async @virtual getDelayed: Function,
+        args: []
+        return: Array
 
       #=============== Must be realized in mixin =========
 

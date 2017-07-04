@@ -11,6 +11,11 @@ module.exports = (Module)->
       @public @virtual name: String
       @public @virtual concurrency: Number
 
+      @public @async @virtual delay: Function, # чтобы предсохранить джоб в resque в tmp-хранилище
+        args: [String, ANY, [NILL, Number]] # scriptName, data
+        # последний аргумент не обязательный - delay в миллисекундах
+        return: String
+
       @public @async @virtual push: Function,
         args: [String, ANY, [NILL, Number]] # scriptName, data
         # последний аргумент не обязательный - delay в миллисекундах

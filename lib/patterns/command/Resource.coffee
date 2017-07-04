@@ -13,6 +13,8 @@ module.exports = (Module)->
     NILL
     APPLICATION_MEDIATOR
     HANDLER_RESULT
+    DELAYED_JOBS_QUEUE
+    RESQUE
 
     SimpleCommand
     ResourceInterface
@@ -261,11 +263,28 @@ module.exports = (Module)->
         @recordBody = Module::Utils.extend {}, @recordBody, id: @recordId
         return args
 
+    @public @async doAction: Function, # для того, чтобы отдельная примесь могла переопределить этот метод и обернуть выполнение например в транзакцию
+      args: [String, Module::ContextInterface]
+      return: Module::ANY
+      default: (action, context)->
+        voResult = yield @[action]? context
+        yield return voResult
+
+    @public @async saveDelayeds: Function, # для того, чтобы сохранить все отложенные джобы
+      args: [Module::ApplicationInterface]
+      return: Module::NILL
+      default: (app)->
+        resque = app.facade.retrieveProxy RESQUE
+        for delayed in yield resque.getDelayed()
+          {queueName, scriptName, data, delay} = delayed
+          queue = yield resque.get queueName ? DELAYED_JOBS_QUEUE
+          yield queue.push scriptName, data, delay
+        yield return
+
     @public @async execute: Function,
       args: [Module::NotificationInterface]
       return: Module::NILL
       default: (aoNotification)->
-        # TODO: открытие транзакции в аранге тоже должно быть гдето здесь, а не в свиче
         resourceName = aoNotification.getType()
         voBody = aoNotification.getBody()
         action = aoNotification.getType()
@@ -273,14 +292,14 @@ module.exports = (Module)->
         try
           if service.context?
             voResult =
-              result: yield @[action]? voBody.context
+              result: yield @doAction action, voBody.context
               resource: @
           else
             app = @Module::MainApplication.new Module::LIGHTWEIGHT
             voResult =
               result: yield app.execute resourceName, voBody, action
               resource: @
-            # TODO: тут до финиша приложения надо забрать информацию о том, какие джобы в процессе выполнения появились в RESQUE - чтобы передать их в метод текущего (главного RESQUE) для реального сохранения.
+            yield @saveDelayeds app
             app.finish()
         catch err
           voResult =

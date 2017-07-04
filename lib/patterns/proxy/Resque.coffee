@@ -38,7 +38,11 @@ module.exports = (Module)->
 ###
 
 module.exports = (Module)->
-  {NILL} = Module::
+  {
+    NILL
+
+    Utils: {uuid}
+  } = Module::
 
   class Resque extends Module::Proxy
     @inheritProtected()
@@ -46,9 +50,7 @@ module.exports = (Module)->
     @include Module::ConfigurableMixin
     @module Module
 
-    # TODO: метод pushJob должен запушить джоб в tmp-хранилище
-
-    # TODO: отдельный метод при вызове должен из tmp-хранилища посохранять джобы в базу данных (это уже должно быть реализовано в платформенном коде)
+    @public tmpJobs: Array
 
     @public fullQueueName: Function,
       default: (queueName)-> "#{@moduleName()}|>#{queueName}"
@@ -81,6 +83,18 @@ module.exports = (Module)->
       default: (queueName, concurrency)->
         vhNewQueue = yield @ensureQueue queueName, concurrency
         yield return Module::DelayedQueue.new vhNewQueue, @
+
+    @public @async delay: Function,
+      default: (queueName, scriptName, data, delay)->
+        @tmpJobs ?= []
+        id = uuid.v4()
+        @tmpJobs.push {queueName, scriptName, data, delay, id}
+        yield return id
+
+    @public @async getDelayed: Function,
+      default: ->
+        @tmpJobs ?= []
+        yield return @tmpJobs
 
 
   Resque.initialize()

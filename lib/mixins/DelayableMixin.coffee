@@ -21,7 +21,7 @@ module.exports = (Module)->
         default: (facade, data, options = {})->
           resque = facade.retrieveProxy Module::RESQUE
           queue = yield resque.get options.queue ? Module::DELAYED_JOBS_QUEUE
-          yield queue.push Module::DELAYED_JOBS_SCRIPT, data, options.delayUntil
+          yield queue.delay Module::DELAYED_JOBS_SCRIPT, data, options.delayUntil
           yield return
 
       ###

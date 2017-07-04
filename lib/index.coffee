@@ -83,7 +83,7 @@ class LeanRC extends RC
   require('./mixins/ConfigurableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
-  require('./mixins/DelayableMixin') LeanRC
+  require('./mixins/DelayableMixin') LeanRC # needs retest
 
   require('./patterns/data_mapper/Transform') LeanRC
   require('./patterns/data_mapper/StringTransform') LeanRC
@@ -92,7 +92,7 @@ class LeanRC extends RC
   require('./patterns/data_mapper/BooleanTransform') LeanRC
   require('./patterns/data_mapper/Serializer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
-  require('./patterns/data_mapper/DelayedQueue') LeanRC
+  require('./patterns/data_mapper/DelayedQueue') LeanRC # needs retest
 
   require('./patterns/query_object/Query') LeanRC
 
@@ -108,7 +108,7 @@ class LeanRC extends RC
   require('./patterns/proxy/Gateway') LeanRC
   require('./patterns/proxy/Renderer') LeanRC
   require('./patterns/proxy/Router') LeanRC
-  require('./patterns/proxy/Resque') LeanRC
+  require('./patterns/proxy/Resque') LeanRC # needs retest
 
   require('./mixins/CrudGatewayMixin') LeanRC
   require('./mixins/CrudEndpointMixin') LeanRC
@@ -134,7 +134,7 @@ class LeanRC extends RC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
-  require('./patterns/command/Resource') LeanRC
+  require('./patterns/command/Resource') LeanRC # needs retest
   require('./patterns/command/MigrateCommand') LeanRC
   require('./patterns/command/RollbackCommand') LeanRC
   require('./patterns/command/Script') LeanRC
