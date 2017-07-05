@@ -3,7 +3,16 @@ inflect       = do require 'i'
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    ANY
+    NILL
+
+    LogMessage: {
+      SEND_TO_LOG
+      LEVELS
+      DEBUG
+    }
+  } = Module::
 
   Module.defineMixin Module::Collection, (BaseClass) ->
     class HttpCollectionMixin extends BaseClass
@@ -201,12 +210,11 @@ module.exports = (Module)->
         return: Object
         default: (request)-> # result of requestFor
           hash = @requestToHash request
-          console.log '>>>> hash', hash
+          @sendNotification(SEND_TO_LOG, "HttpCollectionMixin::makeRequest hash #{hash}", LEVELS[DEBUG])
           return yield @sendRequest hash
 
       @public parseQuery: Function,
         default: (aoQuery)->
-          console.log '>BBBFDFSDFDSF'
           voQuery = null
           switch
             when aoQuery.$remove?
@@ -263,7 +271,7 @@ module.exports = (Module)->
 
           res = yield @makeRequest request
           { body } = res
-          console.log '>>>>>>>>>> IN HttpCollectionMixin res', res
+
           if body? and body isnt ''
             if _.isString body
               body = JSON.parse body

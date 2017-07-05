@@ -65,7 +65,7 @@ module.exports = (Module)->
         isLightweight = symbol is LIGHTWEIGHT
         {NAME, name} = @constructor
         if isLightweight
-          @super ApplicationFacade.getInstance uuid.v4()
+          @super ApplicationFacade.getInstance "#{NAME ? name}|>#{uuid.v4()}"
         else
           @super ApplicationFacade.getInstance NAME ? name
         @isLightweight = isLightweight

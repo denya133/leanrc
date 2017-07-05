@@ -3,7 +3,16 @@ inflect       = do require 'i'
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    ANY
+    NILL
+
+    LogMessage: {
+      SEND_TO_LOG
+      LEVELS
+      DEBUG
+    }
+  } = Module::
 
   Module.defineMixin Module::Collection, (BaseClass) ->
     class ThinHttpCollectionMixin extends BaseClass
@@ -278,6 +287,7 @@ module.exports = (Module)->
         return: Module::PromiseInterface
         default: (request)-> # result of requestFor
           hash = @[ipmRequestToHash] request
+          @sendNotification(SEND_TO_LOG, "ThinHttpCollectionMixin::makeRequest hash #{hash}", LEVELS[DEBUG])
           @[ipmSendRequest] hash
 
 
