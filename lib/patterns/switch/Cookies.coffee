@@ -36,7 +36,7 @@ module.exports = (Module)->
         if isArangoDB()
           if opts?
             _opts = {}
-            _opts.ttl = opts.maxAge if opts.maxAge?
+            _opts.ttl = (opts.maxAge / 1000) if opts.maxAge?
             _opts.path = opts.path if opts.path?
             _opts.domain = opts.domain if opts.domain?
             _opts.secure = opts.secure if opts.secure?
