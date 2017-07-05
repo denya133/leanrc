@@ -2,12 +2,12 @@
 
 module.exports = (Module) ->
   {
-    MEM_RESQUE_EXEC
+    RESQUE_EXECUTOR
 
     SimpleCommand
     MainJunctionMediator
     MainSwitch
-    MemoryResqueExecutor
+    ResqueExecutor
   } = Module::
 
   class PrepareViewCommand extends SimpleCommand
@@ -18,7 +18,7 @@ module.exports = (Module) ->
       default: (aoNotification)->
         @facade.registerMediator MainJunctionMediator.new()
         @facade.registerMediator MainSwitch.new()
-        @facade.registerMediator MemoryResqueExecutor.new MEM_RESQUE_EXEC
+        @facade.registerMediator ResqueExecutor.new RESQUE_EXECUTOR
         return
 
 

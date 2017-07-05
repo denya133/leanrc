@@ -35,7 +35,7 @@ class LeanRC extends RC
   @const APPLICATION_MEDIATOR:  'ApplicationMediator'
   @const APPLICATION_ROUTER:  'ApplicationRouter'
   @const APPLICATION_RENDERER:  'ApplicationRenderer'
-  @const MEM_RESQUE_EXEC:  'MemoryResqueExecutor'
+  @const RESQUE_EXECUTOR:  'ResqueExecutor'
   @const LOG_MSG: Symbol 'logMessage'
 
   require('./interfaces/patterns/ApplicationInterface') LeanRC
@@ -130,7 +130,6 @@ class LeanRC extends RC
 
   require('./patterns/mediator/Mediator') LeanRC
   require('./patterns/mediator/Switch') LeanRC
-  require('./patterns/mediator/MemoryResqueExecutor') LeanRC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
@@ -141,6 +140,7 @@ class LeanRC extends RC
   require('./patterns/command/DelayedJobScript') LeanRC
 
   require('./mixins/ApplicationMediatorMixin') LeanRC # needs test
+  require('./mixins/MemoryExecutorMixin') LeanRC # needs test
   require('./mixins/BodyParseMixin') LeanRC
   require('./mixins/CheckSessionsMixin') LeanRC
   require('./mixins/CheckPermissionsMixin') LeanRC

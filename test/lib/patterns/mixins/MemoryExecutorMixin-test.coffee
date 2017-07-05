@@ -5,7 +5,7 @@ _ = require 'lodash'
 LeanRC = require.main.require 'lib'
 { co } = LeanRC::Utils
 
-describe 'MemoryResqueExecutor', ->
+describe 'MemoryExecutorMixin', ->
   describe '.new', ->
     it 'should create new memory resque executor', ->
       co ->
@@ -236,7 +236,7 @@ describe 'MemoryResqueExecutor', ->
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create 'TEST_QUEUE_1', 4
         resque.create 'TEST_QUEUE_2', 4
-        executor = Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
+        executor = Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
         executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
         definedProcessorsSymbol = _.find executorSymbols, (item) ->
           item.toString() is 'Symbol(_definedProcessors)'
@@ -284,7 +284,7 @@ describe 'MemoryResqueExecutor', ->
         facade.registerProxy Test::Resque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
-        executor = Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
+        executor = Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
         executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
         definedProcessorsSymbol = _.find executorSymbols, (item) ->
           item.toString() is 'Symbol(_definedProcessors)'
@@ -335,7 +335,7 @@ describe 'MemoryResqueExecutor', ->
         facade.registerProxy Test::Resque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
-        executor = Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
+        executor = Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
         executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
         definedProcessorsSymbol = _.find executorSymbols, (item) ->
           item.toString() is 'Symbol(_definedProcessors)'
@@ -378,8 +378,8 @@ describe 'MemoryResqueExecutor', ->
         facade.registerProxy Test::Resque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
-        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
-        executor = facade.retrieveMediator LeanRC::MEM_RESQUE_EXEC
+        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
+        executor = facade.retrieveMediator LeanRC::RESQUE_EXECUTOR
         promise = LeanRC::Promise.new (resolve) ->
           trigger.once 'CYCLE_PART', resolve
         facade.sendNotification LeanRC::START_RESQUE
@@ -407,8 +407,8 @@ describe 'MemoryResqueExecutor', ->
         facade.registerProxy Test::Resque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
-        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
-        executor = facade.retrieveMediator LeanRC::MEM_RESQUE_EXEC
+        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
+        executor = facade.retrieveMediator LeanRC::RESQUE_EXECUTOR
         type = 'TEST_TYPE'
         promise = LeanRC::Promise.new (resolve) ->
           executor.getViewComponent().once type, resolve
@@ -449,8 +449,8 @@ describe 'MemoryResqueExecutor', ->
         resque = facade.retrieveProxy LeanRC::RESQUE
         yield resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
         queue = yield resque.get LeanRC::DELAYED_JOBS_QUEUE
-        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::MEM_RESQUE_EXEC
-        executor = facade.retrieveMediator LeanRC::MEM_RESQUE_EXEC
+        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
+        executor = facade.retrieveMediator LeanRC::RESQUE_EXECUTOR
         promise = LeanRC::Promise.new (resolve) ->
           trigger.once 'CYCLE_PART', resolve
         DELAY_UNTIL = Date.now() + 1000

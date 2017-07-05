@@ -8,8 +8,8 @@ class CucumbersMain extends Cucumbers
 
   @const TEST_PROXY_NAME: 'TEST_PROXY_NAME'
 
-  require.main.require('lib/patterns/mediator/MemoryResqueExecutor') @Module
   require.main.require('lib/patterns/command/DelayedJobScript') @Module
+  require('./mediators/ResqueExecutor') @Module
   require('./mediators/MainJunctionMediator') @Module
   require('./mediators/MainSwitch') @Module
 
