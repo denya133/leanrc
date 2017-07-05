@@ -285,7 +285,7 @@ module.exports = (Module)->
             }
           } = Module::
           hash = @[ipmRequestToHash] request
-          @sendNotification(SEND_TO_LOG, "ThinHttpCollectionMixin::makeRequest hash #{hash}", LEVELS[DEBUG])
+          @sendNotification(SEND_TO_LOG, "ThinHttpCollectionMixin::makeRequest hash #{JSON.stringify hash}", LEVELS[DEBUG])
           @[ipmSendRequest] hash
 
 

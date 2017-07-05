@@ -208,7 +208,7 @@ module.exports = (Module)->
             }
           } = Module::
           hash = @requestToHash request
-          @sendNotification(SEND_TO_LOG, "HttpCollectionMixin::makeRequest hash #{hash}", LEVELS[DEBUG])
+          @sendNotification(SEND_TO_LOG, "HttpCollectionMixin::makeRequest hash #{JSON.stringify hash}", LEVELS[DEBUG])
           return yield @sendRequest hash
 
       @public parseQuery: Function,

@@ -126,7 +126,7 @@ module.exports = (Module)->
                     prev
                   , {}
                 ctx.routePath = path
-                facade.sendNotification SEND_TO_LOG, "#{ctx.method} #{path} matches #{ctx.path} #{pathParams}", LEVELS[DEBUG]
+                facade.sendNotification SEND_TO_LOG, "#{ctx.method} #{path} matches #{ctx.path} #{JSON.stringify pathParams}", LEVELS[DEBUG]
                 ctx.pathParams = pathParams
                 return yield routeFunc.apply self, [ctx, next]
               yield return next?()
