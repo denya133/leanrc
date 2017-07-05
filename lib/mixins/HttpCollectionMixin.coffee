@@ -3,16 +3,7 @@ inflect       = do require 'i'
 
 
 module.exports = (Module)->
-  {
-    ANY
-    NILL
-
-    LogMessage: {
-      SEND_TO_LOG
-      LEVELS
-      DEBUG
-    }
-  } = Module::
+  {ANY, NILL} = Module::
 
   Module.defineMixin Module::Collection, (BaseClass) ->
     class HttpCollectionMixin extends BaseClass
@@ -209,6 +200,13 @@ module.exports = (Module)->
         args: [Object]
         return: Object
         default: (request)-> # result of requestFor
+          {
+            LogMessage: {
+              SEND_TO_LOG
+              LEVELS
+              DEBUG
+            }
+          } = Module::
           hash = @requestToHash request
           @sendNotification(SEND_TO_LOG, "HttpCollectionMixin::makeRequest hash #{hash}", LEVELS[DEBUG])
           return yield @sendRequest hash
