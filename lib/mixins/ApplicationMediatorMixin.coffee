@@ -119,11 +119,11 @@ module.exports = (Module)->
         default: (resourceName, {context, reverse}, action)->
           return yield Module::Promise.new (resolve, reject)=>
             try
-              @[ipoEmitter].once reverse, ({error, result})->
+              @[ipoEmitter].once reverse, ({error, result, resource})->
                 if error?
                   reject error
                   return
-                resolve result
+                resolve {result, resource}
                 return
               @sendNotification resourceName, {context, reverse}, action, null
             catch err

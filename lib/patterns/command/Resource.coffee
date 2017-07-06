@@ -297,9 +297,7 @@ module.exports = (Module)->
               resource: @
           else
             app = @Module::MainApplication.new Module::LIGHTWEIGHT
-            voResult =
-              result: yield app.execute resourceName, voBody, action
-              resource: @
+            voResult = yield app.execute resourceName, voBody, action
             yield @saveDelayeds app
             app.finish()
         catch err
