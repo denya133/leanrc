@@ -147,7 +147,9 @@ module.exports = (Module)->
     ##########################################################################
 
     @public responseFormats: Array,
-      get: -> ['json', 'html', 'xml', 'atom']
+      get: -> [
+        'json', 'html', 'xml', 'atom', 'text'
+      ]
 
     @public routerName: String,
       default: APPLICATION_ROUTER
@@ -303,19 +305,16 @@ module.exports = (Module)->
       default: (ctx, aoData, resource, opts)->
         if opts.action is 'create'
           ctx.status = 201
+        unless ctx.headers.accept?
+          yield return
         switch (vsFormat = ctx.accepts @responseFormats)
-          when 'json', 'html', 'xml', 'atom'
+          when no
+          else
             if @["#{vsFormat}RendererName"]?
               voRenderer = @rendererFor vsFormat
               voRendered = yield voRenderer
                 .render ctx, aoData, resource, opts
-            else
-              ctx.set 'Content-Type', 'text/plain'
-              voRendered = JSON.stringify aoData
-            ctx.body = voRendered
-          else
-            ctx.set 'Content-Type', 'text/plain'
-            ctx.body = JSON.stringify aoData
+              ctx.body = voRendered
         yield return
 
     @public defineRoutes: Function,
