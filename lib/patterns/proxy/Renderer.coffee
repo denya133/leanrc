@@ -54,7 +54,7 @@ module.exports = (Module)->
           templatePath = resourceName + action
           templates = yield @templates
           renderedResult = if templates[templatePath]?
-            yield templates[templatePath].call resource, resourceName, action, aoData
+            yield Module::Promise.resolve templates[templatePath].call resource, resourceName, action, aoData
           else
             null
           yield return renderedResult ? aoData ? null
