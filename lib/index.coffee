@@ -37,6 +37,8 @@ class LeanRC extends RC
   @const APPLICATION_RENDERER:  'ApplicationRenderer'
   @const RESQUE_EXECUTOR:  'ResqueExecutor'
   @const LOG_MSG: Symbol 'logMessage'
+  @const PRODUCTION: 'production'
+  @const DEVELOPMENT: 'development'
 
   require('./interfaces/patterns/ApplicationInterface') LeanRC
   require('./interfaces/patterns/TransformInterface') LeanRC

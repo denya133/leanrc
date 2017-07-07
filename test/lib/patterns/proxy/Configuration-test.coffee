@@ -33,7 +33,7 @@ describe 'Configuration', ->
         Test::Configuration.initialize()
         configuration = Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         environment = configuration.environment
-        assert.equal environment, 'development'
+        assert.equal environment, LeanRC::DEVELOPMENT
         yield return
   describe '#defineConfigProperties', ->
     it 'should setup configuration instance', ->

@@ -97,6 +97,8 @@ _ = require 'lodash'
 module.exports = (Module)->
   {
     NILL
+    PRODUCTION
+    DEVELOPMENT
   } = Module::
   {extend, isArangoDB} = Module::Utils
 
@@ -111,14 +113,14 @@ module.exports = (Module)->
       get: ->
         if isArangoDB()
           if module.context.isProduction
-            'production'
+            PRODUCTION
           else
-            'development'
+            DEVELOPMENT
         else
           if process?.env?.NODE_ENV is 'production'
-            'production'
+            PRODUCTION
           else
-            'development'
+            DEVELOPMENT
 
     @public defineConfigProperties: Function,
       args: []

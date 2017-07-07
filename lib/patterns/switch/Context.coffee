@@ -12,6 +12,7 @@ statuses      = require 'statuses'
 module.exports = (Module)->
   {
     ANY
+    DEVELOPMENT
 
     CoreObject
     ContextInterface
@@ -75,9 +76,18 @@ module.exports = (Module)->
           err.message
         else
           code
+        message =
+          error: yes
+          errorNum: err.status
+          errorMessage: msg
+          code: err.code ? code
+        if @switch.configs.environment is DEVELOPMENT
+          message.exception = "#{err.name ? 'Error'}: #{msg}"
+          message.stacktrace = err.stack.split '\n'
         @status = err.status
-        @length = Buffer.byteLength msg
-        @res.end msg
+        message = JSON.stringify message
+        @length = Buffer.byteLength message
+        @res.end message
         return
 
     # Request aliases

@@ -42,13 +42,12 @@ module.exports = (Module)->
     SwitchInterface
     ConfigurableMixin
     Renderer
-    Utils
+    Utils: {
+      co
+      isGeneratorFunction
+      genRandomAlphaNumbers
+    }
   } = Module::
-  {
-    co
-    isGeneratorFunction
-    genRandomAlphaNumbers
-  } = Utils
 
 
   class Switch extends Mediator
