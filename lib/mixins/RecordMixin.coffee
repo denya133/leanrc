@@ -53,13 +53,32 @@ module.exports = (Module)->
         default: (asName)->
           @constructor.findRecordByName asName
 
-      ############################################################################
+      #########################################################################
 
       # # под вопросом ??????
       # @public updateEdges: Function, [ANY], -> ANY # any type
 
-      ############################################################################
+      #########################################################################
 
+      ###
+        @customFilter ->
+          reason:
+            '$eq': (value)->
+              # string of some aql code for example
+            '$neq': (value)->
+              # string of some aql code for example
+      ###
+      @public @static customFilters: Object,
+        get: -> @metaObject.getGroup 'customFilters'
+
+      @public @static customFilter: Function,
+        args: [Module::LAMBDA]
+        return: Module::NILL
+        default: (amStatementFunc)->
+          config = amStatementFunc.call @
+          for own asFilterName, aoStatement of config
+            @metaObject.addMetaData 'customFilters', asFilterName, aoStatement
+          return
 
       @public @static parentClassNames: Function,
         default: (AbstractClass = null)->

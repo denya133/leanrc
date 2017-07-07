@@ -61,28 +61,6 @@ module.exports = (Module)->
       default: (aoType, aoData)->
         @sendNotification Module::RECORD_CHANGED, aoData, aoType
         return
-    # TODO: надо перенести в Record в виде статических методов, т.к. в Рекорды создаются на все сущности в виде классов, а Collection создается в приложении 1-3 раза, а потом уже создаются его инстансы с разными именами и разными делегатами (Рекордами)
-    @public customFilters: Object, # возвращает установленные кастомные фильтры с учетом наследования
-      default: {}
-      get: (__customFilters)->
-        AbstractClass = @
-        fromSuper = if AbstractClass.__super__?
-          AbstractClass.__super__.constructor.customFilters
-        __customFilters[AbstractClass.name] ?= do ->
-          Module::Utils.extend {}
-          , (fromSuper ? {})
-          , (AbstractClass["_#{AbstractClass.name}_customFilters"] ? {})
-        __customFilters[AbstractClass.name]
-
-    @public customFilter: Function,
-      default: (asFilterName, aoStatement)->
-        if _.isObject aoStatement
-          config = aoStatement
-        else if _.isFunction aoStatement
-          config = aoStatement.apply @, []
-        @["_#{@name}_customFilters"] ?= {}
-        @["_#{@name}_customFilters"][asFilterName] = config
-        return
 
 
     @public @async generateId: Function,
