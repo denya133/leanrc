@@ -54,8 +54,10 @@ module.exports = (Module)->
 
     @public fullQueueName: Function,
       default: (queueName)->
-        [ moduleName ] = @moduleName().split '|>'
-        "#{moduleName}|>#{queueName}"
+        unless /\|\>/.test queueName
+          [ moduleName ] = @moduleName().split '|>'
+          queueName = "#{moduleName}|>#{queueName}"
+        queueName
 
     @public @async create: Function,
       default: (queueName, concurrency)->
