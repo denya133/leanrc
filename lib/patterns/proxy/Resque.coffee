@@ -53,7 +53,8 @@ module.exports = (Module)->
     @public tmpJobs: Array
 
     @public fullQueueName: Function,
-      default: (queueName)-> "#{@moduleName()}|>#{queueName}"
+      [ moduleName ] = @moduleName().split '|>'
+      default: (queueName)-> "#{moduleName}|>#{queueName}"
 
     @public @async create: Function,
       default: (queueName, concurrency)->
