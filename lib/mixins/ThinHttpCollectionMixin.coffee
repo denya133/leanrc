@@ -108,7 +108,10 @@ module.exports = (Module)->
       @public headersForRequest: Function,
         args: [Object]
         return: Object
-        default: (params)-> @headers ? {}
+        default: (params)->
+          headers = @headers ? {}
+          headers['Accept'] = 'application/json'
+          headers
 
       @public methodForRequest: Function,
         args: [Object]
