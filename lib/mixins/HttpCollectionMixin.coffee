@@ -214,7 +214,7 @@ module.exports = (Module)->
           @sendNotification(SEND_TO_LOG, "HttpCollectionMixin::makeRequest hash #{JSON.stringify hash}", LEVELS[DEBUG])
           return yield @sendRequest hash
 
-      @public parseQuery: Function,
+      @public @async parseQuery: Function,
         default: (aoQuery)->
           voQuery = null
           switch
@@ -224,31 +224,31 @@ module.exports = (Module)->
                 voQuery.requestType = 'remove'
                 voQuery.recordName = @delegate.name
                 voQuery.query = aoQuery
-                return voQuery
+                yield return voQuery
             when (voRecord = aoQuery.$insert)?
               if aoQuery.$into?
                 voQuery ?= {}
                 voQuery.requestType = 'insert'
                 voQuery.recordName = @delegate.name
-                aoQuery.$insert = @delegate.replicateObject voRecord
+                aoQuery.$insert = yield @delegate.replicateObject voRecord
                 voQuery.query = aoQuery
-                return voQuery
+                yield return voQuery
             when (voRecord = aoQuery.$update)?
               if aoQuery.$forIn?
                 voQuery ?= {}
                 voQuery.requestType = 'update'
                 voQuery.recordName = @delegate.name
-                aoQuery.$update = @delegate.replicateObject voRecord
+                aoQuery.$update = yield @delegate.replicateObject voRecord
                 voQuery.query = aoQuery
-                return voQuery
+                yield return voQuery
             when (voRecord = aoQuery.$replace)?
               if aoQuery.$forIn?
                 voQuery ?= {}
                 voQuery.requestType = 'replace'
                 voQuery.recordName = @delegate.name
-                aoQuery.$replace = @delegate.replicateObject voRecord
+                aoQuery.$replace = yield @delegate.replicateObject voRecord
                 voQuery.query = aoQuery
-                return voQuery
+                yield return voQuery
             else
               voQuery ?= {}
               voQuery.requestType = 'find'
@@ -264,7 +264,7 @@ module.exports = (Module)->
                 aoQuery.$remove? or
                 aoQuery.$return isnt '@doc' and not aoQuery.$insert?
               )
-              return voQuery
+              yield return voQuery
 
       @public @async executeQuery: Function,
         default: (aoQuery, options)->

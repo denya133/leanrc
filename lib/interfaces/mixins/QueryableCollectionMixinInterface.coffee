@@ -51,7 +51,7 @@ module.exports = (Module)->
       @public @async @virtual query: Function,
         args: [[Object, Module::QueryInterface]]
         return: ANY
-      @public @virtual parseQuery: Function, # описание того как стандартный (query object) преобразовать в конкретный запрос к конкретной базе данных
+      @public @async @virtual parseQuery: Function, # описание того как стандартный (query object) преобразовать в конкретный запрос к конкретной базе данных
         args: [[Object, Module::QueryInterface]]
         return: [Object, String, Module::QueryInterface]
       @public @async @virtual executeQuery: Function,

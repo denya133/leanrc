@@ -93,7 +93,7 @@ module.exports = (Module)->
           else
             aoQuery = _.pick aoQuery, Object.keys(aoQuery).filter (key)-> aoQuery[key]?
             voQuery = Module::Query.new aoQuery
-          yield @executeQuery @parseQuery voQuery
+          yield @executeQuery yield @parseQuery voQuery
 
 
     QueryableCollectionMixin.initializeMixin()
