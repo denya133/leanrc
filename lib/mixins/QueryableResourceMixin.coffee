@@ -64,19 +64,19 @@ module.exports = (Module)->
               replica = body.query.$insert
               replica.multitonKey = multitonKey
               replica.collectionName = collectionName
-              voRecord = @collection.delegate.restoreObject @Module, replica
+              voRecord = yield @collection.delegate.restoreObject @Module, replica
               receivedQuery.$insert = voRecord
             when body.query.$update?
               replica = body.query.$update
               replica.multitonKey = multitonKey
               replica.collectionName = collectionName
-              voRecord = @collection.delegate.restoreObject @Module, replica
+              voRecord = yield @collection.delegate.restoreObject @Module, replica
               receivedQuery.$update = voRecord
             when body.query.$replace?
               replica = body.query.$replace
               replica.multitonKey = multitonKey
               replica.collectionName = collectionName
-              voRecord = @collection.delegate.restoreObject @Module, replica
+              voRecord = yield @collection.delegate.restoreObject @Module, replica
               receivedQuery.$replace = voRecord
 
           return yield (yield @collection.query receivedQuery).toArray()
