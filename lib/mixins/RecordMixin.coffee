@@ -341,6 +341,7 @@ module.exports = (Module)->
             replica.attributes = @serialize instance
           else
             replica.id = instance.id
+            replica.attributes = instance.changedAttributes()
           yield return replica
 
       @public init: Function,

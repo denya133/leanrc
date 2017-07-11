@@ -59,23 +59,28 @@ module.exports = (Module)->
           ipsMultitonKey = Symbol.for '~multitonKey'
           multitonKey = @collection[ipsMultitonKey]
           collectionName = @collection.getProxyName()
+          moduleName = @collection.delegate.moduleName()
+          name = @collection.delegate.name
           switch
             when body.query.$insert?
               replica = body.query.$insert
               replica.multitonKey = multitonKey
               replica.collectionName = collectionName
+              replica.attributes.type = "#{moduleName}::#{name}"
               voRecord = yield @collection.delegate.restoreObject @Module, replica
               receivedQuery.$insert = voRecord
             when body.query.$update?
               replica = body.query.$update
               replica.multitonKey = multitonKey
               replica.collectionName = collectionName
+              delete replica.attributes.type
               voRecord = yield @collection.delegate.restoreObject @Module, replica
               receivedQuery.$update = voRecord
             when body.query.$replace?
               replica = body.query.$replace
               replica.multitonKey = multitonKey
               replica.collectionName = collectionName
+              delete replica.attributes.type
               voRecord = yield @collection.delegate.restoreObject @Module, replica
               receivedQuery.$replace = voRecord
 
