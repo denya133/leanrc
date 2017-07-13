@@ -271,6 +271,12 @@ module.exports = (Module)->
           request = @requestFor aoQuery
 
           res = yield @makeRequest request
+
+          if res.status >= 400
+            throw new Error "
+              Request failed with status #{res.status} #{res.message}
+            "
+
           { body } = res
 
           if body? and body isnt ''
@@ -283,6 +289,8 @@ module.exports = (Module)->
               return Module::Cursor.new null, body
             else
               return Module::Cursor.new @, body
+          else
+            return Module::Cursor.new @, []
 
 
     HttpCollectionMixin.initializeMixin()

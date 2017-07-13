@@ -40,6 +40,7 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     NILL
+    DELAYED_JOBS_QUEUE
 
     Utils: {uuid}
   } = Module::
@@ -90,9 +91,13 @@ module.exports = (Module)->
 
     @public @async delay: Function,
       default: (queueName, scriptName, data, delay)->
-        @tmpJobs ?= []
-        id = uuid.v4()
-        @tmpJobs.push {queueName, scriptName, data, delay, id}
+        if /\|\>/.test @facade[Symbol.for '~multitonKey']
+          @tmpJobs ?= []
+          id = uuid.v4()
+          @tmpJobs.push {queueName, scriptName, data, delay, id}
+        else
+          queue = yield @get queueName ? DELAYED_JOBS_QUEUE
+          yield queue.push scriptName, data, delay
         yield return id
 
     @public @async getDelayed: Function,
