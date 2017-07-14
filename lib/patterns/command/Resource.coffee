@@ -270,6 +270,12 @@ module.exports = (Module)->
         voResult = yield @[action]? context
         yield return voResult
 
+    @public @async needsTransaction: Function,
+      args: [String, Module::ContextInterface]
+      return: Boolean
+      default: (asAction, aoContext) ->
+        yield return aoContext.method.toUpperCase() isnt 'GET'
+
     @public @async saveDelayeds: Function, # для того, чтобы сохранить все отложенные джобы
       args: [Module::ApplicationInterface]
       return: Module::NILL

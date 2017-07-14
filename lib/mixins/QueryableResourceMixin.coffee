@@ -6,13 +6,38 @@ _ = require 'lodash'
 
 
 module.exports = (Module)->
-  Module.defineMixin Module::Resource, (BaseClass) ->
+  {
+    Resource
+    Utils
+  } = Module::
+  isArangoDB = Utils.isArangoDB()
+  Module.defineMixin Resource, (BaseClass) ->
     class QueryableResourceMixin extends BaseClass
       @inheritProtected()
       @include Module::BodyParseMixin
       @include Module::CheckSessionsMixin
 
       MAX_LIMIT   = 50
+
+      @public @async needsTransaction: Function,
+        args: [String, Module::ContextInterface]
+        return: Boolean
+        default: (asAction, aoContext) ->
+          result = yield @super asAction, aoContext
+          if result
+            if asAction is 'executeQuery'
+              body = if isArangoDB
+                aoContext.req.body
+              else
+                parse = require 'co-body'
+                yield parse aoContext.req
+              { query } = body ? {}
+              if query?
+                key = _.findKey query, (v, k) -> k in [
+                  '$insert', '$replace', '$update', '$remove'
+                ]
+                result = key?
+          yield return result
 
       @action @async list: Function,
         default: ->
