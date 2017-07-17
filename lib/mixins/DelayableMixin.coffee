@@ -45,7 +45,7 @@ module.exports = (Module)->
       # т.к. статические методы объявлены на классах, а следовательно нет проблемы в том, чтобы найти в неймспейсе нужный класс и вызвать его статический метод.
       @public @static delay: Function,
         default: (facade, opts = null)->
-          @[cphDelayableMap] ?= do =>
+          @[cphDelayableMap] = do =>
             obj = {}
             for own methodName of @classMethods
               if methodName isnt 'delay'
@@ -62,7 +62,7 @@ module.exports = (Module)->
 
       @public delay: Function,
         default: (facade, opts = null)->
-          @[iphDelayableMap] ?= do =>
+          @[iphDelayableMap] = do =>
             obj = {}
             for own methodName of @constructor.instanceMethods
               if methodName isnt 'delay'
