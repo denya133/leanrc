@@ -54,10 +54,11 @@ module.exports = (Module)->
     ipoEndpoints = @private endpoints: Object
 
     @public swaggerDefinition: Function,
-      default: (asAction, lambda = (aoData)-> aoData)->
+      default: (asAction, lambda = ((aoData)-> aoData), force = no)->
         voEndpoint = lambda.apply @, [Module::Endpoint.new(gateway: @)]
         @[ipoEndpoints] ?= {}
-        @[ipoEndpoints][asAction] = voEndpoint
+        if force or not @[ipoEndpoints][asAction]?
+          @[ipoEndpoints][asAction] = voEndpoint
         return
 
     @public registerEndpoints: Function,
