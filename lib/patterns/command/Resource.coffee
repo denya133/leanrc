@@ -109,6 +109,15 @@ module.exports = (Module)->
           return
         yield return args
 
+    @public @async checkExistence: Function,
+      default: (args...) ->
+        unless @recordId?
+          return args
+        doc = yield @collection.find @recordId
+        unless doc?
+          @context.throw HTTP_NOT_FOUND
+        yield return args
+
     @public @async requiredAuthorizationHeader: Function,
       default: (args...) ->
         { apiKey }        = @configs
@@ -210,6 +219,7 @@ module.exports = (Module)->
 
     @beforeHook 'getQuery', only: ['list']
     @beforeHook 'getRecordId', only: ['detail', 'update', 'delete']
+    @beforeHook 'checkExistence', only: ['detail', 'update', 'delete']
     @beforeHook 'getRecordBody', only: ['create', 'update']
     @beforeHook 'omitBody', only: ['create', 'update']
     @beforeHook 'beforeUpdate', only: ['update']
