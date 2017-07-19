@@ -472,6 +472,9 @@ describe 'Resource', ->
                 result.push data
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()
+          @public @async includes: Function,
+            default: (id)->
+              yield return (_.find @getData().data, {id})?
         Test::Collection.initialize()
         facade = LeanRC::Facade.getInstance KEY
         COLLECTION_NAME = 'TestEntitiesCollection'
@@ -609,6 +612,9 @@ describe 'Resource', ->
                 result.push data
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()
+          @public @async includes: Function,
+            default: (id)->
+              yield return (_.find @getData().data, {id})?
         Test::Collection.initialize()
         facade = LeanRC::Facade.getInstance KEY
         COLLECTION_NAME = 'TestEntitiesCollection'
@@ -682,6 +688,9 @@ describe 'Resource', ->
                 result.push data
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()
+          @public @async includes: Function,
+            default: (id)->
+              yield return (_.find @getData().data, {id})?
         Test::Collection.initialize()
         facade = LeanRC::Facade.getInstance KEY
         COLLECTION_NAME = 'TestEntitiesCollection'

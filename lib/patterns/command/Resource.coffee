@@ -112,9 +112,8 @@ module.exports = (Module)->
     @public @async checkExistence: Function,
       default: (args...) ->
         unless @recordId?
-          return args
-        doc = yield @collection.find @recordId
-        unless doc?
+          @context.throw HTTP_NOT_FOUND
+        unless yield @collection.includes @recordId
           @context.throw HTTP_NOT_FOUND
         yield return args
 
