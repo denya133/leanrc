@@ -120,16 +120,28 @@ module.exports = (Module)->
         @defineMethod @[iplRoutes], 'put', asPath, aoOpts
         return
 
-    @public patch: Function,
-      default: (asPath, aoOpts)->
-        @[iplRoutes] ?= []
-        @defineMethod @[iplRoutes], 'patch', asPath, aoOpts
-        return
-
     @public delete: Function,
       default: (asPath, aoOpts)->
         @[iplRoutes] ?= []
         @defineMethod @[iplRoutes], 'delete', asPath, aoOpts
+        return
+
+    @public head: Function,
+      default: (asPath, aoOpts)->
+        @[iplRoutes] ?= []
+        @defineMethod @[iplRoutes], 'head', asPath, aoOpts
+        return
+
+    @public options: Function,
+      default: (asPath, aoOpts)->
+        @[iplRoutes] ?= []
+        @defineMethod @[iplRoutes], 'options', asPath, aoOpts
+        return
+
+    @public patch: Function,
+      default: (asPath, aoOpts)->
+        @[iplRoutes] ?= []
+        @defineMethod @[iplRoutes], 'patch', asPath, aoOpts
         return
 
     @public resource: Function,
@@ -255,7 +267,6 @@ module.exports = (Module)->
         list: 'get'
         detail: 'get'
         create: 'post'
-        patch: 'patch'
         update: 'put'
         delete: 'delete'
         executeQuery: 'post'
@@ -264,7 +275,6 @@ module.exports = (Module)->
         list: ''
         detail: null
         create: ''
-        patch: null
         update: null
         delete: null
         executeQuery: 'query'

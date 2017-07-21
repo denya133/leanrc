@@ -132,6 +132,14 @@ module.exports = (Module)->
           @context.throw UNAUTHORIZED
         yield return args
 
+    @public @async checkNonLimitationHeader: Function,
+      default: ->
+        { apiKey }        = @configs
+        {
+          nonlimitation: nonLimitationHeader
+        } = @context.headers
+        yield return nonLimitationHeader isnt apiKey
+
     @public @async adminOnly: Function,
       default: (args...) ->
         unless @session?.uid? and @currentUser?

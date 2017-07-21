@@ -187,7 +187,7 @@ module.exports = (Module)->
         default: ->
           if yield @isNew()
             throw new Error 'Document does not exist in collection'
-          yield @collection.patch @id, @
+          yield @collection.override @id, @
           vhAttributes = {}
           for own key of @constructor.attributes
             vhAttributes[key] = @[key]

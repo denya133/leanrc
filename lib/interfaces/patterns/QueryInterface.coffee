@@ -28,9 +28,9 @@ module.exports = (Module)->
       @public @virtual $count: Boolean # yes or not present
       @public @virtual $distinct: Boolean # yes or not present
       @public @virtual $remove: Boolean
-      @public @virtual $insert: Object
-      @public @virtual $update: Object
-      @public @virtual $replace: Object
+      # @public @virtual $insert: Object
+      @public @virtual $patch: Object
+      # @public @virtual $replace: Object
       @public @virtual $return: [String, Object]
 
       @public @virtual forIn: Function,
@@ -75,15 +75,15 @@ module.exports = (Module)->
       @public @virtual remove: Function,
         args: [[String, Object]] # definition
         return: QueryInterface
-      @public @virtual insert: Function,
+      # @public @virtual insert: Function,
+      #   args: [Object] # definition
+      #   return: QueryInterface
+      @public @virtual patch: Function,
         args: [Object] # definition
         return: QueryInterface
-      @public @virtual update: Function,
-        args: [Object] # definition
-        return: QueryInterface
-      @public @virtual replace: Function,
-        args: [Object] # definition
-        return: QueryInterface
+      # @public @virtual replace: Function,
+      #   args: [Object] # definition
+      #   return: QueryInterface
       @public @virtual count: Function,
         args: []
         return: QueryInterface

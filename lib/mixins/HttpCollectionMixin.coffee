@@ -12,75 +12,179 @@ module.exports = (Module)->
 
       @public @async push: Function,
         default: (aoRecord)->
-          voQuery = Module::Query.new()
-            .insert aoRecord
-            .into @collectionFullName()
-          response = yield @query voQuery
-          first = yield response.next()
-          return first
+          params ?= {}
+          params.requestType = 'push'
+          params.recordName = @delegate.name
+          params.snapshot = @serialize aoRecord
+
+          request = @requestFor params
+          res = yield @makeRequest request
+
+          if res.status >= 400
+            throw new Error "
+              Request failed with status #{res.status} #{res.message}
+            "
+
+          { body } = res
+          if body? and body isnt ''
+            voRecord = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+          else
+            throw new Error "
+              Record payload has not existed in response body.
+            "
+          yield return voRecord
 
       @public @async remove: Function,
         default: (id)->
-          voQuery = Module::Query.new()
-            .forIn '@doc': @collectionFullName()
-            .filter '@doc.id': {$eq: id}
-            .remove '@doc'
-          yield @query voQuery
-          return yes
+          params ?= {}
+          params.requestType = 'remove'
+          params.recordName = @delegate.name
+          params.id = id
+
+          request = @requestFor params
+          res = yield @makeRequest request
+
+          if res.status >= 400
+            throw new Error "
+              Request failed with status #{res.status} #{res.message}
+            "
+          yield return
 
       @public @async take: Function,
         default: (id)->
-          voQuery = Module::Query.new()
-            .forIn '@doc': @collectionFullName()
-            .filter '@doc.id': {$eq: id}
-            .return '@doc'
-          return yield (yield @query voQuery).first()
+          params ?= {}
+          params.requestType = 'take'
+          params.recordName = @delegate.name
+          params.id = id
+
+          request = @requestFor params
+          res = yield @makeRequest request
+
+          if res.status >= 400
+            throw new Error "
+              Request failed with status #{res.status} #{res.message}
+            "
+
+          { body } = res
+          if body? and body isnt ''
+            voRecord = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+          else
+            throw new Error "
+              Record payload has not existed in response body.
+            "
+          yield return voRecord
+
+      @public @async takeBy: Function,
+        default: (query)->
+          params ?= {}
+          params.requestType = 'takeBy'
+          params.recordName = @delegate.name
+          params.query = $filter: query
+
+          request = @requestFor params
+          res = yield @makeRequest request
+
+          if res.status >= 400
+            throw new Error "
+              Request failed with status #{res.status} #{res.message}
+            "
+
+          { body } = res
+          if body? and body isnt ''
+            vlRecords = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+          else
+            throw new Error "
+              Record payload has not existed in response body.
+            "
+          yield return Module::Cursor.new @, vlRecords
 
       @public @async takeMany: Function,
         default: (ids)->
-          voQuery = Module::Query.new()
-            .forIn '@doc': @collectionFullName()
-            .filter '@doc.id': {$in: ids}
-            .return '@doc'
-          return yield @query voQuery
+          params ?= {}
+          params.requestType = 'takeBy'
+          params.recordName = @delegate.name
+          params.query = $filter: '@doc.id': {$in: ids}
+
+          request = @requestFor params
+          res = yield @makeRequest request
+
+          if res.status >= 400
+            throw new Error "
+              Request failed with status #{res.status} #{res.message}
+            "
+
+          { body } = res
+          if body? and body isnt ''
+            vlRecords = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+          else
+            throw new Error "
+              Record payload has not existed in response body.
+            "
+          yield return Module::Cursor.new @, vlRecords
 
       @public @async takeAll: Function,
         default: ->
-          voQuery = Module::Query.new()
-            .forIn '@doc': @collectionFullName()
-            .return '@doc'
-          return yield @query voQuery
+          params ?= {}
+          params.requestType = 'takeAll'
+          params.recordName = @delegate.name
+          params.query = {}
+
+          request = @requestFor params
+          res = yield @makeRequest request
+
+          if res.status >= 400
+            throw new Error "
+              Request failed with status #{res.status} #{res.message}
+            "
+
+          { body } = res
+          if body? and body isnt ''
+            vlRecords = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+          else
+            throw new Error "
+              Record payload has not existed in response body.
+            "
+          yield return Module::Cursor.new @, vlRecords
 
       @public @async override: Function,
         default: (id, aoRecord)->
-          voQuery = Module::Query.new()
-            .forIn '@doc': @collectionFullName()
-            .filter '@doc.id': {$eq: id}
-            .replace aoRecord
-          return yield (yield @query voQuery).first()
+          params ?= {}
+          params.requestType = 'override'
+          params.recordName = @delegate.name
+          params.snapshot = @serialize aoRecord
+          params.id = id
 
-      @public @async patch: Function,
-        default: (id, aoRecord)->
-          voQuery = Module::Query.new()
-            .forIn '@doc': @collectionFullName()
-            .filter '@doc.id': {$eq: id}
-            .update aoRecord
-          return yield (yield @query voQuery).first()
+          request = @requestFor params
+          res = yield @makeRequest request
+
+          if res.status >= 400
+            throw new Error "
+              Request failed with status #{res.status} #{res.message}
+            "
+
+          { body } = res
+          if body? and body isnt ''
+            voRecord = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+          else
+            throw new Error "
+              Record payload has not existed in response body.
+            "
+          yield return voRecord
 
       @public @async includes: Function,
         default: (id)->
-          voQuery = Module::Query.new()
-            .forIn '@doc': @collectionFullName()
-            .filter '@doc.id': {$eq: id}
-            .limit 1
-            .return '@doc'
+          voQuery =
+            $forIn: '@doc': @collectionFullName()
+            $filter: '@doc.id': {$eq: id}
+            $limit: 1
+            $return: '@doc'
           return yield (yield @query voQuery).hasNext()
 
       @public @async length: Function,
         default: ->
-          voQuery = Module::Query.new()
-            .forIn '@doc': @collectionFullName()
-            .count()
+          voQuery =
+            $forIn: '@doc': @collectionFullName()
+            $count: yes
           return yield (yield @query voQuery).first()
 
       @public headers: Object
@@ -88,7 +192,7 @@ module.exports = (Module)->
         default: 'http://localhost'
       @public namespace: String,
         default: ''
-      @public postfix: String,
+      @public queryEndpoint: String,
         default: 'query'
 
       @public headersForRequest: Function,
@@ -97,22 +201,55 @@ module.exports = (Module)->
         default: (params)->
           headers = @headers ? {}
           headers['Accept'] = 'application/json'
+          if params.requestType in ['query', 'patchBy', 'removeBy']
+            headers['Authorization'] = "Bearer #{@configs.apiKey}"
+          else
+            if params.requestType in ['takeAll', 'takeBy']
+              headers['NonLimitation'] = @configs.apiKey
+            service = @facade.retrieveMediator APPLICATION_MEDIATOR
+              .getViewComponent()
+            if service.context?
+              sessionCookie = service.context.cookies.get @configs.sessionCookie
+              headers['Cookie'] = "#{@configs.sessionCookie}=#{sessionCookie}"
+            else
+              headers['Authorization'] = "Bearer #{@configs.apiKey}"
           headers
 
       @public methodForRequest: Function,
         args: [Object]
         return: String
-        default: -> 'POST'
+        default: ({requestType})->
+          switch requestType
+            when 'query' then 'POST'
+            when 'patchBy' then 'POST'
+            when 'removeBy' then 'POST'
+            when 'takeAll' then 'GET'
+            when 'takeBy' then 'GET'
+            when 'take' then 'GET'
+            when 'push' then 'POST'
+            when 'remove' then 'DELETE'
+            when 'override' then 'PUT'
+            else
+              'GET'
 
       @public dataForRequest: Function,
         args: [Object]
         return: Object
-        default: ({query})-> {query}
+        default: ({recordName, snapshot, requestType, query})->
+          if snapshot? and requestType in ['push', 'override']
+            key = inflect.singularize inflect.underscore recordName.replace /Record$/, ''
+            return "#{key}": snapshot
+          else if requestType in ['query', 'patchBy', 'removeBy']
+            return {query}
+          else
+            return
 
       @public urlForRequest: Function,
         args: [Object]
         return: String
-        default: (params)-> @buildURL params
+        default: (params)->
+          {recordName, snapshot, id, requestType, query} = params
+          @buildURL recordName, snapshot, id, requestType, query
 
       @public pathForType: Function,
         args: [String]
@@ -146,10 +283,10 @@ module.exports = (Module)->
           if @namespace then url.push @namespace
           return url.join '/'
 
-      @public buildURL: Function,
-        args: [Object]
+      @public makeURL: Function,
+        args: [String, [Object, NILL], [Boolean, NILL]]
         return: String
-        default: ({recordName})->
+        default: (recordName, query, id, isQueryable)->
           url = []
           prefix = @urlPrefix()
 
@@ -157,14 +294,100 @@ module.exports = (Module)->
             path = @pathForType recordName
             url.push path if path
 
-          url.push encodeURIComponent @postfix if @postfix?
+          if isQueryable and @queryEndpoint?
+            url.push encodeURIComponent @queryEndpoint
           url.unshift prefix if prefix
+
+          url.push id if id?
 
           url = url.join '/'
           if not @host and url and url.charAt(0) isnt '/'
             url = '/' + url
-
+          if query?
+            query = encodeURIComponent JSON.stringify query ? ''
+            url += "?query=#{query}"
           return url
+
+      @public urlForQuery: Function,
+        args: [String, Object]
+        return: String
+        default: (recordName, query)->
+          @makeURL recordName, null, null, yes
+
+      @public urlForPatchBy: Function,
+        args: [String, Object]
+        return: String
+        default: (recordName, query)->
+          @makeURL recordName, null, null, yes
+
+      @public urlForRemoveBy: Function,
+        args: [String, Object]
+        return: String
+        default: (recordName, query)->
+          @makeURL recordName, null, null, yes
+
+      @public urlForTakeAll: Function,
+        args: [String]
+        return: String
+        default: (recordName, query)->
+          @makeURL recordName, query, null, no
+
+      @public urlForTakeBy: Function,
+        args: [String, Object]
+        return: String
+        default: (recordName, query)->
+          @makeURL recordName, query, null, no
+
+      @public urlForTake: Function,
+        args: [String, String]
+        return: String
+        default: (recordName, id)->
+          @makeURL recordName, null, id, no
+
+      @public urlForPush: Function,
+        args: [String, Object]
+        return: String
+        default: (recordName, snapshot)->
+          @makeURL recordName, null, null, no
+
+      @public urlForRemove: Function,
+        args: [String, String]
+        return: String
+        default: (recordName, id)->
+          @makeURL recordName, null, id, no
+
+      @public urlForOverride: Function,
+        args: [String, Object, String]
+        return: String
+        default: (recordName, snapshot, id)->
+          @makeURL recordName, null, id, no
+
+      @public buildURL: Function,
+        args: [String, [Object, NILL], String, String, [Object, NILL]]
+        return: String
+        default: (recordName, snapshot, id, requestType, query)->
+          switch requestType
+            when 'query'
+              @urlForQuery recordName, query
+            when 'patchBy'
+              @urlForPatchBy recordName, query
+            when 'removeBy'
+              @urlForRemoveBy recordName, query
+            when 'takeAll'
+              @urlForTakeAll recordName, query
+            when 'takeBy'
+              @urlForTakeBy recordName, query
+            when 'take'
+              @urlForTake recordName, id
+            when 'push'
+              @urlForPush recordName, snapshot
+            when 'remove'
+              @urlForRemove recordName, id
+            when 'override'
+              @urlForOverride recordName, snapshot, id
+            else
+              vsMethod = "urlFor#{inflect.camelize requestType}"
+              @[vsMethod]? recordName, query, snapshot, id
 
       @public requestFor: Function,
         args: [Object]
@@ -176,14 +399,12 @@ module.exports = (Module)->
           data    = @dataForRequest params
           return {method, url, headers, data}
 
-      # может быть переопределно другим миксином, который будет посылать запросы через jQuery.ajax например
       @public @async sendRequest: Function,
         args: [Object]
         return: Object
         default: ({method, url, options})->
           return yield Module::Utils.request method, url, options
 
-      # может быть переопределно другим миксином, который будет посылать запросы через jQuery.ajax например
       @public requestToHash: Function,
         args: [Object]
         return: Object
@@ -192,7 +413,7 @@ module.exports = (Module)->
             json: yes
             headers
           }
-          options.body = data
+          options.body = data if data?
           return {
             method
             url
@@ -216,45 +437,30 @@ module.exports = (Module)->
 
       @public @async parseQuery: Function,
         default: (aoQuery)->
-          voQuery = null
+          params = null
           switch
             when aoQuery.$remove?
               if aoQuery.$forIn?
-                voQuery ?= {}
-                voQuery.requestType = 'remove'
-                voQuery.recordName = @delegate.name
-                voQuery.query = aoQuery
-                yield return voQuery
-            when (voRecord = aoQuery.$insert)?
-              if aoQuery.$into?
-                voQuery ?= {}
-                voQuery.requestType = 'insert'
-                voQuery.recordName = @delegate.name
-                aoQuery.$insert = yield @delegate.replicateObject voRecord
-                voQuery.query = aoQuery
-                yield return voQuery
-            when (voRecord = aoQuery.$update)?
+                params ?= {}
+                params.requestType = 'removeBy'
+                params.recordName = @delegate.name
+                params.query = aoQuery
+                params.isCustomReturn = yes
+                yield return params
+            when aoQuery.$patch?
               if aoQuery.$forIn?
-                voQuery ?= {}
-                voQuery.requestType = 'update'
-                voQuery.recordName = @delegate.name
-                aoQuery.$update = yield @delegate.replicateObject voRecord
-                voQuery.query = aoQuery
-                yield return voQuery
-            when (voRecord = aoQuery.$replace)?
-              if aoQuery.$forIn?
-                voQuery ?= {}
-                voQuery.requestType = 'replace'
-                voQuery.recordName = @delegate.name
-                aoQuery.$replace = yield @delegate.replicateObject voRecord
-                voQuery.query = aoQuery
-                yield return voQuery
+                params ?= {}
+                params.requestType = 'patchBy'
+                params.recordName = @delegate.name
+                params.query = aoQuery
+                params.isCustomReturn = yes
+                yield return params
             else
-              voQuery ?= {}
-              voQuery.requestType = 'find'
-              voQuery.recordName = @delegate.name
-              voQuery.query = aoQuery
-              voQuery.isCustomReturn = (
+              params ?= {}
+              params.requestType = 'query'
+              params.recordName = @delegate.name
+              params.query = aoQuery
+              params.isCustomReturn = (
                 aoQuery.$collect? or
                 aoQuery.$count? or
                 aoQuery.$sum? or
@@ -262,14 +468,13 @@ module.exports = (Module)->
                 aoQuery.$max? or
                 aoQuery.$avg? or
                 aoQuery.$remove? or
-                aoQuery.$return isnt '@doc' and not aoQuery.$insert?
+                aoQuery.$return isnt '@doc'
               )
-              yield return voQuery
+              yield return params
 
       @public @async executeQuery: Function,
         default: (aoQuery, options)->
           request = @requestFor aoQuery
-
           res = yield @makeRequest request
 
           if res.status >= 400
@@ -278,7 +483,6 @@ module.exports = (Module)->
             "
 
           { body } = res
-
           if body? and body isnt ''
             if _.isString body
               body = JSON.parse body
@@ -290,7 +494,7 @@ module.exports = (Module)->
             else
               return Module::Cursor.new @, body
           else
-            return Module::Cursor.new @, []
+            return Module::Cursor.new null, []
 
 
     HttpCollectionMixin.initializeMixin()

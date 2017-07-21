@@ -56,8 +56,11 @@ module.exports = (Module)->
           if receivedQuery.$offset
             voQuery.offset receivedQuery.$offset
 
+          needsLimitation = @checkNonLimitationHeader()
+
           limit = Number voQuery.$limit
           voQuery.limit = switch
+            when needsLimitation then limit
             when limit > MAX_LIMIT, limit < 0, isNaN limit then MAX_LIMIT
             else limit
           skip = Number voQuery.$offset
@@ -78,38 +81,7 @@ module.exports = (Module)->
       @action @async executeQuery: Function,
         default: ->
           {body} = @context.request
-          receivedQuery = _.omit body.query, [
-            '$insert', '$update', '$replace'
-          ]
-          ipsMultitonKey = Symbol.for '~multitonKey'
-          multitonKey = @collection[ipsMultitonKey]
-          collectionName = @collection.getProxyName()
-          moduleName = @collection.delegate.moduleName()
-          name = @collection.delegate.name
-          switch
-            when body.query.$insert?
-              replica = body.query.$insert
-              replica.multitonKey = multitonKey
-              replica.collectionName = collectionName
-              replica.attributes.type = "#{moduleName}::#{name}"
-              voRecord = yield @collection.delegate.restoreObject @Module, replica
-              receivedQuery.$insert = voRecord
-            when body.query.$update?
-              replica = body.query.$update
-              replica.multitonKey = multitonKey
-              replica.collectionName = collectionName
-              delete replica.attributes.type
-              voRecord = yield @collection.delegate.restoreObject @Module, replica
-              receivedQuery.$update = voRecord
-            when body.query.$replace?
-              replica = body.query.$replace
-              replica.multitonKey = multitonKey
-              replica.collectionName = collectionName
-              delete replica.attributes.type
-              voRecord = yield @collection.delegate.restoreObject @Module, replica
-              receivedQuery.$replace = voRecord
-
-          return yield (yield @collection.query receivedQuery).toArray()
+          return yield (yield @collection.query body.query).toArray()
 
       # ------------ Chains definitions ---------
       @chains ['executeQuery']

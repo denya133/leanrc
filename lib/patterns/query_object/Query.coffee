@@ -152,9 +152,9 @@ module.exports = (Module)->
     @public $count: Boolean # yes or not present
     @public $distinct: Boolean # yes or not present
     @public $remove: Boolean
-    @public $insert: Object
-    @public $update: Object
-    @public $replace: Object
+    # @public $insert: Object
+    @public $patch: Object
+    # @public $replace: Object
     @public $return: Object
 
     @public forIn: Function,
@@ -208,18 +208,18 @@ module.exports = (Module)->
       default: (expr = yes)->
         @$remove = expr
         return @
-    @public insert: Function,
+    # @public insert: Function,
+    #   default: (aoDefinition)->
+    #     @$insert = aoDefinition
+    #     return @
+    @public patch: Function,
       default: (aoDefinition)->
-        @$insert = aoDefinition
+        @$patch = aoDefinition
         return @
-    @public update: Function,
-      default: (aoDefinition)->
-        @$update = aoDefinition
-        return @
-    @public replace: Function,
-      default: (aoDefinition)->
-        @$replace = aoDefinition
-        return @
+    # @public replace: Function,
+    #   default: (aoDefinition)->
+    #     @$replace = aoDefinition
+    #     return @
     @public return: Function,
       default: (aoDefinition)->
         @$return = aoDefinition
@@ -271,7 +271,8 @@ module.exports = (Module)->
         _.pick @, [
           '$forIn', '$join', '$let', '$filter', '$collect', '$into', '$having'
           '$sort', '$limit', '$offset', '$avg', '$sum', '$min', '$max', '$count'
-          '$distinct', '$remove', '$insert', '$update', '$replace', '$return'
+          '$distinct', '$remove', '$patch', '$return'
+          # '$insert', '$replace'
         ]
 
 
