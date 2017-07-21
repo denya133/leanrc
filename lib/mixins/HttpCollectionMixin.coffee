@@ -3,7 +3,10 @@ inflect       = do require 'i'
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    ANY, NILL
+    APPLICATION_MEDIATOR
+  } = Module::
 
   Module.defineMixin Module::Collection, (BaseClass) ->
     class HttpCollectionMixin extends BaseClass
