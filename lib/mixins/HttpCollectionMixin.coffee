@@ -12,7 +12,7 @@ module.exports = (Module)->
 
       @public @async push: Function,
         default: (aoRecord)->
-          params ?= {}
+          params = {}
           params.requestType = 'push'
           params.recordName = @delegate.name
           params.snapshot = @serialize aoRecord
@@ -36,7 +36,7 @@ module.exports = (Module)->
 
       @public @async remove: Function,
         default: (id)->
-          params ?= {}
+          params = {}
           params.requestType = 'remove'
           params.recordName = @delegate.name
           params.id = id
@@ -52,7 +52,7 @@ module.exports = (Module)->
 
       @public @async take: Function,
         default: (id)->
-          params ?= {}
+          params = {}
           params.requestType = 'take'
           params.recordName = @delegate.name
           params.id = id
@@ -76,7 +76,7 @@ module.exports = (Module)->
 
       @public @async takeBy: Function,
         default: (query)->
-          params ?= {}
+          params = {}
           params.requestType = 'takeBy'
           params.recordName = @delegate.name
           params.query = $filter: query
@@ -100,7 +100,7 @@ module.exports = (Module)->
 
       @public @async takeMany: Function,
         default: (ids)->
-          params ?= {}
+          params = {}
           params.requestType = 'takeBy'
           params.recordName = @delegate.name
           params.query = $filter: '@doc.id': {$in: ids}
@@ -124,7 +124,7 @@ module.exports = (Module)->
 
       @public @async takeAll: Function,
         default: ->
-          params ?= {}
+          params = {}
           params.requestType = 'takeAll'
           params.recordName = @delegate.name
           params.query = {}
@@ -148,7 +148,7 @@ module.exports = (Module)->
 
       @public @async override: Function,
         default: (id, aoRecord)->
-          params ?= {}
+          params = {}
           params.requestType = 'override'
           params.recordName = @delegate.name
           params.snapshot = @serialize aoRecord
@@ -437,11 +437,10 @@ module.exports = (Module)->
 
       @public @async parseQuery: Function,
         default: (aoQuery)->
-          params = null
+          params = {}
           switch
             when aoQuery.$remove?
               if aoQuery.$forIn?
-                params ?= {}
                 params.requestType = 'removeBy'
                 params.recordName = @delegate.name
                 params.query = aoQuery
@@ -449,14 +448,12 @@ module.exports = (Module)->
                 yield return params
             when aoQuery.$patch?
               if aoQuery.$forIn?
-                params ?= {}
                 params.requestType = 'patchBy'
                 params.recordName = @delegate.name
                 params.query = aoQuery
                 params.isCustomReturn = yes
                 yield return params
             else
-              params ?= {}
               params.requestType = 'query'
               params.recordName = @delegate.name
               params.query = aoQuery
