@@ -6,22 +6,20 @@
 
 module.exports = (Module)->
   {
-    Utils
+    Utils: {co}
   } = Module::
-  {co} = Utils
 
   Module.defineMixin Module::CoreObject, (BaseClass) ->
     class DelayableMixin extends BaseClass
       @inheritProtected()
       @implements Module::DelayableMixinInterface
 
-      cphDelayableMap = @private @static delayableMap: Object
-      iphDelayableMap = @private delayableMap: Object
-
       cpmDelayJob = @private @static @async delayJob: Function,
         default: (facade, data, options = {})->
           resque = facade.retrieveProxy Module::RESQUE
+          console.log '>>>> IN DelayableMixin options.queue', options.queue
           queue = yield resque.get options.queue ? Module::DELAYED_JOBS_QUEUE
+          console.log '>>>> IN DelayableMixin queue', queue
           yield queue.delay Module::DELAYED_JOBS_SCRIPT, data, options.delayUntil
           yield return
 
@@ -46,37 +44,33 @@ module.exports = (Module)->
       # т.к. статические методы объявлены на классах, а следовательно нет проблемы в том, чтобы найти в неймспейсе нужный класс и вызвать его статический метод.
       @public @static delay: Function,
         default: (facade, opts = null)->
-          @[cphDelayableMap] = do =>
-            obj = {}
-            for own methodName of @classMethods
-              if methodName isnt 'delay'
-                do (methodName)=>
-                  obj[methodName] = co.wrap (args...)=>
-                    data =
-                      moduleName: @moduleName()
-                      replica: yield @constructor.replicateObject @
-                      methodName: methodName
-                      args: args
-                    return yield @[cpmDelayJob] facade, data, opts
-            obj
-          @[cphDelayableMap]
+          obj = {}
+          for own methodName of @classMethods
+            if methodName isnt 'delay'
+              do (methodName)=>
+                obj[methodName] = co.wrap (args...)=>
+                  data =
+                    moduleName: @moduleName()
+                    replica: yield @constructor.replicateObject @
+                    methodName: methodName
+                    args: args
+                  return yield @[cpmDelayJob] facade, data, opts
+          obj
 
       @public delay: Function,
         default: (facade, opts = null)->
-          @[iphDelayableMap] = do =>
-            obj = {}
-            for own methodName of @constructor.instanceMethods
-              if methodName isnt 'delay'
-                do (methodName)=>
-                  obj[methodName] = co.wrap (args...)=>
-                    data =
-                      moduleName: @moduleName()
-                      replica: yield @constructor.replicateObject @
-                      methodName: methodName
-                      args: args
-                    return yield @constructor[cpmDelayJob] facade, data, opts
-            obj
-          @[iphDelayableMap]
+          obj = {}
+          for own methodName of @constructor.instanceMethods
+            if methodName isnt 'delay'
+              do (methodName)=>
+                obj[methodName] = co.wrap (args...)=>
+                  data =
+                    moduleName: @moduleName()
+                    replica: yield @constructor.replicateObject @
+                    methodName: methodName
+                    args: args
+                  return yield @constructor[cpmDelayJob] facade, data, opts
+          obj
 
 
     DelayableMixin.initializeMixin()
