@@ -260,9 +260,7 @@ module.exports = (Module)->
       @public @async isNew: Function,
         default: ->
           return yes  unless @id?
-          return yes  unless (cursor = yield @collection.find @id)?
-          return cursor.length is 0  unless cursor instanceof Module::Cursor
-          return not (yield cursor.first())?
+          return not (yield @collection.includes @id)
 
       @public @async @virtual reload: Function,
         args: []
