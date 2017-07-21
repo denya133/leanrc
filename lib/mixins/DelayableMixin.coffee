@@ -17,9 +17,7 @@ module.exports = (Module)->
       cpmDelayJob = @private @static @async delayJob: Function,
         default: (facade, data, options = {})->
           resque = facade.retrieveProxy Module::RESQUE
-          console.log '>>>> IN DelayableMixin options.queue', options.queue
           queue = yield resque.get options.queue ? Module::DELAYED_JOBS_QUEUE
-          console.log '>>>> IN DelayableMixin queue', queue
           yield queue.delay Module::DELAYED_JOBS_SCRIPT, data, options.delayUntil
           yield return
 
