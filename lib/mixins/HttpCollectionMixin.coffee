@@ -30,7 +30,7 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            voRecord = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+            voRecord = @normalize body
           else
             throw new Error "
               Record payload has not existed in response body.
@@ -71,7 +71,7 @@ module.exports = (Module)->
           { body } = res
           if body? and body isnt ''
             console.log 'HttpCollectionMixin::take before @normalize body', body
-            voRecord = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+            voRecord = @normalize body
             console.log 'HttpCollectionMixin::take after @normalize body', voRecord
           else
             throw new Error "
@@ -96,12 +96,12 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            vlRecords = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+            voCursor = @normalize body
           else
             throw new Error "
               Record payload has not existed in response body.
             "
-          yield return Module::Cursor.new @, vlRecords
+          yield return voCursor
 
       @public @async takeMany: Function,
         default: (ids)->
@@ -120,12 +120,12 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            vlRecords = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+            voCursor = @normalize body
           else
             throw new Error "
               Record payload has not existed in response body.
             "
-          yield return Module::Cursor.new @, vlRecords
+          yield return voCursor
 
       @public @async takeAll: Function,
         default: ->
@@ -144,12 +144,12 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            vlRecords = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+            voCursor = @normalize body
           else
             throw new Error "
               Record payload has not existed in response body.
             "
-          yield return Module::Cursor.new @, vlRecords
+          yield return voCursor
 
       @public @async override: Function,
         default: (id, aoRecord)->
@@ -169,7 +169,7 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            voRecord = @normalize body # TODO: теоретически может потребоваться HttpSerializerMixin
+            voRecord = @normalize body
           else
             throw new Error "
               Record payload has not existed in response body.
@@ -245,8 +245,7 @@ module.exports = (Module)->
         return: Object
         default: ({recordName, snapshot, requestType, query})->
           if snapshot? and requestType in ['push', 'override']
-            key = inflect.singularize inflect.underscore recordName.replace /Record$/, ''
-            return "#{key}": snapshot
+            return snapshot
           else if requestType in ['query', 'patchBy', 'removeBy']
             return {query}
           else
