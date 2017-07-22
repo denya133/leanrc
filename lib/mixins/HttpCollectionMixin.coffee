@@ -212,8 +212,11 @@ module.exports = (Module)->
             service = @facade.retrieveMediator APPLICATION_MEDIATOR
               .getViewComponent()
             if service.context?
-              sessionCookie = service.context.cookies.get @configs.sessionCookie
-              headers['Cookie'] = "#{@configs.sessionCookie}=#{sessionCookie}"
+              if service.context.headers['Authorization'] is "Bearer #{@configs.apiKey}"
+                headers['Authorization'] = "Bearer #{@configs.apiKey}"
+              else
+                sessionCookie = service.context.cookies.get @configs.sessionCookie
+                headers['Cookie'] = "#{@configs.sessionCookie}=#{sessionCookie}"
             else
               headers['Authorization'] = "Bearer #{@configs.apiKey}"
           headers
