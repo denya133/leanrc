@@ -15,12 +15,13 @@ module.exports = (Module)->
       @implements Module::RelationsMixinInterface
 
       @public @static belongsTo: Function,
-        default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable}={})->
+        default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable, validate}={})->
           # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
           [vsAttr] = Object.keys typeDefinition
           attr ?= "#{vsAttr}Id"
           refKey ?= 'id'
-          @attribute "#{attr}": String
+          @attribute "#{attr}": String,
+            validate: validate ? -> joi.string()
           if attr isnt "#{vsAttr}Id"
             @computed "#{vsAttr}Id": String,
               valuable: "#{vsAttr}Id"
