@@ -14,19 +14,15 @@ module.exports = (Module)->
 
       @public normalize: Function,
         default: (acRecord, ahPayload)->
-          console.log '>>> IN HttpSerializerMixin::normalize', ahPayload, _.isString ahPayload
+          ahPayload = JSON.parse ahPayload if _.isString ahPayload
           recordName = acRecord.name.replace /Record$/, ''
           singular = inflect.singularize inflect.underscore recordName
           plural = inflect.pluralize singular
-          console.log '>>> IN HttpSerializerMixin::normalize singular, plural', singular, plural
           if ahPayload[singular]?
-            console.log '>>> IN HttpSerializerMixin::normalize if singular'
             return acRecord.normalize ahPayload[singular], @collection
           else if ahPayload[plural]?
-            console.log '>>> IN HttpSerializerMixin::normalize if plural'
             return Cursor.new @, ahPayload[plural]
           else
-            console.log '>>> IN HttpSerializerMixin::normalize other'
             return acRecord.normalize ahPayload, @collection
 
       @public serialize: Function,
