@@ -485,6 +485,7 @@ module.exports = (Module)->
             "
 
           { body } = res
+          console.log '>>> IN HttpCollectionMixin::executeQuery body', body
           if body? and body isnt ''
             if _.isString body
               body = JSON.parse body

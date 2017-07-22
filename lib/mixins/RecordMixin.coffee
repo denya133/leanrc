@@ -164,8 +164,10 @@ module.exports = (Module)->
       @public @async save: Function,
         default: ->
           result = if yield @isNew()
+            console.log '>>> IN RecordMixin::save isNew'
             yield @create()
           else
+            console.log '>>> IN RecordMixin::save not isNew'
             yield @update()
           return result
 
