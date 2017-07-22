@@ -21,8 +21,9 @@ module.exports = (Module)->
         methodName
         args
       } = aoData
-      if /\|\>/.test replica.multitonKey
-        [ replica.multitonKey ] = replica.multitonKey.split '|>'
+      # if /\|\>/.test replica.multitonKey
+      #   [ replica.multitonKey ] = replica.multitonKey.split '|>'
+      replica.multitonKey = @[Symbol.for '~multitonKey']
       unless moduleName is @Module.name
         throw new Error "Job was defined with moduleName = `#{moduleName}`, but its Module = `#{@Module.name}`"
         yield return
