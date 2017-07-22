@@ -73,13 +73,6 @@ module.exports = (Module)->
         args: []
         return: Module::CursorInterface
 
-      # @public @async @virtual replace: Function,
-      #   args: [String, Object]
-      #   return: Module::RecordInterface
-      # @public @async @virtual override: Function, # обращается к БД
-      #   args: [String, Module::RecordInterface]
-      #   return: Boolean
-
       @public @async @virtual update: Function,
         args: [String, Object]
         return: Module::RecordInterface

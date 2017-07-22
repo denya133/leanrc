@@ -28,13 +28,6 @@ module.exports = (Module)->
         args: [Object]
         return: Module::CursorInterface
 
-      # @public @async @virtual replaceBy: Function,
-      #   args: [Object, Object]
-      #   return: NILL
-      # @public @async @virtual overrideBy: Function, # обращается к БД
-      #   args: [Object, Module::RecordInterface]
-      #   return: Boolean
-
       @public @async @virtual updateBy: Function,
         args: [Object, Object]
         return: NILL

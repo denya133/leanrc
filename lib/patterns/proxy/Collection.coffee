@@ -96,12 +96,6 @@ module.exports = (Module)->
       default: (ids)->
         yield @takeMany ids
 
-    # @public @async replace: Function,
-    #   default: (id, properties)->
-    #     voRecord = yield @find id
-    #     yield voRecord.updateAttributes properties # ????????????
-    #     return voRecord
-
     @public @async update: Function,
       default: (id, properties)->
         voRecord = yield @find id

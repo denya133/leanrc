@@ -44,21 +44,6 @@ module.exports = (Module)->
           yield @query voQuery
           yield return
 
-      # @public @async replaceBy: Function,
-      #   default: (query, properties)->
-      #     voRecordsCursor = yield @takeBy query
-      #     yield voRecordsCursor.forEach co.wrap (aoRecord)->
-      #       return yield aoRecord.updateAttributes properties
-      #     return
-      #
-      # @public @async overrideBy: Function,
-      #   default: (query, aoRecord)->
-      #     voQuery = Module::Query.new()
-      #       .forIn '@doc': @collectionFullName()
-      #       .filter query
-      #       .replace aoRecord
-      #     yield @query voQuery
-
       @public @async updateBy: Function,
         default: (query, properties)->
           voRecordsCursor = yield @takeBy query
