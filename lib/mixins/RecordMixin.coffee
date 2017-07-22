@@ -345,15 +345,10 @@ module.exports = (Module)->
       @public init: Function,
         default: (aoProperties, aoCollection) ->
           @super arguments...
-          # console.log 'Init of Record', @constructor.name, aoProperties
           @collection = aoCollection
-
-          # TODO: надо не забыть про internalRecord
           for own vsAttrName, voAttrValue of aoProperties
             do (vsAttrName, voAttrValue)=>
               @[vsAttrName] = voAttrValue
-
-          # console.log 'dfdfdf 666'
 
       @public toJSON: Function, { default: -> @constructor.serialize @ }
 
