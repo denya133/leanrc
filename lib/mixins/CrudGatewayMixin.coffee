@@ -85,6 +85,12 @@ module.exports = (Module)->
           @swaggerDefinition 'list', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().optional(), "
+                Authorization header for internal services.
+              "
+              .header 'NonLimitation', joi.string().optional(), "
+                NonLimitation header for internal services.
+              "
               .queryParam 'query', @querySchema, "
                 The query for finding
                 #{@listEntityName}.
@@ -105,6 +111,9 @@ module.exports = (Module)->
           @swaggerDefinition 'detail', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().optional(), "
+                Authorization header for internal services.
+              "
               .pathParam @keyName, @keySchema
               .response @itemSchema, "
                 The #{@itemEntityName}.
@@ -123,6 +132,9 @@ module.exports = (Module)->
           @swaggerDefinition 'create', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().optional(), "
+                Authorization header for internal services.
+              "
               .body @itemSchema.required(), "
                 The #{@itemEntityName} to create.
               "
@@ -147,6 +159,9 @@ module.exports = (Module)->
           @swaggerDefinition 'update', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().optional(), "
+                Authorization header for internal services.
+              "
               .pathParam @keyName, @keySchema
               .body @itemSchema.required(), "
                 The data to replace the
@@ -168,32 +183,12 @@ module.exports = (Module)->
                 request body and returns the new document.
               "
 
-          @swaggerDefinition 'patch', (endpoint)->
-            endpoint
-              .pathParam 'v', @versionSchema
-              .pathParam @keyName, @keySchema
-              .body @itemSchema.required(), "
-                The data to update the
-                #{@itemEntityName} with.
-              "
-              .response @itemSchema, "
-                The updated #{@itemEntityName}.
-              "
-              .error HTTP_NOT_FOUND
-              .error HTTP_CONFLICT
-              .error UNAUTHORIZED
-              .error UPGRADE_REQUIRED
-              .summary "
-                Update the #{@itemEntityName}
-              "
-              .description "
-                Patches the #{@itemEntityName}
-                with the request body and returns the updated document.
-              "
-
           @swaggerDefinition 'delete', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().optional(), "
+                Authorization header for internal services.
+              "
               .pathParam @keyName, @keySchema
               .error HTTP_NOT_FOUND
               .error UNAUTHORIZED

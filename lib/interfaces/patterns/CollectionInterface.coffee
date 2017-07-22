@@ -55,7 +55,7 @@ module.exports = (Module)->
         return: NILL
       @public @async @virtual remove: Function, # обращается к БД
         args: [String]
-        return: Boolean
+        return: NILL
 
       @public @async @virtual find: Function,
         args: [String]
@@ -73,17 +73,10 @@ module.exports = (Module)->
         args: []
         return: Module::CursorInterface
 
-      @public @async @virtual replace: Function,
-        args: [String, Object]
-        return: Module::RecordInterface
-      @public @async @virtual override: Function, # обращается к БД
-        args: [String, Module::RecordInterface]
-        return: Boolean
-
       @public @async @virtual update: Function,
         args: [String, Object]
         return: Module::RecordInterface
-      @public @async @virtual patch: Function, # обращается к БД
+      @public @async @virtual override: Function, # обращается к БД
         args: [String, Module::RecordInterface]
         return: Boolean
 

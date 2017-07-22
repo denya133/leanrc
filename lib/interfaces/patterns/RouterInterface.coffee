@@ -38,11 +38,19 @@ module.exports = (Module)->
         args: [String, Object] # path, opts
         return: NILL
 
-      @public @virtual patch: Function,
+      @public @virtual delete: Function,
         args: [String, Object] # path, opts
         return: NILL
 
-      @public @virtual delete: Function,
+      @public @virtual head: Function,
+        args: [String, Object] # path, opts
+        return: NILL
+
+      @public @virtual options: Function,
+        args: [String, Object] # path, opts
+        return: NILL
+
+      @public @virtual patch: Function,
         args: [String, Object] # path, opts
         return: NILL
 

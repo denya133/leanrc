@@ -15,7 +15,6 @@ module.exports = (Module)->
       @public @virtual $let: Object
       @public @virtual $filter: Object
       @public @virtual $collect: Object
-      # @public @virtual $aggregate: Object
       @public @virtual $into: [String, Object]
       @public @virtual $having: Object
       @public @virtual $sort: Array
@@ -28,9 +27,7 @@ module.exports = (Module)->
       @public @virtual $count: Boolean # yes or not present
       @public @virtual $distinct: Boolean # yes or not present
       @public @virtual $remove: Boolean
-      @public @virtual $insert: Object
-      @public @virtual $update: Object
-      @public @virtual $replace: Object
+      @public @virtual $patch: Object
       @public @virtual $return: [String, Object]
 
       @public @virtual forIn: Function,
@@ -48,9 +45,6 @@ module.exports = (Module)->
       @public @virtual collect: Function,
         args: [Object] # definition
         return: QueryInterface
-      # @public @virtual aggregate: Function,
-      #   args: [Object] # definition
-      #   return: QueryInterface
       @public @virtual into: Function,
         args: [Object] # definition
         return: QueryInterface
@@ -75,13 +69,7 @@ module.exports = (Module)->
       @public @virtual remove: Function,
         args: [[String, Object]] # definition
         return: QueryInterface
-      @public @virtual insert: Function,
-        args: [Object] # definition
-        return: QueryInterface
-      @public @virtual update: Function,
-        args: [Object] # definition
-        return: QueryInterface
-      @public @virtual replace: Function,
+      @public @virtual patch: Function,
         args: [Object] # definition
         return: QueryInterface
       @public @virtual count: Function,

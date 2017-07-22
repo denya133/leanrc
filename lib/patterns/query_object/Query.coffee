@@ -139,7 +139,6 @@ module.exports = (Module)->
     @public $let: Object
     @public $filter: Object
     @public $collect: Object
-    # @public $aggregate: Object
     @public $into: [String, Object]
     @public $having: Object
     @public $sort: Array
@@ -152,9 +151,7 @@ module.exports = (Module)->
     @public $count: Boolean # yes or not present
     @public $distinct: Boolean # yes or not present
     @public $remove: Boolean
-    @public $insert: Object
-    @public $update: Object
-    @public $replace: Object
+    @public $patch: Object
     @public $return: Object
 
     @public forIn: Function,
@@ -208,17 +205,9 @@ module.exports = (Module)->
       default: (expr = yes)->
         @$remove = expr
         return @
-    @public insert: Function,
+    @public patch: Function,
       default: (aoDefinition)->
-        @$insert = aoDefinition
-        return @
-    @public update: Function,
-      default: (aoDefinition)->
-        @$update = aoDefinition
-        return @
-    @public replace: Function,
-      default: (aoDefinition)->
-        @$replace = aoDefinition
+        @$patch = aoDefinition
         return @
     @public return: Function,
       default: (aoDefinition)->
@@ -271,7 +260,7 @@ module.exports = (Module)->
         _.pick @, [
           '$forIn', '$join', '$let', '$filter', '$collect', '$into', '$having'
           '$sort', '$limit', '$offset', '$avg', '$sum', '$min', '$max', '$count'
-          '$distinct', '$remove', '$insert', '$update', '$replace', '$return'
+          '$distinct', '$remove', '$patch', '$return'
         ]
 
 

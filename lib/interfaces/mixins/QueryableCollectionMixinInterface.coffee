@@ -19,7 +19,7 @@ module.exports = (Module)->
         return: NILL
       @public @async @virtual removeBy: Function, # обращается к БД
         args: [Object]
-        return: Boolean
+        return: NILL
 
       @public @async @virtual findBy: Function,
         args: [Object]
@@ -28,19 +28,12 @@ module.exports = (Module)->
         args: [Object]
         return: Module::CursorInterface
 
-      @public @async @virtual replaceBy: Function,
-        args: [Object, Object]
-        return: NILL
-      @public @async @virtual overrideBy: Function, # обращается к БД
-        args: [Object, Module::RecordInterface]
-        return: Boolean
-
       @public @async @virtual updateBy: Function,
         args: [Object, Object]
         return: NILL
       @public @async @virtual patchBy: Function, # обращается к БД
         args: [Object, Module::RecordInterface]
-        return: Boolean
+        return: NILL
 
       @public @async @virtual exists: Function,
         args: [Object]

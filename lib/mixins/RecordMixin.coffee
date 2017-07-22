@@ -171,8 +171,6 @@ module.exports = (Module)->
 
       @public @async create: Function,
         default: ->
-          unless yield @isNew()
-            throw new Error 'Document is exist in collection'
           response = yield @collection.push @
           if response?
             { id } = response
@@ -185,9 +183,7 @@ module.exports = (Module)->
 
       @public @async update: Function,
         default: ->
-          if yield @isNew()
-            throw new Error 'Document does not exist in collection'
-          yield @collection.patch @id, @
+          yield @collection.override @id, @
           vhAttributes = {}
           for own key of @constructor.attributes
             vhAttributes[key] = @[key]
@@ -260,9 +256,7 @@ module.exports = (Module)->
       @public @async isNew: Function,
         default: ->
           return yes  unless @id?
-          return yes  unless (cursor = yield @collection.find @id)?
-          return cursor.length is 0  unless cursor instanceof Module::Cursor
-          return not (yield cursor.first())?
+          return not (yield @collection.includes @id)
 
       @public @async @virtual reload: Function,
         args: []
@@ -347,15 +341,10 @@ module.exports = (Module)->
       @public init: Function,
         default: (aoProperties, aoCollection) ->
           @super arguments...
-          # console.log 'Init of Record', @constructor.name, aoProperties
           @collection = aoCollection
-
-          # TODO: надо не забыть про internalRecord
           for own vsAttrName, voAttrValue of aoProperties
             do (vsAttrName, voAttrValue)=>
               @[vsAttrName] = voAttrValue
-
-          # console.log 'dfdfdf 666'
 
       @public toJSON: Function, { default: -> @constructor.serialize @ }
 

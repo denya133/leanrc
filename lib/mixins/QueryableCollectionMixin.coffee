@@ -8,6 +8,10 @@ _ = require 'lodash'
 
 
 module.exports = (Module)->
+  {
+    Utils: {co}
+  } = Module::
+
   Module.defineMixin Module::Collection, (BaseClass) ->
     class QueryableCollectionMixin extends BaseClass
       @inheritProtected()
@@ -15,19 +19,21 @@ module.exports = (Module)->
 
       @public @async findBy: Function,
         default: (query)->
-          yield @takeBy query
+          return yield @takeBy query
 
       @public @async deleteBy: Function,
         default: (query)->
-          vlRecords = yield @takeBy query
-          yield vlRecords.forEach (aoRecord)-> yield aoRecord.delete()
-          return
+          voRecordsCursor = yield @takeBy query
+          yield voRecordsCursor.forEach co.wrap (aoRecord)->
+            return yield aoRecord.delete()
+          yield return
 
       @public @async destroyBy: Function,
         default: (query)->
-          vlRecords = yield @takeBy query
-          yield vlRecords.forEach (aoRecord)-> yield aoRecord.destroy()
-          return
+          voRecordsCursor = yield @takeBy query
+          yield voRecordsCursor.forEach co.wrap (aoRecord)->
+            return yield aoRecord.destroy()
+          yield return
 
       @public @async removeBy: Function,
         default: (query)->
@@ -36,45 +42,23 @@ module.exports = (Module)->
             .filter query
             .remove()
           yield @query voQuery
-          return yes
-
-      @public @async takeBy: Function,
-        default: (query)->
-          voQuery = Module::Query.new()
-            .forIn '@doc': @collectionFullName()
-            .filter query
-            .return '@doc'
-          yield @query voQuery
-
-      @public @async replaceBy: Function,
-        default: (query, properties)->
-          vlRecords = yield @takeBy query
-          yield vlRecords.forEach (aoRecord)->
-            yield aoRecord.updateAttributes properties
-          return
-
-      @public @async overrideBy: Function,
-        default: (query, aoRecord)->
-          voQuery = Module::Query.new()
-            .forIn '@doc': @collectionFullName()
-            .filter query
-            .replace aoRecord
-          yield @query voQuery
+          yield return
 
       @public @async updateBy: Function,
         default: (query, properties)->
-          vlRecords = yield @takeBy query
-          yield vlRecords.forEach (aoRecord)->
-            yield aoRecord.updateAttributes properties
-          return
+          voRecordsCursor = yield @takeBy query
+          yield voRecordsCursor.forEach co.wrap (aoRecord)->
+            return yield aoRecord.updateAttributes properties
+          yield return
 
       @public @async patchBy: Function,
-        default: (query, aoRecord)->
+        default: (query, properties)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .filter query
-            .update aoRecord
+            .patch properties
           yield @query voQuery
+          yield return
 
       @public @async exists: Function,
         default: (query)->
@@ -84,7 +68,7 @@ module.exports = (Module)->
             .limit 1
             .return '@doc'
           cursor = yield @query voQuery
-          cursor.hasNext()
+          return yield cursor.hasNext()
 
       @public @async query: Function,
         default: (aoQuery)->
@@ -93,7 +77,7 @@ module.exports = (Module)->
           else
             aoQuery = _.pick aoQuery, Object.keys(aoQuery).filter (key)-> aoQuery[key]?
             voQuery = Module::Query.new aoQuery
-          yield @executeQuery yield @parseQuery voQuery
+          return yield @executeQuery yield @parseQuery voQuery
 
 
     QueryableCollectionMixin.initializeMixin()
