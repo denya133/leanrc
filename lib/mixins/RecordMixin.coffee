@@ -173,8 +173,8 @@ module.exports = (Module)->
 
       @public @async create: Function,
         default: ->
-          unless yield @isNew()
-            throw new Error 'Document is exist in collection'
+          # unless yield @isNew()
+          #   throw new Error 'Document is exist in collection'
           response = yield @collection.push @
           if response?
             { id } = response
@@ -187,8 +187,8 @@ module.exports = (Module)->
 
       @public @async update: Function,
         default: ->
-          if yield @isNew()
-            throw new Error 'Document does not exist in collection'
+          # if yield @isNew()
+          #   throw new Error 'Document does not exist in collection'
           yield @collection.override @id, @
           vhAttributes = {}
           for own key of @constructor.attributes
