@@ -70,9 +70,7 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            console.log 'HttpCollectionMixin::take before @normalize body', body
             voRecord = @normalize body
-            console.log 'HttpCollectionMixin::take after @normalize body', voRecord
           else
             throw new Error "
               Record payload has not existed in response body.
