@@ -190,9 +190,7 @@ describe 'Query', ->
             '$count': undefined,
             '$distinct': undefined,
             '$remove': undefined,
-            '$insert': undefined,
-            '$update': undefined,
-            '$replace': undefined,
+            '$patch': undefined
             '$return': country: '@country', city: '@city', usersInCity: '@groups'
         yield return
   describe '.restoreObject', ->
@@ -219,9 +217,7 @@ describe 'Query', ->
             '$count': undefined,
             '$distinct': undefined,
             '$remove': undefined,
-            '$insert': undefined,
-            '$update': undefined,
-            '$replace': undefined,
+            '$patch': undefined,
             '$return': country: '@country', city: '@city', usersInCity: '@groups'
         assert.deepEqual query.toJSON(),
           '$forIn': '@doc': 'users'
@@ -241,8 +237,6 @@ describe 'Query', ->
           '$count': undefined,
           '$distinct': undefined,
           '$remove': undefined,
-          '$insert': undefined,
-          '$update': undefined,
-          '$replace': undefined,
+          '$patch': undefined,
           '$return': country: '@country', city: '@city', usersInCity: '@groups'
         yield return
