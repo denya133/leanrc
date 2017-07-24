@@ -10,7 +10,7 @@ describe 'Record', ->
   describe '.new', ->
     it 'should create record instance', ->
       expect ->
-        class Test extends RC::Module
+        class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
 
@@ -25,7 +25,7 @@ describe 'Record', ->
   describe '#afterCreate', ->
     it 'should be called after create', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
 
@@ -35,26 +35,11 @@ describe 'Record', ->
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public data: Array,
-            default: []
-          @public @async push: Function,
-            default: (record) ->
-              record.id ?= RC::Utils.uuid.v4()
-              @data.push record
-              yield return
-          @public @async patch: Function,
-            default: (id, item) ->
-              record = yield @find id
-              record[key] = value  for own key, value of item
-              yield return record?
-          @public @async take: Function,
-            default: (id) ->
-              yield RC::Promise.resolve _.find @data, { id }
         Test::TestCollection.initialize()
-        collection = Test::TestCollection.new 'TEST_COLLECTION_02'
+        collection = Test::TestCollection.new 'TEST_COLLECTION_02',
+          delegate: Test::TestRecord
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_01'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
@@ -65,7 +50,7 @@ describe 'Record', ->
   describe '#beforeUpdate', ->
     it 'should be called before update', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
 
@@ -75,26 +60,11 @@ describe 'Record', ->
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public data: Array,
-            default: []
-          @public @async push: Function,
-            default: (record) ->
-              record.id ?= RC::Utils.uuid.v4()
-              @data.push record
-              yield return
-          @public @async patch: Function,
-            default: (id, item) ->
-              record = yield @find id
-              record[key] = value  for own key, value of item
-              yield return record?
-          @public @async take: Function,
-            default: (id) ->
-              yield RC::Promise.resolve _.find @data, { id }
         Test::TestCollection.initialize()
-        collection = Test::TestCollection.new 'TEST_COLLECTION_03'
+        collection = Test::TestCollection.new 'TEST_COLLECTION_03',
+          delegate: Test::TestRecord
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_02'
         facade.registerProxy collection
         record = collection.build {id: 123}
@@ -107,7 +77,7 @@ describe 'Record', ->
   describe '#beforeCreate', ->
     it 'should be called before create', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
 
@@ -117,29 +87,12 @@ describe 'Record', ->
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public data: Array,
-            default: []
-          @public @async generateId: Function,
-            default: -> yield return LeanRC::Utils.uuid.v4()
-          @public @async push: Function,
-            default: (record) ->
-              # record._key ?= RC::Utils.uuid.v4()
-              @data.push record
-              yield return
-          @public @async patch: Function,
-            default: (id, item) ->
-              record = yield @find id
-              record[key] = value  for own key, value of item
-              yield return record?
-          @public @async take: Function,
-            default: (id) ->
-              yield RC::Promise.resolve _.find @data, { id }
         Test::TestCollection.initialize()
-        collection = Test::TestCollection.new 'TEST_COLLECTION_03'
-        facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_02'
+        collection = Test::TestCollection.new 'TEST_COLLECTION_04',
+          delegate: Test::TestRecord
+        facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_03'
         facade.registerProxy collection
         record = collection.build()
         assert.isUndefined record.id
@@ -149,7 +102,7 @@ describe 'Record', ->
   describe '#afterUpdate', ->
     it 'should be called after update', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
 
@@ -159,27 +112,12 @@ describe 'Record', ->
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public data: Array,
-            default: []
-          @public @async push: Function,
-            default: (record) ->
-              record.id ?= RC::Utils.uuid.v4()
-              @data.push record
-              yield return
-          @public @async patch: Function,
-            default: (id, item) ->
-              record = yield @find id
-              record[key] = value  for own key, value of item
-              yield return record?
-          @public @async take: Function,
-            default: (id) ->
-              yield RC::Promise.resolve _.find @data, { id }
         Test::TestCollection.initialize()
-        collection = Test::TestCollection.new 'TEST_COLLECTION_04'
-        facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_03'
+        collection = Test::TestCollection.new 'TEST_COLLECTION_05',
+          delegate: Test::TestRecord
+        facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_04'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
         record = collection.build {id: 123}
@@ -190,7 +128,7 @@ describe 'Record', ->
   describe '#beforeDelete', ->
     it 'should be called before delete', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
 
@@ -200,27 +138,12 @@ describe 'Record', ->
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public data: Array,
-            default: []
-          @public @async push: Function,
-            default: (record) ->
-              record.id ?= RC::Utils.uuid.v4()
-              @data.push record
-              yield return
-          @public @async patch: Function,
-            default: (id, item) ->
-              record = yield @find id
-              record[key] = value  for own key, value of item
-              yield return record?
-          @public @async take: Function,
-            default: (id) ->
-              yield RC::Promise.resolve _.find @data, { id }
         Test::TestCollection.initialize()
-        collection = Test::TestCollection.new 'TEST_COLLECTION_05'
-        facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_04'
+        collection = Test::TestCollection.new 'TEST_COLLECTION_06',
+          delegate: Test::TestRecord
+        facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_05'
         facade.registerProxy collection
         record = collection.build {id: 123}
         yield record.save()
@@ -234,7 +157,7 @@ describe 'Record', ->
   describe '#afterDelete', ->
     it 'should be called after delete', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
 
@@ -244,27 +167,12 @@ describe 'Record', ->
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public data: Array,
-            default: []
-          @public @async push: Function,
-            default: (record) ->
-              record.id ?= RC::Utils.uuid.v4()
-              @data.push record
-              yield return
-          @public @async patch: Function,
-            default: (id, item) ->
-              record = yield @find id
-              record[key] = value  for own key, value of item
-              yield return record?
-          @public @async take: Function,
-            default: (id) ->
-              yield RC::Promise.resolve _.find @data, { id }
         Test::TestCollection.initialize()
-        collection = Test::TestCollection.new 'TEST_COLLECTION_04'
-        facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_03'
+        collection = Test::TestCollection.new 'TEST_COLLECTION_07',
+          delegate: Test::TestRecord
+        facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_06'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
         record = collection.build {id: 123}
@@ -275,7 +183,7 @@ describe 'Record', ->
   describe '#afterDestroy', ->
     it 'should be called after destroy', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
 
@@ -285,25 +193,12 @@ describe 'Record', ->
         Test::TestRecord.initialize()
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public data: Array,
-            default: []
-          @public @async push: Function,
-            default: (record) ->
-              record.id ?= RC::Utils.uuid.v4()
-              @data.push record
-              yield return
-          @public @async take: Function,
-            default: (id) ->
-              yield RC::Promise.resolve _.find @data, { id }
-          @public @async remove: Function,
-            default: (id) ->
-              yield RC::Promise.resolve _.remove @data, { id }
         Test::TestCollection.initialize()
-        collection = Test::TestCollection.new 'TEST_COLLECTION_04'
-        facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_03'
+        collection = Test::TestCollection.new 'TEST_COLLECTION_08',
+          delegate: Test::TestRecord
+        facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_07'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
         record = collection.build {id: 123}
