@@ -53,14 +53,14 @@ module.exports = (Module)->
 
       @public checkHeader: Function,
         default: ->
-          { apiKey }        = @configs
+          { apiKey, clientKey } = @configs
           {
             authorization: authHeader
           } = @context.headers
           return no   unless authHeader?
           [..., key] = (/^Bearer\s+(.+)$/.exec authHeader) ? []
           return no   unless key?
-          return apiKey is key
+          return apiKey is key or clientKey is key
 
       @public @async makeSession: Function,
         default: ->
