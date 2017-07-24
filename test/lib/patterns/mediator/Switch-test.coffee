@@ -23,7 +23,7 @@ describe 'Switch', ->
         mediatorName = 'TEST_MEDIATOR'
         switchMediator = Switch.new mediatorName
         assert.deepEqual switchMediator.responseFormats, [
-          'json', 'html', 'xml', 'atom'
+          'json', 'html', 'xml', 'atom', 'text'
         ], 'Property `responseFormats` returns incorrect values'
       .to.not.throw Error
   describe '#listNotificationInterests', ->
@@ -84,7 +84,7 @@ describe 'Switch', ->
         switchMediator = Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator.initializeNotifier 'TEST_SWITCH_1'
         switchMediator.defineRoutes()
-        assert.equal spyCreateNativeRoute.callCount, 27, 'Some routes are missing'
+        assert.equal spyCreateNativeRoute.callCount, 18, 'Some routes are missing'
         facade.remove()
       .to.not.throw Error
   describe '#onRegister', ->
@@ -224,11 +224,11 @@ describe 'Switch', ->
         class TestRenderer extends LeanRC::Renderer
           @inheritProtected()
           @module Test
-          @public render: Function,
+          @public @async render: Function,
             default: (ctx, aoData, aoResource, aoOptions) ->
               spyRendererRender aoData, aoOptions
               vhData = RC::Utils.extend {}, aoData
-              JSON.stringify vhData ? null
+              yield return JSON.stringify vhData ? null
         TestRenderer.initialize()
         facade.registerProxy TestRenderer.new 'TEST_JSON_RENDERER'
         facade.registerProxy TestRenderer.new 'TEST_HTML_RENDERER'
@@ -242,6 +242,7 @@ describe 'Switch', ->
         class TestContext extends RC::CoreObject
           @inheritProtected()
           @module Test
+          @public headers: Object
           @public status: Number
           @public format: String
           @public accepts: Function,
@@ -253,6 +254,8 @@ describe 'Switch', ->
           constructor: (args...) ->
             super args...
             [@format] = args
+            @headers = {}
+            @headers['accept'] = 'application/json'
         TestContext.initialize()
         facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         class TestSwitch extends Switch
@@ -552,7 +555,8 @@ describe 'Switch', ->
         endPromise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
         yield switchMediator.callback() req, res
         data = yield endPromise
-        assert.equal data, 'Not Found'
+        parsedData = (try JSON.parse data ? null) ? {}
+        assert.propertyVal parsedData, 'code', 'Not Found'
         res = new MyResponse
         switchMediator.middlewares = []
         switchMediator.middlewares.push (ctx, next) ->
@@ -816,6 +820,8 @@ describe 'Switch', ->
           headers: 'x-forwarded-for': '192.168.0.1'
         res = new MyResponse
         voContext = Test::Context.new req, res, switchMediator
+        facade.registerMediator LeanRC::Mediator.new LeanRC::APPLICATION_MEDIATOR,
+          context: voContext
         promise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
         yield switchMediator.middlewares[0] voContext, -> res.end()
         yield promise
@@ -854,6 +860,8 @@ describe 'Switch', ->
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
           @createMethod 'get'
+          @public jsonRendererName: String,
+            default: Test::APPLICATION_RENDERER
         TestSwitch.initialize()
         class TestLogCommand extends LeanRC::SimpleCommand
           @inheritProtected()
@@ -861,6 +869,15 @@ describe 'Switch', ->
           @public execute: Function,
             default: (aoNotification) -> trigger.emit 'log', aoNotification
         TestLogCommand.initialize()
+        class TestRenderer extends LeanRC::Renderer
+          @inheritProtected()
+          @module Test
+          @public @async render: Function,
+            default: (ctx, aoData, aoResource, aoOptions) ->
+              vhData = RC::Utils.extend {}, aoData
+              yield return JSON.stringify vhData ? null
+        TestRenderer.initialize()
+        facade.registerProxy TestRenderer.new Test::APPLICATION_RENDERER
         facade.registerCommand Test::LogMessage.SEND_TO_LOG, TestLogCommand
         facade.registerCommand 'TestResource', TestResource
         result = yield LeanRC::Utils.request.get 'http://localhost:8888/test/123'
@@ -871,6 +888,8 @@ describe 'Switch', ->
         voRouter = facade.retrieveProxy switchMediator.routerName
         voRouter.get '/test/:id', resource: 'test', action: 'test'
         switchMediator.createNativeRoute voRouter.routes[0]
+        facade.registerMediator LeanRC::Mediator.new LeanRC::APPLICATION_MEDIATOR,
+          context: {}
         result = yield LeanRC::Utils.request.get 'http://localhost:8888/test/123'
         assert.equal result.status, 200
         assert.equal result.message, 'OK'

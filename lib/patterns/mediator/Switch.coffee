@@ -304,7 +304,7 @@ module.exports = (Module)->
       default: (ctx, aoData, resource, opts)->
         if opts.action is 'create'
           ctx.status = 201
-        unless ctx.headers.accept?
+        unless ctx.headers?.accept?
           yield return
         switch (vsFormat = ctx.accepts @responseFormats)
           when no
