@@ -202,18 +202,10 @@ describe 'Resource', ->
         assert.propertyVal actions.delete, 'attrType', Function
         assert.propertyVal actions.delete, 'level', LeanRC::PUBLIC
         assert.propertyVal actions.delete, 'async', LeanRC::ASYNC
-        assert.propertyVal actions.bulkUpdate, 'attr', 'bulkUpdate'
-        assert.propertyVal actions.bulkUpdate, 'attrType', Function
-        assert.propertyVal actions.bulkUpdate, 'level', LeanRC::PUBLIC
-        assert.propertyVal actions.bulkUpdate, 'async', LeanRC::ASYNC
-        assert.propertyVal actions.bulkPatch, 'attr', 'bulkPatch'
-        assert.propertyVal actions.bulkPatch, 'attrType', Function
-        assert.propertyVal actions.bulkPatch, 'level', LeanRC::PUBLIC
-        assert.propertyVal actions.bulkPatch, 'async', LeanRC::ASYNC
-        assert.propertyVal actions.bulkDelete, 'attr', 'bulkDelete'
-        assert.propertyVal actions.bulkDelete, 'attrType', Function
-        assert.propertyVal actions.bulkDelete, 'level', LeanRC::PUBLIC
-        assert.propertyVal actions.bulkDelete, 'async', LeanRC::ASYNC
+        assert.propertyVal actions.executeQuery, 'attr', 'executeQuery'
+        assert.propertyVal actions.executeQuery, 'attrType', Function
+        assert.propertyVal actions.executeQuery, 'level', LeanRC::PUBLIC
+        assert.propertyVal actions.executeQuery, 'async', LeanRC::ASYNC
         yield return
   describe '#beforeActionHook', ->
     it 'should parse action params as arguments', ->
@@ -560,7 +552,7 @@ describe 'Resource', ->
     it 'should update resource single item', ->
       co ->
         KEY = 'TEST_RESOURCE_004'
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()
@@ -580,7 +572,7 @@ describe 'Resource', ->
           @module Test
           @public entityName: String, { default: 'TestEntity' }
         Test::TestResource.initialize()
-        class Test::Collection extends LeanRC::Collection
+        class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
@@ -597,7 +589,7 @@ describe 'Resource', ->
               aoRecord.id = key
               @getData().data.push aoRecord.toJSON()
               yield yes
-          @public @async patch: Function,
+          @public @async override: Function,
             default: (id, aoRecord) ->
               item = _.find @getData().data, {id}
               if item?
@@ -615,10 +607,10 @@ describe 'Resource', ->
           @public @async includes: Function,
             default: (id)->
               yield return (_.find @getData().data, {id})?
-        Test::Collection.initialize()
+        Test::TestCollection.initialize()
         facade = LeanRC::Facade.getInstance KEY
         COLLECTION_NAME = 'TestEntitiesCollection'
-        facade.registerProxy Test::Collection.new COLLECTION_NAME,
+        facade.registerProxy Test::TestCollection.new COLLECTION_NAME,
           delegate: Test::TestRecord
           serializer: LeanRC::Serializer
           data: []
@@ -673,7 +665,7 @@ describe 'Resource', ->
               aoRecord.id = key
               @getData().data.push aoRecord.toJSON()
               yield yes
-          @public @async patch: Function,
+          @public @async override: Function,
             default: (id, aoRecord) ->
               item = _.find @getData().data, {id}
               if item?
@@ -711,9 +703,10 @@ describe 'Resource', ->
     it 'should call execution', ->
       co ->
         KEY = 'TEST_RESOURCE_008'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC::Module
           @inheritProtected()
-          @root __dirname
+          @root "#{__dirname}/config/root"
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
@@ -732,6 +725,8 @@ describe 'Resource', ->
           @module Test
           @public entityName: String, { default: 'TestEntity' }
         Test::TestResource.initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
         class Test::Collection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
@@ -765,12 +760,13 @@ describe 'Resource', ->
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()
         Test::Collection.initialize()
-        facade = LeanRC::Facade.getInstance KEY
         COLLECTION_NAME = 'TestEntitiesCollection'
         facade.registerProxy Test::Collection.new COLLECTION_NAME,
           delegate: Test::TestRecord
           serializer: LeanRC::Serializer
           data: []
+        facade.registerMediator LeanRC::Mediator.new LeanRC::APPLICATION_MEDIATOR,
+          context: {}
         collection = facade.retrieveProxy COLLECTION_NAME
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
@@ -782,7 +778,9 @@ describe 'Resource', ->
         # yield resource.create body: test_entity: test: 'test2'
         spySendNotitfication = sinon.spy resource, 'sendNotification'
         testBody =
-          context: query: query: '{"test":{"$eq":"test2"}}'
+          context:
+            query: query: '{"test":{"$eq":"test2"}}'
+            headers: {}
           reverse: 'TEST_REVERSE'
         notification = LeanRC::Notification.new 'TEST_NAME', testBody, 'list'
         yield resource.execute notification
@@ -795,7 +793,7 @@ describe 'Resource', ->
           limit: 'not defined'
           offset: 'not defined'
         assert.deepEqual voResource, resource
-        assert.lengthOf items, 2
+        assert.lengthOf items, 3
         assert.equal type, 'TEST_REVERSE'
         facade.remove()
         yield return
