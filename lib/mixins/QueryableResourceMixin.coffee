@@ -19,7 +19,7 @@ module.exports = (Module)->
 
       MAX_LIMIT   = 50
 
-      @public @async needsTransaction: Function,
+      @public @async writeTransaction: Function,
         args: [String, Module::ContextInterface]
         return: Boolean
         default: (asAction, aoContext) ->
@@ -34,7 +34,7 @@ module.exports = (Module)->
               { query } = body ? {}
               if query?
                 key = _.findKey query, (v, k) -> k in [
-                  '$insert', '$replace', '$update', '$remove'
+                  '$patch', '$remove'
                 ]
                 result = key?
           yield return result
