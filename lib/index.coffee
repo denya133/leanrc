@@ -147,7 +147,6 @@ class LeanRC extends RC
   require('./mixins/BodyParseMixin') LeanRC
   require('./mixins/CheckSessionsMixin') LeanRC
   require('./mixins/CheckPermissionsMixin') LeanRC
-  require('./mixins/CheckSchemaVersionMixin') LeanRC # needs test
   require('./mixins/QueryableResourceMixin') LeanRC # needs test
 
   require('./patterns/migration/Migration') LeanRC

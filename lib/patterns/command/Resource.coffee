@@ -15,6 +15,7 @@ module.exports = (Module)->
     HANDLER_RESULT
     DELAYED_JOBS_QUEUE
     RESQUE
+    MIGRATIONS
 
     SimpleCommand
     ResourceInterface
@@ -150,6 +151,18 @@ module.exports = (Module)->
           return
         yield return args
 
+    @public @async checkSchemaVersion: Function,
+      default: (args...)->
+        voMigrations = @facade.retrieveProxy MIGRATIONS
+        [..., lastMigration] = @Module::MIGRATION_NAMES
+        includes = yield voMigrations.includes lastMigration
+        if includes
+          yield return args
+        else
+          throw new Error 'Code schema version is not equal current DB version'
+          yield return
+        return args
+
     @public keyName: String,
       get: ->
         inflect.singularize inflect.underscore @entityName
@@ -223,6 +236,7 @@ module.exports = (Module)->
     ]
 
     @initialHook 'beforeActionHook'
+    @initialHook 'checkSchemaVersion'
 
     @beforeHook 'getQuery', only: ['list']
     @beforeHook 'getRecordId', only: ['detail', 'update', 'delete']
