@@ -417,7 +417,6 @@ module.exports = (Module)->
           options = {
             json: yes
             headers
-            timeout: 5000
           }
           options.body = data if data?
           return {
