@@ -19,7 +19,7 @@ module.exports = (Module)->
 
       MAX_LIMIT   = 50
 
-      @public @async needsTransaction: Function,
+      @public @async writeTransaction: Function,
         args: [String, Module::ContextInterface]
         return: Boolean
         default: (asAction, aoContext) ->

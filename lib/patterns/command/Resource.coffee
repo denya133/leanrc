@@ -287,7 +287,7 @@ module.exports = (Module)->
         voResult = yield @[action]? context
         yield return voResult
 
-    @public @async needsTransaction: Function,
+    @public @async writeTransaction: Function,
       args: [String, Module::ContextInterface]
       return: Boolean
       default: (asAction, aoContext) ->
