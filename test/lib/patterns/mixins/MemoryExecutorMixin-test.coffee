@@ -11,15 +11,33 @@ describe 'MemoryExecutorMixin', ->
       co ->
         executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         viewComponent = { id: 'view-component' }
-        executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
-        assert.instanceOf executor, LeanRC::MemoryResqueExecutor
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
+          @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
+          @module Test
+        MemoryResqueExecutor.initialize()
+        executor = MemoryResqueExecutor.new executorName, viewComponent
+        assert.instanceOf executor, MemoryResqueExecutor
         yield return
   describe '#listNotificationInterests', ->
     it 'should check notification interests list', ->
       co ->
         executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         viewComponent = { id: 'view-component' }
-        executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
+          @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
+          @module Test
+        MemoryResqueExecutor.initialize()
+        executor = MemoryResqueExecutor.new executorName, viewComponent
         assert.deepEqual executor.listNotificationInterests(), [
           LeanRC::JOB_RESULT, LeanRC::START_RESQUE
         ]
@@ -29,11 +47,22 @@ describe 'MemoryExecutorMixin', ->
       co ->
         executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         viewComponent = { id: 'view-component' }
-        executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
+          @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
+          @module Test
+        MemoryResqueExecutor.initialize()
+        executor = MemoryResqueExecutor.new executorName, viewComponent
         executor.stop()
-        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
-        stoppedSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_isStopped)'
+        stoppedSymbol = MemoryResqueExecutor
+          .metaObject
+          .getGroup 'instanceVariables'
+          ._isStopped
+          .pointer
         assert.isTrue executor[stoppedSymbol]
         yield return
   describe '#onRemove', ->
@@ -41,11 +70,22 @@ describe 'MemoryExecutorMixin', ->
       co ->
         executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         viewComponent = { id: 'view-component' }
-        executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
+          @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
+          @module Test
+        MemoryResqueExecutor.initialize()
+        executor = MemoryResqueExecutor.new executorName, viewComponent
         executor.onRemove()
-        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
-        stoppedSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_isStopped)'
+        stoppedSymbol = MemoryResqueExecutor
+          .metaObject
+          .getGroup 'instanceVariables'
+          ._isStopped
+          .pointer
         assert.isTrue executor[stoppedSymbol]
         yield return
   describe '#define', ->
@@ -53,12 +93,21 @@ describe 'MemoryExecutorMixin', ->
       co ->
         executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         viewComponent = { id: 'view-component' }
-        executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
-        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
-        definedProcessorsSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_definedProcessors)'
-        concurrencyCountSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_concurrencyCount)'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
+          @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
+          @module Test
+        MemoryResqueExecutor.initialize()
+        executor = MemoryResqueExecutor.new executorName, viewComponent
+        executorSymbols = MemoryResqueExecutor
+          .metaObject
+          .getGroup 'instanceVariables'
+        definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
+        concurrencyCountSymbol = executorSymbols._concurrencyCount.pointer
         executor[definedProcessorsSymbol] = {}
         executor[concurrencyCountSymbol] = {}
         QUEUE_NAME = 'TEST_QUEUE'
@@ -87,12 +136,21 @@ describe 'MemoryExecutorMixin', ->
       co ->
         executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         viewComponent = { id: 'view-component' }
-        executor = LeanRC::MemoryResqueExecutor.new executorName, viewComponent
-        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
-        definedProcessorsSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_definedProcessors)'
-        concurrencyCountSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_concurrencyCount)'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
+          @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
+          @module Test
+        MemoryResqueExecutor.initialize()
+        executor = MemoryResqueExecutor.new executorName, viewComponent
+        executorSymbols = MemoryResqueExecutor
+          .metaObject
+          .getGroup 'instanceVariables'
+        definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
+        concurrencyCountSymbol = executorSymbols._concurrencyCount.pointer
         executor[definedProcessorsSymbol] = {}
         executor[concurrencyCountSymbol] = {}
         QUEUE_NAME = 'TEST_QUEUE'
@@ -123,33 +181,33 @@ describe 'MemoryExecutorMixin', ->
       co ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_001'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
         Test.initialize()
-        class Test::Resque extends LeanRC::Resque
+        class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
-        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+        TestResque.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
           @module Test
-        Test::MemoryResqueExecutor.initialize()
-        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        MemoryResqueExecutor.initialize()
+        facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create 'TEST_QUEUE_1', 4
         resque.create 'TEST_QUEUE_2', 4
         executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         viewComponent = { id: 'view-component' }
-        executor = Test::MemoryResqueExecutor.new executorName, viewComponent
-        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
-        definedProcessorsSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_definedProcessors)'
-        concurrencyCountSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_concurrencyCount)'
-        resqueSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_resque)'
+        executor = MemoryResqueExecutor.new executorName, viewComponent
+        executorSymbols = MemoryResqueExecutor
+          .metaObject
+          .getGroup 'instanceVariables'
+        definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
+        concurrencyCountSymbol = executorSymbols._concurrencyCount.pointer
+        resqueSymbol = executorSymbols._resque.pointer
         executor.initializeNotifier KEY
         executor.setViewComponent new EventEmitter()
         executor[definedProcessorsSymbol] = {}
@@ -166,89 +224,42 @@ describe 'MemoryExecutorMixin', ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_002'
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
         Test.initialize()
-        class Test::Resque extends LeanRC::Resque
+        class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
-        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+        TestResque.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
           @module Test
           @public @async defineProcessors: Function,
             default: (args...) ->
               yield @super args...
               trigger.emit 'PROCESSORS_DEFINED'
               yield return
-        Test::MemoryResqueExecutor.initialize()
-        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        MemoryResqueExecutor.initialize()
+        facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create 'TEST_QUEUE_1', 4
         resque.create 'TEST_QUEUE_2', 4
         executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         viewComponent = { id: 'view-component' }
-        executor = Test::MemoryResqueExecutor.new executorName, viewComponent
-        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
-        definedProcessorsSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_definedProcessors)'
+        executor = MemoryResqueExecutor.new executorName, viewComponent
+        executorSymbols = MemoryResqueExecutor
+          .metaObject
+          .getGroup 'instanceVariables'
+        definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
         promise = LeanRC::Promise.new (resolve) ->
           trigger.once 'PROCESSORS_DEFINED', resolve
         facade.registerMediator executor
         yield promise
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_1'
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
-        facade.remove()
-        yield return
-  describe '.staticRunner', ->
-    it 'should call cycle part', ->
-      co ->
-        KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_003'
-        facade = LeanRC::Facade.getInstance KEY
-        trigger = new EventEmitter
-        test = null
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root "#{__dirname}/config/root"
-        Test.initialize()
-        class Test::Resque extends LeanRC::Resque
-          @inheritProtected()
-          @include LeanRC::MemoryResqueMixin
-          @module Test
-        Test::Resque.initialize()
-        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
-          @inheritProtected()
-          @module Test
-          @public @async defineProcessors: Function,
-            default: (args...) ->
-              yield @super args...
-              trigger.emit 'PROCESSORS_DEFINED'
-              yield return
-          @public @async cyclePart: Function,
-            default: ->
-              test = yes
-              trigger.emit 'CYCLE_PART'
-              yield return
-        Test::MemoryResqueExecutor.initialize()
-        facade.registerProxy Test::Resque.new LeanRC::RESQUE
-        resque = facade.retrieveProxy LeanRC::RESQUE
-        resque.create 'TEST_QUEUE_1', 4
-        resque.create 'TEST_QUEUE_2', 4
-        executor = Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
-        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
-        definedProcessorsSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_definedProcessors)'
-        promise = LeanRC::Promise.new (resolve) ->
-          trigger.once 'PROCESSORS_DEFINED', resolve
-        facade.registerMediator executor
-        yield promise
-        promise = LeanRC::Promise.new (resolve) ->
-          trigger.once 'CYCLE_PART', resolve
-        yield Test::MemoryResqueExecutor.staticRunner KEY
-        yield promise
-        assert.isNotNull test
         facade.remove()
         yield return
   describe '#recursion', ->
@@ -258,17 +269,18 @@ describe 'MemoryExecutorMixin', ->
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
         test = null
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
         Test.initialize()
-        class Test::Resque extends LeanRC::Resque
+        class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
-        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+        TestResque.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
           @module Test
           @public @async defineProcessors: Function,
             default: (args...) ->
@@ -280,16 +292,16 @@ describe 'MemoryExecutorMixin', ->
               test = yes
               trigger.emit 'CYCLE_PART'
               yield return
-        Test::MemoryResqueExecutor.initialize()
-        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        MemoryResqueExecutor.initialize()
+        facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
-        executor = Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
-        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
-        definedProcessorsSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_definedProcessors)'
-        isStoppedSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_isStopped)'
+        executor = MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
+        executorSymbols = MemoryResqueExecutor
+          .metaObject
+          .getGroup 'instanceVariables'
+        definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
+        isStoppedSymbol = executorSymbols._isStopped.pointer
         promise = LeanRC::Promise.new (resolve) ->
           trigger.once 'PROCESSORS_DEFINED', resolve
         facade.registerMediator executor
@@ -309,17 +321,18 @@ describe 'MemoryExecutorMixin', ->
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
         test = null
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
         Test.initialize()
-        class Test::Resque extends LeanRC::Resque
+        class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
-        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+        TestResque.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
           @module Test
           @public @async defineProcessors: Function,
             default: (args...) ->
@@ -331,14 +344,15 @@ describe 'MemoryExecutorMixin', ->
               test = yes
               trigger.emit 'CYCLE_PART'
               yield return
-        Test::MemoryResqueExecutor.initialize()
-        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        MemoryResqueExecutor.initialize()
+        facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
-        executor = Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
-        executorSymbols = Object.getOwnPropertySymbols LeanRC::MemoryResqueExecutor::
-        definedProcessorsSymbol = _.find executorSymbols, (item) ->
-          item.toString() is 'Symbol(_definedProcessors)'
+        executor = MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
+        executorSymbols = MemoryResqueExecutor
+          .metaObject
+          .getGroup 'instanceVariables'
+        definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
         promise = LeanRC::Promise.new (resolve) ->
           trigger.once 'PROCESSORS_DEFINED', resolve
         facade.registerMediator executor
@@ -357,28 +371,29 @@ describe 'MemoryExecutorMixin', ->
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
         test = null
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
         Test.initialize()
-        class Test::Resque extends LeanRC::Resque
+        class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
-        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+        TestResque.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
           @module Test
           @public @async start: Function,
             default: ->
               test = yes
               trigger.emit 'CYCLE_PART'
               yield return
-        Test::MemoryResqueExecutor.initialize()
-        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        MemoryResqueExecutor.initialize()
+        facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
-        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
+        facade.registerMediator MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
         executor = facade.retrieveMediator LeanRC::RESQUE_EXECUTOR
         promise = LeanRC::Promise.new (resolve) ->
           trigger.once 'CYCLE_PART', resolve
@@ -391,23 +406,24 @@ describe 'MemoryExecutorMixin', ->
       co ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_007'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
         Test.initialize()
-        class Test::Resque extends LeanRC::Resque
+        class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
-        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+        TestResque.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
           @module Test
-        Test::MemoryResqueExecutor.initialize()
-        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        MemoryResqueExecutor.initialize()
+        facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
-        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
+        facade.registerMediator MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
         executor = facade.retrieveMediator LeanRC::RESQUE_EXECUTOR
         type = 'TEST_TYPE'
         promise = LeanRC::Promise.new (resolve) ->
@@ -424,19 +440,20 @@ describe 'MemoryExecutorMixin', ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_008'
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
         Test.initialize()
-        class Test::Resque extends LeanRC::Resque
+        class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
-        class Test::MemoryResqueExecutor extends LeanRC::MemoryResqueExecutor
+        TestResque.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
           @module Test
-        Test::MemoryResqueExecutor.initialize()
+        MemoryResqueExecutor.initialize()
         class TestScript extends LeanRC::Script
           @inheritProtected()
           @module Test
@@ -445,11 +462,11 @@ describe 'MemoryExecutorMixin', ->
             yield return
         TestScript.initialize()
         facade.registerCommand 'TEST_SCRIPT', TestScript
-        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+        facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         yield resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
         queue = yield resque.get LeanRC::DELAYED_JOBS_QUEUE
-        facade.registerMediator Test::MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
+        facade.registerMediator MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
         executor = facade.retrieveMediator LeanRC::RESQUE_EXECUTOR
         promise = LeanRC::Promise.new (resolve) ->
           trigger.once 'CYCLE_PART', resolve

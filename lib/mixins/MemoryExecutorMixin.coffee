@@ -184,7 +184,7 @@ module.exports = (Module)->
         default: ->
           if isArangoDB()
             throw new Error 'MemoryExecutorMixin can not been used for ArrangoDB apps'
-            yield return
+            return
           @[ipbIsStopped] = yes
           clearTimeout @[ipoTimer]
           return
