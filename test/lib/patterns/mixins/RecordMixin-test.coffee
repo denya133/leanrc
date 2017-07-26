@@ -1,10 +1,9 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 _ = require 'lodash'
-RC = require 'RC'
 LeanRC = require.main.require 'lib'
 RecordMixin = LeanRC::RecordMixin
-{ co } = RC::Utils
+{ co } = LeanRC::Utils
 
 describe 'RecordMixin', ->
   describe '.new', ->
@@ -14,7 +13,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
         Test.initialize()
 
-        class Test::TestRecord extends RC::CoreObject
+        class Test::TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
@@ -32,7 +31,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
         Test.initialize()
 
-        class Test::TestRecord extends RC::CoreObject
+        class Test::TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
@@ -52,7 +51,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
         Test.initialize()
 
-        class Test::TestRecord extends RC::CoreObject
+        class Test::TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
@@ -73,7 +72,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
         Test.initialize()
 
-        class Test::TestRecord extends RC::CoreObject
+        class Test::TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
@@ -91,7 +90,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
         Test.initialize()
 
-        class Test::TestRecord extends RC::CoreObject
+        class Test::TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
@@ -116,7 +115,7 @@ describe 'RecordMixin', ->
           @inheritProtected()
         Test.initialize()
 
-        class Test::TestRecord extends RC::CoreObject
+        class Test::TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
@@ -145,32 +144,11 @@ describe 'RecordMixin', ->
           @inheritProtected()
         TestsModule.initialize()
 
-        class TestsCollection extends TestsModule::CoreObject
+        class TestsCollection extends TestsModule::Collection
           @inheritProtected()
-          @include TestsModule::CollectionInterface
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module TestsModule
-          ipsKey = @protected key: String
-          ipsName = @protected name: String
-          iphData = @protected data: Object
-          @public facade: TestsModule::Facade,
-            get: -> TestsModule::Facade.getInstance KEY
-          @public push: Function,
-            default: (item) ->
-              throw new Error 'Item is empty'  unless item?
-              if (yield @find item.id)?
-                throw new Error "Item '#{item.id}' is already exists"
-              item.id ?= TestsModule::Utils.uuid.v4()
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          @public find: Function,
-            default: (id) -> TestsModule::Promise.resolve @[iphData][id]
-          @public dfsgdsfgdsfgdfsg: Function,
-            default: (asKey, asName) ->
-          @public init: Function,
-            default: (asKey, asName) ->
-              @super asKey, asName
-              @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
-              return
         TestsCollection.initialize()
         class TestRecord extends TestsModule::CoreObject
           @inheritProtected()
@@ -179,13 +157,15 @@ describe 'RecordMixin', ->
           @public @static findRecordByName: Function,
             default: (asType) -> TestsModule::TestRecord
         TestRecord.initialize()
-        collection = TestsModule::TestsCollection.new KEY
-        record = TestsModule::TestRecord.new {}, collection
+        collection = TestsModule::TestsCollection.new KEY,
+          delegate: TestsModule::TestRecord
+        collection.onRegister()
+        record = TestsModule::TestRecord.new
+          id: yield collection.generateId()
+        , collection
         assert.isTrue yield record.isNew(), 'Record is not new'
         yield record.create()
         assert.isFalse yield record.isNew(), 'Record is still new'
-        try yield record.create() catch err
-        assert.instanceOf err, Error, 'Record not created'
         yield return
   describe '#destroy', ->
     it 'should remove record', ->
@@ -195,33 +175,11 @@ describe 'RecordMixin', ->
           @inheritProtected()
         TestsModule.initialize()
 
-        class TestsCollection extends TestsModule::CoreObject
+        class TestsCollection extends TestsModule::Collection
           @inheritProtected()
-          @include TestsModule::CollectionInterface
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module TestsModule
-          ipsKey = @protected key: String
-          ipsName = @protected name: String
-          iphData = @protected data: Object
-          @public facade: TestsModule::Facade,
-            get: -> TestsModule::Facade.getInstance KEY
-          @public push: Function,
-            default: (item) ->
-              throw new Error 'Item is empty'  unless item?
-              if (yield @find item.id)?
-                throw new Error "Item '#{item.id}' is already exists"
-              item.id ?= TestsModule::Utils.uuid.v4()
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          @public remove: Function,
-            default: (id) ->
-              TestsModule::Promise.resolve Reflect.deleteProperty @[iphData], id
-          @public find: Function,
-            default: (id) -> TestsModule::Promise.resolve @[iphData][id]
-          @public init: Function,
-            default: (asKey, asName) ->
-              @super asKey, asName
-              @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
-              return
         TestsCollection.initialize()
         class TestRecord extends TestsModule::CoreObject
           @inheritProtected()
@@ -230,8 +188,12 @@ describe 'RecordMixin', ->
           @public @static findRecordByName: Function,
             default: (asType) -> TestsModule::TestRecord
         TestRecord.initialize()
-        collection = TestsModule::TestsCollection.new KEY
-        record = TestsModule::TestRecord.new {}, collection
+        collection = TestsModule::TestsCollection.new KEY,
+          delegate: TestsModule::TestRecord
+        collection.onRegister()
+        record = TestsModule::TestRecord.new
+          id: yield collection.generateId()
+        , collection
         assert.isTrue (yield record.isNew()), 'Record is not new'
         yield record.create()
         assert.isFalse (yield record.isNew()), 'Record is still new'
@@ -246,41 +208,11 @@ describe 'RecordMixin', ->
           @inheritProtected()
         TestsModule.initialize()
 
-        class TestsCollection extends TestsModule::CoreObject
+        class TestsCollection extends TestsModule::Collection
           @inheritProtected()
-          @include TestsModule::CollectionInterface
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module TestsModule
-          ipsKey = @protected key: String
-          ipsName = @protected name: String
-          iphData = @protected data: Object
-          @public facade: TestsModule::Facade,
-            get: -> TestsModule::Facade.getInstance KEY
-          @public find: Function,
-            default: (id) -> TestsModule::Promise.resolve @[iphData][id]
-          @public @async clone: Function,
-            default: (item) ->
-              result = item.constructor.new item, @
-              result[key] = item[key]  for key of item.constructor.attributes
-              result.id = TestsModule::Utils.uuid.v4()
-              yield return result
-          @public push: Function,
-            default: (item) ->
-              throw new Error 'Item is empty'  unless item?
-              if (yield @find item.id)?
-                throw new Error "Item '#{item.id}' is already exists"
-              item.id ?= TestsModule::Utils.uuid.v4()
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          @public patch: Function,
-            default: (id, item) ->
-              if (yield @find id)?
-                @[iphData][item.id] = yield @clone item
-              else
-                throw new Error "Item '#{id}' is missing"
-              @[iphData][item.id]?
-          constructor: (asKey, asName) ->
-            super asKey, asName
-            @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
         TestsCollection.initialize()
         class TestRecord extends TestsModule::CoreObject
           @inheritProtected()
@@ -290,8 +222,13 @@ describe 'RecordMixin', ->
             default: (asType) -> TestsModule::TestRecord
           @attr test: String
         TestRecord.initialize()
-        collection = TestsModule::TestsCollection.new KEY
-        record = TestsModule::TestRecord.new { test: 'test1' }, collection
+        collection = TestsModule::TestsCollection.new KEY,
+          delegate: TestsModule::TestRecord
+        collection.onRegister()
+        record = TestsModule::TestRecord.new
+          id: yield collection.generateId()
+          test: 'test1'
+        , collection
         yield record.create()
         assert.equal (yield collection.find record.id).test, 'test1', 'Initial attr not saved'
         record.test = 'test2'
@@ -302,49 +239,31 @@ describe 'RecordMixin', ->
     it 'should clone record', ->
       co ->
         KEY = 'TEST_RECORD_04'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
-        class Test::Collection extends RC::CoreObject
+        class TestCollection extends Test::Collection
           @inheritProtected()
-          @include LeanRC::CollectionInterface
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
-          ipsKey = @protected key: String
-          ipsName = @protected name: String
-          iphData = @protected data: Object
-          @public facade: LeanRC::Facade,
-            get: -> LeanRC::Facade.getInstance KEY
-          @public find: Function,
-            default: (id) -> RC::Promise.resolve @[iphData][id]
-          @public @async clone: Function,
-            default: (item) ->
-              result = item.constructor.new item, @
-              result[key] = item[key]  for key of item.constructor.attributes
-              result.id = RC::Utils.uuid.v4()
-              yield return result
-          @public push: Function,
-            default: (item) ->
-              throw new Error 'Item is empty'  unless item?
-              if (yield @find item.id)?
-                throw new Error "Item '#{item.id}' is already exists"
-              item.id ?= RC::Utils.uuid.v4()
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          constructor: (asKey, asName) ->
-            super asKey, asName
-            @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
-        Test::Collection.initialize()
-        class Test::TestRecord extends RC::CoreObject
+        TestCollection.initialize()
+        class TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: String
-        Test::TestRecord.initialize()
-        collection = Test::Collection.new KEY
-        record = Test::TestRecord.new { test: 'test1' }, collection
+        TestRecord.initialize()
+        collection = TestCollection.new KEY,
+          delegate: Test::TestRecord
+        collection.onRegister()
+        record = TestRecord.new
+          id: yield collection.generateId()
+          test: 'test1'
+        , collection
         recordCopy = yield record.clone()
         assert.equal record.test, recordCopy.test
         assert.notEqual record.id, recordCopy.id
@@ -352,49 +271,33 @@ describe 'RecordMixin', ->
     it 'should save record', ->
       co ->
         KEY = 'TEST_RECORD_05'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
-        class Test::Collection extends RC::CoreObject
+        class TestCollection extends Test::Collection
           @inheritProtected()
-          @include LeanRC::CollectionInterface
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
-          ipsKey = @protected key: String
-          ipsName = @protected name: String
-          iphData = @protected data: Object
-          @public facade: LeanRC::Facade,
-            get: -> LeanRC::Facade.getInstance KEY
-          @public find: Function,
-            default: (id) -> RC::Promise.resolve @[iphData][id]
-          @public @async clone: Function,
-            default: (item) ->
-              result = item.constructor.new item, @
-              result[key] = item[key]  for key of item.constructor.attributes
-              result.id = RC::Utils.uuid.v4()
-              yield return result
-          @public push: Function,
-            default: (item) ->
-              throw new Error 'Item is empty'  unless item?
-              if (yield @find item.id)?
-                throw new Error "Item '#{item.id}' is already exists"
-              item.id ?= RC::Utils.uuid.v4()
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          constructor: (asKey, asName) ->
-            super asKey, asName
-            @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
-        Test::Collection.initialize()
-        class Test::TestRecord extends RC::CoreObject
+        TestCollection.initialize()
+        class TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
+          @attr id: String
+          @attr type: String
+          @attr isHidden: Boolean, { default: no }
           @attr test: String
-        Test::TestRecord.initialize()
-        collection = Test::Collection.new KEY
-        record = Test::TestRecord.new { test: 'test1' }, collection
+        TestRecord.initialize()
+        collection = TestCollection.new KEY, delegate: Test::TestRecord
+        collection.onRegister()
+        record = TestRecord.new
+          id: yield collection.generateId()
+          test: 'test1'
+        , collection
         yield record.save()
         assert.isTrue (yield collection.find(record.id))?, 'Record is not saved'
         yield return
@@ -402,101 +305,66 @@ describe 'RecordMixin', ->
     it 'should create and then delete a record', ->
       co ->
         KEY = 'TEST_RECORD_06'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
-        class Test::Collection extends RC::CoreObject
+        class TestCollection extends Test::Collection
           @inheritProtected()
-          @include LeanRC::CollectionInterface
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
-          ipsKey = @protected key: String
-          ipsName = @protected name: String
-          iphData = @protected data: Object
-          @public facade: LeanRC::Facade,
-            get: -> LeanRC::Facade.getInstance KEY
-          @public find: Function,
-            default: (id) ->
-              RC::Promise.resolve unless @[iphData][id]?.isHidden then @[iphData][id]
-          @public push: Function,
-            default: (item) ->
-              throw new Error 'Item is empty'  unless item?
-              if (yield @find item.id)?
-                throw new Error "Item '#{item.id}' is already exists"
-              item.id ?= RC::Utils.uuid.v4()
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          constructor: (asKey, asName) ->
-            super asKey, asName
-            @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
-        Test::Collection.initialize()
-        class Test::TestRecord extends RC::CoreObject
+        TestCollection.initialize()
+        class TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
+          @attr id: String
+          @attr type: String
+          @attr isHidden: Boolean, { default: no }
           @attr test: String
-        Test::TestRecord.initialize()
-        collection = Test::Collection.new KEY
-        record = Test::TestRecord.new { test: 'test1' }, collection
+        TestRecord.initialize()
+        collection = TestCollection.new KEY, delegate: Test::TestRecord
+        collection.onRegister()
+        record = TestRecord.new
+          id: yield collection.generateId()
+          test: 'test1'
+        , collection
         yield record.save()
         assert.isTrue (yield collection.find(record.id))?, 'Record is not saved'
         yield record.delete()
-        assert.isFalse (yield collection.find(record.id))?, 'Record is not marked as delete'
+        assert.isTrue (yield collection.find record.id).isHidden, 'Record is not marked as delete'
         yield return
   describe '#copy', ->
     it 'should create and then copy the record', ->
       co ->
         KEY = 'TEST_RECORD_07'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
-        class Test::Collection extends RC::CoreObject
+        class TestCollection extends Test::Collection
           @inheritProtected()
-          @include LeanRC::CollectionInterface
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
-          ipsKey = @protected key: String
-          ipsName = @protected name: String
-          iphData = @protected data: Object
-          @public facade: LeanRC::Facade,
-            get: -> LeanRC::Facade.getInstance KEY
-          @public find: Function,
-            default: (id) -> RC::Promise.resolve @[iphData][id]
-          @public push: Function,
-            default: (item) ->
-              throw new Error 'Item is empty'  unless item?
-              if (yield @find item.id)?
-                throw new Error "Item '#{item.id}' is already exists"
-              item.id ?= RC::Utils.uuid.v4()
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          @public @async clone: Function,
-            default: (item) ->
-              result = item.constructor.new item, @
-              result[key] = item[key]  for key of item.constructor.attributes
-              result.id = RC::Utils.uuid.v4()
-              yield return result
-          @public @async copy: Function,
-            default: (item) ->
-              newItem = yield @clone item
-              yield newItem.save()
-              newItem
-          constructor: (asKey, asName) ->
-            super asKey, asName
-            @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
-        Test::Collection.initialize()
-        class Test::TestRecord extends RC::CoreObject
+        TestCollection.initialize()
+        class TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr test: String
-        Test::TestRecord.initialize()
-        collection = Test::Collection.new KEY
-        record = Test::TestRecord.new { test: 'test1' }, collection
+        TestRecord.initialize()
+        collection = TestCollection.new KEY, delegate: Test::TestRecord
+        collection.onRegister()
+        record = TestRecord.new
+          id: yield collection.generateId()
+          test: 'test1'
+        , collection
         yield record.save()
         assert.isTrue (yield collection.find(record.id))?, 'Record is not saved'
         newRecord = yield record.copy()
@@ -506,39 +374,17 @@ describe 'RecordMixin', ->
     it 'should decrease/increase value of number attribute and toggle boolean', ->
       co ->
         KEY = 'TEST_RECORD_08'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
-        class Test::Collection extends RC::CoreObject
+        class TestCollection extends Test::Collection
           @inheritProtected()
-          @include LeanRC::CollectionInterface
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
-          ipsKey = @protected key: String
-          ipsName = @protected name: String
-          iphData = @protected data: Object
-          @public facade: LeanRC::Facade,
-            get: -> LeanRC::Facade.getInstance KEY
-          @public find: Function,
-            default: (id) -> RC::Promise.resolve @[iphData][id]
-          @public push: Function,
-            default: (item) ->
-              throw new Error 'Item is empty'  unless item?
-              if (yield @find item.id)?
-                throw new Error "Item '#{item.id}' is already exists"
-              item.id ?= RC::Utils.uuid.v4()
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          @public patch: Function,
-            default: (id, item) ->
-              throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          constructor: (asKey, asName) ->
-            super asKey, asName
-            @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
-        Test::Collection.initialize()
-        class Test::TestRecord extends RC::CoreObject
+        TestCollection.initialize()
+        class Test::TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
@@ -547,8 +393,13 @@ describe 'RecordMixin', ->
           @attr test: Number
           @attr has: Boolean
         Test::TestRecord.initialize()
-        collection = Test::Collection.new KEY
-        record = Test::TestRecord.new { test: 1000, has: true }, collection
+        collection = TestCollection.new KEY, delegate: Test::TestRecord
+        collection.onRegister()
+        record = Test::TestRecord.new
+          id: yield collection.generateId()
+          test: 1000
+          has: true
+        , collection
         yield record.save()
         assert.equal record.test, 1000, 'Initial number value is incorrect'
         assert.isTrue record.has, 'Initial boolean value is incorrect'
@@ -565,39 +416,17 @@ describe 'RecordMixin', ->
     it 'should update attributes', ->
       co ->
         KEY = 'TEST_RECORD_09'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
-        class Test::Collection extends RC::CoreObject
+        class TestCollection extends Test::Collection
           @inheritProtected()
-          @include LeanRC::CollectionInterface
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
-          ipsKey = @protected key: String
-          ipsName = @protected name: String
-          iphData = @protected data: Object
-          @public facade: LeanRC::Facade,
-            get: -> LeanRC::Facade.getInstance KEY
-          @public find: Function,
-            default: (id) -> RC::Promise.resolve @[iphData][id]
-          @public push: Function,
-            default: (item) ->
-              throw new Error 'Item is empty'  unless item?
-              if (yield @find item.id)?
-                throw new Error "Item '#{item.id}' is already exists"
-              item.id ?= RC::Utils.uuid.v4()
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          @public patch: Function,
-            default: (id, item) ->
-              throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          constructor: (asKey, asName) ->
-            super asKey, asName
-            @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
-        Test::Collection.initialize()
-        class Test::TestRecord extends RC::CoreObject
+        TestCollection.initialize()
+        class Test::TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
@@ -607,8 +436,14 @@ describe 'RecordMixin', ->
           @attr has: Boolean
           @attr word: String
         Test::TestRecord.initialize()
-        collection = Test::Collection.new KEY
-        record = Test::TestRecord.new { test: 1000, has: true, word: 'test' }, collection
+        collection = TestCollection.new KEY, delegate: Test::TestRecord
+        collection.onRegister()
+        record = Test::TestRecord.new
+          id: yield collection.generateId()
+          test: 1000
+          has: true
+          word: 'test'
+        , collection
         record.save()
         assert.equal record.test, 1000, 'Initial number value is incorrect'
         assert.isTrue record.has, 'Initial boolean value is incorrect'
@@ -627,39 +462,17 @@ describe 'RecordMixin', ->
     it 'should save data with date', ->
       co ->
         KEY = 'TEST_RECORD_10'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
-        class Test::Collection extends RC::CoreObject
+        class TestCollection extends Test::Collection
           @inheritProtected()
-          @include LeanRC::CollectionInterface
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
-          ipsKey = @protected key: String
-          ipsName = @protected name: String
-          iphData = @protected data: Object
-          @public facade: LeanRC::Facade,
-            get: -> LeanRC::Facade.getInstance KEY
-          @public find: Function,
-            default: (id) -> RC::Promise.resolve @[iphData][id]
-          @public push: Function,
-            default: (item) ->
-              throw new Error 'Item is empty'  unless item?
-              if (yield @find item.id)?
-                throw new Error "Item '#{item.id}' is already exists"
-              item.id ?= RC::Utils.uuid.v4()
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          @public patch: Function,
-            default: (id, item) ->
-              throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          constructor: (asKey, asName) ->
-            super asKey, asName
-            @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
-        Test::Collection.initialize()
-        class Test::BasicTestRecord extends RC::CoreObject
+        TestCollection.initialize()
+        class Test::BasicTestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
@@ -676,8 +489,14 @@ describe 'RecordMixin', ->
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
         Test::TestRecord.initialize()
-        collection = Test::Collection.new KEY
-        record = Test::TestRecord.new { test: 1000, has: true, word: 'test' }, collection
+        collection = TestCollection.new KEY, delegate: Test::TestRecord
+        collection.onRegister()
+        record = Test::TestRecord.new
+          id: yield collection.generateId()
+          test: 1000
+          has: true
+          word: 'test'
+        , collection
         yield record.touch()
         assert.equal (yield collection.find record.id).test, 1000, 'Number attribue not updated correctly'
         assert.equal (yield collection.find record.id).has, yes, 'Boolean attribue not updated correctly'
@@ -688,39 +507,17 @@ describe 'RecordMixin', ->
     it 'should test, reset and rollback attributes', ->
       co ->
         KEY = 'TEST_RECORD_11'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
-        class Test::Collection extends RC::CoreObject
+        class TestCollection extends Test::Collection
           @inheritProtected()
-          @include LeanRC::CollectionInterface
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
-          ipsKey = @protected key: String
-          ipsName = @protected name: String
-          iphData = @protected data: Object
-          @public facade: LeanRC::Facade,
-            get: -> LeanRC::Facade.getInstance KEY
-          @public find: Function,
-            default: (id) -> RC::Promise.resolve @[iphData][id]
-          @public push: Function,
-            default: (item) ->
-              throw new Error 'Item is empty'  unless item?
-              if (yield @find item.id)?
-                throw new Error "Item '#{item.id}' is already exists"
-              item.id ?= RC::Utils.uuid.v4()
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          @public patch: Function,
-            default: (id, item) ->
-              throw new Error "Item '#{id}' is missing"  unless (yield @find id)?
-              @[iphData][item.id] = item
-              @[iphData][item.id]?
-          constructor: (asKey, asName) ->
-            super asKey, asName
-            @[ipsKey] = asKey; @[ipsName] = asName; @[iphData] = {}
-        Test::Collection.initialize()
-        class Test::TestRecord extends RC::CoreObject
+        TestCollection.initialize()
+        class Test::TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
@@ -730,8 +527,14 @@ describe 'RecordMixin', ->
           @attr has: Boolean
           @attr word: String
         Test::TestRecord.initialize()
-        collection = Test::Collection.new KEY
-        record = Test::TestRecord.new { test: 1000, has: true, word: 'test' }, collection
+        collection = TestCollection.new KEY, delegate: Test::TestRecord
+        collection.onRegister()
+        record = Test::TestRecord.new
+          test: 1000
+          has: true
+          word: 'test'
+          id: yield collection.generateId()
+        , collection
         yield record.save()
         record.test = 888
         assert.deepEqual record.changedAttributes().test, [ 1000, 888 ], 'Update is incorrect'
@@ -747,13 +550,13 @@ describe 'RecordMixin', ->
         yield return
   describe '.normalize, .serialize', ->
     it 'should serialize and deserialize attributes', ->
-      expect ->
+      co ->
         KEY = 'TEST_RECORD_12'
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
 
-        class Test::TestRecord extends RC::CoreObject
+        class Test::TestRecord extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::RecordMixin
           @module Test
@@ -763,14 +566,18 @@ describe 'RecordMixin', ->
           @attr has: Boolean
           @attr word: String
         Test::TestRecord.initialize()
-        record = Test::TestRecord.normalize { test: 1000, has: true, word: 'test' }, {}
+        record = Test::TestRecord.normalize
+          test: 1000
+          has: true
+          word: 'test'
+        , {}
         assert.propertyVal record, 'test', 1000, 'Property `test` not defined'
         assert.propertyVal record, 'has', yes, 'Property `has` not defined'
         assert.propertyVal record, 'word', 'test', 'Property `word` not defined'
         assert.deepEqual record.changedAttributes(), {}, 'Attributes are altered'
         snapshot = Test::TestRecord.serialize record
         assert.deepEqual snapshot, { test: 1000, has: true, word: 'test' }, 'Snapshot is incorrect'
-      .to.not.throw Error
+        yield return
   describe '.replicateObject', ->
     facade = null
     KEY = 'TEST_RECORD_12'
@@ -802,12 +609,12 @@ describe 'RecordMixin', ->
           @beforeHook 'beforeCreate', only: [ 'create' ]
           @public beforeCreate: Function,
             default: (args...) ->
-              @id ?= LeanRC::Utils.uuid.v4()
+              @id ?= @collection.generateId()
               args
         TestRecord.initialize()
         COLLECTION = 'COLLECTION'
         collection = facade.registerProxy MyCollection.new COLLECTION,
-          delegate: TestRecord
+          delegate: Test::TestRecord
           serializer: Test::Serializer
         collection = facade.retrieveProxy COLLECTION
         record = yield collection.create
@@ -816,6 +623,7 @@ describe 'RecordMixin', ->
           word: 'test'
         replica = yield TestRecord.replicateObject record
         assert.deepEqual replica,
+          attributes: {}
           type: 'instance'
           class: 'TestRecord'
           multitonKey: KEY
@@ -834,6 +642,7 @@ describe 'RecordMixin', ->
           collectionName: COLLECTION
           isNew: yes
           attributes: id: null, test: 1000, has: yes, word: 'test'
+        facade.remove()
         yield return
   describe '.restoreObject', ->
     facade = null
@@ -864,14 +673,14 @@ describe 'RecordMixin', ->
           @attr word: String
           @chains [ 'create' ]
           @beforeHook 'beforeCreate', only: [ 'create' ]
-          @public beforeCreate: Function,
+          @public @async beforeCreate: Function,
             default: (args...) ->
-              @id ?= LeanRC::Utils.uuid.v4()
+              @id ?= yield @collection.generateId()
               args
         TestRecord.initialize()
         COLLECTION = 'COLLECTION'
         collection = facade.registerProxy MyCollection.new COLLECTION,
-          delegate: TestRecord
+          delegate: Test::TestRecord
           serializer: Test::Serializer
         collection = facade.retrieveProxy COLLECTION
         record = yield collection.create
@@ -901,4 +710,5 @@ describe 'RecordMixin', ->
           attributes: id: '123', test: 1000, has: yes, word: 'test'
         assert.notEqual record, restoredRecord
         assert.deepEqual record, restoredRecord
+        facade.remove()
         yield return
