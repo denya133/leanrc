@@ -9,7 +9,7 @@ describe 'QueryableCollectionMixin', ->
   describe '.new', ->
     it 'should create queryable instance', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class Test::Queryable extends RC::CoreObject
@@ -27,7 +27,7 @@ describe 'QueryableCollectionMixin', ->
   describe '#query', ->
     it 'should execute query', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         spyExecuteQuery = sinon.spy (aoParsedQuery) -> yield return aoParsedQuery
@@ -47,60 +47,12 @@ describe 'QueryableCollectionMixin', ->
         assert.isTrue spyParseQuery.calledWith(query)
         assert.isTrue spyExecuteQuery.calledWith(query)
         yield return
-  describe '#takeBy', ->
-    it 'should get data by query', ->
-      co ->
-        KEY = 'FACADE_TEST_QUERYABLE_001'
-        facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
-          @inheritProtected()
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
-          @inheritProtected()
-          @module Test
-          @attribute test: String
-        Test::TestRecord.initialize()
-        class Test::Queryable extends LeanRC::Collection
-          @inheritProtected()
-          @include LeanRC::QueryableCollectionMixin
-          @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
-            default: (aoParsedQuery) -> yield _.filter @getData(), aoParsedQuery.$filter
-          @public patch: Function,
-            default: (id, item) ->
-              record = yield @find id
-              record[key] = value  for own key, value of item
-              yield return record?
-          @public push: Function,
-            default: (record) ->
-              record.id = RC::Utils.uuid.v4()
-              @getData().push record
-              yield return
-        Test::Queryable.initialize()
-        collection = Test::Queryable.new KEY, []
-        facade.registerProxy collection
-        queryable = facade.retrieveProxy KEY
-        yield queryable.create test: 'test1'
-        yield queryable.create test: 'test2'
-        yield queryable.create test: 'test3'
-        yield queryable.create test: 'test4'
-        [ record1 ] = yield queryable.takeBy { test: 'test2' }
-        [ record2 ] = yield queryable.takeBy { test: 'test5' }
-        assert.isDefined record1
-        assert.equal record1.test, 'test2'
-        assert.isUndefined record2
-        facade.remove()
-        yield return
   describe '#exists', ->
     it 'should check data existance by query', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_002'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
@@ -147,7 +99,7 @@ describe 'QueryableCollectionMixin', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_003'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
@@ -170,7 +122,7 @@ describe 'QueryableCollectionMixin', ->
           @public @async executeQuery: LeanRC::Cursor,
             default: (aoParsedQuery) ->
               data = _.filter @getData(), aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @delegate, data
+              yield LeanRC::Cursor.new @, data
           @public patch: Function,
             default: (id, item) ->
               record = yield @find id
@@ -181,6 +133,13 @@ describe 'QueryableCollectionMixin', ->
               record.id = RC::Utils.uuid.v4()
               @getData().push @delegate.serialize record
               yield return
+          @public @async takeBy: Function,
+            default: (query) ->
+              voQuery = Test::Query.new()
+                .forIn '@doc': @collectionFullName()
+                .filter query
+                .limit 1
+              yield return @query voQuery
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
         facade.registerProxy collection
@@ -189,10 +148,10 @@ describe 'QueryableCollectionMixin', ->
         yield queryable.create test: 'test2'
         yield queryable.create test: 'test3'
         yield queryable.create test: 'test4'
-        record1 = yield (yield queryable.findBy { test: 'test2' }).next()
+        record1 = yield (yield queryable.findBy { 'test': 'test2' }).next()
         assert.isDefined record1
         assert.equal record1.test, 'test2'
-        record2 = yield (yield queryable.findBy { test: 'test5' }).next()
+        record2 = yield (yield queryable.findBy { 'test': 'test5' }).next()
         assert.isUndefined record2
         facade.remove()
         yield return
@@ -201,7 +160,7 @@ describe 'QueryableCollectionMixin', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_004'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
@@ -247,6 +206,20 @@ describe 'QueryableCollectionMixin', ->
               record.id = RC::Utils.uuid.v4()
               @getData().push @delegate.serialize record
               yield return
+          @public @async takeBy: Function,
+            default: (query) ->
+              voQuery = Test::Query.new()
+                .forIn '@doc': @collectionFullName()
+                .filter query
+                .limit 1
+              yield return @query voQuery
+          @public @async includes: Function,
+            default: (id) -> yield return @exists { id }
+          @public @async override: Function,
+            default: (id, aoRecord)->
+              index = _.findIndex @getData(), { id }
+              @getData()[index] = @serializer.serialize aoRecord
+              yield return Test::Cursor.new(@, [@getData()[index]]).first()
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
         facade.registerProxy collection
@@ -272,7 +245,7 @@ describe 'QueryableCollectionMixin', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_005'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
@@ -343,7 +316,7 @@ describe 'QueryableCollectionMixin', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_006'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
@@ -387,6 +360,15 @@ describe 'QueryableCollectionMixin', ->
             default: (id) ->
               _.remove @getData(), { id }
               yield return
+          @public @async takeBy: Function,
+            default: (query) ->
+              voQuery = Test::Query.new()
+                .forIn '@doc': @collectionFullName()
+                .filter query
+                .limit 1
+              yield return @query voQuery
+          @public @async includes: Function,
+            default: (id) -> yield return @exists { id }
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
         facade.registerProxy collection
@@ -401,160 +383,12 @@ describe 'QueryableCollectionMixin', ->
         assert.lengthOf _.filter(data, { test: 'test2' }), 0, 'Found removed records'
         facade.remove()
         yield return
-  describe '#overrideBy', ->
-    it 'should update data in records by query', ->
-      co ->
-        KEY = 'FACADE_TEST_QUERYABLE_007'
-        facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
-          @inheritProtected()
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
-          @inheritProtected()
-          @module Test
-          @attribute test: String
-          @attribute updated: Boolean, { default: no }
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::Queryable extends LeanRC::Collection
-          @inheritProtected()
-          @include LeanRC::QueryableCollectionMixin
-          @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
-            default: (aoParsedQuery) ->
-              if (item = aoParsedQuery['$replace'])?
-                toBeReplaced = _.filter @getData(), aoParsedQuery.$filter
-                if _.isArray toBeReplaced
-                  for datum in toBeReplaced
-                    if item.constructor.attributes?
-                      vhAttributes = {}
-                      for own key of item.constructor.attributes
-                        datum[key] = item[key]
-                    else
-                      datum[key] = value  for own key, value of item
-              data = _.filter @getData(), aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @, data
-          @public take: Function,
-            default: (id) ->
-              data = _.find @getData(), { id }
-              throw new Error 'NOT_FOUND'  unless data?
-              yield data
-          @public push: Function,
-            default: (record) ->
-              record.id = RC::Utils.uuid.v4()
-              @getData().push @delegate.serialize record
-              yield return
-        Test::Queryable.initialize()
-        collection = Test::Queryable.new KEY, []
-        facade.registerProxy collection
-        queryable = facade.retrieveProxy KEY
-        yield queryable.create test: 'test1'
-        yield queryable.create test: 'test2'
-        yield queryable.create test: 'test3'
-        yield queryable.create test: 'test2'
-        yield queryable.overrideBy { test: 'test2' }, yield queryable.build test: 'test2', updated: yes
-        for rawData in queryable.getData()
-          assert.isDefined rawData, 'No specified record'
-          if rawData.test is 'test2'
-            assert.propertyVal rawData, 'updated', yes, 'Record was not overriden'
-          else
-            assert.propertyVal rawData, 'updated', no, 'Record was overriden'
-        queryable.setData []
-        yield queryable.create test: 'test1'
-        yield queryable.create test: 'test2'
-        yield queryable.create test: 'test3'
-        yield queryable.create test: 'test2'
-        yield queryable.overrideBy { test: 'test2' }, { updated: yes }
-        for rawData in queryable.getData()
-          assert.isDefined rawData, 'No specified record'
-          if rawData.test is 'test2'
-            assert.propertyVal rawData, 'updated', yes, 'Record was not overriden'
-          else
-            assert.propertyVal rawData, 'updated', no, 'Record was overriden'
-        facade.remove()
-        yield return
-  describe '#replaceBy', ->
-    it 'should update data in records by query', ->
-      co ->
-        KEY = 'FACADE_TEST_QUERYABLE_008'
-        facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
-          @inheritProtected()
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
-          @inheritProtected()
-          @module Test
-          @attribute test: String
-          @attribute updated: Boolean, { default: no }
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::Queryable extends LeanRC::Collection
-          @inheritProtected()
-          @include LeanRC::QueryableCollectionMixin
-          @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
-            default: (aoParsedQuery) ->
-              data = _.filter @getData(), aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @, data
-          @public patch: Function,
-            default: (id, item) ->
-              data = _.filter @getData(), { id }
-              if _.isArray data
-                for datum in data
-                  if item.constructor.attributes?
-                    vhAttributes = {}
-                    for own key of item.constructor.attributes
-                      datum[key] = item[key]
-                  else
-                    datum[key] = value  for own key, value of item
-              yield return data.length > 0
-          @public take: Function,
-            default: (id) ->
-              data = _.find @getData(), { id }
-              throw new Error 'NOT_FOUND'  unless data?
-              yield data
-          @public push: Function,
-            default: (record) ->
-              record.id = RC::Utils.uuid.v4()
-              @getData().push @delegate.serialize record
-              yield return
-        Test::Queryable.initialize()
-        collection = Test::Queryable.new KEY, []
-        facade.registerProxy collection
-        queryable = facade.retrieveProxy KEY
-        yield queryable.create test: 'test1'
-        yield queryable.create test: 'test2'
-        yield queryable.create test: 'test3'
-        yield queryable.create test: 'test2'
-        yield queryable.replaceBy { test: 'test2' }, { updated: yes }
-        for rawData in queryable.getData()
-          assert.isDefined rawData, 'No specified record'
-          if rawData.test is 'test2'
-            assert.propertyVal rawData, 'updated', yes, 'Record was not replaced'
-          else
-            assert.propertyVal rawData, 'updated', no, 'Record was replaced'
-        facade.remove()
-        yield return
   describe '#updateBy', ->
     it 'should update data in records by query', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_009'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
@@ -601,6 +435,20 @@ describe 'QueryableCollectionMixin', ->
               record.id = RC::Utils.uuid.v4()
               @getData().push @delegate.serialize record
               yield return
+          @public @async takeBy: Function,
+            default: (query) ->
+              voQuery = Test::Query.new()
+                .forIn '@doc': @collectionFullName()
+                .filter query
+                .limit 1
+              yield return @query voQuery
+          @public @async includes: Function,
+            default: (id) -> yield return @exists { id }
+          @public @async override: Function,
+            default: (id, aoRecord)->
+              index = _.findIndex @getData(), { id }
+              @getData()[index] = @serializer.serialize aoRecord
+              yield return Test::Cursor.new(@, [@getData()[index]]).first()
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
         facade.registerProxy collection
@@ -623,7 +471,7 @@ describe 'QueryableCollectionMixin', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_010'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class Test::TestRecord extends LeanRC::Record
@@ -646,7 +494,7 @@ describe 'QueryableCollectionMixin', ->
             default: (aoQuery) -> aoQuery
           @public @async executeQuery: LeanRC::Cursor,
             default: (aoParsedQuery) ->
-              if (item = aoParsedQuery['$update'])?
+              if (item = aoParsedQuery['$patch'])?
                 toBeUpdated = _.filter @getData(), aoParsedQuery.$filter
                 if _.isArray toBeUpdated
                   for datum in toBeUpdated
