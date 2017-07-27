@@ -85,7 +85,7 @@ class LeanRC extends RC
   require('./mixins/ConfigurableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
-  require('./mixins/DelayableMixin') LeanRC # needs retest
+  require('./mixins/DelayableMixin') LeanRC
 
   require('./patterns/data_mapper/Transform') LeanRC
   require('./patterns/data_mapper/StringTransform') LeanRC
@@ -94,7 +94,7 @@ class LeanRC extends RC
   require('./patterns/data_mapper/BooleanTransform') LeanRC
   require('./patterns/data_mapper/Serializer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
-  require('./patterns/data_mapper/DelayedQueue') LeanRC # needs retest
+  require('./patterns/data_mapper/DelayedQueue') LeanRC
 
   require('./patterns/query_object/Query') LeanRC
 
@@ -115,7 +115,7 @@ class LeanRC extends RC
   require('./mixins/CrudGatewayMixin') LeanRC
   require('./mixins/CrudEndpointMixin') LeanRC
   require('./mixins/HttpCollectionMixin') LeanRC
-  require('./mixins/HttpSerializerMixin') LeanRC # needs test
+  require('./mixins/HttpSerializerMixin') LeanRC
   require('./mixins/MemoryCollectionMixin') LeanRC
   require('./mixins/GenerateAutoincrementIdMixin') LeanRC # needs test
   require('./mixins/GenerateUuidIdMixin') LeanRC
