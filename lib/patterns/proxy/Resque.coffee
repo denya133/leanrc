@@ -97,7 +97,7 @@ module.exports = (Module)->
           @tmpJobs.push {queueName, scriptName, data, delay, id}
         else
           queue = yield @get queueName ? DELAYED_JOBS_QUEUE
-          yield queue.push scriptName, data, delay
+          id = yield queue.push scriptName, data, delay
         yield return id
 
     @public @async getDelayed: Function,
