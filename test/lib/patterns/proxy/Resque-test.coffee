@@ -233,12 +233,12 @@ describe 'Resque', ->
         resque = TestResque.new 'TEST_RESQUE', data: []
         facade.registerProxy resque
         yield resque.create 'TEST_QUEUE_1', 4
-        id = yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data' }, {}
+        id = yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data' }, 100
         assert.deepEqual resque.jobs[id],
           name: 'TEST_QUEUE_1'
           scriptName: 'TestScript'
           data: { data: 'data' }
-          delayUntil: {}
+          delayUntil: 100
         yield return
     it 'should put delayed procedure into cache', ->
       co ->
@@ -267,14 +267,14 @@ describe 'Resque', ->
         resque = TestResque.new 'TEST_RESQUE', data: []
         facade.registerProxy resque
         yield resque.create 'TEST_QUEUE_1', 4
-        id = yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data' }, {}
+        id = yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data' }, 100
         job = _.find resque.tmpJobs, { id }
         assert.deepEqual job,
           id: id
           queueName: 'TEST_QUEUE_1'
           scriptName: 'TestScript'
           data: { data: 'data' }
-          delay: {}
+          delay: 100
         yield return
   describe '#getDelayed', ->
     facade = null
@@ -306,10 +306,10 @@ describe 'Resque', ->
         resque = TestResque.new 'TEST_RESQUE', data: []
         facade.registerProxy resque
         yield resque.create 'TEST_QUEUE_1', 4
-        yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data1' }, {}
-        yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data2' }, {}
-        yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data3' }, {}
-        yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data4' }, {}
+        yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data1' }, 100
+        yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data2' }, 100
+        yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data3' }, 100
+        yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data4' }, 100
         delayeds = yield resque.getDelayed()
         assert.lengthOf delayeds, 4
         for delayed, index in delayeds
@@ -318,6 +318,6 @@ describe 'Resque', ->
           assert.include delayed,
             queueName: 'TEST_QUEUE_1',
             scriptName: 'TestScript',
+            delay: 100
           assert.deepEqual delayed.data, data: "data#{index + 1}"
-          assert.deepEqual delayed.delay, {}
         yield return
