@@ -56,7 +56,7 @@ module.exports = (Module)->
           if receivedQuery.$offset
             voQuery.offset receivedQuery.$offset
 
-          needsLimitation = @checkNonLimitationHeader()
+          needsLimitation = yield @checkNonLimitationHeader()
 
           limit = Number voQuery.$limit
           voQuery.limit = switch
