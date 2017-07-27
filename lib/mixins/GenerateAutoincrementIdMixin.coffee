@@ -40,9 +40,9 @@ module.exports = (Module)->
           voQuery = Query.new()
             .forIn '@doc': @collectionFullName()
             .max '@doc.id'
-          minId = yield (yield @query voQuery).first()
-          minId ?= 0
-          yield return minId++
+          maxId = yield (yield @query voQuery).first()
+          maxId ?= 0
+          yield return ++maxId
 
 
     GenerateAutoincrementIdMixin.initializeMixin()
