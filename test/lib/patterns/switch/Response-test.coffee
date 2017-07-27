@@ -373,8 +373,8 @@ describe 'Response', ->
         response = Response.new context
         assert.equal response.type, ''
         response.type = 'markdown'
-        assert.equal response.type, 'text/x-markdown'
-        assert.equal res._headers['content-type'], 'text/x-markdown; charset=utf-8'
+        assert.equal response.type, 'text/markdown'
+        assert.equal res._headers['content-type'], 'text/markdown; charset=utf-8'
         response.type = 'file.json'
         assert.equal response.type, 'application/json'
         assert.equal res._headers['content-type'], 'application/json; charset=utf-8'

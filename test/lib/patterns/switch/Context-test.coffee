@@ -1076,8 +1076,8 @@ describe 'Context', ->
         context = Context.new req, res, switchInstance
         assert.equal context.type, ''
         context.type = 'markdown'
-        assert.equal context.type, 'text/x-markdown'
-        assert.equal res._headers['content-type'], 'text/x-markdown; charset=utf-8'
+        assert.equal context.type, 'text/markdown'
+        assert.equal res._headers['content-type'], 'text/markdown; charset=utf-8'
         context.type = 'file.json'
         assert.equal context.type, 'application/json'
         assert.equal res._headers['content-type'], 'application/json; charset=utf-8'
@@ -1469,7 +1469,7 @@ describe 'Context', ->
         assert.instanceOf err, Error
         assert.equal err.message, 'non-error thrown: TEST_ERROR'
         assert.equal err.status, 500
-        assert.equal data, 'Internal Server Error'
+        assert.include data, '"Internal Server Error"'
         context = Context.new req, res, switchInstance
         errorPromise = LeanRC::Promise.new (resolve) ->
           trigger.once 'error', resolve
@@ -1481,7 +1481,7 @@ describe 'Context', ->
         assert.instanceOf err, Error
         assert.equal err.message, 'TEST_ERROR'
         assert.equal err.status, 500
-        assert.equal data, 'Internal Server Error'
+        assert.include data, '"Internal Server Error"'
         context = Context.new req, res, switchInstance
         errorPromise = LeanRC::Promise.new (resolve) ->
           trigger.once 'error', resolve
@@ -1494,5 +1494,5 @@ describe 'Context', ->
         assert.isTrue err.expose
         assert.equal err.message, 'TEST_ERROR'
         assert.equal err.status, 400
-        assert.equal data, 'TEST_ERROR'
+        assert.include data, '"TEST_ERROR"'
         yield return
