@@ -410,10 +410,13 @@ describe 'ThinHttpCollectionMixin', ->
         Test::HttpCollection.initialize()
         collection = Test::HttpCollection.new()
         headers = collection.headersForRequest()
-        assert.deepEqual headers, {}
+        assert.deepEqual headers,
+          'Accept': 'application/json'
         collection.headers = 'Allow': 'GET'
         headers = collection.headersForRequest()
-        assert.deepEqual headers, { 'Allow': 'GET' }
+        assert.deepEqual headers,
+          'Allow': 'GET'
+          'Accept': 'application/json'
         yield return
   describe '#dataForRequest', ->
     it 'should get data for request', ->
@@ -456,7 +459,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.deepEqual request,
           method: 'GET'
           url: 'http://localhost:8000/v1/tests'
-          headers: {}
+          headers: { 'Accept': 'application/json' }
           data: sampleData
           id: undefined
         request = collection[Symbol.for '~requestFor']
@@ -467,7 +470,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.deepEqual request,
           method: 'GET'
           url: 'http://localhost:8000/v1/tests/id-123'
-          headers: {}
+          headers: { 'Accept': 'application/json' }
           data: sampleData
           id: 'id-123'
         request = collection[Symbol.for '~requestFor']
@@ -477,7 +480,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.deepEqual request,
           method: 'POST'
           url: 'http://localhost:8000/v1/tests'
-          headers: {}
+          headers: { 'Accept': 'application/json' }
           data: sampleData
           id: undefined
         request = collection[Symbol.for '~requestFor']
@@ -488,7 +491,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.deepEqual request,
           method: 'PATCH'
           url: 'http://localhost:8000/v1/tests/id-123'
-          headers: {}
+          headers: { 'Accept': 'application/json' }
           data: sampleData
           id: 'id-123'
         request = collection[Symbol.for '~requestFor']
@@ -499,7 +502,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.deepEqual request,
           method: 'PUT'
           url: 'http://localhost:8000/v1/tests/id-123'
-          headers: {}
+          headers: { 'Accept': 'application/json' }
           data: sampleData
           id: 'id-123'
         request = collection[Symbol.for '~requestFor']
@@ -510,7 +513,7 @@ describe 'ThinHttpCollectionMixin', ->
         assert.deepEqual request,
           method: 'DELETE'
           url: 'http://localhost:8000/v1/tests/id-123'
-          headers: {}
+          headers: { 'Accept': 'application/json' }
           data: sampleData
           id: 'id-123'
         yield return
