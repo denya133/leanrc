@@ -218,6 +218,52 @@ describe 'MemoryExecutorMixin', ->
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
         facade.remove()
         yield return
+  describe '#reDefineProcessors', ->
+    it 'should redefine processors', ->
+      co ->
+        KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_009'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class TestResque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        TestResque.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
+          @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
+          @module Test
+        MemoryResqueExecutor.initialize()
+        facade.registerProxy TestResque.new LeanRC::RESQUE
+        resque = facade.retrieveProxy LeanRC::RESQUE
+        resque.create 'TEST_QUEUE_1', 4
+        resque.create 'TEST_QUEUE_2', 4
+        executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
+        viewComponent = { id: 'view-component' }
+        executor = MemoryResqueExecutor.new executorName, viewComponent
+        executorSymbols = MemoryResqueExecutor
+          .metaObject
+          .getGroup 'instanceVariables'
+        definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
+        concurrencyCountSymbol = executorSymbols._concurrencyCount.pointer
+        resqueSymbol = executorSymbols._resque.pointer
+        executor.initializeNotifier KEY
+        executor.setViewComponent new EventEmitter()
+        executor[definedProcessorsSymbol] = {}
+        executor[concurrencyCountSymbol] = {}
+        executor[resqueSymbol] = resque
+        yield executor.defineProcessors()
+        assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_1'
+        assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
+        delete executor[definedProcessorsSymbol]
+        yield executor.reDefineProcessors()
+        assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_1'
+        assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
+        facade.remove()
+        yield return
   describe '#onRegister', ->
     it 'should setup executor on register', ->
       co ->
@@ -476,5 +522,36 @@ describe 'MemoryExecutorMixin', ->
         facade.sendNotification LeanRC::START_RESQUE
         data = yield promise
         assert.deepEqual data, body
+        facade.remove()
+        yield return
+  describe '#fullQueueName', ->
+    it 'should get full queue name', ->
+      co ->
+        KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_010'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+        Test.initialize()
+        class TestResque extends LeanRC::Resque
+          @inheritProtected()
+          @include LeanRC::MemoryResqueMixin
+          @module Test
+        TestResque.initialize()
+        class MemoryResqueExecutor extends LeanRC::Mediator
+          @inheritProtected()
+          @include LeanRC::MemoryExecutorMixin
+          @module Test
+        MemoryResqueExecutor.initialize()
+        facade.registerProxy TestResque.new LeanRC::RESQUE
+        resque = facade.retrieveProxy LeanRC::RESQUE
+        resque.create 'TEST_QUEUE_1', 4
+        resque.create 'TEST_QUEUE_2', 4
+        executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
+        viewComponent = { id: 'view-component' }
+        executor = MemoryResqueExecutor.new executorName, viewComponent
+        facade.registerMediator executor
+        fullQueueName = executor.fullQueueName 'TEST_QUEUE_1'
+        assert.equal fullQueueName, 'Test|>TEST_QUEUE_1'
         facade.remove()
         yield return
