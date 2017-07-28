@@ -61,6 +61,7 @@ describe 'Cookies', ->
         { res: response, req: request } = yield promise
         options = key: COOKIE_KEY
         cookies = Cookies.new request, response, options
+        startDate = Date.now()
         cookies.set COOKIE_NAME, COOKIE_VALUE,
           maxAge: MAX_AGE
           httpOnly: yes
@@ -68,7 +69,7 @@ describe 'Cookies', ->
           domain: DOMAIN
           secure: no
         cookieHeader = response.getHeader 'Set-Cookie'
-        expires = new Date Date.now() + MAX_AGE
+        expires = new Date startDate + MAX_AGE
         keys = new Keygrip [ COOKIE_KEY ], 'sha256', 'hex'
         assert.deepEqual cookieHeader, [
           "#{COOKIE_NAME}=#{COOKIE_VALUE}; path=/; expires=#{expires.toUTCString()}; domain=#{DOMAIN}; httponly"
