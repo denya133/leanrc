@@ -35,6 +35,7 @@ class LeanRC extends RC
   @const APPLICATION_MEDIATOR:  'ApplicationMediator'
   @const APPLICATION_ROUTER:  'ApplicationRouter'
   @const APPLICATION_RENDERER:  'ApplicationRenderer'
+  @const APPLICATION_SWITCH:  'ApplicationSwitch'
   @const RESQUE_EXECUTOR:  'ResqueExecutor'
   @const LOG_MSG: Symbol 'logMessage'
   @const PRODUCTION: 'production'
@@ -147,7 +148,6 @@ class LeanRC extends RC
   require('./mixins/BodyParseMixin') LeanRC
   require('./mixins/CheckSessionsMixin') LeanRC
   require('./mixins/CheckPermissionsMixin') LeanRC
-  require('./mixins/CheckSchemaVersionMixin') LeanRC # needs test
   require('./mixins/QueryableResourceMixin') LeanRC # needs test
 
   require('./patterns/migration/Migration') LeanRC
