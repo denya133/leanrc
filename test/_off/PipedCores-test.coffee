@@ -1,302 +1,299 @@
 EventEmitter = require 'events'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
-# request = require 'request'
 LeanRC = require.main.require 'lib'
-CucumbersApp = require './integration/piped-cores/CucumbersModule/shell'
-CucumbersSchema = require './integration/piped-cores/CucumbersModule/schema'
-TomatosApp = require './integration/piped-cores/TomatosModule/shell'
-TomatosSchema = require './integration/piped-cores/TomatosModule/schema'
+CucumbersApp = require './integration/piped-cores/CucumbersModule'
+TomatosApp = require './integration/piped-cores/TomatosModule'
 { co, request } = LeanRC::Utils
 
 
 describe 'PipedCores', ->
-  describe 'Create CucumbersSchema app instance', ->
-    it 'should apply all migrations', ->
-      co ->
-        trigger = new EventEmitter
-        waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
-        class Test extends CucumbersSchema
-          @inheritProtected()
-        Test.initialize()
-        class TestCommand extends LeanRC::SimpleCommand
-          @inheritProtected()
-          @module Test
-          @public execute: Function,
-            default: ->
-              trigger.emit 'STOPPED'
-              return
-        TestCommand.initialize()
-        app = Test::SchemaApplication.new()
-        app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
-        cucumbersCollection = app.facade.retrieveProxy 'CucumbersCollection'
-        migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
-        resque = app.facade.retrieveProxy Test::RESQUE
-        for name in Test::MIGRATION_NAMES
-          promise = waitForStop()
-          app.facade.sendNotification Test::MIGRATE, until: name
-          res = yield promise
-          assert.isUndefined res
-          assert.property migrationsCollection[Symbol.for '~collection'], name
-          switch name
-            when '20161006133500_create_default_queue_migration'
-              assert.property resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>default'
-            when '20161006133800_create_signals_queue_migration'
-              assert.property resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>signals'
-            when '20161006133900_create_delayed_jobs_queue_migration'
-              assert.property resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>delayed_jobs'
-            # when '20161006134300_create_cucumbers_migration'
-            when '20170206165146_generate_defaults_in_cucumbers_migration'
-              cucumbersHash = cucumbersCollection[Symbol.for '~collection']
-              for id in [ 1 .. 5 ]
-                assert.property cucumbersHash, String id
-                assert.deepPropertyVal cucumbersHash, "#{id}.name", "#{id}-test"
-                assert.deepPropertyVal cucumbersHash, "#{id}.description", "#{id}-test description"
-        app.finish()
-        yield return
-    it 'should revert all migrations (using `until`)', ->
-      co ->
-        trigger = new EventEmitter
-        waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
-        class Test extends CucumbersSchema
-          @inheritProtected()
-        Test.initialize()
-        class TestCommand extends LeanRC::SimpleCommand
-          @inheritProtected()
-          @module Test
-          @public execute: Function,
-            default: ->
-              trigger.emit 'STOPPED'
-              return
-        TestCommand.initialize()
-        app = Test::SchemaApplication.new()
-        app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
-        app.facade.registerCommand Test::STOPPED_ROLLBACK, Test::TestCommand
-        cucumbersCollection = app.facade.retrieveProxy 'CucumbersCollection'
-        migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
-        resque = app.facade.retrieveProxy Test::RESQUE
-        app.facade.sendNotification Test::MIGRATE
-        promise = waitForStop()
-        yield promise
-        for name in Test::MIGRATION_NAMES by -1
-          promise = waitForStop()
-          app.facade.sendNotification Test::ROLLBACK,
-            until: name
-            steps: migrationsCollection[Symbol.for '~collection'].length
-          res = yield promise
-          assert.isUndefined res
-          assert.notProperty migrationsCollection[Symbol.for '~collection'], name
-          switch name
-            when '20161006133500_create_default_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>default'
-            when '20161006133800_create_signals_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>signals'
-            when '20161006133900_create_delayed_jobs_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>delayed_jobs'
-            # when '20161006134300_create_cucumbers_migration'
-            when '20170206165146_generate_defaults_in_cucumbers_migration'
-              cucumbersHash = cucumbersCollection[Symbol.for '~collection']
-              for id in [ 1 .. 5 ]
-                assert.notProperty cucumbersHash, String id
-        app.finish()
-        yield return
-    it 'should revert all migrations (using `steps`)', ->
-      co ->
-        trigger = new EventEmitter
-        waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
-        class Test extends CucumbersSchema
-          @inheritProtected()
-        Test.initialize()
-        class TestCommand extends LeanRC::SimpleCommand
-          @inheritProtected()
-          @module Test
-          @public execute: Function,
-            default: ->
-              trigger.emit 'STOPPED'
-              return
-        TestCommand.initialize()
-        app = Test::SchemaApplication.new()
-        app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
-        app.facade.registerCommand Test::STOPPED_ROLLBACK, Test::TestCommand
-        cucumbersCollection = app.facade.retrieveProxy 'CucumbersCollection'
-        migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
-        resque = app.facade.retrieveProxy Test::RESQUE
-        app.facade.sendNotification Test::MIGRATE
-        promise = waitForStop()
-        yield promise
-        for name in Test::MIGRATION_NAMES by -1
-          promise = waitForStop()
-          app.facade.sendNotification Test::ROLLBACK, steps: 1
-          res = yield promise
-          assert.isUndefined res
-          assert.notProperty migrationsCollection[Symbol.for '~collection'], name
-          switch name
-            when '20161006133500_create_default_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>default'
-            when '20161006133800_create_signals_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>signals'
-            when '20161006133900_create_delayed_jobs_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>delayed_jobs'
-            # when '20161006134300_create_cucumbers_migration'
-            when '20170206165146_generate_defaults_in_cucumbers_migration'
-              cucumbersHash = cucumbersCollection[Symbol.for '~collection']
-              for id in [ 1 .. 5 ]
-                assert.notProperty cucumbersHash, String id
-        app.finish()
-        yield return
-  describe 'Create TomatosSchema app instance', ->
-    it 'should apply all migrations', ->
-      co ->
-        trigger = new EventEmitter
-        waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
-        class Test extends TomatosSchema
-          @inheritProtected()
-        Test.initialize()
-        class TestCommand extends LeanRC::SimpleCommand
-          @inheritProtected()
-          @module Test
-          @public execute: Function,
-            default: ->
-              trigger.emit 'STOPPED'
-              return
-        TestCommand.initialize()
-        app = Test::SchemaApplication.new()
-        app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
-        tomatosCollection = app.facade.retrieveProxy 'TomatosCollection'
-        migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
-        resque = app.facade.retrieveProxy Test::RESQUE
-        for name in Test::MIGRATION_NAMES
-          promise = waitForStop()
-          app.facade.sendNotification Test::MIGRATE, until: name
-          res = yield promise
-          assert.isUndefined res
-          assert.property migrationsCollection[Symbol.for '~collection'], name
-          switch name
-            when '20161006133500_create_default_queue_migration'
-              assert.property resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>default'
-            when '20161006133800_create_signals_queue_migration'
-              assert.property resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>signals'
-            when '20161006133900_create_delayed_jobs_queue_migration'
-              assert.property resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>delayed_jobs'
-            # when '20161006134300_create_tomatos_migration'
-            when '20170206165146_generate_defaults_in_tomatos_migration'
-              tomatosHash = tomatosCollection[Symbol.for '~collection']
-              for id in [ 1 .. 5 ]
-                assert.property tomatosHash, String id
-                assert.deepPropertyVal tomatosHash, "#{id}.name", "#{id}-test"
-                assert.deepPropertyVal tomatosHash, "#{id}.description", "#{id}-test description"
-        app.finish()
-        yield return
-    it 'should revert all migrations (using `until`)', ->
-      co ->
-        trigger = new EventEmitter
-        waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
-        class Test extends TomatosSchema
-          @inheritProtected()
-        Test.initialize()
-        class TestCommand extends LeanRC::SimpleCommand
-          @inheritProtected()
-          @module Test
-          @public execute: Function,
-            default: ->
-              trigger.emit 'STOPPED'
-              return
-        TestCommand.initialize()
-        app = Test::SchemaApplication.new()
-        app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
-        app.facade.registerCommand Test::STOPPED_ROLLBACK, Test::TestCommand
-        tomatosCollection = app.facade.retrieveProxy 'TomatosCollection'
-        migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
-        resque = app.facade.retrieveProxy Test::RESQUE
-        app.facade.sendNotification Test::MIGRATE
-        promise = waitForStop()
-        yield promise
-        for name in Test::MIGRATION_NAMES by -1
-          promise = waitForStop()
-          app.facade.sendNotification Test::ROLLBACK,
-            until: name
-            steps: migrationsCollection[Symbol.for '~collection'].length
-          res = yield promise
-          assert.isUndefined res
-          assert.notProperty migrationsCollection[Symbol.for '~collection'], name
-          switch name
-            when '20161006133500_create_default_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>default'
-            when '20161006133800_create_signals_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>signals'
-            when '20161006133900_create_delayed_jobs_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>delayed_jobs'
-            # when '20161006134300_create_tomatos_migration'
-            when '20170206165146_generate_defaults_in_tomatos_migration'
-              tomatosHash = tomatosCollection[Symbol.for '~collection']
-              for id in [ 1 .. 5 ]
-                assert.notProperty tomatosHash, String id
-        app.finish()
-        yield return
-    it 'should revert all migrations (using `steps`)', ->
-      co ->
-        trigger = new EventEmitter
-        waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
-        class Test extends TomatosSchema
-          @inheritProtected()
-        Test.initialize()
-        class TestCommand extends LeanRC::SimpleCommand
-          @inheritProtected()
-          @module Test
-          @public execute: Function,
-            default: ->
-              trigger.emit 'STOPPED'
-              return
-        TestCommand.initialize()
-        app = Test::SchemaApplication.new()
-        app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
-        app.facade.registerCommand Test::STOPPED_ROLLBACK, Test::TestCommand
-        tomatosCollection = app.facade.retrieveProxy 'TomatosCollection'
-        migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
-        resque = app.facade.retrieveProxy Test::RESQUE
-        app.facade.sendNotification Test::MIGRATE
-        promise = waitForStop()
-        yield promise
-        for name in Test::MIGRATION_NAMES by -1
-          promise = waitForStop()
-          app.facade.sendNotification Test::ROLLBACK, steps: 1
-          res = yield promise
-          assert.isUndefined res
-          assert.notProperty migrationsCollection[Symbol.for '~collection'], name
-          switch name
-            when '20161006133500_create_default_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>default'
-            when '20161006133800_create_signals_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>signals'
-            when '20161006133900_create_delayed_jobs_queue_migration'
-              assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>delayed_jobs'
-            # when '20161006134300_create_tomatos_migration'
-            when '20170206165146_generate_defaults_in_tomatos_migration'
-              tomatosHash = tomatosCollection[Symbol.for '~collection']
-              for id in [ 1 .. 5 ]
-                assert.notProperty tomatosHash, String id
-        app.finish()
-        yield return
+  # describe 'Create CucumbersSchema app instance', ->
+  #   it 'should apply all migrations', ->
+  #     co ->
+  #       trigger = new EventEmitter
+  #       waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
+  #       class Test extends CucumbersSchema
+  #         @inheritProtected()
+  #       Test.initialize()
+  #       class TestCommand extends LeanRC::SimpleCommand
+  #         @inheritProtected()
+  #         @module Test
+  #         @public execute: Function,
+  #           default: ->
+  #             trigger.emit 'STOPPED'
+  #             return
+  #       TestCommand.initialize()
+  #       app = Test::SchemaApplication.new()
+  #       app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
+  #       cucumbersCollection = app.facade.retrieveProxy 'CucumbersCollection'
+  #       migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
+  #       resque = app.facade.retrieveProxy Test::RESQUE
+  #       for name in Test::MIGRATION_NAMES
+  #         promise = waitForStop()
+  #         app.facade.sendNotification Test::MIGRATE, until: name
+  #         res = yield promise
+  #         assert.isUndefined res
+  #         assert.property migrationsCollection[Symbol.for '~collection'], name
+  #         switch name
+  #           when '20161006133500_create_default_queue_migration'
+  #             assert.property resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>default'
+  #           when '20161006133800_create_signals_queue_migration'
+  #             assert.property resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>signals'
+  #           when '20161006133900_create_delayed_jobs_queue_migration'
+  #             assert.property resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>delayed_jobs'
+  #           # when '20161006134300_create_cucumbers_migration'
+  #           when '20170206165146_generate_defaults_in_cucumbers_migration'
+  #             cucumbersHash = cucumbersCollection[Symbol.for '~collection']
+  #             for id in [ 1 .. 5 ]
+  #               assert.property cucumbersHash, String id
+  #               assert.deepPropertyVal cucumbersHash, "#{id}.name", "#{id}-test"
+  #               assert.deepPropertyVal cucumbersHash, "#{id}.description", "#{id}-test description"
+  #       app.finish()
+  #       yield return
+  #   it 'should revert all migrations (using `until`)', ->
+  #     co ->
+  #       trigger = new EventEmitter
+  #       waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
+  #       class Test extends CucumbersSchema
+  #         @inheritProtected()
+  #       Test.initialize()
+  #       class TestCommand extends LeanRC::SimpleCommand
+  #         @inheritProtected()
+  #         @module Test
+  #         @public execute: Function,
+  #           default: ->
+  #             trigger.emit 'STOPPED'
+  #             return
+  #       TestCommand.initialize()
+  #       app = Test::SchemaApplication.new()
+  #       app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
+  #       app.facade.registerCommand Test::STOPPED_ROLLBACK, Test::TestCommand
+  #       cucumbersCollection = app.facade.retrieveProxy 'CucumbersCollection'
+  #       migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
+  #       resque = app.facade.retrieveProxy Test::RESQUE
+  #       app.facade.sendNotification Test::MIGRATE
+  #       promise = waitForStop()
+  #       yield promise
+  #       for name in Test::MIGRATION_NAMES by -1
+  #         promise = waitForStop()
+  #         app.facade.sendNotification Test::ROLLBACK,
+  #           until: name
+  #           steps: migrationsCollection[Symbol.for '~collection'].length
+  #         res = yield promise
+  #         assert.isUndefined res
+  #         assert.notProperty migrationsCollection[Symbol.for '~collection'], name
+  #         switch name
+  #           when '20161006133500_create_default_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>default'
+  #           when '20161006133800_create_signals_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>signals'
+  #           when '20161006133900_create_delayed_jobs_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>delayed_jobs'
+  #           # when '20161006134300_create_cucumbers_migration'
+  #           when '20170206165146_generate_defaults_in_cucumbers_migration'
+  #             cucumbersHash = cucumbersCollection[Symbol.for '~collection']
+  #             for id in [ 1 .. 5 ]
+  #               assert.notProperty cucumbersHash, String id
+  #       app.finish()
+  #       yield return
+  #   it 'should revert all migrations (using `steps`)', ->
+  #     co ->
+  #       trigger = new EventEmitter
+  #       waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
+  #       class Test extends CucumbersSchema
+  #         @inheritProtected()
+  #       Test.initialize()
+  #       class TestCommand extends LeanRC::SimpleCommand
+  #         @inheritProtected()
+  #         @module Test
+  #         @public execute: Function,
+  #           default: ->
+  #             trigger.emit 'STOPPED'
+  #             return
+  #       TestCommand.initialize()
+  #       app = Test::SchemaApplication.new()
+  #       app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
+  #       app.facade.registerCommand Test::STOPPED_ROLLBACK, Test::TestCommand
+  #       cucumbersCollection = app.facade.retrieveProxy 'CucumbersCollection'
+  #       migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
+  #       resque = app.facade.retrieveProxy Test::RESQUE
+  #       app.facade.sendNotification Test::MIGRATE
+  #       promise = waitForStop()
+  #       yield promise
+  #       for name in Test::MIGRATION_NAMES by -1
+  #         promise = waitForStop()
+  #         app.facade.sendNotification Test::ROLLBACK, steps: 1
+  #         res = yield promise
+  #         assert.isUndefined res
+  #         assert.notProperty migrationsCollection[Symbol.for '~collection'], name
+  #         switch name
+  #           when '20161006133500_create_default_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>default'
+  #           when '20161006133800_create_signals_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>signals'
+  #           when '20161006133900_create_delayed_jobs_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'CucumbersSchema|>delayed_jobs'
+  #           # when '20161006134300_create_cucumbers_migration'
+  #           when '20170206165146_generate_defaults_in_cucumbers_migration'
+  #             cucumbersHash = cucumbersCollection[Symbol.for '~collection']
+  #             for id in [ 1 .. 5 ]
+  #               assert.notProperty cucumbersHash, String id
+  #       app.finish()
+  #       yield return
+  # describe 'Create TomatosSchema app instance', ->
+  #   it 'should apply all migrations', ->
+  #     co ->
+  #       trigger = new EventEmitter
+  #       waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
+  #       class Test extends TomatosSchema
+  #         @inheritProtected()
+  #       Test.initialize()
+  #       class TestCommand extends LeanRC::SimpleCommand
+  #         @inheritProtected()
+  #         @module Test
+  #         @public execute: Function,
+  #           default: ->
+  #             trigger.emit 'STOPPED'
+  #             return
+  #       TestCommand.initialize()
+  #       app = Test::SchemaApplication.new()
+  #       app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
+  #       tomatosCollection = app.facade.retrieveProxy 'TomatosCollection'
+  #       migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
+  #       resque = app.facade.retrieveProxy Test::RESQUE
+  #       for name in Test::MIGRATION_NAMES
+  #         promise = waitForStop()
+  #         app.facade.sendNotification Test::MIGRATE, until: name
+  #         res = yield promise
+  #         assert.isUndefined res
+  #         assert.property migrationsCollection[Symbol.for '~collection'], name
+  #         switch name
+  #           when '20161006133500_create_default_queue_migration'
+  #             assert.property resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>default'
+  #           when '20161006133800_create_signals_queue_migration'
+  #             assert.property resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>signals'
+  #           when '20161006133900_create_delayed_jobs_queue_migration'
+  #             assert.property resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>delayed_jobs'
+  #           # when '20161006134300_create_tomatos_migration'
+  #           when '20170206165146_generate_defaults_in_tomatos_migration'
+  #             tomatosHash = tomatosCollection[Symbol.for '~collection']
+  #             for id in [ 1 .. 5 ]
+  #               assert.property tomatosHash, String id
+  #               assert.deepPropertyVal tomatosHash, "#{id}.name", "#{id}-test"
+  #               assert.deepPropertyVal tomatosHash, "#{id}.description", "#{id}-test description"
+  #       app.finish()
+  #       yield return
+  #   it 'should revert all migrations (using `until`)', ->
+  #     co ->
+  #       trigger = new EventEmitter
+  #       waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
+  #       class Test extends TomatosSchema
+  #         @inheritProtected()
+  #       Test.initialize()
+  #       class TestCommand extends LeanRC::SimpleCommand
+  #         @inheritProtected()
+  #         @module Test
+  #         @public execute: Function,
+  #           default: ->
+  #             trigger.emit 'STOPPED'
+  #             return
+  #       TestCommand.initialize()
+  #       app = Test::SchemaApplication.new()
+  #       app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
+  #       app.facade.registerCommand Test::STOPPED_ROLLBACK, Test::TestCommand
+  #       tomatosCollection = app.facade.retrieveProxy 'TomatosCollection'
+  #       migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
+  #       resque = app.facade.retrieveProxy Test::RESQUE
+  #       app.facade.sendNotification Test::MIGRATE
+  #       promise = waitForStop()
+  #       yield promise
+  #       for name in Test::MIGRATION_NAMES by -1
+  #         promise = waitForStop()
+  #         app.facade.sendNotification Test::ROLLBACK,
+  #           until: name
+  #           steps: migrationsCollection[Symbol.for '~collection'].length
+  #         res = yield promise
+  #         assert.isUndefined res
+  #         assert.notProperty migrationsCollection[Symbol.for '~collection'], name
+  #         switch name
+  #           when '20161006133500_create_default_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>default'
+  #           when '20161006133800_create_signals_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>signals'
+  #           when '20161006133900_create_delayed_jobs_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>delayed_jobs'
+  #           # when '20161006134300_create_tomatos_migration'
+  #           when '20170206165146_generate_defaults_in_tomatos_migration'
+  #             tomatosHash = tomatosCollection[Symbol.for '~collection']
+  #             for id in [ 1 .. 5 ]
+  #               assert.notProperty tomatosHash, String id
+  #       app.finish()
+  #       yield return
+  #   it 'should revert all migrations (using `steps`)', ->
+  #     co ->
+  #       trigger = new EventEmitter
+  #       waitForStop = -> Test::Promise.new (resolve) -> trigger.once 'STOPPED', resolve
+  #       class Test extends TomatosSchema
+  #         @inheritProtected()
+  #       Test.initialize()
+  #       class TestCommand extends LeanRC::SimpleCommand
+  #         @inheritProtected()
+  #         @module Test
+  #         @public execute: Function,
+  #           default: ->
+  #             trigger.emit 'STOPPED'
+  #             return
+  #       TestCommand.initialize()
+  #       app = Test::SchemaApplication.new()
+  #       app.facade.registerCommand Test::STOPPED_MIGRATE, Test::TestCommand
+  #       app.facade.registerCommand Test::STOPPED_ROLLBACK, Test::TestCommand
+  #       tomatosCollection = app.facade.retrieveProxy 'TomatosCollection'
+  #       migrationsCollection = app.facade.retrieveProxy Test::MIGRATIONS
+  #       resque = app.facade.retrieveProxy Test::RESQUE
+  #       app.facade.sendNotification Test::MIGRATE
+  #       promise = waitForStop()
+  #       yield promise
+  #       for name in Test::MIGRATION_NAMES by -1
+  #         promise = waitForStop()
+  #         app.facade.sendNotification Test::ROLLBACK, steps: 1
+  #         res = yield promise
+  #         assert.isUndefined res
+  #         assert.notProperty migrationsCollection[Symbol.for '~collection'], name
+  #         switch name
+  #           when '20161006133500_create_default_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>default'
+  #           when '20161006133800_create_signals_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>signals'
+  #           when '20161006133900_create_delayed_jobs_queue_migration'
+  #             assert.notProperty resque[Symbol.for '~delayedQueues'], 'TomatosSchema|>delayed_jobs'
+  #           # when '20161006134300_create_tomatos_migration'
+  #           when '20170206165146_generate_defaults_in_tomatos_migration'
+  #             tomatosHash = tomatosCollection[Symbol.for '~collection']
+  #             for id in [ 1 .. 5 ]
+  #               assert.notProperty tomatosHash, String id
+  #       app.finish()
+  #       yield return
   describe 'Create Cucumbers app instance', ->
     it 'should create new CucumbersApp', ->
       co ->
-        app = CucumbersApp::ShellApplication.new()
+        app = CucumbersApp::MainApplication.new()
         app.finish()
         yield return
   describe 'Create Tomatos app instance', ->
     it 'should create new TomatosApp', ->
       co ->
-        app = TomatosApp::ShellApplication.new()
+        app = TomatosApp::MainApplication.new()
         app.finish()
         yield return
   describe 'Create Cucumbers app and test pipes', ->
     it 'should create new CucumbersApp and test pipes from shell to logger', ->
       co ->
         { CHANGE, DEBUG } = CucumbersApp::Pipes::LogMessage
-        { NAME } = CucumbersApp::ShellApplication
+        { NAME } = CucumbersApp::MainApplication
         { NORMAL } = CucumbersApp::Pipes::PipeMessage
         TEST_LOG_MESSAGE = 'TEST log message'
-        app = CucumbersApp::ShellApplication.new()
+        app = CucumbersApp::MainApplication.new()
         app.facade.sendNotification(CucumbersApp::LogMessage.SEND_TO_LOG, TEST_LOG_MESSAGE, CucumbersApp::LogMessage.LEVELS[CucumbersApp::LogMessage.DEBUG])
 
         facade = CucumbersApp::ApplicationFacade.getInstance 'CucumbersLogger'
@@ -318,10 +315,10 @@ describe 'PipedCores', ->
     it 'should create new TomatosApp and test pipes from shell to logger', ->
       expect ->
         { CHANGE, DEBUG } = TomatosApp::Pipes::LogMessage
-        { NAME } = TomatosApp::ShellApplication
+        { NAME } = TomatosApp::MainApplication
         { NORMAL } = TomatosApp::Pipes::PipeMessage
         TEST_LOG_MESSAGE = 'TEST log message'
-        app = TomatosApp::ShellApplication.new()
+        app = TomatosApp::MainApplication.new()
         app.facade.sendNotification(TomatosApp::LogMessage.SEND_TO_LOG, TEST_LOG_MESSAGE, TomatosApp::LogMessage.LEVELS[TomatosApp::LogMessage.DEBUG])
 
         facade = TomatosApp::ApplicationFacade.getInstance 'TomatosLogger'
@@ -342,7 +339,7 @@ describe 'PipedCores', ->
   describe 'Create Cucumbers app instance and send request', ->
     it 'should create new CucumbersApp and respond on request', ->
       co ->
-        cucumbers = CucumbersApp::ShellApplication.new()
+        cucumbers = CucumbersApp::MainApplication.new()
         res = yield request.get 'http://localhost:3002/0.1/cucumbers'
         { body, status, message } = res
         assert.equal status, 200
@@ -360,7 +357,7 @@ describe 'PipedCores', ->
   describe 'Create Tomatos app instance and send request', ->
     it 'should create new TomatosApp and respond on request', ->
       co ->
-        tomatos = TomatosApp::ShellApplication.new()
+        tomatos = TomatosApp::MainApplication.new()
         res = yield request.get 'http://localhost:3001/0.1/tomatos'
         { body, status, message } = res
         assert.equal status, 200
@@ -378,7 +375,7 @@ describe 'PipedCores', ->
   describe 'Create Cucumbers app and test CRUD', ->
     it 'should create new CucumbersApp and send CRUD requests', ->
       co ->
-        cucumbers = CucumbersApp::ShellApplication.new()
+        cucumbers = CucumbersApp::MainApplication.new()
         res1 = yield request.post 'http://localhost:3002/0.1/cucumbers',
           body:
             cucumber:
@@ -463,7 +460,7 @@ describe 'PipedCores', ->
   describe 'Create Tomatos app and test CRUD', ->
     it 'should create new TomatosApp and send CRUD requests', ->
       co ->
-        tomatos = TomatosApp::ShellApplication.new()
+        tomatos = TomatosApp::MainApplication.new()
         res1 = yield request.post 'http://localhost:3001/0.1/tomatos',
           body:
             tomato:
@@ -548,8 +545,8 @@ describe 'PipedCores', ->
   describe 'Create Cucumbers app and Tomatos app and test its interaction', ->
     it 'should create two apps and get cucumber from tomato', ->
       co ->
-        cucumbers = CucumbersApp::ShellApplication.new()
-        tomatos = TomatosApp::ShellApplication.new()
+        cucumbers = CucumbersApp::MainApplication.new()
+        tomatos = TomatosApp::MainApplication.new()
         res1 = yield request.post 'http://localhost:3002/0.1/cucumbers',
           body:
             cucumber:
@@ -633,7 +630,7 @@ describe 'PipedCores', ->
           @public execute: Function,
             default: (note) ->  trigger.emit 'STOPPED', note.getBody() ? 'ARG'
         TestCommand.initialize()
-        app = Test::ShellApplication.new()
+        app = Test::MainApplication.new()
         { main } = app.facade.retrieveMediator Test::MainModuleMediator.name
         main.facade.registerCommand Test::JOB_RESULT, Test::TestCommand
         proxy = main.facade.retrieveProxy main.Module::TEST_PROXY_NAME
@@ -662,7 +659,7 @@ describe 'PipedCores', ->
           @public execute: Function,
             default: (note) ->  trigger.emit 'STOPPED', note.getBody() ? 'ARG'
         TestCommand.initialize()
-        app = Test::ShellApplication.new()
+        app = Test::MainApplication.new()
         { main } = app.facade.retrieveMediator Test::MainModuleMediator.name
         main.facade.registerCommand Test::JOB_RESULT, Test::TestCommand
         resque = main.facade.retrieveProxy Test::RESQUE
