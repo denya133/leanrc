@@ -236,7 +236,6 @@ module.exports = (Module)->
     ]
 
     @initialHook 'beforeActionHook'
-    @initialHook 'checkSchemaVersion'
 
     @beforeHook 'getQuery', only: ['list']
     @beforeHook 'getRecordId', only: ['detail', 'update', 'delete']

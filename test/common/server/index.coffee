@@ -129,6 +129,7 @@ module.exports = (options) ->
                 when 'QUERY'
                   { query } = querystring.parse url.query
                   query = JSON.parse query  unless _.isEmpty query
+                  query ?= body.query  if body.query?
                   collection = server.data[query?['$forIn']?['@doc'] ? "test_#{path.plural}"] ? []
                   filter = (item) ->
                     if query?.$filter?
@@ -150,6 +151,29 @@ module.exports = (options) ->
                                 return no
                     yes
                   switch req.method
+                    when 'POST'
+                      if query['$insert']?
+                        collection.push query['$insert']
+                        response = JSON.stringify "#{path.plural}": [
+                          query['$insert']
+                        ]
+                      else if query['$update']? or query['$replace']?
+                        records = _.filter collection, filter
+                        newBody = query['$update'] ? query['$replace']
+                        for record in records
+                          for key, value of newBody when key not in [ '_key', 'id' ]
+                            record[key] = value
+                        response = JSON.stringify "#{path.plural}": records
+                      else if query['$remove']?
+                        records = _.filter collection, filter
+                        response = JSON.stringify "#{path.plural}": records
+                        _.remove collection, filter
+                      else
+                        records = _.filter collection, filter
+                        if query?['$count']
+                          response = JSON.stringify count: records.length
+                        else
+                          response = JSON.stringify "#{path.plural}": records
                     when 'GET'
                       records = _.filter collection, filter
                       if query?['$count']

@@ -86,7 +86,7 @@ class LeanRC extends RC
   require('./mixins/ConfigurableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
-  require('./mixins/DelayableMixin') LeanRC # needs retest
+  require('./mixins/DelayableMixin') LeanRC
 
   require('./patterns/data_mapper/Transform') LeanRC
   require('./patterns/data_mapper/StringTransform') LeanRC
@@ -95,7 +95,7 @@ class LeanRC extends RC
   require('./patterns/data_mapper/BooleanTransform') LeanRC
   require('./patterns/data_mapper/Serializer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
-  require('./patterns/data_mapper/DelayedQueue') LeanRC # needs retest
+  require('./patterns/data_mapper/DelayedQueue') LeanRC
 
   require('./patterns/query_object/Query') LeanRC
 
@@ -111,15 +111,15 @@ class LeanRC extends RC
   require('./patterns/proxy/Gateway') LeanRC
   require('./patterns/proxy/Renderer') LeanRC
   require('./patterns/proxy/Router') LeanRC
-  require('./patterns/proxy/Resque') LeanRC # needs retest
+  require('./patterns/proxy/Resque') LeanRC
 
   require('./mixins/CrudGatewayMixin') LeanRC
   require('./mixins/CrudEndpointMixin') LeanRC
   require('./mixins/HttpCollectionMixin') LeanRC
-  require('./mixins/HttpSerializerMixin') LeanRC # needs test
+  require('./mixins/HttpSerializerMixin') LeanRC
   require('./mixins/MemoryCollectionMixin') LeanRC
-  require('./mixins/GenerateAutoincrementIdMixin') LeanRC # needs test
-  require('./mixins/GenerateUuidIdMixin') LeanRC # needs test
+  require('./mixins/GenerateAutoincrementIdMixin') LeanRC
+  require('./mixins/GenerateUuidIdMixin') LeanRC
   require('./mixins/MemoryResqueMixin') LeanRC
   require('./mixins/MemoryConfigurationMixin') LeanRC
   require('./mixins/IterableMixin') LeanRC
@@ -137,14 +137,14 @@ class LeanRC extends RC
 
   require('./patterns/command/SimpleCommand') LeanRC
   require('./patterns/command/MacroCommand') LeanRC
-  require('./patterns/command/Resource') LeanRC # needs retest
+  require('./patterns/command/Resource') LeanRC
   require('./patterns/command/MigrateCommand') LeanRC
   require('./patterns/command/RollbackCommand') LeanRC
   require('./patterns/command/Script') LeanRC
   require('./patterns/command/DelayedJobScript') LeanRC
 
   require('./mixins/ApplicationMediatorMixin') LeanRC # needs test
-  require('./mixins/MemoryExecutorMixin') LeanRC # needs test
+  require('./mixins/MemoryExecutorMixin') LeanRC
   require('./mixins/BodyParseMixin') LeanRC
   require('./mixins/CheckSessionsMixin') LeanRC
   require('./mixins/CheckPermissionsMixin') LeanRC

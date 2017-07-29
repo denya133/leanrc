@@ -79,6 +79,39 @@
       "data": "QUERY"
     }
   },
+  "/v1/tests/query": {
+    "single": "test",
+    "plural": "tests",
+    "POST": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "QUERY"
+    }
+  },
+  "/v1/tests/:key": {
+    "single": "test",
+    "plural": "tests",
+    "GET": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "GET"
+    },
+    "DELETE": {
+      "statusCode": 204,
+      "statusMessage": "No Content",
+      "data": "DELETE"
+    },
+    "PUT": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "PUT"
+    },
+    "PATCH": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "PATCH"
+    }
+  },
   "/v1/tests/bulk": {
     "single": "test",
     "plural": "tests",

@@ -11,6 +11,7 @@ module.exports = (Module)->
     @include BodyParseMixin
     @module Module
 
+    # @initialHook 'checkSchemaVersion'
     @initialHook 'parseBody', only: ['create', 'update']
 
     @public entityName: String,

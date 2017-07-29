@@ -1,14 +1,16 @@
-{ expect, assert } = require 'chai'
+{ assert } = require 'chai'
 sinon = require 'sinon'
 _ = require 'lodash'
-RC = require 'RC'
 LeanRC = require.main.require 'lib'
-Router = LeanRC::Router
+{
+  Router
+  Utils: { co }
+} = LeanRC::
 
 describe 'Router', ->
   describe '.new, .map, #map, #resource, #namespace, #routes', ->
     it 'should create new router', ->
-      expect ->
+      co ->
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -23,11 +25,11 @@ describe 'Router', ->
               @resource 'subtest2'
         Test::TestRouter.initialize()
         router = Test::TestRouter.new 'TEST_ROUTER'
-        assert.lengthOf router.routes, 27, 'Routes did not initialized'
-      .to.not.throw Error
+        assert.lengthOf router.routes, 18, 'Routes did not initialized'
+        yield return
   describe '#defineMethod', ->
     it 'should define methods for router', ->
-      expect ->
+      co ->
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -44,9 +46,9 @@ describe 'Router', ->
         spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
         router = Test::TestRouter.new 'TEST_ROUTER'
         assert.equal spyDefineMethod.callCount, 3, 'Methods did not defined'
-      .to.not.throw Error
+        yield return
     it 'should define `get` method for router', ->
-      expect ->
+      co ->
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -61,10 +63,10 @@ describe 'Router', ->
         spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
         router = Test::TestRouter.new 'TEST_ROUTER'
         assert.equal spyDefineMethod.callCount, 1, 'Methods did not defined'
-      .to.not.throw Error
+        yield return
   describe '#post', ->
     it 'should define `post` method for router', ->
-      expect ->
+      co ->
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -79,10 +81,10 @@ describe 'Router', ->
         spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
         router = Test::TestRouter.new 'TEST_ROUTER'
         assert.equal spyDefineMethod.callCount, 1, 'Methods did not defined'
-      .to.not.throw Error
+        yield return
   describe '#put', ->
     it 'should define `put` method for router', ->
-      expect ->
+      co ->
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -97,10 +99,10 @@ describe 'Router', ->
         spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
         router = Test::TestRouter.new 'TEST_ROUTER'
         assert.equal spyDefineMethod.callCount, 1, 'Methods did not defined'
-      .to.not.throw Error
+        yield return
   describe '#patch', ->
     it 'should define `patch` method for router', ->
-      expect ->
+      co ->
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -115,10 +117,10 @@ describe 'Router', ->
         spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
         router = Test::TestRouter.new 'TEST_ROUTER'
         assert.equal spyDefineMethod.callCount, 1, 'Methods did not defined'
-      .to.not.throw Error
+        yield return
   describe '#delete', ->
     it 'should define `delete` method for router', ->
-      expect ->
+      co ->
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -133,10 +135,10 @@ describe 'Router', ->
         spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
         router = Test::TestRouter.new 'TEST_ROUTER'
         assert.equal spyDefineMethod.callCount, 1, 'Methods did not defined'
-      .to.not.throw Error
+        yield return
   describe '#member', ->
     it 'should define `member` method for router', ->
-      expect ->
+      co ->
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -152,11 +154,11 @@ describe 'Router', ->
         Test::TestRouter.initialize()
         spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
         router = Test::TestRouter.new 'TEST_ROUTER'
-        assert.lengthOf router.routes, 10, 'Methods did not defined'
-      .to.not.throw Error
+        assert.lengthOf router.routes, 8, 'Methods did not defined'
+        yield return
   describe '#collection', ->
     it 'should define `collection` method for router', ->
-      expect ->
+      co ->
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -172,12 +174,12 @@ describe 'Router', ->
         Test::TestRouter.initialize()
         spyDefineMethod = sinon.spy Test::TestRouter::, 'defineMethod'
         router = Test::TestRouter.new 'TEST_ROUTER'
-        assert.lengthOf router.routes, 10, 'Methods did not defined'
-      .to.not.throw Error
+        assert.lengthOf router.routes, 8, 'Methods did not defined'
+        yield return
 
   describe 'complex test', ->
     it 'should define all methods for router', ->
-      expect ->
+      co ->
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -221,4 +223,4 @@ describe 'Router', ->
         { routes } = router
         for key in keys
           assert.isDefined _.find(routes, key), "Cannot find route #{JSON.stringify key}"
-      .to.not.throw Error
+        yield return

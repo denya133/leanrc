@@ -1469,7 +1469,7 @@ describe 'Context', ->
         assert.instanceOf err, Error
         assert.equal err.message, 'non-error thrown: TEST_ERROR'
         assert.equal err.status, 500
-        assert.equal data, 'Internal Server Error'
+        assert.include data, '"Internal Server Error"'
         context = Context.new req, res, switchInstance
         errorPromise = LeanRC::Promise.new (resolve) ->
           trigger.once 'error', resolve
@@ -1481,7 +1481,7 @@ describe 'Context', ->
         assert.instanceOf err, Error
         assert.equal err.message, 'TEST_ERROR'
         assert.equal err.status, 500
-        assert.equal data, 'Internal Server Error'
+        assert.include data, '"Internal Server Error"'
         context = Context.new req, res, switchInstance
         errorPromise = LeanRC::Promise.new (resolve) ->
           trigger.once 'error', resolve
@@ -1494,5 +1494,5 @@ describe 'Context', ->
         assert.isTrue err.expose
         assert.equal err.message, 'TEST_ERROR'
         assert.equal err.status, 400
-        assert.equal data, 'TEST_ERROR'
+        assert.include data, '"TEST_ERROR"'
         yield return

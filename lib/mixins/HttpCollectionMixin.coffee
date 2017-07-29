@@ -13,6 +13,12 @@ module.exports = (Module)->
       @inheritProtected()
       @implements Module::QueryableCollectionMixinInterface
 
+      @public recordMultipleName: Function,
+        default: -> @collectionName()
+
+      @public recordSingleName: Function,
+        default: -> inflect.singularize @recordMultipleName()
+
       @public @async push: Function,
         default: (aoRecord)->
           params = {}
@@ -30,7 +36,7 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            voRecord = @normalize body
+            voRecord = @normalize body[@recordSingleName()]
           else
             throw new Error "
               Record payload has not existed in response body.
@@ -70,7 +76,7 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            voRecord = @normalize body
+            voRecord = @normalize body[@recordSingleName()]
           else
             throw new Error "
               Record payload has not existed in response body.
@@ -94,7 +100,12 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            voCursor = @normalize body
+            vhRecordsData = []
+            if (vlList = body[@recordMultipleName()])?
+              vhRecordsData.push vlList...
+            else if (vhItem = body[@recordSingleName()])?
+              vhRecordsData.push vhItem
+            voCursor = Module::Cursor.new @, vhRecordsData
           else
             throw new Error "
               Record payload has not existed in response body.
@@ -118,7 +129,8 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            voCursor = @normalize body
+            vhRecordsData = body[@recordMultipleName()]
+            voCursor = Module::Cursor.new @, vhRecordsData
           else
             throw new Error "
               Record payload has not existed in response body.
@@ -142,7 +154,8 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            voCursor = @normalize body
+            vhRecordsData = body[@recordMultipleName()]
+            voCursor = Module::Cursor.new @, vhRecordsData
           else
             throw new Error "
               Record payload has not existed in response body.
@@ -167,7 +180,7 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            voRecord = @normalize body
+            voRecord = @normalize body[@recordSingleName()]
           else
             throw new Error "
               Record payload has not existed in response body.
@@ -188,7 +201,7 @@ module.exports = (Module)->
           voQuery =
             $forIn: '@doc': @collectionFullName()
             $count: yes
-          return yield (yield @query voQuery).first()
+          return (yield (yield @query voQuery).first()).count
 
       @public headers: Object
       @public host: String,
@@ -201,9 +214,8 @@ module.exports = (Module)->
       @public headersForRequest: Function,
         args: [Object]
         return: Object
-        default: (params)->
+        default: (params = {})->
           headers = @headers ? {}
-          headers['Connection'] = 'keep-alive'
           headers['Accept'] = 'application/json'
           if params.requestType in ['query', 'patchBy', 'removeBy']
             headers['Authorization'] = "Bearer #{@configs.apiKey}"
@@ -211,8 +223,8 @@ module.exports = (Module)->
             if params.requestType in ['takeAll', 'takeBy']
               headers['NonLimitation'] = @configs.apiKey
             service = @facade.retrieveMediator APPLICATION_MEDIATOR
-              .getViewComponent()
-            if service.context?
+              ?.getViewComponent()
+            if service?.context?
               if service.context.headers['authorization'] is "Bearer #{@configs.apiKey}"
                 headers['Authorization'] = "Bearer #{@configs.apiKey}"
               else

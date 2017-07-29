@@ -89,6 +89,9 @@ describe 'DelayableMixin', ->
               replica: {class: 'Test', type: 'class'}
               methodName: 'test'
               args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+              opts:
+                queue: LeanRC::DELAYED_JOBS_QUEUE
+                delayUntil: DELAY_UNTIL
           delayUntil: DELAY_UNTIL
           status: 'scheduled'
           lockLifetime: 5000
@@ -134,6 +137,9 @@ describe 'DelayableMixin', ->
               replica: {class: 'Test', type: 'instance'}
               methodName: 'test'
               args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+              opts:
+                queue: LeanRC::DELAYED_JOBS_QUEUE
+                delayUntil: DELAY_UNTIL
           delayUntil: DELAY_UNTIL
           status: 'scheduled'
           lockLifetime: 5000
