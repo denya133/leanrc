@@ -35,6 +35,7 @@ class LeanRC extends RC
   @const APPLICATION_MEDIATOR:  'ApplicationMediator'
   @const APPLICATION_ROUTER:  'ApplicationRouter'
   @const APPLICATION_RENDERER:  'ApplicationRenderer'
+  @const APPLICATION_SWITCH:  'ApplicationSwitch'
   @const RESQUE_EXECUTOR:  'ResqueExecutor'
   @const LOG_MSG: Symbol 'logMessage'
   @const PRODUCTION: 'production'
