@@ -216,7 +216,6 @@ module.exports = (Module)->
         return: Object
         default: (params = {})->
           headers = @headers ? {}
-          headers['Connection'] = 'keep-alive'
           headers['Accept'] = 'application/json'
           if params.requestType in ['query', 'patchBy', 'removeBy']
             headers['Authorization'] = "Bearer #{@configs.apiKey}"
