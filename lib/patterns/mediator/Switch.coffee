@@ -56,7 +56,6 @@ module.exports = (Module)->
     @include ConfigurableMixin
     @module Module
 
-    # from https://github.com/koajs/compose/blob/master/index.js #############
     @public @static compose: Function,
       args: [Array]
       return: LAMBDA
@@ -66,20 +65,10 @@ module.exports = (Module)->
         for fn in middlewares
           unless _.isFunction fn
             throw new Error 'Middleware must be composed of functions!'
-        (context, next)->
-          index = -1
-          dispatch = co.wrap (i)->
-            if i <= index
-              throw new Error 'next() called multiple times'
-            index = i
-            middleware = middlewares[i]
-            if i is middlewares.length
-              middleware = next
-            unless middleware?
-              yield return
-            return yield middleware context, -> dispatch i+1
-          return dispatch 0
-    ##########################################################################
+        co.wrap (context)->
+          for middleware in middlewares
+            yield middleware context
+          yield return
 
     # from https://github.com/koajs/route/blob/master/index.js ###############
     decode = (val)-> # чистая функция
@@ -113,9 +102,9 @@ module.exports = (Module)->
             re = pathToRegexp path, keys
             facade.sendNotification SEND_TO_LOG, "#{method ? 'ALL'} #{path} -> #{re}", LEVELS[DEBUG]
 
-            @use co.wrap (ctx, next)->
+            @use co.wrap (ctx)->
               unless matches ctx, method
-                yield return next?()
+                yield return
               m = re.exec ctx.path
               if m
                 pathParams = m[1..]
@@ -127,8 +116,8 @@ module.exports = (Module)->
                 ctx.routePath = path
                 facade.sendNotification SEND_TO_LOG, "#{ctx.method} #{path} matches #{ctx.path} #{JSON.stringify pathParams}", LEVELS[DEBUG]
                 ctx.pathParams = pathParams
-                return yield routeFunc.apply self, [ctx, next]
-              yield return next?()
+                return yield routeFunc.call self, ctx
+              yield return
 
             # это надо будет заиспользовать когда решится вопрос "как подрубить свайгер"
             #@defineSwaggerEndpoint voEndpoint
@@ -367,7 +356,7 @@ module.exports = (Module)->
         {method, path} = opts
         resourceName = inflect.camelize inflect.underscore "#{opts.resource.replace /[/]/g, '_'}Resource"
 
-        @[method]? path, co.wrap (context, next)=>
+        @[method]? path, co.wrap (context)=>
           yield Module::Promise.new (resolve, reject)=>
             try
               reverse = genRandomAlphaNumbers 32
@@ -387,7 +376,7 @@ module.exports = (Module)->
             catch err
               reject err
             return
-          yield return next?()
+          yield return
         return
 
     @public init: Function,

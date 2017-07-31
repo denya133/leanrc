@@ -422,7 +422,7 @@ describe 'Switch', ->
         middlewares = []
         COUNT = 4
         for i in [ 0 .. COUNT ]
-          middlewares.push sinon.spy (ctx, next) -> yield return next()
+          middlewares.push sinon.spy (ctx) -> yield return
         fn = TestSwitch.compose middlewares
         yield fn voContext
         for i in [ 0 .. COUNT ]
@@ -541,17 +541,17 @@ describe 'Switch', ->
           headers: 'x-forwarded-for': '192.168.0.1'
         res = new MyResponse
         switchMediator.middlewares = []
-        switchMediator.middlewares.push (ctx, next) ->
+        switchMediator.middlewares.push (ctx) ->
           ctx.body = Buffer.from JSON.stringify data: 'data'
-          yield return next()
+          yield return
         endPromise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
         yield switchMediator.callback() req, res
         data = yield endPromise
         assert.equal data, '{"data":"data"}'
         res = new MyResponse
-        switchMediator.middlewares.push (ctx, next) ->
+        switchMediator.middlewares.push (ctx) ->
           ctx.throw 404
-          yield return next()
+          yield return
         endPromise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
         yield switchMediator.callback() req, res
         data = yield endPromise
@@ -559,9 +559,9 @@ describe 'Switch', ->
         assert.propertyVal parsedData, 'code', 'Not Found'
         res = new MyResponse
         switchMediator.middlewares = []
-        switchMediator.middlewares.push (ctx, next) ->
+        switchMediator.middlewares.push (ctx) ->
           return ctx.res.emit 'error', new Error 'TEST'
-          yield return next()
+          yield return
         endPromise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
         yield switchMediator.callback() req, res
         data = yield endPromise
@@ -605,7 +605,7 @@ describe 'Switch', ->
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         facade.registerCommand Test::LogMessage.SEND_TO_LOG, TestLogCommand
         promise = LeanRC::Promise.new (resolve) -> trigger.once 'log', resolve
-        testMiddlewareFirst = (ctx, next) -> yield return next?()
+        testMiddlewareFirst = (ctx) -> yield return
         middlewaresCount = switchMediator.middlewares.length
         switchMediator.use testMiddlewareFirst
         notification = yield promise
@@ -614,7 +614,7 @@ describe 'Switch', ->
         usedMiddleware = switchMediator.middlewares[middlewaresCount]
         compareMiddlewares testMiddlewareFirst, usedMiddleware
         promise = LeanRC::Promise.new (resolve) -> trigger.once 'log', resolve
-        testMiddlewareSecond = (ctx, next) -> return next?()
+        testMiddlewareSecond = (ctx) -> return
         middlewaresCount = switchMediator.middlewares.length
         switchMediator.use testMiddlewareSecond
         notification = yield promise
@@ -723,9 +723,9 @@ describe 'Switch', ->
         assert.isFunction switchMediator.get.body
         lastMiddlewareIndex = switchMediator.middlewares.length
         spyMethod = sinon.spy ->
-        switchMediator.get '/test/:id', (ctx, next) ->
+        switchMediator.get '/test/:id', (ctx) ->
           spyMethod JSON.stringify ctx.pathParams
-          yield return next?()
+          yield return
         assert.isDefined switchMediator.middlewares[lastMiddlewareIndex]
         class MyResponse extends EventEmitter
           _headers: {}
@@ -748,7 +748,8 @@ describe 'Switch', ->
         res = new MyResponse
         voContext = Test::Context.new req, res, switchMediator
         promise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
-        yield switchMediator.middlewares[lastMiddlewareIndex] voContext, -> res.end()
+        yield switchMediator.middlewares[lastMiddlewareIndex] voContext
+        res.end()
         yield promise
         assert.isFalse spyMethod.called
         spyMethod.reset()
@@ -759,7 +760,8 @@ describe 'Switch', ->
         res = new MyResponse
         voContext = Test::Context.new req, res, switchMediator
         promise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
-        yield switchMediator.middlewares[lastMiddlewareIndex] voContext, -> res.end()
+        yield switchMediator.middlewares[lastMiddlewareIndex] voContext
+        res.end()
         yield promise
         assert.isTrue spyMethod.calledWith '{"id":"123"}'
         facade.remove()
@@ -823,7 +825,8 @@ describe 'Switch', ->
         facade.registerMediator LeanRC::Mediator.new LeanRC::APPLICATION_MEDIATOR,
           context: voContext
         promise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
-        yield switchMediator.middlewares[0] voContext, -> res.end()
+        yield switchMediator.middlewares[0] voContext
+        res.end()
         yield promise
         assert.isTrue spyTestAction.calledWith voContext
         facade.remove()
