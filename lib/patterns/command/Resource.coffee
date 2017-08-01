@@ -293,11 +293,12 @@ module.exports = (Module)->
         @recordBody = Module::Utils.extend {}, @recordBody, id: @recordId
         return args
 
-    @public @async doAction: Function, # для того, чтобы отдельная примесь могла переопределить этот метод и обернуть выполнение например в транзакцию
+    @public @async doAction: Function,
       args: [String, Module::ContextInterface]
       return: Module::ANY
       default: (action, context)->
         voResult = yield @[action]? context
+        yield @saveDelayeds()
         yield return voResult
 
     @public @async writeTransaction: Function,
@@ -306,11 +307,11 @@ module.exports = (Module)->
       default: (asAction, aoContext) ->
         yield return aoContext.method.toUpperCase() isnt 'GET'
 
-    @public @async saveDelayeds: Function, # для того, чтобы сохранить все отложенные джобы
+    @public @async saveDelayeds: Function,
       args: [Module::ApplicationInterface]
       return: Module::NILL
-      default: (app)->
-        resque = app.facade.retrieveProxy RESQUE
+      default: ->
+        resque = @facade.retrieveProxy RESQUE
         for delayed in yield resque.getDelayed()
           {queueName, scriptName, data, delay} = delayed
           queue = yield resque.get queueName ? DELAYED_JOBS_QUEUE
@@ -334,7 +335,6 @@ module.exports = (Module)->
           else
             app = @Module::MainApplication.new Module::LIGHTWEIGHT
             voResult = yield app.execute resourceName, voBody, action
-            yield @saveDelayeds app
             app.finish()
         catch err
           voResult =
