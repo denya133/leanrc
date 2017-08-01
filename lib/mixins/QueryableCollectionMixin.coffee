@@ -72,11 +72,11 @@ module.exports = (Module)->
 
       @public @async query: Function,
         default: (aoQuery)->
-          if aoQuery instanceof Module::Query
-            voQuery = aoQuery
-          else
+          if _.isPlainObject aoQuery
             aoQuery = _.pick aoQuery, Object.keys(aoQuery).filter (key)-> aoQuery[key]?
             voQuery = Module::Query.new aoQuery
+          else
+            voQuery = aoQuery
           return yield @executeQuery yield @parseQuery voQuery
 
 
