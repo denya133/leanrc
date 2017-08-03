@@ -41,6 +41,7 @@ module.exports = (Module)->
             .forIn '@doc': @collectionFullName()
             .filter query
             .remove()
+            .into @collectionFullName()
           yield @query voQuery
           yield return
 
@@ -57,6 +58,7 @@ module.exports = (Module)->
             .forIn '@doc': @collectionFullName()
             .filter query
             .patch properties
+            .into @collectionFullName()
           yield @query voQuery
           yield return
 
