@@ -49,7 +49,6 @@ module.exports = (Module)->
     # may be redefine at inheritance
     @public @async render: Function,
       default: (ctx, aoData, resource, {path, resource:resourceName, action}={})->
-        # TODO: надо решить вопрос с рендерингом темплейта Ошибка (404, 4хх, 500, 5хх)
         if path? and resourceName? and action?
           templatePath = resourceName + action
           templates = yield @templates

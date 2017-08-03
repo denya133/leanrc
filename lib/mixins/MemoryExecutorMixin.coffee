@@ -33,8 +33,8 @@ module.exports = (Module)->
 ```
 ###
 
-# TODO: Чтобы запустить экзекютор нужно послать сиграл с ключем START_RESQUE
-# TODO: Медиатор надо регистрировать с ключем RESQUE_EXECUTOR
+# Чтобы запустить экзекютор нужно послать сиграл с ключем START_RESQUE
+# Медиатор надо регистрировать с ключем RESQUE_EXECUTOR
 
 module.exports = (Module)->
   {
