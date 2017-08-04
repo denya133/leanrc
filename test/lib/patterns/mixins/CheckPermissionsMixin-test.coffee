@@ -177,12 +177,12 @@ describe 'CheckPermissionsMixin', ->
           id: 'AAA2'
           spaceId: 'XXX'
           userId: 'YYY2'
-          rules: moderator: TestResource: yes
+          rules: moderator: 'Test::TestResource': yes
         yield roles.create
           id: 'AAA3'
           spaceId: 'XXX'
           userId: 'YYY3'
-          rules: TestResource: create: yes
+          rules: 'Test::TestResource': create: yes
         resource = Test::TestResource.new()
         resource.context = Test::Context.new req, res, switchMediator
         resource.initializeNotifier KEY
@@ -288,12 +288,12 @@ describe 'CheckPermissionsMixin', ->
           id: 'AAA2'
           spaceId: 'XXX'
           userId: 'YYY2'
-          rules: moderator: TestResource: yes
+          rules: moderator: 'Test::TestResource': yes
         yield roles.create
           id: 'AAA3'
           spaceId: 'XXX'
           userId: 'YYY3'
-          rules: TestResource: create: yes
+          rules: 'Test::TestResource': create: yes
         resource = Test::TestResource.new()
         resource.context = Test::Context.new req, res, switchMediator
         resource.currentUser = id: 'YYY2'
@@ -420,12 +420,12 @@ describe 'CheckPermissionsMixin', ->
           id: 'AAA2'
           spaceId: 'XXX'
           userId: 'YYY2'
-          rules: moderator: TestResource: yes
+          rules: moderator: 'Test::TestResource': yes
         yield roles.create
           id: 'AAA3'
           spaceId: 'XXX'
           userId: 'YYY3'
-          rules: TestResource: list: yes
+          rules: 'Test::TestResource': list: yes
         resource = Test::TestResource.new()
         { collectionName } = resource
         boundCollection = MemoryCollection.new collectionName,
@@ -437,6 +437,7 @@ describe 'CheckPermissionsMixin', ->
         voContext.pathParams = space: 'XXX'
         resource.context = voContext
         resource.currentUser = id: 'YYY', role: 'user'
+        resource.currentUser.isAdmin = no
         resource.initializeNotifier KEY
         try
           yield resource.checkPermission()
@@ -444,8 +445,10 @@ describe 'CheckPermissionsMixin', ->
         assert.instanceOf error1, httpErrors.Forbidden
         assert.propertyVal error1, 'message', 'Current user has no access'
         resource.currentUser.role = 'admin'
+        resource.currentUser.isAdmin = yes
         yield resource.checkPermission()
         resource.currentUser.role = 'user'
+        resource.currentUser.isAdmin = no
         try
           yield resource.list voContext
         catch error2
@@ -456,6 +459,7 @@ describe 'CheckPermissionsMixin', ->
         voContext = Test::Context.new req, res, switchMediator
         voContext.pathParams = space: 'XXX'
         resource.currentUser = id: 'YYY3', role: 'user'
+        resource.currentUser.isAdmin = no
         try
           yield resource.list voContext
         catch error3

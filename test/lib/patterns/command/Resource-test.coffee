@@ -708,26 +708,40 @@ describe 'Resource', ->
           @inheritProtected()
           @root "#{__dirname}/config/root"
         Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
           @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
+            default: (asType) -> TestRecord
           @public init: Function,
             default: ->
               @super arguments...
               @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::TestResource extends LeanRC::Resource
+        TestRecord.initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @include LeanRC::QueryableResourceMixin
           @module Test
           @public entityName: String, { default: 'TestEntity' }
-        Test::TestResource.initialize()
+        TestResource.initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
-        class Test::Collection extends LeanRC::Collection
+        class TestResque extends LeanRC::Resque
+          @inheritProtected()
+          @module Test
+          @public jobs: Object, { default: {} }
+          @public @async getDelayed: Function,
+            default: ->
+              yield return []
+          @public init: Function,
+            default: (args...) ->
+              @super args...
+              @jobs = {}
+        TestResque.initialize()
+        resque = TestResque.new LeanRC::RESQUE, data: []
+        facade.registerProxy resque
+        class Collection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
@@ -759,16 +773,16 @@ describe 'Resource', ->
                 result.push data
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()
-        Test::Collection.initialize()
+        Collection.initialize()
         COLLECTION_NAME = 'TestEntitiesCollection'
-        facade.registerProxy Test::Collection.new COLLECTION_NAME,
-          delegate: Test::TestRecord
+        facade.registerProxy Collection.new COLLECTION_NAME,
+          delegate: TestRecord
           serializer: LeanRC::Serializer
           data: []
         facade.registerMediator LeanRC::Mediator.new LeanRC::APPLICATION_MEDIATOR,
           context: {}
         collection = facade.retrieveProxy COLLECTION_NAME
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
         yield collection.create test: 'test1'
         yield collection.create test: 'test2'
@@ -1426,6 +1440,20 @@ describe 'Resource', ->
         Test.initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
+        class TestResque extends LeanRC::Resque
+          @inheritProtected()
+          @module Test
+          @public jobs: Object, { default: {} }
+          @public @async getDelayed: Function,
+            default: ->
+              yield return []
+          @public init: Function,
+            default: (args...) ->
+              @super args...
+              @jobs = {}
+        TestResque.initialize()
+        resque = TestResque.new LeanRC::RESQUE, data: []
+        facade.registerProxy resque
         class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
@@ -1517,6 +1545,7 @@ describe 'Resource', ->
           @module Test
         TestResource.initialize()
         resource = TestResource.new()
+        resource.initializeNotifier MULTITON_KEY
         DELAY = Date.now() + 1000000
         yield resque.create 'TEST_QUEUE_1', 4
         yield resque.delay 'TEST_QUEUE_1', 'TestScript', { data: 'data1' }, DELAY

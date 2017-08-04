@@ -777,6 +777,20 @@ describe 'Switch', ->
         Test.initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
+        class TestResque extends LeanRC::Resque
+          @inheritProtected()
+          @module Test
+          @public jobs: Object, { default: {} }
+          @public @async getDelayed: Function,
+            default: ->
+              yield return []
+          @public init: Function,
+            default: (args...) ->
+              @super args...
+              @jobs = {}
+        TestResque.initialize()
+        resque = TestResque.new LeanRC::RESQUE, data: []
+        facade.registerProxy resque
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
@@ -842,6 +856,20 @@ describe 'Switch', ->
         Test.initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
+        class TestResque extends LeanRC::Resque
+          @inheritProtected()
+          @module Test
+          @public jobs: Object, { default: {} }
+          @public @async getDelayed: Function,
+            default: ->
+              yield return []
+          @public init: Function,
+            default: (args...) ->
+              @super args...
+              @jobs = {}
+        TestResque.initialize()
+        resque = TestResque.new LeanRC::RESQUE, data: []
+        facade.registerProxy resque
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
