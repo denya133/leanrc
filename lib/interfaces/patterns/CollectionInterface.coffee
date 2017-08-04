@@ -25,12 +25,6 @@ module.exports = (Module)->
       @public @virtual collectionFullName: Function,
         args: [[String, NILL]]
         return: String
-      @public @virtual customFilters: Function, # возвращает установленные кастомные фильтры с учетом наследования
-        args: []
-        return: Object
-      @public @virtual customFilter: Function,
-        args: [String, [Object, Function]]
-        return: NILL
 
       @public @async @virtual generateId: Function,
         args: []
