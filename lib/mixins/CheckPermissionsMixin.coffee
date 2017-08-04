@@ -91,12 +91,16 @@ module.exports = (Module)->
             yield return args
           space = @context.pathParams['space'] ? '_default'
           if checkPermission.wrapper.chainName is 'list'
-            spaces = space.split '-'
-            unless _.isArray spaces
-              spaces = [spaces]
-            yield from forEach spaces, (item)=>
-              yield @[ipoCheckPermission] item, 'list'
-            @spaces = spaces
+            yield @[ipoCheckPermission] space, 'list'
+            @space = space
+            # TODO: надо будет решить, а нужен ли вообще этот функционал (посылка нескольких спейсов через разделитель) для определения есть ли пермишены
+            # TODO: разделитель нужно заменить на другой, если все таки оставляем этот функционал, т.к. uuid.v4() использует разделитель '-'
+            # spaces = space.split '-'
+            # unless _.isArray spaces
+            #   spaces = [spaces]
+            # yield from forEach spaces, (item)=>
+            #   yield @[ipoCheckPermission] item, 'list'
+            # @spaces = spaces
           else
             yield @[ipoCheckPermission] space, checkPermission.wrapper.chainName
             @space = space
