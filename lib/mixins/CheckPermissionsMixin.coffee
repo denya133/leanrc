@@ -65,11 +65,12 @@ module.exports = (Module)->
         default: (spaceId, userId, action)->
           RolesCollection = @facade.retrieveProxy ROLES
           role = yield (yield RolesCollection.findBy {spaceId, userId}).first()
+          resourceKey = "#{@Module.name}::#{@constructor.name}"
           if role?.rules?['system']?['administrator']
             yield return yes
-          else if role?.rules?['moderator']?[@constructor.name]
+          else if role?.rules?['moderator']?[resourceKey]
             yield return yes
-          else if role?.rules?[@constructor.name]?[action]
+          else if role?.rules?[resourceKey]?[action]
             yield return yes
           else
             yield return no
@@ -86,7 +87,7 @@ module.exports = (Module)->
 
       @public @async checkPermission: Function,
         default: checkPermission = (args...)->
-          if @currentUser.role is 'admin'
+          if @currentUser.isAdmin
             yield return args
           space = @context.pathParams['space'] ? '_default'
           if checkPermission.wrapper.chainName is 'list'
