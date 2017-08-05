@@ -59,12 +59,14 @@ module.exports = (Module)->
           needsLimitation = yield @checkNonLimitationHeader()
 
           limit = Number voQuery.$limit
-          voQuery.limit = switch
-            when needsLimitation then limit
-            when limit > MAX_LIMIT, limit < 0, isNaN limit then MAX_LIMIT
-            else limit
+          if needsLimitation
+            voQuery.limit switch
+              when limit > MAX_LIMIT, limit < 0, isNaN limit then MAX_LIMIT
+              else limit
+          else unless isNaN limit
+            voQuery.limit limit
           skip = Number voQuery.$offset
-          voQuery.offset = switch
+          voQuery.offset switch
             when skip < 0, isNaN skip then 0
             else skip
 
