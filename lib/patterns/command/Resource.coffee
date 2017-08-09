@@ -43,7 +43,7 @@ module.exports = (Module)->
     @beforeHook 'beforeLimitedList', only: ['list']
     @beforeHook 'setOwnerId',       only: ['create']
     @beforeHook 'protectOwnerId',   only: ['update']
-    @beforeHook 'protectSpaceId',   only: ['update']
+    @beforeHook 'protectSpaces',    only: ['update']
 
     ###
 
@@ -74,14 +74,17 @@ module.exports = (Module)->
         @recordBody = _.omit @recordBody, ['ownerId']
         yield return args
 
-    @public @async setSpaceId: Function,
+    @public @async setSpaces: Function,
       default: (args...)->
-        @recordBody.spaceId = @context.pathParams.space ? '_default'
+        @recordBody.spaces ?= []
+        currentSpace = @context.pathParams.space ? '_default'
+        unless _.includes @recordBody.spaces, currentSpace
+          @recordBody.spaces.push currentSpace
         yield return args
 
-    @public @async protectSpaceId: Function,
+    @public @async protectSpaces: Function,
       default: (args...)->
-        @recordBody = _.omit @recordBody, ['spaceId']
+        @recordBody = _.omit @recordBody, ['spaces']
         yield return args
 
     @public @async beforeLimitedList: Function,
