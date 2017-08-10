@@ -74,9 +74,8 @@ module.exports = (Module)->
           return {
             meta:
               pagination:
-                total: 'not defined'
-                limit: 'not defined'
-                offset: 'not defined'
+                limit: voQuery.$limit
+                offset: voQuery.$offset
             items: vlItems
           }
 
