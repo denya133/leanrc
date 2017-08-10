@@ -95,6 +95,14 @@ module.exports = (Module)->
           @query.$filter['@doc.ownerId'] = $eq: @currentUser.id
         yield return args
 
+    @public @async limitBySpace: Function,
+      default: (args...)->
+        @query ?= {}
+        @query.$filter ?= {}
+        currentSpace = @context.pathParams.space ? '_default'
+        @query.$filter['@doc.spaces'] = $all: [currentSpace]
+        yield return args
+
     @public @async checkOwner: Function,
       default: (args...) ->
         unless @session?.uid? and @currentUser?
