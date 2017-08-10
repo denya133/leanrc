@@ -64,7 +64,10 @@ module.exports = (Module)->
       ipoCheckRole = @private @async checkRole: Function,
         default: (spaceId, userId, action)->
           RolesCollection = @facade.retrieveProxy ROLES
-          role = yield (yield RolesCollection.findBy {spaceId, userId}).first()
+          role = yield (yield RolesCollection.findBy
+            '@doc.spaces': $all: [spaceId]
+            userId: userId
+          ).first()
           resourceKey = "#{@Module.name}::#{@constructor.name}"
           if role?.rules?['system']?['administrator']
             yield return yes
@@ -90,20 +93,8 @@ module.exports = (Module)->
           if @currentUser.isAdmin
             yield return args
           space = @context.pathParams['space'] ? '_default'
-          if checkPermission.wrapper.chainName is 'list'
-            yield @[ipoCheckPermission] space, 'list'
-            @space = space
-            # TODO: надо будет решить, а нужен ли вообще этот функционал (посылка нескольких спейсов через разделитель) для определения есть ли пермишены
-            # TODO: разделитель нужно заменить на другой, если все таки оставляем этот функционал, т.к. uuid.v4() использует разделитель '-'
-            # spaces = space.split '-'
-            # unless _.isArray spaces
-            #   spaces = [spaces]
-            # yield from forEach spaces, (item)=>
-            #   yield @[ipoCheckPermission] item, 'list'
-            # @spaces = spaces
-          else
-            yield @[ipoCheckPermission] space, checkPermission.wrapper.chainName
-            @space = space
+          yield @[ipoCheckPermission] space, checkPermission.wrapper.chainName
+          @space = space
           yield return args
 
 

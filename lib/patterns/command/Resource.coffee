@@ -40,10 +40,10 @@ module.exports = (Module)->
     @initialHook 'adminOnly', only: ['create'] # required checkSession before
     @initialHook 'checkOwner', only: ['detail', 'update', 'delete'] # required checkSession before
 
-    @beforeHook 'beforeLimitedList', only: ['list']
+    @beforeHook 'filterOwnerByCurrentUser', only: ['list']
     @beforeHook 'setOwnerId',       only: ['create']
     @beforeHook 'protectOwnerId',   only: ['update']
-    @beforeHook 'protectSpaceId',   only: ['update']
+    @beforeHook 'protectSpaces',    only: ['update']
 
     ###
 
@@ -74,21 +74,33 @@ module.exports = (Module)->
         @recordBody = _.omit @recordBody, ['ownerId']
         yield return args
 
-    @public @async setSpaceId: Function,
+    @public @async setSpaces: Function,
       default: (args...)->
-        @recordBody.spaceId = @context.pathParams.space ? '_default'
+        @recordBody.spaces ?= []
+        currentSpace = @context.pathParams.space ? '_default'
+        unless _.includes @recordBody.spaces, currentSpace
+          @recordBody.spaces.push currentSpace
         yield return args
 
-    @public @async protectSpaceId: Function,
+    @public @async protectSpaces: Function,
       default: (args...)->
-        @recordBody = _.omit @recordBody, ['spaceId']
+        @recordBody = _.omit @recordBody, ['spaces']
         yield return args
 
-    @public @async beforeLimitedList: Function,
+    @public @async filterOwnerByCurrentUser: Function,
       default: (args...)->
         if @currentUser? and not @currentUser.isAdmin
           @query ?= {}
-          @query.ownerId = @currentUser.id
+          @query.$filter ?= {}
+          @query.$filter['@doc.ownerId'] = $eq: @currentUser.id
+        yield return args
+
+    @public @async limitBySpace: Function,
+      default: (args...)->
+        @query ?= {}
+        @query.$filter ?= {}
+        currentSpace = @context.pathParams.space ? '_default'
+        @query.$filter['@doc.spaces'] = $all: [currentSpace]
         yield return args
 
     @public @async checkOwner: Function,
@@ -207,7 +219,6 @@ module.exports = (Module)->
         return {
           meta:
             pagination:
-              total: 'not defined'
               limit: 'not defined'
               offset: 'not defined'
           items: vlItems
