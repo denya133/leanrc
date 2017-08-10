@@ -40,7 +40,7 @@ module.exports = (Module)->
     @initialHook 'adminOnly', only: ['create'] # required checkSession before
     @initialHook 'checkOwner', only: ['detail', 'update', 'delete'] # required checkSession before
 
-    @beforeHook 'beforeLimitedList', only: ['list']
+    @beforeHook 'filterOwnerByCurrentUser', only: ['list']
     @beforeHook 'setOwnerId',       only: ['create']
     @beforeHook 'protectOwnerId',   only: ['update']
     @beforeHook 'protectSpaces',    only: ['update']
@@ -87,11 +87,12 @@ module.exports = (Module)->
         @recordBody = _.omit @recordBody, ['spaces']
         yield return args
 
-    @public @async beforeLimitedList: Function,
+    @public @async filterOwnerByCurrentUser: Function,
       default: (args...)->
         if @currentUser? and not @currentUser.isAdmin
           @query ?= {}
-          @query.ownerId = @currentUser.id
+          @query.$filter ?= {}
+          @query.$filter['@doc.ownerId'] = $eq: @currentUser.id
         yield return args
 
     @public @async checkOwner: Function,
