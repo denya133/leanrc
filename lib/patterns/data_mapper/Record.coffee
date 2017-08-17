@@ -20,7 +20,7 @@ module.exports = (Module)->
       @attribute description: String
 
       @attribute registeredAt: Date,
-        validate: -> joi.date()
+        validate: -> joi.date().iso()
         transform: -> Module::MyDateTransform
     TomatoEntryMixin.initializeMixin()
 ```
@@ -73,11 +73,11 @@ module.exports = (Module)->
       validate: -> joi.boolean().default((-> no), 'by default')
       default: no
     @attribute createdAt: Date,
-      validate: -> joi.date().empty(null)
+      validate: -> joi.date().iso().empty(null)
     @attribute updatedAt: Date,
-      validate: -> joi.date().empty(null)
+      validate: -> joi.date().iso().empty(null)
     @attribute deletedAt: Date,
-      validate: -> joi.date().empty(null).default(null)
+      validate: -> joi.date().iso().empty(null).default(null)
       default: null
 
     ############################################################################
