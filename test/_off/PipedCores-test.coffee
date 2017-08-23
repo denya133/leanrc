@@ -347,7 +347,6 @@ describe 'PipedCores', ->
         assert.isTrue body?
         { meta, cucumbers: data } = body
         assert.deepEqual meta, pagination:
-          total: 'not defined'
           limit: 'not defined'
           offset: 'not defined'
         assert.lengthOf data, 0
@@ -365,7 +364,6 @@ describe 'PipedCores', ->
         assert.isTrue body?
         { meta, tomatos: data } = body
         assert.deepEqual meta, pagination:
-          total: 'not defined'
           limit: 'not defined'
           offset: 'not defined'
         assert.lengthOf data, 0

@@ -409,7 +409,6 @@ describe 'Resource', ->
         resource.initializeNotifier KEY
         { items, meta } = yield resource.list query: query: '{}'
         assert.deepEqual meta, pagination:
-          total: 'not defined'
           limit: 'not defined'
           offset: 'not defined'
         assert.propertyVal items[0], 'test', 'test1'
@@ -800,9 +799,8 @@ describe 'Resource', ->
         {result, resource:voResource} = body
         { meta, items } = result
         assert.deepEqual meta, pagination:
-          total: 'not defined'
-          limit: 'not defined'
-          offset: 'not defined'
+          limit: 50
+          offset: 0
         assert.deepEqual voResource, resource
         assert.lengthOf items, 3
         assert.equal type, 'TEST_REVERSE'
@@ -934,7 +932,7 @@ describe 'Resource', ->
           test: 'test9'
           id: 'ID123456'
         yield return
-  describe '#setSpaceId', ->
+  describe '#setSpaces', ->
     it 'should set space ID for body', ->
       co ->
         class Test extends LeanRC
@@ -955,13 +953,13 @@ describe 'Resource', ->
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
-        yield resource.setSpaceId()
+        yield resource.setSpaces()
         assert.deepEqual resource.recordBody,
           test: 'test9'
           id: 'ID123456'
-          spaceId: 'SPACE123'
+          spaces: ['SPACE123']
         yield return
-  describe '#protectSpaceId', ->
+  describe '#protectSpaces', ->
     it 'should omit space ID from body', ->
       co ->
         class Test extends LeanRC
@@ -982,17 +980,17 @@ describe 'Resource', ->
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
-        yield resource.setSpaceId()
+        yield resource.setSpaces()
         assert.deepEqual resource.recordBody,
           test: 'test9'
           id: 'ID123456'
-          spaceId: 'SPACE123'
-        yield resource.protectSpaceId()
+          spaces: ['SPACE123']
+        yield resource.protectSpaces()
         assert.deepEqual resource.recordBody,
           test: 'test9'
           id: 'ID123456'
         yield return
-  describe '#beforeLimitedList', ->
+  describe '#filterOwnerByCurrentUser', ->
     it 'should update query if caller user is not admin', ->
       co ->
         class Test extends LeanRC
@@ -1013,8 +1011,8 @@ describe 'Resource', ->
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
-        yield resource.beforeLimitedList()
-        assert.deepEqual resource.query, ownerId: 'ID123'
+        yield resource.filterOwnerByCurrentUser()
+        assert.deepEqual resource.query, $filter: '@doc.ownerId': '$eq': 'ID123'
         yield return
   describe '#checkOwner', ->
     it 'should check if user is resource owner', ->

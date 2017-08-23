@@ -104,9 +104,8 @@ describe 'QueryableResourceMixin', ->
         context = Test::Context.new req, res, switchMediator
         { items, meta } = yield resource.list context
         assert.deepEqual meta, pagination:
-          total: 'not defined'
-          limit: 'not defined'
-          offset: 'not defined'
+          limit: 50
+          offset: 0
         assert.propertyVal items[0], 'test', 'test1'
         assert.propertyVal items[1], 'test', 'test2'
         req.url = 'http://localhost:8888/space/SPACE123/test_entity/ID123456?query={"$filter":{"@doc.test":"test2"}}'
