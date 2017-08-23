@@ -88,6 +88,8 @@ class LeanRC extends RC
   require('./mixins/RelationsMixin') LeanRC
   require('./mixins/DelayableMixin') LeanRC
 
+  require('./patterns/iterator/Cursor') LeanRC
+
   require('./patterns/data_mapper/Transform') LeanRC
   require('./patterns/data_mapper/StringTransform') LeanRC
   require('./patterns/data_mapper/NumberTransform') LeanRC
@@ -152,8 +154,6 @@ class LeanRC extends RC
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC
-
-  require('./patterns/iterator/Cursor') LeanRC
 
   require('./patterns/facade/Facade') LeanRC
 
