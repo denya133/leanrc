@@ -21,7 +21,7 @@ module.exports = (Module)->
           if ahPayload[singular]?
             return acRecord.normalize ahPayload[singular], @collection
           else if ahPayload[plural]?
-            return Cursor.new @, ahPayload[plural]
+            return Cursor.new @collection, ahPayload[plural]
           else
             return acRecord.normalize ahPayload, @collection
 
