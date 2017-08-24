@@ -202,10 +202,10 @@ describe 'Resource', ->
         assert.propertyVal actions.delete, 'attrType', Function
         assert.propertyVal actions.delete, 'level', LeanRC::PUBLIC
         assert.propertyVal actions.delete, 'async', LeanRC::ASYNC
-        assert.propertyVal actions.executeQuery, 'attr', 'executeQuery'
-        assert.propertyVal actions.executeQuery, 'attrType', Function
-        assert.propertyVal actions.executeQuery, 'level', LeanRC::PUBLIC
-        assert.propertyVal actions.executeQuery, 'async', LeanRC::ASYNC
+        assert.propertyVal actions.query, 'attr', 'query'
+        assert.propertyVal actions.query, 'attrType', Function
+        assert.propertyVal actions.query, 'level', LeanRC::PUBLIC
+        assert.propertyVal actions.query, 'async', LeanRC::ASYNC
         yield return
   describe '#beforeActionHook', ->
     it 'should parse action params as arguments', ->

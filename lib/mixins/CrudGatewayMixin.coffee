@@ -202,7 +202,7 @@ module.exports = (Module)->
                 from the database.
               "
 
-          @swaggerDefinition 'executeQuery', (endpoint)->
+          @swaggerDefinition 'query', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
               .header 'Authorization', joi.string().required(), "

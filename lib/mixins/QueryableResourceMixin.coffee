@@ -25,7 +25,7 @@ module.exports = (Module)->
         default: (asAction, aoContext) ->
           result = yield @super asAction, aoContext
           if result
-            if asAction is 'executeQuery'
+            if asAction is 'query'
               body = if isArangoDB
                 aoContext.req.body
               else
@@ -79,15 +79,15 @@ module.exports = (Module)->
             items: vlItems
           }
 
-      @action @async executeQuery: Function,
+      @action @async query: Function,
         default: ->
           {body} = @context.request
           return yield (yield @collection.query body.query).toArray()
 
       # ------------ Chains definitions ---------
-      @chains ['executeQuery']
-      @initialHook 'requiredAuthorizationHeader', only: ['executeQuery']
-      @initialHook 'parseBody', only: ['executeQuery']
+      @chains ['query']
+      @initialHook 'requiredAuthorizationHeader', only: ['query']
+      @initialHook 'parseBody', only: ['query']
 
 
     QueryableResourceMixin.initializeMixin()
