@@ -56,7 +56,7 @@ describe 'QueryableResourceMixin', ->
           @public @async takeAll: Function,
             default: ->
               yield LeanRC::Cursor.new @, @getData().data
-          @public @async executeQuery: Function,
+          @public @async query: Function,
             default: (aoParsedQuery) ->
               data = _.filter @getData().data, aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data

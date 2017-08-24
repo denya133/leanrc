@@ -269,7 +269,7 @@ module.exports = (Module)->
         create: 'post'
         update: 'put'
         delete: 'delete'
-        executeQuery: 'post'
+        query: 'post'
 
       voPaths =
         list: ''
@@ -277,7 +277,7 @@ module.exports = (Module)->
         create: ''
         update: null
         delete: null
-        executeQuery: 'query'
+        query: 'query'
 
       @[iplRoutes] ?= []
 

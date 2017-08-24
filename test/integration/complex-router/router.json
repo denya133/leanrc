@@ -33,7 +33,7 @@
     "method": "post",
     "path": "/users/query",
     "resource": "users/",
-    "action": "executeQuery"
+    "action": "query"
   },
   {
     "method": "post",
@@ -93,7 +93,7 @@
     "method": "post",
     "path": "/invitations/query",
     "resource": "invitations/",
-    "action": "executeQuery"
+    "action": "query"
   },
   {
     "method": "get",
@@ -129,7 +129,7 @@
     "method": "post",
     "path": "/spaces/query",
     "resource": "areas/",
-    "action": "executeQuery"
+    "action": "query"
   },
   {
     "method": "post",
@@ -171,7 +171,7 @@
     "method": "post",
     "path": "/:v/:space/uploads/query",
     "resource": "uploads/",
-    "action": "executeQuery"
+    "action": "query"
   },
   {
     "method": "get",
@@ -213,7 +213,7 @@
     "method": "post",
     "path": "/:v/:space/admin/tomatos/query",
     "resource": "admin/tomatos/",
-    "action": "executeQuery"
+    "action": "query"
   },
   {
     "method": "get",
@@ -243,7 +243,7 @@
     "method": "post",
     "path": "/:v/:space/test/tomatos/query",
     "resource": "tomatos/",
-    "action": "executeQuery"
+    "action": "query"
   },
   {
     "method": "get",
@@ -273,7 +273,7 @@
     "method": "post",
     "path": "/:v/:space/tomatos/query",
     "resource": "tomatos/",
-    "action": "executeQuery"
+    "action": "query"
   },
   {
     "method": "get",
@@ -303,7 +303,7 @@
     "method": "post",
     "path": "/:v/:space/tomatos/query",
     "resource": "cucumber/tomatos/",
-    "action": "executeQuery"
+    "action": "query"
   },
   {
     "method": "get",
@@ -333,7 +333,7 @@
     "method": "post",
     "path": "/:v/:space/onion/tomatos/query",
     "resource": "cucumber/tomatos/",
-    "action": "executeQuery"
+    "action": "query"
   },
   {
     "method": "get",
@@ -363,6 +363,6 @@
     "method": "post",
     "path": "/:v/:space/onion/tomatos/query",
     "resource": "carrot/tomatos/",
-    "action": "executeQuery"
+    "action": "query"
   }
 ]
