@@ -289,14 +289,12 @@ module.exports = (Module)->
         default: (ahPayload, aoCollection)->
           unless ahPayload?
             return null
-          vhResult = {}
-          for own asAttrName, ahAttrValue of @attributes
-            do (asAttrName, {transform} = ahAttrValue)=>
-              vhResult[asAttrName] = transform.call(@).normalize ahPayload[asAttrName]
-          result = @new vhResult, aoCollection
           vhAttributes = {}
-          for own key of @attributes
-            vhAttributes[key] = result[key]
+          result = @new {type: ahPayload.type}, aoCollection
+          for own asAttrName, ahAttrValue of result.constructor.attributes
+            do (asAttrName, {transform} = ahAttrValue)=>
+              result[asAttrName] = transform.call(@).normalize ahPayload[asAttrName]
+            vhAttributes[asAttrName] = result[asAttrName]
           result[ipoInternalRecord] = vhAttributes
           result
 
@@ -305,7 +303,7 @@ module.exports = (Module)->
           unless aoRecord?
             return null
           vhResult = {}
-          for own asAttrName, ahAttrValue of @attributes
+          for own asAttrName, ahAttrValue of aoRecord.constructor.attributes
             do (asAttrName, {transform} = ahAttrValue)=>
               vhResult[asAttrName] = transform.call(@).serialize aoRecord[asAttrName]
           vhResult
