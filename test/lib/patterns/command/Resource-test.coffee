@@ -248,7 +248,7 @@ describe 'Resource', ->
         resource.context =
           query: query: '{"test":"test123"}'
         resource.getQuery()
-        assert.deepEqual resource.query, test: 'test123'
+        assert.deepEqual resource.listQuery, test: 'test123'
         yield return
   describe '#getRecordId', ->
     it 'should get resource record ID', ->
@@ -1012,7 +1012,7 @@ describe 'Resource', ->
         resource.getRecordBody()
         resource.beforeUpdate()
         yield resource.filterOwnerByCurrentUser()
-        assert.deepEqual resource.query, $filter: '@doc.ownerId': '$eq': 'ID123'
+        assert.deepEqual resource.listQuery, $filter: '@doc.ownerId': '$eq': 'ID123'
         yield return
   describe '#checkOwner', ->
     it 'should check if user is resource owner', ->

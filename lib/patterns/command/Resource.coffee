@@ -90,17 +90,17 @@ module.exports = (Module)->
     @public @async filterOwnerByCurrentUser: Function,
       default: (args...)->
         if @currentUser? and not @currentUser.isAdmin
-          @query ?= {}
-          @query.$filter ?= {}
-          @query.$filter['@doc.ownerId'] = $eq: @currentUser.id
+          @listQuery ?= {}
+          @listQuery.$filter ?= {}
+          @listQuery.$filter['@doc.ownerId'] = $eq: @currentUser.id
         yield return args
 
     @public @async limitBySpace: Function,
       default: (args...)->
-        @query ?= {}
-        @query.$filter ?= {}
+        @listQuery ?= {}
+        @listQuery.$filter ?= {}
         currentSpace = @context.pathParams.space ? '_default'
-        @query.$filter['@doc.spaces'] = $all: [currentSpace]
+        @listQuery.$filter['@doc.spaces'] = $all: [currentSpace]
         yield return args
 
     @public @async checkOwner: Function,
@@ -197,7 +197,7 @@ module.exports = (Module)->
 
     @public context: ContextInterface
 
-    @public query: Object
+    @public listQuery: Object
     @public recordId: String
     @public recordBody: Object
 
@@ -266,7 +266,7 @@ module.exports = (Module)->
       args: [Object]
       return: ANY
       default: (args...)->
-        @query = JSON.parse @context.query['query'] ? "{}"
+        @listQuery = JSON.parse @context.query['query'] ? "{}"
         return args
 
     @public getRecordId: Function,

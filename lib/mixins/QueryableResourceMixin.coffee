@@ -41,7 +41,7 @@ module.exports = (Module)->
 
       @action @async list: Function,
         default: ->
-          receivedQuery = _.pick @query, [
+          receivedQuery = _.pick @listQuery, [
             '$filter', '$sort', '$limit', '$offset'
           ]
           voQuery = Module::Query.new()
