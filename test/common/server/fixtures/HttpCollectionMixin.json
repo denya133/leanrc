@@ -1,0 +1,143 @@
+{
+  "/": {
+    "OPTIONS": {
+      "headers": {
+        "Allow": "HEAD, OPTIONS, GET, POST, PUT, PATCH, DELETE"
+      },
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "HEAD": {
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "GET,POST,PUT,PATCH": {
+      "data": {
+        "message": "OK"
+      },
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "DELETE": {
+      "statusCode": 202,
+      "statusMessage": "No Content"
+    }
+  },
+  "/test": {
+    "OPTIONS": {
+      "headers": {
+        "Allow": "HEAD, OPTIONS, GET, POST, PUT, PATCH, DELETE"
+      },
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "HEAD": {
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "GET,POST,PUT,PATCH": {
+      "data": {
+        "message": "OK"
+      },
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "DELETE": {
+      "statusCode": 202,
+      "statusMessage": "No Content"
+    }
+  },
+  "/redirect": {
+    "OPTIONS": {
+      "headers": {
+        "Allow": "HEAD, OPTIONS, GET, POST, PUT, PATCH, DELETE"
+      },
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "HEAD": {
+      "statusCode": 200,
+      "statusMessage": "OK"
+    },
+    "GET,POST,PUT,PATCH,DELETE": {
+      "redirect": "/",
+      "statusCode": 302,
+      "statusMessage": "Found"
+    }
+  },
+  "/v1/tests": {
+    "single": "test",
+    "plural": "tests",
+    "POST": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "SELF"
+    },
+    "GET": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "QUERY"
+    }
+  },
+  "/v1/tests/query": {
+    "single": "test",
+    "plural": "tests",
+    "POST": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "QUERY"
+    }
+  },
+  "/v1/tests/:key": {
+    "single": "test",
+    "plural": "tests",
+    "GET": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "GET"
+    },
+    "DELETE": {
+      "statusCode": 204,
+      "statusMessage": "No Content",
+      "data": "DELETE"
+    },
+    "PUT": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "PUT"
+    },
+    "PATCH": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "PATCH"
+    }
+  },
+  "/v1/tests/bulk": {
+    "single": "test",
+    "plural": "tests",
+    "DELETE": {
+      "statusCode": 204,
+      "statusMessage": "No Content",
+      "data": "QUERY"
+    },
+    "PUT,PATCH": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "QUERY"
+    }
+  },
+  "/v1/unique_test_records": {
+    "single": "unique_test_record",
+    "plural": "unique_test_records",
+    "POST": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "SELF"
+    },
+    "GET": {
+      "statusCode": 200,
+      "statusMessage": "OK",
+      "data": "QUERY"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "configuration": {
+    "port": {
+      "description": "port for test switch server",
+      "type": "number",
+      "default": 3000
+    },
+    "trustProxy": {
+      "description": "trustProxy for test switch server",
+      "type": "boolean",
+      "default": false
+    },
+    "subdomainOffset": {
+      "description": "subdomainOffset for test switch server",
+      "type": "number",
+      "default": 2
+    },
+    "secret": {
+      "description": "Secret key for encoding and decoding tokens.",
+      "type": "string",
+      "default": "secret"
+    },
+    "cookieKey": {
+      "description": "Secret key for sign cookies.",
+      "type": "string",
+      "default": "secret"
+    }
+  }
+}
