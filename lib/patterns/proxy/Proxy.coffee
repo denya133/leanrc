@@ -3,7 +3,7 @@
 module.exports = (Module)->
   class Proxy extends Module::Notifier
     @inheritProtected()
-    @implements Module::ProxyInterface
+    # @implements Module::ProxyInterface
     @module Module
 
     ipsProxyName = @private proxyName: String

@@ -41,44 +41,44 @@ class LeanRC extends RC
   @const PRODUCTION: 'production'
   @const DEVELOPMENT: 'development'
 
-  require('./interfaces/patterns/ApplicationInterface') LeanRC
-  require('./interfaces/patterns/TransformInterface') LeanRC
-  require('./interfaces/patterns/NotificationInterface') LeanRC
-  require('./interfaces/patterns/NotifierInterface') LeanRC
-  require('./interfaces/patterns/ObserverInterface') LeanRC
-  require('./interfaces/patterns/CommandInterface') LeanRC
-  require('./interfaces/patterns/MediatorInterface') LeanRC
-  require('./interfaces/patterns/ProxyInterface') LeanRC
-  require('./interfaces/patterns/SerializerInterface') LeanRC
-  require('./interfaces/patterns/FacadeInterface') LeanRC
-  require('./interfaces/patterns/RecordInterface') LeanRC
-  require('./interfaces/patterns/CollectionInterface') LeanRC
-  require('./interfaces/patterns/QueryInterface') LeanRC
-  require('./interfaces/patterns/CursorInterface') LeanRC
-  require('./interfaces/patterns/EndpointInterface') LeanRC
-  require('./interfaces/patterns/GatewayInterface') LeanRC
-  require('./interfaces/patterns/RendererInterface') LeanRC
-  require('./interfaces/patterns/RequestInterface') LeanRC
-  require('./interfaces/patterns/ResponseInterface') LeanRC
-  require('./interfaces/patterns/CookiesInterface') LeanRC
-  require('./interfaces/patterns/ContextInterface') LeanRC
-  require('./interfaces/patterns/ResourceInterface') LeanRC
-  require('./interfaces/patterns/RouterInterface') LeanRC
-  require('./interfaces/patterns/SwitchInterface') LeanRC
+  # require('./interfaces/patterns/ApplicationInterface') LeanRC
+  # require('./interfaces/patterns/TransformInterface') LeanRC
+  # require('./interfaces/patterns/NotificationInterface') LeanRC
+  # require('./interfaces/patterns/NotifierInterface') LeanRC
+  # require('./interfaces/patterns/ObserverInterface') LeanRC
+  # require('./interfaces/patterns/CommandInterface') LeanRC
+  # require('./interfaces/patterns/MediatorInterface') LeanRC
+  # require('./interfaces/patterns/ProxyInterface') LeanRC
+  # require('./interfaces/patterns/SerializerInterface') LeanRC
+  # require('./interfaces/patterns/FacadeInterface') LeanRC
+  # require('./interfaces/patterns/RecordInterface') LeanRC
+  # require('./interfaces/patterns/CollectionInterface') LeanRC
+  # require('./interfaces/patterns/QueryInterface') LeanRC
+  # require('./interfaces/patterns/CursorInterface') LeanRC
+  # require('./interfaces/patterns/EndpointInterface') LeanRC
+  # require('./interfaces/patterns/GatewayInterface') LeanRC
+  # require('./interfaces/patterns/RendererInterface') LeanRC
+  # require('./interfaces/patterns/RequestInterface') LeanRC
+  # require('./interfaces/patterns/ResponseInterface') LeanRC
+  # require('./interfaces/patterns/CookiesInterface') LeanRC
+  # require('./interfaces/patterns/ContextInterface') LeanRC
+  # require('./interfaces/patterns/ResourceInterface') LeanRC
+  # require('./interfaces/patterns/RouterInterface') LeanRC
+  # require('./interfaces/patterns/SwitchInterface') LeanRC
 
-  require('./interfaces/mixins/CrudGatewayMixinInterface') LeanRC
-  require('./interfaces/mixins/IterableMixinInterface') LeanRC
-  require('./interfaces/mixins/QueryableCollectionMixinInterface') LeanRC
-  require('./interfaces/mixins/RelationsMixinInterface') LeanRC
-  require('./interfaces/patterns/MigrationInterface') LeanRC
-  require('./interfaces/patterns/DelayedQueueInterface') LeanRC
-  require('./interfaces/patterns/ResqueInterface') LeanRC
-  require('./interfaces/mixins/DelayableMixinInterface') LeanRC
-  require('./interfaces/patterns/ScriptInterface') LeanRC
+  # require('./interfaces/mixins/CrudGatewayMixinInterface') LeanRC
+  # require('./interfaces/mixins/IterableMixinInterface') LeanRC
+  # require('./interfaces/mixins/QueryableCollectionMixinInterface') LeanRC
+  # require('./interfaces/mixins/RelationsMixinInterface') LeanRC
+  # require('./interfaces/patterns/MigrationInterface') LeanRC
+  # require('./interfaces/patterns/DelayedQueueInterface') LeanRC
+  # require('./interfaces/patterns/ResqueInterface') LeanRC
+  # require('./interfaces/mixins/DelayableMixinInterface') LeanRC
+  # require('./interfaces/patterns/ScriptInterface') LeanRC
 
-  require('./interfaces/core/ControllerInterface') LeanRC
-  require('./interfaces/core/ModelInterface') LeanRC
-  require('./interfaces/core/ViewInterface') LeanRC
+  # require('./interfaces/core/ControllerInterface') LeanRC
+  # require('./interfaces/core/ModelInterface') LeanRC
+  # require('./interfaces/core/ViewInterface') LeanRC
 
   require('./utils/jwt') LeanRC
   require('./utils/crypto') LeanRC
@@ -169,9 +169,9 @@ class Pipes extends LeanRC
 
   @root __dirname
 
-  require('./interfaces/patterns/PipeAwareInterface') Pipes
-  require('./interfaces/patterns/PipeFittingInterface') Pipes
-  require('./interfaces/patterns/PipeMessageInterface') Pipes
+  # require('./interfaces/patterns/PipeAwareInterface') Pipes
+  # require('./interfaces/patterns/PipeFittingInterface') Pipes
+  # require('./interfaces/patterns/PipeMessageInterface') Pipes
 
   require('./patterns/pipes/Pipe') Pipes
   require('./patterns/pipes/PipeMessage') Pipes

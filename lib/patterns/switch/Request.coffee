@@ -23,7 +23,7 @@ module.exports = (Module)->
 
   class Request extends CoreObject
     @inheritProtected()
-    @implements RequestInterface
+    # @implements RequestInterface
     @module Module
 
     @public req: Object, # native request object

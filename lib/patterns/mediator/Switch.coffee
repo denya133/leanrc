@@ -52,7 +52,7 @@ module.exports = (Module)->
 
   class Switch extends Mediator
     @inheritProtected()
-    @implements SwitchInterface
+    # @implements SwitchInterface
     @include ConfigurableMixin
     @module Module
 

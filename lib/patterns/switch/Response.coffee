@@ -28,7 +28,7 @@ module.exports = (Module)->
 
   class Response extends CoreObject
     @inheritProtected()
-    @implements ResponseInterface
+    # @implements ResponseInterface
     @module Module
 
     @public res: Object, # native response object
