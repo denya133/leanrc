@@ -47,7 +47,7 @@ module.exports = (Module)->
 
   class Resque extends Module::Proxy
     @inheritProtected()
-    @implements Module::ResqueInterface
+    # @implements Module::ResqueInterface
     @include Module::ConfigurableMixin
     @module Module
 

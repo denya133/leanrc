@@ -12,7 +12,7 @@ module.exports = (Module)->
   Module.defineMixin Module::CoreObject, (BaseClass) ->
     class DelayableMixin extends BaseClass
       @inheritProtected()
-      @implements Module::DelayableMixinInterface
+      # @implements Module::DelayableMixinInterface
 
       cpmDelayJob = @private @static @async delayJob: Function,
         default: (facade, data, options)->

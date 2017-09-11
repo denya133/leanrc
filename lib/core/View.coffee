@@ -3,7 +3,7 @@
 module.exports = (Module)->
   class View extends Module::CoreObject
     @inheritProtected()
-    @implements Module::ViewInterface
+    # @implements Module::ViewInterface
     @module Module
 
     @const MULTITON_MSG: "View instance for this multiton key already constructed!"

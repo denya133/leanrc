@@ -57,7 +57,7 @@ module.exports = (Module)->
 
   class Record extends CoreObject
     @inheritProtected()
-    @implements RecordInterface
+    # @implements RecordInterface
     @include ChainsMixin
     @include RecordMixin
     @module Module

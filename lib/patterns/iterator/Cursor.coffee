@@ -8,7 +8,7 @@ _  = require 'lodash'
 module.exports = (Module)->
   class Cursor extends Module::CoreObject
     @inheritProtected()
-    @implements Module::CursorInterface
+    # @implements Module::CursorInterface
     @module Module
 
     ipnCurrentIndex = @private currentIndex: Number,

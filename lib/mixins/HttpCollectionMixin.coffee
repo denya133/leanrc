@@ -11,7 +11,7 @@ module.exports = (Module)->
   Module.defineMixin Module::Collection, (BaseClass) ->
     class HttpCollectionMixin extends BaseClass
       @inheritProtected()
-      @implements Module::QueryableCollectionMixinInterface
+      # @implements Module::QueryableCollectionMixinInterface
 
       @public recordMultipleName: Function,
         default: -> @collectionName()

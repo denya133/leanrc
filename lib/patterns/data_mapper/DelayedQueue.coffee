@@ -43,7 +43,7 @@ module.exports = (Module)->
 
   class DelayedQueue extends Module::CoreObject
     @inheritProtected()
-    @implements Module::DelayedQueueInterface
+    # @implements Module::DelayedQueueInterface
     @module Module
 
     # конструктор принимает второй аргумент, ссылку на resque proxy.

@@ -3,7 +3,7 @@
 module.exports = (Module)->
   class Controller extends Module::CoreObject
     @inheritProtected()
-    @implements Module::ControllerInterface
+    # @implements Module::ControllerInterface
     @module Module
 
     @const MULTITON_MSG: "Controller instance for this multiton key already constructed!"

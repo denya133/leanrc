@@ -15,7 +15,7 @@ module.exports = (Module)->
   Module.defineMixin Module::Collection, (BaseClass) ->
     class QueryableCollectionMixin extends BaseClass
       @inheritProtected()
-      @implements Module::QueryableCollectionMixinInterface
+      # @implements Module::QueryableCollectionMixinInterface
 
       @public @async findBy: Function,
         default: (query)->

@@ -3,7 +3,7 @@
 module.exports = (Module)->
   class BooleanTransform extends Module::CoreObject
     @inheritProtected()
-    @implements Module::TransformInterface
+    # @implements Module::TransformInterface
     @module Module
 
     @public @static normalize: Function,

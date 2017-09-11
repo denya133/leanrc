@@ -12,7 +12,7 @@ module.exports = (Module)->
   Module.defineMixin Module::CoreObject, (BaseClass) ->
     class RelationsMixin extends BaseClass
       @inheritProtected()
-      @implements Module::RelationsMixinInterface
+      # @implements Module::RelationsMixinInterface
 
       @public @static belongsTo: Function,
         default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable, validate}={})->

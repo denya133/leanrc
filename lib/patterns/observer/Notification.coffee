@@ -4,7 +4,7 @@ module.exports = (Module)->
 
   class Notification extends Module::CoreObject
     @inheritProtected()
-    @implements Module::NotificationInterface
+    # @implements Module::NotificationInterface
     @module Module
 
     ipsName = @private name: String
