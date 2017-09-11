@@ -14,8 +14,6 @@ module.exports = (Module)->
   Module.defineMixin Resource, (BaseClass) ->
     class QueryableResourceMixin extends BaseClass
       @inheritProtected()
-      @include Module::BodyParseMixin
-      @include Module::CheckSessionsMixin
 
       MAX_LIMIT   = 50
 

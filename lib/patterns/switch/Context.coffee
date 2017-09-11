@@ -27,7 +27,7 @@ module.exports = (Module)->
 
   class Context extends CoreObject
     @inheritProtected()
-    @implements ContextInterface
+    # @implements ContextInterface
     @module Module
 
     @public req: Object # native request object

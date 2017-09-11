@@ -12,7 +12,7 @@ module.exports = (Module)->
 
   class Cookies extends CoreObject
     @inheritProtected()
-    @implements CookiesInterface
+    # @implements CookiesInterface
     @module Module
 
     ipoCookies = @protected cookies: Object

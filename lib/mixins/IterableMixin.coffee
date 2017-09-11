@@ -6,7 +6,7 @@ module.exports = (Module)->
   Module.defineMixin Module::Collection, (BaseClass) ->
     class IterableMixin extends BaseClass
       @inheritProtected()
-      @implements Module::IterableMixinInterface
+      # @implements Module::IterableMixinInterface
 
       @public @async forEach: Function,
         default: (lambda)->

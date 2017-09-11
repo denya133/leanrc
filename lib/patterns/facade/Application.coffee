@@ -17,7 +17,7 @@ module.exports = (Module)->
 
   class Application extends PipeAwareModule
     @inheritProtected()
-    @implements ApplicationInterface
+    # @implements ApplicationInterface
     @include ConfigurableMixin
     @module Module
 

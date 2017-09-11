@@ -93,7 +93,7 @@ module.exports = (Module)->
 
   class Query extends Module::CoreObject
     @inheritProtected()
-    @implements Module::QueryInterface
+    # @implements Module::QueryInterface
     @module Module
 
     @public @static operatorsMap: Object,

@@ -31,7 +31,7 @@ module.exports = (Module)->
   Module.defineMixin Module::Gateway, (BaseClass) ->
     class CrudGatewayMixin extends BaseClass
       @inheritProtected()
-      @implements Module::CrudGatewayMixinInterface
+      # @implements Module::CrudGatewayMixinInterface
 
       @public keyName: String,
         get: ->
