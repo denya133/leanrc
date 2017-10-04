@@ -68,7 +68,9 @@ module.exports = (Module)->
           if @checkHeader()
             session = SessionsCollection.build {uid: 'admin'}
           else if (sessionCookie = @context.cookies.get @configs.sessionCookie)?
-            session = yield SessionsCollection.find sessionCookie
+            session = yield (yield SessionsCollection.findBy
+              "@doc.id": sessionCookie
+            ).first()
           unless session?
             session = SessionsCollection.build()
           @session = session
