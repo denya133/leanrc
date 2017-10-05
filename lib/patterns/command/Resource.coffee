@@ -1,6 +1,7 @@
 _             = require 'lodash'
 inflect       = do require 'i'
 statuses      = require 'statuses'
+semver        = require 'semver'
 
 HTTP_NOT_FOUND    = statuses 'not found'
 UNAUTHORIZED      = statuses 'unauthorized'
@@ -56,12 +57,8 @@ module.exports = (Module)->
         [vNeedVersion] = vCurrentVersion.match(/^\d{1,}[.]\d{1,}/) ? []
         unless vNeedVersion?
           throw new Error 'Incorrect `version` specified in the configuration'
-        sendError = =>
-          @context.throw UPGRADE_REQUIRED, "Upgrade: v#{vNeedVersion}"
-        unless /^[v]\d{1,}[.]\d{1,}/.test vVersion
-          sendError()
-        unless new RegExp(vVersion).test "v#{vCurrentVersion}"
-          sendError()
+        unless semver.satisfies vCurrentVersion, vVersion
+          @context.throw UPGRADE_REQUIRED, "Upgrade: v#{vCurrentVersion}"
         yield return args
 
     @public @async setOwnerId: Function,
