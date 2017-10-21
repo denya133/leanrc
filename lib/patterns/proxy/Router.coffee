@@ -100,7 +100,7 @@ module.exports = (Module)->
             "#{@[ipsPath]}#{path}"
           else
             "#{@[ipsPath]}#{path}"
-
+        template ?= resource + action
         container.push {method, path, resource, action, tags, template}
         return
 
@@ -184,7 +184,9 @@ module.exports = (Module)->
           "#{asName}/"
         vsTemplates = if alTemplates? and alTemplates isnt ''
           alTemplates
-        else if (alTemplates? and alTemplates is '') or not alTemplates?
+        else if alTemplates? and alTemplates is ''
+          ''
+        else
           asName
         @[iplResources] ?= []
         tags = [].concat(@[iplTags] ? []).concat(vlTags ? [])
@@ -242,7 +244,9 @@ module.exports = (Module)->
           "#{asName}/"
         vsTemplates = if alTemplates? and alTemplates isnt ''
           alTemplates
-        else if (alTemplates? and alTemplates is '') or not alTemplates?
+        else if alTemplates? and alTemplates is ''
+          ''
+        else
           asName
         @[iplResources] ?= []
         tags = [].concat(@[iplTags] ? []).concat(vlTags ? [])
@@ -267,11 +271,11 @@ module.exports = (Module)->
 
     @public member: Function,
       default: (lambda)->
-        @namespace null, module: '', prefix: '', at: 'member', lambda
+        @namespace null, module: '', prefix: '', templates: '', at: 'member', lambda
 
     @public collection: Function,
       default: (lambda = ->)->
-        @namespace null, module: '', prefix: '', at: 'collection', lambda
+        @namespace null, module: '', prefix: '', templates: '', at: 'collection', lambda
 
     @public routes: Array,
       get: ->
@@ -321,7 +325,7 @@ module.exports = (Module)->
               action: asAction
               resource: @[ipsResource] ? @[ipsName]
               tags: @[iplTags] ? []
-              template: @[ipsTemplates]
+              template: @[ipsTemplates] + '/' + asAction
         else if @[iplExcept]?
           for own asAction, asMethod of voMethods
             do (asAction, asMethod)=>
@@ -332,7 +336,7 @@ module.exports = (Module)->
                   action: asAction
                   resource: @[ipsResource] ? @[ipsName]
                   tags: @[iplTags] ? []
-                  template: @[ipsTemplates]
+                  template: @[ipsTemplates] + '/' + asAction
         else if @[iplVia]?
           @[iplVia].forEach (asCustomAction)=>
             vsPath = voPaths[asCustomAction]
@@ -344,13 +348,13 @@ module.exports = (Module)->
                     action: asAction
                     resource: @[ipsResource] ? @[ipsName]
                     tags: @[iplTags] ? []
-                    template: @[ipsTemplates]
+                    template: @[ipsTemplates] + '/' + asAction
             else
               @defineMethod @[iplRoutes], voMethods[asCustomAction], vsPath,
                 action: asCustomAction
                 resource: @[ipsResource] ? @[ipsName]
                 tags: @[iplTags] ? []
-                template: @[ipsTemplates]
+                template: @[ipsTemplates] + '/' + asAction
         else
           for own asAction, asMethod of voMethods
             do (asAction, asMethod)=>
@@ -360,7 +364,7 @@ module.exports = (Module)->
                 action: asAction
                 resource: @[ipsResource] ? @[ipsName]
                 tags: @[iplTags] ? []
-                template: @[ipsTemplates]
+                template: @[ipsTemplates] + '/' + asAction
 
 
   Router.initialize()
