@@ -156,7 +156,7 @@ module.exports = (Module)->
         {
           path, module:vsModule
           only, via, except
-          tag:vsTag, templates:alTemplates
+          tag:asTag, templates:alTemplates
           at, resource
         } = aoOpts
         path = path?.replace /^[/]/, ''
