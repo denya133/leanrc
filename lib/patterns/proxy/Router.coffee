@@ -94,11 +94,11 @@ module.exports = (Module)->
           resource += '/'
 
         vsParentTag = if @[ipsTag]? and @[ipsTag] isnt ''
-          "#{@[ipsTag]}/"
+          @[ipsTag]
         else
           ''
         vsTag = if asTag? and asTag isnt ''
-          asTag
+          "/#{asTag}"
         else
           ''
         tag = "#{vsParentTag}#{vsTag}"
@@ -190,7 +190,7 @@ module.exports = (Module)->
         else
           ''
         vsParentTag = if @[ipsTag]? and @[ipsTag] isnt ''
-          "#{@[ipsTag]}/"
+          @[ipsTag]
         else
           ''
         vsName = if vsModule? and vsModule isnt ''
@@ -211,7 +211,7 @@ module.exports = (Module)->
           else
             asName
         vsTag = if asTag? and asTag isnt ''
-          asTag
+          "/#{asTag}"
         else
           ''
         @[iplResources] ?= []
@@ -265,7 +265,7 @@ module.exports = (Module)->
         else
           ''
         vsParentTag = if @[ipsTag]? and @[ipsTag] isnt ''
-          "#{@[ipsTag]}/"
+          @[ipsTag]
         else
           ''
         vsName = if vsModule? and vsModule isnt ''
@@ -286,7 +286,7 @@ module.exports = (Module)->
           else
             asName
         vsTag = if asTag? and asTag isnt ''
-          asTag
+          "/#{asTag}"
         else
           ''
         @[iplResources] ?= []
@@ -311,13 +311,11 @@ module.exports = (Module)->
 
     @public member: Function,
       default: (lambda)->
-        tag = @[ipsTag]
-        @namespace null, module: '', prefix: '', templates: '', tag: tag, at: 'member', lambda
+        @namespace null, module: '', prefix: '', templates: '', at: 'member', lambda
 
     @public collection: Function,
       default: (lambda = ->)->
-        tag = @[ipsTag]
-        @namespace null, module: '', prefix: '', templates: '', tag: tag, at: 'collection', lambda
+        @namespace null, module: '', prefix: '', templates: '', at: 'collection', lambda
 
     @public routes: Array,
       get: ->
