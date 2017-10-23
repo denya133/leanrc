@@ -50,6 +50,8 @@ module.exports = (Module)->
     iplExcept     = @protected except: Array
     ipsAt         = @protected at: String
     ipsResource   = @protected resource: String
+    ipsTag        = @protected tag: String
+    ipsTemplates  = @protected templates: String
 
     iplResources  = @protected resources: Array
     iplRoutes     = @protected routes: Array
@@ -72,7 +74,7 @@ module.exports = (Module)->
         return
 
     @public defineMethod: Function,
-      default: (container, method, path, {to, at, resource, action}={})->
+      default: (container, method, path, {to, at, resource, action, tag:asTag, template}={})->
         unless path?
           throw new Error 'path is required'
         path = path.replace /^[/]/, ''
@@ -91,6 +93,16 @@ module.exports = (Module)->
         unless /[/]$/.test resource
           resource += '/'
 
+        vsParentTag = if @[ipsTag]? and @[ipsTag] isnt ''
+          @[ipsTag]
+        else
+          ''
+        vsTag = if asTag? and asTag isnt ''
+          "/#{asTag}"
+        else
+          ''
+        tag = "#{vsParentTag}#{vsTag}"
+
         path = switch at ? @[ipsAt]
           when 'member'
             "#{@[ipsPath]}:#{inflect.singularize inflect.underscore resource.replace(/[/]/g, '_').replace /[_]$/g, ''}/#{path}"
@@ -98,8 +110,8 @@ module.exports = (Module)->
             "#{@[ipsPath]}#{path}"
           else
             "#{@[ipsPath]}#{path}"
-
-        container.push {method, path, resource, action}
+        template ?= resource + action
+        container.push {method, path, resource, action, tag, template}
         return
 
     @public get: Function,
@@ -151,7 +163,12 @@ module.exports = (Module)->
           lambda = aoOpts
           aoOpts = {}
         aoOpts = {} unless aoOpts?
-        {path, module:vsModule, only, via, except, at, resource} = aoOpts
+        {
+          path, module:vsModule
+          only, via, except
+          tag:asTag, templates:alTemplates
+          at, resource
+        } = aoOpts
         path = path?.replace /^[/]/, ''
         vsPath = if path? and path isnt ''
           "#{path}/"
@@ -168,12 +185,35 @@ module.exports = (Module)->
           else
             "#{@[ipsPath]}#{vsPath}"
         vsParentName = @[ipsName]
+        vsParentTemplates = if @[ipsTemplates]? and @[ipsTemplates] isnt ''
+          "#{@[ipsTemplates]}/"
+        else
+          ''
+        vsParentTag = if @[ipsTag]? and @[ipsTag] isnt ''
+          @[ipsTag]
+        else
+          ''
         vsName = if vsModule? and vsModule isnt ''
           "#{vsModule}/"
         else if vsModule? and vsModule is ''
           ''
         else
           "#{asName}/"
+        vsTemplates = if alTemplates? and alTemplates isnt ''
+          alTemplates
+        else if alTemplates? and alTemplates is ''
+          ''
+        else
+          if vsModule? and vsModule isnt ''
+            vsModule
+          else if vsModule? and vsModule is ''
+            ''
+          else
+            asName
+        vsTag = if asTag? and asTag isnt ''
+          "/#{asTag}"
+        else
+          ''
         @[iplResources] ?= []
         class ResourceRouter extends Router
           @inheritProtected()
@@ -190,6 +230,10 @@ module.exports = (Module)->
             default: via
           @protected except: Array,
             default: except
+          @protected tag: String,
+            default: "#{vsParentTag}#{vsTag}"
+          @protected templates: String,
+            default: "#{vsParentTemplates}#{vsTemplates}"
           @protected resource: String,
             default: resource
           @map lambda
@@ -203,7 +247,11 @@ module.exports = (Module)->
           lambda = aoOpts
           aoOpts = {}
         aoOpts = {} unless aoOpts?
-        {module:vsModule, prefix, at} = aoOpts
+        {
+          module:vsModule, prefix
+          tag:asTag, templates:alTemplates
+          at
+        } = aoOpts
         vsParentPath = @[ipsPath]
         vsPath = if prefix? and prefix isnt ''
           "#{prefix}/"
@@ -212,12 +260,35 @@ module.exports = (Module)->
         else
           "#{asName}/"
         vsParentName = @[ipsName]
+        vsParentTemplates = if @[ipsTemplates]? and @[ipsTemplates] isnt ''
+          "#{@[ipsTemplates]}/"
+        else
+          ''
+        vsParentTag = if @[ipsTag]? and @[ipsTag] isnt ''
+          @[ipsTag]
+        else
+          ''
         vsName = if vsModule? and vsModule isnt ''
           "#{vsModule}/"
         else if vsModule? and vsModule is ''
           ''
         else
           "#{asName}/"
+        vsTemplates = if alTemplates? and alTemplates isnt ''
+          alTemplates
+        else if alTemplates? and alTemplates is ''
+          ''
+        else
+          if vsModule? and vsModule isnt ''
+            vsModule
+          else if vsModule? and vsModule is ''
+            ''
+          else
+            asName
+        vsTag = if asTag? and asTag isnt ''
+          "/#{asTag}"
+        else
+          ''
         @[iplResources] ?= []
         class NamespaceRouter extends Router
           @inheritProtected()
@@ -228,6 +299,10 @@ module.exports = (Module)->
             default: "#{vsParentName}#{vsName}"
           @protected except: Array,
             default: 'all'
+          @protected tag: String,
+            default: "#{vsParentTag}#{vsTag}"
+          @protected templates: String,
+            default: "#{vsParentTemplates}#{vsTemplates}"
           @protected at: String,
             default: at
           @map lambda
@@ -236,11 +311,11 @@ module.exports = (Module)->
 
     @public member: Function,
       default: (lambda)->
-        @namespace null, module: '', prefix: '', at: 'member', lambda
+        @namespace null, module: '', prefix: '', templates: '', at: 'member', lambda
 
     @public collection: Function,
       default: (lambda = ->)->
-        @namespace null, module: '', prefix: '', at: 'collection', lambda
+        @namespace null, module: '', prefix: '', templates: '', at: 'collection', lambda
 
     @public routes: Array,
       get: ->
@@ -289,6 +364,8 @@ module.exports = (Module)->
             @defineMethod @[iplRoutes], voMethods[asAction], vsPath,
               action: asAction
               resource: @[ipsResource] ? @[ipsName]
+              # tag: @[ipsTag]
+              template: @[ipsTemplates] + '/' + asAction
         else if @[iplExcept]?
           for own asAction, asMethod of voMethods
             do (asAction, asMethod)=>
@@ -298,6 +375,8 @@ module.exports = (Module)->
                 @defineMethod @[iplRoutes], asMethod, vsPath,
                   action: asAction
                   resource: @[ipsResource] ? @[ipsName]
+                  # tag: @[ipsTag]
+                  template: @[ipsTemplates] + '/' + asAction
         else if @[iplVia]?
           @[iplVia].forEach (asCustomAction)=>
             vsPath = voPaths[asCustomAction]
@@ -308,10 +387,14 @@ module.exports = (Module)->
                   @defineMethod @[iplRoutes], asMethod, vsPath,
                     action: asAction
                     resource: @[ipsResource] ? @[ipsName]
+                    # tag: @[ipsTag]
+                    template: @[ipsTemplates] + '/' + asAction
             else
               @defineMethod @[iplRoutes], voMethods[asCustomAction], vsPath,
                 action: asCustomAction
                 resource: @[ipsResource] ? @[ipsName]
+                # tag: @[ipsTag]
+                template: @[ipsTemplates] + '/' + asAction
         else
           for own asAction, asMethod of voMethods
             do (asAction, asMethod)=>
@@ -320,6 +403,8 @@ module.exports = (Module)->
               @defineMethod @[iplRoutes], asMethod, vsPath,
                 action: asAction
                 resource: @[ipsResource] ? @[ipsName]
+                # tag: @[ipsTag]
+                template: @[ipsTemplates] + '/' + asAction
 
 
   Router.initialize()
