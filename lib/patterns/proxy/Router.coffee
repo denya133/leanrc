@@ -74,7 +74,7 @@ module.exports = (Module)->
         return
 
     @public defineMethod: Function,
-      default: (container, method, path, {to, at, resource, action, tag, template}={})->
+      default: (container, method, path, {to, at, resource, action, tag:asTag, template}={})->
         unless path?
           throw new Error 'path is required'
         path = path.replace /^[/]/, ''
@@ -92,6 +92,16 @@ module.exports = (Module)->
           action = path
         unless /[/]$/.test resource
           resource += '/'
+
+        vsParentTag = if @[ipsTag]? and @[ipsTag] isnt ''
+          "#{@[ipsTag]}/"
+        else
+          ''
+        vsTag = if asTag? and asTag isnt ''
+          asTag
+        else
+          ''
+        tag = "#{vsParentTag}#{vsTag}"
 
         path = switch at ? @[ipsAt]
           when 'member'
@@ -356,7 +366,7 @@ module.exports = (Module)->
             @defineMethod @[iplRoutes], voMethods[asAction], vsPath,
               action: asAction
               resource: @[ipsResource] ? @[ipsName]
-              tag: @[ipsTag]
+              # tag: @[ipsTag]
               template: @[ipsTemplates] + '/' + asAction
         else if @[iplExcept]?
           for own asAction, asMethod of voMethods
@@ -367,7 +377,7 @@ module.exports = (Module)->
                 @defineMethod @[iplRoutes], asMethod, vsPath,
                   action: asAction
                   resource: @[ipsResource] ? @[ipsName]
-                  tag: @[ipsTag]
+                  # tag: @[ipsTag]
                   template: @[ipsTemplates] + '/' + asAction
         else if @[iplVia]?
           @[iplVia].forEach (asCustomAction)=>
@@ -379,13 +389,13 @@ module.exports = (Module)->
                   @defineMethod @[iplRoutes], asMethod, vsPath,
                     action: asAction
                     resource: @[ipsResource] ? @[ipsName]
-                    tag: @[ipsTag]
+                    # tag: @[ipsTag]
                     template: @[ipsTemplates] + '/' + asAction
             else
               @defineMethod @[iplRoutes], voMethods[asCustomAction], vsPath,
                 action: asCustomAction
                 resource: @[ipsResource] ? @[ipsName]
-                tag: @[ipsTag]
+                # tag: @[ipsTag]
                 template: @[ipsTemplates] + '/' + asAction
         else
           for own asAction, asMethod of voMethods
@@ -395,7 +405,7 @@ module.exports = (Module)->
               @defineMethod @[iplRoutes], asMethod, vsPath,
                 action: asAction
                 resource: @[ipsResource] ? @[ipsName]
-                tag: @[ipsTag]
+                # tag: @[ipsTag]
                 template: @[ipsTemplates] + '/' + asAction
 
 
