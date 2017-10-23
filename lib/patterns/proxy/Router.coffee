@@ -175,7 +175,10 @@ module.exports = (Module)->
           else
             "#{@[ipsPath]}#{vsPath}"
         vsParentName = @[ipsName]
-        vsParentTemplates = @[ipsTemplates]
+        vsParentTemplates = if @[ipsTemplates]? and @[ipsTemplates] isnt ''
+          "#{@[ipsTemplates]}/"
+        else
+          ''
         vsName = if vsModule? and vsModule isnt ''
           "#{vsModule}/"
         else if vsModule? and vsModule is ''
@@ -187,7 +190,12 @@ module.exports = (Module)->
         else if alTemplates? and alTemplates is ''
           ''
         else
-          asName
+          if vsModule? and vsModule isnt ''
+            vsModule
+          else if vsModule? and vsModule is ''
+            ''
+          else
+            asName
         @[iplResources] ?= []
         tags = [].concat(@[iplTags] ? []).concat(vlTags ? [])
         class ResourceRouter extends Router
@@ -208,7 +216,7 @@ module.exports = (Module)->
           @protected tags: Array,
             default: tags
           @protected templates: String,
-            default: "#{vsParentTemplates}/#{vsTemplates}"
+            default: "#{vsParentTemplates}#{vsTemplates}"
           @protected resource: String,
             default: resource
           @map lambda
@@ -235,7 +243,10 @@ module.exports = (Module)->
         else
           "#{asName}/"
         vsParentName = @[ipsName]
-        vsParentTemplates = @[ipsTemplates]
+        vsParentTemplates = if @[ipsTemplates]? and @[ipsTemplates] isnt ''
+          "#{@[ipsTemplates]}/"
+        else
+          ''
         vsName = if vsModule? and vsModule isnt ''
           "#{vsModule}/"
         else if vsModule? and vsModule is ''
@@ -247,7 +258,12 @@ module.exports = (Module)->
         else if alTemplates? and alTemplates is ''
           ''
         else
-          asName
+          if vsModule? and vsModule isnt ''
+            vsModule
+          else if vsModule? and vsModule is ''
+            ''
+          else
+            asName
         @[iplResources] ?= []
         tags = [].concat(@[iplTags] ? []).concat(vlTags ? [])
         class NamespaceRouter extends Router
@@ -262,7 +278,7 @@ module.exports = (Module)->
           @protected tags: Array,
             default: tags
           @protected templates: String,
-            default: "#{vsParentTemplates}/#{vsTemplates}"
+            default: "#{vsParentTemplates}#{vsTemplates}"
           @protected at: String,
             default: at
           @map lambda

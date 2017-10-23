@@ -49,8 +49,10 @@ module.exports = (Module)->
     # may be redefine at inheritance
     @public @async render: Function,
       default: (ctx, aoData, resource, {path, resource:resourceName, action, template:templatePath}={})->
+        console.log '>>>>>> 111', templatePath
         if path? and resourceName? and action?
           templates = yield @templates
+          console.log '>>>>>> 222', templates[templatePath]
           renderedResult = if templates[templatePath]?
             yield Module::Promise.resolve templates[templatePath].call resource, resourceName, action, aoData
           else
