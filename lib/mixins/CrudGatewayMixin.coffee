@@ -76,7 +76,7 @@ module.exports = (Module)->
 
       @public versionSchema: Object,
         default: joi.string().required().description '
-          The version of api endpoint in format `vx.x`
+          The version of api endpoint in semver format `^x.x`
         '
 
       @public onRegister: Function,
@@ -114,7 +114,6 @@ module.exports = (Module)->
               .header 'Authorization', joi.string().optional(), "
                 Authorization header for internal services.
               "
-              .pathParam @keyName, @keySchema
               .response @itemSchema, "
                 The #{@itemEntityName}.
               "
@@ -162,7 +161,6 @@ module.exports = (Module)->
               .header 'Authorization', joi.string().optional(), "
                 Authorization header for internal services.
               "
-              .pathParam @keyName, @keySchema
               .body @itemSchema.required(), "
                 The data to replace the
                 #{@itemEntityName} with.
@@ -189,7 +187,6 @@ module.exports = (Module)->
               .header 'Authorization', joi.string().optional(), "
                 Authorization header for internal services.
               "
-              .pathParam @keyName, @keySchema
               .error HTTP_NOT_FOUND
               .error UNAUTHORIZED
               .error UPGRADE_REQUIRED

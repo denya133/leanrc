@@ -52,6 +52,7 @@ module.exports = (Module)->
     ipsResource   = @protected resource: String
     ipsTag        = @protected tag: String
     ipsTemplates  = @protected templates: String
+    ipsParam      = @protected param: String
 
     iplResources  = @protected resources: Array
     iplRoutes     = @protected routes: Array
@@ -166,7 +167,7 @@ module.exports = (Module)->
         {
           path, module:vsModule
           only, via, except
-          tag:asTag, templates:alTemplates
+          tag:asTag, templates:alTemplates, param:asParam
           at, resource
         } = aoOpts
         path = path?.replace /^[/]/, ''
@@ -214,6 +215,10 @@ module.exports = (Module)->
           "/#{asTag}"
         else
           ''
+        vsParam = if asParam? and asParam isnt ''
+          asParam
+        else
+          ':' + inflect.singularize inflect.underscore (resource ? "#{vsParentName}#{vsName}").replace(/[/]/g, '_').replace /[_]$/g, ''
         @[iplResources] ?= []
         class ResourceRouter extends Router
           @inheritProtected()
@@ -234,6 +239,8 @@ module.exports = (Module)->
             default: "#{vsParentTag}#{vsTag}"
           @protected templates: String,
             default: "#{vsParentTemplates}#{vsTemplates}"
+          @protected param: String,
+            default: vsParam
           @protected resource: String,
             default: resource
           @map lambda
@@ -360,7 +367,7 @@ module.exports = (Module)->
         if @[iplOnly]?
           @[iplOnly].forEach (asAction)=>
             vsPath = voPaths[asAction]
-            vsPath ?= ':' + inflect.singularize inflect.underscore (@[ipsResource] ? @[ipsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
+            vsPath ?= @[ipsParam]
             @defineMethod @[iplRoutes], voMethods[asAction], vsPath,
               action: asAction
               resource: @[ipsResource] ? @[ipsName]
@@ -371,7 +378,7 @@ module.exports = (Module)->
             do (asAction, asMethod)=>
               if not @[iplExcept].includes('all') and not @[iplExcept].includes asAction
                 vsPath = voPaths[asAction]
-                vsPath ?= ':' + inflect.singularize inflect.underscore (@[ipsResource] ? @[ipsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
+                vsPath ?= @[ipsParam]
                 @defineMethod @[iplRoutes], asMethod, vsPath,
                   action: asAction
                   resource: @[ipsResource] ? @[ipsName]
@@ -380,7 +387,7 @@ module.exports = (Module)->
         else if @[iplVia]?
           @[iplVia].forEach (asCustomAction)=>
             vsPath = voPaths[asCustomAction]
-            vsPath ?= ':' + inflect.singularize inflect.underscore (@[ipsResource] ? @[ipsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
+            vsPath ?= @[ipsParam]
             if asCustomAction is 'all'
               for own asAction, asMethod of voMethods
                 do (asAction, asMethod)=>
@@ -399,7 +406,7 @@ module.exports = (Module)->
           for own asAction, asMethod of voMethods
             do (asAction, asMethod)=>
               vsPath = voPaths[asAction]
-              vsPath ?= ':' + inflect.singularize inflect.underscore (@[ipsResource] ? @[ipsName]).replace(/[/]/g, '_').replace /[_]$/g, ''
+              vsPath ?= @[ipsParam]
               @defineMethod @[iplRoutes], asMethod, vsPath,
                 action: asAction
                 resource: @[ipsResource] ? @[ipsName]
