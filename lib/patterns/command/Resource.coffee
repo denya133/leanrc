@@ -44,9 +44,11 @@ module.exports = (Module)->
     @beforeHook 'filterOwnerByCurrentUser', only: ['list']
     @beforeHook 'setOwnerId',       only: ['create']
     @beforeHook 'protectOwnerId',   only: ['update']
-    @beforeHook 'protectSpaces',    only: ['update']
 
     ###
+
+    @public needsLimitation: Boolean,
+      default: yes
 
     @public @async checkApiVersion: Function,
       default: (args...)->
@@ -71,33 +73,18 @@ module.exports = (Module)->
         @recordBody = _.omit @recordBody, ['ownerId']
         yield return args
 
-    @public @async setSpaces: Function,
-      default: (args...)->
-        @recordBody.spaces ?= []
-        currentSpace = @context.pathParams.space ? '_default'
-        unless _.includes @recordBody.spaces, currentSpace
-          @recordBody.spaces.push currentSpace
-        yield return args
-
-    @public @async protectSpaces: Function,
-      default: (args...)->
-        @recordBody = _.omit @recordBody, ['spaces']
-        yield return args
-
     @public @async filterOwnerByCurrentUser: Function,
       default: (args...)->
         if @currentUser? and not @currentUser.isAdmin
           @listQuery ?= {}
-          @listQuery.$filter ?= {}
-          @listQuery.$filter['@doc.ownerId'] = $eq: @currentUser.id
-        yield return args
-
-    @public @async limitBySpace: Function,
-      default: (args...)->
-        @listQuery ?= {}
-        @listQuery.$filter ?= {}
-        currentSpace = @context.pathParams.space ? '_default'
-        @listQuery.$filter['@doc.spaces'] = $all: [currentSpace]
+        if @listQuery.$filter?
+          @listQuery.$filter = $and: [
+            @listQuery.$filter
+          ,
+            '@doc.ownerId': $eq: @currentUser.id
+          ]
+        else
+          @listQuery.$filter = '@doc.ownerId': $eq: @currentUser.id
         yield return args
 
     @public @async checkOwner: Function,
@@ -126,29 +113,6 @@ module.exports = (Module)->
         unless yield @collection.includes @recordId
           @context.throw HTTP_NOT_FOUND
         yield return args
-
-    @public @async requiredAuthorizationHeader: Function,
-      default: (args...) ->
-        { apiKey }        = @configs
-        {
-          authorization: authHeader
-        } = @context.headers
-        unless authHeader?
-          @context.throw UNAUTHORIZED
-        [..., key] = (/^Bearer\s+(.+)$/.exec authHeader) ? []
-        unless key?
-          @context.throw UNAUTHORIZED
-        unless key is apiKey
-          @context.throw UNAUTHORIZED
-        yield return args
-
-    @public @async checkNonLimitationHeader: Function,
-      default: ->
-        { apiKey }        = @configs
-        {
-          nonlimitation: nonLimitationHeader
-        } = @context.headers
-        yield return nonLimitationHeader isnt apiKey
 
     @public @async adminOnly: Function,
       default: (args...) ->
