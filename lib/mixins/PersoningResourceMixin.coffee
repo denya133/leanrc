@@ -39,5 +39,19 @@ module.exports = (Module)->
             @context.throw HTTP_NOT_FOUND
           yield return args
 
+      @public @async setSpaces: Function,
+        default: (args...)->
+          @recordBody.spaces ?= []
+          unless _.includes @recordBody.spaces, '_internal'
+            @recordBody.spaces.push '_internal'
+          unless _.includes @recordBody.spaces, @currentUser.spaceId
+            @recordBody.spaces.push @currentUser.spaceId
+          yield return args
+
+      @public @async protectSpaces: Function,
+        default: (args...)->
+          @recordBody = _.omit @recordBody, ['spaces']
+          yield return args
+
 
     PersoningResourceMixin.initializeMixin()

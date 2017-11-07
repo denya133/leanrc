@@ -51,23 +51,10 @@ module.exports = (Module)->
       @public session: RecordInterface
       @public currentUser: RecordInterface
 
-      @public checkHeader: Function,
-        default: ->
-          { apiKey, clientKey } = @configs
-          {
-            authorization: authHeader
-          } = @context.headers
-          return no   unless authHeader?
-          [..., key] = (/^Bearer\s+(.+)$/.exec authHeader) ? []
-          return no   unless key?
-          return apiKey is key or clientKey is key
-
       @public @async makeSession: Function,
         default: ->
           SessionsCollection = @facade.retrieveProxy SESSIONS
-          if @checkHeader()
-            session = SessionsCollection.build {uid: 'admin'}
-          else if (sessionCookie = @context.cookies.get @configs.sessionCookie)?
+          if (sessionCookie = @context.cookies.get @configs.sessionCookie)?
             session = yield (yield SessionsCollection.findBy
               "@doc.id": sessionCookie
             ).first()
