@@ -157,6 +157,7 @@ class LeanRC extends RC
   require('./mixins/AdminingResourceMixin') LeanRC # needs test
   require('./mixins/PersoningResourceMixin') LeanRC # needs test
   require('./mixins/ModelingResourceMixin') LeanRC # needs test
+  require('./mixins/EditableResourceMixin') LeanRC # needs test
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC
