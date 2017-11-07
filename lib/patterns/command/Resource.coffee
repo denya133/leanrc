@@ -84,20 +84,6 @@ module.exports = (Module)->
         @recordBody = _.omit @recordBody, ['spaces']
         yield return args
 
-    @public @async filterOwnerByCurrentUser: Function,
-      default: (args...)->
-        if @currentUser? and not @currentUser.isAdmin
-          @listQuery ?= {}
-        if @listQuery.$filter?
-          @listQuery.$filter = $and: [
-            @listQuery.$filter
-          ,
-            '@doc.ownerId': $eq: @currentUser.id
-          ]
-        else
-          @listQuery.$filter = '@doc.ownerId': $eq: @currentUser.id
-        yield return args
-
     @public @async checkOwner: Function,
       default: (args...) ->
         unless @session?.uid? and @currentUser?
