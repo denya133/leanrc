@@ -13,6 +13,12 @@ module.exports = (Module)->
     class PersoningResourceMixin extends BaseClass
       @inheritProtected()
 
+      @beforeHook 'limitByUserSpace', only: ['list']
+      @beforeHook 'setSpaces',      only: ['create']
+      @beforeHook 'setOwnerId',     only: ['create']
+      @beforeHook 'protectSpaces',  only: ['update']
+      @beforeHook 'protectOwnerId', only: ['update']
+
       @public @async limitByUserSpace: Function,
         default: (args...)->
           @listQuery ?= {}

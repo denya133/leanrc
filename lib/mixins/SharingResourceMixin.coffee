@@ -22,6 +22,12 @@ module.exports = (Module)->
       @public spaces: Array
       @public space: RecordInterface
 
+      @beforeHook 'limitBySpace',   only: ['list']
+      @beforeHook 'setSpaces',      only: ['create']
+      @beforeHook 'setOwnerId',     only: ['create']
+      @beforeHook 'protectSpaces',  only: ['update']
+      @beforeHook 'protectOwnerId', only: ['update']
+
       @public @async limitBySpace: Function,
         default: (args...)->
           @listQuery ?= {}

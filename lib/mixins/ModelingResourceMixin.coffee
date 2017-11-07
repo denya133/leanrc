@@ -24,6 +24,11 @@ module.exports = (Module)->
       @public session: RecordInterface
       @public currentUser: RecordInterface
 
+      @beforeHook 'setSpaces',      only: ['create']
+      @beforeHook 'setOwnerId',     only: ['create']
+      @beforeHook 'protectSpaces',  only: ['update']
+      @beforeHook 'protectOwnerId', only: ['update']
+
       @public checkHeader: Function,
         default: ->
           { apiKey } = @configs
@@ -76,6 +81,11 @@ module.exports = (Module)->
           @recordBody.spaces ?= []
           unless _.includes @recordBody.spaces, '_internal'
             @recordBody.spaces.push '_internal'
+          yield return args
+
+      @public @async protectSpaces: Function,
+        default: (args...)->
+          @recordBody = _.omit @recordBody, ['spaces']
           yield return args
 
 

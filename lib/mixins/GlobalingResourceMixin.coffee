@@ -13,6 +13,8 @@ module.exports = (Module)->
     class GlobalingResourceMixin extends BaseClass
       @inheritProtected()
 
+      @beforeHook 'limitByDefaultSpace', only: ['list']
+
       @public @async limitByDefaultSpace: Function,
         default: (args...)->
           @listQuery ?= {}

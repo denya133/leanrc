@@ -13,6 +13,8 @@ module.exports = (Module)->
     class GuestingResourceMixin extends BaseClass
       @inheritProtected()
 
+      @beforeHook 'limitByExternalSpace', only: ['list']
+
       @public @async limitByExternalSpace: Function,
         default: (args...)->
           @listQuery ?= {}
