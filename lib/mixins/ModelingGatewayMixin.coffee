@@ -16,22 +16,22 @@ UPGRADE_REQUIRED  = statuses 'upgrade required'
 Module = require 'Module'
 
 module.exports = (App)->
-  App::CrudGateway extends Module::Gateway
+  App::ModelingGateway extends Module::Gateway
     @inheritProtected()
-    @include Module::CrudGatewayMixin
+    @include Module::ModelingGatewayMixin
 
     @module App
 
-  return App::CrudGateway.initialize()
+  return App::ModelingGateway.initialize()
 ```
 
 ###
 
 module.exports = (Module)->
   Module.defineMixin Module::Gateway, (BaseClass) ->
-    class CrudGatewayMixin extends BaseClass
+    class ModelingGatewayMixin extends BaseClass
       @inheritProtected()
-      # @implements Module::CrudGatewayMixinInterface
+      # @implements Module::ModelingGatewayMixinInterface
 
       @public keyName: String,
         get: ->
@@ -85,6 +85,9 @@ module.exports = (Module)->
           @swaggerDefinition 'list', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().required(), "
+                Authorization header for internal services.
+              "
               .queryParam 'query', @querySchema, "
                 The query for finding
                 #{@listEntityName}.
@@ -105,6 +108,9 @@ module.exports = (Module)->
           @swaggerDefinition 'detail', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().required(), "
+                Authorization header for internal services.
+              "
               .response @itemSchema, "
                 The #{@itemEntityName}.
               "
@@ -122,6 +128,9 @@ module.exports = (Module)->
           @swaggerDefinition 'create', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().required(), "
+                Authorization header for internal services.
+              "
               .body @itemSchema.required(), "
                 The #{@itemEntityName} to create.
               "
@@ -146,6 +155,9 @@ module.exports = (Module)->
           @swaggerDefinition 'update', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().required(), "
+                Authorization header for internal services.
+              "
               .body @itemSchema.required(), "
                 The data to replace the
                 #{@itemEntityName} with.
@@ -169,6 +181,9 @@ module.exports = (Module)->
           @swaggerDefinition 'delete', (endpoint)->
             endpoint
               .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().required(), "
+                Authorization header for internal services.
+              "
               .error HTTP_NOT_FOUND
               .error UNAUTHORIZED
               .error UPGRADE_REQUIRED
@@ -181,7 +196,28 @@ module.exports = (Module)->
                 from the database.
               "
 
+          @swaggerDefinition 'query', (endpoint)->
+            endpoint
+              .pathParam 'v', @versionSchema
+              .header 'Authorization', joi.string().required(), "
+                Authorization header is required.
+              "
+              .body @executeQuerySchema, "
+                The query for execute.
+              "
+              .response joi.array().items(joi.any()), "
+                Any result.
+              "
+              .error UNAUTHORIZED
+              .error UPGRADE_REQUIRED
+              .summary "
+                Execute some query
+              "
+              .description "
+                This endpoint will been used from HttpCollectionMixin
+              "
+
           return
 
 
-    CrudGatewayMixin.initializeMixin()
+    ModelingGatewayMixin.initializeMixin()

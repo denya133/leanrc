@@ -116,6 +116,7 @@ class LeanRC extends RC
   require('./patterns/proxy/Resque') LeanRC
 
   require('./mixins/CrudGatewayMixin') LeanRC
+  require('./mixins/ModelingGatewayMixin') LeanRC
   require('./mixins/CrudEndpointMixin') LeanRC
   require('./mixins/HttpCollectionMixin') LeanRC
   require('./mixins/HttpSerializerMixin') LeanRC
@@ -149,13 +150,13 @@ class LeanRC extends RC
   require('./mixins/MemoryExecutorMixin') LeanRC
   require('./mixins/BodyParseMixin') LeanRC
   require('./mixins/CheckSessionsMixin') LeanRC
-  require('./mixins/CheckPermissionsMixin') LeanRC
   require('./mixins/QueryableResourceMixin') LeanRC # needs test
   require('./mixins/GlobalingResourceMixin') LeanRC # needs test
   require('./mixins/GuestingResourceMixin') LeanRC # needs test
   require('./mixins/SharingResourceMixin') LeanRC # needs test
   require('./mixins/AdminingResourceMixin') LeanRC # needs test
   require('./mixins/PersoningResourceMixin') LeanRC # needs test
+  require('./mixins/ModelingResourceMixin') LeanRC # needs test
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC
