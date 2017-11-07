@@ -153,6 +153,7 @@ class LeanRC extends RC
   require('./mixins/QueryableResourceMixin') LeanRC # needs test
   require('./mixins/GlobalingResourceMixin') LeanRC # needs test
   require('./mixins/GuestingResourceMixin') LeanRC # needs test
+  require('./mixins/SharingResourceMixin') LeanRC # needs test
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC

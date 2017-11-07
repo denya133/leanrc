@@ -98,20 +98,6 @@ module.exports = (Module)->
           @listQuery.$filter = '@doc.ownerId': $eq: @currentUser.id
         yield return args
 
-    @public @async limitBySpace: Function,
-      default: (args...)->
-        @listQuery ?= {}
-        currentSpace = @context.pathParams.space
-        if @listQuery.$filter?
-          @listQuery.$filter = $and: [
-            @listQuery.$filter
-          ,
-            '@doc.spaces': $all: [currentSpace]
-          ]
-        else
-          @listQuery.$filter = '@doc.spaces': $all: [currentSpace]
-        yield return args
-
     @public @async checkOwner: Function,
       default: (args...) ->
         unless @session?.uid? and @currentUser?
