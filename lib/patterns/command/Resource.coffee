@@ -88,16 +88,14 @@ module.exports = (Module)->
       default: (args...)->
         if @currentUser? and not @currentUser.isAdmin
           @listQuery ?= {}
-          @listQuery.$filter ?= {}
-          @listQuery.$filter['@doc.ownerId'] = $eq: @currentUser.id
-        yield return args
-
-    @public @async limitBySpace: Function,
-      default: (args...)->
-        @listQuery ?= {}
-        @listQuery.$filter ?= {}
-        currentSpace = @context.pathParams.space ? '_default'
-        @listQuery.$filter['@doc.spaces'] = $all: [currentSpace]
+        if @listQuery.$filter?
+          @listQuery.$filter = $and: [
+            @listQuery.$filter
+          ,
+            '@doc.ownerId': $eq: @currentUser.id
+          ]
+        else
+          @listQuery.$filter = '@doc.ownerId': $eq: @currentUser.id
         yield return args
 
     @public @async checkOwner: Function,

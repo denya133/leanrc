@@ -10,32 +10,34 @@ module.exports = (Module)->
   } = Module::
 
   Module.defineMixin Resource, (BaseClass) ->
-    class GuestingResourceMixin extends BaseClass
+    class SharingResourceMixin extends BaseClass
       @inheritProtected()
 
-      @public @async limitByExternalSpace: Function,
+      @public @async limitBySpace: Function,
         default: (args...)->
           @listQuery ?= {}
+          currentSpace = @context.pathParams.space
           if @listQuery.$filter?
             @listQuery.$filter = $and: [
               @listQuery.$filter
             ,
-              '@doc.spaces': $all: ['_external']
+              '@doc.spaces': $all: [currentSpace]
             ]
           else
-            @listQuery.$filter = '@doc.spaces': $all: ['_external']
+            @listQuery.$filter = '@doc.spaces': $all: [currentSpace]
           yield return args
 
       @public @async checkExistence: Function,
         default: (args...)->
+          currentSpace = @context.pathParams.space
           unless @recordId?
             @context.throw HTTP_NOT_FOUND
           unless (yield @collection.exists
             '@doc.id': $eq: @recordId
-            '@doc.spaces': $all: ['_external']
+            '@doc.spaces': $all: [currentSpace]
           )
             @context.throw HTTP_NOT_FOUND
           yield return args
 
 
-    GuestingResourceMixin.initializeMixin()
+    SharingResourceMixin.initializeMixin()
