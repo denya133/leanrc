@@ -13,7 +13,7 @@ module.exports = (Module)->
     class GuestingResourceMixin extends BaseClass
       @inheritProtected()
 
-      @public @async filterGuestList: Function,
+      @public @async limitByExternalSpace: Function,
         default: (args...)->
           @listQuery ?= {}
           if @listQuery.$filter?
@@ -26,8 +26,10 @@ module.exports = (Module)->
             @listQuery.$filter = '@doc.spaces': $all: ['_external']
           yield return args
 
-      @public @async checkGuestDetail: Function,
+      @public @async checkExistence: Function,
         default: (args...)->
+          unless @recordId?
+            @context.throw HTTP_NOT_FOUND
           unless (yield @collection.exists
             '@doc.id': $eq: @recordId
             '@doc.spaces': $all: ['_external']
