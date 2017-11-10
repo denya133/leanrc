@@ -1076,8 +1076,8 @@ describe 'Context', ->
         context = Context.new req, res, switchInstance
         assert.equal context.type, ''
         context.type = 'markdown'
-        assert.equal context.type, 'text/x-markdown'
-        assert.equal res._headers['content-type'], 'text/x-markdown; charset=utf-8'
+        assert.equal context.type, 'text/markdown'
+        assert.equal res._headers['content-type'], 'text/markdown; charset=utf-8'
         context.type = 'file.json'
         assert.equal context.type, 'application/json'
         assert.equal res._headers['content-type'], 'application/json; charset=utf-8'
