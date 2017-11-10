@@ -198,7 +198,7 @@ describe 'CrudGatewayMixin', ->
           schema: TestRecord.schema
         { versionSchema } = gateway
         assert.deepEqual versionSchema, joi.string().required().description '
-          The version of api endpoint in format `vx.x`
+          The version of api endpoint in semver format `^x.x`
         '
         yield return
   describe '#onRegister', ->

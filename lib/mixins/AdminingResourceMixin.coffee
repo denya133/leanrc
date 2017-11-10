@@ -99,7 +99,7 @@ module.exports = (Module)->
 
       ipoCheckPermission = @private @async checkPermission: Function,
         default: (space, chainName)->
-          else if yield @[ipoCheckRole] space, @currentUser?.id, chainName
+          if yield @[ipoCheckRole] space, @currentUser?.id, chainName
             yield return yes
           else
             @context.throw FORBIDDEN, "Current user has no access"
