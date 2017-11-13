@@ -15,15 +15,7 @@ module.exports = (Module)->
       @public normalize: Function,
         default: (acRecord, ahPayload)->
           ahPayload = JSON.parse ahPayload if _.isString ahPayload
-          recordName = acRecord.name.replace /Record$/, ''
-          singular = inflect.singularize inflect.underscore recordName
-          plural = inflect.pluralize singular
-          if ahPayload[singular]?
-            return acRecord.normalize ahPayload[singular], @collection
-          else if ahPayload[plural]?
-            return Cursor.new @collection, ahPayload[plural]
-          else
-            return acRecord.normalize ahPayload, @collection
+          return acRecord.normalize ahPayload, @collection
 
       @public serialize: Function,
         default: (aoRecord, options = null)->
