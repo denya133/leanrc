@@ -36,6 +36,7 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
+            body = JSON.parse body if _.isString body
             voRecord = @normalize body[@recordSingleName()]
           else
             throw new Error "
@@ -76,6 +77,7 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
+            body = JSON.parse body if _.isString body
             voRecord = @normalize body[@recordSingleName()]
           else
             throw new Error "
@@ -100,11 +102,8 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
-            vhRecordsData = []
-            if (vlList = body[@recordMultipleName()])?
-              vhRecordsData.push vlList...
-            else if (vhItem = body[@recordSingleName()])?
-              vhRecordsData.push vhItem
+            body = JSON.parse body if _.isString body
+            vhRecordsData = body[@recordMultipleName()]
             voCursor = Module::Cursor.new @, vhRecordsData
           else
             throw new Error "
@@ -129,6 +128,7 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
+            body = JSON.parse body if _.isString body
             vhRecordsData = body[@recordMultipleName()]
             voCursor = Module::Cursor.new @, vhRecordsData
           else
@@ -154,6 +154,7 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
+            body = JSON.parse body if _.isString body
             vhRecordsData = body[@recordMultipleName()]
             voCursor = Module::Cursor.new @, vhRecordsData
           else
@@ -180,6 +181,7 @@ module.exports = (Module)->
 
           { body } = res
           if body? and body isnt ''
+            body = JSON.parse body if _.isString body
             voRecord = @normalize body[@recordSingleName()]
           else
             throw new Error "
