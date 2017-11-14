@@ -363,7 +363,6 @@ module.exports = (Module)->
         create: 'post'
         update: 'put'
         delete: 'delete'
-        query: 'post'
 
       voPaths =
         list: ''
@@ -371,7 +370,6 @@ module.exports = (Module)->
         create: ''
         update: null
         delete: null
-        query: 'query'
 
       @[iplRoutes] ?= []
 
@@ -383,7 +381,6 @@ module.exports = (Module)->
             @defineMethod @[iplRoutes], voMethods[asAction], vsPath,
               action: asAction
               resource: @[ipsResource] ? @[ipsName]
-              # tag: @[ipsTag]
               template: @[ipsTemplates] + '/' + asAction
         else if @[iplExcept]?
           for own asAction, asMethod of voMethods
@@ -394,7 +391,6 @@ module.exports = (Module)->
                 @defineMethod @[iplRoutes], asMethod, vsPath,
                   action: asAction
                   resource: @[ipsResource] ? @[ipsName]
-                  # tag: @[ipsTag]
                   template: @[ipsTemplates] + '/' + asAction
         else if @[iplVia]?
           @[iplVia].forEach (asCustomAction)=>
@@ -406,13 +402,11 @@ module.exports = (Module)->
                   @defineMethod @[iplRoutes], asMethod, vsPath,
                     action: asAction
                     resource: @[ipsResource] ? @[ipsName]
-                    # tag: @[ipsTag]
                     template: @[ipsTemplates] + '/' + asAction
             else
               @defineMethod @[iplRoutes], voMethods[asCustomAction], vsPath,
                 action: asCustomAction
                 resource: @[ipsResource] ? @[ipsName]
-                # tag: @[ipsTag]
                 template: @[ipsTemplates] + '/' + asAction
         else
           for own asAction, asMethod of voMethods
@@ -422,7 +416,6 @@ module.exports = (Module)->
               @defineMethod @[iplRoutes], asMethod, vsPath,
                 action: asAction
                 resource: @[ipsResource] ? @[ipsName]
-                # tag: @[ipsTag]
                 template: @[ipsTemplates] + '/' + asAction
 
 
