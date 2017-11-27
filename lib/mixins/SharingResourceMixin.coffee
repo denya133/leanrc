@@ -92,8 +92,6 @@ module.exports = (Module)->
             {rules} = role
             if not rules? and role.getRules?
               rules = yield role.getRules()
-          if rules?['system']?['administrator']
-            yield return yes
           else if rules?['moderator']?[resourceKey]
             yield return yes
           else if rules?[resourceKey]?[action]
