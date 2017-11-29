@@ -1,7 +1,4 @@
 # вычленяем из Record'а все что связано с релейшенами, т.к. Рекорды на основе key-value базы данных (Redis-like) не смогут поддерживать связи - т.к. на фундаментальном уровне кроме поиска по id в них нереализован поиск по НЕ-первичным ключам или сложным условиям
-_ = require 'lodash'
-joi = require 'joi'
-inflect = do require 'i'
 
 
 # миксин для подмешивания в классы унаследованные от Module::Record
@@ -9,7 +6,12 @@ inflect = do require 'i'
 
 
 module.exports = (Module)->
-  Module.defineMixin Module::CoreObject, (BaseClass) ->
+  {
+    CoreObject
+    Utils: { _, inflect, joi }
+  } = Module::
+
+  Module.defineMixin CoreObject, (BaseClass) ->
     class RelationsMixin extends BaseClass
       @inheritProtected()
       # @implements Module::RelationsMixinInterface

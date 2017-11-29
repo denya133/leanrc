@@ -1,9 +1,5 @@
 
 
-_             = require 'lodash'
-EventEmitter  = require 'events'
-
-
 ###
 ```coffee
 module.exports = (Module)->
@@ -48,8 +44,10 @@ module.exports = (Module)->
     DelayableMixin
     ConfigurableMixin
     ResqueInterface
-    Utils: {co, isArangoDB, genRandomAlphaNumbers}
+    Utils: { _, co, isArangoDB, genRandomAlphaNumbers }
   } = Module::
+
+  EventEmitter  = require 'events'
 
   Module.defineMixin Module::Mediator, (BaseClass) ->
     class MemoryExecutorMixin extends BaseClass

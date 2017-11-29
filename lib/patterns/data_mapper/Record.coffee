@@ -1,4 +1,3 @@
-joi = require 'joi'
 
 
 ###
@@ -53,6 +52,8 @@ module.exports = (Module)->
     RecordInterface
     ChainsMixin
     RecordMixin
+
+    Utils: { joi }
   } = Module::
 
   class Record extends CoreObject

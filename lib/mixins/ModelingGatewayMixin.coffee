@@ -1,14 +1,3 @@
-_             = require 'lodash'
-joi           = require 'joi'
-inflect       = do require 'i'
-statuses      = require 'statuses'
-
-
-HTTP_NOT_FOUND    = statuses 'not found'
-HTTP_CONFLICT     = statuses 'conflict'
-UNAUTHORIZED      = statuses 'unauthorized'
-FORBIDDEN         = statuses 'forbidden'
-UPGRADE_REQUIRED  = statuses 'upgrade required'
 
 
 ###
@@ -28,26 +17,39 @@ module.exports = (App)->
 ###
 
 module.exports = (Module)->
-  Module.defineMixin Module::Gateway, (BaseClass) ->
+  {
+    Gateway
+    Utils: { _, inflect, joi, statuses }
+  } = Module::
+
+  HTTP_NOT_FOUND    = statuses 'not found'
+  HTTP_CONFLICT     = statuses 'conflict'
+  UNAUTHORIZED      = statuses 'unauthorized'
+  FORBIDDEN         = statuses 'forbidden'
+  UPGRADE_REQUIRED  = statuses 'upgrade required'
+
+  Module.defineMixin Gateway, (BaseClass) ->
     class ModelingGatewayMixin extends BaseClass
       @inheritProtected()
       # @implements Module::ModelingGatewayMixinInterface
 
       @public keyName: String,
         get: ->
-          inflect.singularize inflect.underscore @getData().entityName
+          {keyName, entityName} = @getData()
+          inflect.singularize inflect.underscore keyName ? entityName
 
       @public itemEntityName: String,
         get: ->
-          inflect.singularize inflect.underscore @getData().entityName
+          {entityName} = @getData()
+          inflect.singularize inflect.underscore entityName
 
       @public listEntityName: String,
         get: ->
-          inflect.pluralize inflect.underscore @getData().entityName
+          {entityName} = @getData()
+          inflect.pluralize inflect.underscore entityName
 
       @public schema: Object,
         get: ->
-          # joi.object @getData().schema
           @getData().schema
 
       @public listSchema: Object,

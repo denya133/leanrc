@@ -1,5 +1,3 @@
-_             = require 'lodash'
-inflect       = do require 'i'
 
 
 ###
@@ -34,7 +32,11 @@ module.exports = (Module)->
 
 
 module.exports = (Module)->
-  { ANY, NILL, DEFAULT_QUEUE } = Module::
+  {
+    ANY, NILL, DEFAULT_QUEUE
+
+    Utils: { _, inflect }
+  } = Module::
 
   Module.defineMixin Module::Resque, (BaseClass) ->
     class MemoryResqueMixin extends BaseClass

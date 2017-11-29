@@ -1,4 +1,4 @@
-_ = require 'lodash'
+
 
 ###
 пример темплейта
@@ -20,6 +20,10 @@ module.exports = (resource, action, aoData)->
 # Возможно стоит обдумать такую идею: валидировать выходящей joi схемой (которая нужна для свайгера) выходящий результат после рендера (но это применимо только для json)
 
 module.exports = (Module)->
+  {
+    Utils: { co, filesTree }
+  } = Module::
+
   class Renderer extends Module::Proxy
     @inheritProtected()
     # @implements Module::RendererInterface
@@ -29,7 +33,6 @@ module.exports = (Module)->
     ipoTemplates = @private templates: Module::PromiseInterface
     @public templates: Module::PromiseInterface,
       get: ->
-        {co, filesTree} = Module::Utils
         @[ipoTemplates] ?= co =>
           files = yield filesTree @templatesDir, filesOnly: yes
           (files ? []).map (i)=>

@@ -1,8 +1,12 @@
-_ = require 'lodash'
 
 
 module.exports = (Module)->
-  class StringTransform extends Module::CoreObject
+  {
+    CoreObject
+    Utils: { _ }
+  } = Module::
+
+  class StringTransform extends CoreObject
     @inheritProtected()
     # @implements Module::TransformInterface
     @module Module

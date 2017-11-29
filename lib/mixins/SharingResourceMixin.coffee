@@ -1,9 +1,3 @@
-_             = require 'lodash'
-statuses      = require 'statuses'
-
-HTTP_NOT_FOUND    = statuses 'not found'
-UNAUTHORIZED      = statuses 'unauthorized'
-FORBIDDEN         = statuses 'forbidden'
 
 
 module.exports = (Module)->
@@ -13,7 +7,13 @@ module.exports = (Module)->
 
     Resource
     RecordInterface
+
+    Utils: { _, statuses }
   } = Module::
+
+  HTTP_NOT_FOUND    = statuses 'not found'
+  UNAUTHORIZED      = statuses 'unauthorized'
+  FORBIDDEN         = statuses 'forbidden'
 
   Module.defineMixin Resource, (BaseClass) ->
     class SharingResourceMixin extends BaseClass
@@ -92,8 +92,6 @@ module.exports = (Module)->
             {rules} = role
             if not rules? and role.getRules?
               rules = yield role.getRules()
-          if rules?['system']?['administrator']
-            yield return yes
           else if rules?['moderator']?[resourceKey]
             yield return yes
           else if rules?[resourceKey]?[action]

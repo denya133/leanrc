@@ -1,5 +1,4 @@
-statuses          = require 'statuses'
-UNAUTHORIZED      = statuses 'unauthorized'
+
 
 ###
 example of usage
@@ -42,7 +41,11 @@ module.exports = (Module)->
 
     Resource
     RecordInterface
+
+    Utils: { statuses }
   } = Module::
+
+  UNAUTHORIZED      = statuses 'unauthorized'
 
   Module.defineMixin Resource, (BaseClass) ->
     class CheckSessionsMixin extends BaseClass

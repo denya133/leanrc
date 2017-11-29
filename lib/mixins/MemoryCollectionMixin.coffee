@@ -1,14 +1,11 @@
-_             = require 'lodash'
-inflect       = do require 'i'
 
 
 module.exports = (Module)->
   {
     ANY, NILL
 
-    Utils
+    Utils: { _, inflect, uuid }
   } = Module::
-  {uuid} = Utils
 
   Module.defineMixin Module::Collection, (BaseClass) ->
     class MemoryCollectionMixin extends BaseClass
