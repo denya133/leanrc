@@ -1,5 +1,3 @@
-inflect = do require 'i'
-_ = require 'lodash'
 
 
 ###
@@ -32,6 +30,10 @@ module.exports = (App)->
 
 
 module.exports = (Module)->
+  {
+    Utils: { _, inflect }
+  } = Module::
+
   class Collection extends Module::Proxy
     @inheritProtected()
     # @implements Module::CollectionInterface

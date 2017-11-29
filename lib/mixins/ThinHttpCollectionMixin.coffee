@@ -1,11 +1,13 @@
-_             = require 'lodash'
-inflect       = do require 'i'
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    ANY, NILL
+    Collection
+    Utils: { _, inflect }
+  } = Module::
 
-  Module.defineMixin Module::Collection, (BaseClass) ->
+  Module.defineMixin Collection, (BaseClass) ->
     class ThinHttpCollectionMixin extends BaseClass
       @inheritProtected()
 

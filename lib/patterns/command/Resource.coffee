@@ -1,12 +1,5 @@
-_             = require 'lodash'
-inflect       = do require 'i'
-statuses      = require 'statuses'
 semver        = require 'semver'
 
-HTTP_NOT_FOUND    = statuses 'not found'
-UNAUTHORIZED      = statuses 'unauthorized'
-FORBIDDEN         = statuses 'forbidden'
-UPGRADE_REQUIRED  = statuses 'upgrade required'
 
 module.exports = (Module)->
   {
@@ -23,7 +16,14 @@ module.exports = (Module)->
     ConfigurableMixin
     ChainsMixin
     ContextInterface
+
+    Utils: { _, inflect, statuses }
   } = Module::
+
+  HTTP_NOT_FOUND    = statuses 'not found'
+  UNAUTHORIZED      = statuses 'unauthorized'
+  FORBIDDEN         = statuses 'forbidden'
+  UPGRADE_REQUIRED  = statuses 'upgrade required'
 
   class Resource extends SimpleCommand
     @inheritProtected()

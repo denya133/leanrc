@@ -1,5 +1,4 @@
 path = require 'path'
-_ = require 'lodash'
 
 ###
 http://edgeguides.rubyonrails.org/active_record_migrations.html
@@ -90,7 +89,12 @@ module.exports = (Module)->
 ###
 
 module.exports = (Module)->
-  class Migration extends Module::Record
+  {
+    Record
+    Utils: { _ }
+  } = Module::
+
+  class Migration extends Record
     @inheritProtected()
     # @implements Module::MigrationInterface
     @module Module

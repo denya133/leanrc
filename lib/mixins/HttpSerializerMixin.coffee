@@ -1,11 +1,10 @@
-_             = require 'lodash'
-inflect       = do require 'i'
 
 
 module.exports = (Module)->
   {
     Serializer
     Cursor
+    Utils: { _, inflect }
   } = Module::
 
   Module.defineMixin Serializer, (BaseClass) ->

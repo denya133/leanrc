@@ -1,13 +1,11 @@
 # миксин может подмешиваться в наследники класса Module
-_ = require 'lodash'
+
 
 module.exports = (Module)->
   {
     Module: ModuleClass
-    Utils
+    Utils: { _, filesListSync }
   } = Module::
-
-  { filesListSync } = Utils
 
   Module.defineMixin ModuleClass, (BaseClass) ->
     class SchemaModuleMixin extends BaseClass

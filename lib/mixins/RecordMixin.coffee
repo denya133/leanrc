@@ -1,10 +1,12 @@
-_ = require 'lodash'
-joi = require 'joi'
-inflect = do require 'i'
 
 
 module.exports = (Module)->
-  Module.defineMixin Module::CoreObject, (BaseClass) ->
+  {
+    CoreObject
+    Utils: { _, inflect, joi }
+  } = Module::
+
+  Module.defineMixin CoreObject, (BaseClass) ->
     class RecordMixin extends BaseClass
       @inheritProtected()
 

@@ -1,11 +1,8 @@
-_             = require 'lodash'
 EventEmitter  = require 'events'
-statuses      = require 'statuses'
 methods       = require 'methods'
 pathToRegexp  = require 'path-to-regexp'
 assert        = require 'assert'
 Stream        = require 'stream'
-inflect       = do require 'i'
 onFinished    = require 'on-finished'
 
 
@@ -43,9 +40,12 @@ module.exports = (Module)->
     ConfigurableMixin
     Renderer
     Utils: {
+      _
+      inflect
       co
       isGeneratorFunction
       genRandomAlphaNumbers
+      statuses
     }
   } = Module::
 

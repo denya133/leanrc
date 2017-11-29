@@ -1,12 +1,16 @@
 # должен имплементировать интерфейс CursorInterface
 # является оберткой над обычным массивом
 
-_  = require 'lodash'
 
 # TODO: от Игоря предложение, сделать свойство isClosed
 
 module.exports = (Module)->
-  class Cursor extends Module::CoreObject
+  {
+    CoreObject
+    Utils: { _ }
+  } = Module::
+
+  class Cursor extends CoreObject
     @inheritProtected()
     # @implements Module::CursorInterface
     @module Module

@@ -1,9 +1,6 @@
 # можно унаследовать от SimpleCommand
 # внутри он должен обратиться к фасаду чтобы тот вернул ему 'MigrationsCollection'
 
-_             = require 'lodash'
-inflect       = do require 'i'
-
 
 ###
 ```coffee
@@ -43,7 +40,10 @@ module.exports = (Module)->
 
 
 module.exports = (Module) ->
-  { ANY, NILL, STOPPED_ROLLBACK } = Module::
+  {
+    ANY, NILL, STOPPED_ROLLBACK
+    Utils: { _, inflect }
+  } = Module::
 
   class RollbackCommand extends Module::SimpleCommand
     @inheritProtected()

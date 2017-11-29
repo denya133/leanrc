@@ -1,4 +1,3 @@
-_ = require 'lodash'
 
 # миксин подмешивается к классам унаследованным от Module::Resource
 # если необходимо переопределить экшен list так чтобы он принимал квери (из браузера) и отдавал не все рекорды в коллекции, а только отфильтрованные
@@ -8,9 +7,9 @@ _ = require 'lodash'
 module.exports = (Module)->
   {
     Resource
-    Utils
+    Utils: { _, isArangoDB }
   } = Module::
-  isArangoDB = Utils.isArangoDB()
+
   Module.defineMixin Resource, (BaseClass) ->
     class QueryableResourceMixin extends BaseClass
       @inheritProtected()
@@ -24,7 +23,7 @@ module.exports = (Module)->
           result = yield @super asAction, aoContext
           if result
             if asAction is 'query'
-              body = if isArangoDB
+              body = if isArangoDB()
                 aoContext.req.body
               else
                 parse = require 'co-body'

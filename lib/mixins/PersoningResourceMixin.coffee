@@ -1,13 +1,12 @@
-_             = require 'lodash'
-statuses      = require 'statuses'
-
-HTTP_NOT_FOUND    = statuses 'not found'
 
 
 module.exports = (Module)->
   {
     Resource
+    Utils: { _, statuses }
   } = Module::
+
+  HTTP_NOT_FOUND    = statuses 'not found'
 
   Module.defineMixin Resource, (BaseClass) ->
     class PersoningResourceMixin extends BaseClass

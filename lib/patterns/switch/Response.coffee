@@ -1,11 +1,9 @@
-_                   = require 'lodash'
 contentDisposition  = require 'content-disposition'
 ensureErrorHandler  = require 'error-inject'
 getType             = require('mime-types').contentType
 onFinish            = require 'on-finished'
 escape              = require 'escape-html'
 typeis              = require('type-is').is
-statuses            = require 'statuses'
 destroy             = require 'destroy'
 assert              = require 'assert'
 extname             = require('path').extname
@@ -24,6 +22,8 @@ module.exports = (Module)->
     ResponseInterface
     SwitchInterface
     ContextInterface
+
+    Utils: { _, statuses }
   } = Module::
 
   class Response extends CoreObject

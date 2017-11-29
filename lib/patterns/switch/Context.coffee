@@ -1,8 +1,6 @@
-_             = require 'lodash'
 accepts       = require 'accepts'
 createError   = require 'http-errors'
 assert        = require 'assert'
-statuses      = require 'statuses'
 
 ###
 Идеи взяты из https://github.com/koajs/koa/blob/master/lib/context.js
@@ -23,6 +21,8 @@ module.exports = (Module)->
     Request
     Response
     Cookies
+
+    Utils: { _, statuses }
   } = Module::
 
   class Context extends CoreObject

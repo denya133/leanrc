@@ -1,4 +1,3 @@
-_ = require 'lodash'
 
 # миксин подмешивается к классам унаследованным от Module::Collection
 # если необходимо реализовать работу методов с использованием абстрактного платформонезависимого класса Module::Query
@@ -9,7 +8,7 @@ _ = require 'lodash'
 
 module.exports = (Module)->
   {
-    Utils: {co}
+    Utils: { co, _ }
   } = Module::
 
   Module.defineMixin Module::Collection, (BaseClass) ->

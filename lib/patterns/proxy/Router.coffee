@@ -21,17 +21,13 @@
 ###
 
 
-_             = require 'lodash'
-inflect       = do require 'i'
-
-
-
 module.exports = (Module)->
   {
     NILL
     ANY
 
     Class
+    Utils: { _, inflect }
   } = Module::
 
   class Router extends Module::Proxy
