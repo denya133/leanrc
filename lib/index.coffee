@@ -1,6 +1,7 @@
-# _         = require 'lodash'
-# fs        = require 'fs'
-RC = require 'RC'
+RC        = require 'RC'
+joi       = require 'joi'
+statuses  = require 'statuses'
+moment    = require 'moment'
 
 
 class LeanRC extends RC
@@ -8,7 +9,7 @@ class LeanRC extends RC
 
   @root __dirname
 
-  Utils: RC::Utils.extend {}, RC::Utils
+  Utils: RC::Utils.extend {}, RC::Utils, {joi, statuses, moment}
 
   @const HANDLER_RESULT:  Symbol 'HANDLER_RESULT'
   @const RECORD_CHANGED:  Symbol 'RECORD_CHANGED'

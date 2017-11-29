@@ -92,15 +92,14 @@ module.exports =
   #...
 ```
 ###
-_ = require 'lodash'
 
 module.exports = (Module)->
   {
     NILL
     PRODUCTION
     DEVELOPMENT
+    Utils: { _, extend, isArangoDB }
   } = Module::
-  {extend, isArangoDB} = Module::Utils
 
   class Configuration extends Module::Proxy
     @inheritProtected()

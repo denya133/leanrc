@@ -1,8 +1,3 @@
-_             = require 'lodash'
-statuses      = require 'statuses'
-
-HTTP_NOT_FOUND    = statuses 'not found'
-UNAUTHORIZED      = statuses 'unauthorized'
 
 
 module.exports = (Module)->
@@ -12,7 +7,11 @@ module.exports = (Module)->
 
     Resource
     RecordInterface
+    Utils: { _, statuses }
   } = Module::
+
+  HTTP_NOT_FOUND    = statuses 'not found'
+  UNAUTHORIZED      = statuses 'unauthorized'
 
   Module.defineMixin Resource, (BaseClass) ->
     class ModelingResourceMixin extends BaseClass

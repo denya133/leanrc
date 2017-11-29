@@ -1,8 +1,12 @@
-_ = require 'lodash'
 
 
 module.exports = (Module)->
-  class NumberTransform extends Module::CoreObject
+  {
+    CoreObject
+    Utils: { _ }
+  } = Module::
+
+  class NumberTransform extends CoreObject
     @inheritProtected()
     # @implements Module::TransformInterface
     @module Module

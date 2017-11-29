@@ -1,8 +1,12 @@
-_ = require 'lodash'
 
 
 module.exports = (Module)->
-  class DateTransform extends Module::CoreObject
+  {
+    CoreObject
+    Utils: { _ }
+  } = Module::
+
+  class DateTransform extends CoreObject
     @inheritProtected()
     # @implements Module::TransformInterface
     @module Module

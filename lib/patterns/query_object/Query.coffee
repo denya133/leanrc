@@ -1,4 +1,4 @@
-_ = require 'lodash'
+
 
 ###
 в Ember app это может выглядить так.
@@ -89,9 +89,13 @@ example for collect
 ###
 
 module.exports = (Module)->
-  {NILL, ANY} = Module::
+  {
+    NILL, ANY
+    CoreObject
+    Utils: { _, extend }
+  } = Module::
 
-  class Query extends Module::CoreObject
+  class Query extends CoreObject
     @inheritProtected()
     # @implements Module::QueryInterface
     @module Module
@@ -157,7 +161,7 @@ module.exports = (Module)->
     @public forIn: Function,
       default: (aoDefinitions)->
         @$forIn ?= {}
-        @$forIn = Module::Utils.extend {}, @$forIn, aoDefinitions
+        @$forIn = extend {}, @$forIn, aoDefinitions
         return @
     @public join: Function, # критерии связывания как в SQL JOIN ... ON
       default: (aoDefinitions)->
@@ -170,7 +174,7 @@ module.exports = (Module)->
     @public let: Function,
       default: (aoDefinitions)->
         @$let ?= {}
-        @$let = Module::Utils.extend {}, @$let, aoDefinitions
+        @$let = extend {}, @$let, aoDefinitions
         return @
     @public collect: Function,
       default: (aoDefinition)->
@@ -235,12 +239,12 @@ module.exports = (Module)->
         return @
 
     @public @static @async restoreObject: Function,
-      default: (Module, replica)->
+      default: (_Module, replica)->
         if replica?.class is @name and replica?.type is 'instance'
           instance = @new replica.query
           yield return instance
         else
-          return yield @super Module, replica
+          return yield @super _Module, replica
 
     @public @static @async replicateObject: Function,
       default: (instance)->

@@ -1,9 +1,11 @@
-_             = require 'lodash'
-inflect       = do require 'i'
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    ANY, NILL
+
+    Utils: { _, inflect }
+  } = Module::
 
   Module.defineMixin Module::Migration, (BaseClass) ->
     class MemoryMigrationMixin extends BaseClass

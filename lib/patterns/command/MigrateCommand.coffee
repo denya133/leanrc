@@ -1,9 +1,6 @@
 # можно унаследовать от SimpleCommand
 # внутри он должен обратиться к фасаду чтобы тот вернул ему 'MigrationsCollection'
 
-_             = require 'lodash'
-inflect       = do require 'i'
-
 
 ###
 ```coffee
@@ -43,7 +40,10 @@ module.exports = (Module)->
 
 
 module.exports = (Module) ->
-  {ANY, NILL, STOPPED_MIGRATE} = Module::
+  {
+    ANY, NILL, STOPPED_MIGRATE
+    Utils: { _, inflect }
+  } = Module::
 
   class MigrateCommand extends Module::SimpleCommand
     @inheritProtected()

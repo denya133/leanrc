@@ -1,11 +1,10 @@
-_             = require 'lodash'
-inflect       = do require 'i'
 
 
 module.exports = (Module)->
   {
     ANY, NILL
     APPLICATION_MEDIATOR
+    Utils: { _, inflect }
   } = Module::
 
   Module.defineMixin Module::Collection, (BaseClass) ->

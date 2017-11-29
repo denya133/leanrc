@@ -1,4 +1,3 @@
-_           = require 'lodash'
 net         = require 'net' # will be used only 'isIP' function
 contentType = require 'content-type'
 stringify   = require('url').format
@@ -19,6 +18,7 @@ module.exports = (Module)->
     RequestInterface
     SwitchInterface
     ContextInterface
+    Utils: { _ }
   } = Module::
 
   class Request extends CoreObject
