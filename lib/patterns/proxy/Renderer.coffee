@@ -21,6 +21,7 @@ module.exports = (resource, action, aoData)->
 
 module.exports = (Module)->
   {
+    APPLICATION_MEDIATOR
     ConfigurableMixin
   } = Module::
 
@@ -35,8 +36,11 @@ module.exports = (Module)->
       default: (ctx, aoData, resource, {path, resource:resourceName, action, template:templatePath}={})->
         console.log '>>>>>> 111', templatePath
         if path? and resourceName? and action?
-          {templates} = @Module
-          console.log '>>>>>> 222', templates?[templatePath]
+          service = @facade.retrieveMediator APPLICATION_MEDIATOR
+            ?.getViewComponent()
+          {templates} = service.Module
+          console.log '>>>>>> 222', service.Module.name, templates
+          console.log '>>>>>> 333', templates?[templatePath]
           return yield Module::Promise.resolve(
             templates?[templatePath]?.call(
               resource, resourceName, action, aoData
