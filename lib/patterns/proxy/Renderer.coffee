@@ -22,25 +22,22 @@ module.exports = (resource, action, aoData)->
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-    ConfigurableMixin
+    # ConfigurableMixin
   } = Module::
 
   class Renderer extends Module::Proxy
     @inheritProtected()
     # @implements Module::RendererInterface
-    @include ConfigurableMixin
+    # @include ConfigurableMixin
     @module Module
 
     # may be redefine at inheritance
     @public @async render: Function,
       default: (ctx, aoData, resource, {path, resource:resourceName, action, template:templatePath}={})->
-        console.log '>>>>>> 111', templatePath
         if path? and resourceName? and action?
           service = @facade.retrieveMediator APPLICATION_MEDIATOR
             ?.getViewComponent()
           {templates} = service.Module
-          console.log '>>>>>> 222', service.Module.name, templates
-          console.log '>>>>>> 333', templates?[templatePath]
           return yield Module::Promise.resolve(
             templates?[templatePath]?.call(
               resource, resourceName, action, aoData
