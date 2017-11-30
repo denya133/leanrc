@@ -21,46 +21,27 @@ module.exports = (resource, action, aoData)->
 
 module.exports = (Module)->
   {
-    Utils: { co, filesTree }
+    ConfigurableMixin
   } = Module::
 
   class Renderer extends Module::Proxy
     @inheritProtected()
     # @implements Module::RendererInterface
-    @include Module::ConfigurableMixin
+    @include ConfigurableMixin
     @module Module
-
-    ipoTemplates = @private templates: Module::PromiseInterface
-    @public templates: Module::PromiseInterface,
-      get: ->
-        @[ipoTemplates] ?= co =>
-          files = yield filesTree @templatesDir, filesOnly: yes
-          (files ? []).map (i)=>
-            templateName = i.replace /\.js|\.coffee/, ''
-            vsTemplatePath = "#{@templatesDir}/#{templateName}"
-            [templateName, require vsTemplatePath]
-          .reduce (acc, [key, value])->
-            acc[key] = value
-            acc
-          , {}
-        @[ipoTemplates]
-
-    @public templatesDir: String,
-      get: ->
-        "#{@configs.ROOT}/../lib/templates"
 
     # may be redefine at inheritance
     @public @async render: Function,
       default: (ctx, aoData, resource, {path, resource:resourceName, action, template:templatePath}={})->
         console.log '>>>>>> 111', templatePath
         if path? and resourceName? and action?
-          templates = yield @templates
-          console.log '>>>>>> 222', templates[templatePath]
-          renderedResult = if templates[templatePath]?
-            yield Module::Promise.resolve templates[templatePath].call resource, resourceName, action, aoData
-          else
-            null
-          yield return renderedResult ? aoData ? null
+          {templates} = @Module
+          console.log '>>>>>> 222', templates?[templatePath]
+          return yield Module::Promise.resolve(
+            templates?[templatePath]?.call(
+              resource, resourceName, action, aoData
+            ) ? aoData
+          )
         else
           yield return aoData
 
