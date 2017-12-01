@@ -84,7 +84,7 @@ module.exports = (Module)->
         default: (spaceId, userId, action)->
           RolesCollection = @facade.retrieveProxy ROLES
           role = yield (yield RolesCollection.findBy
-            '@doc.spaces': $all: [spaceId]
+            '@doc.spaceId': $eq: spaceId
             userId: userId
           ).first()
           resourceKey = "#{@Module.name}::#{@constructor.name}"
