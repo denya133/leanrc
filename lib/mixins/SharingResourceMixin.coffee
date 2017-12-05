@@ -111,13 +111,16 @@ module.exports = (Module)->
 
       @public @async checkPermission: Function,
         default: checkPermission = (args...)->
-          space = @context.pathParams['space']
+          spaceId = @context.pathParams['space']
           {chainName} = checkPermission.wrapper
           SpacesCollection = @facade.retrieveProxy SPACES
-          @space = yield SpacesCollection.find space
+          try
+            @space = yield SpacesCollection.find spaceId
+          unless @space?
+            @context.throw FORBIDDEN, "Current user has no access"
           if @currentUser.isAdmin
             yield return args
-          yield @[ipoCheckPermission] space, chainName
+          yield @[ipoCheckPermission] spaceId, chainName
           yield return args
 
 

@@ -107,7 +107,11 @@ module.exports = (Module)->
       @public @async checkPermission: Function,
         default: checkPermission = (args...)->
           SpacesCollection = @facade.retrieveProxy SPACES
-          @space = yield SpacesCollection.find @context.pathParams['space']
+          spaceId = @context.pathParams['space']
+          try
+            @space = yield SpacesCollection.find spaceId
+          unless @space?
+            @context.throw HTTP_NOT_FOUND, "Space with id: #{spaceId} not found"
           if @currentUser.isAdmin
             yield return args
           {chainName} = checkPermission.wrapper
