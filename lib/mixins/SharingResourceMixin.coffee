@@ -88,11 +88,12 @@ module.exports = (Module)->
             userId: userId
           ).first()
           resourceKey = "#{@Module.name}::#{@constructor.name}"
-          if role?
-            {rules} = role
-            if not rules? and role.getRules?
-              rules = yield role.getRules()
-          else if rules?['moderator']?[resourceKey]
+          unless role?
+            yield return no
+          {rules} = role
+          if not rules? and role.getRules?
+            rules = yield role.getRules()
+          if rules?['moderator']?[resourceKey]
             yield return yes
           else if rules?[resourceKey]?[action]
             yield return yes
