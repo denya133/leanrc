@@ -44,13 +44,12 @@ module.exports = (Module)->
     iplOnly       = @protected only: Array
     iplVia        = @protected via: Array
     iplExcept     = @protected except: Array
+    ipoAbove      = @protected above: Object
     ipsAt         = @protected at: String
     ipsResource   = @protected resource: String
     ipsTag        = @protected tag: String
     ipsTemplates  = @protected templates: String
     ipsParam      = @protected param: String
-
-    ipoOptions    = @protected options: Object
 
     iplRouters    = @protected routers: Array
     iplPathes     = @protected pathes: Array
@@ -168,7 +167,7 @@ module.exports = (Module)->
           path, module:vsModule
           only, via, except
           tag:asTag, templates:alTemplates, param:asParam
-          at, resource, options
+          at, resource, above
         } = aoOpts
         path = path?.replace /^[/]/, ''
         vsPath = if path? and path isnt ''
@@ -235,6 +234,8 @@ module.exports = (Module)->
             default: via
           @protected except: Array,
             default: except
+          @protected above: Object,
+            default: above
           @protected tag: String,
             default: "#{vsParentTag}#{vsTag}"
           @protected templates: String,
@@ -243,12 +244,10 @@ module.exports = (Module)->
             default: vsParam
           @protected resource: String,
             default: resource
-          @protected options: Object,
-            default: options
           @public name: String,
             get: -> @[ipsResource] ? @[ipsName]
-          @public adds: Object,
-            get: -> @[ipoOptions]
+          @public above: Object,
+            get: -> @[ipoAbove]
           @map lambda
         ResourceRouter.constructor = Class
         @[iplRouters].push ResourceRouter
@@ -263,7 +262,7 @@ module.exports = (Module)->
         {
           module:vsModule, prefix
           tag:asTag, templates:alTemplates
-          at, options
+          at, above
         } = aoOpts
         vsParentPath = @[ipsPath]
         vsPath = if prefix? and prefix isnt ''
@@ -318,12 +317,12 @@ module.exports = (Module)->
             default: "#{vsParentTemplates}#{vsTemplates}"
           @protected at: String,
             default: at
-          @protected options: Object,
-            default: options
+          @protected above: Object,
+            default: above
           @public name: String,
             get: -> @[ipsResource] ? @[ipsName]
-          @public adds: Object,
-            get: -> @[ipoOptions]
+          @public above: Object,
+            get: -> @[ipoAbove]
           @map lambda
         NamespaceRouter.constructor = Class
         @[iplRouters].push NamespaceRouter
