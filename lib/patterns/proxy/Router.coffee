@@ -53,6 +53,7 @@ module.exports = (Module)->
     ipoOptions    = @protected options: Object
 
     iplRouters    = @protected routers: Array
+    iplPathes     = @protected pathes: Array
     iplResources  = @protected resources: Array
     iplRoutes     = @protected routes: Array
 
@@ -116,44 +117,44 @@ module.exports = (Module)->
 
     @public get: Function,
       default: (asPath, aoOpts)->
-        @[iplRoutes] ?= []
-        @defineMethod @[iplRoutes], 'get', asPath, aoOpts
+        @[iplPathes] ?= []
+        @defineMethod @[iplPathes], 'get', asPath, aoOpts
         return
 
     @public post: Function,
       default: (asPath, aoOpts)->
-        @[iplRoutes] ?= []
-        @defineMethod @[iplRoutes], 'post', asPath, aoOpts
+        @[iplPathes] ?= []
+        @defineMethod @[iplPathes], 'post', asPath, aoOpts
         return
 
     @public put: Function,
       default: (asPath, aoOpts)->
-        @[iplRoutes] ?= []
-        @defineMethod @[iplRoutes], 'put', asPath, aoOpts
+        @[iplPathes] ?= []
+        @defineMethod @[iplPathes], 'put', asPath, aoOpts
         return
 
     @public delete: Function,
       default: (asPath, aoOpts)->
-        @[iplRoutes] ?= []
-        @defineMethod @[iplRoutes], 'delete', asPath, aoOpts
+        @[iplPathes] ?= []
+        @defineMethod @[iplPathes], 'delete', asPath, aoOpts
         return
 
     @public head: Function,
       default: (asPath, aoOpts)->
-        @[iplRoutes] ?= []
-        @defineMethod @[iplRoutes], 'head', asPath, aoOpts
+        @[iplPathes] ?= []
+        @defineMethod @[iplPathes], 'head', asPath, aoOpts
         return
 
     @public options: Function,
       default: (asPath, aoOpts)->
-        @[iplRoutes] ?= []
-        @defineMethod @[iplRoutes], 'options', asPath, aoOpts
+        @[iplPathes] ?= []
+        @defineMethod @[iplPathes], 'options', asPath, aoOpts
         return
 
     @public patch: Function,
       default: (asPath, aoOpts)->
-        @[iplRoutes] ?= []
-        @defineMethod @[iplRoutes], 'patch', asPath, aoOpts
+        @[iplPathes] ?= []
+        @defineMethod @[iplPathes], 'patch', asPath, aoOpts
         return
 
     @public resource: Function,
@@ -327,20 +328,28 @@ module.exports = (Module)->
       default: (lambda = ->)->
         @namespace null, module: '', prefix: '', templates: '', at: 'collection', lambda
 
-    @public routes: Array,
+    @public resources: Array,
       get: ->
-        vlRoutes = []
-        vlRoutes = vlRoutes.concat @[iplRoutes] ? []
         if @[iplResources]? and @[iplResources].length > 0
-          @[iplResources].forEach (resourceRouter)->
-            vlRoutes = vlRoutes.concat resourceRouter.routes ? []
+          return @[iplResources]
         else
           @[iplResources] ?= []
           @[iplRouters]?.forEach (ResourceRouter)=>
             resourceRouter = ResourceRouter.new()
             @[iplResources].push resourceRouter
+        return @[iplResources]
+
+    @public routes: Array,
+      get: ->
+        if @[iplRoutes]? and @[iplRoutes].length > 0
+          return @[iplRoutes]
+        else
+          vlRoutes = []
+          vlRoutes = vlRoutes.concat @[iplPathes] ? []
+          @resources.forEach (resourceRouter)->
             vlRoutes = vlRoutes.concat resourceRouter.routes ? []
-        return vlRoutes
+          @[iplRoutes] = vlRoutes
+        return @[iplRoutes]
 
     constructor: (args...)->
       super args...
@@ -367,14 +376,14 @@ module.exports = (Module)->
         update: null
         delete: null
 
-      @[iplRoutes] ?= []
+      @[iplPathes] ?= []
 
       if @[ipsName]? and @[ipsName] isnt ''
         if @[iplOnly]?
           @[iplOnly].forEach (asAction)=>
             vsPath = voPaths[asAction]
             vsPath ?= @[ipsParam]
-            @defineMethod @[iplRoutes], voMethods[asAction], vsPath,
+            @defineMethod @[iplPathes], voMethods[asAction], vsPath,
               action: asAction
               resource: @[ipsResource] ? @[ipsName]
               template: @[ipsTemplates] + '/' + asAction
@@ -384,7 +393,7 @@ module.exports = (Module)->
               if not @[iplExcept].includes('all') and not @[iplExcept].includes asAction
                 vsPath = voPaths[asAction]
                 vsPath ?= @[ipsParam]
-                @defineMethod @[iplRoutes], asMethod, vsPath,
+                @defineMethod @[iplPathes], asMethod, vsPath,
                   action: asAction
                   resource: @[ipsResource] ? @[ipsName]
                   template: @[ipsTemplates] + '/' + asAction
@@ -395,12 +404,12 @@ module.exports = (Module)->
             if asCustomAction is 'all'
               for own asAction, asMethod of voMethods
                 do (asAction, asMethod)=>
-                  @defineMethod @[iplRoutes], asMethod, vsPath,
+                  @defineMethod @[iplPathes], asMethod, vsPath,
                     action: asAction
                     resource: @[ipsResource] ? @[ipsName]
                     template: @[ipsTemplates] + '/' + asAction
             else
-              @defineMethod @[iplRoutes], voMethods[asCustomAction], vsPath,
+              @defineMethod @[iplPathes], voMethods[asCustomAction], vsPath,
                 action: asCustomAction
                 resource: @[ipsResource] ? @[ipsName]
                 template: @[ipsTemplates] + '/' + asAction
@@ -409,7 +418,7 @@ module.exports = (Module)->
             do (asAction, asMethod)=>
               vsPath = voPaths[asAction]
               vsPath ?= @[ipsParam]
-              @defineMethod @[iplRoutes], asMethod, vsPath,
+              @defineMethod @[iplPathes], asMethod, vsPath,
                 action: asAction
                 resource: @[ipsResource] ? @[ipsName]
                 template: @[ipsTemplates] + '/' + asAction
