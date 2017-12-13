@@ -50,15 +50,12 @@ module.exports = (Module)->
     ipsTemplates  = @protected templates: String
     ipsParam      = @protected param: String
 
+    ipoOptions    = @protected options: Object
+
     iplRouters    = @protected routers: Array
     iplPathes     = @protected pathes: Array
     iplResources  = @protected resources: Array
     iplRoutes     = @protected routes: Array
-
-    @public options: Object
-
-    @public name: String,
-      get: -> @[ipsResource] ? @[ipsName]
 
     @public @static map: Function,
       default: (lambda = ->)->
@@ -246,8 +243,12 @@ module.exports = (Module)->
             default: vsParam
           @protected resource: String,
             default: resource
-          @public options: Object,
+          @protected options: Object,
             default: options
+          @public name: String,
+            get: -> @[ipsResource] ? @[ipsName]
+          @public adds: Object,
+            get: -> @[ipoOptions]
           @map lambda
         ResourceRouter.constructor = Class
         @[iplRouters].push ResourceRouter
@@ -317,8 +318,12 @@ module.exports = (Module)->
             default: "#{vsParentTemplates}#{vsTemplates}"
           @protected at: String,
             default: at
-          @public options: Object,
+          @protected options: Object,
             default: options
+          @public name: String,
+            get: -> @[ipsResource] ? @[ipsName]
+          @public adds: Object,
+            get: -> @[ipoOptions]
           @map lambda
         NamespaceRouter.constructor = Class
         @[iplRouters].push NamespaceRouter
