@@ -56,6 +56,24 @@ module.exports = (Module)->
     iplResources  = @protected resources: Array
     iplRoutes     = @protected routes: Array
 
+    @public path: String,
+      get: -> @[ipsPath]
+
+    @public name: String,
+      get: -> @[ipsResource] ? @[ipsName]
+
+    @public above: Object,
+      get: -> @[ipoAbove]
+
+    @public tag: String,
+      get: -> @[ipsTag]
+
+    @public templates: String,
+      get: -> @[ipsTemplates]
+
+    @public param: String,
+      get: -> @[ipsParam]
+
     @public @static map: Function,
       default: (lambda = ->)->
         @public map: Function,
@@ -244,10 +262,6 @@ module.exports = (Module)->
             default: vsParam
           @protected resource: String,
             default: resource
-          @public name: String,
-            get: -> @[ipsResource] ? @[ipsName]
-          @public above: Object,
-            get: -> @[ipoAbove]
           @map lambda
         ResourceRouter.constructor = Class
         @[iplRouters].push ResourceRouter
@@ -319,10 +333,6 @@ module.exports = (Module)->
             default: at
           @protected above: Object,
             default: above
-          @public name: String,
-            get: -> @[ipsResource] ? @[ipsName]
-          @public above: Object,
-            get: -> @[ipoAbove]
           @map lambda
         NamespaceRouter.constructor = Class
         @[iplRouters].push NamespaceRouter
