@@ -330,13 +330,6 @@ module.exports = (Module)->
 
     @public resources: Array,
       get: ->
-        if @[iplResources]? and @[iplResources].length > 0
-          return @[iplResources]
-        else
-          @[iplResources] ?= []
-          @[iplRouters]?.forEach (ResourceRouter)=>
-            resourceRouter = ResourceRouter.new()
-            @[iplResources].push resourceRouter
         return @[iplResources]
 
     @public routes: Array,
@@ -346,9 +339,14 @@ module.exports = (Module)->
         else
           vlRoutes = []
           vlRoutes = vlRoutes.concat @[iplPathes] ? []
-          @resources.forEach (resourceRouter)->
+          vlResources = []
+          @[iplRouters]?.forEach (ResourceRouter)=>
+            resourceRouter = ResourceRouter.new()
+            vlResources.push resourceRouter
             vlRoutes = vlRoutes.concat resourceRouter.routes ? []
+            vlResources = vlResources.concat resourceRouter.resources ? []
           @[iplRoutes] = vlRoutes
+          @[iplResources] = vlResources
         return @[iplRoutes]
 
     constructor: (args...)->
