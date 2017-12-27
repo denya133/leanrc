@@ -17,8 +17,8 @@ module.exports = (Module)->
       # @implements Module::QueryableCollectionMixinInterface
 
       @public @async findBy: Function,
-        default: (query)->
-          return yield @takeBy query
+        default: (query, options = {})->
+          return yield @takeBy query, options
 
       @public @async deleteBy: Function,
         default: (query)->
