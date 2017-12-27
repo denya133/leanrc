@@ -200,6 +200,8 @@ module.exports = (Module)->
     @action @async delete: Function,
       default: ->
         yield @collection.delete @recordId
+        @context.status = 204
+        yield return
 
 
     # ------------ Chains definitions ---------

@@ -25,7 +25,7 @@ module.exports = (Module)->
         args: [Object]
         return: Module::CursorInterface
       @public @async @virtual takeBy: Function, # обращается к БД
-        args: [Object]
+        args: [Object, [Object, NILL]]
         return: Module::CursorInterface
 
       @public @async @virtual updateBy: Function,
