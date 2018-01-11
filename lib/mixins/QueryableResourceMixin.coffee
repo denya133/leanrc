@@ -47,7 +47,8 @@ module.exports = (Module)->
           if receivedQuery.$filter
             voQuery.filter receivedQuery.$filter
           if receivedQuery.$sort
-            voQuery.sort receivedQuery.$sort
+            receivedQuery.$sort.forEach (item)->
+              voQuery.sort item
           if receivedQuery.$limit
             voQuery.limit receivedQuery.$limit
           if receivedQuery.$offset

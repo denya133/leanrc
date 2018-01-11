@@ -34,7 +34,7 @@ module.exports = (Module)->
           if /.*[:][:].*/.test(asName)
             [vsModuleName, vsRecordName] = asName.split '::'
           else
-            [vsModuleName, vsRecordName] = [@moduleName(), inflect.camelize inflect.underscore asName]
+            [vsModuleName, vsRecordName] = [@moduleName(), inflect.camelize inflect.underscore inflect.singularize asName]
           unless /(Record$)|(Migration$)/.test vsRecordName
             vsRecordName += 'Record'
           [vsModuleName, vsRecordName]
