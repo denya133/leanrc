@@ -7,7 +7,7 @@
 module.exports = (Module)->
   {
     Resource
-    Utils: { _, isArangoDB }
+    Utils: { _, isArangoDB, joi }
   } = Module::
 
   Module.defineMixin Resource, (BaseClass) ->
@@ -45,13 +45,29 @@ module.exports = (Module)->
             .forIn '@doc': @collection.collectionFullName()
             .return '@doc'
           if receivedQuery.$filter
+            do =>
+              { error } = joi.validate receivedQuery.$filter, joi.object()
+              if error?
+                @context.throw 400, 'ValidationError: `$filter` must be an object', error.stack
             voQuery.filter receivedQuery.$filter
           if receivedQuery.$sort
+            do =>
+              { error } = joi.validate receivedQuery.$sort, joi.array().items joi.object()
+              if error?
+                @context.throw 400, 'ValidationError: `$sort` must be an array'
             receivedQuery.$sort.forEach (item)->
               voQuery.sort item
           if receivedQuery.$limit
+            do =>
+              { error } = joi.validate receivedQuery.$limit, joi.number()
+              if error?
+                @context.throw 400, 'ValidationError: `$limit` must be a number', error.stack
             voQuery.limit receivedQuery.$limit
           if receivedQuery.$offset
+            do =>
+              { error } = joi.validate receivedQuery.$offset, joi.number()
+              if error?
+                @context.throw 400, 'ValidationError: `$offset` must be a number', error.stack
             voQuery.offset receivedQuery.$offset
 
           limit = Number voQuery.$limit
