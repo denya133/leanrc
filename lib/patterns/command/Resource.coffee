@@ -16,6 +16,7 @@ module.exports = (Module)->
     ConfigurableMixin
     ChainsMixin
     ContextInterface
+    LogMessage: {  ERROR, DEBUG, LEVELS, SEND_TO_LOG }
 
     Utils: { _, inflect, statuses }
   } = Module::
@@ -303,13 +304,21 @@ module.exports = (Module)->
           .getViewComponent()
         try
           if service.context?
+            @sendNotification SEND_TO_LOG, '>>>>>>>>>>>>>> EXECUTION START', LEVELS[DEBUG]
             voResult =
               result: yield @doAction action, voBody.context
               resource: @
+            @sendNotification SEND_TO_LOG, '>>>>>>>>>>>>>> EXECUTION END', LEVELS[DEBUG]
           else
+            @sendNotification SEND_TO_LOG, '>>>>>>>>>> LIGHTWEIGHT CREATE', LEVELS[DEBUG]
+            t1 = Date.now()
             app = @Module::MainApplication.new Module::LIGHTWEIGHT
+            @sendNotification SEND_TO_LOG, ">>>>>>>>>> LIGHTWEIGHT START after #{Date.now() - t1}", LEVELS[DEBUG]
             voResult = yield app.execute resourceName, voBody, action
+            @sendNotification SEND_TO_LOG, '>>>>>>>>>> LIGHTWEIGHT END', LEVELS[DEBUG]
+            t2 = Date.now()
             app.finish()
+            @sendNotification SEND_TO_LOG, ">>>>>>>>>> LIGHTWEIGHT DESTROYED after #{Date.now() - t2}", LEVELS[DEBUG]
         catch err
           voResult =
             error: err
