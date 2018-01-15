@@ -39,7 +39,6 @@ module.exports = (Module)->
     SwitchInterface
     ConfigurableMixin
     Renderer
-    LogMessage: {  ERROR, DEBUG, LEVELS, SEND_TO_LOG }
     Utils: {
       _
       inflect
@@ -89,6 +88,8 @@ module.exports = (Module)->
           method = method.toUpperCase()
         else
           originMethodName = 'all'
+
+        { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
 
         @public "#{originMethodName}": Function,
           args: [String, LAMBDA]
@@ -193,6 +194,7 @@ module.exports = (Module)->
         @[ipoHttpServer] = http.createServer @callback()
         @[ipoHttpServer].listen port, ->
           # console.log "listening on port #{port}"
+          { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
           facade.sendNotification SEND_TO_LOG, "listening on port #{port}", LEVELS[DEBUG]
         return
 
@@ -209,6 +211,7 @@ module.exports = (Module)->
           middleware = co.wrap middleware
           middleware._name = oldName
         middlewareName = middleware._name ? middleware.name ? '-'
+        { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         @sendNotification SEND_TO_LOG, "use #{middlewareName}", LEVELS[DEBUG]
         @middlewares.push middleware
         return @
@@ -219,6 +222,7 @@ module.exports = (Module)->
       default: ->
         fn = @constructor.compose @middlewares
         handleRequest = co.wrap (req, res)=>
+          { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
           @sendNotification SEND_TO_LOG, '>>>>>> START REQUEST HANDLING', LEVELS[DEBUG]
           res.statusCode = 404
           voContext = Context.new req, res, @
@@ -244,6 +248,7 @@ module.exports = (Module)->
         return if 404 is err.status or err.expose
         return if @configs.silent
         msg = err.stack ? String err
+        { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         @sendNotification SEND_TO_LOG, msg.replace(/^/gm, '  '), LEVELS[ERROR]
         return
 

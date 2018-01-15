@@ -16,7 +16,6 @@ module.exports = (Module)->
     ConfigurableMixin
     ChainsMixin
     ContextInterface
-    LogMessage: {  ERROR, DEBUG, LEVELS, SEND_TO_LOG }
 
     Utils: { _, inflect, statuses }
   } = Module::
@@ -297,6 +296,7 @@ module.exports = (Module)->
       args: [Module::NotificationInterface]
       return: Module::NILL
       default: (aoNotification)->
+        { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         resourceName = aoNotification.getName()
         voBody = aoNotification.getBody()
         action = aoNotification.getType()
