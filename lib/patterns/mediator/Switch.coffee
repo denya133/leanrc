@@ -89,8 +89,6 @@ module.exports = (Module)->
         else
           originMethodName = 'all'
 
-        { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
-
         @public "#{originMethodName}": Function,
           args: [String, LAMBDA]
           return: NILL
@@ -98,6 +96,7 @@ module.exports = (Module)->
             unless routeFunc
               throw new Error 'handler is required'
             { facade } = @
+            { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
             self = @
             keys = []
             re = pathToRegexp path, keys
