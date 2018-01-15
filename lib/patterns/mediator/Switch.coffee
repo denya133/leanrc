@@ -39,6 +39,7 @@ module.exports = (Module)->
     SwitchInterface
     ConfigurableMixin
     Renderer
+    LogMessage: {  ERROR, DEBUG, LEVELS, SEND_TO_LOG }
     Utils: {
       _
       inflect
@@ -97,7 +98,6 @@ module.exports = (Module)->
               throw new Error 'handler is required'
             { facade } = @
             self = @
-            {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
             keys = []
             re = pathToRegexp path, keys
             facade.sendNotification SEND_TO_LOG, "#{method ? 'ALL'} #{path} -> #{re}", LEVELS[DEBUG]
@@ -189,7 +189,6 @@ module.exports = (Module)->
       default: ->
         port = process?.env?.PORT ? @configs.port
         { facade } = @
-        {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         http = require 'http'
         @[ipoHttpServer] = http.createServer @callback()
         @[ipoHttpServer].listen port, ->
@@ -210,8 +209,7 @@ module.exports = (Module)->
           middleware = co.wrap middleware
           middleware._name = oldName
         middlewareName = middleware._name ? middleware.name ? '-'
-        {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
-        @facade.sendNotification SEND_TO_LOG, "use #{middlewareName}", LEVELS[DEBUG]
+        @sendNotification SEND_TO_LOG, "use #{middlewareName}", LEVELS[DEBUG]
         @middlewares.push middleware
         return @
 
@@ -221,6 +219,7 @@ module.exports = (Module)->
       default: ->
         fn = @constructor.compose @middlewares
         handleRequest = co.wrap (req, res)=>
+          @sendNotification SEND_TO_LOG, '>>>>>> START REQUEST HANDLING', LEVELS[DEBUG]
           res.statusCode = 404
           voContext = Context.new req, res, @
           try
@@ -232,6 +231,7 @@ module.exports = (Module)->
           onFinished res, (err)->
             voContext.onerror err
             return
+          @sendNotification SEND_TO_LOG, '>>>>>> END REQUEST HANDLING', LEVELS[DEBUG]
           yield return
         handleRequest
 
@@ -244,8 +244,7 @@ module.exports = (Module)->
         return if 404 is err.status or err.expose
         return if @configs.silent
         msg = err.stack ? String err
-        {  ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
-        @facade.sendNotification SEND_TO_LOG, msg.replace(/^/gm, '  '), LEVELS[ERROR]
+        @sendNotification SEND_TO_LOG, msg.replace(/^/gm, '  '), LEVELS[ERROR]
         return
 
     @public respond: Function,
