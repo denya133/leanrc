@@ -50,7 +50,7 @@ module.exports = (Module)->
                 obj[methodName] = co.wrap (args...) ->
                   data =
                     moduleName: @moduleName()
-                    replica: yield @constructor.replicateObject self
+                    replica: yield self.constructor.replicateObject self
                     methodName: methodName
                     args: args
                     opts: opts
@@ -67,7 +67,7 @@ module.exports = (Module)->
                 obj[methodName] = co.wrap (args...) ->
                   data =
                     moduleName: @moduleName()
-                    replica: yield @constructor.replicateObject self
+                    replica: yield self.constructor.replicateObject self
                     methodName: methodName
                     args: args
                     opts: opts

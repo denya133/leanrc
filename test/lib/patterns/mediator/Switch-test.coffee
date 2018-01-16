@@ -54,7 +54,7 @@ describe 'Switch', ->
         yield return
   describe '#defineRoutes', ->
     it 'should define routes from route proxies', ->
-      expect ->
+      co ->
         facade = Facade.getInstance 'TEST_SWITCH_1'
         class Test extends LeanRC
           @inheritProtected()
@@ -86,7 +86,7 @@ describe 'Switch', ->
         switchMediator.defineRoutes()
         assert.equal spyCreateNativeRoute.callCount, 15, 'Some routes are missing'
         facade.remove()
-      .to.not.throw Error
+        yield return
   describe '#onRegister', ->
     it 'should run register procedure', ->
       expect ->

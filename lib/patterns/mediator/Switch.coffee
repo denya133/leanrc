@@ -124,8 +124,10 @@ module.exports = (Module)->
             return
         return
 
-    methods.forEach (method)=>
-      @createMethod method
+    Class = @
+    methods.forEach (method)->
+      # console.log 'SWITCH:', @
+      Class.createMethod method
 
     @public del: Function,
       default: (args...)->
@@ -223,7 +225,7 @@ module.exports = (Module)->
         self = @
         handleRequest = co.wrap (req, res)->
           { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
-          @sendNotification SEND_TO_LOG, '>>>>>> START REQUEST HANDLING', LEVELS[DEBUG]
+          self.sendNotification SEND_TO_LOG, '>>>>>> START REQUEST HANDLING', LEVELS[DEBUG]
           res.statusCode = 404
           voContext = Context.new req, res, self
           try
