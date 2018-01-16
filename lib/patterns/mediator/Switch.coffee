@@ -220,21 +220,22 @@ module.exports = (Module)->
       return: LAMBDA
       default: ->
         fn = @constructor.compose @middlewares
-        handleRequest = co.wrap (req, res)=>
+        self = @
+        handleRequest = co.wrap (req, res)->
           { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
           @sendNotification SEND_TO_LOG, '>>>>>> START REQUEST HANDLING', LEVELS[DEBUG]
           res.statusCode = 404
-          voContext = Context.new req, res, @
+          voContext = Context.new req, res, self
           try
             yield fn voContext
-            @respond voContext
+            self.respond voContext
           catch err
             voContext.onerror err
 
           onFinished res, (err)->
             voContext.onerror err
             return
-          @sendNotification SEND_TO_LOG, '>>>>>> END REQUEST HANDLING', LEVELS[DEBUG]
+          self.sendNotification SEND_TO_LOG, '>>>>>> END REQUEST HANDLING', LEVELS[DEBUG]
           yield return
         handleRequest
 
@@ -359,23 +360,24 @@ module.exports = (Module)->
         {method, path} = opts
         resourceName = inflect.camelize inflect.underscore "#{opts.resource.replace /[/]/g, '_'}Resource"
 
-        @[method]? path, co.wrap (context)=>
-          yield Module::Promise.new (resolve, reject)=>
+        self = @
+        @[method]? path, co.wrap (context)->
+          yield Module::Promise.new (resolve, reject)->
             try
               reverse = genRandomAlphaNumbers 32
-              @getViewComponent().once reverse, co.wrap ({error, result, resource})=>
+              self.getViewComponent().once reverse, co.wrap ({error, result, resource})->
                 if error?
                   console.log '>>>>>> ERROR AFTER RESOURCE', error
                   reject error
                   yield return
                 try
-                  yield @sendHttpResponse context, result, resource, opts
+                  yield self.sendHttpResponse context, result, resource, opts
                   resolve()
                   yield return
                 catch err
                   reject err
                   yield return
-              @sender resourceName, {context, reverse}, opts
+              self.sender resourceName, {context, reverse}, opts
             catch err
               reject err
             return

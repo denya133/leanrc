@@ -53,8 +53,9 @@ module.exports = (Module)->
                 @[attr] = set?.apply(@, [null]) ? null #null
                 return
             get: ->
-              Module::Utils.co =>
-                vcRecord = opts.transform.call(@)
+              self = @
+              Module::Utils.co ->
+                vcRecord = opts.transform.call(self)
                 vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
                 vsCollectionName = switch vsCollectionName
                   when 'UsersCollection'
@@ -73,10 +74,10 @@ module.exports = (Module)->
                     vsCollectionName
                 voCollection = @collection.facade.retrieveProxy vsCollectionName
                 unless through
-                  cursor = yield voCollection.takeBy "@doc.#{refKey}": get?.apply(@, [@[attr]]) ? @[attr]
+                  cursor = yield voCollection.takeBy "@doc.#{refKey}": get?.apply(self, [self[attr]]) ? self[attr]
                   cursor.first()
                 else
-                  if @[through[0]]?[0]?
+                  if self[through[0]]?[0]?
                     yield voCollection.take @[through[0]][0][through[1].by]
                   else
                     null
@@ -95,8 +96,9 @@ module.exports = (Module)->
               @Module::[vsRecordName]
           opts.validate = -> joi.array().items opts.transform.call(@).schema
           opts.get = ->
-            Module::Utils.co =>
-              vcRecord = opts.transform.call(@)
+            self = @
+            Module::Utils.co ->
+              vcRecord = opts.transform.call(self)
               vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
               vsCollectionName = switch vsCollectionName
                 when 'UsersCollection'
@@ -115,10 +117,10 @@ module.exports = (Module)->
                   vsCollectionName
               voCollection = @collection.facade.retrieveProxy vsCollectionName
               unless opts.through
-                yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
+                yield voCollection.takeBy "@doc.#{opts.inverse}": self[opts.refKey]
               else
-                if @[opts.through[0]]?
-                  throughItems = yield @[opts.through[0]]
+                if self[opts.through[0]]?
+                  throughItems = yield self[opts.through[0]]
                   yield voCollection.takeMany throughItems.map (i)->
                     i[opts.through[1].by]
                 else
@@ -139,8 +141,9 @@ module.exports = (Module)->
               @Module::[vsRecordName]
           opts.validate = -> opts.transform.call(@).schema
           opts.get = ->
-            Module::Utils.co =>
-              vcRecord = opts.transform.call(@)
+            self = @
+            Module::Utils.co ->
+              vcRecord = opts.transform.call(self)
               vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
               vsCollectionName = switch vsCollectionName
                 when 'UsersCollection'
@@ -157,8 +160,8 @@ module.exports = (Module)->
                   Module::UPLOADS
                 else
                   vsCollectionName
-              voCollection = @collection.facade.retrieveProxy vsCollectionName
-              cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
+              voCollection = self.collection.facade.retrieveProxy vsCollectionName
+              cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": self[opts.refKey]
               cursor.first()
           @computed @async typeDefinition, opts
           @metaObject.addMetaData 'relations', vsAttr, opts

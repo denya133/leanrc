@@ -45,15 +45,16 @@ module.exports = (Module)->
           obj = {}
           for own methodName of @classMethods
             if methodName isnt 'delay'
-              do (methodName)=>
-                obj[methodName] = co.wrap (args...)=>
+              self = @
+              do (methodName) ->
+                obj[methodName] = co.wrap (args...) ->
                   data =
                     moduleName: @moduleName()
-                    replica: yield @constructor.replicateObject @
+                    replica: yield @constructor.replicateObject self
                     methodName: methodName
                     args: args
                     opts: opts
-                  return yield @[cpmDelayJob] facade, data, opts
+                  return yield self[cpmDelayJob] facade, data, opts
           obj
 
       @public delay: Function,
@@ -61,15 +62,16 @@ module.exports = (Module)->
           obj = {}
           for own methodName of @constructor.instanceMethods
             if methodName isnt 'delay'
-              do (methodName)=>
-                obj[methodName] = co.wrap (args...)=>
+              self = @
+              do (methodName) ->
+                obj[methodName] = co.wrap (args...) ->
                   data =
                     moduleName: @moduleName()
-                    replica: yield @constructor.replicateObject @
+                    replica: yield @constructor.replicateObject self
                     methodName: methodName
                     args: args
                     opts: opts
-                  return yield @constructor[cpmDelayJob] facade, data, opts
+                  return yield self.constructor[cpmDelayJob] facade, data, opts
           obj
 
 

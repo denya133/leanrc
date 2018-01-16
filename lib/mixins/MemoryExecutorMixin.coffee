@@ -159,8 +159,9 @@ module.exports = (Module)->
         default: ->
           if @[ipbIsStopped]
             yield return
-          @[ipoTimer] = setTimeout co.wrap =>
-            clearTimeout @[ipoTimer]
+          self = @
+          @[ipoTimer] = setTimeout co.wrap ->
+            clearTimeout self[ipoTimer]
             yield @cyclePart()
           , 100
           yield return
