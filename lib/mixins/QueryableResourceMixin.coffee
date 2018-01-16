@@ -98,7 +98,7 @@ module.exports = (Module)->
 
       # ------------ Chains definitions ---------
       @chains ['query']
-      @initialHook 'requiredAuthorizationHeader', only: ['query']
+      # @initialHook 'requiredAuthorizationHeader', only: ['query']
       @initialHook 'parseBody', only: ['query']
 
 

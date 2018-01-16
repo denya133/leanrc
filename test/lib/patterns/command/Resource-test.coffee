@@ -82,6 +82,9 @@ describe 'Resource', ->
         assert.equal collectionName, 'TestEntitiesCollection'
         yield return
   describe '#collection', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should get collection', ->
       co ->
         TEST_FACADE = 'TEST_FACADE_001'
@@ -103,7 +106,6 @@ describe 'Resource', ->
         facade.registerProxy boundCollection
         { collection } = resource
         assert.equal collection, boundCollection
-        facade.remove()
         yield return
   describe '#action', ->
     it 'should create actions', ->
@@ -202,10 +204,12 @@ describe 'Resource', ->
         assert.propertyVal actions.delete, 'attrType', Function
         assert.propertyVal actions.delete, 'level', LeanRC::PUBLIC
         assert.propertyVal actions.delete, 'async', LeanRC::ASYNC
+        ### Moved to -> ModellingResourceMixin
         assert.propertyVal actions.query, 'attr', 'query'
         assert.propertyVal actions.query, 'attrType', Function
         assert.propertyVal actions.query, 'level', LeanRC::PUBLIC
         assert.propertyVal actions.query, 'async', LeanRC::ASYNC
+        ###
         yield return
   describe '#beforeActionHook', ->
     it 'should parse action params as arguments', ->
@@ -289,6 +293,9 @@ describe 'Resource', ->
         assert.deepEqual resource.recordBody, test: 'test9'
         yield return
   describe '#omitBody', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should clean body from unneeded properties', ->
       co ->
         TEST_FACADE = 'TEST_FACADE_002'
@@ -326,7 +333,6 @@ describe 'Resource', ->
         resource.getRecordBody()
         resource.omitBody()
         assert.deepEqual resource.recordBody, test: 'test9', type: 'Test::TestEntity'
-        facade.remove()
         yield return
   describe '#beforeUpdate', ->
     it 'should get body with ID', ->
@@ -351,6 +357,9 @@ describe 'Resource', ->
         assert.deepEqual resource.recordBody, id: 'ID123456', test: 'test9'
         yield return
   describe '#list', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should list of resource items', ->
       co ->
         KEY = 'TEST_RESOURCE_001'
@@ -413,9 +422,11 @@ describe 'Resource', ->
           offset: 'not defined'
         assert.propertyVal items[0], 'test', 'test1'
         assert.propertyVal items[1], 'test', 'test2'
-        facade.remove()
         yield return
   describe '#detail', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should get resource single item', ->
       co ->
         KEY = 'TEST_RESOURCE_002'
@@ -483,9 +494,11 @@ describe 'Resource', ->
         result = yield resource.detail context
         assert.propertyVal result, 'id', record.id
         assert.propertyVal result, 'test', 'test2'
-        facade.remove()
         yield return
   describe '#create', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should create resource single item', ->
       co ->
         KEY = 'TEST_RESOURCE_003'
@@ -545,9 +558,11 @@ describe 'Resource', ->
         resource.initializeNotifier KEY
         result = yield resource.create request: body: test_entity: test: 'test3'
         assert.propertyVal result, 'test', 'test3'
-        facade.remove()
         yield return
   describe '#update', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should update resource single item', ->
       co ->
         KEY = 'TEST_RESOURCE_004'
@@ -621,9 +636,11 @@ describe 'Resource', ->
           pathParams: test_entity: record.id
           request: body: test_entity: test: 'test8'
         assert.propertyVal result, 'test', 'test8'
-        facade.remove()
         yield return
   describe '#delete', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should remove resource single item', ->
       co ->
         KEY = 'TEST_RESOURCE_005'
@@ -695,10 +712,12 @@ describe 'Resource', ->
         record = yield collection.create test: 'test3'
         result = yield resource.delete
           pathParams: test_entity: record.id
-        assert.propertyVal result, 'isHidden', yes
-        facade.remove()
+        assert.isUndefined result
         yield return
   describe '#execute', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should call execution', ->
       co ->
         KEY = 'TEST_RESOURCE_008'
@@ -794,7 +813,7 @@ describe 'Resource', ->
           reverse: 'TEST_REVERSE'
         notification = LeanRC::Notification.new 'TEST_NAME', testBody, 'list'
         yield resource.execute notification
-        [ name, body, type ] = spySendNotitfication.args[0]
+        [ name, body, type ] = spySendNotitfication.lastCall.args
         assert.equal name, LeanRC::HANDLER_RESULT
         {result, resource:voResource} = body
         { meta, items } = result
@@ -804,9 +823,11 @@ describe 'Resource', ->
         assert.deepEqual voResource, resource
         assert.lengthOf items, 3
         assert.equal type, 'TEST_REVERSE'
-        facade.remove()
         yield return
   describe '#checkApiVersion', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should check API version', ->
       co ->
         KEY = 'TEST_RESOURCE_001'
@@ -872,7 +893,6 @@ describe 'Resource', ->
           yield resource.checkApiVersion()
         catch e
           assert.isDefined e
-        facade.remove()
         yield return
   describe '#setOwnerId', ->
     it 'should get owner ID for body', ->
@@ -932,6 +952,12 @@ describe 'Resource', ->
           test: 'test9'
           id: 'ID123456'
         yield return
+  ###
+  # Moved to:
+  #   -> AdminingResourceMixin
+  #   -> ModellingResourceMixin
+  #   -> PersoningResourceMixin
+  #   -> SharingResourceMixin
   describe '#setSpaces', ->
     it 'should set space ID for body', ->
       co ->
@@ -990,6 +1016,7 @@ describe 'Resource', ->
           test: 'test9'
           id: 'ID123456'
         yield return
+  ###
   describe '#filterOwnerByCurrentUser', ->
     it 'should update query if caller user is not admin', ->
       co ->
@@ -1015,6 +1042,9 @@ describe 'Resource', ->
         assert.deepEqual resource.listQuery, $filter: '@doc.ownerId': '$eq': 'ID123'
         yield return
   describe '#checkOwner', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should check if user is resource owner', ->
       co ->
         KEY = 'TEST_RESOURCE_002'
@@ -1112,9 +1142,11 @@ describe 'Resource', ->
         assert.instanceOf e, httpErrors.Forbidden
         resource.context.pathParams.test_entity = 'ID123457'
         yield resource.checkOwner()
-        facade.remove()
         yield return
   describe '#checkExistence', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should check if entity exists', ->
       co ->
         KEY = 'TEST_RESOURCE_102'
@@ -1202,9 +1234,12 @@ describe 'Resource', ->
         resource.context.pathParams.test_entity = 'ID123457'
         resource.getRecordId()
         yield resource.checkExistence()
-        facade.remove()
         yield return
+  ### removed???
   describe '#requiredAuthorizationHeader', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should if authorization header exists and valid', ->
       co ->
         KEY = 'TEST_RESOURCE_103'
@@ -1273,66 +1308,12 @@ describe 'Resource', ->
           yield resource.requiredAuthorizationHeader()
         catch err4
         assert.isUndefined err4
-        facade.remove()
         yield return
-  describe '#checkNonLimitationHeader', ->
-    it 'should if nonlimitation header exists and valid', ->
-      co ->
-        KEY = 'TEST_RESOURCE_103'
-        facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC
-          @inheritProtected()
-          @root "#{__dirname}/config/root"
-        Test.initialize()
-        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
-        facade.registerProxy configs
-        class TestResource extends LeanRC::Resource
-          @inheritProtected()
-          @module Test
-        TestResource.initialize()
-        class TestRouter extends LeanRC::Router
-          @inheritProtected()
-          @module Test
-        TestRouter.initialize()
-        class MyResponse extends EventEmitter
-          _headers: {}
-          getHeaders: -> LeanRC::Utils.copy @_headers
-          getHeader: (field) -> @_headers[field.toLowerCase()]
-          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
-          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
-          end: (data, encoding = 'utf-8', callback = ->) ->
-            @finished = yes
-            @emit 'finish', data?.toString? encoding
-            callback()
-          constructor: (args...) ->
-            super args...
-            { @finished, @_headers } = finished: no, _headers: {}
-        req =
-          method: 'GET'
-          url: 'http://localhost:8888/space/SPACE123/test_entity/ID123456'
-          headers: 'x-forwarded-for': '192.168.0.1'
-        res = new MyResponse
-        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
-        class TestSwitch extends LeanRC::Switch
-          @inheritProtected()
-          @module Test
-          @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
-        TestSwitch.initialize()
-        resource = TestResource.new()
-        resource.initializeNotifier KEY
-        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
-        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        resource = Test::TestResource.new()
-        resource.initializeNotifier KEY
-        resource.context = Test::Context.new req, res, switchMediator
-        assert.isTrue yield resource.checkNonLimitationHeader()
-        resource.context.request.headers.nonlimitation = 'Auth'
-        assert.isTrue yield resource.checkNonLimitationHeader()
-        resource.context.request.headers.nonlimitation = configs.apiKey
-        assert.isFalse yield resource.checkNonLimitationHeader()
-        facade.remove()
-        yield return
+  ###
   describe '#adminOnly', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should check if user is administrator', ->
       co ->
         KEY = 'TEST_RESOURCE_003'
@@ -1424,9 +1405,11 @@ describe 'Resource', ->
         assert.instanceOf e, httpErrors.Forbidden
         resource.currentUser.isAdmin = yes
         yield resource.adminOnly()
-        facade.remove()
         yield return
   describe '#doAction', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should run specified action', ->
       co ->
         KEY = 'TEST_RESOURCE_104'
@@ -1495,11 +1478,11 @@ describe 'Resource', ->
         context = Test::Context.new req, res, switchMediator
         yield resource.doAction 'test', context
         assert.isTrue testAction.calledWith context
-        facade.remove()
         yield return
   describe '#saveDelayeds', ->
     facade = null
-    afterEach -> facade?.remove?()
+    afterEach ->
+      facade?.remove?()
     it 'should save delayed jobs from cache into queue', ->
       co ->
         MULTITON_KEY = 'TEST_RESOURCE_105|>123456765432'
@@ -1564,6 +1547,9 @@ describe 'Resource', ->
           ++index
         yield return
   describe '#writeTransaction', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should test if transaction is needed', ->
       co ->
         KEY = 'TEST_RESOURCE_106'
@@ -1619,5 +1605,4 @@ describe 'Resource', ->
         assert.isFalse yield resource.writeTransaction 'test', context
         context.request.method = 'POST'
         assert.isTrue yield resource.writeTransaction 'test', context
-        facade.remove()
         yield return
