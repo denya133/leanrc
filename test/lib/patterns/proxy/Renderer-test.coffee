@@ -11,6 +11,7 @@ describe 'Renderer', ->
       expect ->
         renderer = LeanRC::Renderer.new 'TEST_RENDERER'
       .to.not.throw Error
+  ### Moved to TemplatableModuleMixin
   describe '#templatesDir', ->
     it 'should get templates directory', ->
       expect ->
@@ -104,6 +105,7 @@ describe 'Renderer', ->
         ]
         facade.remove()
         yield return
+  ###
   describe '#render', ->
     it 'should render the data', ->
       co ->
