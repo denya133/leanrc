@@ -31,12 +31,6 @@
   },
   {
     "method": "post",
-    "path": "/users/query",
-    "resource": "users/",
-    "action": "query"
-  },
-  {
-    "method": "post",
     "path": "/users/verify",
     "resource": "users/",
     "action": "verify"
@@ -90,12 +84,6 @@
     "action": "update"
   },
   {
-    "method": "post",
-    "path": "/invitations/query",
-    "resource": "invitations/",
-    "action": "query"
-  },
-  {
     "method": "get",
     "path": "/spaces/",
     "resource": "areas/",
@@ -124,12 +112,6 @@
     "path": "/spaces/:area",
     "resource": "areas/",
     "action": "delete"
-  },
-  {
-    "method": "post",
-    "path": "/spaces/query",
-    "resource": "areas/",
-    "action": "query"
   },
   {
     "method": "post",
@@ -168,12 +150,6 @@
     "action": "delete"
   },
   {
-    "method": "post",
-    "path": "/:v/:space/uploads/query",
-    "resource": "uploads/",
-    "action": "query"
-  },
-  {
     "method": "get",
     "path": "/:v/:space/cucumbers/",
     "resource": "cucumbers/",
@@ -210,12 +186,6 @@
     "action": "update"
   },
   {
-    "method": "post",
-    "path": "/:v/:space/admin/tomatos/query",
-    "resource": "admin/tomatos/",
-    "action": "query"
-  },
-  {
     "method": "get",
     "path": "/:v/:space/test/tomatos/",
     "resource": "tomatos/",
@@ -238,12 +208,6 @@
     "path": "/:v/:space/test/tomatos/:tomato",
     "resource": "tomatos/",
     "action": "update"
-  },
-  {
-    "method": "post",
-    "path": "/:v/:space/test/tomatos/query",
-    "resource": "tomatos/",
-    "action": "query"
   },
   {
     "method": "get",
@@ -270,12 +234,6 @@
     "action": "update"
   },
   {
-    "method": "post",
-    "path": "/:v/:space/tomatos/query",
-    "resource": "tomatos/",
-    "action": "query"
-  },
-  {
     "method": "get",
     "path": "/:v/:space/tomatos/",
     "resource": "cucumber/tomatos/",
@@ -298,12 +256,6 @@
     "path": "/:v/:space/tomatos/:cucumber_tomato",
     "resource": "cucumber/tomatos/",
     "action": "update"
-  },
-  {
-    "method": "post",
-    "path": "/:v/:space/tomatos/query",
-    "resource": "cucumber/tomatos/",
-    "action": "query"
   },
   {
     "method": "get",
@@ -330,12 +282,6 @@
     "action": "update"
   },
   {
-    "method": "post",
-    "path": "/:v/:space/onion/tomatos/query",
-    "resource": "cucumber/tomatos/",
-    "action": "query"
-  },
-  {
     "method": "get",
     "path": "/:v/:space/onion/tomatos/",
     "resource": "carrot/tomatos/",
@@ -358,11 +304,5 @@
     "path": "/:v/:space/onion/tomatos/:carrot_tomato",
     "resource": "carrot/tomatos/",
     "action": "update"
-  },
-  {
-    "method": "post",
-    "path": "/:v/:space/onion/tomatos/query",
-    "resource": "carrot/tomatos/",
-    "action": "query"
   }
 ]
