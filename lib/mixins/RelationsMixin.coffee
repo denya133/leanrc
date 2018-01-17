@@ -74,7 +74,7 @@ module.exports = (Module)->
                 voCollection = @collection.facade.retrieveProxy vsCollectionName
                 unless through
                   cursor = yield voCollection.takeBy "@doc.#{refKey}": get?.apply(@, [@[attr]]) ? @[attr]
-                  cursor.first()
+                  return yield cursor.first()
                 else
                   if @[through[0]]?[0]?
                     yield voCollection.take @[through[0]][0][through[1].by]
@@ -159,7 +159,7 @@ module.exports = (Module)->
                   vsCollectionName
               voCollection = @collection.facade.retrieveProxy vsCollectionName
               cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
-              cursor.first()
+              return yield cursor.first()
           @computed @async typeDefinition, opts
           @metaObject.addMetaData 'relations', vsAttr, opts
           return
