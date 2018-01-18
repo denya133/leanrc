@@ -1,3 +1,4 @@
+###
 { IncomingMessage, ServerResponse } = require 'http'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
@@ -465,3 +466,4 @@ describe 'CheckPermissionsMixin', ->
         catch error3
         assert.isUndefined error3
         yield return
+###

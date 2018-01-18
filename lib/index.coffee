@@ -1,15 +1,17 @@
 RC        = require 'RC'
-joi       = require 'joi'
-statuses  = require 'statuses'
-moment    = require 'moment'
-
 
 class LeanRC extends RC
   @inheritProtected()
 
   @root __dirname
 
-  Utils: RC::Utils.extend {}, RC::Utils, {joi, statuses, moment}
+  Utils: RC::Utils.extend {}, RC::Utils#, {joi, statuses, moment}
+  Reflect.defineProperty LeanRC::Utils, 'joi',
+    get: -> require 'joi'
+  Reflect.defineProperty LeanRC::Utils, 'statuses',
+    get: -> require 'statuses'
+  Reflect.defineProperty LeanRC::Utils, 'moment',
+    get: -> require 'moment'
 
   @const HANDLER_RESULT:  Symbol 'HANDLER_RESULT'
   @const RECORD_CHANGED:  Symbol 'RECORD_CHANGED'
