@@ -138,7 +138,8 @@ module.exports = (Module)->
           return
 
       @public @static comp: Function,
-        default: (typeDefinition, ..., opts)->
+        default: (args...)->
+          [typeDefinition, ..., opts] = args
           if typeDefinition is opts
             typeDefinition = "#{opts.attr}": opts.attrType
           [vsAttr] = Object.keys typeDefinition

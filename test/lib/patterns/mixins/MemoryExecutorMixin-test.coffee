@@ -59,8 +59,7 @@ describe 'MemoryExecutorMixin', ->
         executor = MemoryResqueExecutor.new executorName, viewComponent
         executor.stop()
         stoppedSymbol = MemoryResqueExecutor
-          .metaObject
-          .getGroup 'instanceVariables'
+          .instanceVariables
           ._isStopped
           .pointer
         assert.isTrue executor[stoppedSymbol]
@@ -82,8 +81,7 @@ describe 'MemoryExecutorMixin', ->
         executor = MemoryResqueExecutor.new executorName, viewComponent
         executor.onRemove()
         stoppedSymbol = MemoryResqueExecutor
-          .metaObject
-          .getGroup 'instanceVariables'
+          .instanceVariables
           ._isStopped
           .pointer
         assert.isTrue executor[stoppedSymbol]
@@ -103,9 +101,7 @@ describe 'MemoryExecutorMixin', ->
           @module Test
         MemoryResqueExecutor.initialize()
         executor = MemoryResqueExecutor.new executorName, viewComponent
-        executorSymbols = MemoryResqueExecutor
-          .metaObject
-          .getGroup 'instanceVariables'
+        executorSymbols = MemoryResqueExecutor.instanceVariables
         definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
         concurrencyCountSymbol = executorSymbols._concurrencyCount.pointer
         executor[definedProcessorsSymbol] = {}
@@ -146,9 +142,7 @@ describe 'MemoryExecutorMixin', ->
           @module Test
         MemoryResqueExecutor.initialize()
         executor = MemoryResqueExecutor.new executorName, viewComponent
-        executorSymbols = MemoryResqueExecutor
-          .metaObject
-          .getGroup 'instanceVariables'
+        executorSymbols = MemoryResqueExecutor.instanceVariables
         definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
         concurrencyCountSymbol = executorSymbols._concurrencyCount.pointer
         executor[definedProcessorsSymbol] = {}
@@ -205,9 +199,7 @@ describe 'MemoryExecutorMixin', ->
         executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         viewComponent = { id: 'view-component' }
         executor = MemoryResqueExecutor.new executorName, viewComponent
-        executorSymbols = MemoryResqueExecutor
-          .metaObject
-          .getGroup 'instanceVariables'
+        executorSymbols = MemoryResqueExecutor.instanceVariables
         definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
         concurrencyCountSymbol = executorSymbols._concurrencyCount.pointer
         resqueSymbol = executorSymbols._resque.pointer
@@ -249,9 +241,7 @@ describe 'MemoryExecutorMixin', ->
         executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         viewComponent = { id: 'view-component' }
         executor = MemoryResqueExecutor.new executorName, viewComponent
-        executorSymbols = MemoryResqueExecutor
-          .metaObject
-          .getGroup 'instanceVariables'
+        executorSymbols = MemoryResqueExecutor.instanceVariables
         definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
         concurrencyCountSymbol = executorSymbols._concurrencyCount.pointer
         resqueSymbol = executorSymbols._resque.pointer
@@ -303,9 +293,7 @@ describe 'MemoryExecutorMixin', ->
         executorName = 'TEST_MEMORY_RESQUE_EXECUTOR'
         viewComponent = { id: 'view-component' }
         executor = MemoryResqueExecutor.new executorName, viewComponent
-        executorSymbols = MemoryResqueExecutor
-          .metaObject
-          .getGroup 'instanceVariables'
+        executorSymbols = MemoryResqueExecutor.instanceVariables
         definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
         promise = LeanRC::Promise.new (resolve) ->
           trigger.once 'PROCESSORS_DEFINED', resolve
@@ -404,9 +392,7 @@ describe 'MemoryExecutorMixin', ->
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
         executor = MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
-        executorSymbols = MemoryResqueExecutor
-          .metaObject
-          .getGroup 'instanceVariables'
+        executorSymbols = MemoryResqueExecutor.instanceVariables
         definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
         promise = LeanRC::Promise.new (resolve) ->
           trigger.once 'PROCESSORS_DEFINED', resolve

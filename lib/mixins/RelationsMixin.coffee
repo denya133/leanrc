@@ -8,7 +8,7 @@
 module.exports = (Module)->
   {
     CoreObject
-    Utils: { _, inflect, joi }
+    Utils: { _, inflect, joi, co }
   } = Module::
 
   Module.defineMixin CoreObject, (BaseClass) ->
@@ -54,7 +54,7 @@ module.exports = (Module)->
                 return
             get: ->
               self = @
-              Module::Utils.co ->
+              co ->
                 vcRecord = opts.transform.call(self)
                 vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
                 vsCollectionName = switch vsCollectionName
@@ -97,7 +97,7 @@ module.exports = (Module)->
           opts.validate = -> joi.array().items opts.transform.call(@).schema
           opts.get = ->
             self = @
-            Module::Utils.co ->
+            co ->
               vcRecord = opts.transform.call(self)
               vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
               vsCollectionName = switch vsCollectionName
@@ -142,7 +142,7 @@ module.exports = (Module)->
           opts.validate = -> opts.transform.call(@).schema
           opts.get = ->
             self = @
-            Module::Utils.co ->
+            co ->
               vcRecord = opts.transform.call(self)
               vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
               vsCollectionName = switch vsCollectionName
