@@ -72,13 +72,13 @@ module.exports = (Module)->
                     Module::UPLOADS
                   else
                     vsCollectionName
-                voCollection = @collection.facade.retrieveProxy vsCollectionName
+                voCollection = self.collection.facade.retrieveProxy vsCollectionName
                 unless through
                   cursor = yield voCollection.takeBy "@doc.#{refKey}": get?.apply(self, [self[attr]]) ? self[attr]
                   return yield cursor.first()
                 else
                   if self[through[0]]?[0]?
-                    yield voCollection.take @[through[0]][0][through[1].by]
+                    yield voCollection.take self[through[0]][0][through[1].by]
                   else
                     null
           @computed @async "#{vsAttr}": Module::RecordInterface, opts

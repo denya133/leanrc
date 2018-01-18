@@ -2,7 +2,7 @@
 sinon = require 'sinon'
 RC = require 'RC'
 LeanRC = require.main.require 'lib'
-{ co } = LeanRC::Utils
+{ co, map, _ } = LeanRC::Utils
 
 
 describe 'Renderer', ->
@@ -119,12 +119,22 @@ describe 'Renderer', ->
         facade.remove()
         yield return
     it 'should render the data with template', ->
+      facade = null
+      afterEach ->
+        facade?.remove?()
       co ->
         KEY = 'TEST_RENDERER_005'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends RC::Module
           @inheritProtected()
+          @include LeanRC::TemplatableModuleMixin
           @root "#{__dirname}/config/root"
+          @public @static templates: Object,
+            default:
+              sample: co.wrap (resourceName, action, aoData) ->
+                "#{@listEntityName}": yield map aoData, (i)->
+                  res = _.omit i, '_key', '_type', '_owner'
+                  yield return res
         Test.initialize()
         class Test::Configuration extends LeanRC::Configuration
           @inheritProtected()
@@ -136,11 +146,20 @@ describe 'Renderer', ->
           @module Test
           @public entityName: String, { default: 'TestRecord' }
         Test::TestResource.initialize()
+        class Test::ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+          @initialize()
+        class Test::FakeApplication extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+          @initialize()
         facade.registerProxy Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerMediator Test::ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, Test::FakeApplication.new()
         class Test::TestRenderer extends LeanRC::Renderer
           @inheritProtected()
           @module Test
-        Test::TestRenderer.initialize()
+          @initialize()
         data = [id: 1, test: 'test1', data: 'data1']
         renderer = Test::TestRenderer.new 'TEST_RENDERER'
         facade.registerProxy renderer
@@ -150,8 +169,8 @@ describe 'Renderer', ->
           path: 'test'
           resource: 'TestRecord/'
           action: 'find'
+          template: 'sample'
         assert.deepEqual renderResult, test_records: data
-        facade.remove()
         yield return
     it 'should render the data in customized renderer', ->
       co ->
