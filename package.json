@@ -1,7 +1,7 @@
 {
   "name": "LeanRC",
   "description": "LeanRC is a lightweight framework for creating applications based upon the classic Model-View-Controller design meta-pattern",
-  "version": "3.6.4",
+  "version": "3.6.5",
   "main": "dist/index.js",
   "private": true,
   "license": "AGPL-3.0",
@@ -25,6 +25,7 @@
     "distributed system"
   ],
   "scripts": {
+    "performance": "coffee ./test/performance/require-test.coffee",
     "postinstall": "coffee --compile --output ./dist ./lib",
     "test": "mocha"
   },

@@ -28,8 +28,8 @@ module.exports = (Module)->
   FORBIDDEN         = statuses 'forbidden'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  Module.defineMixin Gateway, (BaseClass) ->
-    class ModelingGatewayMixin extends BaseClass
+  Module.defineMixin 'ModelingGatewayMixin', (BaseClass = Gateway) ->
+    class extends BaseClass
       @inheritProtected()
       # @implements Module::ModelingGatewayMixinInterface
 
@@ -222,4 +222,4 @@ module.exports = (Module)->
           return
 
 
-    ModelingGatewayMixin.initializeMixin()
+      @initializeMixin()

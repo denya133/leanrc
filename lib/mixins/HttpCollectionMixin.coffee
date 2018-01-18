@@ -4,11 +4,12 @@ module.exports = (Module)->
   {
     ANY, NILL
     APPLICATION_MEDIATOR
+    Collection
     Utils: { _, inflect }
   } = Module::
 
-  Module.defineMixin Module::Collection, (BaseClass) ->
-    class HttpCollectionMixin extends BaseClass
+  Module.defineMixin 'HttpCollectionMixin', (BaseClass = Collection) ->
+    class extends BaseClass
       @inheritProtected()
       # @implements Module::QueryableCollectionMixinInterface
 
@@ -517,4 +518,4 @@ module.exports = (Module)->
             return Module::Cursor.new null, []
 
 
-    HttpCollectionMixin.initializeMixin()
+      @initializeMixin()

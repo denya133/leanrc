@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class NotifierInterface extends BaseClass
+  Module.defineInterface 'NotifierInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual sendNotification: Function,
@@ -15,4 +15,4 @@ module.exports = (Module)->
         return: NILL
 
 
-    NotifierInterface.initializeInterface()
+      @initializeInterface()

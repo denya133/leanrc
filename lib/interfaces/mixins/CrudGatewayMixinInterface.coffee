@@ -1,8 +1,8 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface (BaseClass) ->
-    class CrudGatewayMixinInterface extends BaseClass
+  Module.defineInterface 'CrudGatewayMixinInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual keyName: String
@@ -28,4 +28,4 @@ module.exports = (Module)->
         return: Module::NILL
 
 
-    CrudGatewayMixinInterface.initializeInterface()
+      @initializeInterface()

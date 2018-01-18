@@ -49,8 +49,8 @@ module.exports = (Module)->
 
   EventEmitter  = require 'events'
 
-  Module.defineMixin Module::Mediator, (BaseClass) ->
-    class MemoryExecutorMixin extends BaseClass
+  Module.defineMixin 'MemoryExecutorMixin', (BaseClass = Mediator) ->
+    class extends BaseClass
       @inheritProtected()
       @include DelayableMixin
       @include ConfigurableMixin
@@ -212,4 +212,4 @@ module.exports = (Module)->
           return
 
 
-    MemoryExecutorMixin.initializeMixin()
+      @initializeMixin()

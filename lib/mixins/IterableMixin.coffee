@@ -3,8 +3,10 @@
 
 
 module.exports = (Module)->
-  Module.defineMixin Module::Collection, (BaseClass) ->
-    class IterableMixin extends BaseClass
+  { Collection } = Module::
+
+  Module.defineMixin 'IterableMixin', (BaseClass = Collection) ->
+    class extends BaseClass
       @inheritProtected()
       # @implements Module::IterableMixinInterface
 
@@ -30,4 +32,4 @@ module.exports = (Module)->
           yield cursor.reduce ((prev, item)-> yield lambda prev, item), initialValue
 
 
-    IterableMixin.initializeMixin()
+      @initializeMixin()

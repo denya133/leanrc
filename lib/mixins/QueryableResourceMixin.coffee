@@ -10,8 +10,8 @@ module.exports = (Module)->
     Utils: { _, isArangoDB, joi }
   } = Module::
 
-  Module.defineMixin Resource, (BaseClass) ->
-    class QueryableResourceMixin extends BaseClass
+  Module.defineMixin 'QueryableResourceMixin', (BaseClass = Resource) ->
+    class extends BaseClass
       @inheritProtected()
 
       MAX_LIMIT   = 50
@@ -102,4 +102,4 @@ module.exports = (Module)->
       @initialHook 'parseBody', only: ['query']
 
 
-    QueryableResourceMixin.initializeMixin()
+      @initializeMixin()

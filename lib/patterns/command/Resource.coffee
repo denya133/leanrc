@@ -167,11 +167,13 @@ module.exports = (Module)->
 
     @public @static action: Function,
       default: (nameDefinition, config)->
+        t1 = Date.now()
         [actionName] = Object.keys nameDefinition
         if nameDefinition.attr? and not config?
           @metaObject.addMetaData 'actions', nameDefinition.attr, nameDefinition
         else
           @metaObject.addMetaData 'actions', actionName, config
+        @____dt += Date.now() - t1
         @public arguments...
 
     @action @async list: Function,

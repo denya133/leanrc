@@ -6,8 +6,8 @@ module.exports = (Module)->
     Utils: { _, inflect, joi }
   } = Module::
 
-  Module.defineMixin CoreObject, (BaseClass) ->
-    class RecordMixin extends BaseClass
+  Module.defineMixin 'RecordMixin', (BaseClass = CoreObject) ->
+    class extends BaseClass
       @inheritProtected()
 
       # конструктор принимает второй аргумент, ссылку на коллекцию.
@@ -77,9 +77,11 @@ module.exports = (Module)->
         args: [Module::LAMBDA]
         return: Module::NILL
         default: (amStatementFunc)->
+          t1 = Date.now()
           config = amStatementFunc.call @
           for own asFilterName, aoStatement of config
             @metaObject.addMetaData 'customFilters', asFilterName, aoStatement
+          @____dt += Date.now() - t1
           return
 
       @public @static parentClassNames: Function,
@@ -105,6 +107,7 @@ module.exports = (Module)->
 
       @public @static attr: Function,
         default: (typeDefinition, opts={})->
+          t1 = Date.now()
           [vsAttr] = Object.keys typeDefinition
           vcAttrType = typeDefinition[vsAttr]
           opts.transform ?= switch vcAttrType
@@ -129,6 +132,7 @@ module.exports = (Module)->
           else
             @metaObject.addMetaData 'attributes', vsAttr, opts
             @metaObject.addMetaData 'edges', vsAttr, opts if opts.through
+          @____dt += Date.now() - t1
           @public typeDefinition, opts
           return
 
@@ -140,6 +144,7 @@ module.exports = (Module)->
       @public @static comp: Function,
         default: (args...)->
           [typeDefinition, ..., opts] = args
+          t1 = Date.now()
           if typeDefinition is opts
             typeDefinition = "#{opts.attr}": opts.attrType
           [vsAttr] = Object.keys typeDefinition
@@ -149,6 +154,7 @@ module.exports = (Module)->
             throw new Error "comp `#{vsAttr}` has been defined previously"
           else
             @metaObject.addMetaData 'computeds', vsAttr, opts
+          @____dt += Date.now() - t1
           @public typeDefinition, opts
           return
 
@@ -351,4 +357,4 @@ module.exports = (Module)->
       @public toJSON: Function, { default: -> @constructor.serialize @ }
 
 
-    RecordMixin.initializeMixin()
+      @initializeMixin()

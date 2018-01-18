@@ -31,8 +31,8 @@ module.exports = (Module)->
     Query
   } = Module::
 
-  Module.defineMixin Collection, (BaseClass) ->
-    class GenerateAutoincrementIdMixin extends BaseClass
+  Module.defineMixin 'GenerateAutoincrementIdMixin', (BaseClass = Collection) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @async generateId: Function,
@@ -45,4 +45,4 @@ module.exports = (Module)->
           yield return ++maxId
 
 
-    GenerateAutoincrementIdMixin.initializeMixin()
+      @initializeMixin()

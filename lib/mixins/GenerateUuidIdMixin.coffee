@@ -28,16 +28,15 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     Collection
-    Utils
+    Utils: { uuid }
   } = Module::
-  { uuid } = Utils
 
-  Module.defineMixin Collection, (BaseClass) ->
-    class GenerateUuidIdMixin extends BaseClass
+  Module.defineMixin 'GenerateUuidIdMixin', (BaseClass = Collection) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @async generateId: Function,
         default: -> yield return uuid.v4()
 
 
-    GenerateUuidIdMixin.initializeMixin()
+      @initializeMixin()

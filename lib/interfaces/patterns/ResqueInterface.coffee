@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class ResqueInterface extends BaseClass
+  Module.defineInterface 'ResqueInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual tmpJobs: Array
@@ -102,4 +102,4 @@ module.exports = (Module)->
         return: Array # массив строк jobId's
 
 
-    ResqueInterface.initializeInterface()
+      @initializeInterface()

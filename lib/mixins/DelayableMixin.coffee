@@ -6,11 +6,12 @@
 
 module.exports = (Module)->
   {
+    CoreObject
     Utils: {co}
   } = Module::
 
-  Module.defineMixin Module::CoreObject, (BaseClass) ->
-    class DelayableMixin extends BaseClass
+  Module.defineMixin 'DelayableMixin', (BaseClass = CoreObject) ->
+    class extends BaseClass
       @inheritProtected()
       # @implements Module::DelayableMixinInterface
 
@@ -75,4 +76,4 @@ module.exports = (Module)->
           obj
 
 
-    DelayableMixin.initializeMixin()
+      @initializeMixin()

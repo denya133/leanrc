@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class ViewInterface extends BaseClass
+  Module.defineInterface 'ViewInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
       @module Module
 
@@ -31,4 +31,4 @@ module.exports = (Module)->
         return: Boolean
 
 
-    ViewInterface.initializeInterface()
+      @initializeInterface()

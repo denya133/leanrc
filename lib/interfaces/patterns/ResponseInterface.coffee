@@ -8,8 +8,8 @@ module.exports = (Module)->
     SwitchInterface
   } = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class ResponseInterface extends BaseClass
+  Module.defineInterface 'ResponseInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual res: Object
@@ -64,4 +64,4 @@ module.exports = (Module)->
         return: Object
 
 
-    ResponseInterface.initializeInterface()
+      @initializeInterface()

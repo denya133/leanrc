@@ -7,6 +7,7 @@ module.exports = (Module)->
     Pipes
   } = Module::
   {
+    JunctionMediator
     PipeAwareModule
     FilterControlMessage
   } = Pipes::
@@ -27,8 +28,8 @@ module.exports = (Module)->
     CHANGE
   } = LogMessage
 
-  Module.defineMixin Module::Pipes::JunctionMediator, (BaseClass) ->
-    class LoggingJunctionMixin extends BaseClass
+  Module.defineMixin 'LoggingJunctionMixin', (BaseClass = JunctionMediator) ->
+    class extends BaseClass
       @inheritProtected()
 
       ipoMultitonKey = Symbol.for '~multitonKey'
@@ -81,4 +82,4 @@ module.exports = (Module)->
               @super note
 
 
-    LoggingJunctionMixin.initializeMixin()
+      @initializeMixin()

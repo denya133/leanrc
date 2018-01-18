@@ -13,8 +13,8 @@ module.exports = (Module)->
   HTTP_NOT_FOUND    = statuses 'not found'
   UNAUTHORIZED      = statuses 'unauthorized'
 
-  Module.defineMixin Resource, (BaseClass) ->
-    class ModelingResourceMixin extends BaseClass
+  Module.defineMixin 'ModelingResourceMixin', (BaseClass = Resource) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public needsLimitation: Boolean,
@@ -88,4 +88,4 @@ module.exports = (Module)->
           yield return args
 
 
-    ModelingResourceMixin.initializeMixin()
+      @initializeMixin()

@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class FacadeInterface extends BaseClass
+  Module.defineInterface 'FacadeInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
       @include Module::NotifierInterface
 
@@ -53,4 +53,4 @@ module.exports = (Module)->
         return: NILL
 
 
-    FacadeInterface.initializeInterface()
+      @initializeInterface()

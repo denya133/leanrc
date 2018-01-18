@@ -1,8 +1,8 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface (BaseClass) ->
-    class PipeFittingInterface extends BaseClass
+  Module.defineInterface 'PipeFittingInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual connect: Function,
@@ -16,4 +16,4 @@ module.exports = (Module)->
         return: Boolean
 
 
-    PipeFittingInterface.initializeInterface()
+      @initializeInterface()

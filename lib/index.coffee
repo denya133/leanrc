@@ -1,5 +1,7 @@
 RC        = require 'RC'
 
+t1 = Date.now()
+
 class LeanRC extends RC
   @inheritProtected()
 
@@ -86,11 +88,13 @@ class LeanRC extends RC
   require('./utils/jwt') LeanRC
   require('./utils/crypto') LeanRC
 
+  console.log '111', Date.now() - t1
   require('./mixins/ConfigurableMixin') LeanRC
   require('./mixins/RecordMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
   require('./mixins/DelayableMixin') LeanRC
 
+  console.log '222', Date.now() - t1
   require('./patterns/iterator/Cursor') LeanRC
 
   require('./patterns/data_mapper/Transform') LeanRC
@@ -118,6 +122,7 @@ class LeanRC extends RC
   require('./patterns/proxy/Router') LeanRC
   require('./patterns/proxy/Resque') LeanRC
 
+  console.log '333', Date.now() - t1
   require('./mixins/CrudGatewayMixin') LeanRC
   require('./mixins/ModelingGatewayMixin') LeanRC
   require('./mixins/CrudEndpointMixin') LeanRC
@@ -134,6 +139,7 @@ class LeanRC extends RC
   require('./mixins/SchemaModuleMixin') LeanRC
   require('./mixins/TemplatableModuleMixin') LeanRC # needs test
 
+  console.log '444', Date.now() - t1
   require('./patterns/switch/Request') LeanRC
   require('./patterns/switch/Response') LeanRC
   require('./patterns/switch/Cookies') LeanRC
@@ -150,6 +156,7 @@ class LeanRC extends RC
   require('./patterns/command/Script') LeanRC
   require('./patterns/command/DelayedJobScript') LeanRC
 
+  console.log '555', Date.now() - t1
   require('./mixins/ApplicationMediatorMixin') LeanRC # needs test
   require('./mixins/MemoryExecutorMixin') LeanRC
   require('./mixins/BodyParseMixin') LeanRC
@@ -163,6 +170,7 @@ class LeanRC extends RC
   require('./mixins/ModelingResourceMixin') LeanRC # needs test
   require('./mixins/EditableResourceMixin') LeanRC # needs test
 
+  console.log '666', Date.now() - t1
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC
 
