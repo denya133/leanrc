@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class CursorInterface extends BaseClass
+  Module.defineInterface 'CursorInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual setCollection: Function,
@@ -64,4 +64,4 @@ module.exports = (Module)->
         return: ANY
 
 
-    CursorInterface.initializeInterface()
+      @initializeInterface()

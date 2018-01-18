@@ -7,8 +7,8 @@ module.exports = (Module)->
     Utils: { _, inflect }
   } = Module::
 
-  Module.defineMixin Serializer, (BaseClass) ->
-    class HttpSerializerMixin extends BaseClass
+  Module.defineMixin 'HttpSerializerMixin', (BaseClass = Serializer) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public normalize: Function,
@@ -25,4 +25,4 @@ module.exports = (Module)->
             "#{singular}": vcRecord.serialize aoRecord, options
           }
 
-    HttpSerializerMixin.initializeMixin()
+      @initializeMixin()

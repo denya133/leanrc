@@ -8,8 +8,8 @@ module.exports = (Module)->
     SwitchInterface
   } = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class RequestInterface extends BaseClass
+  Module.defineInterface 'RequestInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual req: Object
@@ -70,4 +70,4 @@ module.exports = (Module)->
         return: Object
 
 
-    RequestInterface.initializeInterface()
+      @initializeInterface()

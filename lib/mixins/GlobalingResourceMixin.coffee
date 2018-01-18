@@ -8,8 +8,8 @@ module.exports = (Module)->
 
   HTTP_NOT_FOUND    = statuses 'not found'
 
-  Module.defineMixin Resource, (BaseClass) ->
-    class GlobalingResourceMixin extends BaseClass
+  Module.defineMixin 'GlobalingResourceMixin', (BaseClass = Resource) ->
+    class extends BaseClass
       @inheritProtected()
 
       @beforeHook 'limitByDefaultSpace', only: ['list']
@@ -39,4 +39,4 @@ module.exports = (Module)->
           yield return args
 
 
-    GlobalingResourceMixin.initializeMixin()
+      @initializeMixin()

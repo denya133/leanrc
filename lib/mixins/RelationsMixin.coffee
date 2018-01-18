@@ -11,17 +11,19 @@ module.exports = (Module)->
     Utils: { _, inflect, joi }
   } = Module::
 
-  Module.defineMixin CoreObject, (BaseClass) ->
-    class RelationsMixin extends BaseClass
+  Module.defineMixin 'RelationsMixin', (BaseClass = CoreObject) ->
+    class extends BaseClass
       @inheritProtected()
       # @implements Module::RelationsMixinInterface
 
       @public @static belongsTo: Function,
         default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable, validate}={})->
+          t1 = Date.now()
           # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
           [vsAttr] = Object.keys typeDefinition
           attr ?= "#{vsAttr}Id"
           refKey ?= 'id'
+          t2 = Date.now()
           @attribute "#{attr}": String,
             validate: validate ? -> joi.string()
           if attr isnt "#{vsAttr}Id"
@@ -34,6 +36,7 @@ module.exports = (Module)->
                 return
               get: ->
                 get?.apply(@, [@[attr]]) ? @[attr]
+          t3 = Date.now()
           opts =
             valuable: valuable
             sortable: sortable
@@ -80,12 +83,14 @@ module.exports = (Module)->
                     yield voCollection.take @[through[0]][0][through[1].by]
                   else
                     null
-          @computed @async "#{vsAttr}": Module::RecordInterface, opts
           @metaObject.addMetaData 'relations', vsAttr, opts
+          @____dt += (Date.now() - t3) + (t2 - t1)
+          @computed @async "#{vsAttr}": Module::RecordInterface, opts
           return
 
       @public @static hasMany: Function,
         default: (typeDefinition, opts={})->
+          t1 = Date.now()
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
@@ -123,12 +128,14 @@ module.exports = (Module)->
                     i[opts.through[1].by]
                 else
                   null
-          @computed @async "#{vsAttr}": Module::CursorInterface, opts
           @metaObject.addMetaData 'relations', vsAttr, opts
+          @____dt += Date.now() - t1
+          @computed @async "#{vsAttr}": Module::CursorInterface, opts
           return
 
       @public @static hasOne: Function,
         default: (typeDefinition, opts={})->
+          t1 = Date.now()
           # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
@@ -160,8 +167,9 @@ module.exports = (Module)->
               voCollection = @collection.facade.retrieveProxy vsCollectionName
               cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": @[opts.refKey]
               return yield cursor.first()
-          @computed @async typeDefinition, opts
           @metaObject.addMetaData 'relations', vsAttr, opts
+          @____dt += Date.now() - t1
+          @computed @async typeDefinition, opts
           return
 
       # Cucumber.inverseFor 'tomato' #-> {recordClass: App::Tomato, attrName: 'cucumbers', relation: 'hasMany'}
@@ -178,4 +186,4 @@ module.exports = (Module)->
 
 
 
-    RelationsMixin.initializeMixin()
+      @initializeMixin()

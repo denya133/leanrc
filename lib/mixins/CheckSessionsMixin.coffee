@@ -47,8 +47,8 @@ module.exports = (Module)->
 
   UNAUTHORIZED      = statuses 'unauthorized'
 
-  Module.defineMixin Resource, (BaseClass) ->
-    class CheckSessionsMixin extends BaseClass
+  Module.defineMixin 'CheckSessionsMixin', (BaseClass = Resource) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public session: RecordInterface
@@ -81,4 +81,4 @@ module.exports = (Module)->
           yield return args
 
 
-    CheckSessionsMixin.initializeMixin()
+      @initializeMixin()

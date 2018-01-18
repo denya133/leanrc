@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class RelationsMixinInterface extends BaseClass
+  Module.defineInterface 'RelationsMixinInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @static @virtual relations: Function,
@@ -24,4 +24,4 @@ module.exports = (Module)->
         return: Object
 
 
-    RelationsMixinInterface.initializeInterface()
+      @initializeInterface()

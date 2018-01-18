@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class MigrationInterface extends BaseClass
+  Module.defineInterface 'MigrationInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @async @virtual createCollection: Function,
@@ -160,4 +160,4 @@ module.exports = (Module)->
         return: NILL
 
 
-    MigrationInterface.initializeInterface()
+      @initializeInterface()

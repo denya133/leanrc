@@ -6,8 +6,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class QueryableCollectionMixinInterface extends BaseClass
+  Module.defineInterface 'QueryableCollectionMixinInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @async @virtual deleteBy: Function,
@@ -52,4 +52,4 @@ module.exports = (Module)->
         return: ANY
 
 
-    QueryableCollectionMixinInterface.initializeInterface()
+      @initializeInterface()

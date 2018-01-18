@@ -6,8 +6,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class RouterInterface extends BaseClass
+  Module.defineInterface 'RouterInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @static @virtual map: Function,
@@ -73,4 +73,4 @@ module.exports = (Module)->
       @public @virtual routes: Array
 
 
-    RouterInterface.initializeInterface()
+      @initializeInterface()

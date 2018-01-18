@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class ProxyInterface extends BaseClass
+  Module.defineInterface 'ProxyInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
       @include Module::NotifierInterface
 
@@ -25,4 +25,4 @@ module.exports = (Module)->
         return: NILL
 
 
-    ProxyInterface.initializeInterface()
+      @initializeInterface()

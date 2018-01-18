@@ -8,8 +8,8 @@ module.exports = (Module)->
 
   HTTP_NOT_FOUND    = statuses 'not found'
 
-  Module.defineMixin Resource, (BaseClass) ->
-    class EditableResourceMixin extends BaseClass
+  Module.defineMixin 'EditableResourceMixin', (BaseClass = Resource) ->
+    class extends BaseClass
       @inheritProtected()
 
       @beforeHook 'protectEditable',        only: ['create', 'update', 'delete']
@@ -40,4 +40,4 @@ module.exports = (Module)->
           yield return args
 
 
-    EditableResourceMixin.initializeMixin()
+      @initializeMixin()

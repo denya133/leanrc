@@ -7,8 +7,8 @@ module.exports = (Module)->
     Utils: { _, inflect }
   } = Module::
 
-  Module.defineMixin Collection, (BaseClass) ->
-    class ThinHttpCollectionMixin extends BaseClass
+  Module.defineMixin 'ThinHttpCollectionMixin', (BaseClass = Collection) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @async push: Function,
@@ -294,4 +294,4 @@ module.exports = (Module)->
           @[ipmSendRequest] hash
 
 
-    ThinHttpCollectionMixin.initializeMixin()
+      @initializeMixin()

@@ -1,8 +1,8 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface (BaseClass) ->
-    class GatewayInterface extends BaseClass
+  Module.defineInterface 'GatewayInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual swaggerDefinition: Function,
@@ -18,4 +18,4 @@ module.exports = (Module)->
         return: Module::EndpointInterface
 
 
-    GatewayInterface.initializeInterface()
+      @initializeInterface()

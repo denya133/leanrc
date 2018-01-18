@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class EndpointInterface extends BaseClass
+  Module.defineInterface 'EndpointInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual gateway: Module::ProxyInterface
@@ -61,4 +61,4 @@ module.exports = (Module)->
         return: Module::EndpointInterface
 
 
-    EndpointInterface.initializeInterface()
+      @initializeInterface()

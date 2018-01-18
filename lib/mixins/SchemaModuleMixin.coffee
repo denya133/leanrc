@@ -7,8 +7,8 @@ module.exports = (Module)->
     Utils: { _, filesListSync }
   } = Module::
 
-  Module.defineMixin ModuleClass, (BaseClass) ->
-    class SchemaModuleMixin extends BaseClass
+  Module.defineMixin 'SchemaModuleMixin', (BaseClass = ModuleClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @static defineMigrations: Function,
@@ -27,4 +27,4 @@ module.exports = (Module)->
           return
 
 
-    SchemaModuleMixin.initializeMixin()
+      @initializeMixin()

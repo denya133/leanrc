@@ -7,8 +7,8 @@ module.exports = (Module)->
     Utils: { _, filesTreeSync }
   } = Module::
 
-  Module.defineMixin ModuleClass, (BaseClass) ->
-    class TemplatableModuleMixin extends BaseClass
+  Module.defineMixin 'TemplatableModuleMixin', (BaseClass = ModuleClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @static templates: Object,
@@ -16,12 +16,14 @@ module.exports = (Module)->
 
       @public @static defineTemplate: Function,
         default: (filename, fun)->
+          t1 = Date.now()
           vsRoot = @::ROOT ? '.'
           vsTemplatesDir = "#{vsRoot}/templates/"
           templateName = filename
             .replace vsTemplatesDir, ''
             .replace /\.js|\.coffee/, ''
           @metaObject.addMetaData 'templates', templateName, fun
+          @____dt += Date.now() - t1
           return fun
 
       @public @static resolveTemplate: Function,
@@ -34,7 +36,7 @@ module.exports = (Module)->
           return @templates[templateName]
 
       @public @static loadTemplates: Function,
-        default: ()->
+        default: ->
           vsRoot = @::ROOT ? '.'
           vsTemplatesDir = "#{vsRoot}/templates"
           files = filesTreeSync vsTemplatesDir, filesOnly: yes
@@ -45,4 +47,4 @@ module.exports = (Module)->
           return
 
 
-    TemplatableModuleMixin.initializeMixin()
+      @initializeMixin()

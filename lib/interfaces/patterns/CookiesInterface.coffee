@@ -6,8 +6,8 @@ module.exports = (Module)->
     NILL
   } = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class CookiesInterface extends BaseClass
+  Module.defineInterface 'CookiesInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual request: Object
@@ -23,4 +23,4 @@ module.exports = (Module)->
         return: CookiesInterface
 
 
-    CookiesInterface.initializeInterface()
+      @initializeInterface()

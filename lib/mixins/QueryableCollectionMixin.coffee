@@ -8,11 +8,12 @@
 
 module.exports = (Module)->
   {
+    Collection
     Utils: { co, _ }
   } = Module::
 
-  Module.defineMixin Module::Collection, (BaseClass) ->
-    class QueryableCollectionMixin extends BaseClass
+  Module.defineMixin 'QueryableCollectionMixin', (BaseClass = Collection) ->
+    class extends BaseClass
       @inheritProtected()
       # @implements Module::QueryableCollectionMixinInterface
 
@@ -81,4 +82,4 @@ module.exports = (Module)->
           return yield @executeQuery yield @parseQuery voQuery
 
 
-    QueryableCollectionMixin.initializeMixin()
+      @initializeMixin()
