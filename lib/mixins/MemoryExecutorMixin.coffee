@@ -113,12 +113,13 @@ module.exports = (Module)->
             fullQueueName = @[ipoResque].fullQueueName name
             [moduleName] = fullQueueName.split '|>'
             if moduleName is @moduleName()
-              @define name, {concurrency}, co.wrap (job, done)=>
+              self = @
+              @define name, {concurrency}, co.wrap (job, done)->
                 reverse = genRandomAlphaNumbers 32
-                @getViewComponent().once reverse, (aoError)=>
+                self.getViewComponent().once reverse, (aoError)->
                   done aoError
                 {scriptName, data} = job.data
-                @sendNotification scriptName, data, reverse
+                self.sendNotification scriptName, data, reverse
                 return
             continue
           yield return
@@ -162,7 +163,7 @@ module.exports = (Module)->
           self = @
           @[ipoTimer] = setTimeout co.wrap ->
             clearTimeout self[ipoTimer]
-            yield @cyclePart()
+            yield self.cyclePart()
           , 100
           yield return
 

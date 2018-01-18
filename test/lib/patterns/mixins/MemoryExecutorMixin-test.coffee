@@ -177,6 +177,9 @@ describe 'MemoryExecutorMixin', ->
         assert.deepEqual job.reason, error: 'error'
         yield return
   describe '#defineProcessors', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should define processors', ->
       co ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_001'
@@ -216,9 +219,11 @@ describe 'MemoryExecutorMixin', ->
         yield executor.defineProcessors()
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_1'
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
-        facade.remove()
         yield return
   describe '#reDefineProcessors', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should redefine processors', ->
       co ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_009'
@@ -262,9 +267,11 @@ describe 'MemoryExecutorMixin', ->
         yield executor.reDefineProcessors()
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_1'
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
-        facade.remove()
         yield return
   describe '#onRegister', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should setup executor on register', ->
       co ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_002'
@@ -306,9 +313,11 @@ describe 'MemoryExecutorMixin', ->
         yield promise
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_1'
         assert.property executor[definedProcessorsSymbol], 'TEST_QUEUE_2'
-        facade.remove()
         yield return
   describe '#recursion', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should recursively call cycle part', ->
       co ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_004'
@@ -343,9 +352,7 @@ describe 'MemoryExecutorMixin', ->
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
         executor = MemoryResqueExecutor.new LeanRC::RESQUE_EXECUTOR
-        executorSymbols = MemoryResqueExecutor
-          .metaObject
-          .getGroup 'instanceVariables'
+        executorSymbols = MemoryResqueExecutor.instanceVariables
         definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
         isStoppedSymbol = executorSymbols._isStopped.pointer
         promise = LeanRC::Promise.new (resolve) ->
@@ -358,9 +365,11 @@ describe 'MemoryExecutorMixin', ->
         yield executor.recursion()
         yield promise
         assert.isNotNull test
-        facade.remove()
         yield return
   describe '#start', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should call recursion', ->
       co ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_005'
@@ -408,9 +417,11 @@ describe 'MemoryExecutorMixin', ->
         yield executor.start()
         yield promise
         assert.isNotNull test
-        facade.remove()
         yield return
   describe '#handleNotification', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should start resque', ->
       co ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_006'
@@ -446,7 +457,6 @@ describe 'MemoryExecutorMixin', ->
         facade.sendNotification LeanRC::START_RESQUE
         yield promise
         assert.isNotNull test
-        facade.remove()
         yield return
     it 'should get result', ->
       co ->
@@ -478,9 +488,11 @@ describe 'MemoryExecutorMixin', ->
         facade.sendNotification LeanRC::JOB_RESULT, body, type
         data = yield promise
         assert.deepEqual data, body
-        facade.remove()
         yield return
   describe '#cyclePart', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should start cycle part', ->
       co ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_008'
@@ -522,9 +534,11 @@ describe 'MemoryExecutorMixin', ->
         facade.sendNotification LeanRC::START_RESQUE
         data = yield promise
         assert.deepEqual data, body
-        facade.remove()
         yield return
   describe '#fullQueueName', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should get full queue name', ->
       co ->
         KEY = 'TEST_MEMORY_RESQUE_EXECUTOR_010'
@@ -553,5 +567,4 @@ describe 'MemoryExecutorMixin', ->
         facade.registerMediator executor
         fullQueueName = executor.fullQueueName 'TEST_QUEUE_1'
         assert.equal fullQueueName, 'Test|>TEST_QUEUE_1'
-        facade.remove()
         yield return
