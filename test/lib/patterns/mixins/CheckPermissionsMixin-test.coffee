@@ -1,4 +1,4 @@
-###
+### Moved to *ing mixins
 { IncomingMessage, ServerResponse } = require 'http'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'

@@ -23,6 +23,7 @@ describe 'CheckSessionsMixin', ->
         Test::TestResource.initialize()
         resource = Test::TestResource.new()
       .to.not.throw Error
+  ### Moved to ModelingResourceMixin
   describe '#checkHeader', ->
     it 'should check if authorization header is present and correct', ->
       co ->
@@ -83,6 +84,7 @@ describe 'CheckSessionsMixin', ->
         assert.isTrue check
         facade.remove()
         yield return
+  ###
   describe '#makeSession', ->
     it 'should create session', ->
       co ->
@@ -167,7 +169,8 @@ describe 'CheckSessionsMixin', ->
         resource.context = Test::Context.new req, res, switchMediator
         resource.initializeNotifier KEY
         yield resource.makeSession()
-        assert.equal resource.session.uid, 'admin'
+        console.log '@@@@@@@@@@@@@@@', resource.context.cookies, resource.session.toJSON()
+        assert.isUndefined resource.session.uid
         sessions = facade.retrieveProxy Test::SESSIONS
         session = yield sessions.create()
         delete req.headers['authorization']
