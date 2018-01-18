@@ -85,8 +85,9 @@ module.exports = (Module)->
       @public @static parentClassNames: Function,
         default: (AbstractClass = null)->
           AbstractClass ?= @
-          fromSuper = if AbstractClass.__super__?
-            @parentClassNames AbstractClass.__super__.constructor
+          SuperClass = Reflect.getPrototypeOf AbstractClass
+          fromSuper = unless _.isEmpty SuperClass?.name
+            @parentClassNames SuperClass
           _.uniq [].concat(fromSuper ? [])
             .concat [AbstractClass.name]
 

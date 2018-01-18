@@ -113,6 +113,5 @@ describe 'QueryableResourceMixin', ->
         resource.initializeNotifier KEY
         context = Test::Context.new req, res, switchMediator
         { items, meta } = yield resource.list context
-        console.log '1111111111111', items, meta
         assert.propertyVal items[0], 'test', 'test2'
         yield return
