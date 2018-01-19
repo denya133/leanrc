@@ -17,7 +17,7 @@ module.exports = (Module)->
     ChainsMixin
     ContextInterface
 
-    Utils: { _, inflect, statuses }
+    Utils: { _, inflect, statuses, isArangoDB }
   } = Module::
 
   HTTP_NOT_FOUND    = statuses 'not found'
@@ -164,17 +164,15 @@ module.exports = (Module)->
     @public recordBody: Object
 
     @public @static actions: Object,
-      get: -> @metaObject.getGroup 'actions'
+      get: -> @metaObject.getGroup 'actions', no
 
     @public @static action: Function,
       default: (nameDefinition, config)->
-        t1 = Date.now()
         [actionName] = Object.keys nameDefinition
         if nameDefinition.attr? and not config?
           @metaObject.addMetaData 'actions', nameDefinition.attr, nameDefinition
         else
           @metaObject.addMetaData 'actions', actionName, config
-        @____dt += Date.now() - t1
         @public arguments...
 
     @action @async list: Function,
@@ -306,6 +304,8 @@ module.exports = (Module)->
         service = @facade.retrieveMediator APPLICATION_MEDIATOR
           .getViewComponent()
         try
+          if isArangoDB()
+            service.context = voBody.context
           if service.context?
             @sendNotification SEND_TO_LOG, '>>>>>>>>>>>>>> EXECUTION START', LEVELS[DEBUG]
             voResult =

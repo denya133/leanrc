@@ -18,12 +18,10 @@ module.exports = (Module)->
 
       @public @static belongsTo: Function,
         default: (typeDefinition, {attr, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable, validate}={})->
-          t1 = Date.now()
           # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
           [vsAttr] = Object.keys typeDefinition
           attr ?= "#{vsAttr}Id"
           refKey ?= 'id'
-          t2 = Date.now()
           @attribute "#{attr}": String,
             validate: validate ? -> joi.string()
           if attr isnt "#{vsAttr}Id"
@@ -36,7 +34,6 @@ module.exports = (Module)->
                 return
               get: ->
                 get?.apply(@, [@[attr]]) ? @[attr]
-          t3 = Date.now()
           opts =
             valuable: valuable
             sortable: sortable
@@ -85,13 +82,11 @@ module.exports = (Module)->
                   else
                     null
           @metaObject.addMetaData 'relations', vsAttr, opts
-          @____dt += (Date.now() - t3) + (t2 - t1)
           @computed @async "#{vsAttr}": Module::RecordInterface, opts
           return
 
       @public @static hasMany: Function,
         default: (typeDefinition, opts={})->
-          t1 = Date.now()
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
@@ -131,13 +126,11 @@ module.exports = (Module)->
                 else
                   null
           @metaObject.addMetaData 'relations', vsAttr, opts
-          @____dt += Date.now() - t1
           @computed @async "#{vsAttr}": Module::CursorInterface, opts
           return
 
       @public @static hasOne: Function,
         default: (typeDefinition, opts={})->
-          t1 = Date.now()
           # TODO: возможно для фильтрации по этому полю, если оно valuable надо как-то зайдествовать customFilters
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
@@ -171,7 +164,6 @@ module.exports = (Module)->
               cursor = yield voCollection.takeBy "@doc.#{opts.inverse}": self[opts.refKey]
               return yield cursor.first()
           @metaObject.addMetaData 'relations', vsAttr, opts
-          @____dt += Date.now() - t1
           @computed @async typeDefinition, opts
           return
 
@@ -185,7 +177,7 @@ module.exports = (Module)->
           return {recordClass, attrName, relation}
 
       @public @static relations: Object,
-        get: -> @metaObject.getGroup 'relations'
+        get: -> @metaObject.getGroup 'relations', no
 
 
 

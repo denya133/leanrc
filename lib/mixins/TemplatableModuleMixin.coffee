@@ -11,18 +11,16 @@ module.exports = (Module)->
       @inheritProtected()
 
       @public @static templates: Object,
-        get: -> @metaObject.getGroup 'templates'
+        get: -> @metaObject.getGroup 'templates', no
 
       @public @static defineTemplate: Function,
         default: (filename, fun)->
-          t1 = Date.now()
           vsRoot = @::ROOT ? '.'
           vsTemplatesDir = "#{vsRoot}/templates/"
           templateName = filename
             .replace vsTemplatesDir, ''
             .replace /\.js|\.coffee/, ''
           @metaObject.addMetaData 'templates', templateName, fun
-          @____dt += Date.now() - t1
           return fun
 
       @public @static resolveTemplate: Function,

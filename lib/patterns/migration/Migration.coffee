@@ -150,138 +150,108 @@ module.exports = (Module)->
     #@createCollection #name, options, type # type is `document` or `edge`
     @public @static createCollection: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'createCollection'}
-        @____dt += Date.now() - t1
         return
 
     # @createEdgeCollection #для хранения связей М:М #collection_1, collection_2, options
     @public @static createEdgeCollection: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'createEdgeCollection'}
-        @____dt += Date.now() - t1
         return
 
     #@addField #collection_name, field_name, options #{type}
     @public @static addField: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'addField'}
-        @____dt += Date.now() - t1
         return
 
     #@addIndex #collection_name, field_names, options
     @public @static addIndex: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'addIndex'}
-        @____dt += Date.now() - t1
         return
 
     #@addTimestamps # создание полей createdAt, updatedAt, deletedAt #collection_name, options
     @public @static addTimestamps: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'addTimestamps'}
-        @____dt += Date.now() - t1
         return
 
     # Modification
     #@changeCollection #name, options
     @public @static changeCollection: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'changeCollection'}
-        @____dt += Date.now() - t1
         return
 
     #@changeField #collection_name, field_name, options #{type}
     @public @static changeField: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'changeField'}
-        @____dt += Date.now() - t1
         return
 
     #@renameField #collection_name, field_name, new_field_name
     @public @static renameField: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'renameField'}
-        @____dt += Date.now() - t1
         return
 
     #@renameIndex #collection_name, old_name, new_name
     @public @static renameIndex: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'renameIndex'}
-        @____dt += Date.now() - t1
         return
 
     #@renameCollection #collection_name, old_name, new_name
     @public @static renameCollection: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'renameCollection'}
-        @____dt += Date.now() - t1
         return
 
     #Deletion
     #@dropCollection #name
     @public @static dropCollection: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'dropCollection'}
-        @____dt += Date.now() - t1
         return
 
     # @dropEdgeCollection #collection_1, collection_2
     @public @static dropEdgeCollection: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'dropEdgeCollection'}
-        @____dt += Date.now() - t1
         return
 
     #@removeField #collection_name, field_name
     @public @static removeField: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'removeField'}
-        @____dt += Date.now() - t1
         return
 
     #@removeIndex #collection_name, field_names, options
     @public @static removeIndex: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'removeIndex'}
-        @____dt += Date.now() - t1
         return
 
     #@removeTimestamps # удаление полей createdAt, updatedAt, deletedAt #collection_name, options
     @public @static removeTimestamps: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'removeTimestamps'}
-        @____dt += Date.now() - t1
         return
 
     # Special
@@ -317,10 +287,8 @@ module.exports = (Module)->
     ###
     @public @static reversible: Function,
       default: (args...)->
-        t1 = Date.now()
         @::[iplSteps] ?= []
         @::[iplSteps].push {args, method: 'reversible'}
-        @____dt += Date.now() - t1
         return
 
     # Custom
