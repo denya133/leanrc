@@ -6,9 +6,8 @@ module.exports = (Module)->
 
     CoreObject
     CookiesInterface
-    Utils
+    Utils: { isArangoDB }
   } = Module::
-  { isArangoDB } = Utils
 
   class Cookies extends CoreObject
     @inheritProtected()

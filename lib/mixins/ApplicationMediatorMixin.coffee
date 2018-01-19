@@ -1,4 +1,4 @@
-EventEmitter  = require 'events'
+
 
 ###
 for example
@@ -131,6 +131,7 @@ module.exports = (Module)->
 
       @public init: Function,
         default: (args...)->
+          EventEmitter = require 'events'
           voEmitter = new EventEmitter()
           @[ipoEmitter] = voEmitter
           return @super args...

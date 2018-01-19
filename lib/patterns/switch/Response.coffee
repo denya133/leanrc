@@ -1,14 +1,14 @@
-contentDisposition  = require 'content-disposition'
-ensureErrorHandler  = require 'error-inject'
-getType             = require('mime-types').contentType
-onFinish            = require 'on-finished'
-escape              = require 'escape-html'
-typeis              = require('type-is').is
-destroy             = require 'destroy'
-assert              = require 'assert'
-extname             = require('path').extname
-vary                = require 'vary'
-Stream              = require 'stream'
+# contentDisposition  = require 'content-disposition'
+# ensureErrorHandler  = require 'error-inject'
+# getType             = require('mime-types').contentType
+# onFinish            = require 'on-finished'
+# escape              = require 'escape-html'
+# typeis              = require('type-is').is
+# destroy             = require 'destroy'
+# assert              = require 'assert'
+# extname             = require('path').extname
+# vary                = require 'vary'
+# Stream              = require 'stream'
 
 ###
 Идеи взяты из https://github.com/koajs/koa/blob/master/lib/response.js
@@ -54,6 +54,7 @@ module.exports = (Module)->
     @public status: Number,
       get: -> @res.statusCode
       set: (code)->
+        assert = require 'assert'
         assert _.isNumber(code), 'status code must be a number'
         assert statuses[code], "invalid status code: #{code}"
         assert not @res.headersSent, 'headers have already been sent'
@@ -70,7 +71,7 @@ module.exports = (Module)->
         @res.statusMessage = msg
         return
 
-    @public body: [String, Buffer, Object, Stream],
+    @public body: [String, Buffer, Object],
       get: -> @_body
       set: (val)->
         original = @_body
@@ -97,7 +98,10 @@ module.exports = (Module)->
           @length = val.length
           return
         if _.isFunction val.pipe
+          onFinish = require 'on-finished'
+          destroy = require 'destroy'
           onFinish @res, destroy.bind null, val
+          ensureErrorHandler = require 'error-inject'
           ensureErrorHandler val, (err)=> @ctx.onerror err
           if original? and original isnt val
             @remove 'Content-Length'
@@ -168,6 +172,7 @@ module.exports = (Module)->
 
     @public vary: Function,
       default: (field)->
+        vary = require 'vary'
         vary @res, field
         return
 
@@ -179,6 +184,7 @@ module.exports = (Module)->
         unless statuses.redirect[@status]
           @status = 302
         if @ctx.accepts 'html'
+          escape = require 'escape-html'
           url = escape url
           @type = 'text/html; charset=utf-8'
           @body = "Redirecting to <a href=\"#{url}\">#{url}</a>."
@@ -190,7 +196,9 @@ module.exports = (Module)->
     @public attachment: Function,
       default: (filename)->
         if filename
+          extname = require('path').extname
           @type = extname filename
+        contentDisposition = require 'content-disposition'
         @set 'Content-Disposition', contentDisposition filename
 
     @public lastModified: Date,
@@ -215,6 +223,7 @@ module.exports = (Module)->
         return '' unless type
         type.split(';')[0]
       set: (type)->
+        getType = require('mime-types').contentType
         type = getType type
         if type
           @set 'Content-Type', type
@@ -227,6 +236,7 @@ module.exports = (Module)->
         return @type or no unless types
         unless _.isArray types
           types = args
+        typeis = require('type-is').is
         typeis @type, types
 
     @public get: Function,

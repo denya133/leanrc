@@ -1,4 +1,3 @@
-path = require 'path'
 
 
 module.exports = (Module)->
@@ -30,6 +29,7 @@ module.exports = (Module)->
         default: (args...)->
           vsRoot = @::ROOT ? '.'
           vsTemplatesDir = "#{vsRoot}/templates/"
+          path = require 'path'
           templateName = path.resolve args...
             .replace vsTemplatesDir, ''
             .replace /\.js|\.coffee/, ''

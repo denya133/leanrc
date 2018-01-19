@@ -1,4 +1,7 @@
+ttt = Date.now()
 RC        = require 'RC'
+console.log '!!!', Date.now() - ttt
+console.log '!!! IN static methods', RC.____dt
 
 t1 = Date.now()
 

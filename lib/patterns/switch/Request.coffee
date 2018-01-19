@@ -1,10 +1,10 @@
-net         = require 'net' # will be used only 'isIP' function
-contentType = require 'content-type'
-stringify   = require('url').format
-parse       = require 'parseurl'
-qs          = require 'querystring'
-typeis      = require 'type-is'
-fresh       = require 'fresh'
+# net         = require 'net' # will be used only 'isIP' function
+# contentType = require 'content-type'
+# stringify   = require('url').format
+# parse       = require 'parseurl'
+# qs          = require 'querystring'
+# typeis      = require 'type-is'
+# fresh       = require 'fresh'
 
 ###
 Идеи взяты из https://github.com/koajs/koa/blob/master/lib/request.js
@@ -68,27 +68,38 @@ module.exports = (Module)->
       set: (method)-> @req.method = method
 
     @public path: String,
-      get: -> parse(@req).pathname
+      get: ->
+        parse = require 'parseurl'
+        parse(@req).pathname
       set: (path)->
+        parse = require 'parseurl'
         url = parse @req
         return if url.pathname is path
         url.pathname = path
         url.path = null
+        stringify = require('url').format
         @url = stringify url
 
     @public query: Object,
-      get: -> qs.parse @querystring
-      set: (obj)-> @querystring = qs.stringify obj
+      get: ->
+        qs = require 'querystring'
+        qs.parse @querystring
+      set: (obj)->
+        qs = require 'querystring'
+        @querystring = qs.stringify obj
 
     @public querystring: String,
       get: ->
         return '' unless @req?
+        parse = require 'parseurl'
         parse(@req).query ? ''
       set: (str)->
+        parse = require 'parseurl'
         url = parse @req
         return if url.search is "?#{str}"
         url.search = str
         url.path = null
+        stringify = require('url').format
         @url = stringify url
 
     @public search: String,
@@ -133,6 +144,7 @@ module.exports = (Module)->
           return no
         # 2xx or 304 as per rfc2616 14.26
         if (s >= 200 and s < 300) or 304 is s
+          fresh = require 'fresh'
           return fresh @headers, @ctx.response.headers
         return no
 
@@ -152,6 +164,7 @@ module.exports = (Module)->
         type = @get 'Content-Type'
         return '' unless type?
         try
+          contentType = require 'content-type'
           type = contentType.parse type
         catch err
           return ''
@@ -199,6 +212,7 @@ module.exports = (Module)->
       get: ->
         {subdomainOffset:offset} = @ctx.switch.configs
         hostname = @hostname
+        net = require 'net'
         return []  if net.isIP(hostname) isnt 0
         hostname
           .split('.')
@@ -217,6 +231,7 @@ module.exports = (Module)->
     @public 'is': Function,
       default: (args...)->
         [types] = args
+        typeis = require 'type-is'
         return typeis @req unless types
         unless _.isArray types
           types = args

@@ -1,4 +1,4 @@
-semver        = require 'semver'
+# semver        = require 'semver'
 
 
 module.exports = (Module)->
@@ -59,6 +59,7 @@ module.exports = (Module)->
         [vNeedVersion] = vCurrentVersion.match(/^\d{1,}[.]\d{1,}/) ? []
         unless vNeedVersion?
           throw new Error 'Incorrect `version` specified in the configuration'
+        semver = require 'semver'
         unless semver.satisfies vCurrentVersion, vVersion
           @context.throw UPGRADE_REQUIRED, "Upgrade: v#{vCurrentVersion}"
         yield return args

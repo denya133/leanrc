@@ -27,9 +27,8 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     Resource
-    Utils
+    Utils: { isArangoDB }
   } = Module::
-  { isArangoDB } = Utils
 
   Module.defineMixin 'BodyParseMixin', (BaseClass = Resource) ->
     class extends BaseClass

@@ -47,8 +47,6 @@ module.exports = (Module)->
     Utils: { _, co, isArangoDB, genRandomAlphaNumbers }
   } = Module::
 
-  EventEmitter  = require 'events'
-
   Module.defineMixin 'MemoryExecutorMixin', (BaseClass = Mediator) ->
     class extends BaseClass
       @inheritProtected()
@@ -89,6 +87,7 @@ module.exports = (Module)->
       @public onRegister: Function,
         default: (args...)->
           @super args...
+          EventEmitter = require 'events'
           @setViewComponent new EventEmitter()
           @[ipoConcurrencyCount] = {}
           @[ipoDefinedProcessors] = {}

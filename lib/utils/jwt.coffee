@@ -14,9 +14,9 @@
 
 module.exports = (Module) ->
   Module::Utils.jwtDecode = (asKey, asToken, abNoVerify = no) ->
-    isArango = Module::Utils.isArangoDB()
+    { isArangoDB, hasNativePromise } = Module::Utils
     Module::Promise.new (resolve, reject) ->
-      if isArango or not Module::Utils.hasNativePromise()
+      if isArangoDB() or not hasNativePromise()
         # Is ArangoDB !!!
         try
           crypto = require '@arangodb/crypto'
@@ -38,9 +38,9 @@ module.exports = (Module) ->
       return
 
   Module::Utils.jwtEncode = (asKey, asMessage, asAlgorithm) ->
-    isArango = Module::Utils.isArangoDB()
+    { isArangoDB, hasNativePromise } = Module::Utils
     Module::Promise.new (resolve, reject) ->
-      if isArango or not Module::Utils.hasNativePromise()
+      if isArangoDB() or not hasNativePromise()
         # Is ArangoDB !!!
         try
           crypto = require '@arangodb/crypto'

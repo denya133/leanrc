@@ -1,9 +1,9 @@
-EventEmitter  = require 'events'
+# EventEmitter  = require 'events'
 methods       = require 'methods'
-pathToRegexp  = require 'path-to-regexp'
-assert        = require 'assert'
-Stream        = require 'stream'
-onFinished    = require 'on-finished'
+# pathToRegexp  = require 'path-to-regexp'
+# assert        = require 'assert'
+# Stream        = require 'stream'
+# onFinished    = require 'on-finished'
 
 
 ###
@@ -99,6 +99,7 @@ module.exports = (Module)->
             { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
             self = @
             keys = []
+            pathToRegexp = require 'path-to-regexp'
             re = pathToRegexp path, keys
             facade.sendNotification SEND_TO_LOG, "#{method ? 'ALL'} #{path} -> #{re}", LEVELS[DEBUG]
 
@@ -169,6 +170,7 @@ module.exports = (Module)->
 
     @public onRegister: Function,
       default: ->
+        EventEmitter = require 'events'
         voEmitter = new EventEmitter()
         if voEmitter.listeners('error').length is 0
           voEmitter.on 'error', @onerror.bind @
@@ -223,6 +225,7 @@ module.exports = (Module)->
       default: ->
         fn = @constructor.compose @middlewares
         self = @
+        onFinished = require 'on-finished'
         handleRequest = co.wrap (req, res)->
           { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
           self.sendNotification SEND_TO_LOG, '>>>>>> START REQUEST HANDLING', LEVELS[DEBUG]
@@ -246,6 +249,7 @@ module.exports = (Module)->
       args: [Error]
       return: LAMBDA
       default: (err)->
+        assert = require 'assert'
         assert _.isError(err), "non-error thrown: #{err}"
         return if 404 is err.status or err.expose
         return if @configs.silent
@@ -275,7 +279,7 @@ module.exports = (Module)->
           return ctx.res.end body
         if _.isBuffer(body) or _.isString body
           return ctx.res.end body
-        if body instanceof Stream
+        if body instanceof require 'stream'
           return body.pipe ctx.res
         body = JSON.stringify body ? null
         unless ctx.res.headersSent
