@@ -38,7 +38,7 @@ module.exports = (Module)->
           vsRoot = @::ROOT ? '.'
           vsTemplatesDir = "#{vsRoot}/templates"
           files = filesTreeSync vsTemplatesDir, filesOnly: yes
-          _.orderBy _.compact (files ? []).forEach (i)=>
+          (files ? []).forEach (i)=>
             templateName = i.replace /\.js|\.coffee/, ''
             vsTemplatePath = "#{vsTemplatesDir}/#{templateName}"
             require(vsTemplatePath) @Module
