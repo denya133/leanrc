@@ -97,7 +97,7 @@ module.exports = (Module)->
           return yield (yield @collection.query body.query).toArray()
 
       # ------------ Chains definitions ---------
-      @chains ['query']
+      @chains ['query', 'list']
       # @initialHook 'requiredAuthorizationHeader', only: ['query']
       @initialHook 'parseBody', only: ['query']
 

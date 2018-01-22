@@ -11,7 +11,8 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
-      @public @static defineMigrations: Function,
+      # TODO: после того как все приложения будут переведены на использование связки loadMigrations-requireMigrations, этот метод надо удалить.
+      @public @static defineMigrations: Function, # deprecated
         default: (asRoot = @::ROOT ? '.') ->
           vsMigratonsDir = "#{asRoot}/migrations"
           files = filesListSync vsMigratonsDir
