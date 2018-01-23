@@ -1,13 +1,13 @@
 
 
 module.exports = (Module) ->
-  isArango = Module::Utils.isArangoDB()
-  crypto = if isArango
-    require '@arangodb/crypto'
-  else
-    require 'crypto'
   Module::Utils.genRandomAlphaNumbers = (length) ->
-    if isArango
+    { isArangoDB } = Module::Utils
+    crypto = if isArangoDB()
+      require '@arangodb/crypto'
+    else
+      require 'crypto'
+    if isArangoDB()
       # Is ArangoDB !!!
       return crypto.genRandomAlphaNumbers length
     else
@@ -15,11 +15,16 @@ module.exports = (Module) ->
       return crypto.randomBytes(length).toString 'hex'
 
   Module::Utils.hashPassword = (password, opts = {}) ->
+    { isArangoDB } = Module::Utils
     {hashMethod, saltLength} = opts
     hashMethod ?= 'sha256'
     saltLength ?= 16
     method = hashMethod
-    if isArango
+    crypto = if isArangoDB()
+      require '@arangodb/crypto'
+    else
+      require 'crypto'
+    if isArangoDB()
       # Is ArangoDB !!!
       salt = crypto.genRandomAlphaNumbers saltLength
       hash = crypto[method] salt + password
@@ -31,10 +36,15 @@ module.exports = (Module) ->
       return {method, salt, hash}
 
   Module::Utils.verifyPassword = (authData, password)->
+    { isArangoDB } = Module::Utils
     method = authData.method ? 'sha256'
     salt = authData.salt ? ''
     storedHash = authData.hash ? ''
-    if isArango
+    crypto = if isArangoDB()
+      require '@arangodb/crypto'
+    else
+      require 'crypto'
+    if isArangoDB()
       # Is ArangoDB !!!
       generatedHash = crypto[method] salt + password
       return crypto.constantEquals storedHash, generatedHash

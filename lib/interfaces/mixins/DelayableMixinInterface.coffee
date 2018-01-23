@@ -1,8 +1,8 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface (BaseClass) ->
-    class DelayableMixinInterface extends BaseClass
+  Module.defineInterface 'DelayableMixinInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @static @virtual delay: Function,
@@ -10,4 +10,4 @@ module.exports = (Module)->
         return: Object
 
 
-    DelayableMixinInterface.initializeInterface()
+      @initializeInterface()

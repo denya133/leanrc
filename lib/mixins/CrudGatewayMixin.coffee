@@ -28,8 +28,8 @@ module.exports = (Module)->
   FORBIDDEN         = statuses 'forbidden'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  Module.defineMixin Gateway, (BaseClass) ->
-    class CrudGatewayMixin extends BaseClass
+  Module.defineMixin 'CrudGatewayMixin', (BaseClass = Gateway) ->
+    class extends BaseClass
       @inheritProtected()
       # @implements Module::CrudGatewayMixinInterface
 
@@ -186,4 +186,4 @@ module.exports = (Module)->
           return
 
 
-    CrudGatewayMixin.initializeMixin()
+      @initializeMixin()

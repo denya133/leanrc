@@ -1,22 +1,20 @@
---compilers coffee:coffee-script/register
+--require coffeescript/register
 --reporter spec
 --check-leaks
 --growl
-test/lib/
-test/lib/core/
-test/lib/patterns/
-test/lib/patterns/facade/
-test/lib/patterns/observer/
-test/lib/patterns/query_object/
-test/lib/patterns/pipes/
-test/lib/patterns/gateway/
-test/lib/patterns/iterator/
-test/lib/patterns/mediator/
-test/lib/patterns/command/
-test/lib/patterns/migration/
-test/lib/patterns/data_mapper/
-test/lib/patterns/proxy/
-test/lib/patterns/mixins/
-test/lib/patterns/switch/
-test/lib/patterns/utils/
-test/
+test/lib/core/*.coffee
+test/lib/patterns/facade/*.coffee
+test/lib/patterns/observer/*.coffee
+test/lib/patterns/query_object/*.coffee
+test/lib/patterns/pipes/*.coffee
+test/lib/patterns/gateway/*.coffee
+test/lib/patterns/iterator/*.coffee
+test/lib/patterns/mediator/*.coffee
+test/lib/patterns/command/*.coffee
+test/lib/patterns/migration/*.coffee
+test/lib/patterns/data_mapper/*.coffee
+test/lib/patterns/proxy/*.coffee
+test/lib/patterns/mixins/*.coffee
+test/lib/patterns/switch/*.coffee
+test/lib/patterns/utils/*.coffee
+test/*.coffee

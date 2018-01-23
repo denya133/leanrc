@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class DelayedQueueInterface extends BaseClass
+  Module.defineInterface 'DelayedQueueInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual resque: Module::ResqueInterface
@@ -54,4 +54,4 @@ module.exports = (Module)->
         return: Array # массив строк jobId's
 
 
-    DelayedQueueInterface.initializeInterface()
+      @initializeInterface()

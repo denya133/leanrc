@@ -6,8 +6,8 @@ module.exports = (Module)->
     Utils: { _, inflect, joi }
   } = Module::
 
-  Module.defineMixin CoreObject, (BaseClass) ->
-    class RecordMixin extends BaseClass
+  Module.defineMixin 'RecordMixin', (BaseClass = CoreObject) ->
+    class extends BaseClass
       @inheritProtected()
 
       # конструктор принимает второй аргумент, ссылку на коллекцию.
@@ -71,7 +71,7 @@ module.exports = (Module)->
               # string of some aql code for example
       ###
       @public @static customFilters: Object,
-        get: -> @metaObject.getGroup 'customFilters'
+        get: -> @metaObject.getGroup 'customFilters', no
 
       @public @static customFilter: Function,
         args: [Module::LAMBDA]
@@ -85,17 +85,18 @@ module.exports = (Module)->
       @public @static parentClassNames: Function,
         default: (AbstractClass = null)->
           AbstractClass ?= @
-          fromSuper = if AbstractClass.__super__?
-            @parentClassNames AbstractClass.__super__.constructor
+          SuperClass = Reflect.getPrototypeOf AbstractClass
+          fromSuper = unless _.isEmpty SuperClass?.name
+            @parentClassNames SuperClass
           _.uniq [].concat(fromSuper ? [])
             .concat [AbstractClass.name]
 
       @public @static attributes: Object,
-        get: -> @metaObject.getGroup 'attributes'
+        get: -> @metaObject.getGroup 'attributes', no
       @public @static edges: Object,
-        get: -> @metaObject.getGroup 'edges'
+        get: -> @metaObject.getGroup 'edges', no
       @public @static computeds: Object,
-        get: -> @metaObject.getGroup 'computeds'
+        get: -> @metaObject.getGroup 'computeds', no
 
       @public @static attribute: Function,
         default: ->
@@ -137,7 +138,8 @@ module.exports = (Module)->
           return
 
       @public @static comp: Function,
-        default: (typeDefinition, ..., opts)->
+        default: (args...)->
+          [typeDefinition, ..., opts] = args
           if typeDefinition is opts
             typeDefinition = "#{opts.attr}": opts.attrType
           [vsAttr] = Object.keys typeDefinition
@@ -349,4 +351,4 @@ module.exports = (Module)->
       @public toJSON: Function, { default: -> @constructor.serialize @ }
 
 
-    RecordMixin.initializeMixin()
+      @initializeMixin()

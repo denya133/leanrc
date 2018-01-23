@@ -3,12 +3,12 @@
 module.exports = (Module)->
   {
     ANY, NILL
-
+    Collection
     Utils: { _, inflect, uuid }
   } = Module::
 
-  Module.defineMixin Module::Collection, (BaseClass) ->
-    class MemoryCollectionMixin extends BaseClass
+  Module.defineMixin 'MemoryCollectionMixin', (BaseClass = Collection) ->
+    class extends BaseClass
       @inheritProtected()
 
       ipoCollection = @protected collection: Object
@@ -63,4 +63,4 @@ module.exports = (Module)->
           yield return Object.keys(@[ipoCollection]).length
 
 
-    MemoryCollectionMixin.initializeMixin()
+      @initializeMixin()

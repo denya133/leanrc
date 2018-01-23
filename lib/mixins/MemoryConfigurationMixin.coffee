@@ -44,12 +44,12 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     ANY, NILL
-
+    Configuration
     Utils: { _, inflect }
   } = Module::
 
-  Module.defineMixin Module::Configuration, (BaseClass) ->
-    class MemoryConfigurationMixin extends BaseClass
+  Module.defineMixin 'MemoryConfigurationMixin', (BaseClass = Configuration) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public ROOT: String,
@@ -103,4 +103,4 @@ module.exports = (Module)->
               return
           return
 
-    MemoryConfigurationMixin.initializeMixin()
+      @initializeMixin()

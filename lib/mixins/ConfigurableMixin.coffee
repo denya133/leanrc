@@ -7,8 +7,8 @@ module.exports = (Module)->
     CoreObject
   } = Module::
 
-  Module.defineMixin CoreObject, (BaseClass) ->
-    class ConfigurableMixin extends BaseClass
+  Module.defineMixin 'ConfigurableMixin', (BaseClass = CoreObject) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public configs: Object,
@@ -16,4 +16,4 @@ module.exports = (Module)->
           @facade.retrieveProxy CONFIGURATION
 
 
-    ConfigurableMixin.initializeMixin()
+      @initializeMixin()

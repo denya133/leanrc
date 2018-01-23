@@ -3,12 +3,12 @@
 module.exports = (Module)->
   {
     ANY, NILL
-
+    Migration
     Utils: { _, inflect }
   } = Module::
 
-  Module.defineMixin Module::Migration, (BaseClass) ->
-    class MemoryMigrationMixin extends BaseClass
+  Module.defineMixin 'MemoryMigrationMixin', (BaseClass = Migration) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @async createCollection: Function,
@@ -162,4 +162,4 @@ module.exports = (Module)->
           yield return
 
 
-    MemoryMigrationMixin.initializeMixin()
+      @initializeMixin()

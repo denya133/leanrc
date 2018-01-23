@@ -14,8 +14,8 @@ module.exports = (Module)->
   UNAUTHORIZED      = statuses 'unauthorized'
   FORBIDDEN         = statuses 'forbidden'
 
-  Module.defineMixin Resource, (BaseClass) ->
-    class AdminingResourceMixin extends BaseClass
+  Module.defineMixin 'AdminingResourceMixin', (BaseClass = Resource) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public spaces: Array
@@ -118,4 +118,4 @@ module.exports = (Module)->
           yield return args
 
 
-    AdminingResourceMixin.initializeMixin()
+      @initializeMixin()

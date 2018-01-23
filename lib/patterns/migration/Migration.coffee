@@ -1,4 +1,4 @@
-path = require 'path'
+
 
 ###
 http://edgeguides.rubyonrails.org/active_record_migrations.html

@@ -1,4 +1,4 @@
-semver        = require 'semver'
+# semver        = require 'semver'
 
 
 module.exports = (Module)->
@@ -17,7 +17,7 @@ module.exports = (Module)->
     ChainsMixin
     ContextInterface
 
-    Utils: { _, inflect, statuses }
+    Utils: { _, inflect, statuses, isArangoDB }
   } = Module::
 
   HTTP_NOT_FOUND    = statuses 'not found'
@@ -59,6 +59,7 @@ module.exports = (Module)->
         [vNeedVersion] = vCurrentVersion.match(/^\d{1,}[.]\d{1,}/) ? []
         unless vNeedVersion?
           throw new Error 'Incorrect `version` specified in the configuration'
+        semver = require 'semver'
         unless semver.satisfies vCurrentVersion, vVersion
           @context.throw UPGRADE_REQUIRED, "Upgrade: v#{vCurrentVersion}"
         yield return args
@@ -163,7 +164,7 @@ module.exports = (Module)->
     @public recordBody: Object
 
     @public @static actions: Object,
-      get: -> @metaObject.getGroup 'actions'
+      get: -> @metaObject.getGroup 'actions', no
 
     @public @static action: Function,
       default: (nameDefinition, config)->
@@ -303,6 +304,8 @@ module.exports = (Module)->
         service = @facade.retrieveMediator APPLICATION_MEDIATOR
           .getViewComponent()
         try
+          if isArangoDB()
+            service.context = voBody.context
           if service.context?
             @sendNotification SEND_TO_LOG, '>>>>>>>>>>>>>> EXECUTION START', LEVELS[DEBUG]
             voResult =

@@ -1,4 +1,4 @@
-EventEmitter  = require 'events'
+
 
 ###
 for example
@@ -35,12 +35,11 @@ module.exports = (Module)->
     STOPPED_ROLLBACK
 
     Mediator
-    Utils
+    Utils: { genRandomAlphaNumbers }
   } = Module::
-  { genRandomAlphaNumbers } = Utils
 
-  Module.defineMixin Mediator, (BaseClass) ->
-    class ApplicationMediatorMixin extends BaseClass
+  Module.defineMixin 'ApplicationMediatorMixin', (BaseClass = Mediator) ->
+    class extends BaseClass
       @inheritProtected()
 
       ipoEmitter = @private emitter: Object
@@ -132,9 +131,10 @@ module.exports = (Module)->
 
       @public init: Function,
         default: (args...)->
+          EventEmitter = require 'events'
           voEmitter = new EventEmitter()
           @[ipoEmitter] = voEmitter
           return @super args...
 
 
-    ApplicationMediatorMixin.initializeMixin()
+      @initializeMixin()

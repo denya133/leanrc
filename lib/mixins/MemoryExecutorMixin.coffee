@@ -47,10 +47,8 @@ module.exports = (Module)->
     Utils: { _, co, isArangoDB, genRandomAlphaNumbers }
   } = Module::
 
-  EventEmitter  = require 'events'
-
-  Module.defineMixin Module::Mediator, (BaseClass) ->
-    class MemoryExecutorMixin extends BaseClass
+  Module.defineMixin 'MemoryExecutorMixin', (BaseClass = Mediator) ->
+    class extends BaseClass
       @inheritProtected()
       @include DelayableMixin
       @include ConfigurableMixin
@@ -89,6 +87,7 @@ module.exports = (Module)->
       @public onRegister: Function,
         default: (args...)->
           @super args...
+          EventEmitter = require 'events'
           @setViewComponent new EventEmitter()
           @[ipoConcurrencyCount] = {}
           @[ipoDefinedProcessors] = {}
@@ -113,12 +112,13 @@ module.exports = (Module)->
             fullQueueName = @[ipoResque].fullQueueName name
             [moduleName] = fullQueueName.split '|>'
             if moduleName is @moduleName()
-              @define name, {concurrency}, co.wrap (job, done)=>
+              self = @
+              @define name, {concurrency}, co.wrap (job, done)->
                 reverse = genRandomAlphaNumbers 32
-                @getViewComponent().once reverse, (aoError)=>
+                self.getViewComponent().once reverse, (aoError)->
                   done aoError
                 {scriptName, data} = job.data
-                @sendNotification scriptName, data, reverse
+                self.sendNotification scriptName, data, reverse
                 return
             continue
           yield return
@@ -159,9 +159,10 @@ module.exports = (Module)->
         default: ->
           if @[ipbIsStopped]
             yield return
-          @[ipoTimer] = setTimeout co.wrap =>
-            clearTimeout @[ipoTimer]
-            yield @cyclePart()
+          self = @
+          @[ipoTimer] = setTimeout co.wrap ->
+            clearTimeout self[ipoTimer]
+            yield self.cyclePart()
           , 100
           yield return
 
@@ -210,4 +211,4 @@ module.exports = (Module)->
           return
 
 
-    MemoryExecutorMixin.initializeMixin()
+      @initializeMixin()

@@ -23,6 +23,7 @@ describe 'CheckSessionsMixin', ->
         Test::TestResource.initialize()
         resource = Test::TestResource.new()
       .to.not.throw Error
+  ### Moved to ModelingResourceMixin
   describe '#checkHeader', ->
     it 'should check if authorization header is present and correct', ->
       co ->
@@ -83,7 +84,11 @@ describe 'CheckSessionsMixin', ->
         assert.isTrue check
         facade.remove()
         yield return
+  ###
   describe '#makeSession', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should create session', ->
       co ->
         KEY = 'TEST_CHECK_SESSIONS_MIXIN_002'
@@ -117,7 +122,13 @@ describe 'CheckSessionsMixin', ->
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
+          ipoCollection = Symbol.for '~collection'
+          @public @async takeBy: Function,
+            default: (query, options = {})->
+              id = query['@doc.id']
+              yield return LeanRC::Cursor.new(@, [@[ipoCollection][id]])
         SessionsCollection.initialize()
         class Session extends Test::CoreObject
           @inheritProtected()
@@ -167,7 +178,7 @@ describe 'CheckSessionsMixin', ->
         resource.context = Test::Context.new req, res, switchMediator
         resource.initializeNotifier KEY
         yield resource.makeSession()
-        assert.equal resource.session.uid, 'admin'
+        assert.isUndefined resource.session.uid
         sessions = facade.retrieveProxy Test::SESSIONS
         session = yield sessions.create()
         delete req.headers['authorization']
@@ -177,9 +188,11 @@ describe 'CheckSessionsMixin', ->
         delete req.headers['cookie']
         yield resource.makeSession()
         assert.isFalse resource.session.uid?
-        facade.remove()
         yield return
   describe '#checkSession', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should check if session valid', ->
       co ->
         KEY = 'TEST_CHECK_SESSIONS_MIXIN_003'
@@ -213,7 +226,13 @@ describe 'CheckSessionsMixin', ->
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
+          @include LeanRC::QueryableCollectionMixin
           @module Test
+          ipoCollection = Symbol.for '~collection'
+          @public @async takeBy: Function,
+            default: (query, options = {})->
+              id = query['@doc.id']
+              yield return LeanRC::Cursor.new(@, [@[ipoCollection][id]])
         MemoryCollection.initialize()
         class Session extends Test::CoreObject
           @inheritProtected()
@@ -294,5 +313,4 @@ describe 'CheckSessionsMixin', ->
         resource.initializeNotifier KEY
         yield resource.checkSession()
         assert.equal resource.currentUser.id, user.id
-        facade.remove()
         yield return

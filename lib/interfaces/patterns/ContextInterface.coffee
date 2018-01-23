@@ -10,8 +10,8 @@ module.exports = (Module)->
     SwitchInterface
   } = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class ContextInterface extends BaseClass
+  Module.defineInterface 'ContextInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual req: Object
@@ -110,4 +110,4 @@ module.exports = (Module)->
         return: Object
 
 
-    ContextInterface.initializeInterface()
+      @initializeInterface()

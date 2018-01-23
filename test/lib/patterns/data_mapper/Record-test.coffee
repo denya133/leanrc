@@ -23,6 +23,9 @@ describe 'Record', ->
         assert.instanceOf record, LeanRC::Record, 'Not a Record'
       .to.not.throw Error
   describe '#afterCreate', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should be called after create', ->
       co ->
         class Test extends LeanRC::Module
@@ -46,7 +49,7 @@ describe 'Record', ->
         record = collection.build {id: 123}
         yield record.save()
         assert.isTrue spyRunNotitfication.calledWith('createdRecord'), '`afterCreate` run incorrect'
-        facade.remove()
+        yield return
   describe '#beforeUpdate', ->
     it 'should be called before update', ->
       co ->

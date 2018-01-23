@@ -5,8 +5,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class TransformInterface extends BaseClass
+  Module.defineInterface 'TransformInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @static @virtual normalize: Function,
@@ -17,4 +17,4 @@ module.exports = (Module)->
         return: [ANY, NILL]
 
 
-    TransformInterface.initializeInterface()
+      @initializeInterface()

@@ -34,8 +34,10 @@ module.exports = (Module)->
 
 
 module.exports = (Module)->
-  Module.defineMixin Module::Endpoint, (BaseClass) ->
-    class CrudEndpointMixin extends BaseClass
+  { Endpoint } = Module::
+
+  Module.defineMixin 'CrudEndpointMixin', (BaseClass = Endpoint) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public keyName: String,
@@ -69,4 +71,4 @@ module.exports = (Module)->
         get: -> @gateway.versionSchema
 
 
-    CrudEndpointMixin.initializeMixin()
+      @initializeMixin()

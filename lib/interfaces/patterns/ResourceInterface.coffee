@@ -15,8 +15,8 @@ module.exports = (Module)->
     ContextInterface
   } = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class ResourceInterface extends BaseClass
+  Module.defineInterface 'ResourceInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual entityName: String
@@ -55,4 +55,4 @@ module.exports = (Module)->
         return: NILL # без return. данные посылаем сигналом
 
 
-    ResourceInterface.initializeInterface()
+      @initializeInterface()

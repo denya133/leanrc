@@ -28,7 +28,7 @@ describe 'RelationsMixin', ->
       .to.not.throw Error
   describe '.belongsTo', ->
     it 'should define one-to-one or one-to-many relation for class', ->
-      expect ->
+      co ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
@@ -62,10 +62,10 @@ describe 'RelationsMixin', ->
         assert.equal relationData.relation, 'belongsTo', 'Value of `relation` is incorrect'
         assert.equal relationData.attr, 'relation', 'Value of `attr` is incorrect'
         assert.equal relationData.level, RC::PUBLIC, 'Value of `level` is incorrect'
-      .to.not.throw Error
+        yield return
   describe '.hasMany', ->
     it 'should define one-to-one or one-to-many relation for class', ->
-      expect ->
+      co ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
@@ -97,10 +97,10 @@ describe 'RelationsMixin', ->
         assert.equal relationData.relation, 'hasMany', 'Value of `relation` is incorrect'
         assert.equal relationData.attr, 'manyRelation', 'Value of `attr` is incorrect'
         assert.equal relationData.level, RC::PUBLIC, 'Value of `level` is incorrect'
-      .to.not.throw Error
+        yield return
   describe '.hasOne', ->
     it 'should define many-to-one or many-to-one relation for class', ->
-      expect ->
+      co ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
@@ -132,10 +132,10 @@ describe 'RelationsMixin', ->
         assert.equal relationData.relation, 'hasOne', 'Value of `relation` is incorrect'
         assert.equal relationData.attr, 'oneRelation', 'Value of `attr` is incorrect'
         assert.equal relationData.level, RC::PUBLIC, 'Value of `level` is incorrect'
-      .to.not.throw Error
+        yield return
   describe '.inverseFor', ->
     it 'should get inverse info', ->
-      expect ->
+      co ->
         class Test extends RC::Module
           @inheritProtected()
         Test.initialize()
@@ -164,4 +164,4 @@ describe 'RelationsMixin', ->
         assert.equal inverseInfo.recordClass, Test::RelationRecord, 'Record class is incorrect'
         assert.equal inverseInfo.attrName,'test', 'Record class is incorrect'
         assert.equal inverseInfo.relation, 'hasOne', 'Record class is incorrect'
-      .to.not.throw Error
+        yield return

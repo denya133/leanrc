@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class PipeMessageInterface extends BaseClass
+  Module.defineInterface 'PipeMessageInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @static @virtual PRIORITY_HIGH: Number
@@ -41,4 +41,4 @@ module.exports = (Module)->
         return: NILL
 
 
-    PipeMessageInterface.initializeInterface()
+      @initializeInterface()

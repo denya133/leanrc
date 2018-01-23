@@ -27,12 +27,11 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     Resource
-    Utils
+    Utils: { isArangoDB }
   } = Module::
-  { isArangoDB } = Utils
 
-  Module.defineMixin Resource, (BaseClass) ->
-    class BodyParseMixin extends BaseClass
+  Module.defineMixin 'BodyParseMixin', (BaseClass = Resource) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @async parseBody: Function,
@@ -45,4 +44,4 @@ module.exports = (Module)->
           yield return args
 
 
-    BodyParseMixin.initializeMixin()
+      @initializeMixin()

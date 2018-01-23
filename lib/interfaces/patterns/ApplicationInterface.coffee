@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class ApplicationInterface extends BaseClass
+  Module.defineInterface 'ApplicationInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @static @virtual NAME: String
@@ -12,4 +12,4 @@ module.exports = (Module)->
         args: []
         return: NILL
 
-    ApplicationInterface.initializeInterface()
+      @initializeInterface()

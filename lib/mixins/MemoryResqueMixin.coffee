@@ -34,12 +34,12 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     ANY, NILL, DEFAULT_QUEUE
-
+    Resque
     Utils: { _, inflect }
   } = Module::
 
-  Module.defineMixin Module::Resque, (BaseClass) ->
-    class MemoryResqueMixin extends BaseClass
+  Module.defineMixin 'MemoryResqueMixin', (BaseClass = Resque) ->
+    class extends BaseClass
       @inheritProtected()
 
       ipoDelayedJobs = @protected delayedJobs: Object
@@ -222,4 +222,4 @@ module.exports = (Module)->
           yield return res ? []
 
 
-    MemoryResqueMixin.initializeMixin()
+      @initializeMixin()

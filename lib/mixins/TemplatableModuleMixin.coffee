@@ -1,4 +1,3 @@
-path = require 'path'
 
 
 module.exports = (Module)->
@@ -7,12 +6,12 @@ module.exports = (Module)->
     Utils: { _, filesTreeSync }
   } = Module::
 
-  Module.defineMixin ModuleClass, (BaseClass) ->
-    class TemplatableModuleMixin extends BaseClass
+  Module.defineMixin 'TemplatableModuleMixin', (BaseClass = ModuleClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @static templates: Object,
-        get: -> @metaObject.getGroup 'templates'
+        get: -> @metaObject.getGroup 'templates', no
 
       @public @static defineTemplate: Function,
         default: (filename, fun)->
@@ -28,21 +27,22 @@ module.exports = (Module)->
         default: (args...)->
           vsRoot = @::ROOT ? '.'
           vsTemplatesDir = "#{vsRoot}/templates/"
+          path = require 'path'
           templateName = path.resolve args...
             .replace vsTemplatesDir, ''
             .replace /\.js|\.coffee/, ''
           return @templates[templateName]
 
       @public @static loadTemplates: Function,
-        default: ()->
+        default: ->
           vsRoot = @::ROOT ? '.'
           vsTemplatesDir = "#{vsRoot}/templates"
           files = filesTreeSync vsTemplatesDir, filesOnly: yes
-          _.orderBy _.compact (files ? []).forEach (i)=>
+          (files ? []).forEach (i)=>
             templateName = i.replace /\.js|\.coffee/, ''
             vsTemplatePath = "#{vsTemplatesDir}/#{templateName}"
             require(vsTemplatePath) @Module
           return
 
 
-    TemplatableModuleMixin.initializeMixin()
+      @initializeMixin()

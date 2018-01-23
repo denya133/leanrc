@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class SwitchInterface extends BaseClass
+  Module.defineInterface 'SwitchInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual routerName: String
@@ -41,4 +41,4 @@ module.exports = (Module)->
         return: NILL
 
 
-    SwitchInterface.initializeInterface()
+      @initializeInterface()

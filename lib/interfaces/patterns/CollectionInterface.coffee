@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class CollectionInterface extends BaseClass
+  Module.defineInterface 'CollectionInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
 
       @public @virtual recordHasBeenChanged: Function,
@@ -97,4 +97,4 @@ module.exports = (Module)->
         return: ANY # сериализация рекорда для отправки в базу
 
 
-    CollectionInterface.initializeInterface()
+      @initializeInterface()

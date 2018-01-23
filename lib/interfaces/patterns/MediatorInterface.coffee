@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {ANY, NILL} = Module::
 
-  Module.defineInterface (BaseClass) ->
-    class MediatorInterface extends BaseClass
+  Module.defineInterface 'MediatorInterface', (BaseClass) ->
+    class extends BaseClass
       @inheritProtected()
       @include Module::NotifierInterface
 
@@ -31,4 +31,4 @@ module.exports = (Module)->
         return: NILL
 
 
-    MediatorInterface.initializeInterface()
+      @initializeInterface()
