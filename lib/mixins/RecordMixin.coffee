@@ -71,33 +71,32 @@ module.exports = (Module)->
               # string of some aql code for example
       ###
       @public @static customFilters: Object,
-        get: -> @metaObject.getGroup 'customFilters'
+        get: -> @metaObject.getGroup 'customFilters', no
 
       @public @static customFilter: Function,
         args: [Module::LAMBDA]
         return: Module::NILL
         default: (amStatementFunc)->
-          t1 = Date.now()
           config = amStatementFunc.call @
           for own asFilterName, aoStatement of config
             @metaObject.addMetaData 'customFilters', asFilterName, aoStatement
-          @____dt += Date.now() - t1
           return
 
       @public @static parentClassNames: Function,
         default: (AbstractClass = null)->
           AbstractClass ?= @
-          fromSuper = if AbstractClass.__super__?
-            @parentClassNames AbstractClass.__super__.constructor
+          SuperClass = Reflect.getPrototypeOf AbstractClass
+          fromSuper = unless _.isEmpty SuperClass?.name
+            @parentClassNames SuperClass
           _.uniq [].concat(fromSuper ? [])
             .concat [AbstractClass.name]
 
       @public @static attributes: Object,
-        get: -> @metaObject.getGroup 'attributes'
+        get: -> @metaObject.getGroup 'attributes', no
       @public @static edges: Object,
-        get: -> @metaObject.getGroup 'edges'
+        get: -> @metaObject.getGroup 'edges', no
       @public @static computeds: Object,
-        get: -> @metaObject.getGroup 'computeds'
+        get: -> @metaObject.getGroup 'computeds', no
 
       @public @static attribute: Function,
         default: ->
@@ -106,7 +105,6 @@ module.exports = (Module)->
 
       @public @static attr: Function,
         default: (typeDefinition, opts={})->
-          t1 = Date.now()
           [vsAttr] = Object.keys typeDefinition
           vcAttrType = typeDefinition[vsAttr]
           opts.transform ?= switch vcAttrType
@@ -131,7 +129,6 @@ module.exports = (Module)->
           else
             @metaObject.addMetaData 'attributes', vsAttr, opts
             @metaObject.addMetaData 'edges', vsAttr, opts if opts.through
-          @____dt += Date.now() - t1
           @public typeDefinition, opts
           return
 
@@ -141,8 +138,8 @@ module.exports = (Module)->
           return
 
       @public @static comp: Function,
-        default: (typeDefinition, ..., opts)->
-          t1 = Date.now()
+        default: (args...)->
+          [typeDefinition, ..., opts] = args
           if typeDefinition is opts
             typeDefinition = "#{opts.attr}": opts.attrType
           [vsAttr] = Object.keys typeDefinition
@@ -152,7 +149,6 @@ module.exports = (Module)->
             throw new Error "comp `#{vsAttr}` has been defined previously"
           else
             @metaObject.addMetaData 'computeds', vsAttr, opts
-          @____dt += Date.now() - t1
           @public typeDefinition, opts
           return
 

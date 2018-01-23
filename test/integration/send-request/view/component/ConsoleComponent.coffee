@@ -45,7 +45,8 @@ module.exports = (Module) ->
         else
           @[ipoEventEmitter].removeAllListeners eventName
 
-    constructor: ->
+    constructor: (args...) ->
+      super args...
       @[ipoEventEmitter] = new EventEmitter
 
 

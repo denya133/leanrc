@@ -1,5 +1,5 @@
-accepts       = require 'accepts'
-createError   = require 'http-errors'
+# accepts       = require 'accepts'
+# createError   = require 'http-errors'
 assert        = require 'assert'
 
 ###
@@ -46,7 +46,9 @@ module.exports = (Module)->
     # @public database: String # возможно это тоже надо получать из метода из отдельного модуля
 
     @public throw: Function,
-      default: (args...)-> throw createError args...
+      default: (args...)->
+        createError = require 'http-errors'
+        throw createError args...
 
     @public assert: Function,
       default: assert
@@ -213,6 +215,7 @@ module.exports = (Module)->
     @public init: Function,
       default: (req, res, switchInstanse)->
         @super()
+        accepts = require 'accepts'
         @req = req
         @res = res
         @switch = switchInstanse

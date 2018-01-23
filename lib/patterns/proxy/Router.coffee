@@ -75,7 +75,8 @@ module.exports = (Module)->
       get: -> @[ipsParam]
 
     @public @static map: Function,
-      default: (lambda = ->)->
+      default: (lambda)->
+        lambda ?= ->
         @public map: Function,
           args: []
           return: ANY

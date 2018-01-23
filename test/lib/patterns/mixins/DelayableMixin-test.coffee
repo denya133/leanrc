@@ -8,6 +8,9 @@ LeanRC = require.main.require 'lib'
 
 describe 'DelayableMixin', ->
   describe '#_delayJob', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should put job into delayed queue', ->
       co ->
         KEY = 'TEST_DELAYABLE_MIXIN_001'
@@ -29,10 +32,8 @@ describe 'DelayableMixin', ->
         facade.registerProxy Test::Resque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         yield resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
-        classSymbols = Object.getOwnPropertySymbols Test::Test
-        delayJobSymbol = _.find classSymbols, (item) ->
-          item.toString() is 'Symbol(_delayJob)'
-        assert delayJobSymbol
+        delayJobSymbol = Test::Test.classMethods['_delayJob']?.pointer
+        assert.isTrue delayJobSymbol?
         DELAY_UNTIL = Date.now()
         DATA = {}
         options =
@@ -48,9 +49,11 @@ describe 'DelayableMixin', ->
           status: 'scheduled'
           lockLifetime: 5000
           lockLimit: 2
-        facade.remove()
         yield return
   describe '.delay', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should get delayed function wrapper', ->
       co ->
         KEY = 'TEST_DELAYABLE_MIXIN_002'
@@ -96,9 +99,11 @@ describe 'DelayableMixin', ->
           status: 'scheduled'
           lockLifetime: 5000
           lockLimit: 2
-        facade.remove()
         yield return
   describe '#delay', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should get delayed function wrapper', ->
       co ->
         KEY = 'TEST_DELAYABLE_MIXIN_003'
@@ -144,5 +149,4 @@ describe 'DelayableMixin', ->
           status: 'scheduled'
           lockLifetime: 5000
           lockLimit: 2
-        facade.remove()
         yield return

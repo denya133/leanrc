@@ -47,18 +47,18 @@ describe 'QueryableResourceMixin', ->
           @include LeanRC::QueryableCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-          @public parseQuery: Object,
+          @public @async parseQuery: Object,
             default: (aoQuery) ->
               if aoQuery.$filter?
                 aoQuery.$filter = _.mapKeys aoQuery.$filter, (value, key) ->
                   key.replace '@doc.', ''
-              aoQuery
+              return yield aoQuery
           @public @async takeAll: Function,
             default: ->
               yield LeanRC::Cursor.new @, @getData().data
-          @public @async query: Function,
+          @public @async executeQuery: Function,
             default: (aoParsedQuery) ->
-              data = _.filter @getData().data, aoParsedQuery.$filter
+              data = _.filter @getData().data, _.matches aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
           @public @async push: Function,
             default: (aoRecord) ->
