@@ -7,14 +7,14 @@ module.exports = (Module)->
   } = Module::
 
   Module.defineMixin 'CrudRendererMixin', (BaseClass = Renderer) ->
-    class extends BaseClass
+    class CrudRendererMixin extends BaseClass
       @inheritProtected()
 
       @public create: Function,
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
-          itemDecorator = Module.resolveTemplate templateName
-          itemDecorator ?= @itemDecorator
+          itemDecorator = @Module.templates[templateName]
+          itemDecorator ?= CrudRendererMixin::itemDecorator
           return "#{@itemEntityName}": itemDecorator.call @, aoData
 
       @public delete: Function,
@@ -23,8 +23,8 @@ module.exports = (Module)->
       @public detail: Function,
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
-          itemDecorator = Module.resolveTemplate templateName
-          itemDecorator ?= @itemDecorator
+          itemDecorator = @Module.templates[templateName]
+          itemDecorator ?= @constructor::itemDecorator
           return "#{@itemEntityName}": itemDecorator.call @, aoData
 
       @public itemDecorator: Function,
@@ -41,8 +41,8 @@ module.exports = (Module)->
       @public list: Function,
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
-          itemDecorator = Module.resolveTemplate templateName
-          itemDecorator ?= @itemDecorator
+          itemDecorator = @Module.templates[templateName]
+          itemDecorator ?= @constructor::itemDecorator
           return {
             meta: aoData.meta
             "#{@listEntityName}": aoData.items.map itemDecorator.bind @
@@ -54,16 +54,14 @@ module.exports = (Module)->
       @public update: Function,
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
-          itemDecorator = Module.resolveTemplate templateName
-          itemDecorator ?= @itemDecorator
+          itemDecorator = @Module.templates[templateName]
+          itemDecorator ?= @constructor::itemDecorator
           return "#{@itemEntityName}": itemDecorator.call @, aoData
 
       @public @async render: Function,
         default: (ctx, aoData, resource, {path, resource:resourceName, action, template:templatePath}={})->
           if path? and resourceName? and action?
-            service = @facade.retrieveMediator APPLICATION_MEDIATOR
-              ?.getViewComponent()
-            {templates} = service.Module
+            {templates} = @Module
             return yield Module::Promise.resolve(
               if templates?[templatePath]?
                 templates?[templatePath]?.call(
