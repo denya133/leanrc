@@ -115,7 +115,7 @@ module.exports = (Module)->
                   Module::UPLOADS
                 else
                   vsCollectionName
-              voCollection = @collection.facade.retrieveProxy vsCollectionName
+              voCollection = self.collection.facade.retrieveProxy vsCollectionName
               unless opts.through
                 yield voCollection.takeBy "@doc.#{opts.inverse}": self[opts.refKey]
               else
