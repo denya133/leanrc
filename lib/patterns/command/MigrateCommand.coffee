@@ -54,7 +54,7 @@ module.exports = (Module) ->
     @public migrationsCollection: Module::CollectionInterface
     @public migrationNames: Array,
       get: ->
-        app = @retrieveMediator APPLICATION_MEDIATOR
+        app = @facade.retrieveMediator APPLICATION_MEDIATOR
           .getViewComponent()
         app.Module::MIGRATION_NAMES ? []
 
@@ -80,7 +80,7 @@ module.exports = (Module) ->
       args: []
       return: NILL
       default: (options)->
-        app = @retrieveMediator APPLICATION_MEDIATOR
+        app = @facade.retrieveMediator APPLICATION_MEDIATOR
           .getViewComponent()
         for migrationName in @migrationNames
           unless yield @migrationsCollection.includes migrationName

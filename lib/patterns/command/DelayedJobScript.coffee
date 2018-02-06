@@ -23,7 +23,7 @@ module.exports = (Module)->
         args
       } = aoData
       replica.multitonKey = @[Symbol.for '~multitonKey']
-      app = @retrieveMediator APPLICATION_MEDIATOR
+      app = @facade.retrieveMediator APPLICATION_MEDIATOR
         .getViewComponent()
       unless moduleName is app.Module.name
         throw new Error "Job was defined with moduleName = `#{moduleName}`, but its Module = `#{app.Module.name}`"
