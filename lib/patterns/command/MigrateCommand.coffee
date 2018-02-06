@@ -42,6 +42,7 @@ module.exports = (Module)->
 module.exports = (Module) ->
   {
     ANY, NILL, STOPPED_MIGRATE
+    APPLICATION_MEDIATOR
     Utils: { _, inflect }
   } = Module::
 
@@ -51,8 +52,11 @@ module.exports = (Module) ->
     @module Module
 
     @public migrationsCollection: Module::CollectionInterface
-    @public migrationNames: Module::PromiseInterface,
-      get: -> @Module::MIGRATION_NAMES ? []
+    @public migrationNames: Array,
+      get: ->
+        app = @facade.retrieveMediator APPLICATION_MEDIATOR
+          .getViewComponent()
+        app.Module::MIGRATION_NAMES ? []
 
     @public migrationsDir: String,
       get: ->
@@ -76,13 +80,15 @@ module.exports = (Module) ->
       args: []
       return: NILL
       default: (options)->
+        app = @facade.retrieveMediator APPLICATION_MEDIATOR
+          .getViewComponent()
         for migrationName in @migrationNames
           unless yield @migrationsCollection.includes migrationName
             id = String migrationName
             clearedMigrationName = migrationName.replace /^\d{14}[_]/, ''
             migrationClassName = inflect.camelize clearedMigrationName
-            vcMigration = @Module::[migrationClassName]
-            type = "#{@Module.name}::#{migrationClassName}"
+            vcMigration = app.Module::[migrationClassName]
+            type = "#{app.Module.name}::#{migrationClassName}"
             try
               voMigration = yield @migrationsCollection.find id
               unless voMigration?

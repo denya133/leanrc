@@ -42,6 +42,7 @@ module.exports = (Module)->
 module.exports = (Module) ->
   {
     ANY, NILL, STOPPED_ROLLBACK
+    APPLICATION_MEDIATOR
     Utils: { _, inflect }
   } = Module::
 
@@ -52,7 +53,10 @@ module.exports = (Module) ->
 
     @public migrationsCollection: Module::CollectionInterface
     @public migrationNames: Array,
-      get: -> @Module::MIGRATION_NAMES ? []
+      get: ->
+        app = @facade.retrieveMediator APPLICATION_MEDIATOR
+          .getViewComponent()
+        app.Module::MIGRATION_NAMES ? []
 
     @public migrationsDir: String,
       get: ->
