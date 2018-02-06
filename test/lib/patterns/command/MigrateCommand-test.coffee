@@ -125,6 +125,15 @@ describe 'MigrateCommand', ->
           delegate: TestRecord
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
+        class ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+        ApplicationMediator.initialize()
+        class TestApplication extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+        TestApplication.initialize()
+        facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestCommand.new()
         command.initializeNotifier KEY
         migrationNames = command.migrationNames
@@ -172,6 +181,15 @@ describe 'MigrateCommand', ->
           delegate: LeanRC::Migration
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
+        class ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+        ApplicationMediator.initialize()
+        class TestApplication extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+        TestApplication.initialize()
+        facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestCommand.new()
         command.initializeNotifier KEY
         migrationNames = command.migrationNames
@@ -230,6 +248,15 @@ describe 'MigrateCommand', ->
           delegate: LeanRC::Migration
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
+        class ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+        ApplicationMediator.initialize()
+        class TestApplication extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+        TestApplication.initialize()
+        facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestCommand.new()
         command.initializeNotifier KEY
         untilName = '00000000000002_second_migration'

@@ -125,6 +125,15 @@ describe 'RollbackCommand', ->
           delegate: TestRecord
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
+        class ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+        ApplicationMediator.initialize()
+        class TestApplication extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+        TestApplication.initialize()
+        facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestCommand.new()
         command.initializeNotifier KEY
         migrationNames = command.migrationNames
@@ -176,6 +185,15 @@ describe 'RollbackCommand', ->
           @inheritProtected()
           @module Test
         TestMigrateCommand.initialize()
+        class ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+        ApplicationMediator.initialize()
+        class TestApplication extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+        TestApplication.initialize()
+        facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         forward = TestMigrateCommand.new()
         forward.initializeNotifier KEY
         command = TestCommand.new()
@@ -246,6 +264,15 @@ describe 'RollbackCommand', ->
           @inheritProtected()
           @module Test
         TestMigrateCommand.initialize()
+        class ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+        ApplicationMediator.initialize()
+        class TestApplication extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+        TestApplication.initialize()
+        facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         forward = TestMigrateCommand.new()
         forward.initializeNotifier KEY
         command = TestCommand.new()

@@ -33,6 +33,15 @@ describe 'DelayedJobScript', ->
               trigger.emit 'RUN_SCRIPT', args
               return
         TestClass.initialize()
+        class ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+        ApplicationMediator.initialize()
+        class TestApplication extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+        TestApplication.initialize()
+        facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestScript.new()
         command.initializeNotifier KEY
         promise = LeanRC::Promise.new (resolve, reject) ->
@@ -69,6 +78,15 @@ describe 'DelayedJobScript', ->
               trigger.emit 'RUN_SCRIPT', args
               return
         TestClass.initialize()
+        class ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+        ApplicationMediator.initialize()
+        class TestApplication extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+        TestApplication.initialize()
+        facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestScript.new()
         command.initializeNotifier KEY
         promise = LeanRC::Promise.new (resolve, reject) ->
@@ -105,6 +123,15 @@ describe 'DelayedJobScript', ->
               trigger.emit 'RUN_SCRIPT', args
               yield return
         TestClass.initialize()
+        class ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+        ApplicationMediator.initialize()
+        class TestApplication extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+        TestApplication.initialize()
+        facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestScript.new()
         command.initializeNotifier KEY
         promise = LeanRC::Promise.new (resolve, reject) ->
@@ -141,6 +168,15 @@ describe 'DelayedJobScript', ->
               trigger.emit 'RUN_SCRIPT', args
               yield return
         TestClass.initialize()
+        class ApplicationMediator extends LeanRC::Mediator
+          @inheritProtected()
+          @module Test
+        ApplicationMediator.initialize()
+        class TestApplication extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+        TestApplication.initialize()
+        facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestScript.new()
         command.initializeNotifier KEY
         promise = LeanRC::Promise.new (resolve, reject) ->
