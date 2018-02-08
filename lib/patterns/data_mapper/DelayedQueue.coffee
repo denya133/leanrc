@@ -53,43 +53,43 @@ module.exports = (Module)->
 
     @public @async delay: Function,
       default: (scriptName, data, delayUntil)->
-        yield return @resque.delay @name, scriptName, data, delayUntil
+        return yield @resque.delay @name, scriptName, data, delayUntil
 
     @public @async push: Function,
       default: (scriptName, data, delayUntil)->
-        yield return @resque.pushJob @name, scriptName, data, delayUntil
+        return yield @resque.pushJob @name, scriptName, data, delayUntil
 
     @public @async get: Function,
       default: (jobId)->
-        yield return @resque.getJob @name, jobId
+        return yield @resque.getJob @name, jobId
 
     @public @async delete: Function,
       default: (jobId)->
-        yield return @resque.deleteJob @name, jobId
+        return yield @resque.deleteJob @name, jobId
 
     @public @async abort: Function,
       default: (jobId)->
-        yield return @resque.abortJob @name, jobId
+        return yield @resque.abortJob @name, jobId
 
     @public @async all: Function,
       default: (scriptName)->
-        yield return @resque.allJobs @name, scriptName
+        return yield @resque.allJobs @name, scriptName
 
     @public @async pending: Function,
       default: (scriptName)->
-        yield return @resque.pendingJobs @name, scriptName
+        return yield @resque.pendingJobs @name, scriptName
 
     @public @async progress: Function,
       default: (scriptName)->
-        yield return @resque.progressJobs @name, scriptName
+        return yield @resque.progressJobs @name, scriptName
 
     @public @async completed: Function,
       default: (scriptName)->
-        yield return @resque.completedJobs @name, scriptName
+        return yield @resque.completedJobs @name, scriptName
 
     @public @async failed: Function,
       default: (scriptName)->
-        yield return @resque.failedJobs @name, scriptName
+        return yield @resque.failedJobs @name, scriptName
 
     @public @static @async restoreObject: Function,
       default: (Module, replica)->
