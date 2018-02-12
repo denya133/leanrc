@@ -34,12 +34,17 @@ module.exports = (Module)->
 
 
 module.exports = (Module)->
-  { Endpoint } = Module::
+  { Endpoint, Utils: { _ } } = Module::
 
   Module.defineMixin 'CrudEndpointMixin', (BaseClass = Endpoint) ->
     class extends BaseClass
       @inheritProtected()
 
+      ipsKeyName = @private keyName: String
+      ipsEntityName = @private entityName: String
+      ipoSchema = @private schema: Object
+
+      ###
       @public keyName: String,
         get: -> @gateway.keyName
 
@@ -69,6 +74,61 @@ module.exports = (Module)->
 
       @public versionSchema: Object,
         get: -> @gateway.versionSchema
+      ###
+      @public keyName: String,
+        get: ->
+          inflect.singularize inflect.underscore @[ipsKeyName] ? @[ipsEntityName]
+
+      @public itemEntityName: String,
+        get: -> inflect.singularize inflect.underscore @[ipsEntityName]
+
+      @public listEntityName: String,
+        get: -> inflect.pluralize inflect.underscore @[ipsEntityName]
+
+      @public schema: Object,
+        get: -> @[ipoSchema]
+
+      @public listSchema: Object,
+        get: ->
+          joi.object "#{@listEntityName}": joi.array().items @schema
+
+      @public itemSchema: Object,
+        get: ->
+          joi.object "#{@itemEntityName}": @schema
+
+      @public keySchema: Object,
+        default: joi.string().required().description 'The key of the objects.'
+
+      @public querySchema: Object,
+        default: joi.string().empty('{}').optional().default '{}', '
+          The query for finding objects.
+        '
+
+      @public executeQuerySchema: Object,
+        default: joi.object(query: joi.object().required()).required(), '
+          The query for execute.
+        '
+
+      @public bulkResponseSchema: Object,
+        default: joi.object success: joi.boolean()
+
+      @public versionSchema: Object,
+        default: joi.string().required().description '
+          The version of api endpoint in semver format `^x.x`
+        '
+
+      @public init: Function,
+        default: (args...) ->
+          @super args...
+          [ options ] = args
+          { keyName, entityName, schema } = options
+          @[ipsKeyName] = keyName
+          @[ipsEntityName] = entityName
+          if _.isString schema
+            Record = Module::["#{_.upperFirst _.camelCase schema}Record"]
+            @[ipoSchema] = Record.schema
+          else
+            @[ipoSchema] = schema
 
 
       @initializeMixin()

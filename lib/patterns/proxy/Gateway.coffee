@@ -45,6 +45,9 @@ module.exports = (App)->
 
 
 module.exports = (Module)->
+  {
+    Utils: { _ }
+  } = Module::
   class Gateway extends Module::Proxy
     @inheritProtected()
     # @implements Module::GatewayInterface
@@ -70,6 +73,26 @@ module.exports = (Module)->
 
     @public swaggerDefinitionFor: Function,
       default: (asAction)-> @[ipoEndpoints]?[asAction]
+
+    @public getCrudEndpoint: Function,
+      default: (asResourse, asAction, opts) ->
+        vsEndpointName = "#{_.upperFirst _.camelCase asResourse}#{_.upperFirst _.camelCase asAction}Endpoint"
+        vcEndpoint = Module::[vsEndpointName] ? Module::["#{_.upperFirst asAction}Endpoint"]
+        vcEndpoint.new opts
+
+    @public getEndpoint: Function,
+      default: (asResourse, asAction, opts) ->
+        vsEndpointName = "#{_.upperFirst _.camelCase asResourse}#{_.upperFirst _.camelCase asAction}Endpoint"
+        vsEndpointPath = "#{Module::ROOT}/endpoints/#{vsEndpointName}"
+        vcEndpoint = Module::[vsEndpointName] ? (try require(vsEndpointPath) Module) ? Module::Endpoint
+        vcEndpoint.new opts
+
+    @public swaggerDefinitionFor: Function,
+      default: (asResourse, asAction, opts, isCRUD = no)->
+        if isCRUD
+          @getCrudEndpoint asResourse, asAction, opts
+        else
+          @getEndpoint asResourse, asAction, opts
 
     @public onRegister: Function,
       default: (args...)->
