@@ -23,8 +23,8 @@ describe 'CrudEndpointMixin', ->
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
+          entityName: 'cucumber'
+          gateway: TestCrudGateway.new 'TestGateway'
         assert.instanceOf endpoint, TestCrudEndpoint
         yield return
   describe '#keyName', ->
@@ -44,8 +44,8 @@ describe 'CrudEndpointMixin', ->
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
+          entityName: 'cucumber'
+          gateway: TestCrudGateway.new 'TestGateway'
         { keyName } = endpoint
         assert.equal keyName, 'cucumber'
         yield return
@@ -66,8 +66,8 @@ describe 'CrudEndpointMixin', ->
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
+          entityName: 'cucumber'
+          gateway: TestCrudGateway.new 'TestGateway'
         { itemEntityName } = endpoint
         assert.equal itemEntityName, 'cucumber'
         yield return
@@ -88,8 +88,8 @@ describe 'CrudEndpointMixin', ->
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
+          entityName: 'cucumber'
+          gateway: TestCrudGateway.new 'TestGateway'
         { listEntityName } = endpoint
         assert.equal listEntityName, 'cucumbers'
         yield return
@@ -114,9 +114,9 @@ describe 'CrudEndpointMixin', ->
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          schema: TestRecord.schema
+          gateway: TestCrudGateway.new 'TestGateway'
         { schema } = endpoint
         assert.equal schema, TestRecord.schema
         yield return
@@ -141,9 +141,9 @@ describe 'CrudEndpointMixin', ->
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          schema: TestRecord.schema
+          gateway: TestCrudGateway.new 'TestGateway'
         { listSchema } = endpoint
         assert.deepEqual listSchema, joi.object
           cucumbers: joi.array().items TestRecord.schema
@@ -169,9 +169,9 @@ describe 'CrudEndpointMixin', ->
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          schema: TestRecord.schema
+          gateway: TestCrudGateway.new 'TestGateway'
         { itemSchema } = endpoint
         assert.deepEqual itemSchema, joi.object
           cucumber: TestRecord.schema
@@ -197,9 +197,9 @@ describe 'CrudEndpointMixin', ->
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          schema: TestRecord.schema
+          gateway: TestCrudGateway.new 'TestGateway'
         { querySchema } = endpoint
         assert.deepEqual querySchema, joi.string().empty('{}').optional().default '{}', '
           The query for finding objects.
@@ -226,9 +226,9 @@ describe 'CrudEndpointMixin', ->
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          schema: TestRecord.schema
+          gateway: TestCrudGateway.new 'TestGateway'
         { bulkResponseSchema } = endpoint
         assert.deepEqual bulkResponseSchema, joi.object success: joi.boolean()
         yield return
@@ -253,9 +253,9 @@ describe 'CrudEndpointMixin', ->
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          schema: TestRecord.schema
+          gateway: TestCrudGateway.new 'TestGateway'
         { versionSchema } = endpoint
         assert.deepEqual versionSchema, joi.string().required().description '
           The version of api endpoint in semver format `^x.x`
