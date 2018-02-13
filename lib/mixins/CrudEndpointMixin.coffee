@@ -34,7 +34,12 @@ module.exports = (Module)->
 
 
 module.exports = (Module)->
-  { Endpoint, Utils: { _ } } = Module::
+  {
+    Endpoint,
+    Utils: {
+      _, joi, inflect
+    }
+  } = Module::
 
   Module.defineMixin 'CrudEndpointMixin', (BaseClass = Endpoint) ->
     class extends BaseClass
