@@ -93,23 +93,14 @@ module.exports = (Module)->
         vsEndpointName = "#{inflect.camelize asAction}Endpoint"
         Module::[vsEndpointName] ? Module::Endpoint
 
-    @public getCrudEndpoint: Function,
+    @public getEndpoint: Function,
       default: (asResourse, asAction) ->
         vsEndpointName = @getEndpointName asResourse, asAction
         Module::[vsEndpointName] ? @tryLoadEndpoint(vsEndpointName) ? @getStandardActionEndpoint asAction
 
-    @public getEndpoint: Function,
-      default: (asResourse, asAction) ->
-        vsEndpointName = @getEndpointName asResourse, asAction
-        Module::[vsEndpointName] ? @tryLoadEndpoint(vsEndpointName) ? Module::Endpoint
-
     @public swaggerDefinitionFor: Function,
-      default: (asResourse, asAction, opts, isCRUD = no)->
-        vcEndpoint = if isCRUD
-          @getCrudEndpoint asResourse, asAction
-        else
-          @getEndpoint asResourse, asAction
-        opts = extend {}, opts, gateway: @
+      default: (asResourse, asAction, opts)->
+        vcEndpoint = @getEndpoint asResourse, asAction
         vcEndpoint.new opts
 
     @public onRegister: Function,

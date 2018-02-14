@@ -34,32 +34,38 @@ describe 'Gateway', ->
           @module Test
           @initialize()
         gateway = ApplicationGateway.new 'TEST_GATEWAY'
-        voEndpointForListAction = gateway.swaggerDefinitionFor 'test', 'list',
+        voEndpointForDetailAction = gateway.swaggerDefinitionFor 'test', 'detail',
           keyName: 'test'
           entityName: 'test'
-          schema: joi.object()
+          schema: {}
         , yes
-        assert.instanceOf voEndpointForListAction, Test::ListEndpoint
+        assert.instanceOf voEndpointForDetailAction, Test::DetailEndpoint
         voEndpointForUndoAction = gateway.swaggerDefinitionFor 'test', 'undo',
           keyName: 'test'
           entityName: 'test'
-          schema: joi.object()
+          schema: {}
         , yes
         assert.isDefined Test::TestUndoEndpoint
         assert.instanceOf voEndpointForUndoAction, Test::TestUndoEndpoint
         voEndpointForTestAction = gateway.swaggerDefinitionFor 'test', 'test',
           keyName: 'test'
           entityName: 'test'
-          schema: joi.object()
+          schema: {}
         , no
         assert.isDefined Test::TestTestEndpoint
         assert.instanceOf voEndpointForTestAction, Test::TestTestEndpoint
         voEndpointForAnyAction = gateway.swaggerDefinitionFor 'test', 'any',
           keyName: 'test'
           entityName: 'test'
-          schema: joi.object()
+          schema: {}
         , no
         assert.instanceOf voEndpointForAnyAction, Test::Endpoint
+        voEndpointForTestListAction = gateway.swaggerDefinitionFor 'test', 'list',
+          keyName: 'test'
+          entityName: 'test'
+          schema: {}
+        , no
+        assert.instanceOf voEndpointForTestListAction, Test::TestListEndpoint
         yield return
   ###
   describe '#onRegister', ->

@@ -19,7 +19,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
@@ -40,7 +40,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
@@ -62,7 +62,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
@@ -84,7 +84,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
@@ -110,7 +110,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
@@ -137,7 +137,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
@@ -165,7 +165,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
@@ -193,7 +193,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
@@ -222,7 +222,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
@@ -249,7 +249,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new

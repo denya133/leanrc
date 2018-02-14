@@ -225,8 +225,8 @@ describe 'Router', ->
         router = Test::TestRouter.new 'TEST_ROUTER'
         keys = require.main.require 'test/integration/complex-router/router.json'
         { routes } = router
-        console.log 'ROUTES:', routes
-        console.log 'KEYS:', keys
+        # console.log 'ROUTES:', routes
+        # console.log 'KEYS:', keys
         for key in keys
           assert.isDefined _.find(routes, key), "Cannot find route #{JSON.stringify key}"
         yield return
