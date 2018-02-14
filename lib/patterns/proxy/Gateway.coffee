@@ -46,7 +46,7 @@ module.exports = (App)->
 
 module.exports = (Module)->
   {
-    Utils: { _, extend }
+    Utils: { inflect, extend }
   } = Module::
   class Gateway extends Module::Proxy
     @inheritProtected()
@@ -66,7 +66,7 @@ module.exports = (Module)->
 
     @public getEndpointName: Function,
       default: (asResourse, asAction) ->
-        "#{_.upperFirst _.camelCase asResourse}#{_.upperFirst _.camelCase asAction}Endpoint"
+        "#{inflect.camelize asResourse}#{inflect.camelize asAction}Endpoint"
 
     @public swaggerDefinition: Function,
       default: (asAction, lambda = ((aoData)-> aoData), force = no)->
@@ -90,7 +90,7 @@ module.exports = (Module)->
 
     @public getStandardActionEndpoint: Function,
       default: (asAction) ->
-        vsEndpointName = "#{_.upperFirst _.camelCase asAction}Endpoint"
+        vsEndpointName = "#{inflect.camelize asAction}Endpoint"
         Module::[vsEndpointName] ? Module::Endpoint
 
     @public getCrudEndpoint: Function,

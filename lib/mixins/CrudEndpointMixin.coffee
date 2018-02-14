@@ -126,14 +126,14 @@ module.exports = (Module)->
         default: (args...) ->
           @super args...
           [ options ] = args
-          { keyName, entityName, schema } = options
+          { keyName, entityName, recordName } = options
           @[ipsKeyName] = keyName
           @[ipsEntityName] = entityName
-          if _.isString schema
-            Record = Module::["#{_.upperFirst _.camelCase schema}Record"]
+          if _.isString recordName
+            recordName += 'Record'  unless /Record$/.test recordName
+            Record = @Module::[inflect.camelize recordName]
             @[ipoSchema] = Record.schema
-          else
-            @[ipoSchema] = schema
+          @[ipoSchema] ?= {}
 
 
       @initializeMixin()

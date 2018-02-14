@@ -74,6 +74,13 @@ module.exports = (Module)->
     @public param: String,
       get: -> @[ipsParam]
 
+    @public defaultEntityName: Function,
+      default: ->
+        [..., vsEntityName] = @[ipsName]
+          .replace /\/$/, ''
+          .split '/'
+        inflect.singularize vsEntityName
+
     @public @static map: Function,
       default: (lambda)->
         lambda ?= ->
@@ -93,7 +100,7 @@ module.exports = (Module)->
         return
 
     @public defineMethod: Function,
-      default: (container, method, path, {to, at, resource, action, tag:asTag, template}={}, options)->
+      default: (container, method, path, {to, at, resource, action, tag:asTag, template, keyName, entityName, recordName}={})->
         unless path?
           throw new Error 'path is required'
         path = path.replace /^[/]/, ''
@@ -111,6 +118,10 @@ module.exports = (Module)->
           action = path
         unless /[/]$/.test resource
           resource += '/'
+        keyName ?= @[ipsParam]?.replace /^\:/, ''
+        entityName ?= @defaultEntityName()
+        unless _.isString(recordName) or _.isNull(recordName)
+          recordName = @defaultEntityName()
 
         vsParentTag = if @[ipsTag]? and @[ipsTag] isnt ''
           @[ipsTag]
@@ -130,7 +141,7 @@ module.exports = (Module)->
           else
             "#{@[ipsPath]}#{path}"
         template ?= resource + action
-        container.push {method, path, resource, action, tag, template, options}
+        container.push {method, path, resource, action, tag, template, keyName, entityName, recordName}
         return
 
     @public get: Function,
@@ -395,6 +406,12 @@ module.exports = (Module)->
       @[iplPathes] ?= []
 
       if @[ipsName]? and @[ipsName] isnt ''
+        vsKeyName = @[ipsParam]?.replace /^\:/, ''
+        vsEntityName = @[ipoAbove]?.entityName
+        vsEntityName ?= @defaultEntityName()
+        vsRecordName = @[ipoAbove]?.recordName
+        if _.isNil(vsRecordName) and not _.isNull vsRecordName
+          vsRecordName = @defaultEntityName()
         if @[iplOnly]?
           @[iplOnly].forEach (asAction)=>
             vsPath = voPaths[asAction]
@@ -403,6 +420,9 @@ module.exports = (Module)->
               action: asAction
               resource: @[ipsResource] ? @[ipsName]
               template: @[ipsTemplates] + '/' + asAction
+              keyName: vsKeyName
+              entityName: vsEntityName
+              recordName: vsRecordName
         else if @[iplExcept]?
           for own asAction, asMethod of voMethods
             do (asAction, asMethod)=>
@@ -413,6 +433,9 @@ module.exports = (Module)->
                   action: asAction
                   resource: @[ipsResource] ? @[ipsName]
                   template: @[ipsTemplates] + '/' + asAction
+                  keyName: vsKeyName
+                  entityName: vsEntityName
+                  recordName: vsRecordName
         else if @[iplVia]?
           @[iplVia].forEach (asCustomAction)=>
             vsPath = voPaths[asCustomAction]
@@ -424,11 +447,17 @@ module.exports = (Module)->
                     action: asAction
                     resource: @[ipsResource] ? @[ipsName]
                     template: @[ipsTemplates] + '/' + asAction
+                    keyName: vsKeyName
+                    entityName: vsEntityName
+                    recordName: vsRecordName
             else
               @defineMethod @[iplPathes], voMethods[asCustomAction], vsPath,
                 action: asCustomAction
                 resource: @[ipsResource] ? @[ipsName]
                 template: @[ipsTemplates] + '/' + asAction
+                keyName: vsKeyName
+                entityName: vsEntityName
+                recordName: vsRecordName
         else
           for own asAction, asMethod of voMethods
             do (asAction, asMethod)=>
@@ -438,6 +467,9 @@ module.exports = (Module)->
                 action: asAction
                 resource: @[ipsResource] ? @[ipsName]
                 template: @[ipsTemplates] + '/' + asAction
+                keyName: vsKeyName
+                entityName: vsEntityName
+                recordName: vsRecordName
 
 
   Router.initialize()

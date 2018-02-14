@@ -9,300 +9,448 @@
     "method": "get",
     "path": "/users/",
     "resource": "users/",
-    "action": "list"
+    "action": "list",
+    "keyName": "user",
+    "entityName": "user",
+    "recordName": "user"
   },
   {
     "method": "get",
     "path": "/users/:user",
     "resource": "users/",
-    "action": "detail"
+    "action": "detail",
+    "keyName": "user",
+    "entityName": "user",
+    "recordName": "user"
   },
   {
     "method": "post",
     "path": "/users/",
     "resource": "users/",
-    "action": "create"
+    "action": "create",
+    "keyName": "user",
+    "entityName": "user",
+    "recordName": "user"
   },
   {
     "method": "put",
     "path": "/users/:user",
     "resource": "users/",
-    "action": "update"
+    "action": "update",
+    "keyName": "user",
+    "entityName": "user",
+    "recordName": "user"
   },
   {
     "method": "post",
     "path": "/users/verify",
     "resource": "users/",
-    "action": "verify"
+    "action": "verify",
+    "entityName": "user",
+    "recordName": "user"
   },
   {
     "method": "get",
     "path": "/users/:user/today_watches",
     "resource": "users/",
-    "action": "today_watches"
+    "action": "today_watches",
+    "entityName": "user",
+    "recordName": "user"
   },
   {
     "method": "get",
     "path": "/users/:user/descendants/count",
     "resource": "users/descendants/",
-    "action": "count"
+    "action": "count",
+    "keyName": "users_descendant",
+    "entityName": "descendant",
+    "recordName": "descendant"
   },
   {
     "method": "get",
     "path": "/users/:user/descendants/",
     "resource": "users/descendants/",
-    "action": "list"
+    "action": "list",
+    "keyName": "users_descendant",
+    "entityName": "user",
+    "recordName": "user"
   },
   {
     "method": "post",
     "path": "/invitations/confirm",
     "resource": "invitations/",
-    "action": "confirm"
+    "action": "confirm",
+    "keyName": "invitation",
+    "entityName": "invitation",
+    "recordName": "invitation"
   },
   {
     "method": "get",
     "path": "/invitations/",
     "resource": "invitations/",
-    "action": "list"
+    "action": "list",
+    "keyName": "invitation",
+    "entityName": "invitation",
+    "recordName": "invitation"
   },
   {
     "method": "get",
     "path": "/invitations/:invitation",
     "resource": "invitations/",
-    "action": "detail"
+    "action": "detail",
+    "keyName": "invitation",
+    "entityName": "invitation",
+    "recordName": "invitation"
   },
   {
     "method": "post",
     "path": "/invitations/",
     "resource": "invitations/",
-    "action": "create"
+    "action": "create",
+    "keyName": "invitation",
+    "entityName": "invitation",
+    "recordName": "invitation"
   },
   {
     "method": "put",
     "path": "/invitations/:invitation",
     "resource": "invitations/",
-    "action": "update"
+    "action": "update",
+    "keyName": "invitation",
+    "entityName": "invitation",
+    "recordName": "invitation"
   },
   {
     "method": "get",
     "path": "/spaces/",
     "resource": "areas/",
-    "action": "list"
+    "action": "list",
+    "keyName": "area",
+    "entityName": "space",
+    "recordName": "space"
   },
   {
     "method": "get",
     "path": "/spaces/:area",
     "resource": "areas/",
-    "action": "detail"
+    "action": "detail",
+    "keyName": "area",
+    "entityName": "space",
+    "recordName": "space"
   },
   {
     "method": "post",
     "path": "/spaces/",
     "resource": "areas/",
-    "action": "create"
+    "action": "create",
+    "keyName": "area",
+    "entityName": "space",
+    "recordName": "space"
   },
   {
     "method": "put",
     "path": "/spaces/:area",
     "resource": "areas/",
-    "action": "update"
+    "action": "update",
+    "keyName": "area",
+    "entityName": "space",
+    "recordName": "space"
   },
   {
     "method": "delete",
     "path": "/spaces/:area",
     "resource": "areas/",
-    "action": "delete"
+    "action": "delete",
+    "keyName": "area",
+    "entityName": "space",
+    "recordName": "space"
   },
   {
     "method": "post",
     "path": "/:v/:space/uploads/:upload/add_attachment",
     "resource": "uploads/",
-    "action": "add_attachment"
+    "action": "add_attachment",
+    "keyName": "upload",
+    "entityName": "attachment",
+    "recordName": "upload"
   },
   {
     "method": "get",
     "path": "/:v/:space/uploads/",
     "resource": "uploads/",
-    "action": "list"
+    "action": "list",
+    "keyName": "upload",
+    "entityName": "upload",
+    "recordName": "upload"
   },
   {
     "method": "get",
     "path": "/:v/:space/uploads/:upload",
     "resource": "uploads/",
-    "action": "detail"
+    "action": "detail",
+    "keyName": "upload",
+    "entityName": "upload",
+    "recordName": "upload"
   },
   {
     "method": "post",
     "path": "/:v/:space/uploads/",
     "resource": "uploads/",
-    "action": "create"
+    "action": "create",
+    "keyName": "upload",
+    "entityName": "upload",
+    "recordName": "upload"
   },
   {
     "method": "put",
     "path": "/:v/:space/uploads/:upload",
     "resource": "uploads/",
-    "action": "update"
+    "action": "update",
+    "keyName": "upload",
+    "entityName": "upload",
+    "recordName": "upload"
   },
   {
     "method": "delete",
     "path": "/:v/:space/uploads/:upload",
     "resource": "uploads/",
-    "action": "delete"
+    "action": "delete",
+    "keyName": "upload",
+    "entityName": "upload",
+    "recordName": "upload"
   },
   {
     "method": "get",
     "path": "/:v/:space/cucumbers/",
     "resource": "cucumbers/",
-    "action": "list"
+    "action": "list",
+    "keyName": "cucumber",
+    "entityName": "cucumber",
+    "recordName": "cucumber"
   },
   {
     "method": "get",
     "path": "/:v/:space/cucumbers/:cucumber",
     "resource": "cucumbers/",
-    "action": "detail"
+    "action": "detail",
+    "keyName": "cucumber",
+    "entityName": "cucumber",
+    "recordName": "cucumber"
   },
   {
     "method": "get",
     "path": "/:v/:space/admin/tomatos/",
     "resource": "admin/tomatos/",
-    "action": "list"
+    "action": "list",
+    "keyName": "admin_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "get",
     "path": "/:v/:space/admin/tomatos/:admin_tomato",
     "resource": "admin/tomatos/",
-    "action": "detail"
+    "action": "detail",
+    "keyName": "admin_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "post",
     "path": "/:v/:space/admin/tomatos/",
     "resource": "admin/tomatos/",
-    "action": "create"
+    "action": "create",
+    "keyName": "admin_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "put",
     "path": "/:v/:space/admin/tomatos/:admin_tomato",
     "resource": "admin/tomatos/",
-    "action": "update"
+    "action": "update",
+    "keyName": "admin_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "get",
     "path": "/:v/:space/test/tomatos/",
     "resource": "tomatos/",
-    "action": "list"
+    "action": "list",
+    "keyName": "tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "get",
     "path": "/:v/:space/test/tomatos/:tomato",
     "resource": "tomatos/",
-    "action": "detail"
+    "action": "detail",
+    "keyName": "tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "post",
     "path": "/:v/:space/test/tomatos/",
     "resource": "tomatos/",
-    "action": "create"
+    "action": "create",
+    "keyName": "tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "put",
     "path": "/:v/:space/test/tomatos/:tomato",
     "resource": "tomatos/",
-    "action": "update"
+    "action": "update",
+    "keyName": "tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "get",
     "path": "/:v/:space/tomatos/",
     "resource": "tomatos/",
-    "action": "list"
+    "action": "list",
+    "keyName": "tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "get",
     "path": "/:v/:space/tomatos/:tomato",
     "resource": "tomatos/",
-    "action": "detail"
+    "action": "detail",
+    "keyName": "tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "post",
     "path": "/:v/:space/tomatos/",
     "resource": "tomatos/",
-    "action": "create"
+    "action": "create",
+    "keyName": "tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "put",
     "path": "/:v/:space/tomatos/:tomato",
     "resource": "tomatos/",
-    "action": "update"
+    "action": "update",
+    "keyName": "tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "get",
     "path": "/:v/:space/tomatos/",
     "resource": "cucumber/tomatos/",
-    "action": "list"
+    "action": "list",
+    "keyName": "cucumber_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "get",
     "path": "/:v/:space/tomatos/:cucumber_tomato",
     "resource": "cucumber/tomatos/",
-    "action": "detail"
+    "action": "detail",
+    "keyName": "cucumber_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "post",
     "path": "/:v/:space/tomatos/",
     "resource": "cucumber/tomatos/",
-    "action": "create"
+    "action": "create",
+    "keyName": "cucumber_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "put",
     "path": "/:v/:space/tomatos/:cucumber_tomato",
     "resource": "cucumber/tomatos/",
-    "action": "update"
+    "action": "update",
+    "keyName": "cucumber_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "get",
     "path": "/:v/:space/onion/tomatos/",
     "resource": "cucumber/tomatos/",
-    "action": "list"
+    "action": "list",
+    "keyName": "cucumber_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "get",
     "path": "/:v/:space/onion/tomatos/:cucumber_tomato",
     "resource": "cucumber/tomatos/",
-    "action": "detail"
+    "action": "detail",
+    "keyName": "cucumber_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "post",
     "path": "/:v/:space/onion/tomatos/",
     "resource": "cucumber/tomatos/",
-    "action": "create"
+    "action": "create",
+    "keyName": "cucumber_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "put",
     "path": "/:v/:space/onion/tomatos/:cucumber_tomato",
     "resource": "cucumber/tomatos/",
-    "action": "update"
+    "action": "update",
+    "keyName": "cucumber_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "get",
     "path": "/:v/:space/onion/tomatos/",
     "resource": "carrot/tomatos/",
-    "action": "list"
+    "action": "list",
+    "keyName": "carrot_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "get",
     "path": "/:v/:space/onion/tomatos/:carrot_tomato",
     "resource": "carrot/tomatos/",
-    "action": "detail"
+    "action": "detail",
+    "keyName": "carrot_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "post",
     "path": "/:v/:space/onion/tomatos/",
     "resource": "carrot/tomatos/",
-    "action": "create"
+    "action": "create",
+    "keyName": "carrot_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   },
   {
     "method": "put",
     "path": "/:v/:space/onion/tomatos/:carrot_tomato",
     "resource": "carrot/tomatos/",
-    "action": "update"
+    "action": "update",
+    "keyName": "carrot_tomato",
+    "entityName": "tomato",
+    "recordName": "tomato"
   }
 ]

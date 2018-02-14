@@ -115,7 +115,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
           entityName: 'cucumber'
-          schema: TestRecord.schema
+          recordName: 'TestRecord'
           gateway: TestCrudGateway.new 'TestGateway'
         { schema } = endpoint
         assert.equal schema, TestRecord.schema
@@ -142,7 +142,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
           entityName: 'cucumber'
-          schema: TestRecord.schema
+          recordName: 'TestRecord'
           gateway: TestCrudGateway.new 'TestGateway'
         { listSchema } = endpoint
         assert.deepEqual listSchema, joi.object
@@ -170,7 +170,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
           entityName: 'cucumber'
-          schema: TestRecord.schema
+          recordName: 'TestRecord'
           gateway: TestCrudGateway.new 'TestGateway'
         { itemSchema } = endpoint
         assert.deepEqual itemSchema, joi.object
@@ -198,7 +198,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
           entityName: 'cucumber'
-          schema: TestRecord.schema
+          recordName: 'TestRecord'
           gateway: TestCrudGateway.new 'TestGateway'
         { querySchema } = endpoint
         assert.deepEqual querySchema, joi.string().empty('{}').optional().default '{}', '
@@ -227,7 +227,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
           entityName: 'cucumber'
-          schema: TestRecord.schema
+          recordName: 'TestRecord'
           gateway: TestCrudGateway.new 'TestGateway'
         { bulkResponseSchema } = endpoint
         assert.deepEqual bulkResponseSchema, joi.object success: joi.boolean()
@@ -254,7 +254,7 @@ describe 'CrudEndpointMixin', ->
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
           entityName: 'cucumber'
-          schema: TestRecord.schema
+          recordName: 'TestRecord'
           gateway: TestCrudGateway.new 'TestGateway'
         { versionSchema } = endpoint
         assert.deepEqual versionSchema, joi.string().required().description '
