@@ -206,6 +206,7 @@ describe 'Router', ->
               @namespace 'space', module: '', prefix: ':space', ->
                 @resource 'uploads', ->
                   @post 'add_attachment', at: 'member', entityName: 'attachment'
+                  @post 'add_test', at: 'member', entityName: 'test_entity', recordName: 'test', keyName: 'test'
                 @resource 'cucumbers', only: ['list', 'detail']
                 @namespace 'admin', ->
                   @resource 'tomatos', except: ['delete']
