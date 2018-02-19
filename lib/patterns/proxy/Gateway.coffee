@@ -66,7 +66,7 @@ module.exports = (Module)->
 
     @public getEndpointName: Function,
       default: (asResourse, asAction) ->
-        "#{inflect.camelize asResourse}#{inflect.camelize asAction}Endpoint"
+        inflect.camelize "#{asResourse.replace /\//, '_'}#{asAction}Endpoint"
 
     @public swaggerDefinition: Function,
       default: (asAction, lambda = ((aoData)-> aoData), force = no)->
