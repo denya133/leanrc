@@ -12,6 +12,7 @@ describe 'Gateway', ->
       co ->
         gateway = Gateway.new 'TEST_GATEWAY', endpoints: {}
         yield return
+  ###
   describe '#swaggerDefinition', ->
     it 'should create swagger definition for action', ->
       expect ->
@@ -22,6 +23,7 @@ describe 'Gateway', ->
           aoEndpoint
         assert.instanceOf voEndpoint, LeanRC::Endpoint, 'No endpoint created'
       .to.not.throw Error
+  ###
   describe '#swaggerDefinitionFor', ->
     it 'should get swagger definition for action', ->
       co ->
@@ -37,33 +39,33 @@ describe 'Gateway', ->
         voEndpointForDetailAction = gateway.swaggerDefinitionFor 'test', 'detail',
           keyName: 'test'
           entityName: 'test'
-          schema: {}
+          recordName: null
         , yes
         assert.instanceOf voEndpointForDetailAction, Test::DetailEndpoint
         voEndpointForUndoAction = gateway.swaggerDefinitionFor 'test', 'undo',
           keyName: 'test'
           entityName: 'test'
-          schema: {}
+          recordName: null
         , yes
         assert.isDefined Test::TestUndoEndpoint
         assert.instanceOf voEndpointForUndoAction, Test::TestUndoEndpoint
-        voEndpointForTestAction = gateway.swaggerDefinitionFor 'test', 'test',
+        voEndpointForTestAction = gateway.swaggerDefinitionFor 'test/', 'test',
           keyName: 'test'
           entityName: 'test'
-          schema: {}
+          recordName: null
         , no
         assert.isDefined Test::TestTestEndpoint
         assert.instanceOf voEndpointForTestAction, Test::TestTestEndpoint
         voEndpointForAnyAction = gateway.swaggerDefinitionFor 'test', 'any',
           keyName: 'test'
           entityName: 'test'
-          schema: {}
+          recordName: null
         , no
         assert.instanceOf voEndpointForAnyAction, Test::Endpoint
         voEndpointForTestListAction = gateway.swaggerDefinitionFor 'test', 'list',
           keyName: 'test'
           entityName: 'test'
-          schema: {}
+          recordName: null
         , no
         assert.instanceOf voEndpointForTestListAction, Test::TestListEndpoint
         yield return

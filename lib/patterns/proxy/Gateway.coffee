@@ -46,6 +46,7 @@ module.exports = (App)->
 
 module.exports = (Module)->
   {
+    APPLICATION_MEDIATOR
     Utils: { inflect, extend }
   } = Module::
   class Gateway extends Module::Proxy
@@ -55,28 +56,43 @@ module.exports = (Module)->
     @module Module
 
     ipoEndpoints = @private endpoints: Object
+    ipsMultitonKey = @protected multitonKey: String
+
+    @public ApplicationModule: Module::Class,
+      get: ->
+        if @[ipsMultitonKey]?
+          @facade.receiveMediator APPLICATION_MEDIATOR
+            .getViewComponent()
+            .Module
+        else
+          @Module
 
     ipsEndpointsPath = @private endpointsPath: String,
-      get: -> "#{@Module::ROOT}/endpoints"
+      get: -> "#{@ApplicationModule::ROOT}/endpoints"
 
     @public tryLoadEndpoint: Function,
       default: (asName) ->
         vsEndpointPath = "#{@[ipsEndpointsPath]}/#{asName}"
-        try require(vsEndpointPath) @Module
+        try require(vsEndpointPath) @ApplicationModule
 
     @public getEndpointName: Function,
       default: (asResourse, asAction) ->
-        inflect.camelize "#{asResourse.replace /\//, '_'}#{asAction}Endpoint"
+        vsResource = asResourse
+          .replace /\//g, '_'
+          .replace /\_+/g, '_'
+        vsPath = "#{vsResource}_#{asAction}_endpoint"
+        vsPath = vsPath.replace /\_+/g, '_'
+        inflect.camelize vsPath
 
+    ###
     @public swaggerDefinition: Function,
       default: (asAction, lambda = ((aoData)-> aoData), force = no)->
-        voEndpoint = lambda.apply @, [Module::Endpoint.new(gateway: @)]
+        voEndpoint = lambda.apply @, [@ApplicationModule::Endpoint.new(gateway: @)]
         @[ipoEndpoints] ?= {}
         if force or not @[ipoEndpoints][asAction]?
           @[ipoEndpoints][asAction] = voEndpoint
         return
 
-    ###
     @public registerEndpoints: Function,
       default: (ahConfig)->
         @[ipoEndpoints] ?= {}
@@ -91,12 +107,12 @@ module.exports = (Module)->
     @public getStandardActionEndpoint: Function,
       default: (asAction) ->
         vsEndpointName = "#{inflect.camelize asAction}Endpoint"
-        @Module::[vsEndpointName] ? @Module::Endpoint
+        @ApplicationModule::[vsEndpointName] ? @ApplicationModule::Endpoint
 
     @public getEndpoint: Function,
       default: (asResourse, asAction) ->
         vsEndpointName = @getEndpointName asResourse, asAction
-        @Module::[vsEndpointName] ? @tryLoadEndpoint(vsEndpointName) ? @getStandardActionEndpoint asAction
+        @ApplicationModule::[vsEndpointName] ? @tryLoadEndpoint(vsEndpointName) ? @getStandardActionEndpoint asAction
 
     @public swaggerDefinitionFor: Function,
       default: (asResourse, asAction, opts)->
