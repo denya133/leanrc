@@ -129,7 +129,7 @@ module.exports = (Module)->
           { keyName, entityName, recordName } = options
           @[ipsKeyName] = keyName
           @[ipsEntityName] = entityName
-          if _.isString recordName
+          if recordName? and _.isString recordName
             recordName += 'Record'  unless /Record$/.test recordName
             Record = @Module::[inflect.camelize recordName]
             @[ipoSchema] = Record.schema
