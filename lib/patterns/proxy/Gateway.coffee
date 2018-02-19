@@ -61,8 +61,8 @@ module.exports = (Module)->
     @public ApplicationModule: Module::Class,
       get: ->
         if @[ipsMultitonKey]?
-          @facade?.receiveMediator APPLICATION_MEDIATOR
-            ?.getViewComponent()
+          @facade?.receiveMediator? APPLICATION_MEDIATOR
+            ?.getViewComponent?()
             ?.Module ? @Module
         else
           @Module
