@@ -118,6 +118,7 @@ class LeanRC extends RC
   require('./patterns/proxy/Resque') LeanRC
 
   # require('./mixins/CrudGatewayMixin') LeanRC
+  require('./mixins/NamespacedGatewayMixin') LeanRC
   require('./mixins/ModelingGatewayMixin') LeanRC
   require('./mixins/CrudEndpointMixin') LeanRC
   require('./mixins/HttpCollectionMixin') LeanRC

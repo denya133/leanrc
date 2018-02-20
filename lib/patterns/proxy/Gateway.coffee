@@ -112,7 +112,9 @@ module.exports = (Module)->
     @public getEndpoint: Function,
       default: (asResourse, asAction) ->
         vsEndpointName = @getEndpointName asResourse, asAction
-        @ApplicationModule::[vsEndpointName] ? @tryLoadEndpoint(vsEndpointName) ? @getStandardActionEndpoint asAction
+        @ApplicationModule::[vsEndpointName] ?
+          @tryLoadEndpoint(vsEndpointName) ?
+          @getStandardActionEndpoint asAction
 
     @public swaggerDefinitionFor: Function,
       default: (asResourse, asAction, opts)->
