@@ -3,7 +3,6 @@
 module.exports = (Module)->
   {
     Renderer
-    Utils: { extend }
   } = Module::
 
   Module.defineMixin 'CrudRendererMixin', (BaseClass = Renderer) ->
@@ -24,13 +23,13 @@ module.exports = (Module)->
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
           itemDecorator = @Module.templates[templateName]
-          itemDecorator ?= @constructor::itemDecorator
+          itemDecorator ?= CrudRendererMixin::itemDecorator
           return "#{@itemEntityName}": itemDecorator.call @, aoData
 
       @public itemDecorator: Function,
         default: (aoData)->
           if aoData?
-            result = extend {}, aoData
+            result = JSON.parse JSON.stringify aoData
             result.createdAt = aoData.createdAt?.toISOString()
             result.updatedAt = aoData.updatedAt?.toISOString()
             result.deletedAt = aoData.deletedAt?.toISOString()
@@ -42,7 +41,7 @@ module.exports = (Module)->
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
           itemDecorator = @Module.templates[templateName]
-          itemDecorator ?= @constructor::itemDecorator
+          itemDecorator ?= CrudRendererMixin::itemDecorator
           return {
             meta: aoData.meta
             "#{@listEntityName}": aoData.items.map itemDecorator.bind @
@@ -55,7 +54,7 @@ module.exports = (Module)->
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
           itemDecorator = @Module.templates[templateName]
-          itemDecorator ?= @constructor::itemDecorator
+          itemDecorator ?= CrudRendererMixin::itemDecorator
           return "#{@itemEntityName}": itemDecorator.call @, aoData
 
       @public @async render: Function,

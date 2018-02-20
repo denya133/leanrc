@@ -71,7 +71,7 @@ module.exports = (Module)->
           return yield Module::Promise.new (resolve, reject)=>
             try
               reverse = genRandomAlphaNumbers 32
-              @[ipoEmitter].once reverse, (error)->
+              @[ipoEmitter].once reverse, ({error})->
                 if error?
                   reject error
                   return
@@ -87,7 +87,7 @@ module.exports = (Module)->
           return yield Module::Promise.new (resolve, reject)=>
             try
               reverse = genRandomAlphaNumbers 32
-              @[ipoEmitter].once reverse, (error)->
+              @[ipoEmitter].once reverse, ({error})->
                 if error?
                   reject error
                   return
@@ -103,11 +103,11 @@ module.exports = (Module)->
           return yield Module::Promise.new (resolve, reject)=>
             try
               reverse = genRandomAlphaNumbers 32
-              @[ipoEmitter].once reverse, (error)->
+              @[ipoEmitter].once reverse, ({error, result})->
                 if error?
                   reject error
                   return
-                resolve()
+                resolve(result)
                 return
               @facade.sendNotification scriptName, data, reverse
             catch err
