@@ -61,6 +61,6 @@ module.exports = (Module)->
             @tryLoadEndpoint(vsEndpointName) ?
             @ApplicationModule::[vsTrimmedEndpointName] ?
             @tryLoadEndpoint(vsTrimmedEndpointName) ?
-            @getStandardActionEndpoint asAction
+            @getStandardActionEndpoint asResourse, asAction
 
       @initializeMixin()
