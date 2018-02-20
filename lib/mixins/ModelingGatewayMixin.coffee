@@ -226,9 +226,9 @@ module.exports = (Module)->
       @public getStandardActionEndpoint: Function,
         default: (asResourse, asAction) ->
           vsEndpointName = if _.startsWith asResourse.toLowerCase(), 'modeling'
-            "#{inflect.camelize asAction}Endpoint"
-          else
             "Modeling#{inflect.camelize asAction}Endpoint"
+          else
+            "#{inflect.camelize asAction}Endpoint"
           @ApplicationModule::[vsEndpointName] ? @ApplicationModule::Endpoint
 
       @initializeMixin()
