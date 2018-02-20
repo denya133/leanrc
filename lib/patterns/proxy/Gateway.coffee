@@ -61,7 +61,7 @@ module.exports = (Module)->
     @public ApplicationModule: Module::Class,
       get: ->
         if @[ipsMultitonKey]?
-          @facade?.receiveMediator? APPLICATION_MEDIATOR
+          @facade?.retrieveMediator? APPLICATION_MEDIATOR
             ?.getViewComponent?()
             ?.Module ? @Module
         else
@@ -117,7 +117,8 @@ module.exports = (Module)->
     @public swaggerDefinitionFor: Function,
       default: (asResourse, asAction, opts)->
         vcEndpoint = @getEndpoint asResourse, asAction
-        vcEndpoint.new opts
+        options = extend {}, opts, gateway: @
+        vcEndpoint.new options
 
     @public onRegister: Function,
       default: (args...)->

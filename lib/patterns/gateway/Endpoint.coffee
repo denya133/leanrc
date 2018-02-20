@@ -86,12 +86,12 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    ###
     @public init: Function,
       default: (args...) ->
         @super args...
         [ options ] = args
         { @gateway } = options
+    ###
       default: ({@gateway})->
         @super arguments...
     ###

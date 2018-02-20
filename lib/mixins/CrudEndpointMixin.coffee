@@ -35,7 +35,9 @@ module.exports = (Module)->
 
 module.exports = (Module)->
   {
-    Endpoint,
+    APPLICATION_MEDIATOR
+
+    Endpoint
     Utils: {
       _, joi, inflect
     }
@@ -122,6 +124,15 @@ module.exports = (Module)->
           The version of api endpoint in semver format `^x.x`
         '
 
+      @public ApplicationModule: Module::Class,
+        get: ->
+          if @gateway?
+            @gateway?.facade?.retrieveMediator? APPLICATION_MEDIATOR
+              ?.getViewComponent?()
+              ?.Module ? @Module
+          else
+            @Module
+
       @public init: Function,
         default: (args...) ->
           @super args...
@@ -130,8 +141,9 @@ module.exports = (Module)->
           @[ipsKeyName] = keyName
           @[ipsEntityName] = entityName
           if recordName? and _.isString recordName
+            recordName = inflect.camelize recordName
             recordName += 'Record'  unless /Record$/.test recordName
-            Record = @Module::[inflect.camelize recordName]
+            Record = @ApplicationModule::[recordName]
             @[ipoSchema] = Record.schema
           @[ipoSchema] ?= {}
 
