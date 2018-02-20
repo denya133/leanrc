@@ -33,6 +33,7 @@ module.exports = (Module)->
       @inheritProtected()
       # @implements Module::ModelingGatewayMixinInterface
 
+      ###
       @public keyName: String,
         get: ->
           {keyName, entityName} = @getData()
@@ -220,6 +221,14 @@ module.exports = (Module)->
               "
 
           return
+      ###
 
+      @public getStandardActionEndpoint: Function,
+        default: (asResourse, asAction) ->
+          vsEndpointName = if _.startsWith asResourse.toLowerCase(), 'modeling'
+            "#{inflect.camelize asAction}Endpoint"
+          else
+            "Modeling#{inflect.camelize asAction}Endpoint"
+          @ApplicationModule::[vsEndpointName] ? @ApplicationModule::Endpoint
 
       @initializeMixin()

@@ -105,7 +105,7 @@ module.exports = (Module)->
     ###
 
     @public getStandardActionEndpoint: Function,
-      default: (asAction) ->
+      default: (asResourse, asAction) ->
         vsEndpointName = "#{inflect.camelize asAction}Endpoint"
         @ApplicationModule::[vsEndpointName] ? @ApplicationModule::Endpoint
 
@@ -114,7 +114,7 @@ module.exports = (Module)->
         vsEndpointName = @getEndpointName asResourse, asAction
         @ApplicationModule::[vsEndpointName] ?
           @tryLoadEndpoint(vsEndpointName) ?
-          @getStandardActionEndpoint asAction
+          @getStandardActionEndpoint asResourse, asAction
 
     @public swaggerDefinitionFor: Function,
       default: (asResourse, asAction, opts)->
