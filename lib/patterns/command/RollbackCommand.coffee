@@ -73,7 +73,7 @@ module.exports = (Module) ->
         voBody = aoNotification.getBody()
         vsType = aoNotification.getType()
         err = yield @rollback voBody ? {}
-        @facade.sendNotification STOPPED_ROLLBACK, err, vsType
+        @facade.sendNotification STOPPED_ROLLBACK, {error: err}, vsType
         yield return
 
     @public @async rollback: Function,

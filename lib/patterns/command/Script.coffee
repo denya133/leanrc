@@ -23,10 +23,10 @@ module.exports = (Module)->
         voBody = aoNotification.getBody()
         reverse = aoNotification.getType()
         try
-          yield @body voBody
-          voResult = null
+          res = yield @body voBody
+          voResult = {result: res}
         catch err
-          voResult = err
+          voResult = {error: err}
         @sendNotification Module::JOB_RESULT, voResult, reverse
         return
 
