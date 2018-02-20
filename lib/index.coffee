@@ -140,6 +140,12 @@ class LeanRC extends RC
   require('./patterns/gateway/ListEndpoint') LeanRC
   require('./patterns/gateway/UpdateEndpoint') LeanRC
   require('./patterns/gateway/DeleteEndpoint') LeanRC
+  require('./patterns/gateway/ModelingCreateEndpoint') LeanRC
+  require('./patterns/gateway/ModelingDetailEndpoint') LeanRC
+  require('./patterns/gateway/ModelingListEndpoint') LeanRC
+  require('./patterns/gateway/ModelingUpdateEndpoint') LeanRC
+  require('./patterns/gateway/ModelingDeleteEndpoint') LeanRC
+  require('./patterns/gateway/ModelingQueryEndpoint') LeanRC
 
   require('./patterns/switch/Request') LeanRC
   require('./patterns/switch/Response') LeanRC
