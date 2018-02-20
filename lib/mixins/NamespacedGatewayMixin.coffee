@@ -51,7 +51,7 @@ module.exports = (Module)->
               vsResource = vsResource.replace re, ''
               return yes
             return no
-          vsResource
+          inflect.camelize vsResource
 
       @public getEndpoint: Function,
         default: (asResourse, asAction) ->
