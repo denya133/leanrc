@@ -91,10 +91,6 @@ module.exports = (Module)->
         @super args...
         [ options ] = args
         { @gateway } = options
-    ###
-      default: ({@gateway})->
-        @super arguments...
-    ###
 
 
   Endpoint.initialize()

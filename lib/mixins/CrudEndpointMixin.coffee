@@ -51,37 +51,6 @@ module.exports = (Module)->
       ipsEntityName = @private entityName: String
       ipoSchema = @private schema: Object
 
-      ###
-      @public keyName: String,
-        get: -> @gateway.keyName
-
-      @public itemEntityName: String,
-        get: -> @gateway.itemEntityName
-
-      @public listEntityName: String,
-        get: -> @gateway.listEntityName
-
-      @public schema: Object,
-        get: -> @gateway.schema
-
-      @public listSchema: Object,
-        get: -> @gateway.listSchema
-
-      @public itemSchema: Object,
-        get: -> @gateway.itemSchema
-
-      @public keySchema: Object,
-        get: -> @gateway.keySchema
-
-      @public querySchema: Object,
-        get: -> @gateway.querySchema
-
-      @public bulkResponseSchema: Object,
-        get: -> @gateway.bulkResponseSchema
-
-      @public versionSchema: Object,
-        get: -> @gateway.versionSchema
-      ###
       @public keyName: String,
         get: ->
           inflect.singularize inflect.underscore @[ipsKeyName] ? @[ipsEntityName]
