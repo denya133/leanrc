@@ -9,7 +9,7 @@ module.exports = (Module)->
   UNAUTHORIZED      = statuses 'unauthorized'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  class ModilingQueryEndpoint extends Module::Endpoint
+  class ModelingQueryEndpoint extends Module::Endpoint
     @inheritProtected()
     # @implements Module::EndpointInterface
     @include CrudEndpointMixin
