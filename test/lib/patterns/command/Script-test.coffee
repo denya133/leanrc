@@ -54,7 +54,11 @@ describe 'Script', ->
           return
         command.execute LeanRC::Notification.new 'TEST', { body: 'body' }, 'TEST_TYPE'
         options = yield promise
-        assert.deepEqual options, [ LeanRC::JOB_RESULT, null, 'TEST_TYPE' ]
+        assert.deepEqual options, [
+          LeanRC::JOB_RESULT
+          {result: [{body: 'body'}]}
+          'TEST_TYPE'
+        ]
         facade.remove()
         yield return
     it 'should fail script', ->
@@ -86,7 +90,8 @@ describe 'Script', ->
         command.execute LeanRC::Notification.new 'TEST', { body: 'body' }, 'TEST_TYPE'
         [ title, body, type ] = yield promise
         assert.equal title, LeanRC::JOB_RESULT
-        assert.instanceOf body, Error
+        assert.instanceOf body.error, Error
+        assert.equal body.error.message, 'TEST_ERROR'
         assert.equal type, 'TEST_TYPE'
         facade.remove()
         yield return

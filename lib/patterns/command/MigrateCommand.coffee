@@ -73,7 +73,7 @@ module.exports = (Module) ->
         voBody = aoNotification.getBody()
         vsType = aoNotification.getType()
         err = yield @migrate voBody ? {}
-        @facade.sendNotification STOPPED_MIGRATE, err, vsType
+        @facade.sendNotification STOPPED_MIGRATE, {error: err}, vsType
         yield return
 
     @public @async migrate: Function,
