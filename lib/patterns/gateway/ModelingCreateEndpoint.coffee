@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     CrudEndpointMixin
-    Utils: { statuses }
+    Utils: { statuses, joi }
   } = Module::
 
   HTTP_CONFLICT     = statuses 'conflict'
