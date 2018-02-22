@@ -46,7 +46,7 @@ module.exports = (Module)->
         default: (asResourse, asAction) ->
           vsNamespaces = "(#{@namespaces().join '|'})"
           re = new RegExp "^#{vsNamespaces}_"
-          vsPath = "#{asResourse}_#{asAction}_endpoint"
+          vsPath = "#{inflect.underscore asResourse}_#{asAction}_endpoint"
             .replace /\//g, '_'
             .replace /\_+/g, '_'
             .replace re, ''
