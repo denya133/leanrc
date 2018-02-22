@@ -37,6 +37,7 @@ class LeanRC extends RC
   @const APPLICATION_ROUTER:  'ApplicationRouter'
   @const APPLICATION_RENDERER:  'ApplicationRenderer'
   @const APPLICATION_SWITCH:  'ApplicationSwitch'
+  @const APPLICATION_GATEWAY:  'ApplicationGateway'
   @const RESQUE_EXECUTOR:  'ResqueExecutor'
   @const LOG_MSG: Symbol 'logMessage'
   @const PRODUCTION: 'production'
@@ -116,7 +117,8 @@ class LeanRC extends RC
   require('./patterns/proxy/Router') LeanRC
   require('./patterns/proxy/Resque') LeanRC
 
-  require('./mixins/CrudGatewayMixin') LeanRC
+  # require('./mixins/CrudGatewayMixin') LeanRC
+  require('./mixins/NamespacedGatewayMixin') LeanRC
   require('./mixins/ModelingGatewayMixin') LeanRC
   require('./mixins/CrudEndpointMixin') LeanRC
   require('./mixins/HttpCollectionMixin') LeanRC
@@ -132,6 +134,18 @@ class LeanRC extends RC
   require('./mixins/SchemaModuleMixin') LeanRC
   require('./mixins/CrudRendererMixin') LeanRC # needs test
   require('./mixins/TemplatableModuleMixin') LeanRC # needs test
+
+  require('./patterns/gateway/CreateEndpoint') LeanRC
+  require('./patterns/gateway/DetailEndpoint') LeanRC
+  require('./patterns/gateway/ListEndpoint') LeanRC
+  require('./patterns/gateway/UpdateEndpoint') LeanRC
+  require('./patterns/gateway/DeleteEndpoint') LeanRC
+  require('./patterns/gateway/ModelingCreateEndpoint') LeanRC
+  require('./patterns/gateway/ModelingDetailEndpoint') LeanRC
+  require('./patterns/gateway/ModelingListEndpoint') LeanRC
+  require('./patterns/gateway/ModelingUpdateEndpoint') LeanRC
+  require('./patterns/gateway/ModelingDeleteEndpoint') LeanRC
+  require('./patterns/gateway/ModelingQueryEndpoint') LeanRC
 
   require('./patterns/switch/Request') LeanRC
   require('./patterns/switch/Response') LeanRC

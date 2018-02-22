@@ -34,41 +34,87 @@ module.exports = (Module)->
 
 
 module.exports = (Module)->
-  { Endpoint } = Module::
+  {
+    APPLICATION_MEDIATOR
+
+    Endpoint
+    Utils: {
+      _, joi, inflect
+    }
+  } = Module::
 
   Module.defineMixin 'CrudEndpointMixin', (BaseClass = Endpoint) ->
     class extends BaseClass
       @inheritProtected()
 
+      ipsKeyName = @private keyName: String
+      ipsEntityName = @private entityName: String
+      ipoSchema = @private schema: Object
+
       @public keyName: String,
-        get: -> @gateway.keyName
+        get: ->
+          inflect.singularize inflect.underscore @[ipsKeyName] ? @[ipsEntityName]
 
       @public itemEntityName: String,
-        get: -> @gateway.itemEntityName
+        get: -> inflect.singularize inflect.underscore @[ipsEntityName]
 
       @public listEntityName: String,
-        get: -> @gateway.listEntityName
+        get: -> inflect.pluralize inflect.underscore @[ipsEntityName]
 
       @public schema: Object,
-        get: -> @gateway.schema
+        get: -> @[ipoSchema]
 
       @public listSchema: Object,
-        get: -> @gateway.listSchema
+        get: ->
+          joi.object "#{@listEntityName}": joi.array().items @schema
 
       @public itemSchema: Object,
-        get: -> @gateway.itemSchema
+        get: ->
+          joi.object "#{@itemEntityName}": @schema
 
       @public keySchema: Object,
-        get: -> @gateway.keySchema
+        default: joi.string().required().description 'The key of the objects.'
 
       @public querySchema: Object,
-        get: -> @gateway.querySchema
+        default: joi.string().empty('{}').optional().default '{}', '
+          The query for finding objects.
+        '
+
+      @public executeQuerySchema: Object,
+        default: joi.object(query: joi.object().required()).required(), '
+          The query for execute.
+        '
 
       @public bulkResponseSchema: Object,
-        get: -> @gateway.bulkResponseSchema
+        default: joi.object success: joi.boolean()
 
       @public versionSchema: Object,
-        get: -> @gateway.versionSchema
+        default: joi.string().required().description '
+          The version of api endpoint in semver format `^x.x`
+        '
+
+      @public ApplicationModule: Module::Class,
+        get: ->
+          if @gateway?
+            @gateway?.facade?.retrieveMediator? APPLICATION_MEDIATOR
+              ?.getViewComponent?()
+              ?.Module ? @Module
+          else
+            @Module
+
+      @public init: Function,
+        default: (args...) ->
+          @super args...
+          [ options ] = args
+          { keyName, entityName, recordName } = options
+          @[ipsKeyName] = keyName
+          @[ipsEntityName] = entityName
+          if recordName? and _.isString recordName
+            recordName = inflect.camelize recordName
+            recordName += 'Record'  unless /Record$/.test recordName
+            Record = @ApplicationModule::[recordName]
+            @[ipoSchema] = Record.schema
+          @[ipoSchema] ?= {}
 
 
       @initializeMixin()
