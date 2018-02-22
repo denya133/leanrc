@@ -10,7 +10,11 @@ describe 'Gateway', ->
   describe '.new', ->
     it 'should create new gateway', ->
       co ->
-        gateway = Gateway.new 'TEST_GATEWAY', endpoints: {}
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/lib"
+          @initialize()
+        gateway = Test::Gateway.new 'TEST_GATEWAY', endpoints: {}
         yield return
   ###
   describe '#swaggerDefinition', ->

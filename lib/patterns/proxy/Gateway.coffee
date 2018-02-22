@@ -47,7 +47,7 @@ module.exports = (App)->
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-    Utils: { inflect, extend }
+    Utils: { inflect, extend, filesListSync }
   } = Module::
   class Gateway extends Module::Proxy
     @inheritProtected()
@@ -55,8 +55,9 @@ module.exports = (Module)->
     @include Module::ConfigurableMixin
     @module Module
 
-    ipoEndpoints = @private endpoints: Object
+    # ipoEndpoints = @private endpoints: Object
     ipsMultitonKey = @protected multitonKey: String
+    iplKnownEndpoints = @protected knownEndpoints: Array
 
     @public ApplicationModule: Module::Class,
       get: ->
@@ -72,8 +73,10 @@ module.exports = (Module)->
 
     @public tryLoadEndpoint: Function,
       default: (asName) ->
-        vsEndpointPath = "#{@[ipsEndpointsPath]}/#{asName}"
-        try require(vsEndpointPath) @ApplicationModule
+        if asName in @[iplKnownEndpoints]
+          vsEndpointPath = "#{@[ipsEndpointsPath]}/#{asName}"
+          return try require(vsEndpointPath) @ApplicationModule
+        return
 
     @public getEndpointName: Function,
       default: (asResourse, asAction) ->
@@ -101,6 +104,19 @@ module.exports = (Module)->
         vcEndpoint = @getEndpoint asResourse, asAction
         options = extend {}, opts, gateway: @
         vcEndpoint.new options
+
+    @public init: Function,
+      default: (args...) ->
+        @super args...
+        vPostfixMask = /\.(js|coffee)$/
+        vlKnownEndpoints = try filesListSync @[ipsEndpointsPath]
+        if vlKnownEndpoints?
+          @[iplKnownEndpoints] = vlKnownEndpoints
+            .filter (asFileName) -> vPostfixMask.test asFileName
+            .map (asFileName) -> asFileName.replace vPostfixMask, ''
+        else
+          @[iplKnownEndpoints] = []
+        return
 
 
   Gateway.initialize()
