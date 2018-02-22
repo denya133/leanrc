@@ -80,11 +80,9 @@ module.exports = (Module)->
 
     @public getEndpointName: Function,
       default: (asResourse, asAction) ->
-        vsResource = asResourse
+        vsPath = "#{asResourse}_#{asAction}_endpoint"
           .replace /\//g, '_'
           .replace /\_+/g, '_'
-        vsPath = "#{vsResource}_#{asAction}_endpoint"
-        vsPath = vsPath.replace /\_+/g, '_'
         inflect.camelize vsPath
 
     @public getStandardActionEndpoint: Function,

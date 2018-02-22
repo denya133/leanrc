@@ -44,23 +44,20 @@ module.exports = (Module)->
 
       @public getTrimmedEndpointName: Function,
         default: (asResourse, asAction) ->
-          vsResource = inflect.underscore @getEndpointName asResourse, asAction
-          @namespaces().some (vsNamespace) ->
-            re = new RegExp "^#{vsNamespace}_"
-            if re.test vsResource
-              vsResource = vsResource.replace re, ''
-              return yes
-            return no
-          inflect.camelize vsResource
+          vsNamespaces = "(#{@namespaces().join '|'})"
+          re = new RegExp "^#{vsNamespaces}_"
+          vsPath = "#{asResourse}_#{asAction}_endpoint"
+            .replace /\//g, '_'
+            .replace /\_+/g, '_'
+            .replace re, ''
+          inflect.camelize vsPath
 
       @public getEndpoint: Function,
         default: (asResourse, asAction) ->
-          vsEndpointName = @getEndpointName asResourse, asAction
-          vsTrimmedEndpointName = @getTrimmedEndpointName asResourse, asAction
-          @ApplicationModule::[vsEndpointName] ?
-            @tryLoadEndpoint(vsEndpointName) ?
-            @ApplicationModule::[vsTrimmedEndpointName] ?
-            @tryLoadEndpoint(vsTrimmedEndpointName) ?
+          @ApplicationModule::[vsName = @getEndpointName asResourse, asAction] ?
+            @tryLoadEndpoint(vsName) ?
+            @ApplicationModule::[vsTrimmedName = @getTrimmedEndpointName asResourse, asAction] ?
+            @tryLoadEndpoint(vsTrimmedName) ?
             @getStandardActionEndpoint asResourse, asAction
 
       @initializeMixin()
