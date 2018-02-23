@@ -49,28 +49,35 @@ module.exports = (Module)->
 
       ipsKeyName = @private keyName: String
       ipsEntityName = @private entityName: String
+      ipsRecordName = @private recordName: String
       ipoSchema = @private schema: Object
+      Endpoint.keyNames ?= {}
+      Endpoint.itemEntityNames ?= {}
+      Endpoint.listEntityNames ?= {}
+      Endpoint.itemSchemas ?= {}
+      Endpoint.listSchemas ?= {}
 
       @public keyName: String,
         get: ->
-          inflect.singularize inflect.underscore @[ipsKeyName] ? @[ipsEntityName]
+          keyName = @[ipsKeyName] ? @[ipsEntityName]
+          Endpoint.keyNames[keyName] ?= inflect.singularize inflect.underscore keyName
 
       @public itemEntityName: String,
-        get: -> inflect.singularize inflect.underscore @[ipsEntityName]
+        get: -> Endpoint.itemEntityNames[@[ipsEntityName]] ?= inflect.singularize inflect.underscore @[ipsEntityName]
 
       @public listEntityName: String,
-        get: -> inflect.pluralize inflect.underscore @[ipsEntityName]
+        get: -> Endpoint.listEntityNames[@[ipsEntityName]] ?= inflect.pluralize inflect.underscore @[ipsEntityName]
 
       @public schema: Object,
         get: -> @[ipoSchema]
 
       @public listSchema: Object,
         get: ->
-          joi.object "#{@listEntityName}": joi.array().items @schema
+          Endpoint.listSchemas["#{@[ipsEntityName]}|#{@[ipsRecordName]}"] ?= joi.object "#{@listEntityName}": joi.array().items @schema
 
       @public itemSchema: Object,
         get: ->
-          joi.object "#{@itemEntityName}": @schema
+          Endpoint.itemSchemas["#{@[ipsEntityName]}|#{@[ipsRecordName]}"] ?= joi.object "#{@itemEntityName}": @schema
 
       @public keySchema: Object,
         default: joi.string().required().description 'The key of the objects.'
@@ -94,13 +101,7 @@ module.exports = (Module)->
         '
 
       @public ApplicationModule: Module::Class,
-        get: ->
-          if @gateway?
-            @gateway?.facade?.retrieveMediator? APPLICATION_MEDIATOR
-              ?.getViewComponent?()
-              ?.Module ? @Module
-          else
-            @Module
+        get: -> @gateway?.ApplicationModule ? @Module
 
       @public init: Function,
         default: (args...) ->
@@ -109,11 +110,13 @@ module.exports = (Module)->
           { keyName, entityName, recordName } = options
           @[ipsKeyName] = keyName
           @[ipsEntityName] = entityName
+          @[ipsRecordName] = recordName
           if recordName? and _.isString recordName
             recordName = inflect.camelize recordName
             recordName += 'Record'  unless /Record$/.test recordName
-            Record = @ApplicationModule::[recordName]
-            @[ipoSchema] = Record.schema
+            voSchema = @gateway?.getSchema recordName
+            voSchema ?= @ApplicationModule::[recordName].schema
+            @[ipoSchema] = voSchema
           @[ipoSchema] ?= {}
 
 

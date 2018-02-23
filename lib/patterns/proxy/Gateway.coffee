@@ -58,12 +58,15 @@ module.exports = (Module)->
     # ipoEndpoints = @private endpoints: Object
     ipsMultitonKey = @protected multitonKey: String
     iplKnownEndpoints = @protected knownEndpoints: Array
+    ipcApplicationModule = @protected ApplicationModule: Module::Class
+    iphSchemas = @private schemas: Object
 
     @public ApplicationModule: Module::Class,
       get: ->
-        if @[ipsMultitonKey]?
-          @facade?.retrieveMediator? APPLICATION_MEDIATOR
-            ?.getViewComponent?()
+        @[ipcApplicationModule] ?= if @[ipsMultitonKey]?
+          @facade
+            ?.retrieveMediator APPLICATION_MEDIATOR
+            ?.getViewComponent()
             ?.Module ? @Module
         else
           @Module
@@ -77,6 +80,10 @@ module.exports = (Module)->
           vsEndpointPath = "#{@[ipsEndpointsPath]}/#{asName}"
           return try require(vsEndpointPath) @ApplicationModule
         return
+
+    @public getEndpointByName: Function,
+      default: (asName) ->
+        @ApplicationModule::[asName] ? @tryLoadEndpoint asName
 
     @public getEndpointName: Function,
       default: (asResourse, asAction) ->
@@ -93,8 +100,7 @@ module.exports = (Module)->
     @public getEndpoint: Function,
       default: (asResourse, asAction) ->
         vsEndpointName = @getEndpointName asResourse, asAction
-        @ApplicationModule::[vsEndpointName] ?
-          @tryLoadEndpoint(vsEndpointName) ?
+        @getEndpointByName(vsEndpointName) ?
           @getStandardActionEndpoint asResourse, asAction
 
     @public swaggerDefinitionFor: Function,
@@ -103,17 +109,23 @@ module.exports = (Module)->
         options = extend {}, opts, gateway: @
         vcEndpoint.new options
 
+    @public getSchema: Function,
+      default: (asRecordName) ->
+        @[iphSchemas][asRecordName] ?= @ApplicationModule::[asRecordName].schema
+        @[iphSchemas][asRecordName]
+
     @public init: Function,
       default: (args...) ->
         @super args...
+        @[iphSchemas] = {}
         vPostfixMask = /\.(js|coffee)$/
         vlKnownEndpoints = try filesListSync @[ipsEndpointsPath]
-        if vlKnownEndpoints?
-          @[iplKnownEndpoints] = vlKnownEndpoints
+        @[iplKnownEndpoints] = if vlKnownEndpoints?
+          vlKnownEndpoints
             .filter (asFileName) -> vPostfixMask.test asFileName
             .map (asFileName) -> asFileName.replace vPostfixMask, ''
         else
-          @[iplKnownEndpoints] = []
+          []
         return
 
 

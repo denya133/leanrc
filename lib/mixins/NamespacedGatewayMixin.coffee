@@ -32,6 +32,8 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
+      ipoJoinedNamespacesMask = @private joinedNamespacesMask: RegExp
+
       @public namespaces: Array,
         default: -> [
           'admining'
@@ -42,22 +44,21 @@ module.exports = (Module)->
           'sharing'
         ]
 
+      @public joinedNamespacesMask: RegExp,
+        get: -> @[ipoJoinedNamespacesMask] ? new RegExp "^(#{@namespaces().join '|'})_"
+
       @public getTrimmedEndpointName: Function,
         default: (asResourse, asAction) ->
-          vsNamespaces = "(#{@namespaces().join '|'})"
-          re = new RegExp "^#{vsNamespaces}_"
           vsPath = "#{inflect.underscore asResourse}_#{asAction}_endpoint"
             .replace /\//g, '_'
             .replace /\_+/g, '_'
-            .replace re, ''
+            .replace @joinedNamespacesMask, ''
           inflect.camelize vsPath
 
       @public getEndpoint: Function,
         default: (asResourse, asAction) ->
-          @ApplicationModule::[vsName = @getEndpointName asResourse, asAction] ?
-            @tryLoadEndpoint(vsName) ?
-            @ApplicationModule::[vsTrimmedName = @getTrimmedEndpointName asResourse, asAction] ?
-            @tryLoadEndpoint(vsTrimmedName) ?
+          @getEndpointByName(@getEndpointName asResourse, asAction) ?
+            @getEndpointByName(@getTrimmedEndpointName asResourse, asAction) ?
             @getStandardActionEndpoint asResourse, asAction
 
       @initializeMixin()
