@@ -90,7 +90,7 @@ module.exports = (Module)->
       @public getRecordId: Function,
         default: (args...)->
           @super args...
-          @recordId ?= @context.pathParams[@keyName.replace /^modeling_/, '']
+          @recordId ?= @context.pathParams["modeling_#{@keyName}"]
           return args
 
 
