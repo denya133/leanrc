@@ -87,5 +87,13 @@ module.exports = (Module)->
           @recordBody = _.omit @recordBody, ['spaces']
           yield return args
 
+      @public getRecordId: Function,
+        args: [Object]
+        return: ANY
+        default: (args...)->
+          @super args...
+          @recordId ?= context.pathParams[@keyName.replace /^modeling_/, '']
+          return args
+
 
       @initializeMixin()
