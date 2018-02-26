@@ -88,11 +88,9 @@ module.exports = (Module)->
           yield return args
 
       @public getRecordId: Function,
-        args: [Object]
-        return: ANY
         default: (args...)->
           @super args...
-          @recordId ?= context.pathParams[@keyName.replace /^modeling_/, '']
+          @recordId ?= @context.pathParams[@keyName.replace /^modeling_/, '']
           return args
 
 
