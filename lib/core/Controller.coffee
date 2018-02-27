@@ -73,6 +73,7 @@ module.exports = (Module)->
 
     @public lazyRegisterCommand: Function,
       default: (asNotificationName, asClassName)->
+        asClassName ?= asNotificationName
         unless @[iphCommandMap][asNotificationName]
           @[ipoView].registerObserver asNotificationName, Module::Observer.new(@executeCommand, @)
           @[iphClassNames][asNotificationName] = asClassName

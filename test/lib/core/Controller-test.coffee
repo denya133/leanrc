@@ -65,7 +65,13 @@ describe 'Controller', ->
         facade.registerMediator Test::Mediator.new APPLICATION_MEDIATOR, Application.new()
         notification = new Notification 'TEST_COMMAND2'
         controller.lazyRegisterCommand notification.getName(), 'TestCommand'
-        assert controller.hasCommand notification.getName(),
+        assert controller.hasCommand notification.getName()
+        controller.executeCommand notification
+        assert spy.called
+        spy.reset()
+        notification = new Notification 'TestCommand'
+        controller.lazyRegisterCommand notification.getName()
+        assert controller.hasCommand notification.getName()
         controller.executeCommand notification
         assert spy.called
         yield return
