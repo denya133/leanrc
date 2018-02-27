@@ -80,6 +80,11 @@ module.exports = (Module)->
         @[ipoModel].registerProxy aoProxy
         return
 
+    @public lazyRegisterProxy: Function,
+      default: (asProxyName, asProxyClassName, ahData)->
+        @[ipoModel].lazyRegisterProxy asProxyName, asProxyClassName, ahData
+        return
+
     @public retrieveProxy: Function,
       default: (asProxyName)->
         @[ipoModel].retrieveProxy asProxyName

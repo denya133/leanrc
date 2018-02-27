@@ -1,8 +1,13 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-Model = LeanRC::Model
-Proxy = LeanRC::Proxy
+{
+  APPLICATION_MEDIATOR
+
+  Model
+  Proxy
+  Utils: { co }
+} = LeanRC::
 
 describe 'Model', ->
   describe '.getInstance', ->
@@ -22,7 +27,7 @@ describe 'Model', ->
         assert model isnt newModel, 'Model instance didn\'t renewed'
       .to.not.throw Error
   describe '#registerProxy', ->
-    it 'should create new proxy and regiter it', ->
+    it 'should create new proxy and register it', ->
       expect ->
         model = Model.getInstance 'TEST3'
         onRegister = sinon.spy()
@@ -38,6 +43,41 @@ describe 'Model', ->
         hasProxy = model.hasProxy 'TEST_PROXY'
         assert hasProxy, 'Proxy is not registered'
       .to.not.throw Error
+  describe '#lazyRegisterProxy', ->
+    facade = null
+    INSTANCE_NAME = 'TEST33'
+    after ->
+      facade?.remove()
+    it 'should create new proxy and register it when needed', ->
+      co ->
+        onRegister = sinon.spy()
+        class Test extends LeanRC
+          @inheritProtected()
+          @initialize()
+        class TestProxy extends Proxy
+          @inheritProtected()
+          @module Test
+          @public onRegister: Function,
+            default: onRegister
+          @initialize()
+        class Application extends Test::CoreObject
+          @inheritProtected()
+          @module Test
+          @initialize()
+        facade = Test::Facade.getInstance INSTANCE_NAME
+        model = Test::Model.getInstance INSTANCE_NAME
+        facade.registerMediator Test::Mediator.new APPLICATION_MEDIATOR, Application.new()
+        proxyData = { data: 'data' }
+        model.lazyRegisterProxy 'TEST_PROXY', 'TestProxy', proxyData
+        assert.isFalse onRegister.called, 'Proxy is already created and registered'
+        onRegister.reset()
+        hasProxy = model.hasProxy 'TEST_PROXY'
+        assert hasProxy, 'Proxy is not registered'
+        testProxy = model.retrieveProxy 'TEST_PROXY'
+        assert.instanceOf testProxy, TestProxy
+        assert onRegister.called, 'Proxy is not registered'
+        onRegister.reset()
+        yield return
   describe '#removeProxy', ->
     it 'should create new proxy and regiter it, after that remove it', ->
       expect ->
