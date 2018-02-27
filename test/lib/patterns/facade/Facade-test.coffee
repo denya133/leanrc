@@ -1,12 +1,16 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-Facade = LeanRC::Facade
-SimpleCommand = LeanRC::SimpleCommand
-Notification = LeanRC::Notification
-Proxy = LeanRC::Proxy
-Mediator = LeanRC::Mediator
-{ co } = LeanRC::Utils
+{
+  APPLICATION_MEDIATOR
+
+  Facade
+  SimpleCommand
+  Notification
+  Proxy
+  Mediator
+  Utils: { co }
+} = LeanRC::
 
 describe 'Facade', ->
   describe '.getInstance', ->
@@ -36,6 +40,35 @@ describe 'Facade', ->
         facade.remove()
         return
       .to.not.throw Error
+  describe '#lazyRegisterCommand', ->
+    facade = null
+    INSTANCE_NAME = 'TEST999'
+    after ->
+      facade?.remove()
+    it 'should register new command lazily', ->
+      co ->
+        spy = sinon.spy()
+        class Test extends LeanRC
+          @inheritProtected()
+          @initialize()
+        class TestCommand extends SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function,
+            default: spy
+          @initialize()
+        class Application extends Test::CoreObject
+          @inheritProtected()
+          @module Test
+          @initialize()
+        facade = Test::Facade.getInstance INSTANCE_NAME
+        facade.registerMediator Test::Mediator.new APPLICATION_MEDIATOR, Application.new()
+        vsNotificationName = 'TEST_COMMAND2'
+        facade.lazyRegisterCommand vsNotificationName, 'TestCommand'
+        assert facade.hasCommand vsNotificationName
+        facade.sendNotification vsNotificationName
+        assert spy.called
+        yield return
   describe '#removeCommand', ->
     it 'should remove command if present', ->
       expect ->

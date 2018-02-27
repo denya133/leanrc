@@ -15,7 +15,7 @@ module.exports = (Module)->
     @const MULTITON_MSG: "Model instance for this multiton key already constructed!"
 
     iphProxyMap     = @private proxyMap: Object
-    iphMetaProxyMap     = @private proxyMap: Object
+    iphMetaProxyMap = @private metaProxyMap: Object
     ipsMultitonKey  = @protected multitonKey: String
     cphInstanceMap  = @private @static _instanceMap: Object,
       default: {}

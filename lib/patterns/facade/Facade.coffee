@@ -66,6 +66,11 @@ module.exports = (Module)->
         @[ipoController].registerCommand asNotificationName, aCommand
         return
 
+    @public lazyRegisterCommand: Function,
+      default: (asNotificationName, asClassName)->
+        @[ipoController].lazyRegisterCommand asNotificationName, asClassName
+        return
+
     @public removeCommand: Function,
       default: (asNotificationName)->
         @[ipoController].removeCommand asNotificationName
