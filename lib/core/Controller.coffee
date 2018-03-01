@@ -57,7 +57,7 @@ module.exports = (Module)->
         vCommand = @[iphCommandMap][vsName]
         unless vCommand?
           unless _.isEmpty vsClassName = @[iphClassNames][vsName]
-            vCommand = @[iphCommandMap][vsName] = @ApplicationModule::[vsClassName]
+            vCommand = @[iphCommandMap][vsName] = (@ApplicationModule.NS ? @ApplicationModule::)[vsClassName]
         if vCommand?
           voCommand = vCommand.new()
           voCommand.initializeNotifier @[ipsMultitonKey]

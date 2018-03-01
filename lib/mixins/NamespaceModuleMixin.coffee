@@ -18,6 +18,7 @@ module.exports = (Module)->
             'collection'
             'configuration'
             'resque'
+            'renderer'
           ]
           mediator: [
             'switch'
@@ -36,6 +37,8 @@ module.exports = (Module)->
               vsPrefix = Class::ROOT
               vsName = inflect.underscore asName
               [ blackhole, vsTypeName ] = vsName.match(/^.*_(\w+)$/) ? []
+              if vsTypeName is 'interface'
+                return
               if vsTypeName
                 if vsTypeName in Class[cphPrefixMap].proxy
                   vsTypeName = 'proxy'
