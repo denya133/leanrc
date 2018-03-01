@@ -4,59 +4,42 @@
 module.exports = (Module)->
   {
     Module: ModuleClass
-    Utils: { _, inflect }
+    Utils: { _, inflect, filesTreeSync }
   } = Module::
 
   Module.defineMixin 'NamespaceModuleMixin', (BaseClass = ModuleClass) ->
     class extends BaseClass
       @inheritProtected()
 
-      cphPrefixMap = @private @static prefixMap: Object,
-        default:
-          proxy: [
-            'gateway'
-            'collection'
-            'configuration'
-            'resque'
-            'renderer'
-          ]
-          mediator: [
-            'switch'
-            'executor'
-          ]
-          root: [
-            'facade'
-            'router'
-            'application'
-          ]
+      cphPathMap = @private @static pathMap: Object
 
       cpmHandler = @private @static handler: Function,
         default: (Class) ->
           get: (aoTarget, asName) ->
             unless Reflect.get aoTarget, asName
-              vsPrefix = Class::ROOT
-              vsName = inflect.underscore asName
-              [ blackhole, vsTypeName ] = vsName.match(/^.*_(\w+)$/) ? []
-              if vsTypeName is 'interface'
-                return
-              if vsTypeName
-                if vsTypeName in Class[cphPrefixMap].proxy
-                  vsTypeName = 'proxy'
-                if vsTypeName in Class[cphPrefixMap].mediator
-                  vsTypeName = 'mediator'
-                unless vsTypeName in Class[cphPrefixMap].root
-                  vsPrefix = "#{vsPrefix}/#{inflect.pluralize vsTypeName}"
-              require("#{vsPrefix}/#{asName}") Class
+              vsPath = Class[cphPathMap][asName]
+              if vsPath
+                require(vsPath) Class
             Reflect.get aoTarget, asName
       cpoNamespace = @private @static proto: Object
 
       @public @static NS: Object,
         get: ->
+          vsRoot = @::ROOT
+          @[cphPathMap] ?= filesTreeSync vsRoot, filesOnly: yes
+            .reduce (vhResult, vsItem) ->
+              if /\.(js|coffee)$/.test vsItem
+                [ blackhole, vsName ] = vsItem.match(/(\w+)\.(js|coffee)$/) ? []
+                if vsItem and vsName
+                  vhResult[vsName] = "#{vsRoot}/#{vsItem}"
+              vhResult
+            , {}
           @[cpoNamespace] ?= new Proxy @::, @[cpmHandler] @
 
       @public @static inheritProtected: Function,
         default: (args...) ->
           @super args...
+          @[cphPathMap] = undefined
           @[cpoNamespace] = undefined
 
 
