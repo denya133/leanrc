@@ -134,6 +134,7 @@ class LeanRC extends RC
   require('./mixins/SchemaModuleMixin') LeanRC
   require('./mixins/CrudRendererMixin') LeanRC # needs test
   require('./mixins/TemplatableModuleMixin') LeanRC # needs test
+  require('./mixins/NamespaceModuleMixin') LeanRC # needs test
 
   require('./patterns/gateway/CreateEndpoint') LeanRC
   require('./patterns/gateway/DetailEndpoint') LeanRC
