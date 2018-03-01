@@ -3,7 +3,7 @@ sinon = require 'sinon'
 request = require 'request'
 LeanRC = require.main.require 'lib'
 TestApp = require './integration/animate-robot'
-AppFacade = TestApp::AppFacade
+AppFacade = TestApp.NS.AppFacade
 RequestApp = require './integration/send-request'
 RequestFacade = RequestApp::AppFacade
 
@@ -20,7 +20,7 @@ describe 'ConcreteFacade', ->
       expect ->
         app = AppFacade.getInstance 'HELLO_WORLD2'
         app.startup()
-        consoleComponent = TestApp::ConsoleComponent.getInstance()
+        consoleComponent = TestApp.NS.ConsoleComponent.getInstance()
         consoleComponentSpy = sinon.spy consoleComponent, 'writeMessages'
         consoleComponent.startAnimateRobot()
         assert consoleComponentSpy.called

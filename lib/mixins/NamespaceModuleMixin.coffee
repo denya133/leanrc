@@ -11,6 +11,24 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
+      cphPrefixMap = @private @static prefixMap: Object,
+        default:
+          proxy: [
+            'gateway'
+            'collection'
+            'configuration'
+            'resque'
+          ]
+          mediator: [
+            'switch'
+            'executor'
+          ]
+          root: [
+            'facade'
+            'router'
+            'application'
+          ]
+
       cpmHandler = @private @static handler: Function,
         default: (Class) ->
           get: (aoTarget, asName) ->
@@ -19,9 +37,11 @@ module.exports = (Module)->
               vsName = inflect.underscore asName
               [ blackhole, vsTypeName ] = vsName.match(/^.*_(\w+)$/) ? []
               if vsTypeName
-                if vsTypeName in [ 'gateway', 'collection', 'configuration', 'resque']
+                if vsTypeName in Class[cphPrefixMap].proxy
                   vsTypeName = 'proxy'
-                unless vsTypeName in [ 'facade', 'router', 'application' ]
+                if vsTypeName in Class[cphPrefixMap].mediator
+                  vsTypeName = 'mediator'
+                unless vsTypeName in Class[cphPrefixMap].root
                   vsPrefix = "#{vsPrefix}/#{inflect.pluralize vsTypeName}"
               require("#{vsPrefix}/#{asName}") Class
             Reflect.get aoTarget, asName
