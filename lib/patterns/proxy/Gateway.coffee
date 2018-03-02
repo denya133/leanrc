@@ -83,7 +83,7 @@ module.exports = (Module)->
 
     @public getEndpointByName: Function,
       default: (asName) ->
-        @ApplicationModule::[asName] ? @tryLoadEndpoint asName
+        (@ApplicationModule.NS ? @ApplicationModule::)[asName] ? @tryLoadEndpoint asName
 
     @public getEndpointName: Function,
       default: (asResourse, asAction) ->

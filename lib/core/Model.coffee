@@ -69,7 +69,7 @@ module.exports = (Module)->
         unless @[iphProxyMap][asProxyName]?
           { className, data = {} } = @[iphMetaProxyMap][asProxyName] ? {}
           unless _.isEmpty className
-            Class = @ApplicationModule::[className]
+            Class = (@ApplicationModule.NS ? @ApplicationModule::)[className]
             @registerProxy Class.new asProxyName, data
         @[iphProxyMap][asProxyName] ? null
 
