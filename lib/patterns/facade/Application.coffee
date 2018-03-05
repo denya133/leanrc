@@ -61,7 +61,7 @@ module.exports = (Module)->
 
     @public init: Function,
       default: (symbol)->
-        {ApplicationFacade} = @constructor.Module::
+        {ApplicationFacade} = @constructor.Module.NS ? @constructor.Module::
         isLightweight = symbol is LIGHTWEIGHT
         {NAME, name} = @constructor
         if isLightweight

@@ -45,40 +45,87 @@ module.exports = (App)->
 
 
 module.exports = (Module)->
+  {
+    APPLICATION_MEDIATOR
+    Utils: { inflect, extend, filesListSync }
+  } = Module::
   class Gateway extends Module::Proxy
     @inheritProtected()
     # @implements Module::GatewayInterface
     @include Module::ConfigurableMixin
     @module Module
 
-    ipoEndpoints = @private endpoints: Object
+    # ipoEndpoints = @private endpoints: Object
+    ipsMultitonKey = @protected multitonKey: String
+    iplKnownEndpoints = @protected knownEndpoints: Array
+    ipcApplicationModule = @protected ApplicationModule: Module::Class
+    iphSchemas = @private schemas: Object
 
-    @public swaggerDefinition: Function,
-      default: (asAction, lambda = ((aoData)-> aoData), force = no)->
-        voEndpoint = lambda.apply @, [Module::Endpoint.new(gateway: @)]
-        @[ipoEndpoints] ?= {}
-        if force or not @[ipoEndpoints][asAction]?
-          @[ipoEndpoints][asAction] = voEndpoint
+    @public ApplicationModule: Module::Class,
+      get: ->
+        @[ipcApplicationModule] ?= if @[ipsMultitonKey]?
+          @facade
+            ?.retrieveMediator APPLICATION_MEDIATOR
+            ?.getViewComponent()
+            ?.Module ? @Module
+        else
+          @Module
+
+    ipsEndpointsPath = @private endpointsPath: String,
+      get: -> "#{@ApplicationModule::ROOT}/endpoints"
+
+    @public tryLoadEndpoint: Function,
+      default: (asName) ->
+        if asName in @[iplKnownEndpoints]
+          vsEndpointPath = "#{@[ipsEndpointsPath]}/#{asName}"
+          return try require(vsEndpointPath) @ApplicationModule
         return
 
-    @public registerEndpoints: Function,
-      default: (ahConfig)->
-        @[ipoEndpoints] ?= {}
-        for own asAction, aoEndpoint of ahConfig
-          @[ipoEndpoints][asAction] = aoEndpoint
-        return
+    @public getEndpointByName: Function,
+      default: (asName) ->
+        (@ApplicationModule.NS ? @ApplicationModule::)[asName] ? @tryLoadEndpoint asName
+
+    @public getEndpointName: Function,
+      default: (asResourse, asAction) ->
+        vsPath = "#{asResourse}_#{asAction}_endpoint"
+          .replace /\//g, '_'
+          .replace /\_+/g, '_'
+        inflect.camelize vsPath
+
+    @public getStandardActionEndpoint: Function,
+      default: (asResourse, asAction) ->
+        vsEndpointName = "#{inflect.camelize asAction}Endpoint"
+        (@ApplicationModule.NS ? @ApplicationModule::)[vsEndpointName] ? @ApplicationModule::Endpoint
+
+    @public getEndpoint: Function,
+      default: (asResourse, asAction) ->
+        vsEndpointName = @getEndpointName asResourse, asAction
+        @getEndpointByName(vsEndpointName) ?
+          @getStandardActionEndpoint asResourse, asAction
 
     @public swaggerDefinitionFor: Function,
-      default: (asAction)-> @[ipoEndpoints]?[asAction]
+      default: (asResourse, asAction, opts)->
+        vcEndpoint = @getEndpoint asResourse, asAction
+        options = extend {}, opts, gateway: @
+        vcEndpoint.new options
 
-    @public onRegister: Function,
-      default: (args...)->
+    @public getSchema: Function,
+      default: (asRecordName) ->
+        @[iphSchemas][asRecordName] ?= (@ApplicationModule.NS ? @ApplicationModule::)[asRecordName].schema
+        @[iphSchemas][asRecordName]
+
+    @public init: Function,
+      default: (args...) ->
         @super args...
-        {endpoints} = @getData() ? {}
-        if endpoints?
-          @[ipoEndpoints] ?= {}
-          for own asAction, acEndpoint of endpoints
-            @[ipoEndpoints][asAction] = acEndpoint.new gateway: @
+        @[iphSchemas] = {}
+        vPostfixMask = /\.(js|coffee)$/
+        vlKnownEndpoints = try filesListSync @[ipsEndpointsPath]
+        @[iplKnownEndpoints] = if vlKnownEndpoints?
+          vlKnownEndpoints
+            .filter (asFileName) -> vPostfixMask.test asFileName
+            .map (asFileName) -> asFileName.replace vPostfixMask, ''
+        else
+          []
         return
 
 

@@ -52,7 +52,7 @@ module.exports = (Module)->
     @public response: Function,
       default: (status, schema, mimes, description)->
         @responses ?= []
-        @responses.push {status, schema, mimes, description}
+        @responses.push { status, schema, mimes, description }
         return @
 
     @public error: Function,
@@ -87,8 +87,10 @@ module.exports = (Module)->
         yield return
 
     @public init: Function,
-      default: ({@gateway})->
-        @super arguments...
+      default: (args...) ->
+        @super args...
+        [ options ] = args
+        { @gateway } = options
 
 
   Endpoint.initialize()

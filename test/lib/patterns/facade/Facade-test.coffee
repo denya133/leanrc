@@ -1,12 +1,16 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-Facade = LeanRC::Facade
-SimpleCommand = LeanRC::SimpleCommand
-Notification = LeanRC::Notification
-Proxy = LeanRC::Proxy
-Mediator = LeanRC::Mediator
-{ co } = LeanRC::Utils
+{
+  APPLICATION_MEDIATOR
+
+  Facade
+  SimpleCommand
+  Notification
+  Proxy
+  Mediator
+  Utils: { co }
+} = LeanRC::
 
 describe 'Facade', ->
   describe '.getInstance', ->
@@ -36,6 +40,35 @@ describe 'Facade', ->
         facade.remove()
         return
       .to.not.throw Error
+  describe '#lazyRegisterCommand', ->
+    facade = null
+    INSTANCE_NAME = 'TEST999'
+    after ->
+      facade?.remove()
+    it 'should register new command lazily', ->
+      co ->
+        spy = sinon.spy()
+        class Test extends LeanRC
+          @inheritProtected()
+          @initialize()
+        class TestCommand extends SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function,
+            default: spy
+          @initialize()
+        class Application extends Test::CoreObject
+          @inheritProtected()
+          @module Test
+          @initialize()
+        facade = Test::Facade.getInstance INSTANCE_NAME
+        facade.registerMediator Test::Mediator.new APPLICATION_MEDIATOR, Application.new()
+        vsNotificationName = 'TEST_COMMAND2'
+        facade.lazyRegisterCommand vsNotificationName, 'TestCommand'
+        assert facade.hasCommand vsNotificationName
+        facade.sendNotification vsNotificationName
+        assert spy.called
+        yield return
   describe '#removeCommand', ->
     it 'should remove command if present', ->
       expect ->
@@ -62,9 +95,13 @@ describe 'Facade', ->
         return
       .to.not.throw Error
   describe '#registerProxy', ->
+    facade = null
+    INSTANCE_NAME = 'TEST6'
+    after ->
+      facade?.remove()
     it 'should create new proxy and regiter it', ->
-      expect ->
-        facade = Facade.getInstance 'TEST6'
+      co ->
+        facade = Facade.getInstance INSTANCE_NAME
         onRegister = sinon.spy ->
         class TestProxy extends Proxy
           @inheritProtected()
@@ -77,8 +114,41 @@ describe 'Facade', ->
         onRegister.reset()
         hasProxy = facade.hasProxy 'TEST_PROXY'
         assert hasProxy, 'Proxy is not registered'
-        facade.remove()
-      .to.not.throw Error
+        yield return
+  describe '#lazyRegisterProxy', ->
+    facade = null
+    INSTANCE_NAME = 'TEST66'
+    after ->
+      facade?.remove()
+    it 'should create new proxy and register it when needed', ->
+      co ->
+        onRegister = sinon.spy ->
+        class Test extends LeanRC
+          @inheritProtected()
+          @initialize()
+        class TestProxy extends Proxy
+          @inheritProtected()
+          @module Test
+          @public onRegister: Function,
+            default: onRegister
+          @initialize()
+        class Application extends Test::CoreObject
+          @inheritProtected()
+          @module Test
+          @initialize()
+        facade = Facade.getInstance INSTANCE_NAME
+        facade.registerMediator Test::Mediator.new Test::APPLICATION_MEDIATOR, Application.new()
+        proxyData = { data: 'data' }
+        facade.lazyRegisterProxy 'TEST_PROXY', 'TestProxy', proxyData
+        assert.isFalse onRegister.called, 'Proxy is already registered'
+        onRegister.reset()
+        hasProxy = facade.hasProxy 'TEST_PROXY'
+        assert hasProxy, 'Proxy is not registered'
+        testProxy = facade.retrieveProxy 'TEST_PROXY'
+        assert.instanceOf testProxy, TestProxy
+        assert onRegister.called, 'Proxy is not registered'
+        onRegister.reset()
+        yield return
   describe '#retrieveProxy', ->
     it 'should retrieve registred proxy', ->
       expect ->

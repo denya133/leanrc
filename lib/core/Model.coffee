@@ -1,6 +1,12 @@
 
 
 module.exports = (Module)->
+  {
+    APPLICATION_MEDIATOR
+
+    Facade
+    Utils: { _ }
+  } = Module::
   class Model extends Module::CoreObject
     @inheritProtected()
     # @implements Module::ModelInterface
@@ -9,9 +15,21 @@ module.exports = (Module)->
     @const MULTITON_MSG: "Model instance for this multiton key already constructed!"
 
     iphProxyMap     = @private proxyMap: Object
+    iphMetaProxyMap = @private metaProxyMap: Object
     ipsMultitonKey  = @protected multitonKey: String
     cphInstanceMap  = @private @static _instanceMap: Object,
       default: {}
+    ipcApplicationModule = @protected ApplicationModule: Module::Class
+
+    @public ApplicationModule: Module::Class,
+      get: ->
+        @[ipcApplicationModule] ?= if @[ipsMultitonKey]?
+          Facade.getInstance @[ipsMultitonKey]
+            ?.retrieveMediator APPLICATION_MEDIATOR
+            ?.getViewComponent()
+            ?.Module ? @Module
+        else
+          @Module
 
     @public @static getInstance: Function,
       default: (asKey)->
@@ -40,17 +58,31 @@ module.exports = (Module)->
         voProxy = @[iphProxyMap][asProxyName]
         if voProxy
           @[iphProxyMap][asProxyName] = undefined
+          @[iphMetaProxyMap][asProxyName] = undefined
           delete @[iphProxyMap][asProxyName]
+          delete @[iphMetaProxyMap][asProxyName]
           voProxy.onRemove()
         return voProxy
 
     @public retrieveProxy: Function,
       default: (asProxyName)->
+        unless @[iphProxyMap][asProxyName]?
+          { className, data = {} } = @[iphMetaProxyMap][asProxyName] ? {}
+          unless _.isEmpty className
+            Class = (@ApplicationModule.NS ? @ApplicationModule::)[className]
+            @registerProxy Class.new asProxyName, data
         @[iphProxyMap][asProxyName] ? null
 
     @public hasProxy: Function,
       default: (asProxyName)->
-        @[iphProxyMap][asProxyName]?
+        @[iphProxyMap][asProxyName]? or @[iphMetaProxyMap][asProxyName]?
+
+    @public lazyRegisterProxy: Function,
+      default: (asProxyName, asProxyClassName, ahData)->
+        @[iphMetaProxyMap][asProxyName] =
+          className: asProxyClassName
+          data: ahData
+        return
 
     @public initializeModel: Function,
       args: []
@@ -65,6 +97,7 @@ module.exports = (Module)->
         Model[cphInstanceMap][asKey] = @
         @[ipsMultitonKey] = asKey
         @[iphProxyMap] = {}
+        @[iphMetaProxyMap] = {}
 
         @initializeModel()
         return

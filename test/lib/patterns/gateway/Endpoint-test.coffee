@@ -1,16 +1,20 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-Endpoint = LeanRC::Endpoint
+{
+  Endpoint,
+  Utils: { co }
+} = LeanRC::
 
 describe 'Endpoint', ->
   describe '.new', ->
     it 'should create new endpoint', ->
-      expect ->
+      co ->
         gateway = test: 'test'
         endpoint = Endpoint.new { gateway }
-        assert.equal endpoint.gateway, gateway, 'Gateway is incorrect'
-      .to.not.throw Error
+        # assert.equal endpoint.gateway, gateway, 'Gateway is incorrect'
+        assert.instanceOf endpoint, Endpoint
+        yield return
   describe '#tag', ->
     it 'should create endpoint and add tag', ->
       expect ->

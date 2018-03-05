@@ -129,6 +129,8 @@ module.exports = (Module)->
       default: (args...)->
         voMigrations = @facade.retrieveProxy MIGRATIONS
         [..., lastMigration] = @Module::MIGRATION_NAMES
+        unless lastMigration?
+          yield return args
         includes = yield voMigrations.includes lastMigration
         if includes
           yield return args
