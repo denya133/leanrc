@@ -19,12 +19,12 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
+          entityName: 'cucumber'
+          gateway: TestCrudGateway.new 'TestGateway'
         assert.instanceOf endpoint, TestCrudEndpoint
         yield return
   describe '#keyName', ->
@@ -40,12 +40,12 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
+          entityName: 'cucumber'
+          gateway: TestCrudGateway.new 'TestGateway'
         { keyName } = endpoint
         assert.equal keyName, 'cucumber'
         yield return
@@ -62,12 +62,12 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
+          entityName: 'cucumber'
+          gateway: TestCrudGateway.new 'TestGateway'
         { itemEntityName } = endpoint
         assert.equal itemEntityName, 'cucumber'
         yield return
@@ -84,12 +84,12 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
+          entityName: 'cucumber'
+          gateway: TestCrudGateway.new 'TestGateway'
         { listEntityName } = endpoint
         assert.equal listEntityName, 'cucumbers'
         yield return
@@ -110,13 +110,15 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
+        gateway = TestCrudGateway.new 'TestGateway'
+        gateway.initializeNotifier 'TEST'
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          recordName: 'TestRecord'
+          gateway: gateway
         { schema } = endpoint
         assert.equal schema, TestRecord.schema
         yield return
@@ -137,13 +139,15 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
+        gateway = TestCrudGateway.new 'TestGateway'
+        gateway.initializeNotifier 'TEST'
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          recordName: 'TestRecord'
+          gateway: gateway
         { listSchema } = endpoint
         assert.deepEqual listSchema, joi.object
           cucumbers: joi.array().items TestRecord.schema
@@ -165,13 +169,15 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
+        gateway = TestCrudGateway.new 'TestGateway'
+        gateway.initializeNotifier 'TEST'
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          recordName: 'TestRecord'
+          gateway: gateway
         { itemSchema } = endpoint
         assert.deepEqual itemSchema, joi.object
           cucumber: TestRecord.schema
@@ -193,13 +199,15 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
+        gateway = TestCrudGateway.new 'TestGateway'
+        gateway.initializeNotifier 'TEST'
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          recordName: 'TestRecord'
+          gateway: gateway
         { querySchema } = endpoint
         assert.deepEqual querySchema, joi.string().empty('{}').optional().default '{}', '
           The query for finding objects.
@@ -222,13 +230,15 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
+        gateway = TestCrudGateway.new 'TestGateway'
+        gateway.initializeNotifier 'TEST'
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          recordName: 'TestRecord'
+          gateway: gateway
         { bulkResponseSchema } = endpoint
         assert.deepEqual bulkResponseSchema, joi.object success: joi.boolean()
         yield return
@@ -249,13 +259,15 @@ describe 'CrudEndpointMixin', ->
         TestCrudEndpoint.initialize()
         class TestCrudGateway extends LeanRC::Gateway
           @inheritProtected()
-          @include LeanRC::CrudGatewayMixin
+          # @include LeanRC::CrudGatewayMixin
           @module Test
         TestCrudGateway.initialize()
+        gateway = TestCrudGateway.new 'TestGateway'
+        gateway.initializeNotifier 'TEST'
         endpoint = TestCrudEndpoint.new
-          gateway: TestCrudGateway.new 'CucumberGateway',
-            entityName: 'cucumber'
-            schema: TestRecord.schema
+          entityName: 'cucumber'
+          recordName: 'TestRecord'
+          gateway: gateway
         { versionSchema } = endpoint
         assert.deepEqual versionSchema, joi.string().required().description '
           The version of api endpoint in semver format `^x.x`

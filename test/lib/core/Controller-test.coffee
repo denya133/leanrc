@@ -1,9 +1,14 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-Controller = LeanRC::Controller
-SimpleCommand = LeanRC::SimpleCommand
-Notification = LeanRC::Notification
+{
+  APPLICATION_MEDIATOR
+
+  Controller
+  SimpleCommand
+  Notification
+  Utils: { co }
+} = LeanRC::
 
 describe 'Controller', ->
   describe '.getInstance', ->
@@ -34,6 +39,42 @@ describe 'Controller', ->
         assert controller.hasCommand 'TEST_COMMAND'
         return
       .to.not.throw Error
+  describe '#lazyRegisterCommand', ->
+    facade = null
+    INSTANCE_NAME = 'TEST3'
+    after ->
+      facade?.remove()
+    it 'should register new command lazily', ->
+      co ->
+        spy = sinon.spy()
+        class Test extends LeanRC
+          @inheritProtected()
+          @initialize()
+        class TestCommand extends SimpleCommand
+          @inheritProtected()
+          @module Test
+          @public execute: Function,
+            default: spy
+          @initialize()
+        class Application extends Test::CoreObject
+          @inheritProtected()
+          @module Test
+          @initialize()
+        facade = Test::Facade.getInstance INSTANCE_NAME
+        controller = Controller.getInstance INSTANCE_NAME
+        facade.registerMediator Test::Mediator.new APPLICATION_MEDIATOR, Application.new()
+        notification = new Notification 'TEST_COMMAND2'
+        controller.lazyRegisterCommand notification.getName(), 'TestCommand'
+        assert controller.hasCommand notification.getName()
+        controller.executeCommand notification
+        assert spy.called
+        spy.reset()
+        notification = new Notification 'TestCommand'
+        controller.lazyRegisterCommand notification.getName()
+        assert controller.hasCommand notification.getName()
+        controller.executeCommand notification
+        assert spy.called
+        yield return
   describe '#executeCommand', ->
     it 'should register new command and call it', ->
       expect ->

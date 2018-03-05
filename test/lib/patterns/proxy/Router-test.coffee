@@ -194,7 +194,10 @@ describe 'Router', ->
                 @post 'verify'
               @member ->
                 @get 'today_watches'
-                @resource 'descendants', only: 'list', ->
+                @resource 'descendants', only: 'list', above:
+                  entityName: 'user'
+                  recordName: 'user'
+                , ->
                   @get 'count', at: 'collection'
             @resource 'invitations', except: 'delete', ->
               @post 'confirm', at: 'collection'
@@ -202,7 +205,8 @@ describe 'Router', ->
             @namespace 'version', module: '', prefix: ':v', ->
               @namespace 'space', module: '', prefix: ':space', ->
                 @resource 'uploads', ->
-                  @post 'add_attachment', at: 'member'
+                  @post 'add_attachment', at: 'member', entityName: 'attachment'
+                  @post 'add_test', at: 'member', entityName: 'test_entity', recordName: 'test', keyName: 'test'
                 @resource 'cucumbers', only: ['list', 'detail']
                 @namespace 'admin', ->
                   @resource 'tomatos', except: ['delete']
@@ -221,6 +225,8 @@ describe 'Router', ->
         router = Test::TestRouter.new 'TEST_ROUTER'
         keys = require.main.require 'test/integration/complex-router/router.json'
         { routes } = router
+        # console.log 'ROUTES:', routes
+        # console.log 'KEYS:', keys
         for key in keys
           assert.isDefined _.find(routes, key), "Cannot find route #{JSON.stringify key}"
         yield return
