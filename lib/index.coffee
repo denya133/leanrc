@@ -9,7 +9,9 @@ class LeanRC extends RC
 
   @root __dirname
 
-  Utils: RC::Utils.extend {}, RC::Utils, {joi, statuses, moment}
+  @util { joi }
+  @util { statuses }
+  @util { joi }
 
   @const HANDLER_RESULT:  Symbol 'HANDLER_RESULT'
   @const RECORD_CHANGED:  Symbol 'RECORD_CHANGED'
