@@ -1,7 +1,7 @@
 
 
 module.exports = (Module) ->
-  class RobotDataProxy extends Module::Proxy
+  class RobotDataProxy extends Module.NS.Proxy
     @inheritProtected()
     @module Module
 
@@ -11,6 +11,6 @@ module.exports = (Module) ->
       default: ->
         @setData yes
         if @getData()
-          @sendNotification Module::ROBOT_SPEAKING, 'I am awaken. Hello World'
+          @sendNotification Module.NS.ROBOT_SPEAKING, 'I am awaken. Hello World'
 
   RobotDataProxy.initialize()

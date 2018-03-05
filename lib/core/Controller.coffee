@@ -1,6 +1,12 @@
 
 
 module.exports = (Module)->
+  {
+    APPLICATION_MEDIATOR
+
+    Facade
+    Utils: { _ }
+  } = Module::
   class Controller extends Module::CoreObject
     @inheritProtected()
     # @implements Module::ControllerInterface
@@ -10,9 +16,21 @@ module.exports = (Module)->
 
     ipoView         = @private view: Module::ViewInterface
     iphCommandMap   = @private commandMap: Object
+    iphClassNames   = @private classNames: Object
     ipsMultitonKey  = @protected multitonKey: String
     cphInstanceMap  = @private @static _instanceMap: Object,
       default: {}
+    ipcApplicationModule = @protected ApplicationModule: Module::Class
+
+    @public ApplicationModule: Module::Class,
+      get: ->
+        @[ipcApplicationModule] ?= if @[ipsMultitonKey]?
+          Facade.getInstance @[ipsMultitonKey]
+            ?.retrieveMediator APPLICATION_MEDIATOR
+            ?.getViewComponent()
+            ?.Module ? @Module
+        else
+          @Module
 
     @public @static getInstance: Function,
       args: [String]
@@ -35,7 +53,11 @@ module.exports = (Module)->
 
     @public executeCommand: Function,
       default: (aoNotification)->
-        vCommand = @[iphCommandMap][aoNotification.getName()]
+        vsName = aoNotification.getName()
+        vCommand = @[iphCommandMap][vsName]
+        unless vCommand?
+          unless _.isEmpty vsClassName = @[iphClassNames][vsName]
+            vCommand = @[iphCommandMap][vsName] = (@ApplicationModule.NS ? @ApplicationModule::)[vsClassName]
         if vCommand?
           voCommand = vCommand.new()
           voCommand.initializeNotifier @[ipsMultitonKey]
@@ -49,16 +71,26 @@ module.exports = (Module)->
           @[iphCommandMap][asNotificationName] = aCommand
         return
 
+    @public lazyRegisterCommand: Function,
+      default: (asNotificationName, asClassName)->
+        asClassName ?= asNotificationName
+        unless @[iphCommandMap][asNotificationName]
+          @[ipoView].registerObserver asNotificationName, Module::Observer.new(@executeCommand, @)
+          @[iphClassNames][asNotificationName] = asClassName
+        return
+
     @public hasCommand: Function,
       default: (asNotificationName)->
-        @[iphCommandMap][asNotificationName]?
+        @[iphCommandMap][asNotificationName]? or @[iphClassNames][asNotificationName]?
 
     @public removeCommand: Function,
       default: (asNotificationName)->
         if @hasCommand(asNotificationName)
           @[ipoView].removeObserver asNotificationName, @
           @[iphCommandMap][asNotificationName] = undefined
+          @[iphClassNames][asNotificationName] = undefined
           delete @[iphCommandMap][asNotificationName]
+          delete @[iphClassNames][asNotificationName]
         return
 
     @public initializeController: Function,
@@ -75,6 +107,7 @@ module.exports = (Module)->
         Controller[cphInstanceMap][asKey] = @
         @[ipsMultitonKey] = asKey
         @[iphCommandMap] = {}
+        @[iphClassNames] = {}
         @initializeController()
 
 

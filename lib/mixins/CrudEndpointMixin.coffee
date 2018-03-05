@@ -115,7 +115,7 @@ module.exports = (Module)->
             recordName = inflect.camelize recordName
             recordName += 'Record'  unless /Record$/.test recordName
             voSchema = @gateway?.getSchema recordName
-            voSchema ?= @ApplicationModule::[recordName].schema
+            voSchema ?= (@ApplicationModule.NS ? @ApplicationModule::)[recordName].schema
             @[ipoSchema] = voSchema
           @[ipoSchema] ?= {}
 

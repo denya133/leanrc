@@ -9,7 +9,9 @@ class LeanRC extends RC
 
   @root __dirname
 
-  Utils: RC::Utils.extend {}, RC::Utils, {joi, statuses, moment}
+  @util { joi }
+  @util { statuses }
+  @util { joi }
 
   @const HANDLER_RESULT:  Symbol 'HANDLER_RESULT'
   @const RECORD_CHANGED:  Symbol 'RECORD_CHANGED'
@@ -134,6 +136,7 @@ class LeanRC extends RC
   require('./mixins/SchemaModuleMixin') LeanRC
   require('./mixins/CrudRendererMixin') LeanRC # needs test
   require('./mixins/TemplatableModuleMixin') LeanRC # needs test
+  require('./mixins/NamespaceModuleMixin') LeanRC # needs test
 
   require('./patterns/gateway/CreateEndpoint') LeanRC
   require('./patterns/gateway/DetailEndpoint') LeanRC

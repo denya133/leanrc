@@ -2,7 +2,7 @@
 EventEmitter = require 'events'
 
 module.exports = (Module) ->
-  class ConsoleComponent extends Module::CoreObject
+  class ConsoleComponent extends Module.NS.CoreObject
     @inheritProtected()
     @module Module
 

@@ -2,7 +2,7 @@
 request = require 'request'
 
 module.exports = (Module) ->
-  class RequestProxy extends Module::Proxy
+  class RequestProxy extends Module.NS.Proxy
     @inheritProtected()
     @module Module
 
@@ -15,6 +15,6 @@ module.exports = (Module) ->
             message = "Error: #{err.message ? err}"
           else
             message = JSON.parse(body ? null)?.message ? body
-          @sendNotification Module::RECEIVE_RESPONSE, message
+          @sendNotification Module.NS.RECEIVE_RESPONSE, message
 
   RequestProxy.initialize()

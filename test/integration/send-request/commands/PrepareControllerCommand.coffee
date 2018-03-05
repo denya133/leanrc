@@ -1,13 +1,13 @@
 
 
 module.exports = (Module) ->
-  class PrepareControllerCommand extends Module::SimpleCommand
+  class PrepareControllerCommand extends Module.NS.SimpleCommand
     @inheritProtected()
     @module Module
 
     @public execute: Function,
       default: ->
-        @facade.registerCommand Module::ANIMATE_ROBOT,
-          Module::AnimateRobotCommand
+        @facade.registerCommand Module.NS.SEND_REQUEST,
+          Module.NS.SendRequestCommand
 
   PrepareControllerCommand.initialize()

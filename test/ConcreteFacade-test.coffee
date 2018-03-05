@@ -3,9 +3,9 @@ sinon = require 'sinon'
 request = require 'request'
 LeanRC = require.main.require 'lib'
 TestApp = require './integration/animate-robot'
-AppFacade = TestApp::AppFacade
+AppFacade = TestApp.NS.AppFacade
 RequestApp = require './integration/send-request'
-RequestFacade = RequestApp::AppFacade
+RequestFacade = RequestApp.NS.AppFacade
 
 describe 'ConcreteFacade', ->
   describe 'Create AppFacade', ->
@@ -20,13 +20,13 @@ describe 'ConcreteFacade', ->
       expect ->
         app = AppFacade.getInstance 'HELLO_WORLD2'
         app.startup()
-        consoleComponent = TestApp::ConsoleComponent.getInstance()
+        consoleComponent = TestApp.NS.ConsoleComponent.getInstance()
         consoleComponentSpy = sinon.spy consoleComponent, 'writeMessages'
         consoleComponent.startAnimateRobot()
         assert consoleComponentSpy.called
         app.finish()
       .to.not.throw Error
-  describe 'Create RequestApp::AppFacade', ->
+  describe 'Create RequestApp.NS.AppFacade', ->
     before ->
       sinon
         .stub request, 'get'
@@ -38,9 +38,9 @@ describe 'ConcreteFacade', ->
       expect ->
         app = RequestFacade.getInstance 'HELLO_WORLD3'
         app.startup()
-        consoleComponent = RequestApp::ConsoleComponent.getInstance()
+        consoleComponent = RequestApp.NS.ConsoleComponent.getInstance()
         consoleComponentSpy = sinon.spy consoleComponent, 'writeMessages'
-        consoleComponent.subscribeEventOnce RequestApp::ConsoleComponent::MESSAGE_WRITTEN, =>
+        consoleComponent.subscribeEventOnce RequestApp.NS.ConsoleComponent::MESSAGE_WRITTEN, =>
           assert consoleComponentSpy.called, 'Console not filled'
           app.finish()
           done()

@@ -2,7 +2,7 @@
 EventEmitter = require 'events'
 
 module.exports = (Module) ->
-  class Module::ConsoleComponent extends Module::CoreObject
+  class ConsoleComponent extends Module.NS.CoreObject
     @inheritProtected()
     @module Module
 
@@ -11,24 +11,24 @@ module.exports = (Module) ->
 
     ipoEventEmitter = @private eventEmitter: EventEmitter,
       default: null
-    ipoInstance = @private instance: Module::ConsoleComponent,
+    ipoInstance = @private instance: ConsoleComponent,
       default: null
 
     @public @static getInstance: Function,
       default: ->
         unless @[ipoInstance]?
-          @[ipoInstance] = Module::ConsoleComponent.new()
+          @[ipoInstance] = ConsoleComponent.new()
         @[ipoInstance]
 
     @public writeMessages: Function,
       default: (messages...) ->
         # Commented out to prevent terminal pollution
         # console.log messages...
-        @[ipoEventEmitter].emit Module::ConsoleComponent::MESSAGE_WRITTEN
+        @[ipoEventEmitter].emit ConsoleComponent::MESSAGE_WRITTEN
 
     @public sendRequest: Function,
       default: ->
-        @[ipoEventEmitter].emit Module::ConsoleComponent::SEND_REQUEST_EVENT
+        @[ipoEventEmitter].emit ConsoleComponent::SEND_REQUEST_EVENT
 
     @public subscribeEvent: Function,
       default: (eventName, callback) ->
@@ -50,4 +50,4 @@ module.exports = (Module) ->
       @[ipoEventEmitter] = new EventEmitter
 
 
-  Module::ConsoleComponent.initialize()
+  ConsoleComponent.initialize()

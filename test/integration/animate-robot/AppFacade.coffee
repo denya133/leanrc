@@ -1,7 +1,7 @@
 
 
 module.exports = (Module) ->
-  class AppFacade extends Module::Facade
+  class AppFacade extends Module.NS.Facade
     @inheritProtected()
     @module Module
 
@@ -14,18 +14,18 @@ module.exports = (Module) ->
       default: ->
         unless @[vpbIsInitialized]
           @[vpbIsInitialized] = yes
-          @registerCommand Module::STARTUP, Module::StartupCommand
-          @sendNotification Module::STARTUP
+          @registerCommand Module.NS.STARTUP, Module.NS.StartupCommand
+          @sendNotification Module.NS.STARTUP
 
     @public finish: Function,
       default: ->
-        @removeMediator  Module::ConsoleComponentMediator::CONSOLE_MEDIATOR
+        @removeMediator  Module.NS.ConsoleComponentMediator::CONSOLE_MEDIATOR
 
     @public @static getInstance: Function,
       default: (asKey)->
-        vhInstanceMap = Module::Facade[cphInstanceMap]
+        vhInstanceMap = Module.NS.Facade[cphInstanceMap]
         unless vhInstanceMap[asKey]?
-          vhInstanceMap[asKey] = Module::AppFacade.new asKey
+          vhInstanceMap[asKey] = Module.NS.AppFacade.new asKey
         vhInstanceMap[asKey]
 
   AppFacade.initialize()

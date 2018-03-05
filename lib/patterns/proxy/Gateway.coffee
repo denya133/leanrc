@@ -83,7 +83,7 @@ module.exports = (Module)->
 
     @public getEndpointByName: Function,
       default: (asName) ->
-        @ApplicationModule::[asName] ? @tryLoadEndpoint asName
+        (@ApplicationModule.NS ? @ApplicationModule::)[asName] ? @tryLoadEndpoint asName
 
     @public getEndpointName: Function,
       default: (asResourse, asAction) ->
@@ -95,7 +95,7 @@ module.exports = (Module)->
     @public getStandardActionEndpoint: Function,
       default: (asResourse, asAction) ->
         vsEndpointName = "#{inflect.camelize asAction}Endpoint"
-        @ApplicationModule::[vsEndpointName] ? @ApplicationModule::Endpoint
+        (@ApplicationModule.NS ? @ApplicationModule::)[vsEndpointName] ? @ApplicationModule::Endpoint
 
     @public getEndpoint: Function,
       default: (asResourse, asAction) ->
@@ -111,7 +111,7 @@ module.exports = (Module)->
 
     @public getSchema: Function,
       default: (asRecordName) ->
-        @[iphSchemas][asRecordName] ?= @ApplicationModule::[asRecordName].schema
+        @[iphSchemas][asRecordName] ?= (@ApplicationModule.NS ? @ApplicationModule::)[asRecordName].schema
         @[iphSchemas][asRecordName]
 
     @public init: Function,
