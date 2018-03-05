@@ -11,7 +11,7 @@ class LeanRC extends RC
 
   @util { joi }
   @util { statuses }
-  @util { joi }
+  @util { moment }
 
   @const HANDLER_RESULT:  Symbol 'HANDLER_RESULT'
   @const RECORD_CHANGED:  Symbol 'RECORD_CHANGED'
