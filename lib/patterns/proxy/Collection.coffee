@@ -41,8 +41,13 @@ module.exports = (Module)->
     @module Module
 
     @public delegate: Module::Class,
-      get: (delegate)->
-        delegate ? @getData()?.delegate
+      get: ->
+        delegate = @getData()?.delegate
+        if _.isString delegate
+          delegate = (@ApplicationModule.NS ? @ApplicationModule::)[delegate]
+        else unless /Migration$|Record$/.test delegate.name
+          delegate = delegate?()
+        delegate
     @public serializer: Module::SerializerInterface
 
     @public collectionName: Function,
@@ -131,7 +136,19 @@ module.exports = (Module)->
     @public init: Function,
       default: (args...)->
         @super args...
-        vcSerializer = @getData()?.serializer ? Module::Serializer
+        serializer = @getData()?.serializer
+        vcSerializer = unless serializer?
+          Module::Serializer
+        else if _.isString serializer
+          (
+            @ApplicationModule.NS ? @ApplicationModule::
+          )[serializer]
+        else unless /Serializer$/.test serializer.name
+          serializer?()
+        else
+          serializer
+
+        # vcSerializer = @getData()?.serializer ? Module::Serializer
         @serializer = vcSerializer.new @
         @
 

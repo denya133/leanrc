@@ -130,7 +130,7 @@ describe 'CheckSessionsMixin', ->
               id = query['@doc.id']
               yield return LeanRC::Cursor.new(@, [@[ipoCollection][id]])
         SessionsCollection.initialize()
-        class Session extends Test::CoreObject
+        class SessionRecord extends Test::CoreObject
           @inheritProtected()
           @include Test::ChainsMixin
           @include Test::RecordMixin
@@ -152,9 +152,9 @@ describe 'CheckSessionsMixin', ->
               @expires ?= now + 108000
               @uid ?= Test::Utils.uuid.v4()
               yield return
-        Session.initialize()
+        SessionRecord.initialize()
         facade.registerProxy SessionsCollection.new Test::SESSIONS,
-          delegate: Session
+          delegate: SessionRecord
           serializer: Test::Serializer
         body = '{"test":"test"}'
         class MyRequest extends IncomingMessage
@@ -234,7 +234,7 @@ describe 'CheckSessionsMixin', ->
               id = query['@doc.id']
               yield return LeanRC::Cursor.new(@, [@[ipoCollection][id]])
         MemoryCollection.initialize()
-        class Session extends Test::CoreObject
+        class SessionRecord extends Test::CoreObject
           @inheritProtected()
           @include Test::ChainsMixin
           @include Test::RecordMixin
@@ -256,17 +256,17 @@ describe 'CheckSessionsMixin', ->
               @expires ?= now + 108000
               @uid ?= Test::Utils.uuid.v4()
               yield return
-        Session.initialize()
-        class User extends Test::Record
+        SessionRecord.initialize()
+        class UserRecord extends Test::Record
           @inheritProtected()
           @module Test
           @attribute verified: Boolean, { default: no }
-        User.initialize()
+        UserRecord.initialize()
         facade.registerProxy MemoryCollection.new Test::SESSIONS,
-          delegate: Session
+          delegate: SessionRecord
           serializer: Test::Serializer
         facade.registerProxy MemoryCollection.new Test::USERS,
-          delegate: User
+          delegate: UserRecord
           serializer: Test::Serializer
         body = '{"test":"test"}'
         class MyRequest extends IncomingMessage
