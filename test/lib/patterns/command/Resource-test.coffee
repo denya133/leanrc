@@ -310,29 +310,33 @@ describe 'Resource', ->
           @public entityName: String,
             default: 'TestEntity'
         TestResource.initialize()
-        class TestEntity extends LeanRC::Record
+        class TestsCollection extends LeanRC::Collection
+          @inheritProtected()
+          @module Test
+        TestsCollection.initialize()
+        class TestEntityRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
           @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestEntity
+            default: (asType) -> Test::TestEntityRecord
           @public init: Function,
             default: ->
               @super arguments...
-              @type = 'Test::TestEntity'
-        TestEntity.initialize()
+              @type = 'Test::TestEntityRecord'
+        TestEntityRecord.initialize()
         resource = TestResource.new()
         resource.initializeNotifier TEST_FACADE
         { collectionName } = resource
-        boundCollection = LeanRC::Collection.new collectionName,
-          delegate: TestEntity
+        boundCollection = TestsCollection.new collectionName,
+          delegate: 'TestEntityRecord'
         facade.registerProxy boundCollection
         resource.context =
           request: body: test_entity:
-            _id: '123', test: 'test9', _space: 'test', type: 'TestEntity'
+            _id: '123', test: 'test9', _space: 'test', type: 'TestEntityRecord'
         resource.getRecordBody()
         resource.omitBody()
-        assert.deepEqual resource.recordBody, test: 'test9', type: 'Test::TestEntity'
+        assert.deepEqual resource.recordBody, test: 'test9', type: 'Test::TestEntityRecord'
         yield return
   describe '#beforeUpdate', ->
     it 'should get body with ID', ->
@@ -363,7 +367,7 @@ describe 'Resource', ->
     it 'should list of resource items', ->
       co ->
         KEY = 'TEST_RESOURCE_001'
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()
@@ -384,7 +388,7 @@ describe 'Resource', ->
           @public entityName: String,
             default: 'TestEntity'
         Test::TestResource.initialize()
-        class Test::Collection extends LeanRC::Collection
+        class TestsCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
@@ -404,12 +408,12 @@ describe 'Resource', ->
               aoRecord.id = key
               @getData().data.push aoRecord.toJSON()
               yield yes
-        Test::Collection.initialize()
+        TestsCollection.initialize()
         facade = LeanRC::Facade.getInstance KEY
         COLLECTION_NAME = 'TestEntitiesCollection'
-        facade.registerProxy Test::Collection.new COLLECTION_NAME,
+        facade.registerProxy TestsCollection.new COLLECTION_NAME,
           delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
+          serializer: 'Serializer'
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
         yield collection.create test: 'test1'
@@ -482,7 +486,7 @@ describe 'Resource', ->
         COLLECTION_NAME = 'TestEntitiesCollection'
         facade.registerProxy Test::Collection.new COLLECTION_NAME,
           delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
+          serializer: -> LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
         yield collection.create test: 'test1'
@@ -1089,18 +1093,18 @@ describe 'Resource', ->
           @module Test
           @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
         TestSwitch.initialize()
-        class TestEntity extends LeanRC::Record
+        class TestEntityRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
           @attribute ownerId: String
           @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestEntity
+            default: (asType) -> Test::TestEntityRecord
           @public init: Function,
             default: ->
               @super arguments...
-              @type = 'Test::TestEntity'
-        TestEntity.initialize()
+              @type = 'Test::TestEntityRecord'
+        TestEntityRecord.initialize()
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
@@ -1111,7 +1115,7 @@ describe 'Resource', ->
         resource.initializeNotifier KEY
         { collectionName } = resource
         boundCollection = TestCollection.new collectionName,
-          delegate: TestEntity
+          delegate: -> TestEntityRecord
         facade.registerProxy boundCollection
         yield boundCollection.create id: 'ID123456', test: 'test', ownerId: 'ID124'
         yield boundCollection.create id: 'ID123457', test: 'test', ownerId: 'ID123'
@@ -1191,18 +1195,18 @@ describe 'Resource', ->
           @module Test
           @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
         TestSwitch.initialize()
-        class TestEntity extends LeanRC::Record
+        class TestEntityRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
           @attribute ownerId: String
           @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestEntity
+            default: (asType) -> Test::TestEntityRecord
           @public init: Function,
             default: ->
               @super arguments...
-              @type = 'Test::TestEntity'
-        TestEntity.initialize()
+              @type = 'Test::TestEntityRecord'
+        TestEntityRecord.initialize()
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
@@ -1213,7 +1217,7 @@ describe 'Resource', ->
         resource.initializeNotifier KEY
         { collectionName } = resource
         boundCollection = TestCollection.new collectionName,
-          delegate: TestEntity
+          delegate: TestEntityRecord
         facade.registerProxy boundCollection
         yield boundCollection.create id: 'ID123456', test: 'test', ownerId: 'ID124'
         yield boundCollection.create id: 'ID123457', test: 'test', ownerId: 'ID123'
@@ -1358,18 +1362,18 @@ describe 'Resource', ->
           @module Test
           @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
         TestSwitch.initialize()
-        class TestEntity extends LeanRC::Record
+        class TestEntityRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
           @attribute ownerId: String
           @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestEntity
+            default: (asType) -> Test::TestEntityRecord
           @public init: Function,
             default: ->
               @super arguments...
-              @type = 'Test::TestEntity'
-        TestEntity.initialize()
+              @type = 'Test::TestEntityRecord'
+        TestEntityRecord.initialize()
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
@@ -1380,7 +1384,7 @@ describe 'Resource', ->
         resource.initializeNotifier KEY
         { collectionName } = resource
         boundCollection = TestCollection.new collectionName,
-          delegate: TestEntity
+          delegate: TestEntityRecord
         facade.registerProxy boundCollection
         yield boundCollection.create id: 'ID123456', test: 'test', ownerId: 'ID124'
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
