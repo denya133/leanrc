@@ -41,7 +41,7 @@ module.exports = (Module)->
             filterable: filterable
             transform: transform ? ->
               [vsModuleName, vsRecordName] = @parseRecordName vsAttr
-              @Module::[vsRecordName]
+              (@Module.NS ? @Module::)[vsRecordName]
             validate: -> opts.transform.call(@).schema
             inverse: inverse ? "#{inflect.pluralize inflect.camelize @name, no}"
             relation: 'belongsTo'
@@ -92,8 +92,8 @@ module.exports = (Module)->
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
           opts.relation = 'hasMany'
           opts.transform ?= ->
-              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
-              @Module::[vsRecordName]
+            [vsModuleName, vsRecordName] = @parseRecordName vsAttr
+            (@Module.NS ? @Module::)[vsRecordName]
           opts.validate = -> joi.array().items opts.transform.call(@).schema
           opts.get = ->
             self = @
@@ -137,8 +137,8 @@ module.exports = (Module)->
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
           opts.relation = 'hasOne'
           opts.transform ?= ->
-              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
-              @Module::[vsRecordName]
+            [vsModuleName, vsRecordName] = @parseRecordName vsAttr
+            (@Module.NS ? @Module::)[vsRecordName]
           opts.validate = -> opts.transform.call(@).schema
           opts.get = ->
             self = @
