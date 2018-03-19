@@ -63,8 +63,10 @@ module.exports = (Module)->
           @recordBody.spaces ?= []
           unless _.includes @recordBody.spaces, '_internal'
             @recordBody.spaces.push '_internal'
-          unless _.includes @recordBody.spaces, @currentUser.spaceId
-            @recordBody.spaces.push @currentUser.spaceId
+          # NOTE: временно закоментировал, т.к. появилось понимание, что контент создаваемый через админку не должен быть "частно" доступен у человека, который его создал - НО это надо обсуждать!
+          # unless _.includes @recordBody.spaces, @currentUser.spaceId
+          #   @recordBody.spaces.push @currentUser.spaceId
+          # TODO: если примем решение что в урле будет захардкожен _internal, то в следующих 3-х строчках нет никакого смысла.
           currentSpace = @context.pathParams.space
           unless _.includes @recordBody.spaces, currentSpace
             @recordBody.spaces.push currentSpace
