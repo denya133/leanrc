@@ -30,25 +30,23 @@ module.exports = (Module)->
       @public @async limitBySpace: Function,
         default: (args...)->
           @listQuery ?= {}
-          currentSpace = @context.pathParams.space
           if @listQuery.$filter?
             @listQuery.$filter = $and: [
               @listQuery.$filter
             ,
-              '@doc.spaces': $all: [currentSpace]
+              '@doc.spaces': $all: ['_internal']
             ]
           else
-            @listQuery.$filter = '@doc.spaces': $all: [currentSpace]
+            @listQuery.$filter = '@doc.spaces': $all: ['_internal']
           yield return args
 
       @public @async checkExistence: Function,
         default: (args...)->
-          currentSpace = @context.pathParams.space
           unless @recordId?
             @context.throw HTTP_NOT_FOUND
           unless (yield @collection.exists
             '@doc.id': $eq: @recordId
-            '@doc.spaces': $all: [currentSpace]
+            '@doc.spaces': $all: ['_internal']
           )
             @context.throw HTTP_NOT_FOUND
           yield return args
@@ -107,11 +105,10 @@ module.exports = (Module)->
       @public @async checkPermission: Function,
         default: checkPermission = (args...)->
           SpacesCollection = @facade.retrieveProxy SPACES
-          spaceId = @context.pathParams['space']
           try
-            @space = yield SpacesCollection.find spaceId
+            @space = yield SpacesCollection.find '_internal'
           unless @space?
-            @context.throw HTTP_NOT_FOUND, "Space with id: #{spaceId} not found"
+            @context.throw HTTP_NOT_FOUND, "Space with id: _internal not found"
           if @currentUser.isAdmin
             yield return args
           {chainName} = checkPermission.wrapper
