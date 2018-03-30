@@ -269,7 +269,7 @@ module.exports = (Module)->
           @protected tag: String,
             default: "#{vsParentTag}#{vsTag}"
           @protected templates: String,
-            default: "#{vsParentTemplates}#{vsTemplates}"
+            default: "#{vsParentTemplates}#{vsTemplates}".replace /[\/][\/]/g, '/'
           @protected param: String,
             default: vsParam
           @protected resource: String,
@@ -340,7 +340,7 @@ module.exports = (Module)->
           @protected tag: String,
             default: "#{vsParentTag}#{vsTag}"
           @protected templates: String,
-            default: "#{vsParentTemplates}#{vsTemplates}"
+            default: "#{vsParentTemplates}#{vsTemplates}".replace /[\/][\/]/g, '/'
           @protected at: String,
             default: at
           @protected above: Object,
