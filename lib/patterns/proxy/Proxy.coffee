@@ -39,7 +39,7 @@ module.exports = (Module)->
     # need test it
     @public @static @async replicateObject: Function,
       default: (instance)->
-        replica = @super instance
+        replica = yield @super instance
         ipsMultitonKey = Symbol.for '~multitonKey'
         replica.multitonKey = instance[ipsMultitonKey]
         replica.proxyName = instance.getProxyName()
