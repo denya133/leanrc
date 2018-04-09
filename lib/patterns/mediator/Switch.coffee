@@ -56,18 +56,44 @@ module.exports = (Module)->
     @include ConfigurableMixin
     @module Module
 
+    ipoHttpServer = @private httpServer: Object
+    ipoRenderers = @private renderers: Object
+
+    @public middlewares: Array
+    @public handlers: Array
+
+    @public responseFormats: Array,
+      get: -> [
+        'json', 'html', 'xml', 'atom', 'text'
+      ]
+
+    @public routerName: String,
+      default: APPLICATION_ROUTER
+
     @public @static compose: Function,
       args: [Array]
       return: LAMBDA
-      default: (middlewares)->
+      default: (middlewares, handlers)->
         unless _.isArray middlewares
           throw new Error 'Middleware stack must be an array!'
-        for fn in middlewares
-          unless _.isFunction fn
-            throw new Error 'Middleware must be composed of functions!'
+        unless _.isArray handlers
+          throw new Error 'Handlers stack must be an array!'
         co.wrap (context)->
           for middleware in middlewares
+            unless _.isFunction middleware
+              throw new Error 'Middleware must be composed of functions!'
             yield middleware context
+          runned = no
+          for handlerGroup in handlers
+            unless handlerGroup?
+              continue
+            for handler in handlerGroup
+              unless _.isFunction handler
+                throw new Error 'Handler must be composed of functions!'
+              if yield handler context
+                runned = yes
+                break
+            break if runned
           yield return
 
     # from https://github.com/koajs/route/blob/master/index.js ###############
@@ -103,7 +129,7 @@ module.exports = (Module)->
             re = pathToRegexp path, keys
             facade.sendNotification SEND_TO_LOG, "#{method ? 'ALL'} #{path} -> #{re}", LEVELS[DEBUG]
 
-            @use co.wrap (ctx)->
+            @use keys.length, co.wrap (ctx)->
               unless matches ctx, method
                 yield return
               m = re.exec ctx.path
@@ -136,16 +162,6 @@ module.exports = (Module)->
 
     @createMethod() # create @public all:...
     ##########################################################################
-
-    @public responseFormats: Array,
-      get: -> [
-        'json', 'html', 'xml', 'atom', 'text'
-      ]
-
-    @public routerName: String,
-      default: APPLICATION_ROUTER
-
-    ipoHttpServer = @private httpServer: Object
 
     # @public jsonRendererName: String
     # @public htmlRendererName: String
@@ -201,14 +217,15 @@ module.exports = (Module)->
           facade.sendNotification SEND_TO_LOG, "listening on port #{port}", LEVELS[DEBUG]
         return
 
-    @public middlewares: Array
-
     @public use: Function,
-      args: [LAMBDA]
+      args: [Number, LAMBDA]
       return: SwitchInterface
-      default: (middleware)->
+      default: (index, middleware)->
+        unless middleware?
+          middleware = index
+          index = null
         unless _.isFunction middleware
-          throw new Error 'middleware must be a function!'
+          throw new Error 'middleware or handler must be a function!'
         if isGeneratorFunction middleware
           { name: oldName } = middleware
           middleware = co.wrap middleware
@@ -216,14 +233,18 @@ module.exports = (Module)->
         middlewareName = middleware._name ? middleware.name ? '-'
         { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         @sendNotification SEND_TO_LOG, "use #{middlewareName}", LEVELS[DEBUG]
-        @middlewares.push middleware
+        if index?
+          @handlers[index] ?= []
+          @handlers[index].push middleware
+        else
+          @middlewares.push middleware
         return @
 
     @public callback: Function,
       args: []
       return: LAMBDA
       default: ->
-        fn = @constructor.compose @middlewares
+        fn = @constructor.compose @middlewares, @handlers
         self = @
         onFinished = require 'on-finished'
         handleRequest = co.wrap (req, res)->
@@ -286,8 +307,6 @@ module.exports = (Module)->
           ctx.length = Buffer.byteLength body
         ctx.res.end body
         return
-
-    ipoRenderers = @private renderers: Object
 
     @public rendererFor: Function,
       default: (asFormat)->
@@ -387,13 +406,14 @@ module.exports = (Module)->
             catch err
               reject err
             return
-          yield return
+          yield return yes
         return
 
     @public init: Function,
       default: (args...)->
         @super args...
         @middlewares = []
+        @handlers = []
         return
 
 
