@@ -10,7 +10,7 @@ module.exports = (Module)->
   UNAUTHORIZED      = statuses 'unauthorized'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  class ModelingDeleteEndpoint extends Module::Endpoint
+  class ModelingDestroyEndpoint extends Module::Endpoint
     @inheritProtected()
     # @implements Module::EndpointInterface
     @include CrudEndpointMixin
@@ -28,10 +28,10 @@ module.exports = (Module)->
         @error UPGRADE_REQUIRED
         @response null
         @summary "
-          Hide the #{@itemEntityName}
+          Remove the #{@itemEntityName}
         "
         @description "
-          Hide the #{@itemEntityName}
+          Deletes the #{@itemEntityName}
           from the database.
         "
 
