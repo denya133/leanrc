@@ -19,6 +19,9 @@ module.exports = (Module)->
       @public delete: Function,
         default: (resource, action, aoData)->
 
+      @public destroy: Function,
+        default: (resource, action, aoData)->
+
       @public detail: Function,
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
@@ -67,7 +70,7 @@ module.exports = (Module)->
                   resource, resourceName, action, aoData
                 )
               else if action in [
-                'create', 'delete', 'detail', 'list', 'update'
+                'create', 'delete', 'destroy', 'detail', 'list', 'update'
               ]
                 @[action].call(
                   resource, resourceName, action, aoData, templatePath

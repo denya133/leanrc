@@ -25,10 +25,10 @@ module.exports = (Module)->
         @error UPGRADE_REQUIRED
         @response null
         @summary "
-          Remove the #{@itemEntityName}
+          Hide the #{@itemEntityName}
         "
         @description "
-          Deletes the #{@itemEntityName}
+          Hide the #{@itemEntityName}
           from the database.
         "
 

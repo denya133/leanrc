@@ -206,17 +206,23 @@ module.exports = (Module)->
         @context.status = 204
         yield return
 
+    @action @async destroy: Function,
+      default: ->
+        yield @collection.destroy @recordId
+        @context.status = 204
+        yield return
+
 
     # ------------ Chains definitions ---------
     @chains [
-      'list', 'detail', 'create', 'update', 'delete'
+      'list', 'detail', 'create', 'update', 'delete', 'destroy'
     ]
 
     @initialHook 'beforeActionHook'
 
     @beforeHook 'getQuery', only: ['list']
-    @beforeHook 'getRecordId', only: ['detail', 'update', 'delete']
-    @beforeHook 'checkExistence', only: ['detail', 'update', 'delete']
+    @beforeHook 'getRecordId', only: ['detail', 'update', 'delete', 'destroy']
+    @beforeHook 'checkExistence', only: ['detail', 'update', 'delete', 'destroy']
     @beforeHook 'getRecordBody', only: ['create', 'update']
     @beforeHook 'omitBody', only: ['create', 'update']
     @beforeHook 'beforeUpdate', only: ['update']
