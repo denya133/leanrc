@@ -3,14 +3,14 @@
 module.exports = (Module)->
   {
     CrudEndpointMixin
-    Utils: { statuses, joi }
+    Utils: { statuses }
   } = Module::
 
   HTTP_NOT_FOUND    = statuses 'not found'
   UNAUTHORIZED      = statuses 'unauthorized'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  class ModelingDeleteEndpoint extends Module::Endpoint
+  class DestroyEndpoint extends Module::Endpoint
     @inheritProtected()
     # @implements Module::EndpointInterface
     @include CrudEndpointMixin
@@ -20,18 +20,15 @@ module.exports = (Module)->
       default: (args...) ->
         @super args...
         @pathParam 'v', @versionSchema
-        @header 'Authorization', joi.string().required(), "
-          Authorization header for internal services.
-        "
         @error HTTP_NOT_FOUND
         @error UNAUTHORIZED
         @error UPGRADE_REQUIRED
         @response null
         @summary "
-          Hide the #{@itemEntityName}
+          Remove the #{@itemEntityName}
         "
         @description "
-          Hide the #{@itemEntityName}
+          Deletes the #{@itemEntityName}
           from the database.
         "
 

@@ -143,11 +143,17 @@ class LeanRC extends RC
   require('./patterns/gateway/ListEndpoint') LeanRC
   require('./patterns/gateway/UpdateEndpoint') LeanRC
   require('./patterns/gateway/DeleteEndpoint') LeanRC
+  require('./patterns/gateway/DestroyEndpoint') LeanRC
+  require('./patterns/gateway/BulkDeleteEndpoint') LeanRC
+  require('./patterns/gateway/BulkDestroyEndpoint') LeanRC
   require('./patterns/gateway/ModelingCreateEndpoint') LeanRC
   require('./patterns/gateway/ModelingDetailEndpoint') LeanRC
   require('./patterns/gateway/ModelingListEndpoint') LeanRC
   require('./patterns/gateway/ModelingUpdateEndpoint') LeanRC
   require('./patterns/gateway/ModelingDeleteEndpoint') LeanRC
+  require('./patterns/gateway/ModelingDestroyEndpoint') LeanRC
+  require('./patterns/gateway/ModelingBulkDeleteEndpoint') LeanRC
+  require('./patterns/gateway/ModelingBulkDestroyEndpoint') LeanRC
   require('./patterns/gateway/ModelingQueryEndpoint') LeanRC
 
   require('./patterns/switch/Request') LeanRC
@@ -178,6 +184,10 @@ class LeanRC extends RC
   require('./mixins/PersoningResourceMixin') LeanRC # needs test
   require('./mixins/ModelingResourceMixin') LeanRC # needs test
   require('./mixins/EditableResourceMixin') LeanRC # needs test
+
+  require('./mixins/BulkMethodsRendererMixin') LeanRC # needs test
+  require('./mixins/BulkMethodsResourceMixin') LeanRC # needs test
+  require('./mixins/BulkMethodsCollectionMixin') LeanRC # needs test
 
   require('./patterns/migration/Migration') LeanRC
   require('./mixins/MemoryMigrationMixin') LeanRC
