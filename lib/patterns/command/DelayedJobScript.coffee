@@ -5,7 +5,6 @@
 module.exports = (Module)->
   {
     ASYNC
-    APPLICATION_MEDIATOR
 
     Script
     Class
@@ -23,21 +22,19 @@ module.exports = (Module)->
         args
       } = aoData
       replica.multitonKey = @[Symbol.for '~multitonKey']
-      app = @facade.retrieveMediator APPLICATION_MEDIATOR
-        .getViewComponent()
-      unless moduleName is app.Module.name
-        throw new Error "Job was defined with moduleName = `#{moduleName}`, but its Module = `#{app.Module.name}`"
+      unless moduleName is @ApplicationModule.name
+        throw new Error "Job was defined with moduleName = `#{moduleName}`, but its Module = `#{@ApplicationModule.name}`"
         yield return
       switch replica.type
         when 'class'
-          replicated = yield Class.restoreObject app.Module, replica
+          replicated = yield Class.restoreObject @ApplicationModule, replica
           if (config = replicated.classMethods[methodName]).async is ASYNC
             yield replicated[config.pointer]? args...
           else
             replicated[config.pointer]? args...
         when 'instance'
-          vcInstanceClass = app.Module::[replica.class]
-          replicated = yield vcInstanceClass.restoreObject app.Module, replica
+          vcInstanceClass = (@ApplicationModule.NS ? @ApplicationModule::)[replica.class]
+          replicated = yield vcInstanceClass.restoreObject @ApplicationModule, replica
           if (config = vcInstanceClass.instanceMethods[methodName]).async is ASYNC
             yield replicated[config.pointer]? args...
           else
