@@ -26,7 +26,7 @@ module.exports = (Module)->
             if error?
               @context.throw 400, 'ValidationError: `$filter` must be an object', error.stack
           deletedAt = moment().utc().toISOString()
-          removerId = @currentUser?.id ? 'system'
+          removerId = @session.uid ? 'system'
           yield @collection.delay @facade
             .bulkDelete JSON.stringify {
               deletedAt

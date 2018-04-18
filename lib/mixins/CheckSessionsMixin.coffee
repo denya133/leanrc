@@ -41,8 +41,9 @@ module.exports = (Module)->
 
     Resource
     RecordInterface
+    PromiseInterface
 
-    Utils: { statuses }
+    Utils: { statuses, co }
   } = Module::
 
   UNAUTHORIZED      = statuses 'unauthorized'
@@ -52,7 +53,9 @@ module.exports = (Module)->
       @inheritProtected()
 
       @public session: RecordInterface
-      @public currentUser: RecordInterface
+      @public currentUser: PromiseInterface,
+        get: co.wrap ->
+          return yield @facade.retrieveProxy(USERS).find @session.uid
 
       @public @async makeSession: Function,
         default: ->
@@ -61,7 +64,12 @@ module.exports = (Module)->
             session = yield (yield SessionsCollection.findBy
               "@doc.id": sessionCookie
             ).first()
-          unless session?
+          if session?
+            unless session.userSpaceId?
+              session = yield (
+                SessionsCollection.calcComputedsForOne?(session) ? session
+              )
+          else
             session = SessionsCollection.build()
           @session = session
           yield return
@@ -69,15 +77,15 @@ module.exports = (Module)->
       @public @async checkSession: Function,
         default: (args...)->
           yield @makeSession()
-          unless @session?.uid?
+          unless @session.uid?
             @context.throw UNAUTHORIZED
             return
-          UsersCollection = @facade.retrieveProxy USERS
-          currentUser = yield UsersCollection.find @session.uid
-          unless currentUser?.verified
+          # UsersCollection = @facade.retrieveProxy USERS
+          # currentUser = yield UsersCollection.find @session.uid
+          unless @session.userVerified
             @context.throw UNAUTHORIZED, 'Unverified'
             return
-          @currentUser = currentUser
+          # @currentUser = currentUser
           yield return args
 
 
