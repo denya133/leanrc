@@ -7,7 +7,8 @@ module.exports = (Module)->
 
     Resource
     RecordInterface
-    Utils: { _, statuses }
+    PromiseInterface
+    Utils: { _, statuses, co }
   } = Module::
 
   HTTP_NOT_FOUND    = statuses 'not found'
@@ -21,7 +22,9 @@ module.exports = (Module)->
         default: no
 
       @public session: RecordInterface
-      @public currentUser: RecordInterface
+      @public currentUser: PromiseInterface,
+        get: co.wrap ->
+          return yield @facade.retrieveProxy(USERS).find 'system'
 
       @beforeHook 'setSpaces',      only: ['create']
       @beforeHook 'setOwnerId',     only: ['create']
@@ -52,22 +55,22 @@ module.exports = (Module)->
       @public @async systemOnly: Function,
         default: (args...)->
           yield @makeSession()
-          unless @session?.uid?
+          unless @session.uid?
             @context.throw UNAUTHORIZED
             return
-          UsersCollection = @facade.retrieveProxy USERS
-          currentUser = UsersCollection.build
-            id: 'system'
-            handle: 'system'
-            email: 'system@leanrc.com'
-            firstName: 'Owner'
-            lastName: 'System'
-            role: 'admin'
-            accepted:                       yes
-            verified:                       yes
-            ownerId: 'system'
-            inviterId: 'admin'
-          @currentUser = currentUser
+          # UsersCollection = @facade.retrieveProxy USERS
+          # currentUser = UsersCollection.build
+          #   id: 'system'
+          #   handle: 'system'
+          #   email: 'system@leanrc.com'
+          #   firstName: 'Owner'
+          #   lastName: 'System'
+          #   role: 'admin'
+          #   accepted:                       yes
+          #   verified:                       yes
+          #   ownerId: 'system'
+          #   inviterId: 'admin'
+          # @currentUser = currentUser
           yield return args
 
       @public @async setOwnerId: Function,

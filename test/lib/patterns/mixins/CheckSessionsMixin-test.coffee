@@ -222,7 +222,19 @@ describe 'CheckSessionsMixin', ->
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
         TestSwitch.initialize()
-        class MemoryCollection extends LeanRC::Collection
+        # class MemoryCollection extends LeanRC::Collection
+        #   @inheritProtected()
+        #   @include LeanRC::MemoryCollectionMixin
+        #   @include LeanRC::GenerateUuidIdMixin
+        #   @include LeanRC::QueryableCollectionMixin
+        #   @module Test
+        #   ipoCollection = Symbol.for '~collection'
+        #   @public @async takeBy: Function,
+        #     default: (query, options = {})->
+        #       id = query['@doc.id']
+        #       yield return LeanRC::Cursor.new(@, [@[ipoCollection][id]])
+        # MemoryCollection.initialize()
+        class SessionsCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
@@ -233,7 +245,16 @@ describe 'CheckSessionsMixin', ->
             default: (query, options = {})->
               id = query['@doc.id']
               yield return LeanRC::Cursor.new(@, [@[ipoCollection][id]])
-        MemoryCollection.initialize()
+          @public userVerified: Boolean,
+            default: no
+          @public @async calcComputedsForOne: Function,
+            default: (record) ->
+              record.userIsAdmin = no
+              record.userSpaceId = '234562362362452345'
+              record.userVerified = @userVerified
+              record.ownSpaces = []
+              yield return record
+          @initialize()
         class SessionRecord extends Test::CoreObject
           @inheritProtected()
           @include Test::ChainsMixin
@@ -257,17 +278,17 @@ describe 'CheckSessionsMixin', ->
               @uid ?= Test::Utils.uuid.v4()
               yield return
         SessionRecord.initialize()
-        class UserRecord extends Test::Record
-          @inheritProtected()
-          @module Test
-          @attribute verified: Boolean, { default: no }
-        UserRecord.initialize()
-        facade.registerProxy MemoryCollection.new Test::SESSIONS,
+        # class UserRecord extends Test::Record
+        #   @inheritProtected()
+        #   @module Test
+        #   @attribute verified: Boolean, { default: no }
+        # UserRecord.initialize()
+        facade.registerProxy SessionsCollection.new Test::SESSIONS,
           delegate: SessionRecord
           serializer: Test::Serializer
-        facade.registerProxy MemoryCollection.new Test::USERS,
-          delegate: UserRecord
-          serializer: Test::Serializer
+        # facade.registerProxy MemoryCollection.new Test::USERS,
+        #   delegate: UserRecord
+        #   serializer: Test::Serializer
         body = '{"test":"test"}'
         class MyRequest extends IncomingMessage
           constructor: (socket) ->
@@ -292,11 +313,11 @@ describe 'CheckSessionsMixin', ->
           yield resource.checkSession()
         catch error1
         assert.instanceOf error1, httpErrors.Unauthorized
-        users = facade.retrieveProxy Test::USERS
-        user = yield users.create()
+        # users = facade.retrieveProxy Test::USERS
+        # user = yield users.create()
         sessions = facade.retrieveProxy Test::SESSIONS
         try
-          session = yield sessions.create uid: user.id
+          session = yield sessions.create()
           req.headers.cookie = "#{configs.sessionCookie}=#{session.id}"
           resource = Test::TestResource.new()
           resource.context = Test::Context.new req, res, switchMediator
@@ -305,12 +326,12 @@ describe 'CheckSessionsMixin', ->
         catch error2
         assert.instanceOf error2, httpErrors.Unauthorized
         assert.propertyVal error2, 'message', 'Unverified'
-        user.verified = yes
-        yield user.save()
+        sessions.userVerified = yes
+        session = yield sessions.create uid: 'ID123'
         req.headers.cookie = "#{configs.sessionCookie}=#{session.id}"
         resource = Test::TestResource.new()
         resource.context = Test::Context.new req, res, switchMediator
         resource.initializeNotifier KEY
         yield resource.checkSession()
-        assert.equal resource.currentUser.id, user.id
+        assert.equal resource.session.uid, 'ID123'
         yield return

@@ -6,8 +6,8 @@ module.exports = (Module)->
     ROLES
 
     Resource
-    RecordInterface
-    Utils: { _, statuses }
+    PromiseInterface
+    Utils: { _, statuses, co }
   } = Module::
 
   HTTP_NOT_FOUND    = statuses 'not found'
@@ -18,8 +18,10 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
-      @public spaces: Array
-      @public space: RecordInterface
+      # @public spaces: Array
+      @public currentSpace: PromiseInterface,
+        get: co.wrap ->
+          return yield @facade.retrieveProxy(SPACES).find '_internal'
 
       @beforeHook 'limitBySpace',   only: ['list']
       @beforeHook 'setSpaces',      only: ['create']
@@ -62,8 +64,8 @@ module.exports = (Module)->
           unless _.includes @recordBody.spaces, '_internal'
             @recordBody.spaces.push '_internal'
           # NOTE: временно закоментировал, т.к. появилось понимание, что контент создаваемый через админку не должен быть "частно" доступен у человека, который его создал - НО это надо обсуждать!
-          # unless _.includes @recordBody.spaces, @currentUser.spaceId
-          #   @recordBody.spaces.push @currentUser.spaceId
+          # unless _.includes @recordBody.spaces, @session.userSpaceId
+          #   @recordBody.spaces.push @session.userSpaceId
           # TODO: если примем решение что в урле будет захардкожен _internal, то в следующих 3-х строчках нет никакого смысла.
           currentSpace = @context.pathParams.space
           unless _.includes @recordBody.spaces, currentSpace
@@ -96,7 +98,7 @@ module.exports = (Module)->
 
       ipoCheckPermission = @private @async checkPermission: Function,
         default: (space, chainName)->
-          if yield @[ipoCheckRole] space, @currentUser?.id, chainName
+          if yield @[ipoCheckRole] space, @session.uid, chainName
             yield return yes
           else
             @context.throw FORBIDDEN, "Current user has no access"
@@ -104,12 +106,12 @@ module.exports = (Module)->
 
       @public @async checkPermission: Function,
         default: checkPermission = (args...)->
-          SpacesCollection = @facade.retrieveProxy SPACES
-          try
-            @space = yield SpacesCollection.find '_internal'
-          unless @space?
-            @context.throw HTTP_NOT_FOUND, "Space with id: _internal not found"
-          if @currentUser.isAdmin
+          # SpacesCollection = @facade.retrieveProxy SPACES
+          # try
+          #   @space = yield SpacesCollection.find '_internal'
+          # unless @space?
+          #   @context.throw HTTP_NOT_FOUND, "Space with id: _internal not found"
+          if @session.userIsAdmin
             yield return args
           {chainName} = checkPermission.wrapper
           yield @[ipoCheckPermission] '_internal', chainName
