@@ -6,9 +6,9 @@ module.exports = (Module)->
     ROLES
 
     Resource
-    RecordInterface
+    PromiseInterface
 
-    Utils: { _, statuses }
+    Utils: { _, statuses, co }
   } = Module::
 
   HTTP_NOT_FOUND    = statuses 'not found'
@@ -19,8 +19,11 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
-      @public spaces: Array
-      @public space: RecordInterface
+      # @public spaces: Array
+      @public currentSpace: PromiseInterface,
+        get: co.wrap ->
+          currentSpace = @context.pathParams.space
+          return yield @facade.retrieveProxy(SPACES).find currentSpace
 
       @beforeHook 'limitBySpace',   only: ['list']
       @beforeHook 'setSpaces',      only: ['create']
@@ -64,8 +67,8 @@ module.exports = (Module)->
           @recordBody.spaces ?= []
           unless _.includes @recordBody.spaces, '_internal'
             @recordBody.spaces.push '_internal'
-          unless _.includes @recordBody.spaces, @currentUser.spaceId
-            @recordBody.spaces.push @currentUser.spaceId
+          unless _.includes @recordBody.spaces, @session.userSpaceId
+            @recordBody.spaces.push @session.userSpaceId
           currentSpace = @context.pathParams.space
           unless _.includes @recordBody.spaces, currentSpace
             @recordBody.spaces.push currentSpace
@@ -78,7 +81,7 @@ module.exports = (Module)->
 
       ipoCheckOwner = @private @async checkOwner: Function,
         default: (userId)->
-          yield return @space?.ownerId is userId
+          yield return @context.pathParams.space in @session.ownSpaces
 
       ipoCheckRole = @private @async checkRole: Function,
         default: (spaceId, userId, action)->
@@ -101,9 +104,9 @@ module.exports = (Module)->
 
       ipoCheckPermission = @private @async checkPermission: Function,
         default: (spaceId, chainName)->
-          if yield @[ipoCheckOwner] @currentUser?.id
+          if yield @[ipoCheckOwner] @session.uid
             yield return yes
-          else if yield @[ipoCheckRole] spaceId, @currentUser?.id, chainName
+          else if yield @[ipoCheckRole] spaceId, @session.uid, chainName
             yield return yes
           else
             @context.throw FORBIDDEN, "Current user has no access"
@@ -111,14 +114,14 @@ module.exports = (Module)->
 
       @public @async checkPermission: Function,
         default: checkPermission = (args...)->
-          spaceId = @context.pathParams['space']
+          spaceId = @context.pathParams.space
           {chainName} = checkPermission.wrapper
-          SpacesCollection = @facade.retrieveProxy SPACES
-          try
-            @space = yield SpacesCollection.find spaceId
-          unless @space?
-            @context.throw FORBIDDEN, "Current user has no access"
-          if @currentUser.isAdmin
+          # SpacesCollection = @facade.retrieveProxy SPACES
+          # try
+          #   @space = yield SpacesCollection.find spaceId
+          # unless @space?
+          #   @context.throw FORBIDDEN, "Current user has no access"
+          if @session.userIsAdmin
             yield return args
           yield @[ipoCheckPermission] spaceId, chainName
           yield return args

@@ -21,7 +21,7 @@ module.exports = (Module)->
       @public @async limitByUserSpace: Function,
         default: (args...)->
           @listQuery ?= {}
-          currentUserSpace = @currentUser.spaceId
+          currentUserSpace = @session.userSpaceId
           if @listQuery.$filter?
             @listQuery.$filter = $and: [
               @listQuery.$filter
@@ -34,7 +34,7 @@ module.exports = (Module)->
 
       @public @async checkExistence: Function,
         default: (args...)->
-          currentUserSpace = @currentUser.spaceId
+          currentUserSpace = @session.userSpaceId
           unless @recordId?
             @context.throw HTTP_NOT_FOUND
           unless (yield @collection.exists
@@ -49,8 +49,8 @@ module.exports = (Module)->
           @recordBody.spaces ?= []
           unless _.includes @recordBody.spaces, '_internal'
             @recordBody.spaces.push '_internal'
-          unless _.includes @recordBody.spaces, @currentUser.spaceId
-            @recordBody.spaces.push @currentUser.spaceId
+          unless _.includes @recordBody.spaces, @session.userSpaceId
+            @recordBody.spaces.push @session.userSpaceId
           yield return args
 
       @public @async protectSpaces: Function,

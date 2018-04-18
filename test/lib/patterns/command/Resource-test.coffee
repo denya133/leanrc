@@ -912,7 +912,7 @@ describe 'Resource', ->
             default: 'TestEntity'
         Test::TestResource.initialize()
         resource = Test::TestResource.new()
-        resource.currentUser = id: 'ID123'
+        resource.session = uid: 'ID123'
         resource.context =
           pathParams: test_entity: 'ID123456'
           request: body: test_entity: test: 'test9'
@@ -939,7 +939,7 @@ describe 'Resource', ->
             default: 'TestEntity'
         Test::TestResource.initialize()
         resource = Test::TestResource.new()
-        resource.currentUser = id: 'ID123'
+        resource.session = uid: 'ID123'
         resource.context =
           pathParams: test_entity: 'ID123456'
           request: body: test_entity: test: 'test9'
@@ -1035,7 +1035,7 @@ describe 'Resource', ->
             default: 'TestEntity'
         Test::TestResource.initialize()
         resource = Test::TestResource.new()
-        resource.currentUser = id: 'ID123', isAdmin: no
+        resource.session = uid: 'ID123', userIsAdmin: no
         resource.context =
           pathParams: test_entity: 'ID123456', space: 'SPACE123'
           request: body: test_entity: test: 'test9'
@@ -1123,18 +1123,20 @@ describe 'Resource', ->
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        resource.currentUser = id: 'ID123', isAdmin: no
         resource.context = Test::Context.new req, res, switchMediator
         resource.context.pathParams = test_entity: 'ID123455', space: 'SPACE123'
         resource.context.request = body: test_entity: test: 'test9'
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
+        resource.session = {}
         try
           yield resource.checkOwner()
         catch e
         assert.instanceOf e, httpErrors.Unauthorized
-        resource.session = uid: '123456789'
+        resource.session = uid: 'ID123', userIsAdmin: no
+        resource.context.pathParams.test_entity = 'ID0123456'
+        # resource.session = uid: '123456789'
         try
           yield resource.checkOwner()
         catch e
@@ -1225,12 +1227,11 @@ describe 'Resource', ->
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        resource.currentUser = id: 'ID123', isAdmin: no
         resource.context = Test::Context.new req, res, switchMediator
         resource.context.pathParams = test_entity: 'ID123455', space: 'SPACE123'
         resource.context.request = body: test_entity: test: 'test9'
         resource.getRecordId()
-        resource.session = uid: '123456789'
+        resource.session = uid: 'ID123', userIsAdmin: no
         try
           yield resource.checkExistence()
         catch e
@@ -1391,23 +1392,23 @@ describe 'Resource', ->
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
-        resource.currentUser = id: 'ID123', isAdmin: no
         resource.context = Test::Context.new req, res, switchMediator
         resource.context.pathParams = test_entity: 'ID123456', space: 'SPACE123'
         resource.context.request = body: test_entity: test: 'test9'
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
+        resource.session = {}
         try
           yield resource.checkOwner()
         catch e
         assert.instanceOf e, httpErrors.Unauthorized
-        resource.session = uid: '123456789'
+        resource.session = uid: 'ID123'
         try
           yield resource.adminOnly()
         catch e
         assert.instanceOf e, httpErrors.Forbidden
-        resource.currentUser.isAdmin = yes
+        resource.session = uid: 'ID123', userIsAdmin: yes
         yield resource.adminOnly()
         yield return
   describe '#doAction', ->

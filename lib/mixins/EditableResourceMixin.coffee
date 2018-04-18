@@ -19,18 +19,18 @@ module.exports = (Module)->
 
       @public @async setCurrentUserOnCreate: Function,
         default: (args...)->
-          @recordBody.creatorId = @currentUser?.id ? null
+          @recordBody.creatorId = @session.uid ? null
           @recordBody.editorId = @recordBody.creatorId
           yield return args
 
       @public @async setCurrentUserOnUpdate: Function,
         default: (args...)->
-          @recordBody.editorId = @currentUser?.id ? null
+          @recordBody.editorId = @session.uid ? null
           yield return args
 
       @public @async setCurrentUserOnDelete: Function,
         default: (args...)->
-          @recordBody.editorId = @currentUser?.id ? null
+          @recordBody.editorId = @session.uid ? null
           @recordBody.removerId = @recordBody.editorId
           yield return args
 

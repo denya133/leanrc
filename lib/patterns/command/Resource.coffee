@@ -66,7 +66,7 @@ module.exports = (Module)->
 
     @public @async setOwnerId: Function,
       default: (args...)->
-        @recordBody.ownerId = @currentUser?.id ? null
+        @recordBody.ownerId = @session.uid ? null
         yield return args
 
     @public @async protectOwnerId: Function,
@@ -76,24 +76,24 @@ module.exports = (Module)->
 
     @public @async filterOwnerByCurrentUser: Function,
       default: (args...)->
-        if @currentUser? and not @currentUser.isAdmin
+        unless @session.userIsAdmin
           @listQuery ?= {}
         if @listQuery.$filter?
           @listQuery.$filter = $and: [
             @listQuery.$filter
           ,
-            '@doc.ownerId': $eq: @currentUser.id
+            '@doc.ownerId': $eq: @session.uid
           ]
         else
-          @listQuery.$filter = '@doc.ownerId': $eq: @currentUser.id
+          @listQuery.$filter = '@doc.ownerId': $eq: @session.uid
         yield return args
 
     @public @async checkOwner: Function,
       default: (args...) ->
-        unless @session?.uid? and @currentUser?
+        unless @session.uid?
           @context.throw UNAUTHORIZED
           return
-        if @currentUser.isAdmin
+        if @session.userIsAdmin
           return args
         unless (key = @context.pathParams[@keyName])?
           return args
@@ -102,7 +102,7 @@ module.exports = (Module)->
           @context.throw HTTP_NOT_FOUND
         unless doc.ownerId
           return args
-        if @currentUser.id isnt doc.ownerId
+        if @session.uid isnt doc.ownerId
           @context.throw FORBIDDEN
           return
         yield return args
@@ -117,10 +117,10 @@ module.exports = (Module)->
 
     @public @async adminOnly: Function,
       default: (args...) ->
-        unless @session?.uid? and @currentUser?
+        unless @session.uid?
           @context.throw UNAUTHORIZED
           return
-        unless @currentUser.isAdmin
+        unless @session.userIsAdmin
           @context.throw FORBIDDEN
           return
         yield return args
