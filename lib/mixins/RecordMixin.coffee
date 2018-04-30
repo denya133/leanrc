@@ -20,12 +20,12 @@ module.exports = (Module)->
         get: (_data)->
           _data[@name] ?= do =>
             vhAttrs = {}
-            for own asAttrName, ahAttrValue of @attributes
-              do (asAttrName, ahAttrValue)=>
-                if _.isFunction ahAttrValue.validate
-                  vhAttrs[asAttrName] = ahAttrValue.validate.call(@)
+            for own asAttr, ahValue of @attributes
+              vhAttrs[asAttr] = do (asAttr, ahValue)=>
+                if _.isFunction ahValue.validate
+                  ahValue.validate.call(@)
                 else
-                  vhAttrs[asAttrName] = ahAttrValue.validate
+                  ahValue.validate
             joi.object vhAttrs
           _data[@name]
 
@@ -294,11 +294,14 @@ module.exports = (Module)->
           unless ahPayload?
             return null
           vhAttributes = {}
-          result = @new {type: ahPayload.type}, aoCollection
-          for own asAttrName, ahAttrValue of result.constructor.attributes
-            do (asAttrName, {transform} = ahAttrValue)=>
-              result[asAttrName] = transform.call(@).normalize ahPayload[asAttrName]
-            vhAttributes[asAttrName] = result[asAttrName]
+          for own asAttr, ahValue of @attributes
+            vhAttributes[asAttr] = do (asAttr, {transform} = ahValue)=>
+              transform.call(@).normalize ahPayload[asAttr]
+
+          vhAttributes.type = ahPayload.type
+          # NOTE: vhAttributes processed before new - it for StateMachine in record (when it has)
+
+          result = @new vhAttributes, aoCollection
           result[ipoInternalRecord] = vhAttributes
           result
 
@@ -307,9 +310,9 @@ module.exports = (Module)->
           unless aoRecord?
             return null
           vhResult = {}
-          for own asAttrName, ahAttrValue of aoRecord.constructor.attributes
-            do (asAttrName, {transform} = ahAttrValue)=>
-              vhResult[asAttrName] = transform.call(@).serialize aoRecord[asAttrName]
+          for own asAttr, ahValue of aoRecord.constructor.attributes
+            vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>
+              transform.call(@).serialize aoRecord[asAttr]
           vhResult
 
       @public @static @async restoreObject: Function,
