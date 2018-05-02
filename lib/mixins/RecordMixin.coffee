@@ -47,7 +47,7 @@ module.exports = (Module)->
         return: Module::Class
         default: (asName)->
           [vsModuleName, vsRecordName] = @parseRecordName asName
-          @Module::[vsRecordName]
+          (@Module.NS ? @Module::)[vsRecordName]
 
       @public findRecordByName: Function,
         args: [String]
@@ -294,14 +294,20 @@ module.exports = (Module)->
           unless ahPayload?
             return null
           vhAttributes = {}
-          for own asAttr, ahValue of @attributes
-            vhAttributes[asAttr] = do (asAttr, {transform} = ahValue)=>
-              transform.call(@).normalize ahPayload[asAttr]
+
+          RecordClass = if @name is ahPayload.type.split('::')[1]
+            @
+          else
+            @findRecordByName ahPayload.type
+
+          for own asAttr, ahValue of RecordClass.attributes
+            vhAttributes[asAttr] = do (asAttr, {transform} = ahValue)->
+              transform.call(RecordClass).normalize ahPayload[asAttr]
 
           vhAttributes.type = ahPayload.type
           # NOTE: vhAttributes processed before new - it for StateMachine in record (when it has)
 
-          result = @new vhAttributes, aoCollection
+          result = RecordClass.new vhAttributes, aoCollection
           result[ipoInternalRecord] = vhAttributes
           result
 
