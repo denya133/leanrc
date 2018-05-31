@@ -63,7 +63,7 @@ describe 'IterableMixin', ->
             default: ->
               yield RC::Promise.resolve LeanRC::Cursor.new @[ipcRecord], @[iplArray]
         Test::Iterable.initialize()
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord'  }, { data: 'men', type: 'Test::TestRecord'  }, { data: 'in', type: 'Test::TestRecord'  }, { data: 'a boat', type: 'Test::TestRecord'  } ]
         iterable = Test::Iterable.new Test::TestRecord, array
         spyLambda = sinon.spy -> yield return
         yield iterable.forEach spyLambda
@@ -101,7 +101,7 @@ describe 'IterableMixin', ->
             default: ->
               yield RC::Promise.resolve LeanRC::Cursor.new @[ipcRecord], @[iplArray]
         Test::Iterable.initialize()
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord' }, { data: 'men', type: 'Test::TestRecord' }, { data: 'in', type: 'Test::TestRecord' }, { data: 'a boat', type: 'Test::TestRecord' } ]
         iterable = Test::Iterable.new Test::TestRecord, array
         records = yield iterable.map (record) ->
           record.data = '+' + record.data + '+'
@@ -139,7 +139,7 @@ describe 'IterableMixin', ->
             default: ->
               yield RC::Promise.resolve LeanRC::Cursor.new @[ipcRecord], @[iplArray]
         Test::Iterable.initialize()
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord' }, { data: 'men', type: 'Test::TestRecord' }, { data: 'in', type: 'Test::TestRecord' }, { data: 'a boat', type: 'Test::TestRecord' } ]
         iterable = Test::Iterable.new Test::TestRecord, array
         records = yield iterable.filter (record) ->
           yield RC::Promise.resolve record.data.length > 3
@@ -174,7 +174,7 @@ describe 'IterableMixin', ->
             default: ->
               yield RC::Promise.resolve LeanRC::Cursor.new @[ipcRecord], @[iplArray]
         Test::Iterable.initialize()
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord' }, { data: 'men', type: 'Test::TestRecord' }, { data: 'in', type: 'Test::TestRecord' }, { data: 'a boat', type: 'Test::TestRecord' } ]
         iterable = Test::Iterable.new Test::TestRecord, array
         records = yield iterable.reduce (accumulator, item) ->
           accumulator[item.data] = item

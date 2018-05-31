@@ -20,8 +20,9 @@ describe 'RecordMixin', ->
           @public @static findRecordByName: Function,
             default: (asType) ->
               Test::TestRecord
+          @attr type: String
         Test::TestRecord.initialize()
-        record = Test::TestRecord.new {}, {}
+        record = Test::TestRecord.new {type: 'Test::TestRecord'}, {}
         assert.instanceOf record, Test::TestRecord, 'record is not a TestRecord instance'
       .to.not.throw Error
   describe '.parseRecordName', ->
@@ -38,6 +39,7 @@ describe 'RecordMixin', ->
           @public @static findRecordByName: Function,
             default: (asType) ->
               Test::TestRecord
+          @attr type: String
         Test::TestRecord.initialize()
         parsedName = Test::TestRecord.parseRecordName 'test-record'
         assert.deepEqual parsedName, ['Test', 'TestRecord'], 'Parsed incorrectly'
@@ -58,6 +60,7 @@ describe 'RecordMixin', ->
           @public @static findRecordByName: Function,
             default: (asType) ->
               Test::TestRecord
+          @attr type: String
         Test::TestRecord.initialize()
         vsRecord = Test::TestRecord.new()
         parsedName = vsRecord.parseRecordName 'test-record'
@@ -79,6 +82,7 @@ describe 'RecordMixin', ->
           @public @static findRecordByName: Function,
             default: (asType) ->
               Test::TestRecord
+          @attr type: String
         Test::TestRecord.initialize()
         classNames = Test::TestRecord.parentClassNames()
         assert.deepEqual classNames, [ 'CoreObject', 'RecordMixin', 'TestRecord' ], 'Parsed incorrectly'
@@ -96,6 +100,7 @@ describe 'RecordMixin', ->
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
+          @attr type: String
           @attribute string: String
           @attr number: Number
           @attribute boolean: Boolean,
@@ -121,6 +126,7 @@ describe 'RecordMixin', ->
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
+          @attr type: String
           @computed string: String,
             get: (aoData) -> aoData
           @comp number: Number,
@@ -156,12 +162,14 @@ describe 'RecordMixin', ->
           @module TestsModule
           @public @static findRecordByName: Function,
             default: (asType) -> TestsModule::TestRecord
+          @attr type: String
         TestRecord.initialize()
         collection = TestsModule::TestsCollection.new KEY,
           delegate: TestsModule::TestRecord
         collection.onRegister()
         record = TestsModule::TestRecord.new
           id: yield collection.generateId()
+          type: 'Test::TestRecord'
         , collection
         assert.isTrue yield record.isNew(), 'Record is not new'
         yield record.create()
@@ -187,12 +195,14 @@ describe 'RecordMixin', ->
           @module TestsModule
           @public @static findRecordByName: Function,
             default: (asType) -> TestsModule::TestRecord
+          @attr type: String
         TestRecord.initialize()
         collection = TestsModule::TestsCollection.new KEY,
           delegate: TestsModule::TestRecord
         collection.onRegister()
         record = TestsModule::TestRecord.new
           id: yield collection.generateId()
+          type: 'Test::TestRecord'
         , collection
         assert.isTrue (yield record.isNew()), 'Record is not new'
         yield record.create()
@@ -220,6 +230,7 @@ describe 'RecordMixin', ->
           @module TestsModule
           @public @static findRecordByName: Function,
             default: (asType) -> TestsModule::TestRecord
+          @attr type: String
           @attr test: String
         TestRecord.initialize()
         collection = TestsModule::TestsCollection.new KEY,
@@ -227,6 +238,7 @@ describe 'RecordMixin', ->
         collection.onRegister()
         record = TestsModule::TestRecord.new
           id: yield collection.generateId()
+          type: 'Test::TestRecord'
           test: 'test1'
         , collection
         yield record.create()
@@ -255,6 +267,7 @@ describe 'RecordMixin', ->
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
+          @attr type: String
           @attr test: String
         TestRecord.initialize()
         collection = TestCollection.new KEY,
@@ -262,6 +275,7 @@ describe 'RecordMixin', ->
         collection.onRegister()
         record = TestRecord.new
           id: yield collection.generateId()
+          type: 'Test::TestRecord'
           test: 'test1'
         , collection
         recordCopy = yield record.clone()
@@ -296,6 +310,7 @@ describe 'RecordMixin', ->
         collection.onRegister()
         record = TestRecord.new
           id: yield collection.generateId()
+          type: 'Test::TestRecord'
           test: 'test1'
         , collection
         yield record.save()
@@ -330,6 +345,7 @@ describe 'RecordMixin', ->
         collection.onRegister()
         record = TestRecord.new
           id: yield collection.generateId()
+          type: 'Test::TestRecord'
           test: 'test1'
         , collection
         yield record.save()
@@ -357,12 +373,14 @@ describe 'RecordMixin', ->
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
+          @attr type: String
           @attr test: String
         TestRecord.initialize()
         collection = TestCollection.new KEY, delegate: Test::TestRecord
         collection.onRegister()
         record = TestRecord.new
           id: yield collection.generateId()
+          type: 'Test::TestRecord'
           test: 'test1'
         , collection
         yield record.save()
@@ -390,6 +408,7 @@ describe 'RecordMixin', ->
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
+          @attr type: String
           @attr test: Number
           @attr has: Boolean
         Test::TestRecord.initialize()
@@ -397,6 +416,7 @@ describe 'RecordMixin', ->
         collection.onRegister()
         record = Test::TestRecord.new
           id: yield collection.generateId()
+          type: 'Test::TestRecord'
           test: 1000
           has: true
         , collection
@@ -432,6 +452,7 @@ describe 'RecordMixin', ->
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
+          @attr type: String
           @attr test: Number
           @attr has: Boolean
           @attr word: String
@@ -440,6 +461,7 @@ describe 'RecordMixin', ->
         collection.onRegister()
         record = Test::TestRecord.new
           id: yield collection.generateId()
+          type: 'Test::TestRecord'
           test: 1000
           has: true
           word: 'test'
@@ -478,6 +500,7 @@ describe 'RecordMixin', ->
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::BasicTestRecord
+          @attr type: String
           @attribute updatedAt: Date
           @attribute test: Number
           @attribute has: Boolean
@@ -493,6 +516,7 @@ describe 'RecordMixin', ->
         collection.onRegister()
         record = Test::TestRecord.new
           id: yield collection.generateId()
+          type: 'Test::TestRecord'
           test: 1000
           has: true
           word: 'test'
@@ -523,6 +547,7 @@ describe 'RecordMixin', ->
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
+          @attr type: String
           @attr test: Number
           @attr has: Boolean
           @attr word: String
@@ -530,6 +555,7 @@ describe 'RecordMixin', ->
         collection = TestCollection.new KEY, delegate: Test::TestRecord
         collection.onRegister()
         record = Test::TestRecord.new
+          type: 'Test::TestRecord'
           test: 1000
           has: true
           word: 'test'
@@ -562,11 +588,13 @@ describe 'RecordMixin', ->
           @module Test
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
+          @attr type: String
           @attr test: Number
           @attr has: Boolean
           @attr word: String
         Test::TestRecord.initialize()
         record = Test::TestRecord.normalize
+          type: 'Test::TestRecord'
           test: 1000
           has: true
           word: 'test'
@@ -576,7 +604,7 @@ describe 'RecordMixin', ->
         assert.propertyVal record, 'word', 'test', 'Property `word` not defined'
         assert.deepEqual record.changedAttributes(), {}, 'Attributes are altered'
         snapshot = Test::TestRecord.serialize record
-        assert.deepEqual snapshot, { test: 1000, has: true, word: 'test' }, 'Snapshot is incorrect'
+        assert.deepEqual snapshot, { type: 'Test::TestRecord', test: 1000, has: true, word: 'test' }, 'Snapshot is incorrect'
         yield return
   describe '.replicateObject', ->
     facade = null
@@ -602,6 +630,7 @@ describe 'RecordMixin', ->
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr id: String
+          @attr type: String
           @attr test: Number
           @attr has: Boolean
           @attr word: String
@@ -618,6 +647,7 @@ describe 'RecordMixin', ->
           serializer: Test::Serializer
         collection = facade.retrieveProxy COLLECTION
         record = yield collection.create
+          type: 'Test::TestRecord'
           test: 1000
           has: true
           word: 'test'
@@ -631,6 +661,7 @@ describe 'RecordMixin', ->
           isNew: no
           id: record.id
         record = collection.build
+          type: 'Test::TestRecord'
           test: 1000
           has: true
           word: 'test'
@@ -641,7 +672,7 @@ describe 'RecordMixin', ->
           multitonKey: KEY
           collectionName: COLLECTION
           isNew: yes
-          attributes: id: null, test: 1000, has: yes, word: 'test'
+          attributes: id: null, type: 'Test::TestRecord', test: 1000, has: yes, word: 'test'
         facade.remove()
         yield return
   describe '.restoreObject', ->
@@ -668,6 +699,7 @@ describe 'RecordMixin', ->
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
           @attr id: String
+          @attr type: String
           @attr test: Number
           @attr has: Boolean
           @attr word: String
@@ -684,6 +716,7 @@ describe 'RecordMixin', ->
           serializer: Test::Serializer
         collection = facade.retrieveProxy COLLECTION
         record = yield collection.create
+          type: 'Test::TestRecord'
           test: 1000
           has: true
           word: 'test'
@@ -698,6 +731,7 @@ describe 'RecordMixin', ->
         assert.deepEqual record, restoredRecord
         record = collection.build
           id: '123'
+          type: 'Test::TestRecord'
           test: 1000
           has: true
           word: 'test'
@@ -707,7 +741,7 @@ describe 'RecordMixin', ->
           multitonKey: KEY
           collectionName: COLLECTION
           isNew: yes
-          attributes: id: '123', test: 1000, has: yes, word: 'test'
+          attributes: id: '123', type: 'Test::TestRecord', test: 1000, has: yes, word: 'test'
         assert.notEqual record, restoredRecord
         assert.deepEqual record, restoredRecord
         facade.remove()

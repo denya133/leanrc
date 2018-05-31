@@ -178,7 +178,7 @@ describe 'MigrateCommand', ->
           @module Test
         TestCommand.initialize()
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
-          delegate: LeanRC::Migration
+          delegate: Test::TestMigration
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
         class ApplicationMediator extends LeanRC::Mediator
@@ -196,6 +196,7 @@ describe 'MigrateCommand', ->
         untilName = '00000000000002_second_migration'
         yield command.migrate until: untilName
         collectionData = facade.retrieveProxy(LeanRC::MIGRATIONS)[Symbol.for '~collection']
+        console.log '>>>>>>>>>>>>>>>>>>>>>>>>>!!!!', collectionData, migrationNames
         for migrationName in migrationNames
           assert.property collectionData, migrationName
           break  if migrationName is untilName
