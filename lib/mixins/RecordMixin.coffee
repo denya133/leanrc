@@ -288,7 +288,6 @@ module.exports = (Module)->
               @[vsAttrName] = voAttrValue
           return
 
-
       @public @static @async normalize: Function,
         default: (ahPayload, aoCollection)->
           unless ahPayload?
