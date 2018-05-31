@@ -1,32 +1,54 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
+{ co } = LeanRC::Utils
 StringTransform = LeanRC::StringTransform
 
 describe 'StringTransform', ->
   describe '.normalize', ->
     it 'should normalize null value', ->
-      expect StringTransform.normalize null
-      .to.be.null
+      co ->
+        assert.equal (yield StringTransform.normalize null), null
+        yield return
     it 'should normalize boolean value', ->
-      expect StringTransform.normalize yes
-      .to.equal 'true'
+      co ->
+        assert.equal (yield StringTransform.normalize yes), 'true'
+        yield return
     it 'should normalize string value', ->
-      expect StringTransform.normalize 'True'
-      .to.equal 'True'
+      co ->
+        assert.equal (yield StringTransform.normalize 'True'), 'True'
+        yield return
     it 'should normalize number value', ->
-      expect StringTransform.normalize 1
-      .to.equal '1'
+      co ->
+        assert.equal (yield StringTransform.normalize 1), '1'
+        yield return
   describe '.serialize', ->
     it 'should serialize null value', ->
-      expect StringTransform.serialize null
-      .to.be.null
+      co ->
+        assert.equal (yield StringTransform.serialize null), null
+        yield return
     it 'should serialize boolean value', ->
-      expect StringTransform.serialize yes
-      .to.equal 'true'
+      co ->
+        assert.equal (yield StringTransform.serialize yes), 'true'
+        yield return
     it 'should serialize string value', ->
-      expect StringTransform.serialize 'True'
-      .to.equal 'True'
+      co ->
+        assert.equal (yield StringTransform.serialize 'True'), 'True'
+        yield return
     it 'should serialize number value', ->
-      expect StringTransform.serialize 1
+      co ->
+        assert.equal (yield StringTransform.serialize 1), '1'
+        yield return
+  describe '.objectize', ->
+    it 'should objectize null value', ->
+      expect StringTransform.objectize null
+      .to.be.null
+    it 'should objectize boolean value', ->
+      expect StringTransform.objectize yes
+      .to.equal 'true'
+    it 'should objectize string value', ->
+      expect StringTransform.objectize 'True'
+      .to.equal 'True'
+    it 'should objectize number value', ->
+      expect StringTransform.objectize 1
       .to.equal '1'

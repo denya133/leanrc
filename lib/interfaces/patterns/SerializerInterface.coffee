@@ -12,10 +12,10 @@ module.exports = (Module)->
 
       @public @virtual collection: Module::CollectionInterface
 
-      @public @virtual normalize: Function, # virtual declaration of method
+      @public @async @virtual normalize: Function, # virtual declaration of method
         args: [Module::Class, ANY] # payload
         return: [Module::RecordInterface]
-      @public @virtual serialize:   Function, # virtual declaration of method
+      @public @async @virtual serialize:   Function, # virtual declaration of method
         args: [Module::RecordInterface, Object] # record, options
         return: ANY
 

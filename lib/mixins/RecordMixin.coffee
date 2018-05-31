@@ -289,36 +289,57 @@ module.exports = (Module)->
           return
 
 
-      @public @static normalize: Function,
+      @public @static @async normalize: Function,
         default: (ahPayload, aoCollection)->
           unless ahPayload?
             return null
           vhAttributes = {}
+
+          unless ahPayload.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
 
           RecordClass = if @name is ahPayload.type.split('::')[1]
             @
           else
             @findRecordByName ahPayload.type
 
-          for own asAttr, ahValue of RecordClass.attributes
-            vhAttributes[asAttr] = do (asAttr, {transform} = ahValue)->
-              transform.call(RecordClass).normalize ahPayload[asAttr]
+          for own asAttr, { transform } of RecordClass.attributes
+            vhAttributes[asAttr] = yield transform.call(RecordClass).normalize ahPayload[asAttr]
 
           vhAttributes.type = ahPayload.type
           # NOTE: vhAttributes processed before new - it for StateMachine in record (when it has)
 
           result = RecordClass.new vhAttributes, aoCollection
           result[ipoInternalRecord] = vhAttributes
-          result
+          yield return result
 
-      @public @static serialize:   Function,
+      @public @static @async serialize:   Function,
         default: (aoRecord)->
           unless aoRecord?
             return null
+
+          unless aoRecord.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+
           vhResult = {}
-          for own asAttr, ahValue of aoRecord.constructor.attributes
-            vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>
-              transform.call(@).serialize aoRecord[asAttr]
+          for own asAttr, { transform } of aoRecord.constructor.attributes
+            vhResult[asAttr] = yield transform.call(@).serialize aoRecord[asAttr]
+          yield return vhResult
+
+      @public @static objectize:   Function,
+        default: (aoRecord)->
+          unless aoRecord?
+            return null
+
+          unless aoRecord.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+
+          vhResult = {}
+          # for own asAttr, ahValue of aoRecord.constructor.attributes
+          #   vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>
+          #     transform.call(@).objectize aoRecord[asAttr]
+          for own asAttr, { transform } of aoRecord.constructor.attributes
+            vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
           vhResult
 
       @public @static @async restoreObject: Function,
@@ -343,7 +364,7 @@ module.exports = (Module)->
           replica.collectionName = instance.collection.getProxyName()
           replica.isNew = yield instance.isNew()
           if replica.isNew
-            replica.attributes = @serialize instance
+            replica.attributes = yield @serialize instance
           else
             replica.id = instance.id
             replica.attributes = instance.changedAttributes()
@@ -357,7 +378,7 @@ module.exports = (Module)->
             do (vsAttrName, voAttrValue)=>
               @[vsAttrName] = voAttrValue
 
-      @public toJSON: Function, { default: -> @constructor.serialize @ }
+      @public toJSON: Function, { default: -> @constructor.objectize @ }
 
 
       @initializeMixin()

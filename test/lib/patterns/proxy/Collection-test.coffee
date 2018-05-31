@@ -416,7 +416,7 @@ describe 'Collection', ->
   describe '#normalize', ->
     it 'should normalize record from data', ->
       co ->
-        spySerializerNormalize = sinon.spy ->
+        spySerializerNormalize = sinon.spy -> co -> yield return
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -441,14 +441,14 @@ describe 'Collection', ->
             normalize: spySerializerNormalize
         facade = LeanRC::Facade.getInstance 'TEST_COLLECTION_FACADE_11'
         facade.registerProxy collection
-        record = collection.normalize test: 'test', data: 123
+        record = yield collection.normalize test: 'test', data: 123
         assert.isTrue spySerializerNormalize.calledWith(Test::TestRecord, test: 'test', data: 123), 'Normalize called improperly'
         facade.remove()
         yield return
   describe '#serialize', ->
     it 'should serialize record to data', ->
       co ->
-        spySerializerSerialize = sinon.spy ->
+        spySerializerSerialize = sinon.spy -> co -> yield return
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -474,7 +474,7 @@ describe 'Collection', ->
         facade = LeanRC::Facade.getInstance 'TEST_COLLECTION_FACADE_12'
         facade.registerProxy collection
         record = collection.build test: 'test', data: 123
-        data = collection.serialize record, value: 'value'
+        data = yield collection.serialize record, value: 'value'
         assert.isTrue spySerializerSerialize.calledWith(record, value: 'value'), 'Serialize called improperly'
         facade.remove()
         yield return

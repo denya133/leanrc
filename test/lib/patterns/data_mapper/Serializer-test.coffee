@@ -8,7 +8,8 @@ Record = LeanRC::Record
 describe 'Serializer', ->
   describe '#normalize', ->
     it "should normalize object value", ->
-      expect ->
+      co ->
+      # expect ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
@@ -22,7 +23,7 @@ describe 'Serializer', ->
           @attribute boolean: Boolean
         Test::TestRecord.initialize()
         serializer = Serializer.new()
-        record = serializer.normalize Test::TestRecord,
+        record = yield serializer.normalize Test::TestRecord,
           type: 'Test::TestRecord'
           string: 'string'
           number: 123
@@ -32,10 +33,12 @@ describe 'Serializer', ->
         assert.equal record.string, 'string', '`string` is incorrect'
         assert.equal record.number, 123, '`number` is incorrect'
         assert.equal record.boolean, yes, '`boolean` is incorrect'
-      .to.not.throw Error
+        yield return
+      # .to.not.throw Error
   describe '#serialize', ->
     it "should serialize Record.prototype value", ->
-      expect ->
+      co ->
+      # expect ->
         class Test extends LeanRC::Module
           @inheritProtected()
         Test.initialize()
@@ -49,7 +52,7 @@ describe 'Serializer', ->
           @attribute boolean: Boolean
         Test::TestRecord.initialize()
         serializer = Serializer.new()
-        data = serializer.serialize Test::TestRecord.new
+        data = yield serializer.serialize Test::TestRecord.new
           type: 'Test::TestRecord'
           string: 'string'
           number: 123
@@ -59,7 +62,8 @@ describe 'Serializer', ->
         assert.equal data.string, 'string', '`string` is incorrect'
         assert.equal data.number, 123, '`number` is incorrect'
         assert.equal data.boolean, yes, '`boolean` is incorrect'
-      .to.not.throw Error
+        yield return
+      # .to.not.throw Error
   describe '.replicateObject', ->
     facade = null
     KEY = 'TEST_SERIALIZER_001'

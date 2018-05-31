@@ -47,14 +47,14 @@ describe 'GenerateAutoincrementIdMixin', ->
               else
                 LeanRC::Cursor.new @, data
               yield return voCursor
-          @public take: Function,
+          @public @async take: Function,
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
-          @public push: Function,
+          @public @async push: Function,
             default: (record) ->
-              @getData().push @delegate.serialize record
+              @getData().push yield @delegate.serialize record
               yield return
         Test::Queryable.initialize()
         facade.registerProxy Test::Queryable.new KEY, []

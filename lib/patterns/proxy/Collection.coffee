@@ -125,13 +125,13 @@ module.exports = (Module)->
         yield voRecord.save()
         return voRecord
 
-    @public normalize: Function,
+    @public @async normalize: Function,
       default: (ahData)->
-        @serializer.normalize @delegate, ahData
+        return yield @serializer.normalize @delegate, ahData
 
-    @public serialize: Function,
+    @public @async serialize: Function,
       default: (aoRecord, ahOptions)->
-        @serializer.serialize aoRecord, ahOptions
+        return yield @serializer.serialize aoRecord, ahOptions
 
     @public init: Function,
       default: (args...)->

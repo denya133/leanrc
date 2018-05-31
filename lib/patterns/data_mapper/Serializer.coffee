@@ -10,14 +10,14 @@ module.exports = (Module)->
 
     @public collection: Module::CollectionInterface
 
-    @public normalize: Function,
+    @public @async normalize: Function,
       default: (acRecord, ahPayload)->
-        acRecord.normalize ahPayload, @collection
+        return yield acRecord.normalize ahPayload, @collection
 
-    @public serialize: Function,
+    @public @async serialize: Function,
       default: (aoRecord, options = null)->
         vcRecord = aoRecord.constructor
-        vcRecord.serialize aoRecord, options
+        return yield vcRecord.serialize aoRecord, options
 
     @public @static @async restoreObject: Function,
       default: (Module, replica)->
