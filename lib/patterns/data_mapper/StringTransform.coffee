@@ -11,13 +11,13 @@ module.exports = (Module)->
     # @implements Module::TransformInterface
     @module Module
 
-    @public @static normalize: Function,
+    @public @static @async normalize: Function,
       default: (serialized)->
-        if _.isNil(serialized) then null else String serialized
+        yield return (if _.isNil(serialized) then null else String serialized)
 
-    @public @static serialize: Function,
+    @public @static @async serialize: Function,
       default: (deserialized)->
-        if _.isNil(deserialized) then null else String deserialized
+        yield return (if _.isNil(deserialized) then null else String deserialized)
 
     @public @static objectize: Function,
       default: (deserialized)->

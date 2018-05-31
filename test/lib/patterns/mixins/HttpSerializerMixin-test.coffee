@@ -25,7 +25,7 @@ describe 'HttpSerializerMixin', ->
           @module Test
         HttpSerializer.initialize()
         serializer = HttpSerializer.new()
-        record = serializer.normalize Test::TestRecord,
+        record = yield serializer.normalize Test::TestRecord,
           type: 'Test::TestRecord'
           string: 'string'
           number: 123
@@ -58,7 +58,7 @@ describe 'HttpSerializerMixin', ->
           @module Test
         HttpSerializer.initialize()
         serializer = HttpSerializer.new()
-        data = serializer.serialize Test::TestRecord.new
+        data = yield serializer.serialize Test::TestRecord.new
           type: 'Test::TestRecord'
           string: 'string'
           number: 123

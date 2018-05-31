@@ -29,7 +29,7 @@ module.exports = (Module)->
           params = {}
           params.requestType = 'push'
           params.recordName = @delegate.name
-          params.snapshot = @serialize aoRecord
+          params.snapshot = yield @serialize aoRecord
 
           request = @requestFor params
           res = yield @makeRequest request
@@ -42,7 +42,7 @@ module.exports = (Module)->
           { body } = res
           if body? and body isnt ''
             body = JSON.parse body if _.isString body
-            voRecord = @normalize body[@recordSingleName()]
+            voRecord = yield @normalize body[@recordSingleName()]
           else
             throw new Error "
               Record payload has not existed in response body.
@@ -83,7 +83,7 @@ module.exports = (Module)->
           { body } = res
           if body? and body isnt ''
             body = JSON.parse body if _.isString body
-            voRecord = @normalize body[@recordSingleName()]
+            voRecord = yield @normalize body[@recordSingleName()]
           else
             throw new Error "
               Record payload has not existed in response body.
@@ -176,7 +176,7 @@ module.exports = (Module)->
           params = {}
           params.requestType = 'override'
           params.recordName = @delegate.name
-          params.snapshot = @serialize aoRecord
+          params.snapshot = yield @serialize aoRecord
           params.id = id
 
           request = @requestFor params
@@ -190,7 +190,7 @@ module.exports = (Module)->
           { body } = res
           if body? and body isnt ''
             body = JSON.parse body if _.isString body
-            voRecord = @normalize body[@recordSingleName()]
+            voRecord = yield @normalize body[@recordSingleName()]
           else
             throw new Error "
               Record payload has not existed in response body.

@@ -1,43 +1,54 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
+{ co } = LeanRC::Utils
 DateTransform = LeanRC::DateTransform
 
 describe 'DateTransform', ->
   describe '.normalize', ->
     it 'should deserialize null value', ->
-      expect DateTransform.normalize null
-      .to.be.null
+      co ->
+        assert.equal (yield DateTransform.normalize null), null
+        yield return
     it 'should deserialize date value', ->
-      date = new Date
-      expect DateTransform.normalize date.toISOString()
-      .to.eql date
+      co ->
+        date = new Date
+        assert.deepEqual (yield DateTransform.normalize date.toISOString()), date
+        yield return
     it 'should deserialize boolean value', ->
-      expect DateTransform.normalize yes
-      .to.eql new Date 1
+      co ->
+        assert.deepEqual (yield DateTransform.normalize yes), new Date 1
+        yield return
     it 'should deserialize string value', ->
-      expect DateTransform.normalize 'True'
-      .to.be.NaN
+      co ->
+        assert.deepEqual (yield DateTransform.normalize 'True'), new Date ''
+        yield return
     it 'should deserialize number value', ->
-      expect DateTransform.normalize 1
-      .to.eql new Date 1
+      co ->
+        assert.deepEqual (yield DateTransform.normalize 1), new Date 1
+        yield return
   describe '.serialize', ->
     it 'should serialize null value', ->
-      expect DateTransform.serialize null
-      .to.be.null
+      co ->
+        assert.equal (yield DateTransform.serialize null), null
+        yield return
     it 'should serialize date value', ->
-      date = new Date
-      expect DateTransform.serialize date
-      .to.eql date.toISOString()
+      co ->
+        date = new Date
+        assert.equal (yield DateTransform.serialize date), date.toISOString()
+        yield return
     it 'should serialize boolean value', ->
-      expect DateTransform.serialize yes
-      .to.be.null
+      co ->
+        assert.equal (yield DateTransform.serialize yes), null
+        yield return
     it 'should serialize string value', ->
-      expect DateTransform.serialize 'True'
-      .to.be.null
+      co ->
+        assert.equal (yield DateTransform.serialize 'True'), null
+        yield return
     it 'should serialize number value', ->
-      expect DateTransform.serialize 1
-      .to.be.null
+      co ->
+        assert.equal (yield DateTransform.serialize 1), null
+        yield return
   describe '.objectize', ->
     it 'should objectize null value', ->
       expect DateTransform.objectize null

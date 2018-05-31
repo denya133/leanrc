@@ -23,7 +23,7 @@ module.exports = (Module)->
         default: (aoRecord)->
           vsKey = aoRecord.id
           return no  unless vsKey?
-          @[ipoCollection][vsKey] = @serializer.serialize aoRecord
+          @[ipoCollection][vsKey] = yield @serializer.serialize aoRecord
           yield return Module::Cursor.new(@, [@[ipoCollection][vsKey]]).first()
 
       @public @async remove: Function,
@@ -46,12 +46,12 @@ module.exports = (Module)->
 
       @public @async override: Function,
         default: (id, aoRecord)->
-          @[ipoCollection][id] = @serializer.serialize aoRecord
+          @[ipoCollection][id] = yield @serializer.serialize aoRecord
           yield return Module::Cursor.new(@, [@[ipoCollection][id]]).first()
 
       @public @async patch: Function,
         default: (id, aoRecord)->
-          @[ipoCollection][id] = @serializer.serialize aoRecord
+          @[ipoCollection][id] = yield @serializer.serialize aoRecord
           yield return Module::Cursor.new(@, [@[ipoCollection][id]]).first()
 
       @public @async includes: Function,

@@ -245,7 +245,7 @@ describe 'MigrateCommand', ->
               yield return result
         TestCommand.initialize()
         facade.registerProxy TestMemoryCollection.new LeanRC::MIGRATIONS,
-          delegate: LeanRC::Migration
+          delegate: Test::TestMigration
           serializer: LeanRC::Serializer
         facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
         class ApplicationMediator extends LeanRC::Mediator

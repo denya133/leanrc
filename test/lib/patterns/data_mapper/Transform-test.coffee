@@ -1,35 +1,44 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
+{ co } = LeanRC::Utils
 Transform = LeanRC::Transform
 
 describe 'Transform', ->
   describe '.normalize', ->
     it 'should normalize null value', ->
-      expect Transform.normalize null
-      .to.be.null
+      co ->
+        assert.equal (yield Transform.normalize null), null
+        yield return
     it 'should normalize boolean value', ->
-      expect Transform.normalize yes
-      .to.be.true
+      co ->
+        assert.equal (yield Transform.normalize yes), true
+        yield return
     it 'should normalize string value', ->
-      expect Transform.normalize 'True'
-      .to.equal 'True'
+      co ->
+        assert.equal (yield Transform.normalize 'True'), 'True'
+        yield return
     it 'should normalize number value', ->
-      expect Transform.normalize 1
-      .to.equal 1
+      co ->
+        assert.equal (yield Transform.normalize 1), 1
+        yield return
   describe '.serialize', ->
     it 'should serialize null value', ->
-      expect Transform.serialize null
-      .to.be.null
+      co ->
+        assert.equal (yield Transform.serialize null), null
+        yield return
     it 'should serialize boolean value', ->
-      expect Transform.serialize yes
-      .to.be.true
+      co ->
+        assert.equal (yield Transform.normalize yes), true
+        yield return
     it 'should serialize string value', ->
-      expect Transform.serialize 'True'
-      .to.equal 'True'
+      co ->
+        assert.equal (yield Transform.normalize 'True'), 'True'
+        yield return
     it 'should serialize number value', ->
-      expect Transform.serialize 1
-      .to.equal 1
+      co ->
+        assert.equal (yield Transform.normalize 1), 1
+        yield return
   describe '.objectize', ->
     it 'should objectize null value', ->
       expect Transform.objectize null

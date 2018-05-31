@@ -593,7 +593,7 @@ describe 'RecordMixin', ->
           @attr has: Boolean
           @attr word: String
         Test::TestRecord.initialize()
-        record = Test::TestRecord.normalize
+        record = yield Test::TestRecord.normalize
           type: 'Test::TestRecord'
           test: 1000
           has: true
@@ -603,7 +603,7 @@ describe 'RecordMixin', ->
         assert.propertyVal record, 'has', yes, 'Property `has` not defined'
         assert.propertyVal record, 'word', 'test', 'Property `word` not defined'
         assert.deepEqual record.changedAttributes(), {}, 'Attributes are altered'
-        snapshot = Test::TestRecord.serialize record
+        snapshot = yield Test::TestRecord.serialize record
         assert.deepEqual snapshot, { type: 'Test::TestRecord', test: 1000, has: true, word: 'test' }, 'Snapshot is incorrect'
         yield return
   describe '.normalize, .serialize', ->
@@ -625,7 +625,7 @@ describe 'RecordMixin', ->
           @attr has: Boolean
           @attr word: String
         Test::TestRecord.initialize()
-        record = Test::TestRecord.normalize
+        record = yield Test::TestRecord.normalize
           type: 'Test::TestRecord'
           test: 1000
           has: true
@@ -635,7 +635,7 @@ describe 'RecordMixin', ->
         assert.propertyVal record, 'has', yes, 'Property `has` not defined'
         assert.propertyVal record, 'word', 'test', 'Property `word` not defined'
         assert.deepEqual record.changedAttributes(), {}, 'Attributes are altered'
-        snapshot = Test::TestRecord.serialize record
+        snapshot = yield Test::TestRecord.serialize record
         assert.deepEqual snapshot, { type: 'Test::TestRecord', test: 1000, has: true, word: 'test' }, 'Snapshot is incorrect'
         yield return
   describe '.objectize', ->
@@ -657,7 +657,7 @@ describe 'RecordMixin', ->
           @attr has: Boolean
           @attr word: String
         Test::TestRecord.initialize()
-        record = Test::TestRecord.normalize
+        record = yield Test::TestRecord.normalize
           type: 'Test::TestRecord'
           test: 1000
           has: true

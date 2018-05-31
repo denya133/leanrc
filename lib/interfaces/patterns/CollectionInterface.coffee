@@ -89,10 +89,10 @@ module.exports = (Module)->
         args: []
         return: Number
 
-      @public @virtual normalize: Function,
+      @public @async @virtual normalize: Function,
         args: [ANY] # payload
         return: Module::RecordInterface # нормализация данных из базы
-      @public @virtual serialize: Function,
+      @public @async @virtual serialize: Function,
         args: [Module::RecordInterface] # id, options
         return: ANY # сериализация рекорда для отправки в базу
 

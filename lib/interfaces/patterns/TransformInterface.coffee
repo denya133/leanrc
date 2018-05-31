@@ -9,10 +9,10 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
-      @public @static @virtual normalize: Function,
+      @public @static @async @virtual normalize: Function,
         args: [ANY] # data
         return: [ANY, NILL]
-      @public @static @virtual serialize:   Function,
+      @public @static @async @virtual serialize:   Function,
         args: [ANY] # data
         return: [ANY, NILL]
       @public @static @virtual objectize:   Function,
