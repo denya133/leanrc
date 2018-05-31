@@ -606,6 +606,70 @@ describe 'RecordMixin', ->
         snapshot = Test::TestRecord.serialize record
         assert.deepEqual snapshot, { type: 'Test::TestRecord', test: 1000, has: true, word: 'test' }, 'Snapshot is incorrect'
         yield return
+  describe '.normalize, .serialize', ->
+    it 'should serialize and deserialize attributes', ->
+      co ->
+        KEY = 'TEST_RECORD_12'
+        class Test extends LeanRC
+          @inheritProtected()
+        Test.initialize()
+
+        class Test::TestRecord extends LeanRC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @module Test
+          @public @static findRecordByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attr type: String
+          @attr test: Number
+          @attr has: Boolean
+          @attr word: String
+        Test::TestRecord.initialize()
+        record = Test::TestRecord.normalize
+          type: 'Test::TestRecord'
+          test: 1000
+          has: true
+          word: 'test'
+        , {}
+        assert.propertyVal record, 'test', 1000, 'Property `test` not defined'
+        assert.propertyVal record, 'has', yes, 'Property `has` not defined'
+        assert.propertyVal record, 'word', 'test', 'Property `word` not defined'
+        assert.deepEqual record.changedAttributes(), {}, 'Attributes are altered'
+        snapshot = Test::TestRecord.serialize record
+        assert.deepEqual snapshot, { type: 'Test::TestRecord', test: 1000, has: true, word: 'test' }, 'Snapshot is incorrect'
+        yield return
+  describe '.objectize', ->
+    it 'should objectize attributes', ->
+      co ->
+        KEY = 'TEST_RECORD_12'
+        class Test extends LeanRC
+          @inheritProtected()
+        Test.initialize()
+
+        class Test::TestRecord extends LeanRC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @module Test
+          @public @static findRecordByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attr type: String
+          @attr test: Number
+          @attr has: Boolean
+          @attr word: String
+        Test::TestRecord.initialize()
+        record = Test::TestRecord.normalize
+          type: 'Test::TestRecord'
+          test: 1000
+          has: true
+          word: 'test'
+        , {}
+        assert.propertyVal record, 'test', 1000, 'Property `test` not defined'
+        assert.propertyVal record, 'has', yes, 'Property `has` not defined'
+        assert.propertyVal record, 'word', 'test', 'Property `word` not defined'
+        assert.deepEqual record.changedAttributes(), {}, 'Attributes are altered'
+        snapshot = Test::TestRecord.objectize record
+        assert.deepEqual snapshot, { type: 'Test::TestRecord', test: 1000, has: true, word: 'test' }, 'JSON snapshot is incorrect'
+        yield return
   describe '.replicateObject', ->
     facade = null
     KEY = 'TEST_RECORD_12'

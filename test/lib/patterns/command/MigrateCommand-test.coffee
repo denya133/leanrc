@@ -196,7 +196,6 @@ describe 'MigrateCommand', ->
         untilName = '00000000000002_second_migration'
         yield command.migrate until: untilName
         collectionData = facade.retrieveProxy(LeanRC::MIGRATIONS)[Symbol.for '~collection']
-        console.log '>>>>>>>>>>>>>>>>>>>>>>>>>!!!!', collectionData, migrationNames
         for migrationName in migrationNames
           assert.property collectionData, migrationName
           break  if migrationName is untilName

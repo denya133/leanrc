@@ -332,6 +332,10 @@ module.exports = (Module)->
         default: (aoRecord)->
           unless aoRecord?
             return null
+
+          unless aoRecord.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+
           vhResult = {}
           for own asAttr, ahValue of aoRecord.constructor.attributes
             vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>

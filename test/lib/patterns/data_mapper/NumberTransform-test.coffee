@@ -30,3 +30,16 @@ describe 'NumberTransform', ->
     it 'should serialize number value', ->
       expect NumberTransform.serialize 1
       .to.equal 1
+  describe '.objectize', ->
+    it 'should objectize null value', ->
+      expect NumberTransform.objectize null
+      .to.be.null
+    it 'should objectize boolean value', ->
+      expect NumberTransform.objectize yes
+      .to.equal 1
+    it 'should objectize string value', ->
+      expect NumberTransform.objectize 'True'
+      .to.be.NaN
+    it 'should objectize number value', ->
+      expect NumberTransform.objectize 1
+      .to.equal 1

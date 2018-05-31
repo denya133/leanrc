@@ -38,3 +38,20 @@ describe 'DateTransform', ->
     it 'should serialize number value', ->
       expect DateTransform.serialize 1
       .to.be.null
+  describe '.objectize', ->
+    it 'should objectize null value', ->
+      expect DateTransform.objectize null
+      .to.be.null
+    it 'should objectize date value', ->
+      date = new Date
+      expect DateTransform.objectize date
+      .to.eql date.toISOString()
+    it 'should objectize boolean value', ->
+      expect DateTransform.objectize yes
+      .to.be.null
+    it 'should objectize string value', ->
+      expect DateTransform.objectize 'True'
+      .to.be.null
+    it 'should objectize number value', ->
+      expect DateTransform.objectize 1
+      .to.be.null
