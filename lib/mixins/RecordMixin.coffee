@@ -295,6 +295,9 @@ module.exports = (Module)->
             return null
           vhAttributes = {}
 
+          unless ahPayload.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+
           RecordClass = if @name is ahPayload.type.split('::')[1]
             @
           else
@@ -315,10 +318,24 @@ module.exports = (Module)->
         default: (aoRecord)->
           unless aoRecord?
             return null
+
+          unless aoRecord.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+
           vhResult = {}
           for own asAttr, ahValue of aoRecord.constructor.attributes
             vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>
               transform.call(@).serialize aoRecord[asAttr]
+          vhResult
+
+      @public @static objectize:   Function,
+        default: (aoRecord)->
+          unless aoRecord?
+            return null
+          vhResult = {}
+          for own asAttr, ahValue of aoRecord.constructor.attributes
+            vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>
+              transform.call(@).objectize aoRecord[asAttr]
           vhResult
 
       @public @static @async restoreObject: Function,
@@ -357,7 +374,7 @@ module.exports = (Module)->
             do (vsAttrName, voAttrValue)=>
               @[vsAttrName] = voAttrValue
 
-      @public toJSON: Function, { default: -> @constructor.serialize @ }
+      @public toJSON: Function, { default: -> @constructor.objectize @ }
 
 
       @initializeMixin()

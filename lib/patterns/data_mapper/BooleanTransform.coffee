@@ -23,6 +23,10 @@ module.exports = (Module)->
       default: (deserialized)->
         Boolean deserialized
 
+    @public @static objectize: Function,
+      default: (deserialized)->
+        Boolean deserialized
+
     @public @static @async restoreObject: Function,
       default: ->
         throw new Error "restoreObject method not supported for #{@name}"

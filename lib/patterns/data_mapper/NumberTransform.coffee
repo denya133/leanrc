@@ -27,6 +27,14 @@ module.exports = (Module)->
           transformed = Number deserialized
           return if _.isNumber(transformed) then transformed else null
 
+    @public @static objectize: Function,
+      default: (deserialized)->
+        if _.isNil deserialized
+          return null
+        else
+          transformed = Number deserialized
+          return if _.isNumber(transformed) then transformed else null
+
     @public @static @async restoreObject: Function,
       default: ->
         throw new Error "restoreObject method not supported for #{@name}"

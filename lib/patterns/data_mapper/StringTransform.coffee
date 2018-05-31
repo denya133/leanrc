@@ -19,6 +19,10 @@ module.exports = (Module)->
       default: (deserialized)->
         if _.isNil(deserialized) then null else String deserialized
 
+    @public @static objectize: Function,
+      default: (deserialized)->
+        if _.isNil(deserialized) then null else String deserialized
+
     @public @static @async restoreObject: Function,
       default: ->
         throw new Error "restoreObject method not supported for #{@name}"

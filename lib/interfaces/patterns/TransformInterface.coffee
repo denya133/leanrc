@@ -15,6 +15,9 @@ module.exports = (Module)->
       @public @static @virtual serialize:   Function,
         args: [ANY] # data
         return: [ANY, NILL]
+      @public @static @virtual objectize:   Function,
+        args: [ANY] # data
+        return: [ANY, NILL]
 
 
       @initializeInterface()

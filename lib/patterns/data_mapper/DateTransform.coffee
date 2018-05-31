@@ -22,6 +22,13 @@ module.exports = (Module)->
         else
           return null
 
+    @public @static objectize: Function,
+      default: (deserialized)->
+        if _.isDate(deserialized) and not _.isNaN(deserialized)
+          return deserialized.toISOString()
+        else
+          return null
+
     @public @static @async restoreObject: Function,
       default: ->
         throw new Error "restoreObject method not supported for #{@name}"
