@@ -1,15 +1,27 @@
+# NOTE: от этого класса можно унаследовать отдельный класс с кастомным определением схемы и использовать его внутри объявления атрибутов рекорда
 
 
 module.exports = (Module)->
   {
     CoreObject
-    Utils: { _, inflect }
+    Utils: { _, inflect, joi }
   } = Module::
 
   class ObjectTransform extends CoreObject
     @inheritProtected()
     # @implements Module::TransformInterface
     @module Module
+
+    @public @static schema: Object,
+      get: ->
+        joi.alternatives(joi.object(), joi.any()).when [
+          joi.string(), joi.number(), joi.boolean(), joi.date()
+          joi.array().items(joi.any()), joi.binary(), joi.func()
+        ],
+          then: joi.any().error new Error 'Was really expecting an object'  # если по any попал не объект, то выдастся ошибка
+          otherwise: joi.any() # остается только объект с любыми ключами
+
+    # TODO: надо проверить будет ли валидация схемы joi.object() пропускать объекты с любыми ключами? (отличается ли это от схемы пустого объекта joi.object({}))
 
     @public @static parseRecordName: Function,
       default: (asName)->
@@ -45,6 +57,8 @@ module.exports = (Module)->
               yield Module::BooleanTransform.normalize value
             when _.isPlainObject(value) and /.{2,}[:][:].{2,}/.test value.type
               RecordClass = @findRecordByName value.type
+              # NOTE: в правильном использовании вторым аргументом должна передаваться ссылка на коллекцию, то тут мы не можем ее получить
+              # а так как рекорды в этом случае используются ТОЛЬКО для оформления структуры и хранения данных внутри родительского рекорда, то коллекции физически просто нет.
               yield RecordClass.normalize value
             when _.isPlainObject value
               yield Module::ObjectTransform.normalize value
@@ -120,4 +134,4 @@ module.exports = (Module)->
         yield return
 
 
-  ObjectTransform.initialize()
+    @initialize()

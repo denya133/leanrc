@@ -3,13 +3,17 @@
 module.exports = (Module)->
   {
     CoreObject
-    Utils: { _ }
+    Utils: { _, joi }
   } = Module::
 
   class DateTransform extends CoreObject
     @inheritProtected()
     # @implements Module::TransformInterface
     @module Module
+
+    @public @static schema: Object,
+      get: ->
+        joi.date().iso().empty(null).default(null)
 
     @public @static @async normalize: Function,
       default: (serialized)->

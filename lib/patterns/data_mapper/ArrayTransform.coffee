@@ -1,9 +1,10 @@
+# NOTE: от этого класса можно унаследовать отдельный класс с кастомным определением схемы и использовать его внутри объявления атрибутов рекорда
 
 
 module.exports = (Module)->
   {
     CoreObject
-    Utils: { _, inflect }
+    Utils: { _, inflect, joi }
   } = Module::
 
   class ArrayTransform extends CoreObject
@@ -11,7 +12,9 @@ module.exports = (Module)->
     # @implements Module::TransformInterface
     @module Module
 
-    # TODO: возможно во всех трансформах надо реализовать атрибут schema для полиморфизма, но это еще не точно
+    @public @static schema: Object,
+      get: ->
+        joi.array().items joi.any()
 
     @public @static parseRecordName: Function,
       default: (asName)->
@@ -46,6 +49,8 @@ module.exports = (Module)->
               yield Module::BooleanTransform.normalize item
             when _.isPlainObject(item) and /.{2,}[:][:].{2,}/.test item.type
               RecordClass = @findRecordByName item.type
+              # NOTE: в правильном использовании вторым аргументом должна передаваться ссылка на коллекцию, то тут мы не можем ее получить
+              # а так как рекорды в этом случае используются ТОЛЬКО для оформления структуры и хранения данных внутри родительского рекорда, то коллекции физически просто нет.
               yield RecordClass.normalize item
             when _.isPlainObject item
               yield Module::ObjectTransform.normalize item
@@ -119,4 +124,4 @@ module.exports = (Module)->
         yield return
 
 
-  ArrayTransform.initialize()
+    @initialize()

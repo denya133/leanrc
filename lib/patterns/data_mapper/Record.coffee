@@ -56,6 +56,7 @@ module.exports = (Module)->
     Utils: { joi }
   } = Module::
 
+  # TODO: надо решить - надо ли наследовать Record от ObjectTransform
   class Record extends CoreObject
     @inheritProtected()
     # @implements RecordInterface
