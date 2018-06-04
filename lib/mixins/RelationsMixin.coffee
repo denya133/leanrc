@@ -314,7 +314,7 @@ module.exports = (Module)->
               )).first()
 
           @metaObject.addMetaData 'relations', vsAttr, opts
-          @public @async "#{vsAttr}": RecordInterface, opts
+          @public @async "#{vsAttr}": Module::RecordInterface, opts
           return
 
       # Cucumber.inverseFor 'tomato' #-> {recordClass: App::Tomato, attrName: 'cucumbers', relation: 'hasMany'}

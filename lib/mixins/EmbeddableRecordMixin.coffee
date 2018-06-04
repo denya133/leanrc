@@ -40,7 +40,7 @@ module.exports = (Module)->
             joi.object vhAttrs
           _data[@name]
 
-      @public @static hasEmbed: RecordInterface,
+      @public @static hasEmbed: Function,
         default: (typeDefinition, opts={})->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
@@ -191,7 +191,7 @@ module.exports = (Module)->
           # @public @async "#{vsAttr}Embed": RecordInterface, opts
           return
 
-      @public @static hasEmbeds: Array,
+      @public @static hasEmbeds: Function,
         default: (typeDefinition, opts={})->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
@@ -371,7 +371,7 @@ module.exports = (Module)->
 
           yield return voRecord
 
-      @public @static @async serialize:   Function,
+      @public @static @async serialize: Function,
         default: (aoRecord)->
           unless aoRecord?
             return null
@@ -389,7 +389,7 @@ module.exports = (Module)->
 
           yield return vhResult
 
-      @public @static objectize:   Function,
+      @public @static objectize: Function,
         default: (aoRecord)->
           unless aoRecord?
             return null
