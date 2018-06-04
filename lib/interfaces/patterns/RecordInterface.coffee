@@ -40,9 +40,9 @@ module.exports = (Module)->
       @public @static @virtual attributes: Function,
         args: []
         return: Object
-      @public @static @virtual edges: Function,
-        args: []
-        return: Object
+      # @public @static @virtual edges: Function,
+      #   args: []
+      #   return: Object
       @public @static @virtual computeds: Function,
         args: []
         return: Object

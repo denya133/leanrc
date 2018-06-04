@@ -1,8 +1,10 @@
 # вычленяем из Record'а все что связано с релейшенами, т.к. Рекорды на основе key-value базы данных (Redis-like) не смогут поддерживать связи - т.к. на фундаментальном уровне кроме поиска по id в них нереализован поиск по НЕ-первичным ключам или сложным условиям
 
 
-# миксин для подмешивания в классы унаследованные от Module::Record
+# NOTE: Это миксин для подмешивания в классы унаследованные от Module::Record
 # если в этих классах необходим функционал релейшенов.
+
+# NOTE: Главная цель этих методов, когда они используются в рекорд-классе - предоставить удобные в использовании (в коде) ассинхронные геттеры, создаваемые на основе объявленных метаданных. (т.е. чтобы не писать лишних строчек кода, для получения объектов по связями из других коллекций)
 
 
 module.exports = (Module)->
@@ -16,7 +18,7 @@ module.exports = (Module)->
       @inheritProtected()
       # @implements Module::RelationsMixinInterface
 
-      # NOTE: отличается от belongsTo тем, что в атрибуте `<name>Id` может храниться null значение, а сама связь не является обязательной (образуется между объектами "в одной плоскости")
+      # NOTE: отличается от belongsTo тем, что сама связь не является обязательной (образуется между объектами "в одной плоскости"), а в @[opts.attr] может содержаться null значение
       @public @static relatedTo: Function,
         default: (typeDefinition, opts={})->
           recordClass = @
@@ -26,7 +28,9 @@ module.exports = (Module)->
           opts.inverse ?= "#{inflect.pluralize inflect.camelize @name, no}"
           opts.relation = 'relatedTo'
 
-          @attribute "#{opts.attr}": String
+          # # TODO: надо решить проблему с когнитивным диссанансом из-за того, что для простых relatedTo/belongsTo связей связь формулируется через строковый айдишник в атрибуте, а для through - связь формулируется через ембедед объект содержащий айдишник объекта.
+          # # TODO: чтобы решить эту проблему, надо удалить из тела этого метода объявление атрибута, тем более что если through указан, здесь бы пришлось объявлять ебмед атрибут, а это уже выходит за область ответственности этого миксина
+          # @attribute "#{opts.attr}": String
 
           opts.recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
@@ -44,7 +48,10 @@ module.exports = (Module)->
                 "@doc.#{opts.refKey}": @[opts.attr]
               )).first()
             else
-              through = @constructor.relations[opts.through[0]]
+              # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
+              through = @constructor.embeddings?[opts.through[0]]
+              unless through?
+                throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
               ThroughCollection = @collection.facade.retrieveProxy through.collectionName
               ThroughRecord = @findRecordByName through.recordName
               inverse = ThroughRecord.relations[opts.through[1].by]
@@ -64,7 +71,8 @@ module.exports = (Module)->
           @public @async "#{vsAttr}": Module::RecordInterface, opts
           return
 
-      # NOTE: отличается от relatedTo тем, что в атрибуте `<name>Id` обязательно должно храниться значение айдишника родительского объекта, которому "belongs to" - "принадлежит" этот объект. Сама связь является обязательной (образуется между объектами "в иерархии")
+      # NOTE: отличается от relatedTo тем, что сама связь является обязательной (образуется между объектами "в иерархии"), а в @[opts.attr] обязательно должно храниться значение айдишника родительского объекта, которому "belongs to" - "принадлежит" этот объект
+      # NOTE: если указана опция through, то получение данных о связи будет происходить не из @[opts.attr], а из промежуточной коллекции, где помимо айдишника объекта могут храниться дополнительные атрибуты с данными о связи
       @public @static belongsTo: Function,
         # default: (typeDefinition, {attr, recordName, collectionName, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable, validate}={})->
         default: (typeDefinition, opts={})->
@@ -75,8 +83,22 @@ module.exports = (Module)->
           opts.inverse ?= "#{inflect.pluralize inflect.camelize @name, no}"
           opts.relation = 'belongsTo'
 
-          @attribute "#{opts.attr}": String,
-            validate: joi.string().required()
+          # # TODO: надо решить проблему с когнитивным диссанансом из-за того, что для простых relatedTo/belongsTo связей связь формулируется через строковый айдишник в атрибуте, а для through - связь формулируется через ембедед объект содержащий айдишник объекта.
+          # # TODO: чтобы решить эту проблему, надо удалить из тела этого метода объявление атрибута, тем более что если through указан, здесь бы пришлось объявлять ебмед атрибут, а это уже выходит за область ответственности этого миксина
+          # @attribute "#{opts.attr}": String,
+          #   validate: joi.string().required()
+          #   # TODO: более общая проблема состоит в том, что если указана опция through то сдесь должно быть определение геттера и сеттера, которые возьмут проксируемое значение, либо сохранят проксируемое значение в промежуточной коллекции, А если опции нет, то атрибут должен работать с сохраняемым в default значением
+          #   # возможно надо сделать отдельный миксин для таких случаев типа EmbeddableRelationsMixin чтобы они проксировались в промежуточные коллекции "синхронно"
+          #   # если это проксирование many связей, то это может быть не просто массив айдишников связанных рекордов, а так как у каждой связи может быть добавлен как минимум атрибут типа "type", то надо возвращать как минимум еще и его, а это значит что структура данных устремляется к виду полного Рекорда (т.к. помимо типа могут быть введены дополнительные атрибуты для каждой связи)
+          #   # для belongsTo связи добавлять тип бессмысленно, т.к. связь там все равно строго одна, однако для нее могут быть добавлены некоторые атрибуты, что устремит структуру связи так же к виду полного Рекорда
+          #   # из чего можно сделать вывод - хранение связи belongsTo для проксируемых связей некорректно в виде Строки (String) - Их надо хранить как проксируемый embed (объект)
+          #   # А так же вовод о том, что сами through связи надо объявлять не так, как запланировано сейчас через hasMany (как обычная связь, чтобы ее название потом указать в through опции другой связи), а через синхронный embed - так как надо чтобы сеттер сохранил данные, в случае если они установлены.
+          #   # !!! Если синхронно нормализировать а потом обжектизировать массивы связей типа many - то это могут получиться ОЧЕНЬ большие респонзы от сервера, т.к. это могут быть и сотни и тысячи связей
+          #   # делать такие through синхронными наверно будет ошибкой :(
+          #   # но для штучных связей, возможно ничего плохого в этом не будет.
+          #   # Для массива надо ответить на вопрос: нужно ли делать возможность управления массивом через объект (внутри атрибута объекта) ?
+          #   # На данный момент код релейшенов и ембедов сделан так, что в случае если указана опция through они берут по ней метаданные о релейшене, не используя его непосредственно, а следовательно ему все равно синхронные в нем данные или асинхронные - это сделано хорошо. :)
+
 
           # # TODO: нет смысла делать это вычисляемое свойство, т.к. оно нигде не используется
           # if attr isnt "#{vsAttr}Id"
@@ -146,7 +168,10 @@ module.exports = (Module)->
                 "@doc.#{opts.refKey}": @[opts.attr]
               )).first()
             else
-              through = @constructor.relations[opts.through[0]]
+              # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
+              through = @constructor.embeddings?[opts.through[0]]
+              unless through?
+                throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
               ThroughCollection = @collection.facade.retrieveProxy through.collectionName
               ThroughRecord = @findRecordByName through.recordName
               inverse = ThroughRecord.relations[opts.through[1].by]
@@ -161,6 +186,7 @@ module.exports = (Module)->
                 $limit: 1
               )).first()
               # TODO: возможно надо как то с учетом возможного задания through решить вопрос с оформлением edges в RecordMixin
+              # TODO: в свете обдумывания edges всплыла более общая проблема для relatedTo и belongsTo - точнее для самих релейшенов проблемы вроде нет, так как они спроэктированы только на чтение связей и упрощение кода за счет их использования, однако, для работы сохраняющего айдишник атрибута возникает следующая проблема: если происходит запись (set) айдишника, но сам релейшен указан с опцией through , то айдишник не должен храниться в этом рекорде, а должен сохраняться в промежуточной коллекции чтобы геттер смог потом по сохраненным данным получить связь (код в геттере релейшена), НО этой особой логики тут не указано для сеттера!!!
 
           @metaObject.addMetaData 'relations', vsAttr, opts
           @public @async "#{vsAttr}": Module::RecordInterface, opts
@@ -210,7 +236,7 @@ module.exports = (Module)->
                 "@doc.#{opts.inverse}": @[opts.refKey]
               )
             else
-              through = @constructor.relations[opts.through[0]]
+              through = @constructor.embeddings?[opts.through[0]] ? @constructor.relations[opts.through[0]]
               ThroughCollection = @collection.facade.retrieveProxy through.collectionName
               ThroughRecord = @findRecordByName through.recordName
               inverse = ThroughRecord.relations[opts.through[1].by]
@@ -272,7 +298,7 @@ module.exports = (Module)->
                 $limit: 1
               )).first()
             else
-              through = @constructor.relations[opts.through[0]]
+              through = @constructor.embeddings?[opts.through[0]] ? @constructor.relations[opts.through[0]]
               ThroughCollection = @collection.facade.retrieveProxy through.collectionName
               ThroughRecord = @findRecordByName through.recordName
               inverse = ThroughRecord.relations[opts.through[1].by]

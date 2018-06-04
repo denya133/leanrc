@@ -1,3 +1,4 @@
+# NOTE: through источники для relatedTo и belongsTo связей с опцией through НАДО ОБЪЯВЛЯТЬ ЧЕРЕЗ hasEmbed чтобы корректно отрабатывал сеттер сохраняющий данные об айдишнике подвязанного объекта в промежуточную коллекцию
 
 
 module.exports = (Module)->
@@ -73,7 +74,10 @@ module.exports = (Module)->
                 $limit: 1
               )).first()
             else
-              through = @constructor.relations[opts.through[0]]
+              # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
+              through = @constructor.embeddings[opts.through[0]]
+              unless through?
+                throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
               ThroughCollection = @collection.facade.retrieveProxy through.collectionName
               ThroughRecord = @findRecordByName through.recordName
               inverse = ThroughRecord.relations[opts.through[1].by]
@@ -104,7 +108,10 @@ module.exports = (Module)->
                   $not: "@doc.id": savedRecord.id # NOTE: проверяем по айдишнику только-что сохраненного
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
-                through = @constructor.relations[opts.through[0]]
+                # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
+                through = @constructor.embeddings[opts.through[0]]
+                unless through?
+                  throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
                 ThroughCollection = @collection.facade.retrieveProxy through.collectionName
                 ThroughRecord = @findRecordByName through.recordName
                 inverse = ThroughRecord.relations[opts.through[1].by]
@@ -144,7 +151,10 @@ module.exports = (Module)->
                 if voRecord?
                   yield voRecord.destroy()
               else
-                through = @constructor.relations[opts.through[0]]
+                # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
+                through = @constructor.embeddings[opts.through[0]]
+                unless through?
+                  throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
                 ThroughCollection = @collection.facade.retrieveProxy through.collectionName
                 ThroughRecord = @findRecordByName through.recordName
                 inverse = ThroughRecord.relations[opts.through[1].by]
@@ -219,7 +229,7 @@ module.exports = (Module)->
                 "@doc.#{opts.inverse}": @[opts.refKey]
               )).toArray()
             else
-              through = @constructor.relations[opts.through[0]]
+              through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
               ThroughCollection = @collection.facade.retrieveProxy through.collectionName
               ThroughRecord = @findRecordByName through.recordName
               inverse = ThroughRecord.relations[opts.through[1].by]
@@ -249,7 +259,7 @@ module.exports = (Module)->
                   $not: "@doc.id": $in: alRecordIds # NOTE: проверяем айдишники всех только-что сохраненных
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
-                through = @constructor.relations[opts.through[0]]
+                through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
                 ThroughCollection = @collection.facade.retrieveProxy through.collectionName
                 ThroughRecord = @findRecordByName through.recordName
                 inverse = ThroughRecord.relations[opts.through[1].by]
@@ -292,7 +302,7 @@ module.exports = (Module)->
                   "@doc.#{opts.inverse}": @[opts.refKey]
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
-                through = @constructor.relations[opts.through[0]]
+                through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
                 ThroughCollection = @collection.facade.retrieveProxy through.collectionName
                 ThroughRecord = @findRecordByName through.recordName
                 inverse = ThroughRecord.relations[opts.through[1].by]
