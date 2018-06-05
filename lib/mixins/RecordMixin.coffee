@@ -62,13 +62,6 @@ module.exports = (Module)->
         default: (asName)->
           @constructor.findRecordByName asName
 
-      #########################################################################
-
-      # # под вопросом ??????
-      # @public updateEdges: Function, [ANY], -> ANY # any type
-
-      #########################################################################
-
       ###
         @customFilter ->
           reason:
@@ -100,8 +93,6 @@ module.exports = (Module)->
 
       @public @static attributes: Object,
         get: -> @metaObject.getGroup 'attributes', no
-      # @public @static edges: Object,
-      #   get: -> @metaObject.getGroup 'edges', no
       @public @static computeds: Object,
         get: -> @metaObject.getGroup 'computeds', no
 
@@ -118,8 +109,6 @@ module.exports = (Module)->
           opts.transform ?= switch vcAttrType
             when String, Date, Number, Boolean, Array, Object
               -> Module::["#{vcAttrType.name}Transform"]
-            # TODO: надо как то подставить в качестве трансформа рекорд, но вопрос КАК? (если when RecordInterface)
-            # TODO: что делать, если в качестве трансформа идет кастомный трансформ???
             else
               -> Module::Transform
           opts.validate ?= -> opts.transform.call(@).schema
@@ -134,10 +123,6 @@ module.exports = (Module)->
             throw new Error "attribute `#{vsAttr}` has been defined previously"
           else
             @metaObject.addMetaData 'attributes', vsAttr, opts
-            # NOTE: предыстория edges: в первых прототипах эта штука делалась для автоматизации создания графовой связи на основе id, сохраняемого из связи belongsTo. Метаданные об edges нужны были для того, чтобы автоматика при наличии айдишника сама создала нужную грань графа в отдельной специальной коллекции. От части это нужно было из-за того, что связи для обхода графа обязаны быть в отдельных таблицах, из-за того что они не могут быть "определены" через атрибуты в документе (аранга да и любая другая база поддерживает edge-индексы только на отдельной коллекции "связей")
-            # естественно для связей М:М выделяется отдельная коллекция с отдельным рекордом описывающим структуру и нет никакой проблемы
-            # однако в случае с "родительскими" связями например для рефферальной системы или для фолдерной - айдишник родительского объкта чаще всего содержится в отдельном атрибуте (а не выносится в отдельную коллекцию с дополнительным uniq-индексом для симуляции связей 1:М)
-            # @metaObject.addMetaData 'edges', vsAttr, opts if opts.through # TODO: решить вопрос с наличием такого понятия как edge - на данный момент они не используются нигде, либо надо довести их до ума и использовать, либо выпилить совсем.
           @public typeDefinition, opts
           return
 
@@ -161,8 +146,6 @@ module.exports = (Module)->
           opts.transform ?= switch vcAttrType
             when String, Date, Number, Boolean, Array, Object
               -> Module::["#{vcAttrType.name}Transform"]
-            # TODO: надо как то подставить в качестве трансформа рекорд, но вопрос КАК? (если when RecordInterface)
-            # TODO: что делать, если в качестве трансформа идет кастомный трансформ???
             else
               -> Module::Transform
           opts.validate ?= -> opts.transform.call(@).schema.strip()

@@ -30,9 +30,6 @@ module.exports = (Module)->
         args: [String]
         return: RecordInterface
 
-      # # под вопросом ??????
-      # @public updateEdges: Function, [ANY], -> ANY # any type
-
       @public @static @virtual parentClassNames: Function,
         args: [[Module::Class, NILL]]
         return: Array
@@ -40,9 +37,6 @@ module.exports = (Module)->
       @public @static @virtual attributes: Function,
         args: []
         return: Object
-      # @public @static @virtual edges: Function,
-      #   args: []
-      #   return: Object
       @public @static @virtual computeds: Function,
         args: []
         return: Object
