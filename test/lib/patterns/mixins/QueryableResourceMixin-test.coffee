@@ -30,10 +30,10 @@ describe 'QueryableResourceMixin', ->
           @attribute test: String
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @_type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @_type = 'Test::TestRecord'
         TestRecord.initialize()
         class TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -62,8 +62,9 @@ describe 'QueryableResourceMixin', ->
               yield LeanRC::Cursor.new @, data
           @public @async push: Function,
             default: (aoRecord) ->
-              @getData().data.push aoRecord.toJSON()
-              yield yes
+              item = aoRecord.toJSON()
+              @getData().data.push item
+              yield return item
         TestCollection.initialize()
         class MyResponse extends EventEmitter
           _headers: {}

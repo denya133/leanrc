@@ -1087,7 +1087,7 @@ describe 'HttpCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, HttpCollection
         record = yield collection.create name: 'test1'
-        updatedRecord = yield collection.override record.id, collection.build name: 'test2'
+        updatedRecord = yield collection.override record.id, yield collection.build name: 'test2'
         assert.isDefined updatedRecord
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'name', 'test1'

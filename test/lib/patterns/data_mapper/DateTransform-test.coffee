@@ -1,10 +1,14 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-{ co } = LeanRC::Utils
+{ co, joi } = LeanRC::Utils
 DateTransform = LeanRC::DateTransform
 
 describe 'DateTransform', ->
+  describe '.schema', ->
+    it 'should has correct schema value', ->
+      expect DateTransform.schema
+      .deep.equal joi.date().iso().empty(null).default(null)
   describe '.normalize', ->
     it 'should deserialize null value', ->
       co ->

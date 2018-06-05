@@ -9,7 +9,7 @@ describe 'Migration', ->
   describe '.new', ->
     it 'should create migration instance', ->
       co ->
-        migration = LeanRC::Migration.new()
+        migration = LeanRC::Migration.new(type: 'LeanRC::Migration')
         assert.lengthOf migration.steps, 0
         yield return
   describe '.createCollection', ->
@@ -24,7 +24,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.createCollection 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -42,7 +42,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.createEdgeCollection 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -60,7 +60,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.addField 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -78,7 +78,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.addIndex 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -96,7 +96,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.addTimestamps 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -114,7 +114,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.changeCollection 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -132,7 +132,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.changeField 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -150,7 +150,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.renameField 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -168,7 +168,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.renameIndex 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -186,7 +186,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.renameCollection 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -204,7 +204,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.dropCollection 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -222,7 +222,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.dropEdgeCollection 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -240,7 +240,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.removeField 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -258,7 +258,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.removeIndex 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -276,7 +276,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.removeTimestamps 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -294,7 +294,7 @@ describe 'Migration', ->
           @module Test
         Test::BaseMigration.initialize()
         Test::BaseMigration.reversible 'ARG_1', 'ARG_2', 'ARG_3'
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.lengthOf migration.steps, 1
         assert.deepEqual migration.steps[0],
           args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
@@ -311,7 +311,7 @@ describe 'Migration', ->
           @inheritProtected()
           @module Test
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         spyExecute = sinon.spy -> yield return
         yield migration.execute spyExecute
         assert.isTrue spyExecute.called
@@ -354,7 +354,7 @@ describe 'Migration', ->
           @public @async addField: Function,
             default: spyAddField
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         yield migration.up()
         assert.isTrue spyReversibleUp.called
         assert.isTrue spyCreateCollection.calledAfter spyReversibleUp
@@ -389,7 +389,7 @@ describe 'Migration', ->
           @public @async removeField: Function,
             default: spyRemoveField
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         yield migration.down()
         assert.isTrue spyRenameIndex.called
         assert.isTrue spyRemoveField.calledAfter spyRenameIndex
@@ -411,7 +411,7 @@ describe 'Migration', ->
           @module Test
           @up spyUp
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.isFalse spyUp.called
         yield migration.up()
         assert.isTrue spyUp.called
@@ -429,7 +429,7 @@ describe 'Migration', ->
           @module Test
           @down spyDown
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         assert.isFalse spyDown.called
         yield migration.down()
         assert.isTrue spyDown.called
@@ -457,7 +457,7 @@ describe 'Migration', ->
           @public @async addField: Function,
             default: spyAddField
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         yield migration.migrate Test::BaseMigration::UP
         assert.isTrue spyReversibleUp.called
         assert.isTrue spyCreateCollection.calledAfter spyReversibleUp
@@ -491,7 +491,7 @@ describe 'Migration', ->
           @public @async removeField: Function,
             default: spyRemoveField
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         yield migration.migrate Test::BaseMigration::DOWN
         assert.isTrue spyRenameIndex.called
         assert.isTrue spyRemoveField.calledAfter spyRenameIndex

@@ -377,10 +377,10 @@ describe 'Resource', ->
           @attribute test: String
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -406,8 +406,12 @@ describe 'Resource', ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
-              @getData().data.push aoRecord.toJSON()
-              yield yes
+              i = aoRecord.toJSON()
+              @getData().data.push i
+              yield return i
+          @public @async includes: Function,
+            default: (id)->
+              yield return (_.find @getData().data, {id})?
         TestsCollection.initialize()
         facade = LeanRC::Facade.getInstance KEY
         COLLECTION_NAME = 'TestEntitiesCollection'
@@ -444,10 +448,10 @@ describe 'Resource', ->
           @attribute test: String
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -469,8 +473,9 @@ describe 'Resource', ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
-              @getData().data.push aoRecord.toJSON()
-              yield yes
+              i = aoRecord.toJSON()
+              @getData().data.push i
+              yield return i
           @public @async take: Function,
             default: (id) ->
               result = []
@@ -489,8 +494,8 @@ describe 'Resource', ->
           serializer: -> LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
-        yield collection.create test: 'test1'
-        record = yield collection.create test: 'test2'
+        yield collection.create test: 'test1'#, type: 'Test::TestRecord'
+        record = yield collection.create test: 'test2'#, type: 'Test::TestRecord'
         resource = Test::TestResource.new()
         resource.initializeNotifier KEY
         context =
@@ -516,10 +521,10 @@ describe 'Resource', ->
           @attribute test: String
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -541,8 +546,9 @@ describe 'Resource', ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
-              @getData().data.push aoRecord.toJSON()
-              yield yes
+              i = aoRecord.toJSON()
+              @getData().data.push i
+              yield return i
           @public @async take: Function,
             default: (id) ->
               result = []
@@ -550,6 +556,9 @@ describe 'Resource', ->
                 result.push data
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()
+          @public @async includes: Function,
+            default: (id)->
+              yield return (_.find @getData().data, {id})?
         Test::Collection.initialize()
         facade = LeanRC::Facade.getInstance KEY
         COLLECTION_NAME = 'TestEntitiesCollection'
@@ -580,10 +589,10 @@ describe 'Resource', ->
           @attribute test: String
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -605,8 +614,9 @@ describe 'Resource', ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
-              @getData().data.push aoRecord.toJSON()
-              yield yes
+              i = aoRecord.toJSON()
+              @getData().data.push i
+              yield return i
           @public @async override: Function,
             default: (id, aoRecord) ->
               item = _.find @getData().data, {id}
@@ -637,6 +647,7 @@ describe 'Resource', ->
         resource.initializeNotifier KEY
         record = yield collection.create test: 'test3'
         result = yield resource.update
+          type: 'Test::TestRecord'
           pathParams: test_entity: record.id
           request: body: test_entity: test: 'test8'
         assert.propertyVal result, 'test', 'test8'
@@ -658,10 +669,10 @@ describe 'Resource', ->
           @attribute test: String
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestRecord
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -683,8 +694,9 @@ describe 'Resource', ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
-              @getData().data.push aoRecord.toJSON()
-              yield yes
+              i = aoRecord.toJSON()
+              @getData().data.push i
+              yield return i
           @public @async override: Function,
             default: (id, aoRecord) ->
               item = _.find @getData().data, {id}
@@ -736,10 +748,10 @@ describe 'Resource', ->
           @attribute test: String
           @public @static findRecordByName: Function,
             default: (asType) -> TestRecord
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         TestRecord.initialize()
         class TestResource extends LeanRC::Resource
           @inheritProtected()
@@ -782,8 +794,9 @@ describe 'Resource', ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
-              @getData().data.push aoRecord.toJSON()
-              yield yes
+              i = aoRecord.toJSON()
+              @getData().data.push i
+              yield return i
           @public @async remove: Function,
             default: (id) ->
               _.remove @getData().data, {id}
@@ -795,6 +808,9 @@ describe 'Resource', ->
                 result.push data
               cursor = LeanRC::Cursor.new @, result
               yield cursor.first()
+          @public @async includes: Function,
+            default: (id)->
+              yield return (_.find @getData().data, {id})?
         Collection.initialize()
         COLLECTION_NAME = 'TestEntitiesCollection'
         facade.registerProxy Collection.new COLLECTION_NAME,
@@ -1100,10 +1116,10 @@ describe 'Resource', ->
           @attribute ownerId: String
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestEntityRecord
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestEntityRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestEntityRecord'
         TestEntityRecord.initialize()
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
@@ -1204,10 +1220,10 @@ describe 'Resource', ->
           @attribute ownerId: String
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestEntityRecord
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestEntityRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestEntityRecord'
         TestEntityRecord.initialize()
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
@@ -1370,10 +1386,10 @@ describe 'Resource', ->
           @attribute ownerId: String
           @public @static findRecordByName: Function,
             default: (asType) -> Test::TestEntityRecord
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestEntityRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestEntityRecord'
         TestEntityRecord.initialize()
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
