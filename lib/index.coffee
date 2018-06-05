@@ -88,20 +88,21 @@ class LeanRC extends RC
   require('./utils/crypto') LeanRC
 
   require('./mixins/ConfigurableMixin') LeanRC
-  require('./mixins/RecordMixin') LeanRC # needs test
-  require('./mixins/RelationsMixin') LeanRC # needs test
+  require('./mixins/RecordMixin') LeanRC
+  require('./mixins/RelationsMixin') LeanRC
   require('./mixins/DelayableMixin') LeanRC
 
   require('./patterns/iterator/Cursor') LeanRC
 
   require('./patterns/data_mapper/Transform') LeanRC
-  require('./patterns/data_mapper/StringTransform') LeanRC # needs test
-  require('./patterns/data_mapper/NumberTransform') LeanRC # needs test
-  require('./patterns/data_mapper/DateTransform') LeanRC # needs test
-  require('./patterns/data_mapper/BooleanTransform') LeanRC # needs test
-  require('./patterns/data_mapper/ObjectTransform') LeanRC # needs test
-  require('./patterns/data_mapper/ArrayTransform') LeanRC # needs test
+  require('./patterns/data_mapper/StringTransform') LeanRC
+  require('./patterns/data_mapper/NumberTransform') LeanRC
+  require('./patterns/data_mapper/DateTransform') LeanRC
+  require('./patterns/data_mapper/BooleanTransform') LeanRC
+  require('./patterns/data_mapper/ObjectTransform') LeanRC
+  require('./patterns/data_mapper/ArrayTransform') LeanRC
   require('./patterns/data_mapper/Serializer') LeanRC
+  require('./patterns/data_mapper/Objectizer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
   require('./patterns/data_mapper/DelayedQueue') LeanRC
 

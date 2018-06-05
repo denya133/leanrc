@@ -4,7 +4,7 @@
 module.exports = (Module)->
   {
     CoreObject
-    Utils: { _, inflect, joi }
+    Utils: { _, inflect, joi, moment }
   } = Module::
 
   class ArrayTransform extends CoreObject
@@ -13,8 +13,7 @@ module.exports = (Module)->
     @module Module
 
     @public @static schema: Object,
-      get: ->
-        joi.array().items joi.any()
+      get: -> joi.array().items joi.any()
 
     @public @static parseRecordName: Function,
       default: (asName)->
@@ -39,10 +38,10 @@ module.exports = (Module)->
           yield return []
         result = for item in serialized
           switch
+            when _.isString(item) and moment(item, moment.ISO_8601).isValid()
+              yield Module::DateTransform.normalize item
             when _.isString item
               yield Module::StringTransform.normalize item
-            when _.isDate item
-              yield Module::DateTransform.normalize item
             when _.isNumber item
               yield Module::NumberTransform.normalize item
             when _.isBoolean item
@@ -69,13 +68,13 @@ module.exports = (Module)->
           switch
             when _.isString item
               yield Module::StringTransform.serialize item
-            when _.isDate item
-              yield Module::DateTransform.serialize item
             when _.isNumber item
               yield Module::NumberTransform.serialize item
             when _.isBoolean item
               yield Module::BooleanTransform.serialize item
-            when _.isPlainObject(item) and /.{2,}[:][:].{2,}/.test item.type
+            when _.isDate item
+              yield Module::DateTransform.serialize item
+            when _.isObject(item) and /.{2,}[:][:].{2,}/.test item.type
               RecordClass = @findRecordByName item.type
               yield RecordClass.serialize item
             when _.isPlainObject item
@@ -95,13 +94,13 @@ module.exports = (Module)->
           switch
             when _.isString item
               Module::StringTransform.objectize item
-            when _.isDate item
-              Module::DateTransform.objectize item
             when _.isNumber item
               Module::NumberTransform.objectize item
             when _.isBoolean item
               Module::BooleanTransform.objectize item
-            when _.isPlainObject(item) and /.{2,}[:][:].{2,}/.test item.type
+            when _.isDate item
+              Module::DateTransform.objectize item
+            when _.isObject(item) and /.{2,}[:][:].{2,}/.test item.type
               RecordClass = @findRecordByName item.type
               RecordClass.objectize item
             when _.isPlainObject item

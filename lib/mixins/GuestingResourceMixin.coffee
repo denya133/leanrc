@@ -31,10 +31,10 @@ module.exports = (Module)->
         default: (args...)->
           unless @recordId?
             @context.throw HTTP_NOT_FOUND
-          unless (yield @collection.exists
+          unless (yield @collection.exists(
             '@doc.id': $eq: @recordId
             '@doc.spaces': $all: ['_external']
-          )
+          ))
             @context.throw HTTP_NOT_FOUND
           yield return args
 

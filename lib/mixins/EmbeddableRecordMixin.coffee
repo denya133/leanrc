@@ -45,7 +45,7 @@ module.exports = (Module)->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
-          opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
+          opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
           opts.embedding = 'hasEmbed'
             # valuable: valuable # в этом нет смысла, они по умолчанию должны быть уже normalized и objectized
             # sortable: sortable # если это вложенные-проксируемые объекты, которые в базе в этом рекорде даже не хранятся, каким образом выходной массив рекордов должен быть отсортирован по этой фигне?
@@ -56,16 +56,16 @@ module.exports = (Module)->
             vsRecordName
           opts.collectionName ?= ->
             "#{
-              inflect.pluralize opts.recordName.replace /Record$/, ''
+              inflect.pluralize opts.recordName().replace /Record$/, ''
             }Collection"
           # opts.transform ?= ->
           #   [vsModuleName, vsRecordName] = @parseRecordName vsAttr
           #   (@Module.NS ? @Module::)[vsRecordName]
           opts.validate = ->
-            EmbedRecord = @findRecordByName opts.recordName
+            EmbedRecord = @findRecordByName opts.recordName()
             return EmbedRecord.schema.empty(null).default(null)
           opts.load = co.wrap ->
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
             unless opts.through
               return yield (yield EmbedsCollection.takeBy(
@@ -78,8 +78,8 @@ module.exports = (Module)->
               through = @constructor.embeddings[opts.through[0]]
               unless through?
                 throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-              ThroughCollection = @collection.facade.retrieveProxy through.collectionName
-              ThroughRecord = @findRecordByName through.recordName
+              ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+              ThroughRecord = @findRecordByName through.recordName()
               inverse = ThroughRecord.relations[opts.through[1].by]
               embedId = (yield (yield ThroughCollection.takeBy(
                 "@doc.#{through.inverse}": @[opts.refKey]
@@ -93,7 +93,7 @@ module.exports = (Module)->
               )).first()
 
           opts.put = co.wrap ->
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             aoRecord = @[vsAttr]
             if aoRecord?
               unless opts.through
@@ -112,8 +112,8 @@ module.exports = (Module)->
                 through = @constructor.embeddings[opts.through[0]]
                 unless through?
                   throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName
-                ThroughRecord = @findRecordByName through.recordName
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+                ThroughRecord = @findRecordByName through.recordName()
                 inverse = ThroughRecord.relations[opts.through[1].by]
                 aoRecord.spaces = @spaces
                 aoRecord.creatorId = @creatorId
@@ -155,8 +155,8 @@ module.exports = (Module)->
                 through = @constructor.embeddings[opts.through[0]]
                 unless through?
                   throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName
-                ThroughRecord = @findRecordByName through.recordName
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+                ThroughRecord = @findRecordByName through.recordName()
                 inverse = ThroughRecord.relations[opts.through[1].by]
                 embedIds = yield (yield ThroughCollection.takeBy(
                   "@doc.#{through.inverse}": @[opts.refKey]
@@ -174,8 +174,8 @@ module.exports = (Module)->
             yield return
 
           opts.restore = (replica)->
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName
-            EmbedRecord = @findRecordByName opts.recordName
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            EmbedRecord = @findRecordByName opts.recordName()
             if replica?
               EmbedRecord.new replica, EmbedsCollection
             else
@@ -196,7 +196,7 @@ module.exports = (Module)->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
-          opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
+          opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
           opts.embedding = 'hasEmbeds'
             # TODO: вопрос - КАК по массиву можно сортировать, группировать или фильтровать (понятное дело, что фильтрацию можно расширить за счет customFilters на самом рекорде их указав, но зачем это указывать в атрибуте-массиве)
             # sortable: sortable # если это вложенные-проксируемые объекты, которые в базе в этом рекорде даже не хранятся, каким образом выходной массив рекордов должен быть отсортирован по этой фигне?
@@ -207,31 +207,31 @@ module.exports = (Module)->
             vsRecordName
           opts.collectionName ?= ->
             "#{
-              inflect.pluralize opts.recordName.replace /Record$/, ''
+              inflect.pluralize opts.recordName().replace /Record$/, ''
             }Collection"
           # opts.transform ?= ->
           #   # TODO: сдесь надо добавить обертку на основе ArrayTransform потому что может быть вызван normalize метод
           #   [vsModuleName, vsRecordName] = @parseRecordName vsAttr
           #   (@Module.NS ? @Module::)[vsRecordName]
           opts.validate = ->
-            EmbedRecord = @findRecordByName opts.recordName
+            EmbedRecord = @findRecordByName opts.recordName()
             return joi.array().items EmbedRecord.schema, joi.any().strip()
           # opts.validate = -> opts.transform.call(@).schema
           # opts.transform = ->
-          #   EmbedRecord = @findRecordByName opts.recordName
+          #   EmbedRecord = @findRecordByName opts.recordName()
           #
           #   schema: joi.array().items EmbedRecord.schema, joi.any().strip()
           #   normalize: ->
           opts.load = co.wrap ->
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             unless opts.through
               return yield (yield EmbedsCollection.takeBy(
                 "@doc.#{opts.inverse}": @[opts.refKey]
               )).toArray()
             else
               through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
-              ThroughCollection = @collection.facade.retrieveProxy through.collectionName
-              ThroughRecord = @findRecordByName through.recordName
+              ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+              ThroughRecord = @findRecordByName through.recordName()
               inverse = ThroughRecord.relations[opts.through[1].by]
               embedIds = yield (yield ThroughCollection.takeBy(
                 "@doc.#{through.inverse}": @[opts.refKey]
@@ -241,7 +241,7 @@ module.exports = (Module)->
               )).toArray()
 
           opts.put = co.wrap ->
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             alRecords = @[vsAttr]
             if alRecords.length > 0
               unless opts.through
@@ -260,8 +260,8 @@ module.exports = (Module)->
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
                 through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName
-                ThroughRecord = @findRecordByName through.recordName
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+                ThroughRecord = @findRecordByName through.recordName()
                 inverse = ThroughRecord.relations[opts.through[1].by]
                 alRecordIds = []
                 newRecordIds = []
@@ -303,8 +303,8 @@ module.exports = (Module)->
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
                 through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName
-                ThroughRecord = @findRecordByName through.recordName
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+                ThroughRecord = @findRecordByName through.recordName()
                 inverse = ThroughRecord.relations[opts.through[1].by]
                 embedIds = yield (yield ThroughCollection.takeBy(
                   "@doc.#{through.inverse}": @[opts.refKey]
@@ -318,8 +318,8 @@ module.exports = (Module)->
             yield return
 
           opts.restore = (replica)->
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName
-            EmbedRecord = @findRecordByName opts.recordName
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            EmbedRecord = @findRecordByName opts.recordName()
             if replica? and replica.length > 0
               for item in replica
                 EmbedRecord.new item, EmbedsCollection
@@ -341,117 +341,179 @@ module.exports = (Module)->
         get: -> @metaObject.getGroup 'embeddings', no
 
       @public @static @async normalize: Function,
-        default: (ahPayload, aoCollection)->
-          unless ahPayload?
-            return null
-          vhAttributes = {}
+        default: (args...)->
+        # default: (ahPayload, aoCollection)->
+          # unless ahPayload?
+          #   return null
+          # vhAttributes = {}
+          #
+          # unless ahPayload.type?
+          #   throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          #
+          # RecordClass = if @name is ahPayload.type.split('::')[1]
+          #   @
+          # else
+          #   @findRecordByName ahPayload.type
+          #
+          # for own asAttr, { transform } of RecordClass.attributes
+          #   vhAttributes[asAttr] = yield transform.call(RecordClass).normalize ahPayload[asAttr]
+          #
+          # vhAttributes.type = ahPayload.type
+          # # NOTE: vhAttributes processed before new - it for StateMachine in record (when it has)
+          #
+          # voRecord = RecordClass.new vhAttributes, aoCollection
+          #
+          # for own asAttr, { load } of RecordClass.embeddings
+          #   voRecord[asAttr] = yield load.call voRecord
+          #
+          # # TODO: так как vhAttributes может содержать атрибуты сложных типов (массивы, объекты, другие рекорды), НО глубокого копирования не происходит, то в `ipoInternalRecord` атрибуты так же будут ссылаться на эти же структуры, а следовательно `changedAttributes`, `resetAttribute` и `rollbackAttributes` - не смогут отатить их изменения или вернуть дельты изменений
+          # # TODO: для того, чтобы `ipoInternalRecord` имел валидный слепок с рекорда, в него надо записывать результат objectize'а рекорда
+          # voRecord[ipoInternalRecord] = voRecord.constructor.objectize voRecord
 
-          unless ahPayload.type?
-            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
-
-          RecordClass = if @name is ahPayload.type.split('::')[1]
-            @
-          else
-            @findRecordByName ahPayload.type
-
-          for own asAttr, { transform } of RecordClass.attributes
-            vhAttributes[asAttr] = yield transform.call(RecordClass).normalize ahPayload[asAttr]
-
-          vhAttributes.type = ahPayload.type
-          # NOTE: vhAttributes processed before new - it for StateMachine in record (when it has)
-
-          voRecord = RecordClass.new vhAttributes, aoCollection
-
-          for own asAttr, { load } of RecordClass.embeddings
+          voRecord = yield @super args...
+          for own asAttr, { load } of voRecord.constructor.embeddings
             voRecord[asAttr] = yield load.call voRecord
-
-          # TODO: так как vhAttributes может содержать атрибуты сложных типов (массивы, объекты, другие рекорды), НО глубокого копирования не происходит, то в `ipoInternalRecord` атрибуты так же будут ссылаться на эти же структуры, а следовательно `changedAttributes`, `resetAttribute` и `rollbackAttributes` - не смогут отатить их изменения или вернуть дельты изменений
-          # TODO: для того, чтобы `ipoInternalRecord` имел валидный слепок с рекорда, в него надо записывать результат objectize'а рекорда
-          voRecord[ipoInternalRecord] = RecordClass.objectize voRecord
-
+          voRecord[ipoInternalRecord] = voRecord.constructor.makeSnapshotWithEmbeds voRecord
           yield return voRecord
 
       @public @static @async serialize: Function,
-        default: (aoRecord)->
-          unless aoRecord?
-            return null
+        default: (args...)->
+        # default: (aoRecord)->
+          # unless aoRecord?
+          #   return null
+          #
+          # unless aoRecord.type?
+          #   throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          #
+          # vhResult = {}
+          # for own asAttr, { transform } of aoRecord.constructor.attributes
+          #   vhResult[asAttr] = yield transform.call(@).serialize aoRecord[asAttr]
+          # # NOTE: по примеру normalize метода видно что этот миксин просто расширяет методы трансформации стандартного Record-"трансформа"
+          # # NOTE: поэтому здесь нельзя вызывать укороченную запись методtransform.call(@).serialize
+          # for own asAttr, { put } of aoRecord.constructor.embeddings
+          #   yield put.call aoRecord
 
-          unless aoRecord.type?
-            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
-
-          vhResult = {}
-          for own asAttr, { transform } of aoRecord.constructor.attributes
-            vhResult[asAttr] = yield transform.call(@).serialize aoRecord[asAttr]
-          # NOTE: по примеру normalize метода видно что этот миксин просто расширяет методы трансформации стандартного Record-"трансформа"
-          # NOTE: поэтому здесь нельзя вызывать укороченную запись методtransform.call(@).serialize
+          [aoRecord] = args
+          vhResult = yield @super args...
           for own asAttr, { put } of aoRecord.constructor.embeddings
             yield put.call aoRecord
-
           yield return vhResult
 
+      @public @static @async recoverize: Function,
+        default: (args...)->
+        # default: (ahPayload, aoCollection)->
+          # unless ahPayload?
+          #   return null
+          # vhAttributes = {}
+          #
+          # unless ahPayload.type?
+          #   throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          #
+          # RecordClass = if @name is ahPayload.type.split('::')[1]
+          #   @
+          # else
+          #   @findRecordByName ahPayload.type
+          #
+          # for own asAttr, { transform } of RecordClass.attributes
+          #   vhAttributes[asAttr] = yield transform.call(RecordClass).normalize ahPayload[asAttr]
+          #
+          # vhAttributes.type = ahPayload.type
+          # # NOTE: vhAttributes processed before new - it for StateMachine in record (when it has)
+          #
+          # voRecord = RecordClass.new vhAttributes, aoCollection
+          #
+          # for own asAttr, { restore } of RecordClass.embeddings
+          #   voRecord[asAttr] = restore.call voRecord, ahPayload[asAttr]
+          #
+          # # TODO: так как vhAttributes может содержать атрибуты сложных типов (массивы, объекты, другие рекорды), НО глубокого копирования не происходит, то в `ipoInternalRecord` атрибуты так же будут ссылаться на эти же структуры, а следовательно `changedAttributes`, `resetAttribute` и `rollbackAttributes` - не смогут отатить их изменения или вернуть дельты изменений
+          # # TODO: для того, чтобы `ipoInternalRecord` имел валидный слепок с рекорда, в него надо записывать результат objectize'а рекорда
+          # # voRecord[ipoInternalRecord] = voRecord.constructor.objectize voRecord
+
+          [ahPayload] = args
+          voRecord = yield @super args...
+          for own asAttr, { restore } of voRecord.constructor.embeddings
+            voRecord[asAttr] = yield restore.call voRecord, ahPayload[asAttr]
+          yield return voRecord
+
       @public @static objectize: Function,
+        default: (args...)->
+        # default: (aoRecord)->
+          # unless aoRecord?
+          #   return null
+          #
+          # unless aoRecord.type?
+          #   throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          #
+          # vhResult = {}
+          # # for own asAttr, ahValue of aoRecord.constructor.attributes
+          # #   vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>
+          # #     transform.call(@).objectize aoRecord[asAttr]
+          # for own asAttr, { transform } of aoRecord.constructor.attributes
+          #   vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
+          # for own asAttr, { transform } of aoRecord.constructor.computeds
+          #   vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
+          # for own asAttr, { replicate } of aoRecord.constructor.embeddings
+          #   vhResult[asAttr] = replicate.call aoRecord
+
+          [aoRecord] = args
+          vhResult = @super args...
+          for own asAttr, { replicate } of aoRecord.constructor.embeddings
+            if aoRecord[asAttr]?
+              vhResult[asAttr] = replicate.call aoRecord
+          return vhResult
+
+      @public @static makeSnapshotWithEmbeds: Function,
         default: (aoRecord)->
-          unless aoRecord?
-            return null
-
-          unless aoRecord.type?
-            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
-
-          vhResult = {}
-          # for own asAttr, ahValue of aoRecord.constructor.attributes
-          #   vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>
-          #     transform.call(@).objectize aoRecord[asAttr]
-          for own asAttr, { transform } of aoRecord.constructor.attributes
-            vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
-          for own asAttr, { transform } of aoRecord.constructor.computeds
-            vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
+          vhResult = aoRecord[ipoInternalRecord]
           for own asAttr, { replicate } of aoRecord.constructor.embeddings
             vhResult[asAttr] = replicate.call aoRecord
           vhResult
 
       # TODO: не учтены установки значений, которые раньше не были установлены
-      @public changedAttributes: Function,
-        default: ->
-          vhResult = {}
-          for own vsAttrName, { transform } of @constructor.attributes
-            voOldValue = @[ipoInternalRecord][vsAttrName]
-            voNewValue = transform.call(@constructor).objectize @[vsAttrName]
-            unless _.isEqual voNewValue, voOldValue
-              vhResult[vsAttrName] = [voOldValue, voNewValue]
+      @public @async changedAttributes: Function,
+        default: (args...)->
+          # vhResult = {}
+          # for own vsAttrName, { transform } of @constructor.attributes
+          #   voOldValue = @[ipoInternalRecord][vsAttrName]
+          #   voNewValue = transform.call(@constructor).objectize @[vsAttrName]
+          #   unless _.isEqual voNewValue, voOldValue
+          #     vhResult[vsAttrName] = [voOldValue, voNewValue]
+          vhResult = yield @super args...
           for own vsAttrName, { replicate } of @constructor.embeddings
-            voOldValue = @[ipoInternalRecord][vsAttrName]
+            voOldValue = @[ipoInternalRecord]?[vsAttrName]
             voNewValue = replicate.call aoRecord
             unless _.isEqual voNewValue, voOldValue
               vhResult[vsAttrName] = [voOldValue, voNewValue]
-          vhResult
+          yield return vhResult
 
-      @public resetAttribute: Function,
-        default: (asAttribute)->
-          voOldValue = @[ipoInternalRecord][asAttribute]
-          if (attrConf = @constructor.attributes[asAttribute])?
-            { transform } = attrConf
-            @[asAttribute] = transform.call(@constructor).normalize voOldValue
-          else if (attrConf = @constructor.embeddings[asAttribute])?
-            { restore } = attrConf
-            @[asAttribute] = restore.call @, voOldValue
-          return
+      @public @async resetAttribute: Function,
+        default: (args...)->
+          [asAttribute] = args
+          # if (attrConf = @constructor.attributes[asAttribute])?
+          #   { transform } = attrConf
+          #   @[asAttribute] = yield transform.call(@constructor).normalize voOldValue
+          # else if (attrConf = @constructor.embeddings[asAttribute])?
+          #   { restore } = attrConf
+          #   @[asAttribute] = restore.call @, voOldValue
+          yield @super args...
+          if @[ipoInternalRecord]?
+            if (attrConf = @constructor.embeddings[asAttribute])?
+              { restore } = attrConf
+              voOldValue = @[ipoInternalRecord][asAttribute]
+              @[asAttribute] = restore.call @, voOldValue
+          yield return
 
-      @public rollbackAttributes: Function,
-        default: ->
-          for own vsAttrName, { transform } of @constructor.attributes
-            voOldValue = @[ipoInternalRecord][vsAttrName]
-            @[vsAttrName] = transform.call(@constructor).normalize voOldValue
-          for own vsAttrName, { restore } of @constructor.embeddings
-            voOldValue = @[ipoInternalRecord][vsAttrName]
-            @[vsAttrName] = restore.call @, voOldValue
-          return
-
-      @public init: Function,
-        default: (aoProperties, aoCollection) ->
-          @super arguments...
-          for own asAttr, { restore } of @constructor.embeddings
-            @[asAttr] = restore.call @, aoProperties[asAttr]
-          return
+      @public @async rollbackAttributes: Function,
+        default: (args...)->
+          # for own vsAttrName, { transform } of @constructor.attributes
+          #   voOldValue = @[ipoInternalRecord][vsAttrName]
+          #   @[vsAttrName] = yield transform.call(@constructor).normalize voOldValue
+          yield @super args...
+          if @[ipoInternalRecord]?
+            for own vsAttrName, { restore } of @constructor.embeddings
+              voOldValue = @[ipoInternalRecord][vsAttrName]
+              @[vsAttrName] = restore.call @, voOldValue
+          yield return
 
 
       @initializeMixin()

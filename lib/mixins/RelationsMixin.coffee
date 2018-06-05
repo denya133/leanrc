@@ -20,68 +20,80 @@ module.exports = (Module)->
 
       # NOTE: отличается от belongsTo тем, что сама связь не является обязательной (образуется между объектами "в одной плоскости"), а в @[opts.attr] может содержаться null значение
       @public @static relatedTo: Function,
-        default: (typeDefinition, opts={})->
+        default: (typeDefinition, {refKey, attr, inverse, relation, recordName, collectionName, through}={})->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
-          opts.refKey ?= 'id'
-          opts.attr ?= "#{vsAttr}Id"
-          opts.inverse ?= "#{inflect.pluralize inflect.camelize @name, no}"
-          opts.relation = 'relatedTo'
+          refKey ?= 'id'
+          attr ?= "#{vsAttr}Id"
+          inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
+          relation = 'relatedTo'
 
           # # TODO: надо решить проблему с когнитивным диссанансом из-за того, что для простых relatedTo/belongsTo связей связь формулируется через строковый айдишник в атрибуте, а для through - связь формулируется через ембедед объект содержащий айдишник объекта.
           # # TODO: чтобы решить эту проблему, надо удалить из тела этого метода объявление атрибута, тем более что если through указан, здесь бы пришлось объявлять ебмед атрибут, а это уже выходит за область ответственности этого миксина
           # @attribute "#{opts.attr}": String
 
-          opts.recordName ?= ->
+          recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
             vsRecordName
-          opts.collectionName ?= ->
+          collectionName ?= ->
             "#{
-              inflect.pluralize opts.recordName.replace /Record$/, ''
+              inflect.pluralize recordName().replace /Record$/, ''
             }Collection"
 
-          opts.get = co.wrap ->
-            RelatedToCollection = @collection.facade.retrieveProxy opts.collectionName
-            # NOTE: может быть ситуация, что relatedTo связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
-            unless opts.through
-              return yield (yield RelatedToCollection.takeBy(
-                "@doc.#{opts.refKey}": @[opts.attr]
-              )).first()
-            else
-              # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
-              through = @constructor.embeddings?[opts.through[0]]
-              unless through?
-                throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-              ThroughCollection = @collection.facade.retrieveProxy through.collectionName
-              ThroughRecord = @findRecordByName through.recordName
-              inverse = ThroughRecord.relations[opts.through[1].by]
-              relatedId = (yield (yield ThroughCollection.takeBy(
-                "@doc.#{through.inverse}": @[through.refKey]
-              ,
-                $limit: 1
-              )).first())[opts.through[1].by]
-              return yield (yield RelatedToCollection.takeBy(
-                "@doc.#{inverse.refKey}": relatedId
-              ,
-                $limit: 1
-              )).first()
-              # TODO: возможно надо как то с учетом возможного задания through решить вопрос с оформлением edges в RecordMixin
+          opts = {
+            refKey
+            attr
+            inverse
+            relation
+            recordName
+            collectionName
+            through
+            get: co.wrap ->
+              RelatedToCollection = @collection.facade.retrieveProxy collectionName()
+              # NOTE: может быть ситуация, что relatedTo связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
+              unless through
+                return yield (yield RelatedToCollection.takeBy(
+                  "@doc.#{refKey}": @[attr]
+                )).first()
+              else
+                # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
+                through = @constructor.embeddings?[through[0]]
+                unless through?
+                  throw new Error "Metadata about #{through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+                ThroughRecord = @findRecordByName through.recordName()
+                inverse = ThroughRecord.relations[through[1].by]
+                relatedId = (yield (yield ThroughCollection.takeBy(
+                  "@doc.#{through.inverse}": @[through.refKey]
+                ,
+                  $limit: 1
+                )).first())[through[1].by]
+                return yield (yield RelatedToCollection.takeBy(
+                  "@doc.#{inverse.refKey}": relatedId
+                ,
+                  $limit: 1
+                )).first()
+                # TODO: возможно надо как то с учетом возможного задания through решить вопрос с оформлением edges в RecordMixin
+          }
+          property = {
+            get: opts.get
+          }
 
           @metaObject.addMetaData 'relations', vsAttr, opts
-          @public @async "#{vsAttr}": Module::RecordInterface, opts
+          @public "#{vsAttr}": Module::RecordInterface, property
           return
 
       # NOTE: отличается от relatedTo тем, что сама связь является обязательной (образуется между объектами "в иерархии"), а в @[opts.attr] обязательно должно храниться значение айдишника родительского объекта, которому "belongs to" - "принадлежит" этот объект
       # NOTE: если указана опция through, то получение данных о связи будет происходить не из @[opts.attr], а из промежуточной коллекции, где помимо айдишника объекта могут храниться дополнительные атрибуты с данными о связи
       @public @static belongsTo: Function,
         # default: (typeDefinition, {attr, recordName, collectionName, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable, validate}={})->
-        default: (typeDefinition, opts={})->
+        default: (typeDefinition, {refKey, attr, inverse, relation, recordName, collectionName, through}={})->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
-          opts.refKey ?= 'id'
-          opts.attr ?= "#{vsAttr}Id"
-          opts.inverse ?= "#{inflect.pluralize inflect.camelize @name, no}"
-          opts.relation = 'belongsTo'
+          refKey ?= 'id'
+          attr ?= "#{vsAttr}Id"
+          inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
+          relation = 'belongsTo'
 
           # # TODO: надо решить проблему с когнитивным диссанансом из-за того, что для простых relatedTo/belongsTo связей связь формулируется через строковый айдишник в атрибуте, а для through - связь формулируется через ембедед объект содержащий айдишник объекта.
           # # TODO: чтобы решить эту проблему, надо удалить из тела этого метода объявление атрибута, тем более что если through указан, здесь бы пришлось объявлять ебмед атрибут, а это уже выходит за область ответственности этого миксина
@@ -113,12 +125,12 @@ module.exports = (Module)->
           #       get?.apply(@, [@[attr]]) ? @[attr]
 
 
-          opts.recordName ?= ->
+          recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
             vsRecordName
-          opts.collectionName ?= ->
+          collectionName ?= ->
             "#{
-              inflect.pluralize opts.recordName.replace /Record$/, ''
+              inflect.pluralize recordName().replace /Record$/, ''
             }Collection"
 
             # TODO: эти valuable,.. можно удалить, так как вводится миксин для встроенных-проксируемых объектов, а решейшены оставляем только в виде промисов и только для удобства кода на сервере.
@@ -140,9 +152,97 @@ module.exports = (Module)->
             #   else
             #     @[attr] = set?.apply(@, [null]) ? null #null
             #     return
-          opts.get = co.wrap ->
-            BelongsToCollection = @collection.facade.retrieveProxy opts.collectionName
-            # NOTE: может быть ситуация, что belongsTo связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
+          opts = {
+            refKey
+            attr
+            inverse
+            relation
+            recordName
+            collectionName
+            through
+            get: co.wrap ->
+              BelongsToCollection = @collection.facade.retrieveProxy collectionName()
+              # NOTE: может быть ситуация, что belongsTo связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
+
+                # vcRecord = opts.transform.call(@)
+                # vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
+                # vsCollectionName = switch vsCollectionName
+                #   when 'UsersCollection'
+                #     Module::USERS
+                #   when 'SessionsCollection'
+                #     Module::SESSIONS
+                #   when 'SpacesCollection'
+                #     Module::SPACES
+                #   when 'MigrationsCollection'
+                #     Module::MIGRATIONS
+                #   when 'RolesCollection'
+                #     Module::ROLES
+                #   when 'UploadsCollection'
+                #     Module::UPLOADS
+                #   else
+                #     vsCollectionName
+                # voCollection = @collection.facade.retrieveProxy vsCollectionName
+
+              unless through
+                return yield (yield BelongsToCollection.takeBy(
+                  "@doc.#{refKey}": @[attr]
+                )).first()
+              else
+                # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
+                through = @constructor.embeddings?[through[0]]
+                unless through?
+                  throw new Error "Metadata about #{through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+                ThroughRecord = @findRecordByName through.recordName()
+                inverse = ThroughRecord.relations[through[1].by]
+                belongsId = (yield (yield ThroughCollection.takeBy(
+                  "@doc.#{through.inverse}": @[through.refKey]
+                ,
+                  $limit: 1
+                )).first())[through[1].by]
+                return yield (yield BelongsToCollection.takeBy(
+                  "@doc.#{inverse.refKey}": belongsId
+                ,
+                  $limit: 1
+                )).first()
+                # TODO: возможно надо как то с учетом возможного задания through решить вопрос с оформлением edges в RecordMixin
+                # TODO: в свете обдумывания edges всплыла более общая проблема для relatedTo и belongsTo - точнее для самих релейшенов проблемы вроде нет, так как они спроэктированы только на чтение связей и упрощение кода за счет их использования, однако, для работы сохраняющего айдишник атрибута возникает следующая проблема: если происходит запись (set) айдишника, но сам релейшен указан с опцией through , то айдишник не должен храниться в этом рекорде, а должен сохраняться в промежуточной коллекции чтобы геттер смог потом по сохраненным данным получить связь (код в геттере релейшена), НО этой особой логики тут не указано для сеттера!!!
+          }
+          property = {
+            get: opts.get
+          }
+
+          @metaObject.addMetaData 'relations', vsAttr, opts
+          @public "#{vsAttr}": Module::RecordInterface, property
+          return
+
+      @public @static hasMany: Function,
+        default: (typeDefinition, {refKey, inverse, relation, recordName, collectionName, through}={})->
+          recordClass = @
+          [vsAttr] = Object.keys typeDefinition
+          refKey ?= 'id'
+          inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
+          relation = 'hasMany'
+          recordName ?= ->
+            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
+            vsRecordName
+          collectionName ?= ->
+            "#{
+              inflect.pluralize recordName().replace /Record$/, ''
+            }Collection"
+          # opts.transform ?= ->
+          #   [vsModuleName, vsRecordName] = @parseRecordName vsAttr
+          #   (@Module.NS ? @Module::)[vsRecordName]
+          # opts.validate = -> joi.array().items opts.transform.call(@).schema # TODO: есть ощущение, что в релейшенах validate не нужен, т.к. они не сериализуются в респонз с сервера и в реквесте не присылаются (нужны только внутри сервера для упрощения кода)
+          opts = {
+            refKey
+            inverse
+            relation
+            recordName
+            collectionName
+            through
+            get: co.wrap ->
+              HasManyCollection = @collection.facade.retrieveProxy collectionName()
 
               # vcRecord = opts.transform.call(@)
               # vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
@@ -162,166 +262,112 @@ module.exports = (Module)->
               #   else
               #     vsCollectionName
               # voCollection = @collection.facade.retrieveProxy vsCollectionName
-
-            unless opts.through
-              return yield (yield BelongsToCollection.takeBy(
-                "@doc.#{opts.refKey}": @[opts.attr]
-              )).first()
-            else
-              # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
-              through = @constructor.embeddings?[opts.through[0]]
-              unless through?
-                throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-              ThroughCollection = @collection.facade.retrieveProxy through.collectionName
-              ThroughRecord = @findRecordByName through.recordName
-              inverse = ThroughRecord.relations[opts.through[1].by]
-              belongsId = (yield (yield ThroughCollection.takeBy(
-                "@doc.#{through.inverse}": @[through.refKey]
-              ,
-                $limit: 1
-              )).first())[opts.through[1].by]
-              return yield (yield BelongsToCollection.takeBy(
-                "@doc.#{inverse.refKey}": belongsId
-              ,
-                $limit: 1
-              )).first()
-              # TODO: возможно надо как то с учетом возможного задания through решить вопрос с оформлением edges в RecordMixin
-              # TODO: в свете обдумывания edges всплыла более общая проблема для relatedTo и belongsTo - точнее для самих релейшенов проблемы вроде нет, так как они спроэктированы только на чтение связей и упрощение кода за счет их использования, однако, для работы сохраняющего айдишник атрибута возникает следующая проблема: если происходит запись (set) айдишника, но сам релейшен указан с опцией through , то айдишник не должен храниться в этом рекорде, а должен сохраняться в промежуточной коллекции чтобы геттер смог потом по сохраненным данным получить связь (код в геттере релейшена), НО этой особой логики тут не указано для сеттера!!!
+              unless through
+                return yield HasManyCollection.takeBy(
+                  "@doc.#{inverse}": @[refKey]
+                )
+              else
+                through = @constructor.embeddings?[through[0]] ? @constructor.relations[through[0]]
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+                ThroughRecord = @findRecordByName through.recordName()
+                inverse = ThroughRecord.relations[through[1].by]
+                manyIds = yield (yield ThroughCollection.takeBy(
+                  "@doc.#{through.inverse}": @[refKey]
+                )).map (voRecord)-> voRecord[through[1].by]
+                return yield HasManyCollection.takeBy(
+                  "@doc.#{inverse.refKey}": $in: manyIds
+                )
+          }
+          property = {
+            get: opts.get
+          }
 
           @metaObject.addMetaData 'relations', vsAttr, opts
-          @public @async "#{vsAttr}": Module::RecordInterface, opts
-          return
-
-      @public @static hasMany: Function,
-        default: (typeDefinition, opts={})->
-          recordClass = @
-          [vsAttr] = Object.keys typeDefinition
-          opts.refKey ?= 'id'
-          opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
-          opts.relation = 'hasMany'
-          opts.recordName ?= ->
-            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
-            vsRecordName
-          opts.collectionName ?= ->
-            "#{
-              inflect.pluralize opts.recordName.replace /Record$/, ''
-            }Collection"
-          # opts.transform ?= ->
-          #   [vsModuleName, vsRecordName] = @parseRecordName vsAttr
-          #   (@Module.NS ? @Module::)[vsRecordName]
-          # opts.validate = -> joi.array().items opts.transform.call(@).schema # TODO: есть ощущение, что в релейшенах validate не нужен, т.к. они не сериализуются в респонз с сервера и в реквесте не присылаются (нужны только внутри сервера для упрощения кода)
-          opts.get = co.wrap ->
-            HasManyCollection = @collection.facade.retrieveProxy opts.collectionName
-
-            # vcRecord = opts.transform.call(@)
-            # vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
-            # vsCollectionName = switch vsCollectionName
-            #   when 'UsersCollection'
-            #     Module::USERS
-            #   when 'SessionsCollection'
-            #     Module::SESSIONS
-            #   when 'SpacesCollection'
-            #     Module::SPACES
-            #   when 'MigrationsCollection'
-            #     Module::MIGRATIONS
-            #   when 'RolesCollection'
-            #     Module::ROLES
-            #   when 'UploadsCollection'
-            #     Module::UPLOADS
-            #   else
-            #     vsCollectionName
-            # voCollection = @collection.facade.retrieveProxy vsCollectionName
-            unless opts.through
-              return yield HasManyCollection.takeBy(
-                "@doc.#{opts.inverse}": @[opts.refKey]
-              )
-            else
-              through = @constructor.embeddings?[opts.through[0]] ? @constructor.relations[opts.through[0]]
-              ThroughCollection = @collection.facade.retrieveProxy through.collectionName
-              ThroughRecord = @findRecordByName through.recordName
-              inverse = ThroughRecord.relations[opts.through[1].by]
-              manyIds = yield (yield ThroughCollection.takeBy(
-                "@doc.#{through.inverse}": @[opts.refKey]
-              )).map (voRecord)-> voRecord[opts.through[1].by]
-              return yield HasManyCollection.takeBy(
-                "@doc.#{inverse.refKey}": $in: manyIds
-              )
-
-          @metaObject.addMetaData 'relations', vsAttr, opts
-          @public @async "#{vsAttr}": Module::CursorInterface, opts
+          @public "#{vsAttr}": Module::CursorInterface, property
           return
 
       @public @static hasOne: Function,
-        default: (typeDefinition, opts={})->
+        default: (typeDefinition, {refKey, inverse, relation, recordName, collectionName, through}={})->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
-          opts.refKey ?= 'id'
-          opts.inverse ?= "#{inflect.singularize inflect.camelize @name, no}Id"
-          opts.relation = 'hasOne'
-          opts.recordName ?= ->
+          refKey ?= 'id'
+          inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
+          relation = 'hasOne'
+          recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
             vsRecordName
-          opts.collectionName ?= ->
+          collectionName ?= ->
             "#{
-              inflect.pluralize opts.recordName.replace /Record$/, ''
+              inflect.pluralize recordName().replace /Record$/, ''
             }Collection"
           # opts.transform ?= ->
           #   [vsModuleName, vsRecordName] = @parseRecordName vsAttr
           #   (@Module.NS ? @Module::)[vsRecordName]
           # opts.validate = -> opts.transform.call(@).schema # TODO: есть ощущение, что в релейшенах validate не нужен, т.к. они не сериализуются в респонз с сервера и в реквесте не присылаются (нужны только внутри сервера для упрощения кода)
-          opts.get = co.wrap ->
-            HasOneCollection = @collection.facade.retrieveProxy opts.collectionName
-            # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
+          opts = {
+            refKey
+            inverse
+            relation
+            recordName
+            collectionName
+            through
+            get: co.wrap ->
+              HasOneCollection = @collection.facade.retrieveProxy collectionName()
+              # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
-            # vcRecord = opts.transform.call(@)
-            # vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
-            # vsCollectionName = switch vsCollectionName
-            #   when 'UsersCollection'
-            #     Module::USERS
-            #   when 'SessionsCollection'
-            #     Module::SESSIONS
-            #   when 'SpacesCollection'
-            #     Module::SPACES
-            #   when 'MigrationsCollection'
-            #     Module::MIGRATIONS
-            #   when 'RolesCollection'
-            #     Module::ROLES
-            #   when 'UploadsCollection'
-            #     Module::UPLOADS
-            #   else
-            #     vsCollectionName
-            # voCollection = @collection.facade.retrieveProxy vsCollectionName
-            unless opts.through
-              return yield (yield HasOneCollection.takeBy(
-                "@doc.#{opts.inverse}": @[opts.refKey]
-              ,
-                $limit: 1
-              )).first()
-            else
-              through = @constructor.embeddings?[opts.through[0]] ? @constructor.relations[opts.through[0]]
-              ThroughCollection = @collection.facade.retrieveProxy through.collectionName
-              ThroughRecord = @findRecordByName through.recordName
-              inverse = ThroughRecord.relations[opts.through[1].by]
-              oneId = (yield (yield ThroughCollection.takeBy(
-                "@doc.#{through.inverse}": @[opts.refKey]
-              ,
-                $limit: 1
-              )).first())[opts.through[1].by]
-              return yield (yield HasOneCollection.takeBy(
-                "@doc.#{inverse.refKey}": oneId
-              ,
-                $limit: 1
-              )).first()
+              # vcRecord = opts.transform.call(@)
+              # vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
+              # vsCollectionName = switch vsCollectionName
+              #   when 'UsersCollection'
+              #     Module::USERS
+              #   when 'SessionsCollection'
+              #     Module::SESSIONS
+              #   when 'SpacesCollection'
+              #     Module::SPACES
+              #   when 'MigrationsCollection'
+              #     Module::MIGRATIONS
+              #   when 'RolesCollection'
+              #     Module::ROLES
+              #   when 'UploadsCollection'
+              #     Module::UPLOADS
+              #   else
+              #     vsCollectionName
+              # voCollection = @collection.facade.retrieveProxy vsCollectionName
+              unless through
+                return yield (yield HasOneCollection.takeBy(
+                  "@doc.#{inverse}": @[refKey]
+                ,
+                  $limit: 1
+                )).first()
+              else
+                through = @constructor.embeddings?[through[0]] ? @constructor.relations[through[0]]
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+                ThroughRecord = @findRecordByName through.recordName()
+                inverse = ThroughRecord.relations[through[1].by]
+                oneId = (yield (yield ThroughCollection.takeBy(
+                  "@doc.#{through.inverse}": @[refKey]
+                ,
+                  $limit: 1
+                )).first())[through[1].by]
+                return yield (yield HasOneCollection.takeBy(
+                  "@doc.#{inverse.refKey}": oneId
+                ,
+                  $limit: 1
+                )).first()
+          }
+          property = {
+            get: opts.get
+          }
 
           @metaObject.addMetaData 'relations', vsAttr, opts
-          @public @async "#{vsAttr}": Module::RecordInterface, opts
+          @public "#{vsAttr}": Module::RecordInterface, property
           return
 
       # Cucumber.inverseFor 'tomato' #-> {recordClass: App::Tomato, attrName: 'cucumbers', relation: 'hasMany'}
       @public @static inverseFor: Function,
         default: (asAttrName)->
           opts = @relations[asAttrName]
-          RecordClass = @findRecordByName opts.recordName
+          RecordClass = @findRecordByName opts.recordName()
           {inverse:attrName} = opts
           {relation} = RecordClass.relations[attrName]
           return {recordClass: RecordClass, attrName, relation}

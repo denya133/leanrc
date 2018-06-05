@@ -113,13 +113,13 @@ module.exports = (Module)->
       @public @async @virtual reload: Function,
         args: []
         return: Module::RecordInterface
-      @public @virtual changedAttributes: Function,
+      @public @async @virtual changedAttributes: Function,
         args: []
         return: Object # { isAdmin: [undefined, true], name: [undefined, 'Tomster'] }
-      @public @virtual resetAttribute: Function,
+      @public @async @virtual resetAttribute: Function,
         args: [String]
         return: NILL
-      @public @virtual rollbackAttributes: Function,
+      @public @async @virtual rollbackAttributes: Function,
         args: []
         return: NILL
 

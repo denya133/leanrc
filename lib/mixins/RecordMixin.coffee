@@ -180,15 +180,22 @@ module.exports = (Module)->
       @public @static new: Function,
         default: (aoAttributes, aoCollection)->
           aoAttributes ?= {}
-          if aoAttributes.type?
-            if @name is aoAttributes.type.split('::')[1]
-              @super arguments...
-            else
-              RecordClass = @findRecordByName aoAttributes.type
-              RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
-          else
-            aoAttributes.type = "#{@moduleName()}::#{@name}"
+          # if aoAttributes.type?
+          #   if @name is aoAttributes.type.split('::')[1]
+          #     @super aoAttributes, aoCollection
+          #   else
+          #     RecordClass = @findRecordByName aoAttributes.type
+          #     RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
+          # else
+          #   aoAttributes.type = "#{@moduleName()}::#{@name}"
+          #   @super aoAttributes, aoCollection
+          unless aoAttributes.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          if @name is aoAttributes.type.split('::')[1]
             @super aoAttributes, aoCollection
+          else
+            RecordClass = @findRecordByName aoAttributes.type
+            RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
 
       @public @async save: Function,
         default: ->
@@ -208,7 +215,7 @@ module.exports = (Module)->
           # for own key of @constructor.attributes
           #   vhAttributes[key] = @[key]
           # @[ipoInternalRecord] = vhAttributes
-          @[ipoInternalRecord] = @constructor.objectize response
+          @[ipoInternalRecord] = @constructor.makeSnapshot response
           yield return @
 
       @public @async update: Function,
@@ -218,7 +225,7 @@ module.exports = (Module)->
           # for own key of @constructor.attributes
           #   vhAttributes[key] = @[key]
           # @[ipoInternalRecord] = vhAttributes
-          @[ipoInternalRecord] = @constructor.objectize response
+          @[ipoInternalRecord] = @constructor.makeSnapshot response
           yield return @
 
       @public @async delete: Function,
@@ -282,8 +289,7 @@ module.exports = (Module)->
       @public @async updateAttributes: Function,
         default: (aoAttributes)->
           for own vsAttrName, voAttrValue of aoAttributes
-            do (vsAttrName, voAttrValue)=>
-              @[vsAttrName] = voAttrValue
+            @[vsAttrName] = voAttrValue
           yield @save()
 
       @public @async isNew: Function,
@@ -297,28 +303,31 @@ module.exports = (Module)->
         return: Module::RecordInterface
 
       # TODO: не учтены установки значений, которые раньше не были установлены
-      @public changedAttributes: Function,
+      @public @async changedAttributes: Function,
         default: ->
           vhResult = {}
           for own vsAttrName, { transform } of @constructor.attributes
-            voOldValue = @[ipoInternalRecord][vsAttrName]
+            voOldValue = @[ipoInternalRecord]?[vsAttrName]
             voNewValue = transform.call(@constructor).objectize @[vsAttrName]
             unless _.isEqual voNewValue, voOldValue
               vhResult[vsAttrName] = [voOldValue, voNewValue]
-          vhResult
+          yield return vhResult
 
-      @public resetAttribute: Function,
+      @public @async resetAttribute: Function,
         default: (asAttribute)->
-          { transform } = @constructor.attributes[asAttribute]
-          @[asAttribute] = transform.call(@constructor).normalize @[ipoInternalRecord][asAttribute]
-          return
+          if @[ipoInternalRecord]?
+            if (attrConf = @constructor.attributes[asAttribute])?
+              { transform } = attrConf
+              @[asAttribute] = yield transform.call(@constructor).normalize @[ipoInternalRecord][asAttribute]
+          yield return
 
-      @public rollbackAttributes: Function,
+      @public @async rollbackAttributes: Function,
         default: ->
-          for own vsAttrName, { transform } of @constructor.attributes
-            voOldValue = @[ipoInternalRecord][vsAttrName]
-            @[vsAttrName] = transform.call(@constructor).normalize voOldValue
-          return
+          if @[ipoInternalRecord]?
+            for own vsAttrName, { transform } of @constructor.attributes
+              voOldValue = @[ipoInternalRecord][vsAttrName]
+              @[vsAttrName] = yield transform.call(@constructor).normalize voOldValue
+          yield return
 
       @public @static @async normalize: Function,
         default: (ahPayload, aoCollection)->
@@ -343,10 +352,10 @@ module.exports = (Module)->
           voRecord = RecordClass.new vhAttributes, aoCollection
           # TODO: так как vhAttributes может содержать атрибуты сложных типов (массивы, объекты, другие рекорды), НО глубокого копирования не происходит, то в `ipoInternalRecord` атрибуты так же будут ссылаться на эти же структуры, а следовательно `changedAttributes`, `resetAttribute` и `rollbackAttributes` - не смогут отатить их изменения или вернуть дельты изменений
           # TODO: для того, чтобы `ipoInternalRecord` имел валидный слепок с рекорда, в него надо записывать результат objectize'а рекорда
-          voRecord[ipoInternalRecord] = RecordClass.objectize voRecord
+          voRecord[ipoInternalRecord] = voRecord.constructor.makeSnapshot voRecord
           yield return voRecord
 
-      @public @static @async serialize:   Function,
+      @public @static @async serialize: Function,
         default: (aoRecord)->
           unless aoRecord?
             return null
@@ -359,7 +368,33 @@ module.exports = (Module)->
             vhResult[asAttr] = yield transform.call(@).serialize aoRecord[asAttr]
           yield return vhResult
 
-      @public @static objectize:   Function,
+      @public @static @async recoverize: Function,
+        default: (ahPayload, aoCollection)->
+          unless ahPayload?
+            return null
+          vhAttributes = {}
+
+          unless ahPayload.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+
+          RecordClass = if @name is ahPayload.type.split('::')[1]
+            @
+          else
+            @findRecordByName ahPayload.type
+
+          for own asAttr, { transform } of RecordClass.attributes
+            vhAttributes[asAttr] = yield transform.call(RecordClass).normalize ahPayload[asAttr]
+
+          vhAttributes.type = ahPayload.type
+          # NOTE: vhAttributes processed before new - it for StateMachine in record (when it has)
+
+          voRecord = RecordClass.new vhAttributes, aoCollection
+          # TODO: так как vhAttributes может содержать атрибуты сложных типов (массивы, объекты, другие рекорды), НО глубокого копирования не происходит, то в `ipoInternalRecord` атрибуты так же будут ссылаться на эти же структуры, а следовательно `changedAttributes`, `resetAttribute` и `rollbackAttributes` - не смогут отатить их изменения или вернуть дельты изменений
+          # TODO: для того, чтобы `ipoInternalRecord` имел валидный слепок с рекорда, в него надо записывать результат objectize'а рекорда
+          # voRecord[ipoInternalRecord] = voRecord.constructor.objectize voRecord
+          yield return voRecord
+
+      @public @static objectize: Function,
         default: (aoRecord)->
           unless aoRecord?
             return null
@@ -375,6 +410,22 @@ module.exports = (Module)->
             vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
           for own asAttr, { transform } of aoRecord.constructor.computeds
             vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
+          return vhResult
+
+      @public @static makeSnapshot: Function,
+        default: (aoRecord)->
+          unless aoRecord?
+            return null
+
+          unless aoRecord.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+
+          vhResult = {}
+          # for own asAttr, ahValue of aoRecord.constructor.attributes
+          #   vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>
+          #     transform.call(@).objectize aoRecord[asAttr]
+          for own asAttr, { transform } of aoRecord.constructor.attributes
+            vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
           vhResult
 
       @public @static @async restoreObject: Function,
@@ -384,11 +435,10 @@ module.exports = (Module)->
             facade = Facade.getInstance replica.multitonKey
             collection = facade.retrieveProxy replica.collectionName
             if replica.isNew
-              instance = collection.build replica.attributes
+              # NOTE: оставлено временно для обратной совместимости. Понятно что в будущем надо эту ветку удалить.
+              instance = yield collection.build replica.attributes
             else
               instance = yield collection.find replica.id
-              for own vsAttrName, voAttrValue of replica.attributes
-                instance[vsAttrName] = voAttrValue
             yield return instance
           else
             return yield @super Module, replica
@@ -401,23 +451,29 @@ module.exports = (Module)->
           replica.collectionName = instance.collection.getProxyName()
           replica.isNew = yield instance.isNew()
           if replica.isNew
-            replica.attributes = yield @objectize instance
+            throw new Error "Replicating record is `new`. It must be seved previously"
           else
+            changedAttributes = yield instance.changedAttributes()
+            if (changedKeys = Object.keys changedAttributes).length > 0
+              throw new Error "Replicating record has changedAttributes #{changedKeys}"
             replica.id = instance.id
-            replica.attributes = instance.changedAttributes()
           yield return replica
 
       @public init: Function,
         default: (aoProperties, aoCollection) ->
           @super arguments...
           @collection = aoCollection
-          { attributes } = @constructor
+          # { attributes } = @constructor
+          # console.log '>>>>>>>> RecordMixin.init 111', aoProperties, aoCollection, @collection
+          # for own vsAttrName, voAttrValue of aoProperties
+          #   unless attributes[vsAttrName]?
+          #     @[vsAttrName] = voAttrValue
+          # for own vsAttrName, { transform } of attributes
+          #   voAttrValue = aoProperties[vsAttrName]
+          #   @[vsAttrName] = yield transform.call(@constructor).normalize voAttrValue
+          # console.log '>>>>>>>> RecordMixin.init 222', @type
           for own vsAttrName, voAttrValue of aoProperties
-            unless attributes[vsAttrName]?
-              @[vsAttrName] = voAttrValue
-          for own vsAttrName, { transform } of attributes
-            voAttrValue = aoProperties[vsAttrName]
-            @[vsAttrName] = transform.call(@constructor).normalize voAttrValue
+            @[vsAttrName] = voAttrValue
           return
 
       @public toJSON: Function, { default: -> @constructor.objectize @ }

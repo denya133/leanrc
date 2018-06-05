@@ -4,7 +4,7 @@
 module.exports = (Module)->
   {
     CoreObject
-    Utils: { _, inflect, joi }
+    Utils: { _, inflect, joi, moment }
   } = Module::
 
   class ObjectTransform extends CoreObject
@@ -13,15 +13,7 @@ module.exports = (Module)->
     @module Module
 
     @public @static schema: Object,
-      get: ->
-        joi.alternatives(joi.object(), joi.any()).when [
-          joi.string(), joi.number(), joi.boolean(), joi.date()
-          joi.array().items(joi.any()), joi.binary(), joi.func()
-        ],
-          then: joi.any().error new Error 'Was really expecting an object'  # если по any попал не объект, то выдастся ошибка
-          otherwise: joi.any() # остается только объект с любыми ключами
-
-    # TODO: надо проверить будет ли валидация схемы joi.object() пропускать объекты с любыми ключами? (отличается ли это от схемы пустого объекта joi.object({}))
+      get: -> joi.object().empty(null).default(null)
 
     @public @static parseRecordName: Function,
       default: (asName)->
@@ -47,10 +39,10 @@ module.exports = (Module)->
         result = {}
         for own key, value of serialized
           result[key] = switch
+            when _.isString(value) and moment(value, moment.ISO_8601).isValid()
+              yield Module::DateTransform.normalize value
             when _.isString value
               yield Module::StringTransform.normalize value
-            when _.isDate value
-              yield Module::DateTransform.normalize value
             when _.isNumber value
               yield Module::NumberTransform.normalize value
             when _.isBoolean value
@@ -78,13 +70,13 @@ module.exports = (Module)->
           result[key] = switch
             when _.isString value
               yield Module::StringTransform.serialize value
-            when _.isDate value
-              yield Module::DateTransform.serialize value
             when _.isNumber value
               yield Module::NumberTransform.serialize value
             when _.isBoolean value
               yield Module::BooleanTransform.serialize value
-            when _.isPlainObject(value) and /.{2,}[:][:].{2,}/.test value.type
+            when _.isDate value
+              Module::DateTransform.objectize value
+            when _.isObject(value) and /.{2,}[:][:].{2,}/.test value.type
               RecordClass = @findRecordByName value.type
               yield RecordClass.serialize value
             when _.isPlainObject value
@@ -105,13 +97,13 @@ module.exports = (Module)->
           result[key] = switch
             when _.isString value
               Module::StringTransform.objectize value
-            when _.isDate value
-              Module::DateTransform.objectize value
             when _.isNumber value
               Module::NumberTransform.objectize value
             when _.isBoolean value
               Module::BooleanTransform.objectize value
-            when _.isPlainObject(value) and /.{2,}[:][:].{2,}/.test value.type
+            when _.isDate value
+              Module::DateTransform.objectize value
+            when _.isObject(value) and /.{2,}[:][:].{2,}/.test value.type
               RecordClass = @findRecordByName value.type
               RecordClass.objectize value
             when _.isPlainObject value
