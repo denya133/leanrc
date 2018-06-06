@@ -12,6 +12,8 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
+      ipoInternalRecord = @instanceVariables['~internalRecord'].pointer
+
       @public @static schema: Object,
         default: {}
         get: (_data)->
