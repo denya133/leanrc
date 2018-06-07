@@ -99,7 +99,10 @@ class LeanRC extends RC
   require('./patterns/data_mapper/NumberTransform') LeanRC
   require('./patterns/data_mapper/DateTransform') LeanRC
   require('./patterns/data_mapper/BooleanTransform') LeanRC
+  require('./patterns/data_mapper/ObjectTransform') LeanRC
+  require('./patterns/data_mapper/ArrayTransform') LeanRC
   require('./patterns/data_mapper/Serializer') LeanRC
+  require('./patterns/data_mapper/Objectizer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
   require('./patterns/data_mapper/DelayedQueue') LeanRC
 
@@ -137,6 +140,7 @@ class LeanRC extends RC
   require('./mixins/CrudRendererMixin') LeanRC # needs test
   require('./mixins/TemplatableModuleMixin') LeanRC # needs test
   require('./mixins/NamespaceModuleMixin') LeanRC # needs test
+  require('./mixins/EmbeddableRecordMixin') LeanRC # needs test
 
   require('./patterns/gateway/CreateEndpoint') LeanRC
   require('./patterns/gateway/DetailEndpoint') LeanRC

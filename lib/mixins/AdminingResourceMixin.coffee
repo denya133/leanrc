@@ -46,10 +46,10 @@ module.exports = (Module)->
         default: (args...)->
           unless @recordId?
             @context.throw HTTP_NOT_FOUND
-          unless (yield @collection.exists
+          unless (yield @collection.exists(
             '@doc.id': $eq: @recordId
             '@doc.spaces': $all: ['_internal']
-          )
+          ))
             @context.throw HTTP_NOT_FOUND
           yield return args
 
@@ -80,9 +80,9 @@ module.exports = (Module)->
       ipoCheckRole = @private @async checkRole: Function,
         default: (spaceId, userId, action)->
           RolesCollection = @facade.retrieveProxy ROLES
-          role = yield (yield RolesCollection.findBy
+          role = yield (yield RolesCollection.findBy(
             spaceUser: {spaceId, userId}
-          ).first()
+          )).first()
           resourceKey = "#{@Module.name}::#{@constructor.name}"
           unless role?
             yield return no

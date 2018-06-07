@@ -1,10 +1,14 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-{ co } = LeanRC::Utils
+{ co, joi } = LeanRC::Utils
 Transform = LeanRC::Transform
 
 describe 'Transform', ->
+  describe '.schema', ->
+    it 'should has correct schema value', ->
+      expect Transform.schema
+      .deep.equal joi.any()
   describe '.normalize', ->
     it 'should normalize null value', ->
       co ->

@@ -13,7 +13,7 @@ module.exports = (Module)->
       # конструктор принимает второй аргумент, ссылку на коллекцию.
       @public collection: Module::CollectionInterface
 
-      ipoInternalRecord = @private internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
+      ipoInternalRecord = @protected internalRecord: Object
 
       @public @static schema: Object,
         default: {}
@@ -21,6 +21,13 @@ module.exports = (Module)->
           _data[@name] ?= do =>
             vhAttrs = {}
             for own asAttr, ahValue of @attributes
+              vhAttrs[asAttr] = do (asAttr, ahValue)=>
+                if _.isFunction ahValue.validate
+                  ahValue.validate.call(@)
+                else
+                  ahValue.validate
+
+            for own asAttr, ahValue of @computeds
               vhAttrs[asAttr] = do (asAttr, ahValue)=>
                 if _.isFunction ahValue.validate
                   ahValue.validate.call(@)
@@ -55,13 +62,6 @@ module.exports = (Module)->
         default: (asName)->
           @constructor.findRecordByName asName
 
-      #########################################################################
-
-      # # под вопросом ??????
-      # @public updateEdges: Function, [ANY], -> ANY # any type
-
-      #########################################################################
-
       ###
         @customFilter ->
           reason:
@@ -93,8 +93,6 @@ module.exports = (Module)->
 
       @public @static attributes: Object,
         get: -> @metaObject.getGroup 'attributes', no
-      @public @static edges: Object,
-        get: -> @metaObject.getGroup 'edges', no
       @public @static computeds: Object,
         get: -> @metaObject.getGroup 'computeds', no
 
@@ -107,16 +105,13 @@ module.exports = (Module)->
         default: (typeDefinition, opts={})->
           [vsAttr] = Object.keys typeDefinition
           vcAttrType = typeDefinition[vsAttr]
+          # NOTE: это всего лишь автоматическое применение трансформа, если он не указан явно. здесь НЕ надо автоматически подставить нужный рекорд или кастомный трансформ - они если должны использоваться, должны быть указаны вручную в схеме рекорда программистом.
           opts.transform ?= switch vcAttrType
-            when String, Date, Number, Boolean
+            when String, Date, Number, Boolean, Array, Object
               -> Module::["#{vcAttrType.name}Transform"]
             else
               -> Module::Transform
-          opts.validate ?= switch vcAttrType
-            when String, Date, Number, Boolean
-              -> joi[inflect.underscore vcAttrType.name]()
-            else
-              -> joi.object()
+          opts.validate ?= -> opts.transform.call(@).schema
           {set} = opts
           opts.set = (aoData)->
             {value:voData} = opts.validate.call(@).validate aoData
@@ -125,10 +120,9 @@ module.exports = (Module)->
             else
               voData
           if @attributes[vsAttr]?
-            throw new Error "attr `#{vsAttr}` has been defined previously"
+            throw new Error "attribute `#{vsAttr}` has been defined previously"
           else
             @metaObject.addMetaData 'attributes', vsAttr, opts
-            @metaObject.addMetaData 'edges', vsAttr, opts if opts.through
           @public typeDefinition, opts
           return
 
@@ -137,16 +131,27 @@ module.exports = (Module)->
           @comp arguments...
           return
 
+      # NOTE: изначальная задумка была в том, чтобы определять вычисляемые значения - НЕ ПРОМИСЫ! (т.е. некоторое значение, которое отправляется в респонзе реально не хранится в базе, но вычисляется НЕ асинхронной функцией-гетером)
       @public @static comp: Function,
         default: (args...)->
           [typeDefinition, ..., opts] = args
           if typeDefinition is opts
             typeDefinition = "#{opts.attr}": opts.attrType
           [vsAttr] = Object.keys typeDefinition
+          vcAttrType = typeDefinition[vsAttr]
+          # NOTE: это всего лишь автоматическое применение трансформа, если он не указан явно. здесь не надо автоматически подставить нужный рекорд или кастомный трансформ - они если должны использоваться, должны быть указаны вручную в схеме рекорда программистом.
+          opts.transform ?= switch vcAttrType
+            when String, Date, Number, Boolean, Array, Object
+              -> Module::["#{vcAttrType.name}Transform"]
+            else
+              -> Module::Transform
+          opts.validate ?= -> opts.transform.call(@).schema.strip()
           unless opts.get?
-            return throw new Error '`lambda` options is required'
+            throw new Error 'getter `lambda` options is required'
+          if opts.set?
+            throw new Error 'setter `lambda` options is forbidden'
           if @computeds[vsAttr]?
-            throw new Error "comp `#{vsAttr}` has been defined previously"
+            throw new Error "computed `#{vsAttr}` has been defined previously"
           else
             @metaObject.addMetaData 'computeds', vsAttr, opts
           @public typeDefinition, opts
@@ -155,15 +160,14 @@ module.exports = (Module)->
       @public @static new: Function,
         default: (aoAttributes, aoCollection)->
           aoAttributes ?= {}
-          if aoAttributes.type?
-            if @name is aoAttributes.type.split('::')[1]
-              @super arguments...
-            else
-              RecordClass = @findRecordByName aoAttributes.type
-              RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
-          else
-            aoAttributes.type = "#{@moduleName()}::#{@name}"
+
+          unless aoAttributes.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          if @name is aoAttributes.type.split('::')[1]
             @super aoAttributes, aoCollection
+          else
+            RecordClass = @findRecordByName aoAttributes.type
+            RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
 
       @public @async save: Function,
         default: ->
@@ -179,19 +183,13 @@ module.exports = (Module)->
           if response?
             { id } = response
             @id ?= id if id
-          vhAttributes = {}
-          for own key of @constructor.attributes
-            vhAttributes[key] = @[key]
-          @[ipoInternalRecord] = vhAttributes
+          @[ipoInternalRecord] = @constructor.makeSnapshot response
           yield return @
 
       @public @async update: Function,
         default: ->
-          yield @collection.override @id, @
-          vhAttributes = {}
-          for own key of @constructor.attributes
-            vhAttributes[key] = @[key]
-          @[ipoInternalRecord] = vhAttributes
+          response = yield @collection.override @id, @
+          @[ipoInternalRecord] = @constructor.makeSnapshot response
           yield return @
 
       @public @async delete: Function,
@@ -213,9 +211,11 @@ module.exports = (Module)->
         args: []
         return: Array
 
+      # NOTE: в оперативной памяти создается клон рекорда, НО с другим id
       @public @async clone: Function,
         default: -> yield @collection.clone @
 
+      # NOTE: в коллекции создается копия рекорда, НО с другим id
       @public @async copy: Function,
         default: -> yield @collection.copy @
 
@@ -253,8 +253,7 @@ module.exports = (Module)->
       @public @async updateAttributes: Function,
         default: (aoAttributes)->
           for own vsAttrName, voAttrValue of aoAttributes
-            do (vsAttrName, voAttrValue)=>
-              @[vsAttrName] = voAttrValue
+            @[vsAttrName] = voAttrValue
           yield @save()
 
       @public @async isNew: Function,
@@ -262,32 +261,37 @@ module.exports = (Module)->
           return yes  unless @id?
           return not (yield @collection.includes @id)
 
+      # TODO: надо реализовать, НО пока не понятно как перезагрузить все атрибуты этого же рекорда новыми значениями из базы данных?
       @public @async @virtual reload: Function,
         args: []
         return: Module::RecordInterface
 
       # TODO: не учтены установки значений, которые раньше не были установлены
-      @public changedAttributes: Function,
+      @public @async changedAttributes: Function,
         default: ->
           vhResult = {}
-          for own vsAttrName, voAttrValue of @[ipoInternalRecord]
-            do (vsAttrName, voAttrValue)=>
-              if @[vsAttrName] isnt voAttrValue
-                vhResult[vsAttrName] = [voAttrValue, @[vsAttrName]]
-          vhResult
+          for own vsAttrName, { transform } of @constructor.attributes
+            voOldValue = @[ipoInternalRecord]?[vsAttrName]
+            voNewValue = transform.call(@constructor).objectize @[vsAttrName]
+            unless _.isEqual voNewValue, voOldValue
+              vhResult[vsAttrName] = [voOldValue, voNewValue]
+          yield return vhResult
 
-      @public resetAttribute: Function,
+      @public @async resetAttribute: Function,
         default: (asAttribute)->
-          @[asAttribute] = @[ipoInternalRecord][asAttribute]
-          return
+          if @[ipoInternalRecord]?
+            if (attrConf = @constructor.attributes[asAttribute])?
+              { transform } = attrConf
+              @[asAttribute] = yield transform.call(@constructor).normalize @[ipoInternalRecord][asAttribute]
+          yield return
 
-      @public rollbackAttributes: Function,
+      @public @async rollbackAttributes: Function,
         default: ->
-          for own vsAttrName, voAttrValue of @[ipoInternalRecord]
-            do (vsAttrName, voAttrValue)=>
-              @[vsAttrName] = voAttrValue
-          return
-
+          if @[ipoInternalRecord]?
+            for own vsAttrName, { transform } of @constructor.attributes
+              voOldValue = @[ipoInternalRecord][vsAttrName]
+              @[vsAttrName] = yield transform.call(@constructor).normalize voOldValue
+          yield return
 
       @public @static @async normalize: Function,
         default: (ahPayload, aoCollection)->
@@ -309,11 +313,12 @@ module.exports = (Module)->
           vhAttributes.type = ahPayload.type
           # NOTE: vhAttributes processed before new - it for StateMachine in record (when it has)
 
-          result = RecordClass.new vhAttributes, aoCollection
-          result[ipoInternalRecord] = vhAttributes
-          yield return result
+          voRecord = RecordClass.new vhAttributes, aoCollection
 
-      @public @static @async serialize:   Function,
+          voRecord[ipoInternalRecord] = voRecord.constructor.makeSnapshot voRecord
+          yield return voRecord
+
+      @public @static @async serialize: Function,
         default: (aoRecord)->
           unless aoRecord?
             return null
@@ -326,7 +331,31 @@ module.exports = (Module)->
             vhResult[asAttr] = yield transform.call(@).serialize aoRecord[asAttr]
           yield return vhResult
 
-      @public @static objectize:   Function,
+      @public @static @async recoverize: Function,
+        default: (ahPayload, aoCollection)->
+          unless ahPayload?
+            return null
+          vhAttributes = {}
+
+          unless ahPayload.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+
+          RecordClass = if @name is ahPayload.type.split('::')[1]
+            @
+          else
+            @findRecordByName ahPayload.type
+
+          for own asAttr, { transform } of RecordClass.attributes
+            vhAttributes[asAttr] = yield transform.call(RecordClass).normalize ahPayload[asAttr]
+
+          vhAttributes.type = ahPayload.type
+          # NOTE: vhAttributes processed before new - it for StateMachine in record (when it has)
+
+          voRecord = RecordClass.new vhAttributes, aoCollection
+
+          yield return voRecord
+
+      @public @static objectize: Function,
         default: (aoRecord)->
           unless aoRecord?
             return null
@@ -335,9 +364,23 @@ module.exports = (Module)->
             throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
 
           vhResult = {}
-          # for own asAttr, ahValue of aoRecord.constructor.attributes
-          #   vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>
-          #     transform.call(@).objectize aoRecord[asAttr]
+
+          for own asAttr, { transform } of aoRecord.constructor.attributes
+            vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
+          for own asAttr, { transform } of aoRecord.constructor.computeds
+            vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
+          return vhResult
+
+      @public @static makeSnapshot: Function,
+        default: (aoRecord)->
+          unless aoRecord?
+            return null
+
+          unless aoRecord.type?
+            throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+
+          vhResult = {}
+
           for own asAttr, { transform } of aoRecord.constructor.attributes
             vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
           vhResult
@@ -348,10 +391,11 @@ module.exports = (Module)->
             Facade = Module::ApplicationFacade ? Module::Facade
             facade = Facade.getInstance replica.multitonKey
             collection = facade.retrieveProxy replica.collectionName
-            instance = if replica.isNew
-              collection.build replica.attributes
+            if replica.isNew
+              # NOTE: оставлено временно для обратной совместимости. Понятно что в будущем надо эту ветку удалить.
+              instance = yield collection.build replica.attributes
             else
-              yield collection.find replica.id
+              instance = yield collection.find replica.id
             yield return instance
           else
             return yield @super Module, replica
@@ -364,19 +408,22 @@ module.exports = (Module)->
           replica.collectionName = instance.collection.getProxyName()
           replica.isNew = yield instance.isNew()
           if replica.isNew
-            replica.attributes = yield @serialize instance
+            throw new Error "Replicating record is `new`. It must be seved previously"
           else
+            changedAttributes = yield instance.changedAttributes()
+            if (changedKeys = Object.keys changedAttributes).length > 0
+              throw new Error "Replicating record has changedAttributes #{changedKeys}"
             replica.id = instance.id
-            replica.attributes = instance.changedAttributes()
           yield return replica
 
       @public init: Function,
         default: (aoProperties, aoCollection) ->
           @super arguments...
           @collection = aoCollection
+
           for own vsAttrName, voAttrValue of aoProperties
-            do (vsAttrName, voAttrValue)=>
-              @[vsAttrName] = voAttrValue
+            @[vsAttrName] = voAttrValue
+          return
 
       @public toJSON: Function, { default: -> @constructor.objectize @ }
 

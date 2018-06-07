@@ -32,10 +32,10 @@ describe 'MemoryCollectionMixin', ->
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -49,7 +49,7 @@ describe 'MemoryCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         spyPush = sinon.spy collection, 'push'
         assert.instanceOf collection, Test::MemoryCollection
-        record = Test::TestRecord.new test: 'test1', collection
+        record = Test::TestRecord.new {test: 'test1', type: 'Test::TestRecord'}, collection
         record.id = yield collection.generateId()
         yield collection.push record
         assert.equal record, spyPush.args[0][0]
@@ -233,9 +233,10 @@ describe 'MemoryCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, Test::MemoryCollection
         record = yield collection.create test: 'test1'
-        raw = collection.build
+        raw = yield collection.build(
           id: record.id
           test: 'test2'
+        )
         updatedRecord = yield collection.override record.id, raw
         assert.isDefined updatedRecord
         assert.equal record.id, updatedRecord.id
@@ -272,9 +273,10 @@ describe 'MemoryCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, Test::MemoryCollection
         record = yield collection.create test: 'test1'
-        raw = collection.build
+        raw = yield collection.build(
           id: record.id
           test: 'test2'
+        )
         updatedRecord = yield collection.patch record.id, raw
         assert.isDefined updatedRecord
         assert.equal record.id, updatedRecord.id

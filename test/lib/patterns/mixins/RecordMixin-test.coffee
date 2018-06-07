@@ -62,7 +62,7 @@ describe 'RecordMixin', ->
               Test::TestRecord
           @attr type: String
         Test::TestRecord.initialize()
-        vsRecord = Test::TestRecord.new()
+        vsRecord = Test::TestRecord.new({type: 'Test::TestRecord'})
         parsedName = vsRecord.parseRecordName 'test-record'
         assert.deepEqual parsedName, ['Test', 'TestRecord'], 'Parsed incorrectly'
         parsedName = vsRecord.parseRecordName 'Tester::Test'
@@ -103,15 +103,13 @@ describe 'RecordMixin', ->
           @attr type: String
           @attribute string: String
           @attr number: Number
-          @attribute boolean: Boolean,
-            through: 'Test'
           @attr date: Date
+          @attr boolean: Boolean
         Test::TestRecord.initialize()
         assert.isTrue 'string' of Test::TestRecord.attributes, 'Attribute `string` did not defined'
         assert.isTrue 'number' of Test::TestRecord.attributes, 'Attribute `number` did not defined'
         assert.isTrue 'boolean' of Test::TestRecord.attributes, 'Attribute `boolean` did not defined'
         assert.isTrue 'date' of Test::TestRecord.attributes, 'Attribute `date` did not defined'
-        assert.equal Test::TestRecord.edges.boolean.through, 'Test', 'Edge through `Test` did not defined'
       .to.not.throw Error
   describe '.computed, .comp', ->
     it 'should define computed properties for class', ->
@@ -563,13 +561,13 @@ describe 'RecordMixin', ->
         , collection
         yield record.save()
         record.test = 888
-        assert.deepEqual record.changedAttributes().test, [ 1000, 888 ], 'Update is incorrect'
-        record.resetAttribute 'test'
-        assert.isUndefined record.changedAttributes().test, 'Reset is incorrect'
+        assert.deepEqual (yield record.changedAttributes()).test, [ 1000, 888 ], 'Update is incorrect'
+        yield record.resetAttribute 'test'
+        assert.isUndefined (yield record.changedAttributes()).test, 'Reset is incorrect'
         record.test = 888
         record.has = no
         record.word = 'other'
-        record.rollbackAttributes()
+        yield record.rollbackAttributes()
         assert.equal record.test, 1000, 'Number attribue did not rolled back correctly'
         assert.equal record.has, yes, 'Boolean attribue did not rolled back correctly'
         assert.equal record.word, 'test', 'String attribue did not rolled back correctly'
@@ -606,10 +604,10 @@ describe 'RecordMixin', ->
         snapshot = yield Test::TestRecord.serialize record
         assert.deepEqual snapshot, { type: 'Test::TestRecord', test: 1000, has: true, word: 'test' }, 'Snapshot is incorrect'
         yield return
-  describe '.normalize, .serialize', ->
-    it 'should serialize and deserialize attributes', ->
+  describe '.recoverize, .objectize', ->
+    it 'should recoverize and objectize attributes', ->
       co ->
-        KEY = 'TEST_RECORD_12'
+        KEY = 'TEST_RECORD_13'
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -625,39 +623,7 @@ describe 'RecordMixin', ->
           @attr has: Boolean
           @attr word: String
         Test::TestRecord.initialize()
-        record = yield Test::TestRecord.normalize
-          type: 'Test::TestRecord'
-          test: 1000
-          has: true
-          word: 'test'
-        , {}
-        assert.propertyVal record, 'test', 1000, 'Property `test` not defined'
-        assert.propertyVal record, 'has', yes, 'Property `has` not defined'
-        assert.propertyVal record, 'word', 'test', 'Property `word` not defined'
-        assert.deepEqual record.changedAttributes(), {}, 'Attributes are altered'
-        snapshot = yield Test::TestRecord.serialize record
-        assert.deepEqual snapshot, { type: 'Test::TestRecord', test: 1000, has: true, word: 'test' }, 'Snapshot is incorrect'
-        yield return
-  describe '.objectize', ->
-    it 'should objectize attributes', ->
-      co ->
-        KEY = 'TEST_RECORD_12'
-        class Test extends LeanRC
-          @inheritProtected()
-        Test.initialize()
-
-        class Test::TestRecord extends LeanRC::CoreObject
-          @inheritProtected()
-          @include LeanRC::RecordMixin
-          @module Test
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
-          @attr type: String
-          @attr test: Number
-          @attr has: Boolean
-          @attr word: String
-        Test::TestRecord.initialize()
-        record = yield Test::TestRecord.normalize
+        record = yield Test::TestRecord.recoverize
           type: 'Test::TestRecord'
           test: 1000
           has: true
@@ -670,9 +636,41 @@ describe 'RecordMixin', ->
         snapshot = Test::TestRecord.objectize record
         assert.deepEqual snapshot, { type: 'Test::TestRecord', test: 1000, has: true, word: 'test' }, 'JSON snapshot is incorrect'
         yield return
+  describe '.makeSnapshot', ->
+    it 'should make snapshot for ipoInternalRecord', ->
+      co ->
+        KEY = 'TEST_RECORD_14'
+        class Test extends LeanRC
+          @inheritProtected()
+        Test.initialize()
+
+        class Test::TestRecord extends LeanRC::CoreObject
+          @inheritProtected()
+          @include LeanRC::RecordMixin
+          @module Test
+          @public @static findRecordByName: Function,
+            default: (asType) -> Test::TestRecord
+          @attr type: String
+          @attr test: Number
+          @attr has: Boolean
+          @attr word: String
+        Test::TestRecord.initialize()
+        record = yield Test::TestRecord.normalize
+          type: 'Test::TestRecord'
+          test: 1000
+          has: true
+          word: 'test'
+        , {}
+        assert.propertyVal record, 'test', 1000, 'Property `test` not defined'
+        assert.propertyVal record, 'has', yes, 'Property `has` not defined'
+        assert.propertyVal record, 'word', 'test', 'Property `word` not defined'
+        assert.deepEqual record.changedAttributes(), {}, 'Attributes are altered'
+        snapshot = Test::TestRecord.makeSnapshot record
+        assert.deepEqual snapshot, { type: 'Test::TestRecord', test: 1000, has: true, word: 'test' }, 'JSON snapshot is incorrect'
+        yield return
   describe '.replicateObject', ->
     facade = null
-    KEY = 'TEST_RECORD_12'
+    KEY = 'TEST_RECORD_15'
     after -> facade?.remove?()
     it 'should create replica for record', ->
       co ->
@@ -717,31 +715,17 @@ describe 'RecordMixin', ->
           word: 'test'
         replica = yield TestRecord.replicateObject record
         assert.deepEqual replica,
-          attributes: {}
           type: 'instance'
           class: 'TestRecord'
           multitonKey: KEY
           collectionName: COLLECTION
           isNew: no
           id: record.id
-        record = collection.build
-          type: 'Test::TestRecord'
-          test: 1000
-          has: true
-          word: 'test'
-        replica = yield TestRecord.replicateObject record
-        assert.deepEqual replica,
-          type: 'instance'
-          class: 'TestRecord'
-          multitonKey: KEY
-          collectionName: COLLECTION
-          isNew: yes
-          attributes: id: null, type: 'Test::TestRecord', test: 1000, has: yes, word: 'test'
         facade.remove()
         yield return
   describe '.restoreObject', ->
     facade = null
-    KEY = 'TEST_RECORD_13'
+    KEY = 'TEST_RECORD_16'
     after -> facade?.remove?()
     it 'should restore record from replica', ->
       co ->
@@ -793,12 +777,13 @@ describe 'RecordMixin', ->
           id: record.id
         assert.notEqual record, restoredRecord
         assert.deepEqual record, restoredRecord
-        record = collection.build
+        record = yield collection.build(
           id: '123'
           type: 'Test::TestRecord'
           test: 1000
           has: true
           word: 'test'
+        )
         restoredRecord = yield TestRecord.restoreObject Test,
           type: 'instance'
           class: 'TestRecord'

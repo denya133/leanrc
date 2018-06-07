@@ -54,12 +54,13 @@ describe 'GenerateAutoincrementIdMixin', ->
               yield data
           @public @async push: Function,
             default: (record) ->
-              @getData().push yield @delegate.serialize record
-              yield return
+              item = yield @delegate.serialize record
+              @getData().push item
+              yield return item
         Test::Queryable.initialize()
         facade.registerProxy Test::Queryable.new KEY, []
         collection = facade.retrieveProxy KEY
         for i in [ 1 .. 10 ]
-          { id } = yield collection.create()
+          { id } = yield collection.create({type: 'Test::TestRecord'})
           assert.equal i, id
         yield return

@@ -18,7 +18,7 @@ describe 'MemoryMigrationMixin', ->
           @include LeanRC::MemoryMigrationMixin
           @module Test
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         yield return
   describe '#createCollection', ->
     it 'should apply step for create collection', ->
@@ -33,7 +33,7 @@ describe 'MemoryMigrationMixin', ->
           @module Test
           @createCollection 'TestCollection'
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         spyCreateCollection = sinon.spy migration, 'createCollection'
         yield migration.up()
         assert.isTrue spyCreateCollection.calledWith 'TestCollection'
@@ -51,7 +51,7 @@ describe 'MemoryMigrationMixin', ->
           @module Test
           @createEdgeCollection 'TestEdgeCollection'
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         spyCreateCollection = sinon.spy migration, 'createEdgeCollection'
         yield migration.up()
         assert.isTrue spyCreateCollection.calledWith 'TestEdgeCollection'
@@ -69,10 +69,10 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @module Test
           @attr 'test': String
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::BaseMigration extends LeanRC::Migration
           @inheritProtected()
@@ -94,7 +94,7 @@ describe 'MemoryMigrationMixin', ->
         yield collection.create id: 1
         yield collection.create id: 2
         yield collection.create id: 3
-        migration = Test::BaseMigration.new {}, collection
+        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
         for own id, doc of collection[Symbol.for '~collection']
           assert.propertyVal doc, 'test', 'Test1'
@@ -113,7 +113,7 @@ describe 'MemoryMigrationMixin', ->
           @module Test
           @addIndex 'ARG_1', 'ARG_2', 'ARG_3'
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         spyAddIndex = sinon.spy migration, 'addIndex'
         yield migration.up()
         assert.isTrue spyAddIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
@@ -131,10 +131,10 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @module Test
           @attr 'test': String
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -155,7 +155,7 @@ describe 'MemoryMigrationMixin', ->
         yield collection.create id: 1
         yield collection.create id: 2
         yield collection.create id: 3
-        migration = Test::BaseMigration.new {}, collection
+        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
         for own id, doc of collection[Symbol.for '~collection']
           assert.property doc, 'createdAt'
@@ -176,7 +176,7 @@ describe 'MemoryMigrationMixin', ->
           @module Test
           @changeCollection 'ARG_1', 'ARG_2', 'ARG_3'
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         spyChangeCollection = sinon.spy migration, 'changeCollection'
         yield migration.up()
         assert.isTrue spyChangeCollection.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
@@ -194,10 +194,10 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @module Test
           @attr 'test': String
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -218,7 +218,7 @@ describe 'MemoryMigrationMixin', ->
         yield collection.create test: '42'
         yield collection.create test: '42'
         yield collection.create test: '42'
-        migration = Test::BaseMigration.new {}, collection
+        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
         for own id, doc of collection[Symbol.for '~collection']
           assert.propertyVal doc, 'test', 42
@@ -237,10 +237,10 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @module Test
           @attr 'test': String
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -261,7 +261,7 @@ describe 'MemoryMigrationMixin', ->
         yield collection.create test: '42'
         yield collection.create test: '42'
         yield collection.create test: '42'
-        migration = Test::BaseMigration.new {}, collection
+        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
         for own id, doc of collection[Symbol.for '~collection']
           assert.notProperty doc, 'test'
@@ -281,7 +281,7 @@ describe 'MemoryMigrationMixin', ->
           @module Test
           @renameIndex 'ARG_1', 'ARG_2', 'ARG_3'
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         spyRenameIndex = sinon.spy migration, 'renameIndex'
         yield migration.up()
         assert.isTrue spyRenameIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
@@ -299,7 +299,7 @@ describe 'MemoryMigrationMixin', ->
           @module Test
           @renameCollection 'ARG_1', 'ARG_2', 'ARG_3'
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         spyRenameCollection = sinon.spy migration, 'renameCollection'
         yield migration.up()
         assert.isTrue spyRenameCollection.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
@@ -317,10 +317,10 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @module Test
           @attr 'test': String
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -341,7 +341,7 @@ describe 'MemoryMigrationMixin', ->
         yield collection.create test: '42'
         yield collection.create test: '42'
         yield collection.create test: '42'
-        migration = Test::BaseMigration.new {}, collection
+        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
         assert.deepEqual collection[Symbol.for '~collection'], {}
         facade.remove()
@@ -359,10 +359,10 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @module Test
           @attr 'test': String
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -383,7 +383,7 @@ describe 'MemoryMigrationMixin', ->
         yield collection.create test: '42'
         yield collection.create test: '42'
         yield collection.create test: '42'
-        migration = Test::BaseMigration.new {}, collection
+        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
         assert.deepEqual collection[Symbol.for '~collection'], {}
         facade.remove()
@@ -401,10 +401,10 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @module Test
           @attr 'test': String
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -425,7 +425,7 @@ describe 'MemoryMigrationMixin', ->
         yield collection.create test: '42'
         yield collection.create test: '42'
         yield collection.create test: '42'
-        migration = Test::BaseMigration.new {}, collection
+        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
         for own id, doc of collection[Symbol.for '~collection']
           assert.notProperty doc, 'test'
@@ -444,7 +444,7 @@ describe 'MemoryMigrationMixin', ->
           @module Test
           @removeIndex 'ARG_1', 'ARG_2', 'ARG_3'
         Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new()
+        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
         spyRemoveIndex = sinon.spy migration, 'removeIndex'
         yield migration.up()
         assert.isTrue spyRemoveIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
@@ -462,10 +462,10 @@ describe 'MemoryMigrationMixin', ->
           @inheritProtected()
           @module Test
           @attr 'test': String
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestRecord'
+          # @public init: Function,
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestRecord'
         Test::TestRecord.initialize()
         class Test::MemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -487,7 +487,7 @@ describe 'MemoryMigrationMixin', ->
         yield collection.create test: '42', createdAt: DATE
         yield collection.create test: '42', createdAt: DATE
         yield collection.create test: '42', createdAt: DATE
-        migration = Test::BaseMigration.new {}, collection
+        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
         for own id, doc of collection[Symbol.for '~collection']
           assert.property doc, 'createdAt'
           assert.property doc, 'updatedAt'

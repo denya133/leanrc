@@ -30,7 +30,7 @@ module.exports = (Module)->
         args: []
         return: [String, Number, NILL]
 
-      @public @virtual build: Function, # создает инстанс рекорда
+      @public @async @virtual build: Function, # создает инстанс рекорда
         args: [Object]
         return: Module::RecordInterface
       @public @async @virtual create: Function, # создает инстанс рекорда и делает save

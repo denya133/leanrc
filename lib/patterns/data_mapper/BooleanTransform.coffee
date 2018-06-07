@@ -1,10 +1,18 @@
 
 
 module.exports = (Module)->
-  class BooleanTransform extends Module::CoreObject
+  {
+    CoreObject
+    Utils: { joi }
+  } = Module::
+
+  class BooleanTransform extends CoreObject
     @inheritProtected()
     # @implements Module::TransformInterface
     @module Module
+
+    @public @static schema: Object,
+      get: -> joi.boolean().empty(null).default(null)
 
     @public @static @async normalize: Function,
       default: (serialized)->

@@ -145,13 +145,13 @@ describe 'CheckSessionsMixin', ->
           @chains ['create']
           @beforeHook 'beforeCreate', only: [ 'create' ]
           @public @async beforeCreate: Function,
-            default: ->
+            default: (args...)->
               @id ?= Test::Utils.genRandomAlphaNumbers 64
               now = Date.now()
               @created ?= now
               @expires ?= now + 108000
               @uid ?= Test::Utils.uuid.v4()
-              yield return
+              yield return args
         SessionRecord.initialize()
         facade.registerProxy SessionsCollection.new Test::SESSIONS,
           delegate: SessionRecord
@@ -178,9 +178,9 @@ describe 'CheckSessionsMixin', ->
         resource.context = Test::Context.new req, res, switchMediator
         resource.initializeNotifier KEY
         yield resource.makeSession()
-        assert.isUndefined resource.session.uid
+        assert.isNull resource.session.uid
         sessions = facade.retrieveProxy Test::SESSIONS
-        session = yield sessions.create()
+        session = yield sessions.create({})
         delete req.headers['authorization']
         req.headers.cookie = "#{configs.sessionCookie}=#{session.id}"
         yield resource.makeSession()
@@ -317,7 +317,7 @@ describe 'CheckSessionsMixin', ->
         # user = yield users.create()
         sessions = facade.retrieveProxy Test::SESSIONS
         try
-          session = yield sessions.create()
+          session = yield sessions.create({})
           req.headers.cookie = "#{configs.sessionCookie}=#{session.id}"
           resource = Test::TestResource.new()
           resource.context = Test::Context.new req, res, switchMediator

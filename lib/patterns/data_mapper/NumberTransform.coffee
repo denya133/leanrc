@@ -3,13 +3,16 @@
 module.exports = (Module)->
   {
     CoreObject
-    Utils: { _ }
+    Utils: { _, joi }
   } = Module::
 
   class NumberTransform extends CoreObject
     @inheritProtected()
     # @implements Module::TransformInterface
     @module Module
+
+    @public @static schema: Object,
+      get: -> joi.number().empty(null).default(null)
 
     @public @static @async normalize: Function,
       default: (serialized)->

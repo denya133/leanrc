@@ -76,12 +76,12 @@ describe 'QueryableCollectionMixin', ->
             default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
-              yield return record?
+              yield return record
           @public push: Function,
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push record
-              yield return
+              yield return record
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
         facade.registerProxy collection
@@ -127,12 +127,12 @@ describe 'QueryableCollectionMixin', ->
             default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
-              yield return record?
+              yield return record
           @public @async push: Function,
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
-              yield return
+              yield return record
           @public @async takeBy: Function,
             default: (query) ->
               voQuery = Test::Query.new()
@@ -205,7 +205,7 @@ describe 'QueryableCollectionMixin', ->
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
-              yield return
+              yield return record
           @public @async takeBy: Function,
             default: (query) ->
               voQuery = Test::Query.new()
@@ -296,7 +296,7 @@ describe 'QueryableCollectionMixin', ->
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
-              yield return
+              yield return record
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
         facade.registerProxy collection
@@ -355,7 +355,7 @@ describe 'QueryableCollectionMixin', ->
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
-              yield return
+              yield return record
           @public @async remove: Function,
             default: (id) ->
               _.remove @getData(), { id }
@@ -434,7 +434,7 @@ describe 'QueryableCollectionMixin', ->
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
-              yield return
+              yield return record
           @public @async takeBy: Function,
             default: (query) ->
               voQuery = Test::Query.new()
@@ -515,7 +515,7 @@ describe 'QueryableCollectionMixin', ->
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
-              yield return
+              yield return record
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
         facade.registerProxy collection

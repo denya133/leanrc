@@ -86,9 +86,9 @@ module.exports = (Module)->
       ipoCheckRole = @private @async checkRole: Function,
         default: (spaceId, userId, action)->
           RolesCollection = @facade.retrieveProxy ROLES
-          role = yield (yield RolesCollection.findBy
+          role = yield (yield RolesCollection.findBy(
             spaceUser: {spaceId, userId}
-          ).first()
+          )).first()
           resourceKey = "#{@Module.name}::#{@constructor.name}"
           unless role?
             yield return no

@@ -61,16 +61,16 @@ module.exports = (Module)->
         default: ->
           SessionsCollection = @facade.retrieveProxy SESSIONS
           if (sessionCookie = @context.cookies.get @configs.sessionCookie)?
-            session = yield (yield SessionsCollection.findBy
+            session = yield (yield SessionsCollection.findBy(
               "@doc.id": sessionCookie
-            ).first()
+            )).first()
           if session?
             unless session.userSpaceId?
               session = yield (
                 SessionsCollection.calcComputedsForOne?(session) ? session
               )
           else
-            session = SessionsCollection.build()
+            session = yield SessionsCollection.build({})
           @session = session
           yield return
 
