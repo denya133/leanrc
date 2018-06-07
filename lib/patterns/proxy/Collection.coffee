@@ -160,7 +160,6 @@ module.exports = (Module)->
         else
           objectizer
 
-        # vcSerializer = @getData()?.serializer ? Module::Serializer
         @serializer = vcSerializer.new @
         @objectizer = vcObjectizer.new @
         @

@@ -28,10 +28,6 @@ module.exports = (Module)->
           inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
           relation = 'relatedTo'
 
-          # # TODO: надо решить проблему с когнитивным диссанансом из-за того, что для простых relatedTo/belongsTo связей связь формулируется через строковый айдишник в атрибуте, а для through - связь формулируется через ембедед объект содержащий айдишник объекта.
-          # # TODO: чтобы решить эту проблему, надо удалить из тела этого метода объявление атрибута, тем более что если through указан, здесь бы пришлось объявлять ебмед атрибут, а это уже выходит за область ответственности этого миксина
-          # @attribute "#{opts.attr}": String
-
           recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
             vsRecordName
@@ -85,7 +81,6 @@ module.exports = (Module)->
       # NOTE: отличается от relatedTo тем, что сама связь является обязательной (образуется между объектами "в иерархии"), а в @[opts.attr] обязательно должно храниться значение айдишника родительского объекта, которому "belongs to" - "принадлежит" этот объект
       # NOTE: если указана опция through, то получение данных о связи будет происходить не из @[opts.attr], а из промежуточной коллекции, где помимо айдишника объекта могут храниться дополнительные атрибуты с данными о связи
       @public @static belongsTo: Function,
-        # default: (typeDefinition, {attr, recordName, collectionName, refKey, get, set, transform, through, inverse, valuable, sortable, groupable, filterable, validate}={})->
         default: (typeDefinition, {refKey, attr, inverse, relation, recordName, collectionName, through}={})->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
@@ -93,36 +88,6 @@ module.exports = (Module)->
           attr ?= "#{vsAttr}Id"
           inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
           relation = 'belongsTo'
-
-          # # TODO: надо решить проблему с когнитивным диссанансом из-за того, что для простых relatedTo/belongsTo связей связь формулируется через строковый айдишник в атрибуте, а для through - связь формулируется через ембедед объект содержащий айдишник объекта.
-          # # TODO: чтобы решить эту проблему, надо удалить из тела этого метода объявление атрибута, тем более что если through указан, здесь бы пришлось объявлять ебмед атрибут, а это уже выходит за область ответственности этого миксина
-          # @attribute "#{opts.attr}": String,
-          #   validate: joi.string().required()
-          #   # TODO: более общая проблема состоит в том, что если указана опция through то сдесь должно быть определение геттера и сеттера, которые возьмут проксируемое значение, либо сохранят проксируемое значение в промежуточной коллекции, А если опции нет, то атрибут должен работать с сохраняемым в default значением
-          #   # возможно надо сделать отдельный миксин для таких случаев типа EmbeddableRelationsMixin чтобы они проксировались в промежуточные коллекции "синхронно"
-          #   # если это проксирование many связей, то это может быть не просто массив айдишников связанных рекордов, а так как у каждой связи может быть добавлен как минимум атрибут типа "type", то надо возвращать как минимум еще и его, а это значит что структура данных устремляется к виду полного Рекорда (т.к. помимо типа могут быть введены дополнительные атрибуты для каждой связи)
-          #   # для belongsTo связи добавлять тип бессмысленно, т.к. связь там все равно строго одна, однако для нее могут быть добавлены некоторые атрибуты, что устремит структуру связи так же к виду полного Рекорда
-          #   # из чего можно сделать вывод - хранение связи belongsTo для проксируемых связей некорректно в виде Строки (String) - Их надо хранить как проксируемый embed (объект)
-          #   # А так же вовод о том, что сами through связи надо объявлять не так, как запланировано сейчас через hasMany (как обычная связь, чтобы ее название потом указать в through опции другой связи), а через синхронный embed - так как надо чтобы сеттер сохранил данные, в случае если они установлены.
-          #   # !!! Если синхронно нормализировать а потом обжектизировать массивы связей типа many - то это могут получиться ОЧЕНЬ большие респонзы от сервера, т.к. это могут быть и сотни и тысячи связей
-          #   # делать такие through синхронными наверно будет ошибкой :(
-          #   # но для штучных связей, возможно ничего плохого в этом не будет.
-          #   # Для массива надо ответить на вопрос: нужно ли делать возможность управления массивом через объект (внутри атрибута объекта) ?
-          #   # На данный момент код релейшенов и ембедов сделан так, что в случае если указана опция through они берут по ней метаданные о релейшене, не используя его непосредственно, а следовательно ему все равно синхронные в нем данные или асинхронные - это сделано хорошо. :)
-
-
-          # # TODO: нет смысла делать это вычисляемое свойство, т.к. оно нигде не используется
-          # if attr isnt "#{vsAttr}Id"
-          #   @public "#{vsAttr}Id": String,
-          #     # valuable: "#{vsAttr}Id"
-          #     # filterable: "#{vsAttr}Id"
-          #     set: (aoData)->
-          #       aoData = set?.apply(@, [aoData]) ? aoData
-          #       @[attr] = aoData
-          #       return
-          #     get: ->
-          #       get?.apply(@, [@[attr]]) ? @[attr]
-
 
           recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
@@ -132,25 +97,6 @@ module.exports = (Module)->
               inflect.pluralize recordName().replace /Record$/, ''
             }Collection"
 
-            # TODO: эти valuable,.. можно удалить, так как вводится миксин для встроенных-проксируемых объектов, а решейшены оставляем только в виде промисов и только для удобства кода на сервере.
-            # valuable: valuable
-            # sortable: sortable
-            # groupable: groupable
-            # filterable: filterable
-
-            # transform: transform ? -> # есть ощущение, что передавать трансформ в релейшенах немного бессмысленно - ведь сами релейшены не могут трансформировать данные - они всего лишь возвращают промисы
-            #   [vsModuleName, vsRecordName] = @parseRecordName vsAttr
-            #   (@Module.NS ? @Module::)[vsRecordName]
-            # validate: -> opts.transform.call(@).schema # TODO: есть ощущение, что в релейшенах validate не нужен, т.к. они не сериализуются в респонз с сервера и в реквесте не присылаются (нужны только внутри сервера для упрощения кода)
-
-            # # TODO: зачем set на вычисляемом релейшене, когда get возвращает все равно промис, который к тому же надо резолвить? ("разрыв шаблона" - т.к. гетится один тип данных, а устанавливается другой)
-            # set: (aoData)->
-            #   if (id = aoData?[refKey])?
-            #     @[attr] = set?.apply(@, [id]) ? id #id
-            #     return
-            #   else
-            #     @[attr] = set?.apply(@, [null]) ? null #null
-            #     return
           opts = {
             refKey
             attr
@@ -162,25 +108,6 @@ module.exports = (Module)->
             get: co.wrap ->
               BelongsToCollection = @collection.facade.retrieveProxy collectionName()
               # NOTE: может быть ситуация, что belongsTo связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
-
-                # vcRecord = opts.transform.call(@)
-                # vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
-                # vsCollectionName = switch vsCollectionName
-                #   when 'UsersCollection'
-                #     Module::USERS
-                #   when 'SessionsCollection'
-                #     Module::SESSIONS
-                #   when 'SpacesCollection'
-                #     Module::SPACES
-                #   when 'MigrationsCollection'
-                #     Module::MIGRATIONS
-                #   when 'RolesCollection'
-                #     Module::ROLES
-                #   when 'UploadsCollection'
-                #     Module::UPLOADS
-                #   else
-                #     vsCollectionName
-                # voCollection = @collection.facade.retrieveProxy vsCollectionName
 
               unless through
                 return yield (yield BelongsToCollection.takeBy(
@@ -227,10 +154,7 @@ module.exports = (Module)->
             "#{
               inflect.pluralize recordName().replace /Record$/, ''
             }Collection"
-          # opts.transform ?= ->
-          #   [vsModuleName, vsRecordName] = @parseRecordName vsAttr
-          #   (@Module.NS ? @Module::)[vsRecordName]
-          # opts.validate = -> joi.array().items opts.transform.call(@).schema # TODO: есть ощущение, что в релейшенах validate не нужен, т.к. они не сериализуются в респонз с сервера и в реквесте не присылаются (нужны только внутри сервера для упрощения кода)
+
           opts = {
             refKey
             inverse
@@ -241,24 +165,6 @@ module.exports = (Module)->
             get: co.wrap ->
               HasManyCollection = @collection.facade.retrieveProxy collectionName()
 
-              # vcRecord = opts.transform.call(@)
-              # vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
-              # vsCollectionName = switch vsCollectionName
-              #   when 'UsersCollection'
-              #     Module::USERS
-              #   when 'SessionsCollection'
-              #     Module::SESSIONS
-              #   when 'SpacesCollection'
-              #     Module::SPACES
-              #   when 'MigrationsCollection'
-              #     Module::MIGRATIONS
-              #   when 'RolesCollection'
-              #     Module::ROLES
-              #   when 'UploadsCollection'
-              #     Module::UPLOADS
-              #   else
-              #     vsCollectionName
-              # voCollection = @collection.facade.retrieveProxy vsCollectionName
               unless through
                 return yield HasManyCollection.takeBy(
                   "@doc.#{inverse}": @[refKey]
@@ -297,10 +203,7 @@ module.exports = (Module)->
             "#{
               inflect.pluralize recordName().replace /Record$/, ''
             }Collection"
-          # opts.transform ?= ->
-          #   [vsModuleName, vsRecordName] = @parseRecordName vsAttr
-          #   (@Module.NS ? @Module::)[vsRecordName]
-          # opts.validate = -> opts.transform.call(@).schema # TODO: есть ощущение, что в релейшенах validate не нужен, т.к. они не сериализуются в респонз с сервера и в реквесте не присылаются (нужны только внутри сервера для упрощения кода)
+
           opts = {
             refKey
             inverse
@@ -312,24 +215,6 @@ module.exports = (Module)->
               HasOneCollection = @collection.facade.retrieveProxy collectionName()
               # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
-              # vcRecord = opts.transform.call(@)
-              # vsCollectionName = "#{inflect.pluralize vcRecord.name.replace /Record$/, ''}Collection"
-              # vsCollectionName = switch vsCollectionName
-              #   when 'UsersCollection'
-              #     Module::USERS
-              #   when 'SessionsCollection'
-              #     Module::SESSIONS
-              #   when 'SpacesCollection'
-              #     Module::SPACES
-              #   when 'MigrationsCollection'
-              #     Module::MIGRATIONS
-              #   when 'RolesCollection'
-              #     Module::ROLES
-              #   when 'UploadsCollection'
-              #     Module::UPLOADS
-              #   else
-              #     vsCollectionName
-              # voCollection = @collection.facade.retrieveProxy vsCollectionName
               unless through
                 return yield (yield HasOneCollection.takeBy(
                   "@doc.#{inverse}": @[refKey]

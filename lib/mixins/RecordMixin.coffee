@@ -13,7 +13,7 @@ module.exports = (Module)->
       # конструктор принимает второй аргумент, ссылку на коллекцию.
       @public collection: Module::CollectionInterface
 
-      ipoInternalRecord = @protected internalRecord: Object # тип и формат хранения надо обдумать. Это инкапсулированные данные последнего сохраненного состояния из базы - нужно для функционала вычисления дельты изменений. (относительно изменений которые проведены над объектом но еще не сохранены в базе данных - хранилище.)
+      ipoInternalRecord = @protected internalRecord: Object
 
       @public @static schema: Object,
         default: {}
@@ -131,10 +131,7 @@ module.exports = (Module)->
           @comp arguments...
           return
 
-      # TODO: надо определиться, зачем вообще отдельный тип определений computed
       # NOTE: изначальная задумка была в том, чтобы определять вычисляемые значения - НЕ ПРОМИСЫ! (т.е. некоторое значение, которое отправляется в респонзе реально не хранится в базе, но вычисляется НЕ асинхронной функцией-гетером)
-      # NOTE: при этом компьютеду не надо указывать дополнительные специальные опшены типа `valuable` - потому что они по умолчанию обязаны сериализовываться и отправляться в ответах как реальные атрибуты
-      # TODO: надо сделать так, чтобы в определении компьютеда в схеме отдельно значилось что он .forbidden() - т.е. присылать в запросе на сервер его нельзя, но с сервера в ответе он приходит. (возможно стоит восползоваться методом .strip() - он на валидации из output'а удаляет указанный ключ с значением)
       @public @static comp: Function,
         default: (args...)->
           [typeDefinition, ..., opts] = args
@@ -163,15 +160,7 @@ module.exports = (Module)->
       @public @static new: Function,
         default: (aoAttributes, aoCollection)->
           aoAttributes ?= {}
-          # if aoAttributes.type?
-          #   if @name is aoAttributes.type.split('::')[1]
-          #     @super aoAttributes, aoCollection
-          #   else
-          #     RecordClass = @findRecordByName aoAttributes.type
-          #     RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
-          # else
-          #   aoAttributes.type = "#{@moduleName()}::#{@name}"
-          #   @super aoAttributes, aoCollection
+
           unless aoAttributes.type?
             throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
           if @name is aoAttributes.type.split('::')[1]
@@ -194,20 +183,12 @@ module.exports = (Module)->
           if response?
             { id } = response
             @id ?= id if id
-          # vhAttributes = {}
-          # for own key of @constructor.attributes
-          #   vhAttributes[key] = @[key]
-          # @[ipoInternalRecord] = vhAttributes
           @[ipoInternalRecord] = @constructor.makeSnapshot response
           yield return @
 
       @public @async update: Function,
         default: ->
           response = yield @collection.override @id, @
-          # vhAttributes = {}
-          # for own key of @constructor.attributes
-          #   vhAttributes[key] = @[key]
-          # @[ipoInternalRecord] = vhAttributes
           @[ipoInternalRecord] = @constructor.makeSnapshot response
           yield return @
 
@@ -333,8 +314,7 @@ module.exports = (Module)->
           # NOTE: vhAttributes processed before new - it for StateMachine in record (when it has)
 
           voRecord = RecordClass.new vhAttributes, aoCollection
-          # TODO: так как vhAttributes может содержать атрибуты сложных типов (массивы, объекты, другие рекорды), НО глубокого копирования не происходит, то в `ipoInternalRecord` атрибуты так же будут ссылаться на эти же структуры, а следовательно `changedAttributes`, `resetAttribute` и `rollbackAttributes` - не смогут отатить их изменения или вернуть дельты изменений
-          # TODO: для того, чтобы `ipoInternalRecord` имел валидный слепок с рекорда, в него надо записывать результат objectize'а рекорда
+
           voRecord[ipoInternalRecord] = voRecord.constructor.makeSnapshot voRecord
           yield return voRecord
 
@@ -372,9 +352,7 @@ module.exports = (Module)->
           # NOTE: vhAttributes processed before new - it for StateMachine in record (when it has)
 
           voRecord = RecordClass.new vhAttributes, aoCollection
-          # TODO: так как vhAttributes может содержать атрибуты сложных типов (массивы, объекты, другие рекорды), НО глубокого копирования не происходит, то в `ipoInternalRecord` атрибуты так же будут ссылаться на эти же структуры, а следовательно `changedAttributes`, `resetAttribute` и `rollbackAttributes` - не смогут отатить их изменения или вернуть дельты изменений
-          # TODO: для того, чтобы `ipoInternalRecord` имел валидный слепок с рекорда, в него надо записывать результат objectize'а рекорда
-          # voRecord[ipoInternalRecord] = voRecord.constructor.objectize voRecord
+
           yield return voRecord
 
       @public @static objectize: Function,
@@ -386,9 +364,7 @@ module.exports = (Module)->
             throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
 
           vhResult = {}
-          # for own asAttr, ahValue of aoRecord.constructor.attributes
-          #   vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>
-          #     transform.call(@).objectize aoRecord[asAttr]
+
           for own asAttr, { transform } of aoRecord.constructor.attributes
             vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
           for own asAttr, { transform } of aoRecord.constructor.computeds
@@ -404,9 +380,7 @@ module.exports = (Module)->
             throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
 
           vhResult = {}
-          # for own asAttr, ahValue of aoRecord.constructor.attributes
-          #   vhResult[asAttr] = do (asAttr, {transform} = ahValue)=>
-          #     transform.call(@).objectize aoRecord[asAttr]
+
           for own asAttr, { transform } of aoRecord.constructor.attributes
             vhResult[asAttr] = transform.call(@).objectize aoRecord[asAttr]
           vhResult
@@ -446,15 +420,7 @@ module.exports = (Module)->
         default: (aoProperties, aoCollection) ->
           @super arguments...
           @collection = aoCollection
-          # { attributes } = @constructor
-          # console.log '>>>>>>>> RecordMixin.init 111', aoProperties, aoCollection, @collection
-          # for own vsAttrName, voAttrValue of aoProperties
-          #   unless attributes[vsAttrName]?
-          #     @[vsAttrName] = voAttrValue
-          # for own vsAttrName, { transform } of attributes
-          #   voAttrValue = aoProperties[vsAttrName]
-          #   @[vsAttrName] = yield transform.call(@constructor).normalize voAttrValue
-          # console.log '>>>>>>>> RecordMixin.init 222', @type
+
           for own vsAttrName, voAttrValue of aoProperties
             @[vsAttrName] = voAttrValue
           return
