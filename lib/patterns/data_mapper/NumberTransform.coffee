@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     CoreObject
-    Utils: { _ }
+    Utils: { _, joi }
   } = Module::
 
   class NumberTransform extends CoreObject
@@ -11,15 +11,26 @@ module.exports = (Module)->
     # @implements Module::TransformInterface
     @module Module
 
-    @public @static normalize: Function,
+    @public @static schema: Object,
+      get: -> joi.number().empty(null).default(null)
+
+    @public @static @async normalize: Function,
       default: (serialized)->
         if _.isNil serialized
-          return null
+          yield return null
         else
           transformed = Number serialized
-          return if _.isNumber(transformed) then transformed else null
+          yield return (if _.isNumber(transformed) then transformed else null)
 
-    @public @static serialize: Function,
+    @public @static @async serialize: Function,
+      default: (deserialized)->
+        if _.isNil deserialized
+          yield return null
+        else
+          transformed = Number deserialized
+          yield return (if _.isNumber(transformed) then transformed else null)
+
+    @public @static objectize: Function,
       default: (deserialized)->
         if _.isNil deserialized
           return null

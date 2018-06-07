@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     CoreObject
-    Utils: { _ }
+    Utils: { _, joi }
   } = Module::
 
   class StringTransform extends CoreObject
@@ -11,11 +11,18 @@ module.exports = (Module)->
     # @implements Module::TransformInterface
     @module Module
 
-    @public @static normalize: Function,
-      default: (serialized)->
-        if _.isNil(serialized) then null else String serialized
+    @public @static schema: Object,
+      get: -> joi.string().empty(null).default(null)
 
-    @public @static serialize: Function,
+    @public @static @async normalize: Function,
+      default: (serialized)->
+        yield return (if _.isNil(serialized) then null else String serialized)
+
+    @public @static @async serialize: Function,
+      default: (deserialized)->
+        yield return (if _.isNil(deserialized) then null else String deserialized)
+
+    @public @static objectize: Function,
       default: (deserialized)->
         if _.isNil(deserialized) then null else String deserialized
 

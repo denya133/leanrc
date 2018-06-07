@@ -30,17 +30,11 @@ module.exports = (Module)->
         args: [String]
         return: RecordInterface
 
-      # # под вопросом ??????
-      # @public updateEdges: Function, [ANY], -> ANY # any type
-
       @public @static @virtual parentClassNames: Function,
         args: [[Module::Class, NILL]]
         return: Array
 
       @public @static @virtual attributes: Function,
-        args: []
-        return: Object
-      @public @static @virtual edges: Function,
         args: []
         return: Object
       @public @static @virtual computeds: Function,
@@ -113,13 +107,13 @@ module.exports = (Module)->
       @public @async @virtual reload: Function,
         args: []
         return: Module::RecordInterface
-      @public @virtual changedAttributes: Function,
+      @public @async @virtual changedAttributes: Function,
         args: []
         return: Object # { isAdmin: [undefined, true], name: [undefined, 'Tomster'] }
-      @public @virtual resetAttribute: Function,
+      @public @async @virtual resetAttribute: Function,
         args: [String]
         return: NILL
-      @public @virtual rollbackAttributes: Function,
+      @public @async @virtual rollbackAttributes: Function,
         args: []
         return: NILL
 

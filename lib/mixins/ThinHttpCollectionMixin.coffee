@@ -16,7 +16,7 @@ module.exports = (Module)->
           request = @[ipmRequestFor]
             requestType: 'create'
             recordName: @delegate.name
-            snapshot: @serializer.serialize aoRecord
+            snapshot: yield @serializer.serialize aoRecord
 
           { body } = yield @[ipmMakeRequest] request
           pluralKey = @collectionName()
@@ -68,7 +68,7 @@ module.exports = (Module)->
           request = @[ipmRequestFor]
             requestType: 'replace'
             recordName: @delegate.name
-            snapshot: @serializer.serialize aoRecord
+            snapshot: yield @serializer.serialize aoRecord
             id: id
 
           { body } = yield @[ipmMakeRequest] request
@@ -82,7 +82,7 @@ module.exports = (Module)->
           request = @[ipmRequestFor]
             requestType: 'update'
             recordName: @delegate.name
-            snapshot: @serializer.serialize aoRecord
+            snapshot: yield @serializer.serialize aoRecord
             id: id
 
           { body } = yield @[ipmMakeRequest] request

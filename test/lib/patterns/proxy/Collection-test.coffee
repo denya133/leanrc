@@ -25,6 +25,8 @@ describe 'Collection', ->
         collection = Test::TestCollection.new 'COLLECTION',
           delegate: Test::TestRecord
         assert.equal collection.delegate, Test::TestRecord, 'Record is incorrect'
+        assert.deepEqual collection.serializer, LeanRC::Serializer.new(collection), 'Serializer is incorrect'
+        assert.deepEqual collection.objectizer, LeanRC::Objectizer.new(collection), 'Objectizer is incorrect'
         yield return
   describe '#collectionName', ->
     it 'should get collection name', ->
@@ -117,7 +119,7 @@ describe 'Collection', ->
         collection = facade.retrieveProxy 'TEST_COLLECTION'
         facade.registerMediator Test::TestMediator.new 'TEST_MEDIATOR', {}
         mediator = facade.retrieveMediator 'TEST_MEDIATOR'
-        collection.recordHasBeenChanged { test: 'test' }, Test::TestRecord.new()
+        collection.recordHasBeenChanged 'createdRecord', Test::TestRecord.new({ test: 'test', type: 'Test::TestRecord'}, collection)
         assert.isTrue spyHandleNotitfication.called, 'Notification did not received'
         facade.remove()
         yield return
@@ -160,7 +162,7 @@ describe 'Collection', ->
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION',
           delegate: Test::TestRecord
-        record = collection.build test: 'test', data: 123
+        record = yield collection.build test: 'test', data: 123
         assert.equal record.test, 'test', 'Record#test is incorrect'
         assert.equal record.data, 123, 'Record#data is incorrect'
         yield return
@@ -180,6 +182,7 @@ describe 'Collection', ->
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION',
@@ -208,6 +211,7 @@ describe 'Collection', ->
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION',
@@ -369,7 +373,7 @@ describe 'Collection', ->
           delegate: Test::TestRecord
         facade = LeanRC::Facade.getInstance 'TEST_COLLECTION_FACADE_09'
         facade.registerProxy collection
-        original = collection.build test: 'test', data: 123
+        original = yield collection.build test: 'test', data: 123
         clone = yield collection.clone original
         assert.notEqual original, clone, 'Record is not a copy but a reference'
         assert.equal original.test, clone.test, '`test` values are different'
@@ -405,7 +409,7 @@ describe 'Collection', ->
           delegate: Test::TestRecord
         facade = LeanRC::Facade.getInstance 'TEST_COLLECTION_FACADE_10'
         facade.registerProxy collection
-        original = collection.build test: 'test', data: 123
+        original = yield collection.build test: 'test', data: 123
         clone = yield collection.copy original
         assert.notEqual original, clone, 'Record is not a copy but a reference'
         assert.equal original.test, clone.test, '`test` values are different'
@@ -416,7 +420,7 @@ describe 'Collection', ->
   describe '#normalize', ->
     it 'should normalize record from data', ->
       co ->
-        spySerializerNormalize = sinon.spy ->
+        spySerializerNormalize = sinon.spy -> co -> yield return
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -441,14 +445,14 @@ describe 'Collection', ->
             normalize: spySerializerNormalize
         facade = LeanRC::Facade.getInstance 'TEST_COLLECTION_FACADE_11'
         facade.registerProxy collection
-        record = collection.normalize test: 'test', data: 123
+        record = yield collection.normalize test: 'test', data: 123
         assert.isTrue spySerializerNormalize.calledWith(Test::TestRecord, test: 'test', data: 123), 'Normalize called improperly'
         facade.remove()
         yield return
   describe '#serialize', ->
     it 'should serialize record to data', ->
       co ->
-        spySerializerSerialize = sinon.spy ->
+        spySerializerSerialize = sinon.spy -> co -> yield return
         class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
@@ -473,8 +477,8 @@ describe 'Collection', ->
             serialize: spySerializerSerialize
         facade = LeanRC::Facade.getInstance 'TEST_COLLECTION_FACADE_12'
         facade.registerProxy collection
-        record = collection.build test: 'test', data: 123
-        data = collection.serialize record, value: 'value'
+        record = yield collection.build test: 'test', data: 123
+        data = yield collection.serialize record, value: 'value'
         assert.isTrue spySerializerSerialize.calledWith(record, value: 'value'), 'Serialize called improperly'
         facade.remove()
         yield return

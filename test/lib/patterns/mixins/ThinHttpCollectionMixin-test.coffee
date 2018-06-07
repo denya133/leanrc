@@ -758,7 +758,7 @@ describe 'ThinHttpCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, Test::HttpCollection
         record = yield collection.create test: 'test1'
-        updatedRecord = yield collection.override record.id, collection.build test: 'test2'
+        updatedRecord = yield collection.override record.id, yield collection.build test: 'test2'
         assert.isDefined updatedRecord
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'
@@ -799,7 +799,7 @@ describe 'ThinHttpCollectionMixin', ->
         collection = facade.retrieveProxy KEY
         assert.instanceOf collection, Test::HttpCollection
         record = yield collection.create test: 'test1'
-        updatedRecord = yield collection.patch record.id, collection.build test: 'test2'
+        updatedRecord = yield collection.patch record.id, yield collection.build test: 'test2'
         assert.isDefined updatedRecord
         assert.equal record.id, updatedRecord.id
         assert.propertyVal record, 'test', 'test1'

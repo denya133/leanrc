@@ -46,9 +46,9 @@ module.exports = (Module)->
         default: ->
           SessionsCollection = @facade.retrieveProxy SESSIONS
           if @checkHeader()
-            session = SessionsCollection.build {uid: 'system'}
+            session = yield SessionsCollection.build {uid: 'system'}
           unless session?
-            session = SessionsCollection.build()
+            session = yield SessionsCollection.build({})
           @session = session
           yield return
 
@@ -59,7 +59,7 @@ module.exports = (Module)->
             @context.throw UNAUTHORIZED
             return
           # UsersCollection = @facade.retrieveProxy USERS
-          # currentUser = UsersCollection.build
+          # currentUser = yield UsersCollection.build
           #   id: 'system'
           #   handle: 'system'
           #   email: 'system@leanrc.com'

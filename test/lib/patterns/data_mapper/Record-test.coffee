@@ -18,7 +18,7 @@ describe 'Record', ->
           @inheritProtected()
           @module Test
         Test::TestRecord.initialize()
-        record = Test::TestRecord.new {}
+        record = Test::TestRecord.new {type: 'Test::TestRecord'}
         assert.instanceOf record, Test::TestRecord, 'Not a TestRecord'
         assert.instanceOf record, LeanRC::Record, 'Not a Record'
       .to.not.throw Error
@@ -46,7 +46,7 @@ describe 'Record', ->
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_01'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
-        record = collection.build {id: 123}
+        record = yield collection.build {id: 123}
         yield record.save()
         assert.isTrue spyRunNotitfication.calledWith('createdRecord'), '`afterCreate` run incorrect'
         yield return
@@ -70,7 +70,7 @@ describe 'Record', ->
           delegate: Test::TestRecord
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_02'
         facade.registerProxy collection
-        record = collection.build {id: 123}
+        record = yield collection.build {id: 123}
         yield record.save()
         oldUpdatedAt = record.updatedAt
         updated = yield record.save()
@@ -91,14 +91,15 @@ describe 'Record', ->
         class Test::TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
           @module Test
         Test::TestCollection.initialize()
         collection = Test::TestCollection.new 'TEST_COLLECTION_04',
           delegate: Test::TestRecord
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_03'
         facade.registerProxy collection
-        record = collection.build()
-        assert.isUndefined record.id
+        record = yield collection.build({})
+        assert.isNull record.id
         yield record.save()
         assert.isDefined record.id
         facade.remove()
@@ -123,7 +124,7 @@ describe 'Record', ->
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_04'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
-        record = collection.build {id: 123}
+        record = yield collection.build {id: 123}
         yield record.save()
         updated = yield record.save()
         assert.isTrue spyRunNotitfication.calledWith('updatedRecord'), '`afterUpdate` run incorrect'
@@ -148,7 +149,7 @@ describe 'Record', ->
           delegate: Test::TestRecord
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_05'
         facade.registerProxy collection
-        record = collection.build {id: 123}
+        record = yield collection.build {id: 123}
         yield record.save()
         oldUpdatedAt = record.updatedAt
         deleted = yield record.delete()
@@ -178,7 +179,7 @@ describe 'Record', ->
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_06'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
-        record = collection.build {id: 123}
+        record = yield collection.build {id: 123}
         yield record.save()
         deleted = yield record.delete()
         assert.isTrue spyRunNotitfication.calledWith('deletedRecord'), '`afterDelete` run incorrect'
@@ -204,7 +205,7 @@ describe 'Record', ->
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_07'
         facade.registerProxy collection
         spyRunNotitfication = sinon.spy collection, 'recordHasBeenChanged'
-        record = collection.build {id: 123}
+        record = yield collection.build {id: 123}
         yield record.save()
         yield record.destroy()
         assert.isTrue spyRunNotitfication.calledWith('destroyedRecord'), '`afterDestroy` run incorrect'

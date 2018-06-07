@@ -56,6 +56,7 @@ module.exports = (Module)->
     Utils: { joi }
   } = Module::
 
+  # TODO: надо решить - надо ли наследовать Record от ObjectTransform
   class Record extends CoreObject
     @inheritProtected()
     # @implements RecordInterface
@@ -81,13 +82,6 @@ module.exports = (Module)->
       validate: -> joi.date().iso().empty(null).default(null)
       default: null
 
-    ############################################################################
-
-    # # под вопросом ??????
-    # @public updateEdges: Function, [ANY], -> ANY # any type
-
-    ############################################################################
-
     @chains ['create', 'update', 'delete', 'destroy']
 
     @beforeHook 'beforeUpdate', only: ['update']
@@ -98,10 +92,6 @@ module.exports = (Module)->
 
     @beforeHook 'beforeDelete', only: ['delete']
     @afterHook 'afterDelete', only: ['delete']
-
-    # под вопросом ???????????????
-    # @afterHook 'updateEdges', only: ['create', 'update', 'delete']
-
 
     @afterHook 'afterDestroy', only: ['destroy']
 

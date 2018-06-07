@@ -49,6 +49,7 @@ module.exports = (Module)->
           delegate = delegate?()
         delegate
     @public serializer: Module::SerializerInterface
+    @public objectizer: Module::ObjectizerInterface
 
     @public collectionName: Function,
       default: ->
@@ -74,13 +75,13 @@ module.exports = (Module)->
       default: -> yield return
 
 
-    @public build: Function,
+    @public @async build: Function,
       default: (properties)->
-        @delegate.new properties, @
+        return yield @objectizer.recoverize @delegate, properties
 
     @public @async create: Function,
       default: (properties)->
-        voRecord = @build properties
+        voRecord = yield @build properties
         yield voRecord.save()
 
     @public @async delete: Function,
@@ -105,9 +106,9 @@ module.exports = (Module)->
 
     @public @async update: Function,
       default: (id, properties)->
-        voRecord = yield @find id
-        yield voRecord.updateAttributes properties
-        return voRecord
+        properties.id = id
+        voRecord = yield @objectizer.recoverize @delegate, properties
+        return yield voRecord.save()
 
     @public @async clone: Function,
       default: (aoRecord)->
@@ -125,18 +126,19 @@ module.exports = (Module)->
         yield voRecord.save()
         return voRecord
 
-    @public normalize: Function,
+    @public @async normalize: Function,
       default: (ahData)->
-        @serializer.normalize @delegate, ahData
+        return yield @serializer.normalize @delegate, ahData
 
-    @public serialize: Function,
+    @public @async serialize: Function,
       default: (aoRecord, ahOptions)->
-        @serializer.serialize aoRecord, ahOptions
+        return yield @serializer.serialize aoRecord, ahOptions
 
     @public init: Function,
       default: (args...)->
         @super args...
         serializer = @getData()?.serializer
+        objectizer = @getData()?.objectizer
         vcSerializer = unless serializer?
           Module::Serializer
         else if _.isString serializer
@@ -147,9 +149,19 @@ module.exports = (Module)->
           serializer?()
         else
           serializer
+        vcObjectizer = unless objectizer?
+          Module::Objectizer
+        else if _.isString objectizer
+          (
+            @ApplicationModule.NS ? @ApplicationModule::
+          )[objectizer]
+        else unless /Objectizer$/.test objectizer.name
+          objectizer?()
+        else
+          objectizer
 
-        # vcSerializer = @getData()?.serializer ? Module::Serializer
         @serializer = vcSerializer.new @
+        @objectizer = vcObjectizer.new @
         @
 
 

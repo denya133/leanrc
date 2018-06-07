@@ -1,18 +1,32 @@
 
 
 module.exports = (Module)->
-  class Transform extends Module::CoreObject
+  {
+    CoreObject
+    Utils: { joi }
+  } = Module::
+
+  class Transform extends CoreObject
     @inheritProtected()
     # @implements Module::TransformInterface
     @module Module
 
-    @public @static normalize: Function,
+    @public @static schema: Object,
+      get: -> joi.any()
+
+    @public @static @async normalize: Function,
       default: (serialized)->
         unless serialized?
-          return null
-        serialized
+          yield return null
+        yield return serialized
 
-    @public @static serialize: Function,
+    @public @static @async serialize: Function,
+      default: (deserialized)->
+        unless deserialized?
+          yield return null
+        yield return deserialized
+
+    @public @static objectize: Function,
       default: (deserialized)->
         unless deserialized?
           return null

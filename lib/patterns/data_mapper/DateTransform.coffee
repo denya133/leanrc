@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     CoreObject
-    Utils: { _ }
+    Utils: { _, joi }
   } = Module::
 
   class DateTransform extends CoreObject
@@ -11,11 +11,21 @@ module.exports = (Module)->
     # @implements Module::TransformInterface
     @module Module
 
-    @public @static normalize: Function,
-      default: (serialized)->
-        if _.isNil(serialized) then null else new Date serialized
+    @public @static schema: Object,
+      get: -> joi.date().iso().empty(null).default(null)
 
-    @public @static serialize: Function,
+    @public @static @async normalize: Function,
+      default: (serialized)->
+        yield return (if _.isNil(serialized) then null else new Date serialized)
+
+    @public @static @async serialize: Function,
+      default: (deserialized)->
+        if _.isDate(deserialized) and not _.isNaN(deserialized)
+          yield return deserialized.toISOString()
+        else
+          yield return null
+
+    @public @static objectize: Function,
       default: (deserialized)->
         if _.isDate(deserialized) and not _.isNaN(deserialized)
           return deserialized.toISOString()

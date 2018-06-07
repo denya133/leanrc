@@ -76,12 +76,12 @@ describe 'QueryableCollectionMixin', ->
             default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
-              yield return record?
+              yield return record
           @public push: Function,
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push record
-              yield return
+              yield return record
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
         facade.registerProxy collection
@@ -123,16 +123,16 @@ describe 'QueryableCollectionMixin', ->
             default: (aoParsedQuery) ->
               data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
-          @public patch: Function,
+          @public @async patch: Function,
             default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
-              yield return record?
-          @public push: Function,
+              yield return record
+          @public @async push: Function,
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
-              @getData().push @delegate.serialize record
-              yield return
+              @getData().push yield @delegate.serialize record
+              yield return record
           @public @async takeBy: Function,
             default: (query) ->
               voQuery = Test::Query.new()
@@ -184,7 +184,7 @@ describe 'QueryableCollectionMixin', ->
             default: (aoParsedQuery) ->
               data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
-          @public patch: Function,
+          @public @async patch: Function,
             default: (id, item) ->
               data = _.filter @getData(), { id }
               if _.isArray data
@@ -196,16 +196,16 @@ describe 'QueryableCollectionMixin', ->
                   else
                     datum[key] = value  for own key, value of item
               yield return data.length > 0
-          @public take: Function,
+          @public @async take: Function,
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
-          @public push: Function,
+          @public @async push: Function,
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
-              @getData().push @delegate.serialize record
-              yield return
+              @getData().push yield @delegate.serialize record
+              yield return record
           @public @async takeBy: Function,
             default: (query) ->
               voQuery = Test::Query.new()
@@ -218,7 +218,7 @@ describe 'QueryableCollectionMixin', ->
           @public @async override: Function,
             default: (id, aoRecord)->
               index = _.findIndex @getData(), { id }
-              @getData()[index] = @serializer.serialize aoRecord
+              @getData()[index] = yield @serializer.serialize aoRecord
               yield return Test::Cursor.new(@, [@getData()[index]]).first()
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
@@ -275,7 +275,7 @@ describe 'QueryableCollectionMixin', ->
                 else
                   data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, []
-          @public patch: Function,
+          @public @async patch: Function,
             default: (id, item) ->
               data = _.filter @getData(), { id }
               if _.isArray data
@@ -287,16 +287,16 @@ describe 'QueryableCollectionMixin', ->
                   else
                     datum[key] = value  for own key, value of item
               yield return data.length > 0
-          @public take: Function,
+          @public @async take: Function,
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
-          @public push: Function,
+          @public @async push: Function,
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
-              @getData().push @delegate.serialize record
-              yield return
+              @getData().push yield @delegate.serialize record
+              yield return record
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
         facade.registerProxy collection
@@ -346,16 +346,16 @@ describe 'QueryableCollectionMixin', ->
                 else
                   data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
-          @public take: Function,
+          @public @async take: Function,
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
-          @public push: Function,
+          @public @async push: Function,
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
-              @getData().push @delegate.serialize record
-              yield return
+              @getData().push yield @delegate.serialize record
+              yield return record
           @public @async remove: Function,
             default: (id) ->
               _.remove @getData(), { id }
@@ -413,7 +413,7 @@ describe 'QueryableCollectionMixin', ->
             default: (aoParsedQuery) ->
               data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
-          @public patch: Function,
+          @public @async patch: Function,
             default: (id, item) ->
               data = _.filter @getData(), { id }
               if _.isArray data
@@ -425,16 +425,16 @@ describe 'QueryableCollectionMixin', ->
                   else
                     datum[key] = value  for own key, value of item
               yield return data.length > 0
-          @public take: Function,
+          @public @async take: Function,
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
-          @public push: Function,
+          @public @async push: Function,
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
-              @getData().push @delegate.serialize record
-              yield return
+              @getData().push yield @delegate.serialize record
+              yield return record
           @public @async takeBy: Function,
             default: (query) ->
               voQuery = Test::Query.new()
@@ -447,7 +447,7 @@ describe 'QueryableCollectionMixin', ->
           @public @async override: Function,
             default: (id, aoRecord)->
               index = _.findIndex @getData(), { id }
-              @getData()[index] = @serializer.serialize aoRecord
+              @getData()[index] = yield @serializer.serialize aoRecord
               yield return Test::Cursor.new(@, [@getData()[index]]).first()
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
@@ -506,16 +506,16 @@ describe 'QueryableCollectionMixin', ->
                       datum[key] = value  for own key, value of item
               data = _.filter @getData(), aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
-          @public take: Function,
+          @public @async take: Function,
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
-          @public push: Function,
+          @public @async push: Function,
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
-              @getData().push @delegate.serialize record
-              yield return
+              @getData().push yield @delegate.serialize record
+              yield return record
         Test::Queryable.initialize()
         collection = Test::Queryable.new KEY, []
         facade.registerProxy collection

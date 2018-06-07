@@ -1,22 +1,23 @@
-# класс, который должен отвечать за сериализацию отдельной записи при сохранении ее через collection прокси в некоторое хранилище. т.е. за сериализацию отдельных атрибутов и их десериализацию при получении из хранилища.
+# класс, который должен отвечать за деобжектизацию json-структуры в Record запись при получении из браузера например и за обжектизацию Record-объекта в json-структуру для отправки например в браузер.
 
 
 module.exports = (Module)->
-  class Serializer extends Module::CoreObject
+  class Objectizer extends Module::CoreObject
     @inheritProtected()
-    # @implements Module::SerializerInterface
+    # @implements Module::ObjectizerInterface
     @module Module
 
     @public collection: Module::CollectionInterface
 
-    @public @async normalize: Function,
+    @public @async recoverize: Function,
       default: (acRecord, ahPayload)->
-        return yield acRecord.normalize ahPayload, @collection
+        ahPayload.type ?= "#{acRecord.moduleName()}::#{acRecord.name}"
+        return yield acRecord.recoverize ahPayload, @collection
 
-    @public @async serialize: Function,
+    @public @async objectize: Function,
       default: (aoRecord, options = null)->
         vcRecord = aoRecord.constructor
-        return yield vcRecord.serialize aoRecord, options
+        yield return vcRecord.objectize aoRecord, options
 
     @public @static @async restoreObject: Function,
       default: (Module, replica)->
@@ -24,7 +25,7 @@ module.exports = (Module)->
           Facade = Module::ApplicationFacade ? Module::Facade
           facade = Facade.getInstance replica.multitonKey
           collection = facade.retrieveProxy replica.collectionName
-          yield return collection.serializer
+          yield return collection.objectizer
         else
           return yield @super Module, replica
 
@@ -43,4 +44,4 @@ module.exports = (Module)->
         @
 
 
-  Serializer.initialize()
+  Objectizer.initialize()

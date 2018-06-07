@@ -65,7 +65,7 @@ describe 'Cursor', ->
           @include LeanRC::GenerateUuidIdMixin
           @module Test
         MemoryCollection.initialize()
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord'  }, { data: 'men', type: 'Test::TestRecord'  }, { data: 'in', type: 'Test::TestRecord'  }, { data: 'a boat', type: 'Test::TestRecord'  } ]
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
         cursor = Cursor.new voMemoryCollection, array
@@ -93,7 +93,7 @@ describe 'Cursor', ->
         MemoryCollection.initialize()
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
-        array = [ { data: 'data' } ]
+        array = [ { data: 'data', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         assert.isTrue (yield cursor.hasNext()), 'There is no next value'
         data = yield cursor.next()
@@ -117,7 +117,7 @@ describe 'Cursor', ->
         MemoryCollection.initialize()
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord'  }, { data: 'men', type: 'Test::TestRecord'  }, { data: 'in', type: 'Test::TestRecord'  }, { data: 'a boat', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         records = yield cursor.toArray()
         assert.equal records.length, array.length, 'Counts of input and output data are different'
@@ -144,7 +144,7 @@ describe 'Cursor', ->
         MemoryCollection.initialize()
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord'  }, { data: 'men', type: 'Test::TestRecord'  }, { data: 'in', type: 'Test::TestRecord'  }, { data: 'a boat', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         assert.isTrue (yield cursor.hasNext()), 'There is no next value'
         yield cursor.close()
@@ -169,7 +169,7 @@ describe 'Cursor', ->
         MemoryCollection.initialize()
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord'  }, { data: 'men', type: 'Test::TestRecord'  }, { data: 'in', type: 'Test::TestRecord'  }, { data: 'a boat', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         assert.equal (yield cursor.count()), 4, 'Count works incorrectly'
         return
@@ -192,7 +192,7 @@ describe 'Cursor', ->
         MemoryCollection.initialize()
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord'  }, { data: 'men', type: 'Test::TestRecord'  }, { data: 'in', type: 'Test::TestRecord'  }, { data: 'a boat', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         spyLambda = sinon.spy -> yield return
         yield cursor.forEach spyLambda
@@ -222,7 +222,7 @@ describe 'Cursor', ->
         MemoryCollection.initialize()
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord'  }, { data: 'men', type: 'Test::TestRecord'  }, { data: 'in', type: 'Test::TestRecord'  }, { data: 'a boat', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         records = yield cursor.map (record) ->
           record.data = '+' + record.data + '+'
@@ -252,7 +252,7 @@ describe 'Cursor', ->
         MemoryCollection.initialize()
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord'  }, { data: 'men', type: 'Test::TestRecord'  }, { data: 'in', type: 'Test::TestRecord'  }, { data: 'a boat', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         records = yield cursor.filter (record) ->
           yield RC::Promise.resolve record.data.length > 3
@@ -279,7 +279,7 @@ describe 'Cursor', ->
         MemoryCollection.initialize()
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
-        array = [ { name: 'Jerome' }, { name: 'George' }, { name: 'Harris' } ]
+        array = [ { name: 'Jerome', type: 'Test::TestRecord'  }, { name: 'George', type: 'Test::TestRecord'  }, { name: 'Harris', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         record = yield cursor.find (record) ->
           yield RC::Promise.resolve record.name is 'George'
@@ -304,7 +304,7 @@ describe 'Cursor', ->
         MemoryCollection.initialize()
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
-        array = [ null, { data: 'men' }, undefined, { data: 'a boat' } ]
+        array = [ null, { data: 'men', type: 'Test::TestRecord'  }, undefined, { data: 'a boat', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         records = yield cursor.compact()
         assert.lengthOf records, 2, 'Records count not match'
@@ -330,7 +330,7 @@ describe 'Cursor', ->
         MemoryCollection.initialize()
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord'  }, { data: 'men', type: 'Test::TestRecord'  }, { data: 'in', type: 'Test::TestRecord'  }, { data: 'a boat', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         records = yield cursor.reduce (accumulator, item) ->
           accumulator[item.data] = item
@@ -360,11 +360,11 @@ describe 'Cursor', ->
         MemoryCollection.initialize()
         voMemoryCollection = MemoryCollection.new 'MemoryCollection',
           delegate: TestRecord
-        array = [ { data: 'three' }, { data: 'men' }, { data: 'in' }, { data: 'a boat' } ]
+        array = [ { data: 'three', type: 'Test::TestRecord'  }, { data: 'men', type: 'Test::TestRecord'  }, { data: 'in', type: 'Test::TestRecord'  }, { data: 'a boat', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         record = yield cursor.first()
         assert.equal record.data, 'three', '1st record is not match'
-        array = [ { data: 'Jerome' }, { data: 'George' }, { data: 'Harris' } ]
+        array = [ { data: 'Jerome', type: 'Test::TestRecord'  }, { data: 'George', type: 'Test::TestRecord'  }, { data: 'Harris', type: 'Test::TestRecord'  } ]
         cursor = Cursor.new voMemoryCollection, array
         record = yield cursor.first()
         assert.equal record.data, 'Jerome', 'Another 1st record is not match'
