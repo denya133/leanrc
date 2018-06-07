@@ -69,8 +69,17 @@ module.exports = (Module)->
           opts.load = co.wrap ->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
-            unless opts.through
-              return yield (yield EmbedsCollection.takeBy(
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+
+            res = unless opts.through
+              yield (yield EmbedsCollection.takeBy(
                 "@doc.#{opts.inverse}": @[opts.refKey]
               ,
                 $limit: 1
@@ -88,15 +97,29 @@ module.exports = (Module)->
               ,
                 $limit: 1
               )).first())[opts.through[1].by]
-              return yield (yield EmbedsCollection.takeBy(
+              yield (yield EmbedsCollection.takeBy(
                 "@doc.#{inverse.refKey}": embedId
               ,
                 $limit: 1
               )).first()
 
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbed.load #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            yield return res
+
           opts.put = co.wrap ->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             aoRecord = @[vsAttr]
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbed.put #{vsAttr} embed #{JSON.stringify aoRecord}", LEVELS[DEBUG])
+
             if aoRecord?
               unless opts.through
                 aoRecord[opts.inverse] = @[opts.refKey]
@@ -107,7 +130,7 @@ module.exports = (Module)->
                 savedRecord = yield aoRecord.save()
                 yield (yield EmbedsCollection.takeBy(
                   "@doc.#{opts.inverse}": @[opts.refKey]
-                  $not: "@doc.id": savedRecord.id # NOTE: проверяем по айдишнику только-что сохраненного
+                  "@doc.id": $ne: savedRecord.id # NOTE: проверяем по айдишнику только-что сохраненного
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
                 # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
@@ -135,7 +158,7 @@ module.exports = (Module)->
                   savedRecord = yield aoRecord.save()
                 embedIds = yield (yield ThroughCollection.takeBy(
                   "@doc.#{through.inverse}": @[opts.refKey]
-                  $not: "@doc.#{opts.through[1].by}": savedRecord[inverse.refKey]
+                  "@doc.#{opts.through[1].by}": $ne: savedRecord[inverse.refKey]
                 )).map co.wrap (voRecord)->
                   id = voRecord[opts.through[1].by]
                   yield voRecord.destroy()
@@ -178,15 +201,43 @@ module.exports = (Module)->
           opts.restore = (replica)->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
-            if replica?
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbed.restore #{vsAttr} replica #{JSON.stringify replica}", LEVELS[DEBUG])
+
+            res = if replica?
+              replica.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
               EmbedRecord.new replica, EmbedsCollection
             else
               null
 
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbed.restore #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            res
+
           opts.replicate = ->
             aoRecord = @[vsAttr]
-            EmbedRecord = aoRecord.constructor
-            EmbedRecord.objectize aoRecord
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbed.replicate #{vsAttr} embed #{JSON.stringify aoRecord}", LEVELS[DEBUG])
+
+            res = aoRecord.constructor.objectize aoRecord
+
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbed.replicate #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            res
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
           @public "#{vsAttr}": RecordInterface
@@ -217,7 +268,7 @@ module.exports = (Module)->
           #   (@Module.NS ? @Module::)[vsRecordName]
           opts.validate = ->
             EmbedRecord = @findRecordByName opts.recordName()
-            return joi.array().items EmbedRecord.schema, joi.any().strip()
+            return joi.array().items [EmbedRecord.schema, joi.any().strip()]
           # opts.validate = -> opts.transform.call(@).schema
           # opts.transform = ->
           #   EmbedRecord = @findRecordByName opts.recordName()
@@ -226,8 +277,17 @@ module.exports = (Module)->
           #   normalize: ->
           opts.load = co.wrap ->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
-            unless opts.through
-              return yield (yield EmbedsCollection.takeBy(
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+
+            res = unless opts.through
+              yield (yield EmbedsCollection.takeBy(
                 "@doc.#{opts.inverse}": @[opts.refKey]
               )).toArray()
             else
@@ -238,13 +298,27 @@ module.exports = (Module)->
               embedIds = yield (yield ThroughCollection.takeBy(
                 "@doc.#{through.inverse}": @[opts.refKey]
               )).map (voRecord)-> voRecord[opts.through[1].by]
-              return yield (yield EmbedsCollection.takeBy(
+              yield (yield EmbedsCollection.takeBy(
                 "@doc.#{inverse.refKey}": $in: embedIds
               )).toArray()
+
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbeds.load #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            yield return res
 
           opts.put = co.wrap ->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             alRecords = @[vsAttr]
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbeds.put #{vsAttr} embeds #{JSON.stringify alRecords}", LEVELS[DEBUG])
+
             if alRecords.length > 0
               unless opts.through
                 alRecordIds = []
@@ -258,7 +332,7 @@ module.exports = (Module)->
                   alRecordIds.push id
                 yield (yield EmbedsCollection.takeBy(
                   "@doc.#{opts.inverse}": @[opts.refKey]
-                  $not: "@doc.id": $in: alRecordIds # NOTE: проверяем айдишники всех только-что сохраненных
+                  "@doc.id": $nin: alRecordIds # NOTE: проверяем айдишники всех только-что сохраненных
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
                 through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
@@ -281,7 +355,7 @@ module.exports = (Module)->
                     alRecordIds.push savedRecord[inverse.refKey]
                 embedIds = yield (yield ThroughCollection.takeBy(
                   "@doc.#{through.inverse}": @[opts.refKey]
-                  $not: "@doc.#{opts.through[1].by}": $in: alRecordIds
+                  "@doc.#{opts.through[1].by}": $nin: alRecordIds
                 )).map co.wrap (voRecord)->
                   id = voRecord[opts.through[1].by]
                   yield voRecord.destroy()
@@ -322,17 +396,46 @@ module.exports = (Module)->
           opts.restore = (replica)->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
-            if replica? and replica.length > 0
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbeds.restore #{vsAttr} replica #{JSON.stringify replica}", LEVELS[DEBUG])
+
+            res = if replica? and replica.length > 0
               for item in replica
+                item.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
                 EmbedRecord.new item, EmbedsCollection
             else
               []
 
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbeds.restore #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            res
+
           opts.replicate = ->
             alRecords = @[vsAttr]
-            for item in alRecords
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbeds.replicate #{vsAttr} embeds #{JSON.stringify alRecords}", LEVELS[DEBUG])
+
+            res = for item in alRecords
               EmbedRecord = item.constructor
               EmbedRecord.objectize item
+
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbeds.replicate #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            res
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
           @public "#{vsAttr}": Array
