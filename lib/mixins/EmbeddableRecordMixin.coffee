@@ -118,6 +118,8 @@ module.exports = (Module)->
             if aoRecord?
               unless opts.through
                 aoRecord[opts.inverse] = @[opts.refKey]
+                aoRecord.spaceId = @spaceId if @spaceId?
+                aoRecord.teamId = @teamId if @teamId?
                 aoRecord.spaces = @spaces
                 aoRecord.creatorId = @creatorId
                 aoRecord.editorId = @editorId
@@ -135,6 +137,8 @@ module.exports = (Module)->
                 ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
                 ThroughRecord = @findRecordByName through.recordName()
                 inverse = ThroughRecord.relations[opts.through[1].by]
+                aoRecord.spaceId = @spaceId if @spaceId?
+                aoRecord.teamId = @teamId if @teamId?
                 aoRecord.spaces = @spaces
                 aoRecord.creatorId = @creatorId
                 aoRecord.editorId = @editorId
@@ -144,6 +148,8 @@ module.exports = (Module)->
                   yield ThroughCollection.create(
                     "#{through.inverse}": @[opts.refKey]
                     "#{opts.through[1].by}": savedRecord[inverse.refKey]
+                    spaceId: @spaceId if @spaceId?
+                    teamId: @teamId if @teamId?
                     spaces: @spaces
                     creatorId: @creatorId
                     editorId: @editorId
@@ -307,6 +313,8 @@ module.exports = (Module)->
                 alRecordIds = []
                 for aoRecord in alRecords
                   aoRecord[opts.inverse] = @[opts.refKey]
+                  aoRecord.spaceId = @spaceId if @spaceId?
+                  aoRecord.teamId = @teamId if @teamId?
                   aoRecord.spaces = @spaces
                   aoRecord.creatorId = @creatorId
                   aoRecord.editorId = @editorId
@@ -325,6 +333,8 @@ module.exports = (Module)->
                 alRecordIds = []
                 newRecordIds = []
                 for aoRecord in alRecords
+                  aoRecord.spaceId = @spaceId if @spaceId?
+                  aoRecord.teamId = @teamId if @teamId?
                   aoRecord.spaces = @spaces
                   aoRecord.creatorId = @creatorId
                   aoRecord.editorId = @editorId
@@ -350,6 +360,8 @@ module.exports = (Module)->
                   yield ThroughCollection.create(
                     "#{through.inverse}": @[opts.refKey]
                     "#{opts.through[1].by}": newRecordId
+                    spaceId: @spaceId if @spaceId?
+                    teamId: @teamId if @teamId?
                     spaces: @spaces
                     creatorId: @creatorId
                     editorId: @editorId
