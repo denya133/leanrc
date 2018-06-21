@@ -60,7 +60,7 @@ module.exports = (Module)->
 
           opts.validate = ->
             EmbedRecord = @findRecordByName opts.recordName()
-            return EmbedRecord.schema.empty(null).default(null)
+            return EmbedRecord.schema.allow(null).optional()
           opts.load = co.wrap ->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)

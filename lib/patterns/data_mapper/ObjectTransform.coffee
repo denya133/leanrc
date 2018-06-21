@@ -13,8 +13,7 @@ module.exports = (Module)->
     @module Module
 
     @public @static schema: Object,
-      get: -> joi.object().empty(null).default(null)
-      # TODO: после того как в аранге наконец-то обновится свайгер можно будет использовать `.allow(null)`, а пока пробуем через трюк `.empty(null).default(null)`
+      get: -> joi.object().allow(null).optional()
 
     @public @static parseRecordName: Function,
       default: (asName)->
