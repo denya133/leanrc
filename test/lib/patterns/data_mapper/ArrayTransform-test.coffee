@@ -8,7 +8,7 @@ describe 'ArrayTransform', ->
   describe '.schema', ->
     it 'should has correct schema value', ->
       expect ArrayTransform.schema
-      .deep.equal joi.array().items joi.any()
+      .deep.equal joi.array().items(joi.any()).allow(null).optional()
     it 'should has correct validate empty array value', ->
       expect joi.validate [], ArrayTransform.schema
       .deep.equal {error: null, value: []}

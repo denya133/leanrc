@@ -8,7 +8,7 @@ describe 'BooleanTransform', ->
   describe '.schema', ->
     it 'should has correct schema value', ->
       expect BooleanTransform.schema
-      .deep.equal joi.boolean().empty(null).default(null)
+      .deep.equal joi.boolean().allow(null).optional()
   describe '.normalize', ->
     it 'should deserialize null value', ->
       co ->

@@ -8,7 +8,7 @@ describe 'NumberTransform', ->
   describe '.schema', ->
     it 'should has correct schema value', ->
       expect NumberTransform.schema
-      .deep.equal joi.number().empty(null).default(null)
+      .deep.equal joi.number().allow(null).optional()
   describe '.normalize', ->
     it 'should normalize null value', ->
       co ->
