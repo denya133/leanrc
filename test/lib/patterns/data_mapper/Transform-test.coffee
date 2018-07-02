@@ -8,7 +8,7 @@ describe 'Transform', ->
   describe '.schema', ->
     it 'should has correct schema value', ->
       expect Transform.schema
-      .deep.equal joi.any()
+      .deep.equal joi.any().allow(null).optional()
   describe '.normalize', ->
     it 'should normalize null value', ->
       co ->

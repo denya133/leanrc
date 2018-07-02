@@ -13,7 +13,7 @@ module.exports = (Module)->
     @module Module
 
     @public @static schema: Object,
-      get: -> joi.array().items joi.any()
+      get: -> joi.array().items(joi.any()).allow(null).optional()
 
     @public @static parseRecordName: Function,
       default: (asName)->

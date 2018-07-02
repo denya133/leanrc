@@ -54,7 +54,7 @@ module.exports = (Module)->
         return: Module::Class
         default: (asName)->
           [vsModuleName, vsRecordName] = @parseRecordName asName
-          (@Module.NS ? @Module::)[vsRecordName]
+          (@Module.NS ? @Module::)[vsRecordName] ? @
 
       @public findRecordByName: Function,
         args: [String]
@@ -167,7 +167,10 @@ module.exports = (Module)->
             @super aoAttributes, aoCollection
           else
             RecordClass = @findRecordByName aoAttributes.type
-            RecordClass?.new(aoAttributes, aoCollection) ? @super arguments...
+            if RecordClass is @
+              @super aoAttributes, aoCollection
+            else
+              RecordClass.new(aoAttributes, aoCollection)
 
       @public @async save: Function,
         default: ->

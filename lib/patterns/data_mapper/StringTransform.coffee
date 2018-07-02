@@ -12,7 +12,7 @@ module.exports = (Module)->
     @module Module
 
     @public @static schema: Object,
-      get: -> joi.string().empty(null).default(null)
+      get: -> joi.string().allow(null).optional()
 
     @public @static @async normalize: Function,
       default: (serialized)->

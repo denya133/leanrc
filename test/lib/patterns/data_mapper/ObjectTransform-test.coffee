@@ -8,7 +8,7 @@ describe 'ObjectTransform', ->
   describe '.schema', ->
     it 'should has correct schema value', ->
       expect ObjectTransform.schema
-      .deep.equal joi.object().empty(null).default(null)
+      .deep.equal joi.object().allow(null).optional()
     it 'should has correct validate null value', ->
       expect joi.validate null, ObjectTransform.schema
       .deep.equal {error: null, value: null}

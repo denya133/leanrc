@@ -8,7 +8,7 @@ describe 'DateTransform', ->
   describe '.schema', ->
     it 'should has correct schema value', ->
       expect DateTransform.schema
-      .deep.equal joi.date().iso().empty(null).default(null)
+      .deep.equal joi.date().iso().allow(null).optional()
   describe '.normalize', ->
     it 'should deserialize null value', ->
       co ->

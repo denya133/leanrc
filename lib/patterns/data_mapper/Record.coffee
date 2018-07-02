@@ -64,23 +64,15 @@ module.exports = (Module)->
     @include RecordMixin
     @module Module
 
-    @attribute id: String,
-      validate: -> joi.string().empty(null).default(null)
-      # TODO: после того как в аранге наконец-то обновится свайгер можно будет использовать `.allow(null)`, а пока пробуем через трюк `.empty(null).default(null)`
-    @attribute rev: String,
-      validate: -> joi.string().empty(null).default(null)
-    @attribute type: String,
-      validate: -> joi.string().empty(null).default(null)
+    @attribute id: String
+    @attribute rev: String
+    @attribute type: String
     @attribute isHidden: Boolean,
-      validate: -> joi.boolean().default((-> no), 'by default')
+      validate: -> joi.boolean().empty(null).default(no, 'false by default')
       default: no
-    @attribute createdAt: Date,
-      validate: -> joi.date().iso().empty(null)
-    @attribute updatedAt: Date,
-      validate: -> joi.date().iso().empty(null)
-    @attribute deletedAt: Date,
-      validate: -> joi.date().iso().empty(null).default(null)
-      default: null
+    @attribute createdAt: Date
+    @attribute updatedAt: Date
+    @attribute deletedAt: Date
 
     @chains ['create', 'update', 'delete', 'destroy']
 
