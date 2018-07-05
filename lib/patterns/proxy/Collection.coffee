@@ -107,8 +107,11 @@ module.exports = (Module)->
     @public @async update: Function,
       default: (id, properties)->
         properties.id = id
-        voRecord = yield @objectizer.recoverize @delegate, properties
-        return yield voRecord.save()
+        existedRecord = yield @find id
+        receivedRecord = yield @objectizer.recoverize @delegate, properties
+        for own key of properties
+          existedRecord[key] = receivedRecord[key]
+        return yield existedRecord.save()
 
     @public @async clone: Function,
       default: (aoRecord)->
