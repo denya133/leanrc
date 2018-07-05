@@ -459,7 +459,7 @@ module.exports = (Module)->
         default: (args...)->
           [ahPayload] = args
           voRecord = yield @super args...
-          for own asAttr, { restore } of voRecord.constructor.embeddings
+          for own asAttr, { restore } of voRecord.constructor.embeddings when asAttr of ahPayload
             voRecord[asAttr] = yield restore.call voRecord, ahPayload[asAttr]
           yield return voRecord
 
@@ -467,9 +467,8 @@ module.exports = (Module)->
         default: (args...)->
           [aoRecord] = args
           vhResult = @super args...
-          for own asAttr, { replicate } of aoRecord.constructor.embeddings
-            if aoRecord[asAttr]?
-              vhResult[asAttr] = replicate.call aoRecord
+          for own asAttr, { replicate } of aoRecord.constructor.embeddings when aoRecord[asAttr]?
+            vhResult[asAttr] = replicate.call aoRecord
           return vhResult
 
       @public @static makeSnapshotWithEmbeds: Function,
