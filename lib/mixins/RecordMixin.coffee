@@ -348,7 +348,7 @@ module.exports = (Module)->
           else
             @findRecordByName ahPayload.type
 
-          for own asAttr, { transform } of RecordClass.attributes
+          for own asAttr, { transform } of RecordClass.attributes when asAttr of ahPayload
             vhAttributes[asAttr] = yield transform.call(RecordClass).normalize ahPayload[asAttr]
 
           vhAttributes.type = ahPayload.type
