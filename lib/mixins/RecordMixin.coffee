@@ -184,15 +184,20 @@ module.exports = (Module)->
         default: ->
           response = yield @collection.push @
           if response?
-            { id } = response
-            @id ?= id if id
-          @[ipoInternalRecord] = @constructor.makeSnapshot response
+            # { id } = response
+            # @id ?= id if id
+            for own asAttr of @constructor.attributes
+              @[asAttr] = response[asAttr]
+            @[ipoInternalRecord] = response[ipoInternalRecord]
           yield return @
 
       @public @async update: Function,
         default: ->
           response = yield @collection.override @id, @
-          @[ipoInternalRecord] = @constructor.makeSnapshot response
+          if response?
+            for own asAttr of @constructor.attributes
+              @[asAttr] = response[asAttr]
+            @[ipoInternalRecord] = response[ipoInternalRecord]
           yield return @
 
       @public @async delete: Function,

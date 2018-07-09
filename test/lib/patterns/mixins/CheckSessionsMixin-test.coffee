@@ -178,7 +178,7 @@ describe 'CheckSessionsMixin', ->
         resource.context = Test::Context.new req, res, switchMediator
         resource.initializeNotifier KEY
         yield resource.makeSession()
-        assert.isNull resource.session.uid
+        assert.isUndefined resource.session.uid
         sessions = facade.retrieveProxy Test::SESSIONS
         session = yield sessions.create({})
         delete req.headers['authorization']

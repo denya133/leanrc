@@ -98,8 +98,8 @@ describe 'Record', ->
           delegate: Test::TestRecord
         facade = LeanRC::Facade.getInstance 'TEST_RECORD_FACADE_03'
         facade.registerProxy collection
-        record = yield collection.build({})
-        assert.isNull record.id
+        record = yield collection.build({type: 'Test::TestRecord'})
+        assert.isUndefined record.id
         yield record.save()
         assert.isDefined record.id
         facade.remove()

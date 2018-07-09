@@ -439,6 +439,28 @@ module.exports = (Module)->
       @public @static embeddings: Object,
         get: -> @metaObject.getGroup 'embeddings', no
 
+      @public @async create: Function,
+        default: ->
+          response = yield @collection.push @
+          if response?
+            for own asAttr of @constructor.attributes
+              @[asAttr] = response[asAttr]
+            for own asEmbed of @constructor.embeddings
+              @[asEmbed] = response[asEmbed]
+            @[ipoInternalRecord] = response[ipoInternalRecord]
+          yield return @
+
+      @public @async update: Function,
+        default: ->
+          response = yield @collection.override @id, @
+          if response?
+            for own asAttr of @constructor.attributes
+              @[asAttr] = response[asAttr]
+            for own asEmbed of @constructor.embeddings
+              @[asEmbed] = response[asEmbed]
+            @[ipoInternalRecord] = response[ipoInternalRecord]
+          yield return @
+
       @public @static @async normalize: Function,
         default: (args...)->
           voRecord = yield @super args...
