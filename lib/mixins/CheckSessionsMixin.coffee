@@ -71,6 +71,7 @@ module.exports = (Module)->
               )
           else
             session = yield SessionsCollection.build({})
+          @context.session = session
           @session = session
           yield return
 

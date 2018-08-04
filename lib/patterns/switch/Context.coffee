@@ -42,6 +42,7 @@ module.exports = (Module)->
     @public routePath: String
     @public pathParams: Object
     @public transaction: Object
+    @public session: Object
 
     # @public database: String # возможно это тоже надо получать из метода из отдельного модуля
 
