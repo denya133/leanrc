@@ -37,6 +37,7 @@ module.exports = (Module)->
     Mediator
     Context
     SwitchInterface
+    ContextInterface
     ConfigurableMixin
     Renderer
     Utils: {
@@ -248,6 +249,7 @@ module.exports = (Module)->
         self = @
         onFinished = require 'on-finished'
         handleRequest = co.wrap (req, res)->
+          t1 = Date.now()
           { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
           self.sendNotification SEND_TO_LOG, '>>>>>> START REQUEST HANDLING', LEVELS[DEBUG]
           res.statusCode = 404
@@ -262,13 +264,30 @@ module.exports = (Module)->
             voContext.onerror err
             return
           self.sendNotification SEND_TO_LOG, '>>>>>> END REQUEST HANDLING', LEVELS[DEBUG]
+          reqLength = voContext.request.length
+          resLength = voContext.response.length
+          time = Date.now() - t1
+          yield self.handleStatistics reqLength, resLength, time, voContext
           yield return
         handleRequest
+
+    # NOTE: пустая функция, которую вызываем из callback и передаем в нее длину реквеста, длину респонза, время выполнения, и контекст, чтобы потом в отдельном миксине можно было определить тело этого метода, т.е. как реализовывать сохранение (реагировать) этой статистики.
+    @public @async handleStatistics: Function,
+      args: [Number, Number, Number, ContextInterface]
+      return: NILL
+      default: (reqLength, resLength, time, aoContext)->
+        { DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
+        @sendNotification SEND_TO_LOG, "
+          REQUEST LENGTH #{reqLength} byte
+          RESPONSE LENGTH #{resLength} byte
+          HANDLED BY #{time} ms
+        ", LEVELS[DEBUG]
+        yield return
 
     # Default error handler
     @public onerror: Function,
       args: [Error]
-      return: LAMBDA
+      return: NILL
       default: (err)->
         assert = require 'assert'
         assert _.isError(err), "non-error thrown: #{err}"

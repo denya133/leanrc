@@ -551,7 +551,7 @@ describe 'Response', ->
           removeHeader: (field) -> delete @_headers[field.toLowerCase()]
         context = { res }
         response = Response.new context
-        assert.isUndefined response.length
+        assert.equal response.length, 0
         response.length = 10
         assert.equal response.length, 10
         response.remove 'Content-Length'
