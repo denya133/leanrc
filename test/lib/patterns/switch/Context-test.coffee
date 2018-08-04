@@ -999,7 +999,7 @@ describe 'Context', ->
           setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
           removeHeader: (field) -> delete @_headers[field.toLowerCase()]
         context = Context.new req, res, switchInstance
-        assert.isUndefined context.length
+        assert.equal context.length, 0
         context.length = 10
         assert.equal context.length, 10
         context.response.remove 'Content-Length'
