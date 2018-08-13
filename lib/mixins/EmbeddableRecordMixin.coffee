@@ -439,6 +439,8 @@ module.exports = (Module)->
       @public @static embeddings: Object,
         get: -> @metaObject.getGroup 'embeddings', no
 
+      @chains ['create', 'update']
+
       @public @async create: Function,
         default: ->
           response = yield @collection.push @
