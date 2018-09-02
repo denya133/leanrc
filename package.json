@@ -1,7 +1,7 @@
 {
   "name": "LeanRC",
   "description": "LeanRC is a lightweight framework for creating applications based upon the classic Model-View-Controller design meta-pattern",
-  "version": "5.3.3",
+  "version": "5.3.4",
   "main": "dist/index.js",
   "private": true,
   "license": "AGPL-3.0",
