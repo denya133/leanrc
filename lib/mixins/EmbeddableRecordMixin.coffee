@@ -199,7 +199,7 @@ module.exports = (Module)->
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
             yield return
 
-          opts.restore = (replica)->
+          opts.restore = co.wrap (replica)->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
 
@@ -214,13 +214,14 @@ module.exports = (Module)->
 
             res = if replica?
               replica.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
-              EmbedRecord.new replica, EmbedsCollection
+              yield EmbedsCollection.build replica
+              # EmbedRecord.new replica, EmbedsCollection
             else
               null
 
             @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbed.restore #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
 
-            res
+            yield return res
 
           opts.replicate = ->
             aoRecord = @[vsAttr]
@@ -388,7 +389,7 @@ module.exports = (Module)->
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
             yield return
 
-          opts.restore = (replica)->
+          opts.restore = co.wrap (replica)->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
 
@@ -404,13 +405,14 @@ module.exports = (Module)->
             res = if replica? and replica.length > 0
               for item in replica
                 item.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
-                EmbedRecord.new item, EmbedsCollection
+                yield EmbedsCollection.build item
+                # EmbedRecord.new item, EmbedsCollection
             else
               []
 
             @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbeds.restore #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
 
-            res
+            yield return res
 
           opts.replicate = ->
             alRecords = @[vsAttr]
