@@ -104,6 +104,7 @@ module.exports = (Module)->
 
           opts.put = co.wrap ->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            EmbedRecord = @findRecordByName opts.recordName()
             aoRecord = @[vsAttr]
 
             {
@@ -117,6 +118,9 @@ module.exports = (Module)->
 
             if aoRecord?
               unless opts.through
+                if aoRecord.constructor is Object
+                  aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
+                  aoRecord = yield EmbedsCollection.build aoRecord
                 aoRecord[opts.inverse] = @[opts.refKey]
                 aoRecord.spaceId = @spaceId if @spaceId?
                 aoRecord.teamId = @teamId if @teamId?
@@ -137,6 +141,9 @@ module.exports = (Module)->
                 ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
                 ThroughRecord = @findRecordByName through.recordName()
                 inverse = ThroughRecord.relations[opts.through[1].by]
+                if aoRecord.constructor is Object
+                  aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
+                  aoRecord = yield EmbedsCollection.build aoRecord
                 aoRecord.spaceId = @spaceId if @spaceId?
                 aoRecord.teamId = @teamId if @teamId?
                 aoRecord.spaces = @spaces
@@ -298,6 +305,7 @@ module.exports = (Module)->
 
           opts.put = co.wrap ->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            EmbedRecord = @findRecordByName opts.recordName()
             alRecords = @[vsAttr]
 
             {
@@ -313,6 +321,9 @@ module.exports = (Module)->
               unless opts.through
                 alRecordIds = []
                 for aoRecord in alRecords
+                  if aoRecord.constructor is Object
+                    aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
+                    aoRecord = yield EmbedsCollection.build aoRecord
                   aoRecord[opts.inverse] = @[opts.refKey]
                   aoRecord.spaceId = @spaceId if @spaceId?
                   aoRecord.teamId = @teamId if @teamId?
@@ -334,6 +345,9 @@ module.exports = (Module)->
                 alRecordIds = []
                 newRecordIds = []
                 for aoRecord in alRecords
+                  if aoRecord.constructor is Object
+                    aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
+                    aoRecord = yield EmbedsCollection.build aoRecord
                   aoRecord.spaceId = @spaceId if @spaceId?
                   aoRecord.teamId = @teamId if @teamId?
                   aoRecord.spaces = @spaces
@@ -436,6 +450,27 @@ module.exports = (Module)->
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
           @public "#{vsAttr}": Array
+          # ipmConstructProxy = @protected "constructProxyFor#{vsAttr}": Function,
+          #   default: ->
+          #     @[iplPrivateEmbeds] ?= new Proxy [],
+          #       set: (aoTarget, asName, aValue, aoReceiver) ->
+          #         unless Reflect.get Class::, asName
+          #           Class.util asName, aValue
+          #       get: (aoTarget, asName) ->
+          #         unless Reflect.get Class::, asName
+          #           vsPath = Class[cphUtilsMap][asName]
+          #           if vsPath
+          #             require(vsPath) Class
+          #         Reflect.get Class::, asName
+          # iplPrivateEmbeds = @private "#{vsAttr}": Array
+          # @public "#{vsAttr}": Array,
+          #   get: ->
+          #     @[iplPrivateEmbeds] ?= @[ipmConstructProxy]()
+          #   set: (data)->
+          #     @[ipmConstructProxy]()
+          #     @[iplPrivateEmbeds] = data
+          #     @[iplPrivateEmbeds]
+          #   default:
           return
 
       @public @static embeddings: Object,
