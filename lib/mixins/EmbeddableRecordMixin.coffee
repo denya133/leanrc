@@ -542,6 +542,7 @@ module.exports = (Module)->
       # TODO: не учтены установки значений, которые раньше не были установлены
       @public @async changedAttributes: Function,
         default: (args...)->
+          [aoRecord] = args
           vhResult = yield @super args...
           for own vsAttrName, { replicate } of @constructor.embeddings
             voOldValue = @[ipoInternalRecord]?[vsAttrName]
