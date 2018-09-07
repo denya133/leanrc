@@ -65,7 +65,8 @@ module.exports = (Module)->
             EmbedRecord = @findRecordByName opts.recordName()
             return EmbedRecord.schema.allow(null).optional()
           opts.load = co.wrap ->
-            yield return null if opts.writeOnly
+            if opts.writeOnly
+              yield return null
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
@@ -287,7 +288,8 @@ module.exports = (Module)->
             return joi.array().items [EmbedRecord.schema, joi.any().strip()]
 
           opts.load = co.wrap ->
-            yield return [] if opts.writeOnly
+            if opts.writeOnly
+              yield return []
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
 
             {
