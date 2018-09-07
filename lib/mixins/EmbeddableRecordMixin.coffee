@@ -108,7 +108,8 @@ module.exports = (Module)->
             yield return res
 
           opts.put = co.wrap ->
-            yield return if opts.readOnly
+            if opts.readOnly
+              yield return
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
             aoRecord = @[vsAttr]
@@ -321,7 +322,8 @@ module.exports = (Module)->
             yield return res
 
           opts.put = co.wrap ->
-            yield return if opts.readOnly
+            if opts.readOnly
+              yield return
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
             alRecords = @[vsAttr]
