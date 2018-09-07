@@ -522,7 +522,10 @@ module.exports = (Module)->
         default: (args...)->
           voRecord = yield @super args...
           for own asAttr, { load, writeOnly } of voRecord.constructor.embeddings
-            voRecord[asAttr] = yield load.call voRecord unless writeOnly
+            unless writeOnly
+              voRecord[asAttr] = yield load.call voRecord
+            else
+              voRecord[asAttr] = []
           voRecord[ipoInternalRecord] = voRecord.constructor.makeSnapshotWithEmbeds voRecord
           yield return voRecord
 
