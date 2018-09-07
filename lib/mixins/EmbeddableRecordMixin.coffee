@@ -42,13 +42,17 @@ module.exports = (Module)->
             joi.object vhAttrs
           _data[@name]
 
-      @public @static hasEmbed: Function,
+      @public @static relatedEmbed: Function,
         default: (typeDefinition, opts={})->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
-          opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
-          opts.embedding = 'hasEmbed'
+          opts.inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
+          opts.attr ?= "#{vsAttr}Id"
+          opts.embedding = 'relatedEmbed'
+
+          opts.putOnly ?= no
+          opts.loadOnly ?= no
 
           opts.recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
@@ -62,6 +66,375 @@ module.exports = (Module)->
             EmbedRecord = @findRecordByName opts.recordName()
             return EmbedRecord.schema.allow(null).optional()
           opts.load = co.wrap ->
+            if opts.putOnly
+              yield return null
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+
+            res = unless opts.through
+              yield (yield EmbedsCollection.takeBy(
+                "@doc.#{opts.refKey}": @[opts.attr]
+              ,
+                $limit: 1
+              )).first()
+            else
+              # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода relatedEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
+              through = @constructor.embeddings[opts.through[0]]
+              unless through?
+                throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.relatedEmbed` method"
+              ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+              ThroughRecord = @findRecordByName through.recordName()
+              inverse = ThroughRecord.relations[opts.through[1].by]
+              embedId = (yield (yield ThroughCollection.takeBy(
+                "@doc.#{through.inverse}": @[through.refKey]
+              ,
+                $limit: 1
+              )).first())[opts.through[1].by]
+              yield (yield EmbedsCollection.takeBy(
+                "@doc.#{inverse.refKey}": embedId
+              ,
+                $limit: 1
+              )).first()
+
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbed.load #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            yield return res
+
+          opts.put = co.wrap ->
+            if opts.loadOnly
+              yield return
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            EmbedRecord = @findRecordByName opts.recordName()
+            aoRecord = @[vsAttr]
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbed.put #{vsAttr} embed #{JSON.stringify aoRecord}", LEVELS[DEBUG])
+
+            if aoRecord?
+              if aoRecord.constructor is Object
+                aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
+                aoRecord = yield EmbedsCollection.build aoRecord
+              unless opts.through
+                aoRecord.spaceId = @spaceId if @spaceId?
+                aoRecord.teamId = @teamId if @teamId?
+                aoRecord.spaces = @spaces
+                aoRecord.creatorId = @creatorId
+                aoRecord.editorId = @editorId
+                aoRecord.ownerId = @ownerId
+                if (yield aoRecord.isNew()) or Object.keys(yield aoRecord.changedAttributes()).length
+                  savedRecord = yield aoRecord.save()
+                else
+                  savedRecord = aoRecord
+                @[opts.attr] = savedRecord[opts.refKey]
+              else
+                # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода relatedEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
+                through = @constructor.embeddings[opts.through[0]]
+                unless through?
+                  throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.relatedEmbed` method"
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+                ThroughRecord = @findRecordByName through.recordName()
+                inverse = ThroughRecord.relations[opts.through[1].by]
+                aoRecord.spaceId = @spaceId if @spaceId?
+                aoRecord.teamId = @teamId if @teamId?
+                aoRecord.spaces = @spaces
+                aoRecord.creatorId = @creatorId
+                aoRecord.editorId = @editorId
+                aoRecord.ownerId = @ownerId
+                if yield aoRecord.isNew()
+                  savedRecord = yield aoRecord.save()
+                  yield ThroughCollection.create(
+                    "#{through.inverse}": @[through.refKey]
+                    "#{opts.through[1].by}": savedRecord[inverse.refKey]
+                    spaceId: @spaceId if @spaceId?
+                    teamId: @teamId if @teamId?
+                    spaces: @spaces
+                    creatorId: @creatorId
+                    editorId: @editorId
+                    ownerId: @ownerId
+                  )
+                else
+                  if Object.keys(yield aoRecord.changedAttributes()).length
+                    savedRecord = yield aoRecord.save()
+                  else
+                    savedRecord = aoRecord
+                yield (yield ThroughCollection.takeBy(
+                  "@doc.#{through.inverse}": @[through.refKey]
+                  "@doc.#{opts.through[1].by}": $ne: savedRecord[inverse.refKey]
+                )).forEach co.wrap (voRecord)->
+                  yield voRecord.destroy()
+                  yield return
+            yield return
+
+          opts.restore = co.wrap (replica)->
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            EmbedRecord = @findRecordByName opts.recordName()
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbed.restore #{vsAttr} replica #{JSON.stringify replica}", LEVELS[DEBUG])
+
+            res = if replica?
+              replica.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
+              yield EmbedsCollection.build replica
+            else
+              null
+
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbed.restore #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            yield return res
+
+          opts.replicate = ->
+            aoRecord = @[vsAttr]
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbed.replicate #{vsAttr} embed #{JSON.stringify aoRecord}", LEVELS[DEBUG])
+
+            res = aoRecord.constructor.objectize aoRecord
+
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbed.replicate #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            res
+
+          @metaObject.addMetaData 'embeddings', vsAttr, opts
+          @public "#{vsAttr}": RecordInterface
+          return
+
+      @public @static relatedEmbeds: Function,
+        default: (typeDefinition, opts={})->
+          recordClass = @
+          [vsAttr] = Object.keys typeDefinition
+          opts.refKey ?= 'id'
+          opts.inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
+          opts.attr ?= "#{inflect.pluralize inflect.camelize vsAttr, no}"
+          opts.embedding = 'relatedEmbeds'
+
+          opts.putOnly ?= no
+          opts.loadOnly ?= no
+
+          opts.recordName ?= ->
+            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
+            vsRecordName
+          opts.collectionName ?= ->
+            "#{
+              inflect.pluralize opts.recordName().replace /Record$/, ''
+            }Collection"
+
+          opts.validate = ->
+            EmbedRecord = @findRecordByName opts.recordName()
+            return EmbedRecord.schema.allow(null).optional()
+          opts.load = co.wrap ->
+            if opts.putOnly
+              yield return null
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+
+            res = unless opts.through
+              yield (yield EmbedsCollection.takeBy(
+                "@doc.#{opts.refKey}": $in: @[opts.attr]
+              ,
+                $limit: 1
+              )).first()
+            else
+              through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
+              ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+              ThroughRecord = @findRecordByName through.recordName()
+              inverse = ThroughRecord.relations[opts.through[1].by]
+              embedIds = yield (yield ThroughCollection.takeBy(
+                "@doc.#{through.inverse}": @[through.refKey]
+              )).map (voRecord)-> voRecord[opts.through[1].by]
+              yield (yield EmbedsCollection.takeBy(
+                "@doc.#{inverse.refKey}": $in: embedIds
+              )).toArray()
+
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbeds.load #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            yield return res
+
+          opts.put = co.wrap ->
+            if opts.loadOnly
+              yield return
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            EmbedRecord = @findRecordByName opts.recordName()
+            alRecords = @[vsAttr]
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbeds.put #{vsAttr} embeds #{JSON.stringify alRecords}", LEVELS[DEBUG])
+
+            if alRecords.length > 0
+              unless opts.through
+                alRecordIds = []
+                for aoRecord in alRecords
+                  if aoRecord.constructor is Object
+                    aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
+                    aoRecord = yield EmbedsCollection.build aoRecord
+                  aoRecord.spaceId = @spaceId if @spaceId?
+                  aoRecord.teamId = @teamId if @teamId?
+                  aoRecord.spaces = @spaces
+                  aoRecord.creatorId = @creatorId
+                  aoRecord.editorId = @editorId
+                  aoRecord.ownerId = @ownerId
+                  if (yield aoRecord.isNew()) or Object.keys(yield aoRecord.changedAttributes()).length
+                    { id } = yield aoRecord.save()
+                  else
+                    { id } = aoRecord
+                  alRecordIds.push id
+                @[opts.attr] = alRecordIds
+              else
+                through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
+                ThroughRecord = @findRecordByName through.recordName()
+                inverse = ThroughRecord.relations[opts.through[1].by]
+                alRecordIds = []
+                newRecordIds = []
+                for aoRecord in alRecords
+                  if aoRecord.constructor is Object
+                    aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
+                    aoRecord = yield EmbedsCollection.build aoRecord
+                  aoRecord.spaceId = @spaceId if @spaceId?
+                  aoRecord.teamId = @teamId if @teamId?
+                  aoRecord.spaces = @spaces
+                  aoRecord.creatorId = @creatorId
+                  aoRecord.editorId = @editorId
+                  aoRecord.ownerId = @ownerId
+                  if yield aoRecord.isNew()
+                    savedRecord = yield aoRecord.save()
+                    alRecordIds.push savedRecord[inverse.refKey]
+                    newRecordIds.push savedRecord[inverse.refKey]
+                  else
+                    if Object.keys(yield aoRecord.changedAttributes()).length
+                      savedRecord = yield aoRecord.save()
+                    else
+                      savedRecord = aoRecord
+                    alRecordIds.push savedRecord[inverse.refKey]
+                unless opts.putOnly
+                  yield (yield ThroughCollection.takeBy(
+                    "@doc.#{through.inverse}": @[through.refKey]
+                    "@doc.#{opts.through[1].by}": $nin: alRecordIds
+                  )).forEach co.wrap (voRecord)->
+                    yield voRecord.destroy()
+                    yield return
+                for newRecordId in newRecordIds
+                  yield ThroughCollection.create(
+                    "#{through.inverse}": @[through.refKey]
+                    "#{opts.through[1].by}": newRecordId
+                    spaceId: @spaceId if @spaceId?
+                    teamId: @teamId if @teamId?
+                    spaces: @spaces
+                    creatorId: @creatorId
+                    editorId: @editorId
+                    ownerId: @ownerId
+                  )
+            yield return
+
+          opts.restore = co.wrap (replica)->
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            EmbedRecord = @findRecordByName opts.recordName()
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbeds.restore #{vsAttr} replica #{JSON.stringify replica}", LEVELS[DEBUG])
+
+            res = if replica?
+              replica.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
+              yield EmbedsCollection.build replica
+            else
+              null
+
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbeds.restore #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            yield return res
+
+          opts.replicate = ->
+            aoRecord = @[vsAttr]
+
+            {
+              LogMessage: {
+                SEND_TO_LOG
+                LEVELS
+                DEBUG
+              }
+            } = Module::
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbeds.replicate #{vsAttr} embed #{JSON.stringify aoRecord}", LEVELS[DEBUG])
+
+            res = aoRecord.constructor.objectize aoRecord
+
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbeds.replicate #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
+
+            res
+
+          @metaObject.addMetaData 'embeddings', vsAttr, opts
+          @public "#{vsAttr}": RecordInterface
+          return
+
+      @public @static hasEmbed: Function,
+        default: (typeDefinition, opts={})->
+          recordClass = @
+          [vsAttr] = Object.keys typeDefinition
+          opts.refKey ?= 'id'
+          opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
+          opts.embedding = 'hasEmbed'
+
+          opts.putOnly ?= no
+          opts.loadOnly ?= no
+
+          opts.recordName ?= ->
+            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
+            vsRecordName
+          opts.collectionName ?= ->
+            "#{
+              inflect.pluralize opts.recordName().replace /Record$/, ''
+            }Collection"
+
+          opts.validate = ->
+            EmbedRecord = @findRecordByName opts.recordName()
+            return EmbedRecord.schema.allow(null).optional()
+          opts.load = co.wrap ->
+            if opts.putOnly
+              yield return null
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
@@ -103,6 +476,8 @@ module.exports = (Module)->
             yield return res
 
           opts.put = co.wrap ->
+            if opts.loadOnly
+              yield return
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
             aoRecord = @[vsAttr]
@@ -117,10 +492,10 @@ module.exports = (Module)->
             @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbed.put #{vsAttr} embed #{JSON.stringify aoRecord}", LEVELS[DEBUG])
 
             if aoRecord?
+              if aoRecord.constructor is Object
+                aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
+                aoRecord = yield EmbedsCollection.build aoRecord
               unless opts.through
-                if aoRecord.constructor is Object
-                  aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
-                  aoRecord = yield EmbedsCollection.build aoRecord
                 aoRecord[opts.inverse] = @[opts.refKey]
                 aoRecord.spaceId = @spaceId if @spaceId?
                 aoRecord.teamId = @teamId if @teamId?
@@ -128,7 +503,10 @@ module.exports = (Module)->
                 aoRecord.creatorId = @creatorId
                 aoRecord.editorId = @editorId
                 aoRecord.ownerId = @ownerId
-                savedRecord = yield aoRecord.save()
+                if (yield aoRecord.isNew()) or Object.keys(yield aoRecord.changedAttributes()).length
+                  savedRecord = yield aoRecord.save()
+                else
+                  savedRecord = aoRecord
                 yield (yield EmbedsCollection.takeBy(
                   "@doc.#{opts.inverse}": @[opts.refKey]
                   "@doc.id": $ne: savedRecord.id # NOTE: проверяем по айдишнику только-что сохраненного
@@ -141,9 +519,6 @@ module.exports = (Module)->
                 ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
                 ThroughRecord = @findRecordByName through.recordName()
                 inverse = ThroughRecord.relations[opts.through[1].by]
-                if aoRecord.constructor is Object
-                  aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
-                  aoRecord = yield EmbedsCollection.build aoRecord
                 aoRecord.spaceId = @spaceId if @spaceId?
                 aoRecord.teamId = @teamId if @teamId?
                 aoRecord.spaces = @spaces
@@ -163,7 +538,10 @@ module.exports = (Module)->
                     ownerId: @ownerId
                   )
                 else
-                  savedRecord = yield aoRecord.save()
+                  if Object.keys(yield aoRecord.changedAttributes()).length
+                    savedRecord = yield aoRecord.save()
+                  else
+                    savedRecord = aoRecord
                 embedIds = yield (yield ThroughCollection.takeBy(
                   "@doc.#{through.inverse}": @[opts.refKey]
                   "@doc.#{opts.through[1].by}": $ne: savedRecord[inverse.refKey]
@@ -174,7 +552,7 @@ module.exports = (Module)->
                 yield (yield EmbedsCollection.takeBy(
                   "@doc.#{inverse.refKey}": $in: embedIds
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
-            else
+            else unless opts.putOnly
               unless opts.through
                 voRecord = yield (yield EmbedsCollection.takeBy(
                   "@doc.#{opts.inverse}": @[opts.refKey]
@@ -222,7 +600,6 @@ module.exports = (Module)->
             res = if replica?
               replica.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
               yield EmbedsCollection.build replica
-              # EmbedRecord.new replica, EmbedsCollection
             else
               null
 
@@ -260,6 +637,9 @@ module.exports = (Module)->
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
           opts.embedding = 'hasEmbeds'
 
+          opts.putOnly ?= no
+          opts.loadOnly ?= no
+
           opts.recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
             vsRecordName
@@ -273,6 +653,8 @@ module.exports = (Module)->
             return joi.array().items [EmbedRecord.schema, joi.any().strip()]
 
           opts.load = co.wrap ->
+            if opts.putOnly
+              yield return []
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
 
             {
@@ -304,6 +686,8 @@ module.exports = (Module)->
             yield return res
 
           opts.put = co.wrap ->
+            if opts.loadOnly
+              yield return
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
             alRecords = @[vsAttr]
@@ -331,12 +715,16 @@ module.exports = (Module)->
                   aoRecord.creatorId = @creatorId
                   aoRecord.editorId = @editorId
                   aoRecord.ownerId = @ownerId
-                  { id } = yield aoRecord.save()
+                  if (yield aoRecord.isNew()) or Object.keys(yield aoRecord.changedAttributes()).length
+                    { id } = yield aoRecord.save()
+                  else
+                    { id } = aoRecord
                   alRecordIds.push id
-                yield (yield EmbedsCollection.takeBy(
-                  "@doc.#{opts.inverse}": @[opts.refKey]
-                  "@doc.id": $nin: alRecordIds # NOTE: проверяем айдишники всех только-что сохраненных
-                )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
+                unless opts.putOnly
+                  yield (yield EmbedsCollection.takeBy(
+                    "@doc.#{opts.inverse}": @[opts.refKey]
+                    "@doc.id": $nin: alRecordIds # NOTE: проверяем айдишники всех только-что сохраненных
+                  )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
                 through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
                 ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
@@ -359,18 +747,22 @@ module.exports = (Module)->
                     alRecordIds.push savedRecord[inverse.refKey]
                     newRecordIds.push savedRecord[inverse.refKey]
                   else
-                    savedRecord = yield aoRecord.save()
+                    if Object.keys(yield aoRecord.changedAttributes()).length
+                      savedRecord = yield aoRecord.save()
+                    else
+                      savedRecord = aoRecord
                     alRecordIds.push savedRecord[inverse.refKey]
-                embedIds = yield (yield ThroughCollection.takeBy(
-                  "@doc.#{through.inverse}": @[opts.refKey]
-                  "@doc.#{opts.through[1].by}": $nin: alRecordIds
-                )).map co.wrap (voRecord)->
-                  id = voRecord[opts.through[1].by]
-                  yield voRecord.destroy()
-                  yield return id
-                yield (yield EmbedsCollection.takeBy(
-                  "@doc.#{inverse.refKey}": $in: embedIds
-                )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
+                unless opts.putOnly
+                  embedIds = yield (yield ThroughCollection.takeBy(
+                    "@doc.#{through.inverse}": @[opts.refKey]
+                    "@doc.#{opts.through[1].by}": $nin: alRecordIds
+                  )).map co.wrap (voRecord)->
+                    id = voRecord[opts.through[1].by]
+                    yield voRecord.destroy()
+                    yield return id
+                  yield (yield EmbedsCollection.takeBy(
+                    "@doc.#{inverse.refKey}": $in: embedIds
+                  )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
                 for newRecordId in newRecordIds
                   yield ThroughCollection.create(
                     "#{through.inverse}": @[opts.refKey]
@@ -382,7 +774,7 @@ module.exports = (Module)->
                     editorId: @editorId
                     ownerId: @ownerId
                   )
-            else
+            else unless opts.putOnly
               unless opts.through
                 yield (yield EmbedsCollection.takeBy(
                   "@doc.#{opts.inverse}": @[opts.refKey]
@@ -420,7 +812,6 @@ module.exports = (Module)->
               for item in replica
                 item.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
                 yield EmbedsCollection.build item
-                # EmbedRecord.new item, EmbedsCollection
             else
               []
 
@@ -450,27 +841,6 @@ module.exports = (Module)->
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
           @public "#{vsAttr}": Array
-          # ipmConstructProxy = @protected "constructProxyFor#{vsAttr}": Function,
-          #   default: ->
-          #     @[iplPrivateEmbeds] ?= new Proxy [],
-          #       set: (aoTarget, asName, aValue, aoReceiver) ->
-          #         unless Reflect.get Class::, asName
-          #           Class.util asName, aValue
-          #       get: (aoTarget, asName) ->
-          #         unless Reflect.get Class::, asName
-          #           vsPath = Class[cphUtilsMap][asName]
-          #           if vsPath
-          #             require(vsPath) Class
-          #         Reflect.get Class::, asName
-          # iplPrivateEmbeds = @private "#{vsAttr}": Array
-          # @public "#{vsAttr}": Array,
-          #   get: ->
-          #     @[iplPrivateEmbeds] ?= @[ipmConstructProxy]()
-          #   set: (data)->
-          #     @[ipmConstructProxy]()
-          #     @[iplPrivateEmbeds] = data
-          #     @[iplPrivateEmbeds]
-          #   default:
           return
 
       @public @static embeddings: Object,
@@ -509,11 +879,10 @@ module.exports = (Module)->
           yield return voRecord
 
       @public @static @async serialize: Function,
-        default: (args...)->
-          [aoRecord] = args
-          vhResult = yield @super args...
+        default: (aoRecord)->
           for own asAttr, { put } of aoRecord.constructor.embeddings
             yield put.call aoRecord
+          vhResult = yield @super aoRecord
           yield return vhResult
 
       @public @static @async recoverize: Function,
@@ -541,12 +910,11 @@ module.exports = (Module)->
 
       # TODO: не учтены установки значений, которые раньше не были установлены
       @public @async changedAttributes: Function,
-        default: (args...)->
-          [aoRecord] = args
-          vhResult = yield @super args...
+        default: ->
+          vhResult = yield @super()
           for own vsAttrName, { replicate } of @constructor.embeddings
             voOldValue = @[ipoInternalRecord]?[vsAttrName]
-            voNewValue = replicate.call aoRecord
+            voNewValue = replicate.call @
             unless _.isEqual voNewValue, voOldValue
               vhResult[vsAttrName] = [voOldValue, voNewValue]
           yield return vhResult
@@ -559,7 +927,7 @@ module.exports = (Module)->
             if (attrConf = @constructor.embeddings[asAttribute])?
               { restore } = attrConf
               voOldValue = @[ipoInternalRecord][asAttribute]
-              @[asAttribute] = restore.call @, voOldValue
+              @[asAttribute] = yield restore.call @, voOldValue
           yield return
 
       @public @async rollbackAttributes: Function,
@@ -568,7 +936,7 @@ module.exports = (Module)->
           if @[ipoInternalRecord]?
             for own vsAttrName, { restore } of @constructor.embeddings
               voOldValue = @[ipoInternalRecord][vsAttrName]
-              @[vsAttrName] = restore.call @, voOldValue
+              @[vsAttrName] = yield restore.call @, voOldValue
           yield return
 
 
