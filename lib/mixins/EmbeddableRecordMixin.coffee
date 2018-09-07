@@ -50,8 +50,8 @@ module.exports = (Module)->
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
           opts.embedding = 'hasEmbed'
 
-          opts.writeOnly ?= no
-          opts.readOnly ?= no
+          opts.putOnly ?= no
+          opts.loadOnly ?= no
 
           opts.recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
@@ -65,7 +65,7 @@ module.exports = (Module)->
             EmbedRecord = @findRecordByName opts.recordName()
             return EmbedRecord.schema.allow(null).optional()
           opts.load = co.wrap ->
-            if opts.writeOnly
+            if opts.putOnly
               yield return null
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
@@ -108,7 +108,7 @@ module.exports = (Module)->
             yield return res
 
           opts.put = co.wrap ->
-            if opts.readOnly
+            if opts.loadOnly
               yield return
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
@@ -187,7 +187,7 @@ module.exports = (Module)->
                 yield (yield EmbedsCollection.takeBy(
                   "@doc.#{inverse.refKey}": $in: embedIds
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
-            else
+            else unless opts.putOnly
               unless opts.through
                 voRecord = yield (yield EmbedsCollection.takeBy(
                   "@doc.#{opts.inverse}": @[opts.refKey]
@@ -273,8 +273,8 @@ module.exports = (Module)->
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
           opts.embedding = 'hasEmbeds'
 
-          opts.writeOnly ?= no
-          opts.readOnly ?= no
+          opts.putOnly ?= no
+          opts.loadOnly ?= no
 
           opts.recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
@@ -289,7 +289,7 @@ module.exports = (Module)->
             return joi.array().items [EmbedRecord.schema, joi.any().strip()]
 
           opts.load = co.wrap ->
-            if opts.writeOnly
+            if opts.putOnly
               yield return []
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
 
@@ -322,7 +322,7 @@ module.exports = (Module)->
             yield return res
 
           opts.put = co.wrap ->
-            if opts.readOnly
+            if opts.loadOnly
               yield return
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
@@ -337,7 +337,7 @@ module.exports = (Module)->
             } = Module::
             @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbeds.put #{vsAttr} embeds #{JSON.stringify alRecords}", LEVELS[DEBUG])
 
-            if alRecords.length > 0 or opts.writeOnly
+            if alRecords.length > 0
               unless opts.through
                 alRecordIds = []
                 for aoRecord in alRecords
@@ -356,7 +356,7 @@ module.exports = (Module)->
                   else
                     { id } = aoRecord
                   alRecordIds.push id
-                unless opts.writeOnly
+                unless opts.putOnly
                   yield (yield EmbedsCollection.takeBy(
                     "@doc.#{opts.inverse}": @[opts.refKey]
                     "@doc.id": $nin: alRecordIds # NOTE: проверяем айдишники всех только-что сохраненных
@@ -388,16 +388,17 @@ module.exports = (Module)->
                     else
                       savedRecord = aoRecord
                     alRecordIds.push savedRecord[inverse.refKey]
-                embedIds = yield (yield ThroughCollection.takeBy(
-                  "@doc.#{through.inverse}": @[opts.refKey]
-                  "@doc.#{opts.through[1].by}": $nin: alRecordIds
-                )).map co.wrap (voRecord)->
-                  id = voRecord[opts.through[1].by]
-                  yield voRecord.destroy()
-                  yield return id
-                yield (yield EmbedsCollection.takeBy(
-                  "@doc.#{inverse.refKey}": $in: embedIds
-                )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
+                unless opts.putOnly
+                  embedIds = yield (yield ThroughCollection.takeBy(
+                    "@doc.#{through.inverse}": @[opts.refKey]
+                    "@doc.#{opts.through[1].by}": $nin: alRecordIds
+                  )).map co.wrap (voRecord)->
+                    id = voRecord[opts.through[1].by]
+                    yield voRecord.destroy()
+                    yield return id
+                  yield (yield EmbedsCollection.takeBy(
+                    "@doc.#{inverse.refKey}": $in: embedIds
+                  )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
                 for newRecordId in newRecordIds
                   yield ThroughCollection.create(
                     "#{through.inverse}": @[opts.refKey]
@@ -409,7 +410,7 @@ module.exports = (Module)->
                     editorId: @editorId
                     ownerId: @ownerId
                   )
-            else
+            else unless opts.putOnly
               unless opts.through
                 yield (yield EmbedsCollection.takeBy(
                   "@doc.#{opts.inverse}": @[opts.refKey]
