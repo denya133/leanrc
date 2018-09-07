@@ -50,6 +50,9 @@ module.exports = (Module)->
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
           opts.embedding = 'hasEmbed'
 
+          opts.writeOnly ?= no
+          opts.readOnly ?= no
+
           opts.recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
             vsRecordName
@@ -128,7 +131,10 @@ module.exports = (Module)->
                 aoRecord.creatorId = @creatorId
                 aoRecord.editorId = @editorId
                 aoRecord.ownerId = @ownerId
-                savedRecord = yield aoRecord.save()
+                if (yield aoRecord.isNew()) or Object.keys(yield aoRecord.changedAttributes()).length
+                  savedRecord = yield aoRecord.save()
+                else
+                  savedRecord = aoRecord
                 yield (yield EmbedsCollection.takeBy(
                   "@doc.#{opts.inverse}": @[opts.refKey]
                   "@doc.id": $ne: savedRecord.id # NOTE: проверяем по айдишнику только-что сохраненного
@@ -163,7 +169,10 @@ module.exports = (Module)->
                     ownerId: @ownerId
                   )
                 else
-                  savedRecord = yield aoRecord.save()
+                  if Object.keys(yield aoRecord.changedAttributes()).length
+                    savedRecord = yield aoRecord.save()
+                  else
+                    savedRecord = aoRecord
                 embedIds = yield (yield ThroughCollection.takeBy(
                   "@doc.#{through.inverse}": @[opts.refKey]
                   "@doc.#{opts.through[1].by}": $ne: savedRecord[inverse.refKey]
@@ -260,6 +269,9 @@ module.exports = (Module)->
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
           opts.embedding = 'hasEmbeds'
 
+          opts.writeOnly ?= no
+          opts.readOnly ?= no
+
           opts.recordName ?= ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
             vsRecordName
@@ -331,7 +343,10 @@ module.exports = (Module)->
                   aoRecord.creatorId = @creatorId
                   aoRecord.editorId = @editorId
                   aoRecord.ownerId = @ownerId
-                  { id } = yield aoRecord.save()
+                  if (yield aoRecord.isNew()) or Object.keys(yield aoRecord.changedAttributes()).length
+                    { id } = yield aoRecord.save()
+                  else
+                    { id } = aoRecord
                   alRecordIds.push id
                 yield (yield EmbedsCollection.takeBy(
                   "@doc.#{opts.inverse}": @[opts.refKey]
@@ -359,7 +374,10 @@ module.exports = (Module)->
                     alRecordIds.push savedRecord[inverse.refKey]
                     newRecordIds.push savedRecord[inverse.refKey]
                   else
-                    savedRecord = yield aoRecord.save()
+                    if Object.keys(yield aoRecord.changedAttributes()).length
+                      savedRecord = yield aoRecord.save()
+                    else
+                      savedRecord = aoRecord
                     alRecordIds.push savedRecord[inverse.refKey]
                 embedIds = yield (yield ThroughCollection.takeBy(
                   "@doc.#{through.inverse}": @[opts.refKey]
@@ -503,8 +521,8 @@ module.exports = (Module)->
       @public @static @async normalize: Function,
         default: (args...)->
           voRecord = yield @super args...
-          for own asAttr, { load } of voRecord.constructor.embeddings
-            voRecord[asAttr] = yield load.call voRecord
+          for own asAttr, { load, writeOnly } of voRecord.constructor.embeddings
+            voRecord[asAttr] = yield load.call voRecord unless writeOnly
           voRecord[ipoInternalRecord] = voRecord.constructor.makeSnapshotWithEmbeds voRecord
           yield return voRecord
 
@@ -512,8 +530,8 @@ module.exports = (Module)->
         default: (args...)->
           [aoRecord] = args
           vhResult = yield @super args...
-          for own asAttr, { put } of aoRecord.constructor.embeddings
-            yield put.call aoRecord
+          for own asAttr, { put, readOnly } of aoRecord.constructor.embeddings
+            yield put.call aoRecord unless readOnly
           yield return vhResult
 
       @public @static @async recoverize: Function,
