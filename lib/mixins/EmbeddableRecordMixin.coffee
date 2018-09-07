@@ -129,7 +129,6 @@ module.exports = (Module)->
                 aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
                 aoRecord = yield EmbedsCollection.build aoRecord
               unless opts.through
-                # aoRecord[opts.inverse] = @[opts.refKey]
                 aoRecord.spaceId = @spaceId if @spaceId?
                 aoRecord.teamId = @teamId if @teamId?
                 aoRecord.spaces = @spaces
@@ -141,11 +140,6 @@ module.exports = (Module)->
                 else
                   savedRecord = aoRecord
                 @[opts.attr] = savedRecord[opts.refKey]
-                # NOTE: удалять предыдущий нельзя, т.к. он может быть заиспользован в другом рекорде
-                # yield (yield EmbedsCollection.takeBy(
-                #   "@doc.#{opts.inverse}": @[opts.refKey]
-                #   "@doc.id": $ne: savedRecord.id # NOTE: проверяем по айдишнику только-что сохраненного
-                # )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
                 # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода relatedEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
                 through = @constructor.embeddings[opts.through[0]]
@@ -183,41 +177,6 @@ module.exports = (Module)->
                 )).forEach co.wrap (voRecord)->
                   yield voRecord.destroy()
                   yield return
-                # NOTE: удалять предыдущий нельзя, т.к. он может быть заиспользован в другом рекорде
-                # yield (yield EmbedsCollection.takeBy(
-                #   "@doc.#{inverse.refKey}": $in: embedIds
-                # )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
-            # NOTE: удалять другие нельзя, т.к. они могут быть заиспользованы в другом рекорде, а through связи почистятся кодом выше
-            # else unless opts.putOnly
-            #   unless opts.through
-            #     voRecord = yield (yield EmbedsCollection.takeBy(
-            #       "@doc.#{opts.inverse}": @[opts.refKey]
-            #     ,
-            #       $limit: 1
-            #     )).first()
-            #     if voRecord?
-            #       yield voRecord.destroy()
-            #   else
-            #     # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода relatedEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
-            #     through = @constructor.embeddings[opts.through[0]]
-            #     unless through?
-            #       throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.relatedEmbed` method"
-            #     ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-            #     ThroughRecord = @findRecordByName through.recordName()
-            #     inverse = ThroughRecord.relations[opts.through[1].by]
-            #     embedIds = yield (yield ThroughCollection.takeBy(
-            #       "@doc.#{through.inverse}": @[opts.refKey]
-            #     ,
-            #       $limit: 1
-            #     )).map co.wrap (voRecord)->
-            #       id = voRecord[opts.through[1].by]
-            #       yield voRecord.destroy()
-            #       yield return id
-            #     yield (yield EmbedsCollection.takeBy(
-            #       "@doc.#{inverse.refKey}": $in: embedIds
-            #     ,
-            #       $limit: 1
-            #     )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
             yield return
 
           opts.restore = co.wrap (replica)->
@@ -236,7 +195,6 @@ module.exports = (Module)->
             res = if replica?
               replica.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
               yield EmbedsCollection.build replica
-              # EmbedRecord.new replica, EmbedsCollection
             else
               null
 
@@ -348,7 +306,6 @@ module.exports = (Module)->
                   if aoRecord.constructor is Object
                     aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
                     aoRecord = yield EmbedsCollection.build aoRecord
-                  # aoRecord[opts.inverse] = @[opts.refKey]
                   aoRecord.spaceId = @spaceId if @spaceId?
                   aoRecord.teamId = @teamId if @teamId?
                   aoRecord.spaces = @spaces
@@ -361,12 +318,6 @@ module.exports = (Module)->
                     { id } = aoRecord
                   alRecordIds.push id
                 @[opts.attr] = alRecordIds
-                # NOTE: удалять другие нельзя, т.к. они могут быть заиспользованы в другом рекорде
-                # unless opts.putOnly
-                #   yield (yield EmbedsCollection.takeBy(
-                #     "@doc.#{opts.inverse}": @[opts.refKey]
-                #     "@doc.id": $nin: alRecordIds # NOTE: проверяем айдишники всех только-что сохраненных
-                #   )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
                 through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
                 ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
@@ -399,12 +350,8 @@ module.exports = (Module)->
                     "@doc.#{through.inverse}": @[through.refKey]
                     "@doc.#{opts.through[1].by}": $nin: alRecordIds
                   )).forEach co.wrap (voRecord)->
-                    # id = voRecord[opts.through[1].by]
                     yield voRecord.destroy()
-                    yield return #id
-                  # yield (yield EmbedsCollection.takeBy(
-                  #   "@doc.#{inverse.refKey}": $in: embedIds
-                  # )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
+                    yield return
                 for newRecordId in newRecordIds
                   yield ThroughCollection.create(
                     "#{through.inverse}": @[through.refKey]
@@ -416,25 +363,6 @@ module.exports = (Module)->
                     editorId: @editorId
                     ownerId: @ownerId
                   )
-            # else unless opts.putOnly
-            #   unless opts.through
-            #     yield (yield EmbedsCollection.takeBy(
-            #       "@doc.#{opts.inverse}": @[opts.refKey]
-            #     )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
-            #   else
-            #     through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
-            #     ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-            #     ThroughRecord = @findRecordByName through.recordName()
-            #     inverse = ThroughRecord.relations[opts.through[1].by]
-            #     embedIds = yield (yield ThroughCollection.takeBy(
-            #       "@doc.#{through.inverse}": @[opts.refKey]
-            #     )).map co.wrap (voRecord)->
-            #       id = voRecord[opts.through[1].by]
-            #       yield voRecord.destroy()
-            #       yield return id
-            #     yield (yield EmbedsCollection.takeBy(
-            #       "@doc.#{inverse.refKey}": $in: embedIds
-            #     )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
             yield return
 
           opts.restore = co.wrap (replica)->
@@ -453,7 +381,6 @@ module.exports = (Module)->
             res = if replica?
               replica.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
               yield EmbedsCollection.build replica
-              # EmbedRecord.new replica, EmbedsCollection
             else
               null
 
@@ -673,7 +600,6 @@ module.exports = (Module)->
             res = if replica?
               replica.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
               yield EmbedsCollection.build replica
-              # EmbedRecord.new replica, EmbedsCollection
             else
               null
 
@@ -886,7 +812,6 @@ module.exports = (Module)->
               for item in replica
                 item.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
                 yield EmbedsCollection.build item
-                # EmbedRecord.new item, EmbedsCollection
             else
               []
 
@@ -916,27 +841,6 @@ module.exports = (Module)->
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
           @public "#{vsAttr}": Array
-          # ipmConstructProxy = @protected "constructProxyFor#{vsAttr}": Function,
-          #   default: ->
-          #     @[iplPrivateEmbeds] ?= new Proxy [],
-          #       set: (aoTarget, asName, aValue, aoReceiver) ->
-          #         unless Reflect.get Class::, asName
-          #           Class.util asName, aValue
-          #       get: (aoTarget, asName) ->
-          #         unless Reflect.get Class::, asName
-          #           vsPath = Class[cphUtilsMap][asName]
-          #           if vsPath
-          #             require(vsPath) Class
-          #         Reflect.get Class::, asName
-          # iplPrivateEmbeds = @private "#{vsAttr}": Array
-          # @public "#{vsAttr}": Array,
-          #   get: ->
-          #     @[iplPrivateEmbeds] ?= @[ipmConstructProxy]()
-          #   set: (data)->
-          #     @[ipmConstructProxy]()
-          #     @[iplPrivateEmbeds] = data
-          #     @[iplPrivateEmbeds]
-          #   default:
           return
 
       @public @static embeddings: Object,
