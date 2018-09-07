@@ -65,6 +65,7 @@ module.exports = (Module)->
             EmbedRecord = @findRecordByName opts.recordName()
             return EmbedRecord.schema.allow(null).optional()
           opts.load = co.wrap ->
+            yield return null if opts.writeOnly
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
@@ -106,6 +107,7 @@ module.exports = (Module)->
             yield return res
 
           opts.put = co.wrap ->
+            yield return if opts.readOnly
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
             aoRecord = @[vsAttr]
@@ -285,6 +287,7 @@ module.exports = (Module)->
             return joi.array().items [EmbedRecord.schema, joi.any().strip()]
 
           opts.load = co.wrap ->
+            yield return [] if opts.writeOnly
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
 
             {
@@ -316,6 +319,7 @@ module.exports = (Module)->
             yield return res
 
           opts.put = co.wrap ->
+            yield return if opts.readOnly
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
             EmbedRecord = @findRecordByName opts.recordName()
             alRecords = @[vsAttr]
@@ -329,7 +333,7 @@ module.exports = (Module)->
             } = Module::
             @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.hasEmbeds.put #{vsAttr} embeds #{JSON.stringify alRecords}", LEVELS[DEBUG])
 
-            if alRecords.length > 0
+            if alRecords.length > 0 or opts.writeOnly
               unless opts.through
                 alRecordIds = []
                 for aoRecord in alRecords
@@ -348,10 +352,11 @@ module.exports = (Module)->
                   else
                     { id } = aoRecord
                   alRecordIds.push id
-                yield (yield EmbedsCollection.takeBy(
-                  "@doc.#{opts.inverse}": @[opts.refKey]
-                  "@doc.id": $nin: alRecordIds # NOTE: проверяем айдишники всех только-что сохраненных
-                )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
+                unless opts.writeOnly
+                  yield (yield EmbedsCollection.takeBy(
+                    "@doc.#{opts.inverse}": @[opts.refKey]
+                    "@doc.id": $nin: alRecordIds # NOTE: проверяем айдишники всех только-что сохраненных
+                  )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
                 through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
                 ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
@@ -521,11 +526,8 @@ module.exports = (Module)->
       @public @static @async normalize: Function,
         default: (args...)->
           voRecord = yield @super args...
-          for own asAttr, { load, writeOnly } of voRecord.constructor.embeddings
-            unless writeOnly
-              voRecord[asAttr] = yield load.call voRecord
-            else
-              voRecord[asAttr] = []
+          for own asAttr, { load } of voRecord.constructor.embeddings
+            voRecord[asAttr] = yield load.call voRecord
           voRecord[ipoInternalRecord] = voRecord.constructor.makeSnapshotWithEmbeds voRecord
           yield return voRecord
 
@@ -533,8 +535,8 @@ module.exports = (Module)->
         default: (args...)->
           [aoRecord] = args
           vhResult = yield @super args...
-          for own asAttr, { put, readOnly } of aoRecord.constructor.embeddings
-            yield put.call aoRecord unless readOnly
+          for own asAttr, { put } of aoRecord.constructor.embeddings
+            yield put.call aoRecord
           yield return vhResult
 
       @public @static @async recoverize: Function,
