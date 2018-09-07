@@ -50,6 +50,8 @@ module.exports = (Module)->
               unless through
                 return yield (yield RelatedToCollection.takeBy(
                   "@doc.#{refKey}": @[attr]
+                ,
+                  $limit: 1
                 )).first()
               else
                 # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
@@ -112,6 +114,8 @@ module.exports = (Module)->
               unless through
                 return yield (yield BelongsToCollection.takeBy(
                   "@doc.#{refKey}": @[attr]
+                ,
+                  $limit: 1
                 )).first()
               else
                 # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
