@@ -143,4 +143,4 @@ module.exports = (Module)->
         return
 
 
-  Record.initialize()
+    @initialize()

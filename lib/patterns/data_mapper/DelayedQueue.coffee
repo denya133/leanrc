@@ -121,4 +121,4 @@ module.exports = (Module)->
         return
 
 
-  DelayedQueue.initialize()
+    @initialize()

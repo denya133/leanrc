@@ -44,4 +44,4 @@ module.exports = (Module)->
         @
 
 
-  Objectizer.initialize()
+    @initialize()

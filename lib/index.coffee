@@ -101,6 +101,8 @@ class LeanRC extends RC
   require('./patterns/data_mapper/BooleanTransform') LeanRC
   require('./patterns/data_mapper/ObjectTransform') LeanRC
   require('./patterns/data_mapper/ArrayTransform') LeanRC
+  require('./patterns/data_mapper/ComplexObjectTransform') LeanRC
+  require('./patterns/data_mapper/ComplexArrayTransform') LeanRC
   require('./patterns/data_mapper/Serializer') LeanRC
   require('./patterns/data_mapper/Objectizer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC

@@ -15,21 +15,29 @@ module.exports = (Module)->
       get: -> joi.boolean().allow(null).optional()
 
     @public @static @async normalize: Function,
+      default: (args...)->
+        yield return @normalizeSync args...
+
+    @public @static @async serialize: Function,
+      default: (args...)->
+        yield return @serializeSync args...
+
+    @public @static normalizeSync: Function,
       default: (serialized)->
         type = typeof serialized
 
         if type is "boolean"
-          yield return serialized
+          return serialized
         else if type is "string"
-          yield return serialized.match(/^true$|^t$|^1$/i) isnt null
+          return serialized.match(/^true$|^t$|^1$/i) isnt null
         else if type is "number"
-          yield return serialized is 1
+          return serialized is 1
         else
-          yield return no
+          return no
 
-    @public @static @async serialize: Function,
+    @public @static serializeSync: Function,
       default: (deserialized)->
-        yield return Boolean deserialized
+        return Boolean deserialized
 
     @public @static objectize: Function,
       default: (deserialized)->
@@ -46,4 +54,4 @@ module.exports = (Module)->
         yield return
 
 
-  BooleanTransform.initialize()
+    @initialize()

@@ -33,4 +33,4 @@ module.exports = (Module) ->
         return
 
 
-  LogFilterMessage.initialize()
+    @initialize()
