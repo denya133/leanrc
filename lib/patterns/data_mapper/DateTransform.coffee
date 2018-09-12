@@ -15,15 +15,23 @@ module.exports = (Module)->
       get: -> joi.date().iso().allow(null).optional()
 
     @public @static @async normalize: Function,
-      default: (serialized)->
-        yield return (if _.isNil(serialized) then null else new Date serialized)
+      default: (args...)->
+        yield return @normalizeSync args...
 
     @public @static @async serialize: Function,
+      default: (args...)->
+        yield return @serializeSync args...
+
+    @public @static normalizeSync: Function,
+      default: (serialized)->
+        return (if _.isNil(serialized) then null else new Date serialized)
+
+    @public @static serializeSync: Function,
       default: (deserialized)->
         if _.isDate(deserialized) and not _.isNaN(deserialized)
-          yield return deserialized.toISOString()
+          return deserialized.toISOString()
         else
-          yield return null
+          return null
 
     @public @static objectize: Function,
       default: (deserialized)->
@@ -43,4 +51,4 @@ module.exports = (Module)->
         yield return
 
 
-  DateTransform.initialize()
+    @initialize()

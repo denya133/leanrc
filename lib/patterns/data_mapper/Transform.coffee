@@ -15,16 +15,24 @@ module.exports = (Module)->
       get: -> joi.any().allow(null).optional()
 
     @public @static @async normalize: Function,
-      default: (serialized)->
-        unless serialized?
-          yield return null
-        yield return serialized
+      default: (args...)->
+        yield return @normalizeSync args...
 
     @public @static @async serialize: Function,
+      default: (args...)->
+        yield return @serializeSync args...
+
+    @public @static normalizeSync: Function,
+      default: (serialized)->
+        unless serialized?
+          return null
+        return serialized
+
+    @public @static serializeSync: Function,
       default: (deserialized)->
         unless deserialized?
-          yield return null
-        yield return deserialized
+          return null
+        return deserialized
 
     @public @static objectize: Function,
       default: (deserialized)->
@@ -43,4 +51,4 @@ module.exports = (Module)->
         yield return
 
 
-  Transform.initialize()
+    @initialize()

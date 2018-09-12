@@ -67,4 +67,4 @@ module.exports = (Module) ->
         return
 
 
-  LogMessage.initialize()
+    @initialize()

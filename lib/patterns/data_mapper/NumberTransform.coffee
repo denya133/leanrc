@@ -15,20 +15,28 @@ module.exports = (Module)->
       get: -> joi.number().allow(null).optional()
 
     @public @static @async normalize: Function,
-      default: (serialized)->
-        if _.isNil serialized
-          yield return null
-        else
-          transformed = Number serialized
-          yield return (if _.isNumber(transformed) then transformed else null)
+      default: (args...)->
+        yield return @normalizeSync args...
 
     @public @static @async serialize: Function,
+      default: (args...)->
+        yield return @serializeSync args...
+
+    @public @static normalizeSync: Function,
+      default: (serialized)->
+        if _.isNil serialized
+          return null
+        else
+          transformed = Number serialized
+          return (if _.isNumber(transformed) then transformed else null)
+
+    @public @static serializeSync: Function,
       default: (deserialized)->
         if _.isNil deserialized
-          yield return null
+          return null
         else
           transformed = Number deserialized
-          yield return (if _.isNumber(transformed) then transformed else null)
+          return (if _.isNumber(transformed) then transformed else null)
 
     @public @static objectize: Function,
       default: (deserialized)->
@@ -49,4 +57,4 @@ module.exports = (Module)->
         yield return
 
 
-  NumberTransform.initialize()
+    @initialize()
