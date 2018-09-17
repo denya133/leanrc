@@ -9,8 +9,7 @@ https://docs.google.com/a/saifas.com/document/d/114zNDimqXbdF76nnKBUqDfZoKd7xn6c
 
 ## Usefull command in console for creation ssh agent
 ```
-eval `ssh-agent -s`
-ssh-add ~/.ssh/id_rsa
+eval `ssh-agent -s`; ssh-add ~/.ssh/id_rsa
 
 ```
 

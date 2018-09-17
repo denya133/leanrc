@@ -3,7 +3,6 @@
 module.exports = (Module)->
   {
     Serializer
-    Cursor
     Utils: { _, inflect }
   } = Module::
 
