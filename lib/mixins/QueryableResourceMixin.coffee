@@ -36,6 +36,20 @@ module.exports = (Module)->
                 result = key?
           yield return result
 
+      @public @async showNoHiddenByDefault: Function,
+        default: (args...)->
+          @listQuery ?= {}
+          if @listQuery.$filter?
+            unless /.*\@doc\.isHidden.*/.test JSON.stringify @listQuery.$filter
+              @listQuery.$filter = $and: [
+                @listQuery.$filter
+              ,
+                '@doc.isHidden': no
+              ]
+          else
+            @listQuery.$filter = '@doc.isHidden': no
+          yield return args
+
       @action @async list: Function,
         default: ->
           receivedQuery = _.pick @listQuery, [
@@ -100,6 +114,7 @@ module.exports = (Module)->
       @chains ['query', 'list']
       # @initialHook 'requiredAuthorizationHeader', only: ['query']
       @initialHook 'parseBody', only: ['query']
+      @beforeHook 'showNoHiddenByDefault', only: ['list']
 
 
       @initializeMixin()

@@ -50,6 +50,12 @@ describe 'QueryableResourceMixin', ->
           @public @async parseQuery: Object,
             default: (aoQuery) ->
               if aoQuery.$filter?
+                if aoQuery.$filter['$and']?
+                  aoQuery.$filter = aoQuery.$filter.$and.reduce (prev, cur)->
+                    for own k, v of cur
+                      prev[k] = v
+                    prev
+                  , {}
                 aoQuery.$filter = _.mapKeys aoQuery.$filter, (value, key) ->
                   key.replace '@doc.', ''
               return yield aoQuery
@@ -98,8 +104,8 @@ describe 'QueryableResourceMixin', ->
           serializer: LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
-        yield collection.create test: 'test1'
-        yield collection.create test: 'test2'
+        yield collection.create test: 'test1', isHidden: no
+        yield collection.create test: 'test2', isHidden: no
         resource = TestResource.new()
         resource.initializeNotifier KEY
         context = Test::Context.new req, res, switchMediator
