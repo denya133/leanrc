@@ -1,9 +1,16 @@
 
 
 module.exports = (Module)->
-  class PipeMessage extends Module::CoreObject
+  {
+    NilT, PointerT
+    FuncG, MaybeG
+    PipeMessageInterface
+    CoreObject
+  } = Module::
+
+  class PipeMessage extends CoreObject
     @inheritProtected()
-    # @implements Module::PipeMessageInterface
+    @implements PipeMessageInterface
     @module Module
 
     @public @static PRIORITY_HIGH: Number,
@@ -17,42 +24,40 @@ module.exports = (Module)->
       default: 'namespaces/pipes/messages/'
     @public @static NORMAL: String,
       get: -> "#{@BASE}normal"
-    @public @static ERROR: String,
-      get: -> "#{@BASE}error"
 
-    ipsType = @protected type: String
-    ipnPriority = @protected priority: Number
-    ipoHeader = @protected header: Object
-    ipoBody = @protected body: Object
+    ipsType = PointerT @protected type: String
+    ipnPriority = PointerT @protected priority: Number
+    ipoHeader = PointerT @protected header: Object
+    ipoBody = PointerT @protected body: Object
 
-    @public getType: Function,
+    @public getType: FuncG([], String),
       default: -> @[ipsType]
 
-    @public setType: Function,
+    @public setType: FuncG(String, NilT),
       default: (asType)->
         @[ipsType] = asType
         return
 
-    @public getPriority: Function,
+    @public getPriority: FuncG([], Number),
       default: -> @[ipnPriority]
 
-    @public setPriority: Function,
+    @public setPriority: FuncG(Number, NilT),
       default: (anPriority)->
         @[ipnPriority] = anPriority
         return
 
-    @public getHeader: Function,
+    @public getHeader: FuncG([], Object),
       default: -> @[ipoHeader]
 
-    @public setHeader: Function,
+    @public setHeader: FuncG(Object, NilT),
       default: (aoHeader)->
         @[ipoHeader] = aoHeader
         return
 
-    @public getBody: Function,
+    @public getBody: FuncG([], Object),
       default: -> @[ipoBody]
 
-    @public setBody: Function,
+    @public setBody: FuncG(Object, NilT),
       default: (aoBody)->
         @[ipoBody] = aoBody
         return
@@ -67,13 +72,16 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG([
+      String, MaybeG(Object), MaybeG(Object), MaybeG Number
+    ], NilT),
       default: (asType, aoHeader=null, aoBody=null, anPriority=5)->
         @super arguments...
         @setType asType
-        @setHeader aoHeader
-        @setBody aoBody
+        @setHeader aoHeader if aoHeader?
+        @setBody aoBody if aoBody?
         @setPriority anPriority
+        return
 
 
-  PipeMessage.initialize()
+    @initialize()

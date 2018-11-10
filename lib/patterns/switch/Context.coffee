@@ -9,25 +9,19 @@ assert        = require 'assert'
 
 module.exports = (Module)->
   {
-    ANY
     DEVELOPMENT
-
-    CoreObject
+    AnyT, NilT
+    FuncG, UnionG, MaybeG
+    RequestInterface, ResponseInterface, SwitchInterface, CookiesInterface
     ContextInterface
-    RequestInterface
-    ResponseInterface
-    SwitchInterface
-    CookiesInterface
-    Request
-    Response
-    Cookies
-
+    CoreObject
+    Request, Response, Cookies
     Utils: { _, statuses }
   } = Module::
 
   class Context extends CoreObject
     @inheritProtected()
-    # @implements ContextInterface
+    @implements ContextInterface
     @module Module
 
     @public req: Object # native request object
@@ -46,15 +40,15 @@ module.exports = (Module)->
 
     # @public database: String # возможно это тоже надо получать из метода из отдельного модуля
 
-    @public throw: Function,
+    @public throw: FuncG([UnionG(String, Number), MaybeG(String), MaybeG Object], NilT),
       default: (args...)->
         createError = require 'http-errors'
         throw createError args...
 
-    @public assert: Function,
+    @public assert: FuncG([AnyT, UnionG(String, Number), MaybeG(String), MaybeG Object], NilT),
       default: assert
 
-    @public onerror: Function,
+    @public onerror: FuncG(Error, NilT),
       default: (err)->
         return unless err?
         unless _.isError err
@@ -138,24 +132,24 @@ module.exports = (Module)->
       get: -> @request.ips
     @public subdomains: Array,
       get: -> @request.subdomains
-    @public 'is': Function,
+    @public 'is': FuncG([UnionG String, Array], UnionG String, Boolean, NilT),
       default: (args...)-> @request.is args...
-    @public accepts: Function,
+    @public accepts: FuncG([UnionG String, Array], UnionG String, Array, Boolean),
       default: (args...)-> @request.accepts args...
-    @public acceptsEncodings: Function,
+    @public acceptsEncodings: FuncG([UnionG String, Array], UnionG String, Array),
       default: (args...)-> @request.acceptsEncodings args...
-    @public acceptsCharsets: Function,
+    @public acceptsCharsets: FuncG([UnionG String, Array], UnionG String, Array),
       default: (args...)-> @request.acceptsCharsets args...
-    @public acceptsLanguages: Function,
+    @public acceptsLanguages: FuncG([UnionG String, Array], UnionG String, Array),
       default: (args...)-> @request.acceptsLanguages args...
-    @public get: Function,
+    @public get: FuncG(String, String),
       default: (args...)-> @request.get args...
 
     # Response aliases
-    @public body: [String, Buffer, Object, Array, Number, Boolean],
+    @public body: UnionG(String, Buffer, Object, Array, Number, Boolean),
       get: -> @response.body
       set: (body)-> @response.body = body
-    @public status: [String, Number],
+    @public status: UnionG(String, Number),
       get: -> @response.status
       set: (status)-> @response.status = status
     @public message: String,
@@ -171,19 +165,19 @@ module.exports = (Module)->
       set: (type)-> @response.type = type
     @public headerSent: Boolean,
       get: -> @response.headerSent
-    @public redirect: Function,
+    @public redirect: FuncG([String, String], NilT),
       default: (args...)-> @response.redirect args...
-    @public attachment: Function,
+    @public attachment: FuncG(String, NilT),
       default: (args...)-> @response.attachment args...
-    @public set: Function,
+    @public set: FuncG([UnionG(String, Object, Array), String], NilT),
       default: (args...)-> @response.set args...
-    @public append: Function,
+    @public append: FuncG([String, UnionG String, Array], UnionG String, Array),
       default: (args...)-> @response.append args...
-    @public vary: Function,
+    @public vary: FuncG(String, NilT),
       default: (args...)-> @response.vary args...
     @public flushHeaders: Function,
       default: (args...)-> @response.flushHeaders args...
-    @public remove: Function,
+    @public remove: FuncG(String, NilT),
       default: (args...)-> @response.remove args...
     @public lastModified: Date,
       set: (date)-> @response.lastModified = date
@@ -213,7 +207,7 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG([Object, Object, SwitchInterface], NilT),
       default: (req, res, switchInstanse)->
         @super()
         accepts = require 'accepts'
@@ -231,4 +225,4 @@ module.exports = (Module)->
         return
 
 
-  Context.initialize()
+    @initialize()

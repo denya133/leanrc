@@ -3,25 +3,32 @@
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-
-    Facade
+    NilT, PointerT
+    SubsetG, DictG, FuncG, StructG
+    ProxyInterface
+    ModelInterface
+    CoreObject, Facade
     Utils: { _ }
   } = Module::
-  class Model extends Module::CoreObject
+
+  class Model extends CoreObject
     @inheritProtected()
-    # @implements Module::ModelInterface
+    @implements ModelInterface
     @module Module
 
     @const MULTITON_MSG: "Model instance for this multiton key already constructed!"
 
-    iphProxyMap     = @private proxyMap: Object
-    iphMetaProxyMap = @private metaProxyMap: Object
-    ipsMultitonKey  = @protected multitonKey: String
-    cphInstanceMap  = @private @static _instanceMap: Object,
+    iphProxyMap     = PointerT @private proxyMap: DictG String, ProxyInterface
+    iphMetaProxyMap = PointerT @private metaProxyMap: DictG String, StructG {
+      className: String
+      data: Object
+    }
+    ipsMultitonKey  = PointerT @protected multitonKey: String
+    cphInstanceMap  = PointerT @private @static _instanceMap: DictG(String, ModelInterface),
       default: {}
-    ipcApplicationModule = @protected ApplicationModule: Module::Class
+    ipcApplicationModule = PointerT @protected ApplicationModule: SubsetG Module
 
-    @public ApplicationModule: Module::Class,
+    @public ApplicationModule: SubsetG(Module),
       get: ->
         @[ipcApplicationModule] ?= if @[ipsMultitonKey]?
           Facade.getInstance @[ipsMultitonKey]
@@ -31,13 +38,13 @@ module.exports = (Module)->
         else
           @Module
 
-    @public @static getInstance: Function,
+    @public @static getInstance: FuncG(String, ModelInterface),
       default: (asKey)->
         unless Model[cphInstanceMap][asKey]?
           Model[cphInstanceMap][asKey] = Model.new asKey
         Model[cphInstanceMap][asKey]
 
-    @public @static removeModel: Function,
+    @public @static removeModel: FuncG(String, NilT),
       default: (asKey)->
         if (voModel = Model[cphInstanceMap][asKey])?
           for asProxyName in Reflect.ownKeys voModel[iphProxyMap]
@@ -46,14 +53,14 @@ module.exports = (Module)->
           delete Model[cphInstanceMap][asKey]
         return
 
-    @public registerProxy: Function,
+    @public registerProxy: FuncG(ProxyInterface, NilT),
       default: (aoProxy)->
         aoProxy.initializeNotifier @[ipsMultitonKey]
         @[iphProxyMap][aoProxy.getProxyName()] = aoProxy
         aoProxy.onRegister()
         return
 
-    @public removeProxy: Function,
+    @public removeProxy: FuncG(String, ProxyInterface),
       default: (asProxyName)->
         voProxy = @[iphProxyMap][asProxyName]
         if voProxy
@@ -64,7 +71,7 @@ module.exports = (Module)->
           voProxy.onRemove()
         return voProxy
 
-    @public retrieveProxy: Function,
+    @public retrieveProxy: FuncG(String, ProxyInterface),
       default: (asProxyName)->
         unless @[iphProxyMap][asProxyName]?
           { className, data = {} } = @[iphMetaProxyMap][asProxyName] ? {}
@@ -73,11 +80,11 @@ module.exports = (Module)->
             @registerProxy Class.new asProxyName, data
         @[iphProxyMap][asProxyName] ? null
 
-    @public hasProxy: Function,
+    @public hasProxy: FuncG(String, Boolean),
       default: (asProxyName)->
         @[iphProxyMap][asProxyName]? or @[iphMetaProxyMap][asProxyName]?
 
-    @public lazyRegisterProxy: Function,
+    @public lazyRegisterProxy: FuncG(String, String, Object),
       default: (asProxyName, asProxyClassName, ahData)->
         @[iphMetaProxyMap][asProxyName] =
           className: asProxyClassName
@@ -85,11 +92,9 @@ module.exports = (Module)->
         return
 
     @public initializeModel: Function,
-      args: []
-      return: Module::NILL
       default: ->
 
-    @public init: Function,
+    @public init: FuncG(String, NilT),
       default: (asKey)->
         @super arguments...
         if Model[cphInstanceMap][asKey]
@@ -103,4 +108,4 @@ module.exports = (Module)->
         return
 
 
-  Model.initialize()
+    @initialize()

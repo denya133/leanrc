@@ -1,21 +1,24 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface 'GatewayInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  {
+    JoiT
+    FuncG, MaybeG, SubsetG
+    EndpointInterface
+    ProxyInterface
+  } = Module::
 
-      @public @virtual swaggerDefinition: Function,
-        args: [String, Function]
-        return: Module::NILL
+  class GatewayInterface extends ProxyInterface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual registerEndpoints: Function,
-        args: [Object]
-        return: Module::NILL
+    @virtual tryLoadEndpoint: FuncG String, MaybeG SubsetG EndpointInterface
+    @virtual getEndpointByName: FuncG String, MaybeG SubsetG EndpointInterface
+    @virtual getEndpointName: FuncG [String, String], String
+    @virtual getStandardActionEndpoint: FuncG [String, String], SubsetG EndpointInterface
+    @virtual getEndpoint: FuncG [String, String], SubsetG EndpointInterface
+    @virtual swaggerDefinitionFor: FuncG [String, String, MaybeG Object], EndpointInterface
+    @virtual getSchema: FuncG String, JoiT
 
-      @public @virtual swaggerDefinitionFor: Function,
-        args: [String]
-        return: Module::EndpointInterface
 
-
-      @initializeInterface()
+    @initialize()

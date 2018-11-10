@@ -9,18 +9,23 @@
 
 module.exports = (Module)->
   {
-    CoreObject
+    NilT, PromiseT
+    PropertyDefinitionT, RelationOptionsT, RelationConfigT, RelationInverseT
+    FuncG, SubsetG, AsyncFuncG
+    RecordInterface, CursorInterface
+    RelatableInterface
+    Record, Mixin
     Utils: { _, inflect, joi, co }
   } = Module::
 
-  Module.defineMixin 'RelationsMixin', (BaseClass = CoreObject) ->
+  Module.defineMixin Mixin 'RelationsMixin', (BaseClass = Record) ->
     class extends BaseClass
       @inheritProtected()
-      # @implements Module::RelationsMixinInterface
+      @implements RelatableInterface
 
       # NOTE: отличается от belongsTo тем, что сама связь не является обязательной (образуется между объектами "в одной плоскости"), а в @[opts.attr] может содержаться null значение
-      @public @static relatedTo: Function,
-        default: (typeDefinition, {refKey, attr, inverse, relation, recordName, collectionName, through}={})->
+      @public @static relatedTo: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
+        default: (typeDefinition, {refKey, attr, inverse, recordName, collectionName, through}={})->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
           refKey ?= 'id'
@@ -28,10 +33,10 @@ module.exports = (Module)->
           inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
           relation = 'relatedTo'
 
-          recordName ?= ->
+          recordName ?= FuncG([], String) ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
             vsRecordName
-          collectionName ?= ->
+          collectionName ?= FuncG([], String) ->
             "#{
               inflect.pluralize recordName().replace /Record$/, ''
             }Collection"
@@ -44,7 +49,7 @@ module.exports = (Module)->
             recordName
             collectionName
             through
-            get: co.wrap ->
+            get: AsyncFuncG([], RecordInterface) co.wrap ->
               RelatedToCollection = @collection.facade.retrieveProxy collectionName()
               # NOTE: может быть ситуация, что relatedTo связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
               unless through
@@ -55,14 +60,14 @@ module.exports = (Module)->
                 )).first()
               else
                 # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
-                through = @constructor.embeddings?[through[0]]
-                unless through?
+                throughEmbed = @constructor.embeddings?[through[0]]
+                unless throughEmbed?
                   throw new Error "Metadata about #{through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-                ThroughRecord = @findRecordByName through.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName()
+                ThroughRecord = @findRecordByName throughEmbed.recordName()
                 inverse = ThroughRecord.relations[through[1].by]
                 relatedId = (yield (yield ThroughCollection.takeBy(
-                  "@doc.#{through.inverse}": @[through.refKey]
+                  "@doc.#{throughEmbed.inverse}": @[throughEmbed.refKey]
                 ,
                   $limit: 1
                 )).first())[through[1].by]
@@ -77,13 +82,13 @@ module.exports = (Module)->
           }
 
           @metaObject.addMetaData 'relations', vsAttr, opts
-          @public "#{vsAttr}": Module::RecordInterface, property
+          @public "#{vsAttr}": PromiseT, property
           return
 
       # NOTE: отличается от relatedTo тем, что сама связь является обязательной (образуется между объектами "в иерархии"), а в @[opts.attr] обязательно должно храниться значение айдишника родительского объекта, которому "belongs to" - "принадлежит" этот объект
       # NOTE: если указана опция through, то получение данных о связи будет происходить не из @[opts.attr], а из промежуточной коллекции, где помимо айдишника объекта могут храниться дополнительные атрибуты с данными о связи
-      @public @static belongsTo: Function,
-        default: (typeDefinition, {refKey, attr, inverse, relation, recordName, collectionName, through}={})->
+      @public @static belongsTo: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
+        default: (typeDefinition, {refKey, attr, inverse, recordName, collectionName, through}={})->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
           refKey ?= 'id'
@@ -91,10 +96,10 @@ module.exports = (Module)->
           inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
           relation = 'belongsTo'
 
-          recordName ?= ->
+          recordName ?= FuncG([], String) ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
             vsRecordName
-          collectionName ?= ->
+          collectionName ?= FuncG([], String) ->
             "#{
               inflect.pluralize recordName().replace /Record$/, ''
             }Collection"
@@ -107,7 +112,7 @@ module.exports = (Module)->
             recordName
             collectionName
             through
-            get: co.wrap ->
+            get: AsyncFuncG([], RecordInterface) co.wrap ->
               BelongsToCollection = @collection.facade.retrieveProxy collectionName()
               # NOTE: может быть ситуация, что belongsTo связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
@@ -119,14 +124,14 @@ module.exports = (Module)->
                 )).first()
               else
                 # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
-                through = @constructor.embeddings?[through[0]]
-                unless through?
+                throughEmbed = @constructor.embeddings?[through[0]]
+                unless throughEmbed?
                   throw new Error "Metadata about #{through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-                ThroughRecord = @findRecordByName through.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName()
+                ThroughRecord = @findRecordByName throughEmbed.recordName()
                 inverse = ThroughRecord.relations[through[1].by]
                 belongsId = (yield (yield ThroughCollection.takeBy(
-                  "@doc.#{through.inverse}": @[through.refKey]
+                  "@doc.#{throughEmbed.inverse}": @[throughEmbed.refKey]
                 ,
                   $limit: 1
                 )).first())[through[1].by]
@@ -141,20 +146,20 @@ module.exports = (Module)->
           }
 
           @metaObject.addMetaData 'relations', vsAttr, opts
-          @public "#{vsAttr}": Module::RecordInterface, property
+          @public "#{vsAttr}": PromiseT, property
           return
 
-      @public @static hasMany: Function,
-        default: (typeDefinition, {refKey, inverse, relation, recordName, collectionName, through}={})->
+      @public @static hasMany: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
+        default: (typeDefinition, {refKey, inverse, recordName, collectionName, through}={})->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
           refKey ?= 'id'
           inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
           relation = 'hasMany'
-          recordName ?= ->
+          recordName ?= FuncG([], String) ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
             vsRecordName
-          collectionName ?= ->
+          collectionName ?= FuncG([], String) ->
             "#{
               inflect.pluralize recordName().replace /Record$/, ''
             }Collection"
@@ -166,7 +171,7 @@ module.exports = (Module)->
             recordName
             collectionName
             through
-            get: co.wrap ->
+            get: AsyncFuncG([], CursorInterface) co.wrap ->
               HasManyCollection = @collection.facade.retrieveProxy collectionName()
 
               unless through
@@ -174,12 +179,12 @@ module.exports = (Module)->
                   "@doc.#{inverse}": @[refKey]
                 )
               else
-                through = @constructor.embeddings?[through[0]] ? @constructor.relations[through[0]]
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-                ThroughRecord = @findRecordByName through.recordName()
+                throughEmbed = @constructor.embeddings?[through[0]] ? @constructor.relations[through[0]]
+                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName()
+                ThroughRecord = @findRecordByName throughEmbed.recordName()
                 inverse = ThroughRecord.relations[through[1].by]
                 manyIds = yield (yield ThroughCollection.takeBy(
-                  "@doc.#{through.inverse}": @[refKey]
+                  "@doc.#{throughEmbed.inverse}": @[refKey]
                 )).map (voRecord)-> voRecord[through[1].by]
                 return yield HasManyCollection.takeBy(
                   "@doc.#{inverse.refKey}": $in: manyIds
@@ -190,20 +195,20 @@ module.exports = (Module)->
           }
 
           @metaObject.addMetaData 'relations', vsAttr, opts
-          @public "#{vsAttr}": Module::CursorInterface, property
+          @public "#{vsAttr}": PromiseT, property
           return
 
-      @public @static hasOne: Function,
-        default: (typeDefinition, {refKey, inverse, relation, recordName, collectionName, through}={})->
+      @public @static hasOne: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
+        default: (typeDefinition, {refKey, inverse, recordName, collectionName, through}={})->
           recordClass = @
           [vsAttr] = Object.keys typeDefinition
           refKey ?= 'id'
           inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
           relation = 'hasOne'
-          recordName ?= ->
+          recordName ?= FuncG([], String) ->
             [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
             vsRecordName
-          collectionName ?= ->
+          collectionName ?= FuncG([], String) ->
             "#{
               inflect.pluralize recordName().replace /Record$/, ''
             }Collection"
@@ -215,7 +220,7 @@ module.exports = (Module)->
             recordName
             collectionName
             through
-            get: co.wrap ->
+            get: AsyncFuncG([], RecordInterface) co.wrap ->
               HasOneCollection = @collection.facade.retrieveProxy collectionName()
               # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
@@ -226,12 +231,12 @@ module.exports = (Module)->
                   $limit: 1
                 )).first()
               else
-                through = @constructor.embeddings?[through[0]] ? @constructor.relations[through[0]]
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-                ThroughRecord = @findRecordByName through.recordName()
+                throughEmbed = @constructor.embeddings?[through[0]] ? @constructor.relations[through[0]]
+                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName()
+                ThroughRecord = @findRecordByName throughEmbed.recordName()
                 inverse = ThroughRecord.relations[through[1].by]
                 oneId = (yield (yield ThroughCollection.takeBy(
-                  "@doc.#{through.inverse}": @[refKey]
+                  "@doc.#{throughEmbed.inverse}": @[refKey]
                 ,
                   $limit: 1
                 )).first())[through[1].by]
@@ -246,11 +251,11 @@ module.exports = (Module)->
           }
 
           @metaObject.addMetaData 'relations', vsAttr, opts
-          @public "#{vsAttr}": Module::RecordInterface, property
+          @public "#{vsAttr}": PromiseT, property
           return
 
       # Cucumber.inverseFor 'tomato' #-> {recordClass: App::Tomato, attrName: 'cucumbers', relation: 'hasMany'}
-      @public @static inverseFor: Function,
+      @public @static inverseFor: FuncG(String, RelationInverseT),
         default: (asAttrName)->
           opts = @relations[asAttrName]
           RecordClass = @findRecordByName opts.recordName()
@@ -258,7 +263,7 @@ module.exports = (Module)->
           {relation} = RecordClass.relations[attrName]
           return {recordClass: RecordClass, attrName, relation}
 
-      @public @static relations: Object,
+      @public @static relations: DictG(String, RelationConfigT),
         get: -> @metaObject.getGroup 'relations', no
 
 

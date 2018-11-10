@@ -2,27 +2,30 @@
 
 module.exports = (Module)->
   {
+    JoiT
+    FuncG, MaybeG, UnionG
+    TransformInterface
     CoreObject
     Utils: { joi }
   } = Module::
 
   class BooleanTransform extends CoreObject
     @inheritProtected()
-    # @implements Module::TransformInterface
+    @implements TransformInterface
     @module Module
 
-    @public @static schema: Object,
+    @public @static schema: JoiT,
       get: -> joi.boolean().allow(null).optional()
 
-    @public @static @async normalize: Function,
+    @public @static @async normalize: FuncG([UnionG Boolean, String, Number], Boolean),
       default: (args...)->
         yield return @normalizeSync args...
 
-    @public @static @async serialize: Function,
+    @public @static @async serialize: FuncG([MaybeG UnionG Boolean, String, Number], Boolean),
       default: (args...)->
         yield return @serializeSync args...
 
-    @public @static normalizeSync: Function,
+    @public @static normalizeSync: FuncG([UnionG Boolean, String, Number], Boolean),
       default: (serialized)->
         type = typeof serialized
 
@@ -35,13 +38,11 @@ module.exports = (Module)->
         else
           return no
 
-    @public @static serializeSync: Function,
-      default: (deserialized)->
-        return Boolean deserialized
+    @public @static serializeSync: FuncG([MaybeG UnionG Boolean, String, Number], Boolean),
+      default: (deserialized)-> Boolean deserialized
 
-    @public @static objectize: Function,
-      default: (deserialized)->
-        Boolean deserialized
+    @public @static objectize: FuncG([MaybeG UnionG Boolean, String, Number], Boolean),
+      default: (deserialized)-> Boolean deserialized
 
     @public @static @async restoreObject: Function,
       default: ->

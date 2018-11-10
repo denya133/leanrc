@@ -1,14 +1,21 @@
 
 
 module.exports = (Module)->
-  class Pipe extends Module::CoreObject
+  {
+    NilT, PointerT
+    FuncG, MaybeG
+    PipeFittingInterface, PipeMessageInterface
+    CoreObject
+  } = Module::
+
+  class Pipe extends CoreObject
     @inheritProtected()
-    # @implements Module::PipeFittingInterface
+    @implements PipeFittingInterface
     @module Module
 
-    ipoOutput = @protected output: Module::PipeFittingInterface
+    ipoOutput = PointerT @protected output: PipeFittingInterface
 
-    @public connect: Function,
+    @public connect: FuncG(PipeFittingInterface, Boolean),
       default: (aoOutput)->
         vbSuccess = no
         unless @[ipoOutput]?
@@ -16,13 +23,13 @@ module.exports = (Module)->
           vbSuccess = yes
         vbSuccess
 
-    @public disconnect: Function,
+    @public disconnect: FuncG([], MaybeG PipeFittingInterface),
       default: ->
         disconnectedFitting = @[ipoOutput]
         @[ipoOutput] = null
         disconnectedFitting
 
-    @public write: Function,
+    @public write: FuncG(PipeMessageInterface, Boolean),
       default: (aoMessage)->
         return @[ipoOutput].write aoMessage
 
@@ -36,11 +43,12 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG([MaybeG PipeFittingInterface], NilT),
       default: (aoOutput)->
         @super arguments...
         if aoOutput?
           @connect aoOutput
+        return
 
 
-  Pipe.initialize()
+    @initialize()

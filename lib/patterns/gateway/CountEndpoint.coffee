@@ -2,16 +2,18 @@
 
 module.exports = (Module)->
   {
+    EndpointInterface
     CrudEndpointMixin
+    Endpoint
     Utils: { statuses, joi }
   } = Module::
 
   UNAUTHORIZED      = statuses 'unauthorized'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  class CountEndpoint extends Module::Endpoint
+  class CountEndpoint extends Endpoint
     @inheritProtected()
-    # @implements Module::EndpointInterface
+    @implements EndpointInterface
     @include CrudEndpointMixin
     @module Module
 
@@ -35,5 +37,7 @@ module.exports = (Module)->
           Retrieves a count of filtered
           #{@listEntityName} by using query.
         "
+        return
+
 
     @initialize()

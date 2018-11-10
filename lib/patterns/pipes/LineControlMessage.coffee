@@ -1,13 +1,19 @@
 
 
 module.exports = (Module)->
-  class QueueControlMessage extends Module::PipeMessage
+  {
+    NilT
+    FuncG, MaybeG
+    PipeMessage
+  } = Module::
+
+  class LineControlMessage extends PipeMessage
     @inheritProtected()
 
     @module Module
 
     @public @static BASE: String,
-      get: -> "#{Module::PipeMessage.BASE}queue/"
+      get: -> "#{PipeMessage.BASE}queue/"
     @public @static FLUSH: String,
       get: -> "#{@BASE}flush"
     @public @static SORT: String,
@@ -15,9 +21,12 @@ module.exports = (Module)->
     @public @static FIFO: String,
       get: -> "#{@BASE}fifo"
 
-    @public init: Function,
+    @public init: FuncG([
+      String, MaybeG(Object), MaybeG(Object), MaybeG Number
+    ], NilT),
       default: (asType)->
         @super asType
+        return
 
 
-  QueueControlMessage.initialize()
+    @initialize()

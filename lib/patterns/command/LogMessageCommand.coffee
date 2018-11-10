@@ -2,6 +2,9 @@
 
 module.exports = (Module) ->
   {
+    NilT
+    FuncG
+    NotificationInterface
     SimpleCommand
     Application
   } = Module::
@@ -13,11 +16,11 @@ module.exports = (Module) ->
     @inheritProtected()
     @module Module
 
-    @public execute: Function,
+    @public execute: FuncG(NotificationInterface, NilT),
       default: (aoNotification)->
         proxy = @facade.retrieveProxy LOGGER_PROXY
         proxy.addLogEntry aoNotification.getBody()
         return
 
 
-  LogMessageCommand.initialize()
+    @initialize()

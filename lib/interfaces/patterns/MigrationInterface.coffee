@@ -1,163 +1,177 @@
 
 
 module.exports = (Module)->
-  {NILL} = Module::
+  {
+    AnyT, NilT, AsyncFunctionT
+    FuncG, ListG, StructG, EnumG, MaybeG, UnionG, InterfaceG, AsyncFuncG
+    RecordInterface
+  } = Module::
 
-  Module.defineInterface 'MigrationInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class MigrationInterface extends RecordInterface
+    @inheritProtected()
+    @module Module
 
-      @public @async @virtual createCollection: Function,
-        args: [String, Object]
-        return: NILL
+    @const UP: UP = Symbol 'UP'
+    @const DOWN: DOWN = Symbol 'DOWN'
+    @const SUPPORTED_TYPES: SUPPORTED_TYPES = {
+      json:         'json'
+      binary:       'binary'
+      boolean:      'boolean'
+      date:         'date'
+      datetime:     'datetime'
+      decimal:      'decimal'
+      float:        'float'
+      integer:      'integer'
+      primary_key:  'primary_key'
+      string:       'string'
+      text:         'text'
+      time:         'time'
+      timestamp:    'timestamp'
+      array:        'array'
+      hash:         'hash'
+    }
 
-      @public @static @virtual createCollection: Function,
-        args: [String, Object]
-        return: NILL
+    @virtual steps: ListG StructG {
+      args: Array
+      method: EnumG [
+        'createCollection'
+        'createEdgeCollection'
+        'addField'
+        'addIndex'
+        'addTimestamps'
+        'changeCollection'
+        'changeField'
+        'renameField'
+        'renameIndex'
+        'renameCollection'
+        'dropCollection'
+        'dropEdgeCollection'
+        'removeField'
+        'removeIndex'
+        'removeTimestamps'
+        'reversible'
+      ]
+    }
 
-      @public @async @virtual createEdgeCollection: Function,
-        args: [String, String, Object]
-        return: NILL
+    @virtual @static createCollection: FuncG [String, MaybeG Object], NilT
 
-      @public @static @virtual createEdgeCollection: Function,
-        args: [String, String, Object]
-        return: NILL
+    @virtual @async createCollection: FuncG [String, MaybeG Object], NilT
 
-      @public @async @virtual addField: Function,
-        args: [String, String, Object]
-        return: NILL
+    @virtual @static createEdgeCollection: FuncG [String, String, MaybeG Object], NilT
 
-      @public @static @virtual addField: Function,
-        args: [String, String, Object]
-        return: NILL
+    @virtual @async createEdgeCollection: FuncG [String, String, MaybeG Object], NilT
 
-      @public @async @virtual addIndex: Function,
-        args: [String, Array, Object]
-        return: NILL
+    @virtual @static addField: FuncG [String, String, UnionG(
+      EnumG SUPPORTED_TYPES
+      InterfaceG {
+        type: EnumG SUPPORTED_TYPES
+        default: AnyT
+      }
+    )], NilT
 
-      @public @static @virtual addIndex: Function,
-        args: [String, Array, Object]
-        return: NILL
+    @virtual @async addField: FuncG [String, String, UnionG(
+      EnumG SUPPORTED_TYPES
+      InterfaceG {
+        type: EnumG SUPPORTED_TYPES
+        default: AnyT
+      }
+    )], NilT
 
-      @public @async @virtual addTimestamps: Function,
-        args: [String, Object]
-        return: NILL
+    @virtual @static addIndex: FuncG [String, ListG(String), InterfaceG {
+      type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
+      unique: MaybeG Boolean
+      sparse: MaybeG Boolean
+    }], NilT
 
-      @public @static @virtual addTimestamps: Function,
-        args: [String, Object]
-        return: NILL
+    @virtual @async addIndex: FuncG [String, ListG(String), InterfaceG {
+      type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
+      unique: MaybeG Boolean
+      sparse: MaybeG Boolean
+    }], NilT
 
-      @public @async @virtual changeCollection: Function,
-        args: [String, Object]
-        return: NILL
+    @virtual @static addTimestamps: FuncG [String, MaybeG Object], NilT
 
-      @public @static @virtual changeCollection: Function,
-        args: [String, Object]
-        return: NILL
+    @virtual @async addTimestamps: FuncG [String, MaybeG Object], NilT
 
-      @public @async @virtual changeField: Function,
-        args: [String, String, Object]
-        return: NILL
+    @virtual @static changeCollection: FuncG [String, Object], NilT
 
-      @public @static @virtual changeField: Function,
-        args: [String, String, Object]
-        return: NILL
+    @virtual @async changeCollection: FuncG [String, Object], NilT
 
-      @public @async @virtual renameField: Function,
-        args: [String, String, String]
-        return: NILL
+    @virtual @static changeField: FuncG [String, String, UnionG(
+      EnumG SUPPORTED_TYPES
+      InterfaceG {
+        type: EnumG SUPPORTED_TYPES
+      }
+    )], NilT
 
-      @public @static @virtual renameField: Function,
-        args: [String, String, String]
-        return: NILL
+    @virtual @async changeField: FuncG [String, String, UnionG(
+      EnumG SUPPORTED_TYPES
+      InterfaceG {
+        type: EnumG SUPPORTED_TYPES
+      }
+    )], NilT
 
-      @public @async @virtual renameIndex: Function,
-        args: [String, String, String]
-        return: NILL
+    @virtual @static renameField: FuncG [String, String, String], NilT
 
-      @public @static @virtual renameIndex: Function,
-        args: [String, String, String]
-        return: NILL
+    @virtual @async renameField: FuncG [String, String, String], NilT
 
-      @public @async @virtual renameCollection: Function,
-        args: [String, String, String]
-        return: NILL
+    @virtual @static renameIndex: FuncG [String, String, String], NilT
 
-      @public @static @virtual renameCollection: Function,
-        args: [String, String, String]
-        return: NILL
+    @virtual @async renameIndex: FuncG [String, String, String], NilT
 
-      @public @async @virtual dropCollection: Function,
-        args: [String]
-        return: NILL
+    @virtual @static renameCollection: FuncG [String, String], NilT
 
-      @public @static @virtual dropCollection: Function,
-        args: [String]
-        return: NILL
+    @virtual @async renameCollection: FuncG [String, String], NilT
 
-      @public @async @virtual dropEdgeCollection: Function,
-        args: [String, String]
-        return: NILL
+    @virtual @static dropCollection: FuncG String, NilT
 
-      @public @static @virtual dropEdgeCollection: Function,
-        args: [String, String]
-        return: NILL
+    @virtual @async dropCollection: FuncG String, NilT
 
-      @public @async @virtual removeField: Function,
-        args: [String, String]
-        return: NILL
+    @virtual @static dropEdgeCollection: FuncG [String, String], NilT
 
-      @public @static @virtual removeField: Function,
-        args: [String, String]
-        return: NILL
+    @virtual @async dropEdgeCollection: FuncG [String, String], NilT
 
-      @public @async @virtual removeIndex: Function,
-        args: [String, Array, Object]
-        return: NILL
+    @virtual @static removeField: FuncG [String, String], NilT
 
-      @public @static @virtual removeIndex: Function,
-        args: [String, Array, Object]
-        return: NILL
+    @virtual @async removeField: FuncG [String, String], NilT
 
-      @public @async @virtual removeTimestamps: Function,
-        args: [String, Object]
-        return: NILL
+    @virtual @static removeIndex: FuncG [String, ListG(String), InterfaceG {
+      type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
+      unique: MaybeG Boolean
+      sparse: MaybeG Boolean
+    }], NilT
 
-      @public @static @virtual removeTimestamps: Function,
-        args: [String, Object]
-        return: NILL
+    @virtual @async removeIndex: FuncG [String, ListG(String), InterfaceG {
+      type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
+      unique: MaybeG Boolean
+      sparse: MaybeG Boolean
+    }], NilT
 
-      @public @static @virtual reversible: Function,
-        args: [Function]
-        return: NILL
+    @virtual @static removeTimestamps: FuncG [String, MaybeG Object], NilT
 
-      @public @async @virtual execute: Function,
-        args: [Function]
-        return: NILL
+    @virtual @async removeTimestamps: FuncG [String, MaybeG Object], NilT
 
-      @public @async @virtual migrate: Function,
-        args: [Function]
-        return: NILL
+    @virtual @static reversible: FuncG AsyncFuncG(
+      StructG {
+        up: AsyncFuncG AsyncFunctionT, NilT
+        down: AsyncFuncG AsyncFunctionT, NilT
+      }
+      NilT
+    ), NilT
 
-      @public @static @virtual change: Function,
-        args: [Function]
-        return: NILL
+    @virtual @async execute: FuncG AsyncFunctionT, NilT
 
-      @public @async @virtual up: Function,
-        args: []
-        return: NILL
+    @virtual @async migrate: FuncG [EnumG UP, DOWN], NilT
 
-      @public @static @virtual up: Function,
-        args: [Function]
-        return: NILL
+    @virtual @static change: FuncG Function, NilT
 
-      @public @async @virtual down: Function,
-        args: []
-        return: NILL
+    @virtual @async up: Function
 
-      @public @static @virtual down: Function,
-        args: [Function]
-        return: NILL
+    @virtual @static up: FuncG AsyncFunctionT, NilT
+
+    @virtual @async down: Function
+
+    @virtual @static down: FuncG AsyncFunctionT, NilT
 
 
-      @initializeInterface()
+    @initialize()

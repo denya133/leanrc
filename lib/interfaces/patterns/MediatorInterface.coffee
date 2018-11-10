@@ -1,34 +1,24 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT, NilT
+    FuncG
+    NotificationInterface
+    NotifierInterface
+  } = Module::
 
-  Module.defineInterface 'MediatorInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
-      @include Module::NotifierInterface
+  class MediatorInterface extends NotifierInterface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual getMediatorName: Function,
-        args: []
-        return: String
-      @public @virtual getViewComponent: Function,
-        args: []
-        return: ANY
-      @public @virtual setViewComponent: Function,
-        args: [ANY]
-        return: NILL
-      @public @virtual listNotificationInterests: Function,
-        args: []
-        return: Array
-      @public @virtual handleNotification: Function,
-        args: [Module::NotificationInterface]
-        return: NILL
-      @public @virtual onRegister: Function,
-        args: []
-        return: NILL
-      @public @virtual onRemove: Function,
-        args: []
-        return: NILL
+    @virtual getMediatorName: FuncG [], String
+    @virtual getViewComponent: FuncG [], AnyT
+    @virtual setViewComponent: FuncG AnyT, NilT
+    @virtual listNotificationInterests: FuncG [], Array
+    @virtual handleNotification: FuncG NotificationInterface, NilT
+    @virtual onRegister: Function
+    @virtual onRemove: Function
 
 
-      @initializeInterface()
+    @initialize()

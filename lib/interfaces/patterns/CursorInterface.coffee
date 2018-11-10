@@ -1,67 +1,47 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT, NilT
+    FuncG, MaybeG
+    CollectionInterface
+    CursorInterface: CursorInterfaceDef
+    Interface
+  } = Module::
 
-  Module.defineInterface 'CursorInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class CursorInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual setCollection: Function,
-        args: [Module::ProxyInterface]
-        return: CursorInterface
+    @virtual isClosed: Boolean
 
-      @public @virtual setIterable: Function,
-        args: [ANY]
-        return: CursorInterface
+    @virtual setCollection: FuncG CollectionInterface, CursorInterfaceDef
 
-      @public @async @virtual toArray: Function,
-        args: []
-        return: Array
+    @virtual setIterable: FuncG AnyT, CursorInterfaceDef
 
-      @public @async @virtual next: Function,
-        args: []
-        return: ANY
+    @virtual @async toArray: FuncG [], Array
 
-      @public @async @virtual hasNext: Function,
-        args: []
-        return: Boolean
+    @virtual @async next: FuncG [], AnyT
 
-      @public @async @virtual close: Function,
-        args: []
-        return: NILL
+    @virtual @async hasNext: FuncG [], Boolean
 
-      @public @async @virtual count: Function,
-        args: []
-        return: Number
+    @virtual @async close: Function
 
-      @public @async @virtual forEach: Function,
-        args: [Function]
-        return: NILL
+    @virtual @async count: FuncG [], Number
 
-      @public @async @virtual map: Function,
-        args: [Function]
-        return: Array
+    @virtual @async forEach: FuncG Function, NilT
 
-      @public @async @virtual filter: Function,
-        args: [Function]
-        return: Array
+    @virtual @async map: FuncG Function, Array
 
-      @public @async @virtual find: Function,
-        args: [Function]
-        return: ANY
+    @virtual @async filter: FuncG Function, Array
 
-      @public @async @virtual compact: Function,
-        args: []
-        return: Array
+    @virtual @async find: FuncG Function, AnyT
 
-      @public @async @virtual reduce: Function,
-        args: [Function, ANY]
-        return: ANY
+    @virtual @async compact: FuncG [], Array
 
-      @public @async @virtual first: Function,
-        args: []
-        return: ANY
+    @virtual @async reduce: FuncG [Function, AnyT], AnyT
+
+    @virtual @async first: FuncG [], MaybeG  AnyT
 
 
-      @initializeInterface()
+    @initialize()

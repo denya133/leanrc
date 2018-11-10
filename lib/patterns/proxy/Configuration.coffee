@@ -95,14 +95,15 @@ module.exports =
 
 module.exports = (Module)->
   {
-    NILL
     PRODUCTION
     DEVELOPMENT
+    ConfigurationInterface
     Utils: { _, extend, isArangoDB }
   } = Module::
 
   class Configuration extends Module::Proxy
     @inheritProtected()
+    @implements ConfigurationInterface
     @module Module
 
     @public ROOT: String,
@@ -122,8 +123,6 @@ module.exports = (Module)->
             DEVELOPMENT
 
     @public defineConfigProperties: Function,
-      args: []
-      return: NILL
       default: ->
         manifestPath = "#{@ROOT}/../manifest.json"
         manifest = require manifestPath
@@ -217,4 +216,4 @@ module.exports = (Module)->
         return
 
 
-  Configuration.initialize()
+    @initialize()

@@ -2,20 +2,33 @@
 
 module.exports = (Module)->
   {
-    Renderer
+    AnyT
+    FuncG, MaybeG, InterfaceG
+    ContextInterface, ResourceInterface
+    Renderer, Mixin
   } = Module::
 
-  Module.defineMixin 'CountMethodsRendererMixin', (BaseClass = Renderer) ->
+  Module.defineMixin Mixin 'CountMethodsRendererMixin', (BaseClass = Renderer) ->
     class extends BaseClass
       @inheritProtected()
 
-      @public count: Function,
+      @public count: FuncG([String, String, AnyT], Number),
         default: (resource, action, aoData)-> aoData
 
-      @public length: Function,
+      @public length: FuncG([String, String, AnyT], Number),
         default: (resource, action, aoData)-> aoData
 
-      @public @async render: Function,
+      @public @async render: FuncG([ContextInterface, AnyT, ResourceInterface, MaybeG InterfaceG {
+        method: String
+        path: String
+        resource: String
+        action: String
+        tag: String
+        template: String
+        keyName: String
+        entityName: String
+        recordName: String
+      }], MaybeG AnyT),
         default: (args...)->
           [ctx, aoData, resource, options = {}] = args
           {path, resource:resourceName, action, template:templatePath} = options

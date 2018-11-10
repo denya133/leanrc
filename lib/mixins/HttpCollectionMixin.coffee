@@ -2,37 +2,38 @@
 
 module.exports = (Module)->
   {
-    ANY, NILL
     APPLICATION_MEDIATOR
-    Collection
-    Utils: { _, inflect }
+    AnyT, NilT, PointerT
+    FuncG, SubsetG, MaybeG, UnionG, ListG, InterfaceG, DictG, StructG
+    RecordInterface, QueryInterface, CursorInterface
+    Collection, Cursor, Mixin
+    Utils: { _, inflect, request }
   } = Module::
 
-  Module.defineMixin 'HttpCollectionMixin', (BaseClass = Collection) ->
+  Module.defineMixin Mixin 'HttpCollectionMixin', (BaseClass = Collection) ->
     class extends BaseClass
       @inheritProtected()
-      # @implements Module::QueryableCollectionMixinInterface
 
-      ipsRecordMultipleName = @private recordMultipleName: String
-      ipsRecordSingleName = @private recordSingleName: String
+      ipsRecordMultipleName = PointerT @private recordMultipleName: String
+      ipsRecordSingleName = PointerT @private recordSingleName: String
 
-      @public recordMultipleName: Function,
+      @public recordMultipleName: FuncG([], String),
         default: ->
           @[ipsRecordMultipleName] ?= inflect.pluralize @recordSingleName()
 
-      @public recordSingleName: Function,
+      @public recordSingleName: FuncG([], String),
         default: ->
           @[ipsRecordSingleName] ?= inflect.underscore @delegate.name.replace /Record$/, ''
 
-      @public @async push: Function,
+      @public @async push: FuncG(RecordInterface, RecordInterface),
         default: (aoRecord)->
           params = {}
           params.requestType = 'push'
           params.recordName = @delegate.name
           params.snapshot = yield @serialize aoRecord
 
-          request = @requestFor params
-          res = yield @makeRequest request
+          requestObj = @requestFor params
+          res = yield @makeRequest requestObj
 
           if res.status >= 400
             throw new Error "
@@ -49,15 +50,15 @@ module.exports = (Module)->
             "
           yield return voRecord
 
-      @public @async remove: Function,
+      @public @async remove: FuncG([UnionG String, Number], NilT),
         default: (id)->
           params = {}
           params.requestType = 'remove'
           params.recordName = @delegate.name
           params.id = id
 
-          request = @requestFor params
-          res = yield @makeRequest request
+          requestObj = @requestFor params
+          res = yield @makeRequest requestObj
 
           if res.status >= 400
             throw new Error "
@@ -65,15 +66,15 @@ module.exports = (Module)->
             "
           yield return
 
-      @public @async take: Function,
+      @public @async take: FuncG([UnionG String, Number], RecordInterface),
         default: (id)->
           params = {}
           params.requestType = 'take'
           params.recordName = @delegate.name
           params.id = id
 
-          request = @requestFor params
-          res = yield @makeRequest request
+          requestObj = @requestFor params
+          res = yield @makeRequest requestObj
 
           if res.status >= 400
             throw new Error "
@@ -90,7 +91,7 @@ module.exports = (Module)->
             "
           yield return voRecord
 
-      @public @async takeBy: Function,
+      @public @async takeBy: FuncG([Object, MaybeG Object], CursorInterface),
         default: (query, options = {})->
           params = {}
           params.requestType = 'takeBy'
@@ -100,8 +101,8 @@ module.exports = (Module)->
           params.query.$limit = options.$limit if options.$limit?
           params.query.$offset = options.$offset if options.$offset?
 
-          request = @requestFor params
-          res = yield @makeRequest request
+          requestObj = @requestFor params
+          res = yield @makeRequest requestObj
 
           if res.status >= 400
             throw new Error "
@@ -112,22 +113,22 @@ module.exports = (Module)->
           if body? and body isnt ''
             body = JSON.parse body if _.isString body
             vhRecordsData = body[@recordMultipleName()]
-            voCursor = Module::Cursor.new @, vhRecordsData
+            voCursor = Cursor.new @, vhRecordsData
           else
             throw new Error "
               Record payload has not existed in response body.
             "
           yield return voCursor
 
-      @public @async takeMany: Function,
+      @public @async takeMany: FuncG([ListG UnionG String, Number], CursorInterface),
         default: (ids)->
           params = {}
           params.requestType = 'takeBy'
           params.recordName = @delegate.name
           params.query = $filter: '@doc.id': {$in: ids}
 
-          request = @requestFor params
-          res = yield @makeRequest request
+          requestObj = @requestFor params
+          res = yield @makeRequest requestObj
 
           if res.status >= 400
             throw new Error "
@@ -138,22 +139,22 @@ module.exports = (Module)->
           if body? and body isnt ''
             body = JSON.parse body if _.isString body
             vhRecordsData = body[@recordMultipleName()]
-            voCursor = Module::Cursor.new @, vhRecordsData
+            voCursor = Cursor.new @, vhRecordsData
           else
             throw new Error "
               Record payload has not existed in response body.
             "
           yield return voCursor
 
-      @public @async takeAll: Function,
+      @public @async takeAll: FuncG([], CursorInterface),
         default: ->
           params = {}
           params.requestType = 'takeAll'
           params.recordName = @delegate.name
           params.query = {}
 
-          request = @requestFor params
-          res = yield @makeRequest request
+          requestObj = @requestFor params
+          res = yield @makeRequest requestObj
 
           if res.status >= 400
             throw new Error "
@@ -164,14 +165,14 @@ module.exports = (Module)->
           if body? and body isnt ''
             body = JSON.parse body if _.isString body
             vhRecordsData = body[@recordMultipleName()]
-            voCursor = Module::Cursor.new @, vhRecordsData
+            voCursor = Cursor.new @, vhRecordsData
           else
             throw new Error "
               Record payload has not existed in response body.
             "
           yield return voCursor
 
-      @public @async override: Function,
+      @public @async override: FuncG([UnionG(String, Number), RecordInterface], RecordInterface),
         default: (id, aoRecord)->
           params = {}
           params.requestType = 'override'
@@ -179,8 +180,8 @@ module.exports = (Module)->
           params.snapshot = yield @serialize aoRecord
           params.id = id
 
-          request = @requestFor params
-          res = yield @makeRequest request
+          requestObj = @requestFor params
+          res = yield @makeRequest requestObj
 
           if res.status >= 400
             throw new Error "
@@ -197,7 +198,7 @@ module.exports = (Module)->
             "
           yield return voRecord
 
-      @public @async includes: Function,
+      @public @async includes: FuncG([UnionG String, Number], Boolean),
         default: (id)->
           voQuery =
             $forIn: '@doc': @collectionFullName()
@@ -206,14 +207,14 @@ module.exports = (Module)->
             $return: '@doc'
           return yield (yield @query voQuery).hasNext()
 
-      @public @async length: Function,
+      @public @async length: FuncG([], Number),
         default: ->
           voQuery =
             $forIn: '@doc': @collectionFullName()
             $count: yes
           return (yield (yield @query voQuery).first()).count
 
-      @public headers: Object
+      @public headers: MaybeG DictG String, String
       @public host: String,
         default: 'http://localhost'
       @public namespace: String,
@@ -221,9 +222,14 @@ module.exports = (Module)->
       @public queryEndpoint: String,
         default: 'query'
 
-      @public headersForRequest: Function,
-        args: [Object]
-        return: Object
+      @public headersForRequest: FuncG(StructG({
+        requestType: String
+        recordName: String
+        snapshot: MaybeG Object
+        id: MaybeG String
+        query: MaybeG Object
+        isCustomReturn: MaybeG Boolean
+      }), DictG String, String),
         default: (params = {})->
           headers = @headers ? {}
           headers['Accept'] = 'application/json'
@@ -244,9 +250,14 @@ module.exports = (Module)->
               headers['Authorization'] = "Bearer #{@configs.apiKey}"
           headers
 
-      @public methodForRequest: Function,
-        args: [Object]
-        return: String
+      @public methodForRequest: FuncG(StructG({
+        requestType: String
+        recordName: String
+        snapshot: MaybeG Object
+        id: MaybeG String
+        query: MaybeG Object
+        isCustomReturn: MaybeG Boolean
+      }), String),
         default: ({requestType})->
           switch requestType
             when 'query' then 'POST'
@@ -261,9 +272,14 @@ module.exports = (Module)->
             else
               'GET'
 
-      @public dataForRequest: Function,
-        args: [Object]
-        return: Object
+      @public dataForRequest: FuncG(StructG({
+        requestType: String
+        recordName: String
+        snapshot: MaybeG Object
+        id: MaybeG String
+        query: MaybeG Object
+        isCustomReturn: MaybeG Boolean
+      }), MaybeG Object),
         default: ({recordName, snapshot, requestType, query})->
           if snapshot? and requestType in ['push', 'override']
             return snapshot
@@ -272,22 +288,23 @@ module.exports = (Module)->
           else
             return
 
-      @public urlForRequest: Function,
-        args: [Object]
-        return: String
+      @public urlForRequest: FuncG(StructG({
+        requestType: String
+        recordName: String
+        snapshot: MaybeG Object
+        id: MaybeG String
+        query: MaybeG Object
+        isCustomReturn: MaybeG Boolean
+      }), String),
         default: (params)->
           {recordName, snapshot, id, requestType, query} = params
           @buildURL recordName, snapshot, id, requestType, query
 
-      @public pathForType: Function,
-        args: [String]
-        return: String
+      @public pathForType: FuncG(String, String),
         default: (recordName)->
           inflect.pluralize inflect.underscore recordName.replace /Record$/, ''
 
-      @public urlPrefix: Function,
-        args: [String, String]
-        return: String
+      @public urlPrefix: FuncG([MaybeG(String), MaybeG String], String),
         default: (path, parentURL)->
           if not @host or @host is '/'
             @host = ''
@@ -311,9 +328,7 @@ module.exports = (Module)->
           if @namespace then url.push @namespace
           return url.join '/'
 
-      @public makeURL: Function,
-        args: [String, [Object, NILL], [Boolean, NILL]]
-        return: String
+      @public makeURL: FuncG([String, MaybeG(Object), MaybeG(UnionG Number, String), MaybeG Boolean], String),
         default: (recordName, query, id, isQueryable)->
           url = []
           prefix = @urlPrefix()
@@ -336,63 +351,43 @@ module.exports = (Module)->
             url += "?query=#{query}"
           return url
 
-      @public urlForQuery: Function,
-        args: [String, Object]
-        return: String
+      @public urlForQuery: FuncG([String, MaybeG Object], String),
         default: (recordName, query)->
           @makeURL recordName, null, null, yes
 
-      @public urlForPatchBy: Function,
-        args: [String, Object]
-        return: String
+      @public urlForPatchBy: FuncG([String, MaybeG Object], String),
         default: (recordName, query)->
           @makeURL recordName, null, null, yes
 
-      @public urlForRemoveBy: Function,
-        args: [String, Object]
-        return: String
+      @public urlForRemoveBy: FuncG([String, MaybeG Object], String),
         default: (recordName, query)->
           @makeURL recordName, null, null, yes
 
-      @public urlForTakeAll: Function,
-        args: [String]
-        return: String
+      @public urlForTakeAll: FuncG([String, MaybeG Object], String),
         default: (recordName, query)->
           @makeURL recordName, query, null, no
 
-      @public urlForTakeBy: Function,
-        args: [String, Object]
-        return: String
+      @public urlForTakeBy: FuncG([String, MaybeG Object], String),
         default: (recordName, query)->
           @makeURL recordName, query, null, no
 
-      @public urlForTake: Function,
-        args: [String, String]
-        return: String
+      @public urlForTake: FuncG([String, String], String),
         default: (recordName, id)->
           @makeURL recordName, null, id, no
 
-      @public urlForPush: Function,
-        args: [String, Object]
-        return: String
+      @public urlForPush: FuncG([String, Object], String),
         default: (recordName, snapshot)->
           @makeURL recordName, null, null, no
 
-      @public urlForRemove: Function,
-        args: [String, String]
-        return: String
+      @public urlForRemove: FuncG([String, String], String),
         default: (recordName, id)->
           @makeURL recordName, null, id, no
 
-      @public urlForOverride: Function,
-        args: [String, Object, String]
-        return: String
+      @public urlForOverride: FuncG([String, Object, String], String),
         default: (recordName, snapshot, id)->
           @makeURL recordName, null, id, no
 
-      @public buildURL: Function,
-        args: [String, [Object, NILL], String, String, [Object, NILL]]
-        return: String
+      @public buildURL: FuncG([String, MaybeG(Object), MaybeG(String), String, MaybeG Object], String),
         default: (recordName, snapshot, id, requestType, query)->
           switch requestType
             when 'query'
@@ -417,9 +412,19 @@ module.exports = (Module)->
               vsMethod = "urlFor#{inflect.camelize requestType}"
               @[vsMethod]? recordName, query, snapshot, id
 
-      @public requestFor: Function,
-        args: [Object]
-        return: Object
+      @public requestFor: FuncG(StructG({
+        requestType: String
+        recordName: String
+        snapshot: MaybeG Object
+        id: MaybeG String
+        query: MaybeG Object
+        isCustomReturn: MaybeG Boolean
+      }), StructG {
+        method: String
+        url: String
+        headers: Object
+        data: MaybeG Object
+      }),
         default: (params)->
           method  = @methodForRequest params
           url     = @urlForRequest params
@@ -427,15 +432,37 @@ module.exports = (Module)->
           data    = @dataForRequest params
           return {method, url, headers, data}
 
-      @public @async sendRequest: Function,
-        args: [Object]
-        return: Object
+      @public @async sendRequest: FuncG(StructG({
+        method: String
+        url: String
+        options: StructG {
+          json: EnumG yes
+          headers: Object
+          body: MaybeG Object
+        }
+      }), StructG {
+        body: MaybeG AnyT
+        headers: DictG String, String
+        status: Number
+        message: MaybeG String
+      }),
         default: ({method, url, options})->
-          return yield Module::Utils.request method, url, options
+          return yield request method, url, options
 
-      @public requestToHash: Function,
-        args: [Object]
-        return: Object
+      @public requestToHash: FuncG(StructG({
+        method: String
+        url: String
+        headers: Object
+        data: MaybeG Object
+      }), StructG {
+        method: String
+        url: String
+        options: StructG {
+          json: EnumG yes
+          headers: Object
+          body: MaybeG Object
+        }
+      }),
         default: ({method, url, headers, data})->
           options = {
             json: yes
@@ -448,10 +475,18 @@ module.exports = (Module)->
             options
           }
 
-      @public @async makeRequest: Function,
-        args: [Object]
-        return: Object
-        default: (request)-> # result of requestFor
+      @public @async makeRequest: FuncG(StructG({
+        method: String
+        url: String
+        headers: Object
+        data: MaybeG Object
+      }), StructG {
+        body: MaybeG AnyT
+        headers: DictG String, String
+        status: Number
+        message: MaybeG String
+      }),
+        default: (requestObj)-> # result of requestFor
           {
             LogMessage: {
               SEND_TO_LOG
@@ -459,11 +494,14 @@ module.exports = (Module)->
               DEBUG
             }
           } = Module::
-          hash = @requestToHash request
+          hash = @requestToHash requestObj
           @sendNotification(SEND_TO_LOG, "HttpCollectionMixin::makeRequest hash #{JSON.stringify hash}", LEVELS[DEBUG])
           return yield @sendRequest hash
 
-      @public @async parseQuery: Function,
+      @public @async parseQuery: FuncG(
+        [UnionG Object, QueryInterface]
+        UnionG Object, String, QueryInterface
+      ),
         default: (aoQuery)->
           params = {}
           switch
@@ -497,10 +535,13 @@ module.exports = (Module)->
               )
               yield return params
 
-      @public @async executeQuery: Function,
+      @public @async executeQuery: FuncG(
+        [UnionG Object, String, QueryInterface]
+        CursorInterface
+      ),
         default: (aoQuery, options)->
-          request = @requestFor aoQuery
-          res = yield @makeRequest request
+          requestObj = @requestFor aoQuery
+          res = yield @makeRequest requestObj
 
           if res.status >= 400
             throw new Error "
@@ -516,11 +557,11 @@ module.exports = (Module)->
               body = [body]
 
             if aoQuery.isCustomReturn
-              return Module::Cursor.new null, body
+              return Cursor.new null, body
             else
-              return Module::Cursor.new @, body
+              return Cursor.new @, body
           else
-            return Module::Cursor.new null, []
+            return Cursor.new null, []
 
 
       @initializeMixin()

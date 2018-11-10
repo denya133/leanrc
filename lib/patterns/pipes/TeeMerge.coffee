@@ -1,24 +1,31 @@
 
 
 module.exports = (Module)->
-  class TeeMerge extends Module::Pipe
-    @inheritProtected()
+  {
+    NilT
+    FuncG, MaybeG
+    PipeFittingInterface
+    Pipe
+  } = Module::
 
+  class TeeMerge extends Pipe
+    @inheritProtected()
     @module Module
 
-    @public connectInput: Function,
-      args: [Module::PipeFittingInterface]
-      return: Boolean
+    @public connectInput: FuncG(PipeFittingInterface, Boolean),
       default: (aoInput)->
         aoInput.connect @
 
-    @public init: Function,
+    @public init: FuncG([
+      MaybeG(PipeFittingInterface), MaybeG PipeFittingInterface
+    ], NilT),
       default: (input1=null, input2=null)->
         @super arguments...
         if input1?
           @connectInput input1
         if input2?
           @connectInput input2
+        return
 
 
-  TeeMerge.initialize()
+    @initialize()

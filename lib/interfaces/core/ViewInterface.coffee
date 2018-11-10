@@ -1,34 +1,27 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    ANY, NilT
+    FuncG, UnionG
+    ObserverInterface
+    NotificationInterface
+    ControllerInterface
+    MediatorInterface
+    Interface
+  } = Module::
 
-  Module.defineInterface 'ViewInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
-      @module Module
+  class ViewInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual registerObserver: Function,
-        args: [String, Module::ObserverInterface]
-        return: NILL
-      @public @virtual removeObserver: Function,
-        args: [String, ANY]
-        return: NILL
-      @public @virtual notifyObservers: Function,
-        args: [Module::NotificationInterface]
-        return: NILL
-      @public @virtual registerMediator: Function,
-        args: [Module::MediatorInterface]
-        return: NILL
-      @public @virtual retrieveMediator: Function,
-        args: [String]
-        return: Module::MediatorInterface
-      @public @virtual removeMediator: Function,
-        args: [String]
-        return: Module::MediatorInterface
-      @public @virtual hasMediator: Function,
-        args: [String]
-        return: Boolean
+    @virtual registerObserver: FuncG [String, ObserverInterface], NilT
+    @virtual removeObserver: FuncG [String, UnionG ControllerInterface, MediatorInterface], NilT
+    @virtual notifyObservers: FuncG NotificationInterface, NilT
+    @virtual registerMediator: FuncG MediatorInterface, NilT
+    @virtual retrieveMediator: FuncG String, MediatorInterface
+    @virtual removeMediator: FuncG String, MediatorInterface
+    @virtual hasMediator: FuncG String, Boolean
 
 
-      @initializeInterface()
+    @initialize()

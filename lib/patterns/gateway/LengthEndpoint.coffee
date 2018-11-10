@@ -2,16 +2,18 @@
 
 module.exports = (Module)->
   {
+    EndpointInterface
     CrudEndpointMixin
+    Endpoint
     Utils: { statuses, joi }
   } = Module::
 
   UNAUTHORIZED      = statuses 'unauthorized'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  class LengthEndpoint extends Module::Endpoint
+  class LengthEndpoint extends Endpoint
     @inheritProtected()
-    # @implements Module::EndpointInterface
+    @implements EndpointInterface
     @include CrudEndpointMixin
     @module Module
 
@@ -31,5 +33,7 @@ module.exports = (Module)->
           Retrieves a length of
           #{@listEntityName} collection.
         "
+        return
+
 
     @initialize()

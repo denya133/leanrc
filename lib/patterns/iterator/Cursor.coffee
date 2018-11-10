@@ -6,37 +6,43 @@
 
 module.exports = (Module)->
   {
+    AnyT, NilT, PointerT
+    FuncG, MaybeG
+    CollectionInterface, CursorInterface
     CoreObject
     Utils: { _ }
   } = Module::
 
   class Cursor extends CoreObject
     @inheritProtected()
-    # @implements Module::CursorInterface
+    @implements CursorInterface
     @module Module
 
-    ipnCurrentIndex = @private currentIndex: Number,
+    ipnCurrentIndex = PointerT @private currentIndex: Number,
       default: 0
-    iplArray = @private array: Array
+    iplArray = PointerT @private array: Array
 
-    ipoCollection = @private collection: Module::CollectionInterface
+    ipoCollection = PointerT @private collection: CollectionInterface
 
-    @public setCollection: Function,
+    @public isClosed: Boolean,
+      default: false
+
+    @public setCollection: FuncG(CollectionInterface, CursorInterface),
       default: (aoCollection)->
         @[ipoCollection] = aoCollection
         return @
 
-    @public setIterable: Function,
+    @public setIterable: FuncG(AnyT, CursorInterface),
       default: (alArray)->
         @[iplArray] = alArray
         return @
 
-    @public @async toArray: Function,
+    @public @async toArray: FuncG([], Array),
       default: ->
         while yield @hasNext()
           yield @next()
 
-    @public @async next: Function,
+    @public @async next: FuncG([], AnyT),
       default: ->
         data = yield Module::Promise.resolve @[iplArray][@[ipnCurrentIndex]]
         @[ipnCurrentIndex]++
@@ -48,7 +54,7 @@ module.exports = (Module)->
           else
             yield return data
 
-    @public @async hasNext: Function,
+    @public @async hasNext: FuncG([], Boolean),
       default: ->
         yield Module::Promise.resolve not _.isNil @[iplArray][@[ipnCurrentIndex]]
 
@@ -59,12 +65,12 @@ module.exports = (Module)->
         delete @[iplArray]
         yield return
 
-    @public @async count: Function,
+    @public @async count: FuncG([], Number),
       default: ->
         array = @[iplArray] ? []
         yield Module::Promise.resolve array.length?() ? array.length
 
-    @public @async forEach: Function,
+    @public @async forEach: FuncG(Function, NilT),
       default: (lambda)->
         index = 0
         try
@@ -75,7 +81,7 @@ module.exports = (Module)->
           yield @close()
           throw err
 
-    @public @async map: Function,
+    @public @async map: FuncG(Function, Array),
       default: (lambda)->
         index = 0
         try
@@ -85,7 +91,7 @@ module.exports = (Module)->
           yield @close()
           throw err
 
-    @public @async filter: Function,
+    @public @async filter: FuncG(Function, Array),
       default: (lambda)->
         index = 0
         records = []
@@ -99,7 +105,7 @@ module.exports = (Module)->
           yield @close()
           throw err
 
-    @public @async find: Function,
+    @public @async find: FuncG(Function, AnyT),
       default: (lambda)->
         index = 0
         _record = null
@@ -114,7 +120,7 @@ module.exports = (Module)->
           yield @close()
           throw err
 
-    @public @async compact: Function,
+    @public @async compact: FuncG([], Array),
       default: ->
         results = []
         try
@@ -133,7 +139,7 @@ module.exports = (Module)->
           yield @close()
           throw err
 
-    @public @async reduce: Function,
+    @public @async reduce: FuncG([Function, AnyT], AnyT),
       default: (lambda, initialValue)->
         try
           index = 0
@@ -145,7 +151,7 @@ module.exports = (Module)->
           yield @close()
           throw err
 
-    @public @async first: Function,
+    @public @async first: FuncG([], MaybeG AnyT),
       default: ->
         try
           result = if yield @hasNext()
@@ -168,11 +174,12 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG([MaybeG(CollectionInterface), MaybeG Array], NilT),
       default: (aoCollection = null, alArray = null)->
         @super arguments...
         @[ipoCollection] = aoCollection
         @[iplArray] = alArray
+        return
 
 
-  Cursor.initialize()
+    @initialize()

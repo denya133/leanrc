@@ -13,22 +13,21 @@
 ###
 Идеи взяты из https://github.com/koajs/koa/blob/master/lib/response.js
 ###
+Stream = require 'stream'
+
 
 module.exports = (Module)->
   {
-    NILL
-
+    NilT
+    FuncG, UnionG, MaybeG
+    ResponseInterface, SwitchInterface, ContextInterface
     CoreObject
-    ResponseInterface
-    SwitchInterface
-    ContextInterface
-
     Utils: { _, statuses }
   } = Module::
 
   class Response extends CoreObject
     @inheritProtected()
-    # @implements ResponseInterface
+    @implements ResponseInterface
     @module Module
 
     @public res: Object, # native response object
@@ -71,7 +70,7 @@ module.exports = (Module)->
         @res.statusMessage = msg
         return
 
-    @public body: [String, Buffer, Object],
+    @public body: UnionG(String, Buffer, Object, Stream),
       get: -> @_body
       set: (val)->
         original = @_body
@@ -152,7 +151,7 @@ module.exports = (Module)->
     #   args: [[String, Buffer]]
     #   default: (data)->
 
-    @public length: Boolean,
+    @public length: Number,
       get: ->
         len = @headers['content-length']
         unless len?
@@ -170,13 +169,13 @@ module.exports = (Module)->
     @public headerSent: Boolean,
       get: -> @res.headersSent
 
-    @public vary: Function,
+    @public vary: FuncG(String, NilT),
       default: (field)->
         vary = require 'vary'
         vary @res, field
         return
 
-    @public redirect: Function,
+    @public redirect: FuncG([String, String], NilT),
       default: (url, alt)->
         if 'back' is url
           url = @ctx.get('Referrer') or alt or '/'
@@ -193,15 +192,16 @@ module.exports = (Module)->
         @body = "Redirecting to #{url}"
         return
 
-    @public attachment: Function,
+    @public attachment: FuncG(String, NilT),
       default: (filename)->
         if filename
           extname = require('path').extname
           @type = extname filename
         contentDisposition = require 'content-disposition'
         @set 'Content-Disposition', contentDisposition filename
+        return
 
-    @public lastModified: Date,
+    @public lastModified: MaybeG(Date),
       get: ->
         date = @get 'last-modified'
         if date
@@ -230,7 +230,7 @@ module.exports = (Module)->
         else
           @remove 'Content-Type'
 
-    @public 'is': Function,
+    @public 'is': FuncG([UnionG String, Array], UnionG String, Boolean, NilT),
       default: (args...)->
         [types] = args
         return @type or no unless types
@@ -239,11 +239,11 @@ module.exports = (Module)->
         typeis = require('type-is').is
         typeis @type, types
 
-    @public get: Function,
+    @public get: FuncG(String, String),
       default: (field)->
         @headers[field.toLowerCase()] ? ''
 
-    @public set: Function,
+    @public set: FuncG([UnionG(String, Object, Array), String], NilT),
       default: (args...)->
         [field, val] = args
         if 2 is args.length
@@ -257,7 +257,7 @@ module.exports = (Module)->
             @set key, value
         return
 
-    @public append: Function,
+    @public append: FuncG([String, UnionG String, Array], UnionG String, Array),
       default: (field, val)->
         prev = @get field
         if prev
@@ -267,7 +267,7 @@ module.exports = (Module)->
             val = [prev].concat val
         @set field, val
 
-    @public remove: Function,
+    @public remove: FuncG(String, NilT),
       default: (field)->
         @res.removeHeader field
         return
@@ -292,14 +292,14 @@ module.exports = (Module)->
             @res.removeHeader header
         return
 
-    # @public inspect: Function,
+    # @public inspect: FuncG([], Object),
     #   default: ->
     #     return unless @res
     #     o = @toJSON()
     #     o.body = @body
     #     o
 
-    # @public toJSON: Function,
+    # @public toJSON: FuncG([], Object),
     #   default: -> _.pick @, ['status', 'message', 'header']
 
     @public @static @async restoreObject: Function,
@@ -312,11 +312,11 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG(ContextInterface, NilT),
       default: (context)->
         @super()
         @ctx = context
         return
 
 
-  Response.initialize()
+    @initialize()

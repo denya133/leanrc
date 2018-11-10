@@ -2,7 +2,9 @@
 
 module.exports = (Module)->
   {
+    EndpointInterface
     CrudEndpointMixin
+    Endpoint
     Utils: { statuses, joi }
   } = Module::
 
@@ -10,9 +12,9 @@ module.exports = (Module)->
   UNAUTHORIZED      = statuses 'unauthorized'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  class ModelingDetailEndpoint extends Module::Endpoint
+  class ModelingDetailEndpoint extends Endpoint
     @inheritProtected()
-    # @implements Module::EndpointInterface
+    @implements EndpointInterface
     @include CrudEndpointMixin
     @module Module
 
@@ -36,5 +38,7 @@ module.exports = (Module)->
           Retrieves the
           #{@itemEntityName} by its key.
         "
+        return
+
 
     @initialize()

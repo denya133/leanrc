@@ -1,15 +1,34 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT, NilT
+    FuncG, StructG, MaybeG
+    ContextInterface
+    ResourceInterface
+    Interface
+  } = Module::
 
-  Module.defineInterface 'ApplicationInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class ApplicationInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @static @virtual NAME: String
-      @public @virtual finish: Function,
-        args: []
-        return: NILL
+    @virtual @static NAME: String
 
-      @initializeInterface()
+    @virtual isLightweight: Boolean
+    @virtual context: ContextInterface
+
+    @virtual finish: Function
+    @virtual @async migrate: FuncG [MaybeG StructG until: MaybeG String], NilT
+    @virtual @async rollback: FuncG [MaybeG StructG {
+      steps: MaybeG(Number), until: MaybeG String
+    }], NilT
+    @virtual @async run: FuncG [String, AnyT], AnyT
+    @virtual @async execute: FuncG [String, StructG({
+      context: ContextInterface, reverse: String
+    }), String], StructG {
+      result: AnyT, resource: ResourceInterface
+    }
+
+
+    @initialize()

@@ -1,21 +1,36 @@
 # миксин может подмешиваеться к любым классам унаследованным от Module::CoreObject
 # в классе появляется статический атрибут `delay` после обращения к которому через '.' можно вызвать один из статических методов класса так, чтобы он отработал асинхронно в фоновом режиме (условно говоря в отдельном внешнем процессе).
-# для этого используется функционал Resque и DelayedQueue
+# для этого используется функционал Resque и Queue
 # апи технологии сделано по аналогии с https://github.com/collectiveidea/delayed_job
 
 
 module.exports = (Module)->
   {
+    NilT, PointerT
+    FuncG, StructG, MaybeG, InterfaceG
+    DelayableInterface
+    FacadeInterface
     CoreObject
-    Utils: {co}
+    Mixin
+    Utils: { co }
   } = Module::
 
-  Module.defineMixin 'DelayableMixin', (BaseClass = CoreObject) ->
+  Module.defineMixin Mixin 'DelayableMixin', (BaseClass = CoreObject) ->
     class extends BaseClass
       @inheritProtected()
-      # @implements Module::DelayableMixinInterface
+      @implements DelayableInterface
 
-      cpmDelayJob = @private @static @async delayJob: Function,
+      cpmDelayJob = PointerT @private @static @async delayJob: FuncG([
+        FacadeInterface
+        StructG {
+          moduleName: String
+          replica: Object
+          methodName: String
+          args: Array
+          opts: InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
+        }
+        InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
+      ], NilT),
         default: (facade, data, options)->
           resque = facade.retrieveProxy Module::RESQUE
           queue = yield resque.get options.queue ? Module::DELAYED_JOBS_QUEUE

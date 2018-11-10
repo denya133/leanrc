@@ -2,23 +2,31 @@
 
 
 module.exports = (Module)->
-  class Serializer extends Module::CoreObject
+  {
+    NilT, AnyT
+    FuncG, SubsetG
+    CollectionInterface, RecordInterface
+    SerializerInterface
+    CoreObject
+  } = Module::
+
+  class Serializer extends CoreObject
     @inheritProtected()
-    # @implements Module::SerializerInterface
+    @implements SerializerInterface
     @module Module
 
-    @public collection: Module::CollectionInterface
+    @public collection: CollectionInterface
 
-    @public @async normalize: Function,
+    @public @async normalize: FuncG([SubsetG(RecordInterface), AnyT], RecordInterface),
       default: (acRecord, ahPayload)->
         return yield acRecord.normalize ahPayload, @collection
 
-    @public @async serialize: Function,
+    @public @async serialize: FuncG([RecordInterface, Object], AnyT),
       default: (aoRecord, options = null)->
         vcRecord = aoRecord.constructor
         return yield vcRecord.serialize aoRecord, options
 
-    @public @static @async restoreObject: Function,
+    @public @static @async restoreObject: FuncG([SubsetG(Module), Object], SerializerInterface),
       default: (Module, replica)->
         if replica?.class is @name and replica?.type is 'instance'
           Facade = Module::ApplicationFacade ? Module::Facade
@@ -28,7 +36,7 @@ module.exports = (Module)->
         else
           return yield @super Module, replica
 
-    @public @static @async replicateObject: Function,
+    @public @static @async replicateObject: FuncG(SerializerInterface, Object),
       default: (instance)->
         replica = yield @super instance
         ipsMultitonKey = Symbol.for '~multitonKey'
@@ -36,11 +44,11 @@ module.exports = (Module)->
         replica.collectionName = instance.collection.getProxyName()
         yield return replica
 
-    @public init: Function,
+    @public init: FuncG(CollectionInterface, NilT),
       default: (args...)->
         @super args...
         [@collection] = args
-        @
+        return
 
 
     @initialize()

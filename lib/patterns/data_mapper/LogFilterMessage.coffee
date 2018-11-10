@@ -2,6 +2,10 @@
 
 module.exports = (Module) ->
   {
+    NilT
+    FuncG, MaybeG
+  } = Module::
+  {
     PipeMessageInterface
     FilterControlMessage
   } = Module::Pipes::
@@ -19,14 +23,12 @@ module.exports = (Module) ->
 
     @public logLevel: Number
 
-    @public @static filterLogByLevel: Function,
-      args: [PipeMessageInterface, Object]
-      return: Module::NILL
+    @public @static filterLogByLevel: FuncG([PipeMessageInterface, Object], NilT),
       default: (message, params)->
         if message.getHeader().logLevel > params.logLevel
           throw new Error()
 
-    @public init: Function,
+    @public init: FuncG(String, MaybeG Number),
       default: (action, logLevel = 0)->
         @super action, @constructor.LOG_FILTER_NAME, null, {logLevel}
         @logLevel = logLevel

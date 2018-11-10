@@ -47,13 +47,16 @@ describe 'Controller', ->
     it 'should register new command lazily', ->
       co ->
         spy = sinon.spy()
+        {
+          NilT, FuncG, NotificationInterface
+        } = LeanRC::
         class Test extends LeanRC
           @inheritProtected()
           @initialize()
         class TestCommand extends SimpleCommand
           @inheritProtected()
           @module Test
-          @public execute: Function,
+          @public execute: FuncG(NotificationInterface, NilT),
             default: spy
           @initialize()
         class Application extends Test::CoreObject

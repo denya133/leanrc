@@ -1,70 +1,83 @@
 
 
 module.exports = (Module)->
-  class Filter extends Module::Pipe
+  {
+    NilT, PointerT, LambdaT
+    FuncG, MaybeG
+    PipeMessageInterface, PipeFittingInterface
+    FilterControlMessage
+    PipeMessage: { NORMAL }
+    Pipe
+  } = Module::
+  {
+    FILTER
+    SET_PARAMS
+    SET_FILTER
+    BYPASS
+  } = FilterControlMessage
+
+  class Filter extends Pipe
     @inheritProtected()
 
     @module Module
 
-    ipoOutput = Symbol.for '~output'
-    ipsMode = @protected mode: String,
-      default: Module::FilterControlMessage.FILTER
-    ipmFilter = @protected filter: Module::LAMBDA,
+    ipoOutput = PointerT Symbol.for '~output'
+    ipsMode = PointerT @protected mode: String,
+      default: FILTER
+    ipmFilter = PointerT @protected filter: LambdaT,
       default: (aoMessage, aoParams)->
-    ipoParams = @protected params: Object
-    ipsName = @protected name: String
+    ipoParams = PointerT @protected params: Object
+    ipsName = PointerT @protected name: String
 
-    ipmIsTarget = @protected isTarget: Function,
-      args: [Module::PipeMessageInterface]
-      return: Boolean
+    ipmIsTarget = PointerT @protected isTarget: FuncG(PipeMessageInterface, Boolean),
       default: (aoMessage)-> # must be instance of FilterControlMessage
-        aoMessage instanceof Module::FilterControlMessage and
+        aoMessage instanceof FilterControlMessage and
           aoMessage?.getName() is @[ipsName]
 
-    ipmApplyFilter = @protected applyFilter: Function,
-      args: [Module::PipeMessageInterface]
-      return: Module::PipeMessageInterface
+    ipmApplyFilter = PointerT @protected applyFilter: FuncG(
+      PipeMessageInterface, PipeMessageInterface
+    ),
       default: (aoMessage)->
         @[ipmFilter].apply @, [aoMessage, @[ipoParams]]
         return aoMessage
 
-    @public setParams: Function,
+    @public setParams: FuncG(Object, NilT),
       default: (aoParams)->
         @[ipoParams] = aoParams
         return
 
-    @public setFilter: Function,
+    @public setFilter: FuncG(Function, NilT),
       default: (amFilter)->
         @[ipmFilter] = amFilter
         return
 
-    @public write: Function,
+    @public write: FuncG(PipeMessageInterface, Boolean),
       default: (aoMessage)->
         vbSuccess = yes
         voOutputMessage = null
         switch aoMessage.getType()
-          when Module::PipeMessage.NORMAL
+          when NORMAL
             try
-              if @[ipsMode] is Module::FilterControlMessage.FILTER
+              if @[ipsMode] is FILTER
                 voOutputMessage = @[ipmApplyFilter] aoMessage
               else
                 voOutputMessage = aoMessage
               vbSuccess = @[ipoOutput].write voOutputMessage
             catch err
               vbSuccess = no
-          when Module::FilterControlMessage.SET_PARAMS
+          when SET_PARAMS
             if @[ipmIsTarget] aoMessage
               @setParams aoMessage.getParams()
             else
               vbSuccess = @[ipoOutput].write voOutputMessage
             break
-          when Module::FilterControlMessage.SET_FILTER
+          when SET_FILTER
             if @[ipmIsTarget] aoMessage
               @setFilter aoMessage.getFilter()
             else
               vbSuccess = @[ipoOutput].write voOutputMessage
             break
-          when Module::FilterControlMessage.BYPASS, Module::FilterControlMessage.FILTER
+          when BYPASS, FILTER
             if @[ipmIsTarget] aoMessage
               @[ipsMode] = aoMessage.getType()
             else
@@ -74,7 +87,9 @@ module.exports = (Module)->
             vbSuccess = @[ipoOutput].write outputMessage
         return vbSuccess
 
-    @public init: Function,
+    @public init: FuncG([
+      String, MaybeG(PipeFittingInterface), MaybeG(Function), MaybeG Object
+    ], NilT),
       default: (asName, aoOutput=null, amFilter=null, aoParams=null)->
         @super aoOutput
         @[ipsName] = asName
@@ -82,6 +97,7 @@ module.exports = (Module)->
           @setFilter amFilter
         if aoParams?
           @setParams aoParams
+        return
 
 
-  Filter.initialize()
+    @initialize()

@@ -1,37 +1,42 @@
 
 
 module.exports = (Module)->
+  {
+    AnyT, NilT, PointerT
+    FuncG, MaybeG, SubsetG
+    NotificationInterface
+    CoreObject
+  } = Module::
 
-  class Notification extends Module::CoreObject
+  class Notification extends CoreObject
     @inheritProtected()
-    # @implements Module::NotificationInterface
+    @implements NotificationInterface
     @module Module
 
-    ipsName = @private name: String
-    ipoBody = @private body: Module::ANY
-    ipsType = @private type: String
+    ipsName = PointerT @private name: String
+    ipoBody = PointerT @private body: MaybeG AnyT
+    ipsType = PointerT @private type: String
 
-    @public getName: Function,
-      default: ->
-        @[ipsName]
+    @public getName: FuncG([], String),
+      default: -> @[ipsName]
 
-    @public setBody: Function,
+    @public setBody: FuncG([MaybeG AnyT], NilT),
       default: (aoBody)->
         @[ipoBody] = aoBody
         return
 
-    @public getBody: Function,
+    @public getBody: FuncG([], MaybeG AnyT),
       default: -> @[ipoBody]
 
-    @public setType: Function,
+    @public setType: FuncG(String, NilT),
       default: (asType)->
         @[ipsType] = asType
         return
 
-    @public getType: Function,
+    @public getType: FuncG([], String),
       default: -> @[ipsType]
 
-    @public toString: Function,
+    @public toString: FuncG([], String),
       default: ->
         """
           Notification Name: #{@getName()}
@@ -39,7 +44,7 @@ module.exports = (Module)->
           Type: #{if @getType()? then @getType() else 'null'}
         """
 
-    @public @static @async restoreObject: Function,
+    @public @static @async restoreObject: FuncG([SubsetG(Module), Object], NotificationInterface),
       default: (Module, replica)->
         if replica?.class is @name and replica?.type is 'instance'
           {name, body, type} = replica.notification
@@ -48,7 +53,7 @@ module.exports = (Module)->
         else
           return yield @super Module, replica
 
-    @public @static @async replicateObject: Function,
+    @public @static @async replicateObject: FuncG(NotificationInterface, Object),
       default: (instance)->
         replica = yield @super instance
         replica.notification =
@@ -57,13 +62,13 @@ module.exports = (Module)->
           type: instance.getType()
         yield return replica
 
-    @public init: Function,
+    @public init: FuncG([String, MaybeG(AnyT), String], NilT),
       default: (asName, aoBody, asType)->
         @super arguments...
         @[ipsName] = asName
         @[ipoBody] = aoBody
         @[ipsType] = asType
+        return
 
 
-
-  Notification.initialize()
+    @initialize()

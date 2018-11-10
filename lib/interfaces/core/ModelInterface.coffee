@@ -1,26 +1,21 @@
 
 
 module.exports = (Module)->
-  {NILL} = Module::
+  {
+    NilT
+    FuncG
+    ProxyInterface
+    Interface
+  } = Module::
 
-  Module.defineInterface 'ModelInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
-      @module Module
+  class ModelInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual registerProxy: Function,
-        args: [Module::ProxyInterface]
-        return: NILL
-      @public @virtual removeProxy: Function,
-        args: [String]
-        return: Module::ProxyInterface
-      @public @virtual retrieveProxy: Function,
-        args: [String]
-        return: Module::ProxyInterface
-      @public @virtual hasProxy: Function,
-        args: [String]
-        return: Boolean
+    @virtual registerProxy: FuncG ProxyInterface, NilT
+    @virtual removeProxy: FuncG String, ProxyInterface
+    @virtual retrieveProxy: FuncG String, ProxyInterface
+    @virtual hasProxy: FuncG String, Boolean
 
 
-
-      @initializeInterface()
+    @initialize()

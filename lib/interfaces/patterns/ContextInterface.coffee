@@ -2,112 +2,80 @@
 
 module.exports = (Module)->
   {
-    ANY
-    NILL
-
-    RequestInterface
-    ResponseInterface
-    SwitchInterface
+    AnyT, NilT
+    FuncG, UnionG, MaybeG
+    RequestInterface, ResponseInterface, SwitchInterface, CookiesInterface
+    Interface
   } = Module::
 
-  Module.defineInterface 'ContextInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class ContextInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual req: Object
-      @public @virtual res: Object
-      @public @virtual request: RequestInterface
-      @public @virtual response: ResponseInterface
-      @public @virtual state: Object
-      @public @virtual switch: SwitchInterface
-      @public @virtual respond: Boolean
-      @public @virtual routePath: String
-      @public @virtual pathParams: Object
+    @virtual req: Object
+    @virtual res: Object
+    @virtual request: RequestInterface
+    @virtual response: ResponseInterface
+    @virtual state: Object
+    @virtual switch: SwitchInterface
+    @virtual respond: Boolean
+    @virtual routePath: String
+    @virtual pathParams: Object
 
-      @public @virtual throw: Function,
-        args: [[String, Number], [String, NILL], [Object, NILL]]
-        return: NILL
+    @virtual throw: FuncG [UnionG(String, Number), MaybeG(String), MaybeG Object], NilT
 
-      @public @virtual assert: Function,
-        args: [ANY, [String, Number], [String, NILL], [Object, NILL]]
-        return: NILL
+    @virtual assert: FuncG [AnyT, UnionG(String, Number), MaybeG(String), MaybeG Object], NilT
 
-      @public @virtual onerror: Function,
-        args: [Error]
-        return: NILL
+    @virtual onerror: FuncG Error, NilT
 
-      # Request aliases
-      @public @virtual header: Object
-      @public @virtual headers: Object
-      @public @virtual method: String
-      @public @virtual url: String
-      @public @virtual originalUrl: String
-      @public @virtual origin: String
-      @public @virtual href: String
-      @public @virtual path: String
-      @public @virtual query: Object
-      @public @virtual querystring: String
-      @public @virtual host: String
-      @public @virtual hostname: String
-      @public @virtual fresh: Boolean
-      @public @virtual stale: Boolean
-      @public @virtual socket: Object
-      @public @virtual protocol: String
-      @public @virtual secure: Boolean
-      @public @virtual ip: String
-      @public @virtual ips: Array
-      @public @virtual subdomains: Array
-      @public @virtual is: Function,
-        args: [[String, Array]]
-        return: [String, Boolean, NILL]
-      @public @virtual accepts: Function,
-        args: [[String, Array]]
-        return: [String, Array, Boolean]
-      @public @virtual acceptsEncodings: Function,
-        args: [[String, Array]]
-        return: [String, Array]
-      @public @virtual acceptsCharsets: Function,
-        args: [[String, Array]]
-        return: [String, Array]
-      @public @virtual acceptsLanguages: Function,
-        args: [[String, Array]]
-        return: [String, Array]
-      @public @virtual get: Function,
-        args: [String]
-        return: String
+    # Request aliases
+    @virtual header: Object
+    @virtual headers: Object
+    @virtual method: String
+    @virtual url: String
+    @virtual originalUrl: String
+    @virtual origin: String
+    @virtual href: String
+    @virtual path: String
+    @virtual query: Object
+    @virtual querystring: String
+    @virtual host: String
+    @virtual hostname: String
+    @virtual fresh: Boolean
+    @virtual stale: Boolean
+    @virtual socket: Object
+    @virtual protocol: String
+    @virtual secure: Boolean
+    @virtual ip: String
+    @virtual ips: Array
+    @virtual subdomains: Array
+    @virtual is: FuncG [UnionG String, Array], UnionG String, Boolean, NilT
+    @virtual accepts: FuncG [UnionG String, Array], UnionG String, Array, Boolean
+    @virtual acceptsEncodings: FuncG [UnionG String, Array], UnionG String, Array
+    @virtual acceptsCharsets: FuncG [UnionG String, Array], UnionG String, Array
+    @virtual acceptsLanguages: FuncG [UnionG String, Array], UnionG String, Array
+    @virtual get: FuncG String, String
 
-      # Response aliases
-      @public @virtual body: [String, Buffer, Object, Array, Number, Boolean]
-      @public @virtual status: [String, Number]
-      @public @virtual message: String
-      @public @virtual length: Number
-      @public @virtual type: String
-      @public @virtual headerSent: Boolean
-      @public @virtual redirect: Function,
-        args: [String, String]
-        return: NILL
-      @public @virtual attachment: Function,
-        args: [String]
-        return: NILL
-      @public @virtual set: Function,
-        args: [[String, Object, Array], String]
-        return: NILL
-      @public @virtual append: Function,
-        args: [String, [String, Array]]
-        return: [String, Array]
-      @public @virtual remove: Function,
-        args: [String]
-        return: NILL
-      @public @virtual lastModified: Date
-      @public @virtual etag: String
+    # Response aliases
+    @virtual body: UnionG String, Buffer, Object, Array, Number, Boolean
+    @virtual status: UnionG String, Number
+    @virtual message: String
+    @virtual length: Number
+    @virtual type: String
+    @virtual headerSent: Boolean
+    @virtual redirect: FuncG [String, String], NilT
+    @virtual attachment: FuncG String, NilT
+    @virtual set: FuncG [UnionG(String, Object, Array), String], NilT
+    @virtual append: FuncG [String, UnionG String, Array], UnionG String, Array
+    @virtual vary: FuncG String, NilT
+    @virtual flushHeaders: Function
+    @virtual remove: FuncG String, NilT
+    @virtual lastModified: Date
+    @virtual etag: String
 
-      @public @virtual toJSON: Function,
-        args: []
-        return: Object
-
-      @public @virtual inspect: Function,
-        args: []
-        return: Object
+    # @virtual toJSON: FuncG [], Object
+    #
+    # @virtual inspect: FuncG [], Object
 
 
-      @initializeInterface()
+    @initialize()

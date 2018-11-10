@@ -33,76 +33,87 @@ module.exports = (Module)->
 
 module.exports = (Module)->
   {
-    ANY, NILL, DEFAULT_QUEUE
-    Resque
+    DEFAULT_QUEUE
+    AnyT, NilT, PointerT
+    FuncG, DictG, ListG, StructG, EnumG, MaybeG
+    Resque, Mixin
     Utils: { _, inflect }
   } = Module::
 
-  Module.defineMixin 'MemoryResqueMixin', (BaseClass = Resque) ->
+  Module.defineMixin Mixin 'MemoryResqueMixin', (BaseClass = Resque) ->
     class extends BaseClass
       @inheritProtected()
 
-      ipoDelayedJobs = @protected delayedJobs: Object
-      ipoDelayedQueues = @protected delayedQueues: Object
+      ipoJobs = PointerT @protected jobs: DictG String, ListG StructG {
+        queueName: String
+        data: StructG {scriptName: String, data: AnyT}
+        delayUntil: Number
+        status: EnumG 'scheduled'
+        lockLifetime: EnumG 5000
+        lockLimit: EnumG 2
+      }
+      ipoQueues = PointerT @protected queues: DictG String, StructG {
+        name: String
+        concurrency: Number
+      }
 
       @public onRegister: Function,
         default: (args...)->
           @super args...
-          @[ipoDelayedQueues] = {}
-          @[ipoDelayedJobs] = {}
+          @[ipoQueues] = {}
+          @[ipoJobs] = {}
           fullName = @fullQueueName DEFAULT_QUEUE
-          @[ipoDelayedQueues][fullName] = name: DEFAULT_QUEUE, concurrency: 1
+          @[ipoQueues][fullName] = name: DEFAULT_QUEUE, concurrency: 1
           return
 
       @public onRemove: Function,
         default: (args...)->
           @super args...
-          for queueName in Reflect.ownKeys @[ipoDelayedQueues]
-            queuedJobs = @[ipoDelayedQueues][queueName]
-            for jobId in Reflect.ownKeys queuedJobs
-              delete queuedJobs[jobId]
-            delete @[ipoDelayedQueues][queueName]
-          @[ipoDelayedQueues] = undefined
-          @[ipoDelayedJobs] = undefined
+          for queueName in Reflect.ownKeys @[ipoQueues]
+            delete @[ipoQueues][queueName]
+          delete @[ipoQueues]
+          for queueName in Reflect.ownKeys @[ipoJobs]
+            delete @[ipoJobs][queueName]
+          delete @[ipoJobs]
           return
 
-      @public @async ensureQueue: Function,
+      @public @async ensureQueue: FuncG([String, MaybeG Number], StructG name: String, concurrency: Number),
         default: (name, concurrency = 1)->
           fullName = @fullQueueName name
-          if (queue = @[ipoDelayedQueues][fullName])?
+          if (queue = @[ipoQueues][fullName])?
             queue.concurrency = concurrency
-            @[ipoDelayedQueues][fullName] = queue
+            @[ipoQueues][fullName] = queue
           else
-            @[ipoDelayedQueues][fullName] = {name, concurrency}
+            @[ipoQueues][fullName] = {name, concurrency}
           yield return {name, concurrency}
 
-      @public @async getQueue: Function,
+      @public @async getQueue: FuncG(String, MaybeG StructG name: String, concurrency: Number),
         default: (name)->
           fullName = @fullQueueName name
-          if (queue = @[ipoDelayedQueues][fullName])?
+          if (queue = @[ipoQueues][fullName])?
             {concurrency} = queue
             yield return {name, concurrency}
           else
             yield return
 
-      @public @async removeQueue: Function,
+      @public @async removeQueue: FuncG(String, NilT),
         default: (queueName)->
           fullName = @fullQueueName queueName
-          if (queue = @[ipoDelayedQueues][fullName])?
-            delete @[ipoDelayedQueues][fullName]
+          if (queue = @[ipoQueues][fullName])?
+            delete @[ipoQueues][fullName]
           yield return
 
-      @public @async allQueues: Function,
+      @public @async allQueues: FuncG([], ListG StructG name: String, concurrency: Number),
         default: ->
-          yield return _.values(@[ipoDelayedQueues]).map ({name, concurrency})->
+          yield return _.values(@[ipoQueues]).map ({name, concurrency})->
             {name, concurrency}
 
-      @public @async pushJob: Function,
+      @public @async pushJob: FuncG([String, String, AnyT, MaybeG Number], Number),
         default: (queueName, scriptName, data, delayUntil)->
           fullName = @fullQueueName queueName
           delayUntil ?= Date.now()
-          @[ipoDelayedJobs][fullName] ?= []
-          length = @[ipoDelayedJobs][fullName].push
+          @[ipoJobs][fullName] ?= []
+          length = @[ipoJobs][fullName].push
             queueName: fullName
             data: {scriptName, data}
             delayUntil: delayUntil
@@ -112,38 +123,38 @@ module.exports = (Module)->
           jobId = length - 1
           yield return jobId
 
-      @public @async getJob: Function,
+      @public @async getJob: FuncG([String, Number], MaybeG Object),
         default: (queueName, jobId)->
           fullName = @fullQueueName queueName
-          @[ipoDelayedJobs][fullName] ?= []
-          yield return @[ipoDelayedJobs][fullName][jobId] ? null
+          @[ipoJobs][fullName] ?= []
+          yield return @[ipoJobs][fullName][jobId] ? null
 
-      @public @async deleteJob: Function,
+      @public @async deleteJob: FuncG([String, Number], Boolean),
         default: (queueName, jobId)->
           fullName = @fullQueueName queueName
-          @[ipoDelayedJobs][fullName] ?= []
-          if @[ipoDelayedJobs][fullName][jobId]?
-            delete @[ipoDelayedJobs][fullName][jobId]
+          @[ipoJobs][fullName] ?= []
+          if @[ipoJobs][fullName][jobId]?
+            delete @[ipoJobs][fullName][jobId]
             isDeleted = yes
           else
             isDeleted = no
           yield return isDeleted
 
-      @public @async abortJob: Function,
+      @public @async abortJob: FuncG([String, Number], NilT),
         default: (queueName, jobId)->
           fullName = @fullQueueName queueName
-          @[ipoDelayedJobs][fullName] ?= []
-          if (job = @[ipoDelayedJobs][fullName][jobId])?
+          @[ipoJobs][fullName] ?= []
+          if (job = @[ipoJobs][fullName][jobId])?
             if job.status is 'scheduled'
               job.status = 'failed'
               job.reason = new Error 'Job has been aborted'
           yield return
 
-      @public @async allJobs: Function,
+      @public @async allJobs: FuncG([String, MaybeG String], ListG Object),
         default: (queueName, scriptName=null)->
           fullName = @fullQueueName queueName
-          @[ipoDelayedJobs][fullName] ?= []
-          res = @[ipoDelayedJobs][fullName].filter (job)->
+          @[ipoJobs][fullName] ?= []
+          res = @[ipoJobs][fullName].filter (job)->
             if scriptName?
               if job.data.scriptName is scriptName
                 yes
@@ -153,11 +164,11 @@ module.exports = (Module)->
               yes
           yield return res ? []
 
-      @public @async pendingJobs: Function,
+      @public @async pendingJobs: FuncG([String, MaybeG String], ListG Object),
         default: (queueName, scriptName)->
           fullName = @fullQueueName queueName
-          @[ipoDelayedJobs][fullName] ?= []
-          res = @[ipoDelayedJobs][fullName].filter (job)->
+          @[ipoJobs][fullName] ?= []
+          res = @[ipoJobs][fullName].filter (job)->
             if scriptName?
               if job.data.scriptName is scriptName and job.status in ['scheduled', 'queued']
                 yes
@@ -170,11 +181,11 @@ module.exports = (Module)->
                 no
           yield return res ? []
 
-      @public @async progressJobs: Function,
+      @public @async progressJobs: FuncG([String, MaybeG String], ListG Object),
         default: (queueName, scriptName)->
           fullName = @fullQueueName queueName
-          @[ipoDelayedJobs][fullName] ?= []
-          res = @[ipoDelayedJobs][fullName].filter (job)->
+          @[ipoJobs][fullName] ?= []
+          res = @[ipoJobs][fullName].filter (job)->
             if scriptName?
               if job.data.scriptName is scriptName and job.status is 'running'
                 yes
@@ -187,11 +198,11 @@ module.exports = (Module)->
                 no
           yield return res ? []
 
-      @public @async completedJobs: Function,
+      @public @async completedJobs: FuncG([String, MaybeG String], ListG Object),
         default: (queueName, scriptName)->
           fullName = @fullQueueName queueName
-          @[ipoDelayedJobs][fullName] ?= []
-          res = @[ipoDelayedJobs][fullName].filter (job)->
+          @[ipoJobs][fullName] ?= []
+          res = @[ipoJobs][fullName].filter (job)->
             if scriptName?
               if job.data.scriptName is scriptName and job.status is 'completed'
                 yes
@@ -204,11 +215,11 @@ module.exports = (Module)->
                 no
           yield return res ? []
 
-      @public @async failedJobs: Function,
+      @public @async failedJobs: FuncG([String, MaybeG String], ListG Object),
         default: (queueName, scriptName)->
           fullName = @fullQueueName queueName
-          @[ipoDelayedJobs][fullName] ?= []
-          res = @[ipoDelayedJobs][fullName].filter (job)->
+          @[ipoJobs][fullName] ?= []
+          res = @[ipoJobs][fullName].filter (job)->
             if scriptName?
               if job.data.scriptName is scriptName and job.status is 'failed'
                 yes

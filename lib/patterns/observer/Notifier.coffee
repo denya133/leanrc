@@ -1,33 +1,41 @@
 
 
 module.exports = (Module)->
-  class Notifier extends Module::CoreObject
+  {
+    AnyT, NilT, PointerT
+    FuncG, SubsetG, MaybeG
+    NotifierInterface
+    FacadeInterface
+    CoreObject
+  } = Module::
+
+  class Notifier extends CoreObject
     @inheritProtected()
-    # @implements Module::NotifierInterface
+    @implements NotifierInterface
     @module Module
 
     @const MULTITON_MSG: "multitonKey for this Notifier not yet initialized!"
 
-    ipsMultitonKey = @protected multitonKey: String
-    ipcApplicationModule = @protected ApplicationModule: Module::Class
+    ipsMultitonKey = PointerT @protected multitonKey: String
+    ipcApplicationModule = PointerT @protected ApplicationModule: SubsetG Module
 
-    @public facade: Module::FacadeInterface,
+    @public facade: FacadeInterface,
       get: ->
         unless @[ipsMultitonKey]?
           throw new Error Notifier::MULTITON_MSG
         Module::Facade.getInstance @[ipsMultitonKey]
 
-    @public sendNotification: Function,
+    @public sendNotification: FuncG([String, MaybeG(AnyT), String], NilT),
       default: (asName, aoBody, asType)->
         @facade?.sendNotification asName, aoBody, asType
         return
 
-    @public initializeNotifier: Function,
+    @public initializeNotifier: FuncG(String, NilT),
       default: (asKey)->
         @[ipsMultitonKey] = asKey
         return
 
-    @public ApplicationModule: Module::Class,
+    @public ApplicationModule: SubsetG(Module),
       get: ->
         @[ipcApplicationModule] ?= if @[ipsMultitonKey]?
           Module::Facade.getInstance @[ipsMultitonKey]
@@ -38,4 +46,4 @@ module.exports = (Module)->
           @Module
 
 
-  Notifier.initialize()
+    @initialize()

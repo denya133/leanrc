@@ -1,7 +1,11 @@
 
 
 module.exports = (Module) ->
-  Module.util genRandomAlphaNumbers: (length) ->
+  {
+    FuncG, MaybeG, StructG
+  } = Module::
+
+  Module.util genRandomAlphaNumbers: FuncG(Number, String) (length) ->
     { isArangoDB } = Module::Utils
     crypto = if isArangoDB()
       require '@arangodb/crypto'
@@ -14,7 +18,14 @@ module.exports = (Module) ->
       # Is Node.js !!!
       return crypto.randomBytes(length).toString 'hex'
 
-  Module.util hashPassword: (password, opts = {}) ->
+  Module.util hashPassword: FuncG([String, MaybeG StructG {
+    hashMethod: MaybeG String
+    saltLength: Number
+  }], StructG {
+    method: String
+    salt: String
+    hash: String
+  }) (password, opts = {}) ->
     { isArangoDB } = Module::Utils
     {hashMethod, saltLength} = opts
     hashMethod ?= 'sha256'
@@ -35,7 +46,11 @@ module.exports = (Module) ->
       hash = crypto.createHash(method).update(salt + password).digest 'hex'
       return {method, salt, hash}
 
-  Module.util verifyPassword: (authData, password)->
+  Module.util verifyPassword: FuncG([StructG {
+    method: String
+    salt: String
+    hash: String
+  }], String) (authData, password)->
     { isArangoDB } = Module::Utils
     method = authData.method ? 'sha256'
     salt = authData.salt ? ''

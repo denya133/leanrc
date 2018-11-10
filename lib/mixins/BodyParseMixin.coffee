@@ -26,11 +26,11 @@ module.exports = (Module)->
 
 module.exports = (Module)->
   {
-    Resource
+    Resource, Mixin
     Utils: { isArangoDB }
   } = Module::
 
-  Module.defineMixin 'BodyParseMixin', (BaseClass = Resource) ->
+  Module.defineMixin Mixin 'BodyParseMixin', (BaseClass = Resource) ->
     class extends BaseClass
       @inheritProtected()
 

@@ -3,21 +3,20 @@
 
 module.exports = (Module)->
   {
-    ANY
-    NILL
     APPLICATION_MEDIATOR
     HANDLER_RESULT
     DELAYED_JOBS_QUEUE
     RESQUE
     MIGRATIONS
-
-    SimpleCommand
-    ResourceInterface
+    AnyT, NilT
+    FuncG, UnionG, TupleG, MaybeG, DictG, StructG, EnumG, ListG
+    ResourceInterface, CollectionInterface, ContextInterface
+    NotificationInterface, RecordInterface
     ConfigurableMixin
     ChainsMixin
-    ContextInterface
+    SimpleCommand
 
-    Utils: { _, inflect, statuses, isArangoDB }
+    Utils: { _, inflect, assign, statuses, isArangoDB }
   } = Module::
 
   HTTP_NOT_FOUND    = statuses 'not found'
@@ -27,12 +26,15 @@ module.exports = (Module)->
 
   class Resource extends SimpleCommand
     @inheritProtected()
-    # @implements ResourceInterface
+    @implements ResourceInterface
     @include ConfigurableMixin
     @include ChainsMixin
     @module Module
 
-    # @public entityName: String # Имя сущности должно быть установлено при объявлении дочернего класса
+    @public entityName: String,
+      get: ->
+        throw new Error 'Not implemented specific property'
+        yield return
 
     # example of usage
     ###
@@ -155,29 +157,38 @@ module.exports = (Module)->
       get: ->
         "#{inflect.pluralize inflect.camelize @entityName}Collection"
 
-    @public collection: Module::CollectionInterface,
+    @public collection: CollectionInterface,
       get: ->
         @facade.retrieveProxy @collectionName
 
     @public context: ContextInterface
 
-    @public listQuery: Object
-    @public recordId: String
-    @public recordBody: Object
+    @public listQuery: MaybeG Object
+    @public recordId: MaybeG String
+    @public recordBody: MaybeG Object
 
-    @public @static actions: Object,
+    @public @static actions: DictG String, Object,
       get: -> @metaObject.getGroup 'actions', no
 
-    @public @static action: Function,
-      default: (nameDefinition, config)->
-        [actionName] = Object.keys nameDefinition
-        if nameDefinition.attr? and not config?
-          @metaObject.addMetaData 'actions', nameDefinition.attr, nameDefinition
-        else
-          @metaObject.addMetaData 'actions', actionName, config
-        @public arguments...
+    @public @static action: FuncG([UnionG Object, TupleG Object, Object], NilT),
+      default: (args...)->
+      # default: (nameDefinition, config)->
+        # [actionName] = Object.keys nameDefinition
+        # if nameDefinition.attr? and not config?
+        #   @metaObject.addMetaData 'actions', nameDefinition.attr, nameDefinition
+        # else
+        #   @metaObject.addMetaData 'actions', actionName, config
+        name = @public args...
+        @metaObject.addMetaData 'actions', name, @instanceMethods[name]
+        return
 
-    @action @async list: Function,
+    @action @async list: FuncG([], StructG {
+      meta: StructG pagination: StructG {
+        limit: UnionG Number, EnumG ['not defined']
+        offset: UnionG Number, EnumG ['not defined']
+      }
+      items: ListG Object
+    }),
       default: ->
         vlItems = yield (yield @collection.takeAll()).toArray()
         return {
@@ -188,15 +199,15 @@ module.exports = (Module)->
           items: vlItems
         }
 
-    @action @async detail: Function,
+    @action @async detail: FuncG([], RecordInterface),
       default: ->
         yield @collection.find @recordId
 
-    @action @async create: Function,
+    @action @async create: FuncG([], RecordInterface),
       default: ->
         yield @collection.create @recordBody
 
-    @action @async update: Function,
+    @action @async update: FuncG([], RecordInterface),
       default: ->
         yield @collection.update @recordId, @recordBody
 
@@ -228,36 +239,26 @@ module.exports = (Module)->
     @beforeHook 'beforeUpdate', only: ['update']
 
     @public beforeActionHook: Function,
-      args: [Object]
-      return: ANY
       default: (args...)->
         [@context] = args
         return args
 
     @public getQuery: Function,
-      args: [Object]
-      return: ANY
       default: (args...)->
         @listQuery = JSON.parse @context.query['query'] ? "{}"
         return args
 
     @public getRecordId: Function,
-      args: [Object]
-      return: ANY
       default: (args...)->
         @recordId = @context.pathParams[@keyName]
         return args
 
     @public getRecordBody: Function,
-      args: [Object]
-      return: ANY
       default: (args...)->
         @recordBody = @context.request.body?[@itemEntityName]
         return args
 
     @public omitBody: Function,
-      args: [Object]
-      return: ANY
       default: (args...)->
         @recordBody = _.omit @recordBody, [
           '_id', '_rev', 'rev', 'type', '_type'
@@ -270,29 +271,21 @@ module.exports = (Module)->
         return args
 
     @public beforeUpdate: Function,
-      args: [Object]
-      return: ANY
       default: (args...)->
-        @recordBody = Module::Utils.extend {}, @recordBody, id: @recordId
+        @recordBody = assign {}, @recordBody, id: @recordId
         return args
 
-    @public @async doAction: Function,
-      args: [String, Module::ContextInterface]
-      return: Module::ANY
+    @public @async doAction: FuncG([String, ContextInterface], AnyT),
       default: (action, context)->
         voResult = yield @[action]? context
         yield @saveDelayeds()
         yield return voResult
 
-    @public @async writeTransaction: Function,
-      args: [String, Module::ContextInterface]
-      return: Boolean
+    @public @async writeTransaction: FuncG([String, ContextInterface], Boolean),
       default: (asAction, aoContext) ->
         yield return aoContext.method.toUpperCase() isnt 'GET'
 
     @public @async saveDelayeds: Function,
-      args: [Module::ApplicationInterface]
-      return: Module::NILL
       default: ->
         resque = @facade.retrieveProxy RESQUE
         for delayed in yield resque.getDelayed()
@@ -301,9 +294,7 @@ module.exports = (Module)->
           yield queue.push scriptName, data, delay
         yield return
 
-    @public @async execute: Function,
-      args: [Module::NotificationInterface]
-      return: Module::NILL
+    @public @async execute: FuncG(NotificationInterface, NilT),
       default: (aoNotification)->
         { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         resourceName = aoNotification.getName()
@@ -338,4 +329,4 @@ module.exports = (Module)->
         yield return
 
 
-  Resource.initialize()
+    @initialize()

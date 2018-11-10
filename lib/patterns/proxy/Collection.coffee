@@ -31,16 +31,22 @@ module.exports = (App)->
 
 module.exports = (Module)->
   {
+    AnyT, NilT
+    FuncG, SubsetG, MaybeG, UnionG, ListG, InterfaceG
+    CollectionInterface, RecordInterface, CursorInterface
+    SerializerInterface, ObjectizerInterface
+    ConfigurableMixin
+    Serializer, Objectizer
     Utils: { _, inflect }
   } = Module::
 
   class Collection extends Module::Proxy
     @inheritProtected()
-    # @implements Module::CollectionInterface
-    @include Module::ConfigurableMixin
+    @implements CollectionInterface
+    @include ConfigurableMixin
     @module Module
 
-    @public delegate: Module::Class,
+    @public delegate: SubsetG(RecordInterface),
       get: ->
         delegate = @getData()?.delegate
         if _.isString delegate
@@ -48,63 +54,84 @@ module.exports = (Module)->
         else unless /Migration$|Record$/.test delegate.name
           delegate = delegate?()
         delegate
-    @public serializer: Module::SerializerInterface
-    @public objectizer: Module::ObjectizerInterface
+    @public serializer: SerializerInterface
+    @public objectizer: ObjectizerInterface
 
-    @public collectionName: Function,
+    @public collectionName: FuncG([], String),
       default: ->
         firstClassName = _.first _.remove @delegate.parentClassNames(), (name)->
           not /Mixin$|Interface$|^CoreObject$|^Record$/.test name
         inflect.pluralize inflect.underscore firstClassName.replace /Record$/, ''
 
-    @public collectionPrefix: Function,
+    @public collectionPrefix: FuncG([], String),
       default: ->
         "#{inflect.underscore @Module.name}_"
 
-    @public collectionFullName: Function,
+    @public collectionFullName: FuncG([MaybeG String], String),
       default: (asName = null)->
         "#{@collectionPrefix()}#{asName ? @collectionName()}"
 
-    @public recordHasBeenChanged: Function,
-      default: (aoType, aoData)->
-        @sendNotification Module::RECORD_CHANGED, aoData, aoType
+    @public recordHasBeenChanged: FuncG([String, Object], NilT),
+      default: (asType, aoData)->
+        @sendNotification Module::RECORD_CHANGED, aoData, asType
         return
 
-
-    @public @async generateId: Function,
+    @public @async generateId: FuncG([], UnionG String, Number, NilT),
       default: -> yield return
 
-
-    @public @async build: Function,
+    @public @async build: FuncG(Object, RecordInterface),
       default: (properties)->
         return yield @objectizer.recoverize @delegate, properties
 
-    @public @async create: Function,
+    @public @async create: FuncG(Object, RecordInterface),
       default: (properties)->
         voRecord = yield @build properties
-        yield voRecord.save()
+        return yield voRecord.save()
 
-    @public @async delete: Function,
+    @public @async push: FuncG(RecordInterface, RecordInterface),
+      default: ->
+        throw new Error 'Not implemented specific method'
+        yield return
+
+    @public @async delete: FuncG([UnionG String, Number], NilT),
       default: (id)->
         voRecord = yield @find id
         yield voRecord.delete()
-        return voRecord
+        yield return
 
-    @public @async destroy: Function,
+    @public @async destroy: FuncG([UnionG String, Number], NilT),
       default: (id)->
         voRecord = yield @find id
         yield voRecord.destroy()
-        return
+        yield return
 
-    @public @async find: Function,
-      default: (id)->
-        yield @take id
+    @public @async remove: FuncG([UnionG String, Number], NilT),
+      default: ->
+        throw new Error 'Not implemented specific method'
+        yield return
 
-    @public @async findMany: Function,
-      default: (ids)->
-        yield @takeMany ids
+    @public @async find: FuncG([UnionG String, Number], RecordInterface),
+      default: (id)-> return yield @take id
 
-    @public @async update: Function,
+    @public @async findMany: FuncG([ListG UnionG String, Number], CursorInterface),
+      default: (ids)-> return yield @takeMany ids
+
+    @public @async take: FuncG([UnionG String, Number], RecordInterface),
+      default: ->
+        throw new Error 'Not implemented specific method'
+        yield return
+
+    @public @async takeMany: FuncG([ListG UnionG String, Number], CursorInterface),
+      default: ->
+        throw new Error 'Not implemented specific method'
+        yield return
+
+    @public @async takeAll: FuncG([], CursorInterface),
+      default: ->
+        throw new Error 'Not implemented specific method'
+        yield return
+
+    @public @async update: FuncG([UnionG(String, Number), Object], RecordInterface),
       default: (id, properties)->
         properties.id = id
         existedRecord = yield @find id
@@ -113,7 +140,12 @@ module.exports = (Module)->
           existedRecord[key] = receivedRecord[key]
         return yield existedRecord.save()
 
-    @public @async clone: Function,
+    @public @async override: FuncG([UnionG(String, Number), RecordInterface], RecordInterface),
+      default: ->
+        throw new Error 'Not implemented specific method'
+        yield return
+
+    @public @async clone: FuncG(RecordInterface, RecordInterface),
       default: (aoRecord)->
         vhAttributes = {}
         vlAttributes = Object.keys @delegate.attributes
@@ -123,27 +155,40 @@ module.exports = (Module)->
         voRecord.id = yield @generateId()
         yield return voRecord
 
-    @public @async copy: Function,
+    @public @async copy: FuncG(RecordInterface, RecordInterface),
       default: (aoRecord)->
         voRecord = yield @clone aoRecord
         yield voRecord.save()
-        return voRecord
+        yield return voRecord
 
-    @public @async normalize: Function,
+    @public @async includes: FuncG([UnionG String, Number], Boolean),
+      default: ->
+        throw new Error 'Not implemented specific method'
+        yield return
+
+    @public @async length: FuncG([], Number),
+      default: ->
+        throw new Error 'Not implemented specific method'
+        yield return
+
+    @public @async normalize: FuncG(AnyT, RecordInterface),
       default: (ahData)->
         return yield @serializer.normalize @delegate, ahData
 
-    @public @async serialize: Function,
+    @public @async serialize: FuncG(RecordInterface, AnyT),
       default: (aoRecord, ahOptions)->
         return yield @serializer.serialize aoRecord, ahOptions
 
-    @public init: Function,
+    @public init: FuncG([String, InterfaceG {
+      serializer: MaybeG UnionG String, Function, SubsetG Serializer
+      objectizer: MaybeG UnionG String, Function, SubsetG Objectizer
+    }], NilT),
       default: (args...)->
         @super args...
         serializer = @getData()?.serializer
         objectizer = @getData()?.objectizer
         vcSerializer = unless serializer?
-          Module::Serializer
+          Serializer
         else if _.isString serializer
           (
             @ApplicationModule.NS ? @ApplicationModule::
@@ -153,7 +198,7 @@ module.exports = (Module)->
         else
           serializer
         vcObjectizer = unless objectizer?
-          Module::Objectizer
+          Objectizer
         else if _.isString objectizer
           (
             @ApplicationModule.NS ? @ApplicationModule::
@@ -165,7 +210,7 @@ module.exports = (Module)->
 
         @serializer = vcSerializer.new @
         @objectizer = vcObjectizer.new @
-        @
+        return
 
 
-  Collection.initialize()
+    @initialize()

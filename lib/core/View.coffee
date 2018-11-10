@@ -1,26 +1,35 @@
 
 
 module.exports = (Module)->
-  class View extends Module::CoreObject
+  {
+    PointerT, NilT
+    FuncG, DictG, UnionG
+    ViewInterface
+    ObserverInterface, NotificationInterface
+    MediatorInterface, ControllerInterface
+    CoreObject
+  } = Module::
+
+  class View extends CoreObject
     @inheritProtected()
-    # @implements Module::ViewInterface
+    @implements ViewInterface
     @module Module
 
     @const MULTITON_MSG: "View instance for this multiton key already constructed!"
 
-    iphMediatorMap = @private mediatorMap: Object
-    iphObserverMap = @private observerMap: Object
-    ipsMultitonKey = @protected multitonKey: String
-    cphInstanceMap = @private @static _instanceMap: Object,
+    iphMediatorMap = PointerT @private mediatorMap: DictG(String, MediatorInterface)
+    iphObserverMap = PointerT @private observerMap: DictG(String, ObserverInterface)
+    ipsMultitonKey = PointerT @protected multitonKey: String
+    cphInstanceMap = PointerT @private @static _instanceMap: DictG(String, ViewInterface),
       default: {}
 
-    @public @static getInstance: Function,
+    @public @static getInstance: FuncG(String, ViewInterface),
       default: (asKey)->
         unless View[cphInstanceMap][asKey]
           View[cphInstanceMap][asKey] = View.new asKey
         View[cphInstanceMap][asKey]
 
-    @public @static removeView: Function,
+    @public @static removeView: FuncG(String, NilT),
       default: (asKey)->
         if (voView = View[cphInstanceMap][asKey])?
           for asMediatorName in Reflect.ownKeys voView[iphMediatorMap]
@@ -29,7 +38,7 @@ module.exports = (Module)->
           delete View[cphInstanceMap][asKey]
         return
 
-    @public registerObserver: Function,
+    @public registerObserver: FuncG([String, ObserverInterface], NilT),
       default: (asNotificationName, aoObserver)->
         vlObservers = @[iphObserverMap][asNotificationName]
         if vlObservers?
@@ -38,7 +47,7 @@ module.exports = (Module)->
           @[iphObserverMap][asNotificationName] = [aoObserver]
         return
 
-    @public removeObserver: Function,
+    @public removeObserver: FuncG([String, UnionG ControllerInterface, MediatorInterface], NilT),
       default: (asNotificationName, aoNotifyContext)->
         vlObservers = @[iphObserverMap][asNotificationName] ? []
         for voObserver, i in vlObservers
@@ -51,7 +60,7 @@ module.exports = (Module)->
           delete @[iphObserverMap][asNotificationName]
         return
 
-    @public notifyObservers: Function,
+    @public notifyObservers: FuncG(NotificationInterface, NilT),
       default: (aoNotification)->
         vsNotificationName = aoNotification.getName()
         vlObservers = @[iphObserverMap][vsNotificationName]
@@ -62,7 +71,7 @@ module.exports = (Module)->
               voObserver.notifyObserver aoNotification
         return
 
-    @public registerMediator: Function,
+    @public registerMediator: FuncG(MediatorInterface, NilT),
       default: (aoMediator)->
         vsName = aoMediator.getMediatorName()
         # Do not allow re-registration (you must removeMediator first).
@@ -84,11 +93,11 @@ module.exports = (Module)->
         aoMediator.onRegister()
         return
 
-    @public retrieveMediator: Function,
+    @public retrieveMediator: FuncG(String, MediatorInterface),
       default: (asMediatorName)->
         @[iphMediatorMap][asMediatorName] ? null
 
-    @public removeMediator: Function,
+    @public removeMediator: FuncG(String, MediatorInterface),
       default: (asMediatorName)->
         voMediator = @[iphMediatorMap][asMediatorName]
         unless voMediator?
@@ -111,16 +120,14 @@ module.exports = (Module)->
 
         return voMediator
 
-    @public hasMediator: Function,
+    @public hasMediator: FuncG(String, Boolean),
       default: (asMediatorName)->
         @[iphMediatorMap][asMediatorName]?
 
     @public initializeView: Function,
-      args: []
-      return: Module::NILL
       default: ->
 
-    @public init: Function,
+    @public init: FuncG(String, NilT),
       default: (asKey)->
         @super arguments...
         if View[cphInstanceMap][asKey]
@@ -130,6 +137,7 @@ module.exports = (Module)->
         @[iphMediatorMap] = {}
         @[iphObserverMap] = {}
         @initializeView()
+        return
 
 
-  View.initialize()
+    @initialize()

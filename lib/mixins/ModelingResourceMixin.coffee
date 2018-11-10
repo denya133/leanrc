@@ -4,17 +4,17 @@ module.exports = (Module)->
   {
     SESSIONS
     USERS
-
-    Resource
+    PromiseT
+    FuncG
     RecordInterface
-    PromiseInterface
+    Resource, Mixin
     Utils: { _, statuses, co }
   } = Module::
 
   HTTP_NOT_FOUND    = statuses 'not found'
   UNAUTHORIZED      = statuses 'unauthorized'
 
-  Module.defineMixin 'ModelingResourceMixin', (BaseClass = Resource) ->
+  Module.defineMixin Mixin 'ModelingResourceMixin', (BaseClass = Resource) ->
     class extends BaseClass
       @inheritProtected()
 
@@ -22,7 +22,7 @@ module.exports = (Module)->
         default: no
 
       @public session: RecordInterface
-      @public currentUser: PromiseInterface,
+      @public currentUser: PromiseT,
         get: co.wrap ->
           return yield @facade.retrieveProxy(USERS).find 'system'
 
@@ -31,7 +31,7 @@ module.exports = (Module)->
       @beforeHook 'protectSpaces',  only: ['update']
       @beforeHook 'protectOwnerId', only: ['update']
 
-      @public checkHeader: Function,
+      @public checkHeader: FuncG([], Boolean),
         default: ->
           { apiKey } = @configs
           {

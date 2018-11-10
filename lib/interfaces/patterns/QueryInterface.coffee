@@ -4,89 +4,57 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface 'QueryInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  {
+    FuncG, UnionG
+    QueryInterface: QueryInterfaceDefinition
+    Interface
+  } = Module::
 
-      @public @static @virtual operatorsMap: Object
+  class QueryInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual $forIn: Object
-      @public @virtual $join: Object
-      @public @virtual $let: Object
-      @public @virtual $filter: Object
-      @public @virtual $collect: Object
-      @public @virtual $into: [String, Object]
-      @public @virtual $having: Object
-      @public @virtual $sort: Array
-      @public @virtual $limit: Number
-      @public @virtual $offset: Number
-      @public @virtual $avg: String # '@doc.price'
-      @public @virtual $sum: String # '@doc.price'
-      @public @virtual $min: String # '@doc.price'
-      @public @virtual $max: String # '@doc.price'
-      @public @virtual $count: Boolean # yes or not present
-      @public @virtual $distinct: Boolean # yes or not present
-      @public @virtual $remove: Boolean
-      @public @virtual $patch: Object
-      @public @virtual $return: [String, Object]
+    @virtual @static operatorsMap: Object
 
-      @public @virtual forIn: Function,
-        args: [Object] # definitions
-        return: QueryInterface
-      @public @virtual join: Function,
-        args: [Object] # definitions
-        return: QueryInterface
-      @public @virtual filter: Function,
-        args: [Object] # definitions
-        return: QueryInterface
-      @public @virtual let: Function,
-        args: [Object] # definitions
-        return: QueryInterface
-      @public @virtual collect: Function,
-        args: [Object] # definition
-        return: QueryInterface
-      @public @virtual into: Function,
-        args: [Object] # definition
-        return: QueryInterface
-      @public @virtual having: Function,
-        args: [Object] # definitions
-        return: QueryInterface
-      @public @virtual sort: Function,
-        args: [Object] # definition
-        return: QueryInterface
-      @public @virtual limit: Function,
-        args: [Number] # value
-        return: QueryInterface
-      @public @virtual offset: Function,
-        args: [Number] # value
-        return: QueryInterface
-      @public @virtual distinct: Function,
-        args: []
-        return: QueryInterface
-      @public @virtual return: Function,
-        args: [Object] # definition
-        return: QueryInterface
-      @public @virtual remove: Function,
-        args: [[String, Object]] # definition
-        return: QueryInterface
-      @public @virtual patch: Function,
-        args: [Object] # definition
-        return: QueryInterface
-      @public @virtual count: Function,
-        args: []
-        return: QueryInterface
-      @public @virtual avg: Function,
-        args: [String] # definition
-        return: QueryInterface
-      @public @virtual min: Function,
-        args: [String] # definition
-        return: QueryInterface
-      @public @virtual max: Function,
-        args: [String] # definition
-        return: QueryInterface
-      @public @virtual sum: Function,
-        args: [String] # definition
-        return: QueryInterface
+    @virtual $forIn: Object
+    @virtual $join: Object
+    @virtual $let: Object
+    @virtual $filter: Object
+    @virtual $collect: Object
+    @virtual $into: UnionG String, Object
+    @virtual $having: Object
+    @virtual $sort: Array
+    @virtual $limit: Number
+    @virtual $offset: Number
+    @virtual $avg: String # '@doc.price'
+    @virtual $sum: String # '@doc.price'
+    @virtual $min: String # '@doc.price'
+    @virtual $max: String # '@doc.price'
+    @virtual $count: Boolean # yes or not present
+    @virtual $distinct: Boolean # yes or not present
+    @virtual $remove: Boolean
+    @virtual $patch: Object
+    @virtual $return: Object
+
+    @virtual forIn: FuncG Object, QueryInterfaceDefinition
+    @virtual join: FuncG Object, QueryInterfaceDefinition
+    @virtual filter: FuncG Object, QueryInterfaceDefinition
+    @virtual let: FuncG Object, QueryInterfaceDefinition
+    @virtual collect: FuncG Object, QueryInterfaceDefinition
+    @virtual into: FuncG Object, QueryInterfaceDefinition
+    @virtual having: FuncG Object, QueryInterfaceDefinition
+    @virtual sort: FuncG Object, QueryInterfaceDefinition
+    @virtual limit: FuncG Number, QueryInterfaceDefinition
+    @virtual offset: FuncG Number, QueryInterfaceDefinition
+    @virtual distinct: FuncG [], QueryInterfaceDefinition
+    @virtual return: FuncG Object, QueryInterfaceDefinition
+    @virtual remove: FuncG [UnionG String, Object], QueryInterfaceDefinition
+    @virtual patch: FuncG Object, QueryInterfaceDefinition
+    @virtual count: FuncG [], QueryInterfaceDefinition
+    @virtual avg: FuncG String, QueryInterfaceDefinition
+    @virtual min: FuncG String, QueryInterfaceDefinition
+    @virtual max: FuncG String, QueryInterfaceDefinition
+    @virtual sum: FuncG String, QueryInterfaceDefinition
 
 
-      @initializeInterface()
+    @initialize()

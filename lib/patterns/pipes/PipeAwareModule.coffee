@@ -2,13 +2,20 @@
 
 module.exports = (Module)->
   {
+    NilT
+    FuncG
+    PipeAwareInterface, PipeFittingInterface
+    FacadeInterface
+    CoreObject
+  } = Module::
+  {
     ACCEPT_INPUT_PIPE
     ACCEPT_OUTPUT_PIPE
   } = Module::JunctionMediator
 
-  class PipeAwareModule extends Module::CoreObject
+  class PipeAwareModule extends CoreObject
     @inheritProtected()
-    # @implements Module::PipeAwareInterface
+    @implements PipeAwareInterface
     @module Module
 
     @public @static STDOUT: String,
@@ -20,14 +27,14 @@ module.exports = (Module)->
     @public @static STDSHELL: String,
       default: 'standardShell'
 
-    @public facade: Module::FacadeInterface
+    @public facade: FacadeInterface
 
-    @public acceptInputPipe: Function,
+    @public acceptInputPipe: FuncG([String, PipeFittingInterface], NilT),
       default: (asName, aoPipe)->
         @facade.sendNotification ACCEPT_INPUT_PIPE, aoPipe, asName
         return
 
-    @public acceptOutputPipe: Function,
+    @public acceptOutputPipe: FuncG([String, PipeFittingInterface], NilT),
       default: (asName, aoPipe)->
         @facade.sendNotification ACCEPT_OUTPUT_PIPE, aoPipe, asName
         return
@@ -42,10 +49,11 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG(FacadeInterface, NilT),
       default: (aoFacade)->
         @super arguments...
         @facade = aoFacade
+        return
 
 
-  PipeAwareModule.initialize()
+    @initialize()

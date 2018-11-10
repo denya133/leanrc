@@ -23,38 +23,59 @@
 
 module.exports = (Module)->
   {
-    NILL
-    ANY
-
+    NilT, PointerT
+    FuncG, MaybeG, InterfaceG, EnumG, ListG, UnionG, SubsetG, SampleG
+    RouterInterface
+    ConfigurableMixin
     Class
     Utils: { _, inflect }
   } = Module::
 
   class Router extends Module::Proxy
     @inheritProtected()
-    # @implements Module::RouterInterface
-    @include Module::ConfigurableMixin
+    @implements RouterInterface
+    @include ConfigurableMixin
     @module Module
 
-    ipsPath       = @protected path: String,
+    ipsPath       = PointerT @protected path: String,
       default: '/'
-    ipsName       = @protected name: String,
+    ipsName       = PointerT @protected name: String,
       default: ''
-    ipsModule     = @protected module: String
-    iplOnly       = @protected only: Array
-    iplVia        = @protected via: Array
-    iplExcept     = @protected except: Array
-    ipoAbove      = @protected above: Object
-    ipsAt         = @protected at: String
-    ipsResource   = @protected resource: String
-    ipsTag        = @protected tag: String
-    ipsTemplates  = @protected templates: String
-    ipsParam      = @protected param: String
+    ipsModule     = PointerT @protected module: String
+    iplOnly       = PointerT @protected only: MaybeG ListG String
+    iplVia        = PointerT @protected via: MaybeG ListG String
+    iplExcept     = PointerT @protected except: MaybeG ListG String
+    ipoAbove      = PointerT @protected above: MaybeG Object
+    ipsAt         = PointerT @protected at: MaybeG EnumG 'collection', 'member'
+    ipsResource   = PointerT @protected resource: String
+    ipsTag        = PointerT @protected tag: String
+    ipsTemplates  = PointerT @protected templates: String
+    ipsParam      = PointerT @protected param: String
 
-    iplRouters    = @protected routers: Array
-    iplPathes     = @protected pathes: Array
-    iplResources  = @protected resources: Array
-    iplRoutes     = @protected routes: Array
+    iplRouters    = PointerT @protected routers: ListG SubsetG Router
+    iplPathes     = PointerT @protected pathes: ListG InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: String
+      entityName: String
+      recordName: String
+    }
+    iplResources  = PointerT @protected resources: ListG SampleG Router
+    iplRoutes     = PointerT @protected routes: ListG InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: String
+      entityName: String
+      recordName: String
+    }
 
     @public path: String,
       get: -> @[ipsPath]
@@ -62,7 +83,7 @@ module.exports = (Module)->
     @public name: String,
       get: -> @[ipsResource] ? @[ipsName]
 
-    @public above: Object,
+    @public above: MaybeG(Object),
       get: -> @[ipoAbove]
 
     @public tag: String,
@@ -74,32 +95,58 @@ module.exports = (Module)->
     @public param: String,
       get: -> @[ipsParam]
 
-    @public defaultEntityName: Function,
+    @public defaultEntityName: FuncG([], String),
       default: ->
         [..., vsEntityName] = @[ipsName]
           .replace /\/$/, ''
           .split '/'
         inflect.singularize vsEntityName
 
-    @public @static map: Function,
+    @public @static map: FuncG([MaybeG Function], NilT),
       default: (lambda)->
         lambda ?= ->
         @public map: Function,
-          args: []
-          return: ANY
           default: lambda
         return
 
     @public map: Function,
-      args: []
-      return: ANY
-      default: ->
+      default: -> return
 
-    @public root: Function,
+    @public root: FuncG([InterfaceG {
+      to: MaybeG String
+      at: MaybeG EnumG 'collection', 'member'
+      resource: MaybeG String
+      action: MaybeG String
+    }], NilT),
       default: ({to, at, resource, action})->
         return
 
-    @public defineMethod: Function,
+    @public defineMethod: FuncG([
+      ListG InterfaceG {
+        method: String
+        path: String
+        resource: String
+        action: String
+        tag: String
+        template: String
+        keyName: String
+        entityName: String
+        recordName: String
+      }
+      String
+      String
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT),
       default: (container, method, path, {to, at, resource, action, tag:asTag, template, keyName, entityName, recordName}={})->
         unless path?
           throw new Error 'path is required'
@@ -144,49 +191,156 @@ module.exports = (Module)->
         container.push {method, path, resource, action, tag, template, keyName, entityName, recordName}
         return
 
-    @public get: Function,
+    @public get: FuncG([
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT),
       default: (asPath, aoOpts)->
-        @[iplPathes] ?= []
+        # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'get', asPath, aoOpts
         return
 
-    @public post: Function,
+    @public post: FuncG([
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT),
       default: (asPath, aoOpts)->
-        @[iplPathes] ?= []
+        # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'post', asPath, aoOpts
         return
 
-    @public put: Function,
+    @public put: FuncG([
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT),
       default: (asPath, aoOpts)->
-        @[iplPathes] ?= []
+        # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'put', asPath, aoOpts
         return
 
-    @public delete: Function,
+    @public delete: FuncG([
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT),
       default: (asPath, aoOpts)->
-        @[iplPathes] ?= []
+        # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'delete', asPath, aoOpts
         return
 
-    @public head: Function,
+    @public head: FuncG([
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT),
       default: (asPath, aoOpts)->
-        @[iplPathes] ?= []
+        # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'head', asPath, aoOpts
         return
 
-    @public options: Function,
+    @public options: FuncG([
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT),
       default: (asPath, aoOpts)->
-        @[iplPathes] ?= []
+        # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'options', asPath, aoOpts
         return
 
-    @public patch: Function,
+    @public patch: FuncG([
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT),
       default: (asPath, aoOpts)->
-        @[iplPathes] ?= []
+        # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'patch', asPath, aoOpts
         return
 
-    @public resource: Function,
+    @public resource: FuncG([
+      String
+      UnionG(InterfaceG({
+        path: MaybeG String
+        module: MaybeG String
+        only: MaybeG ListG String
+        via: MaybeG ListG String
+        except: MaybeG ListG String
+        tag: MaybeG String
+        templates: MaybeG String
+        param: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        above: MaybeG Object
+      }), Function)
+      MaybeG Function
+    ], NilT),
       default: (asName, aoOpts = null, lambda = null)->
         vcModule = @Module
         if aoOpts?.constructor is Function
@@ -248,7 +402,7 @@ module.exports = (Module)->
           asParam
         else
           ':' + inflect.singularize inflect.underscore (resource ? "#{vsParentName}#{vsName}").replace(/[/]/g, '_').replace /[_]$/g, ''
-        @[iplRouters] ?= []
+        # @[iplRouters] ?= []
         class ResourceRouter extends Router
           @inheritProtected()
           @module vcModule
@@ -258,13 +412,13 @@ module.exports = (Module)->
             default: "#{vsParentName}#{vsName}"
           @protected module: String,
             default: vsModule
-          @protected only: Array,
+          @protected only: MaybeG(ListG String),
             default: only
-          @protected via: Array,
+          @protected via: MaybeG(ListG String),
             default: via
-          @protected except: Array,
+          @protected except: MaybeG(ListG String),
             default: except
-          @protected above: Object,
+          @protected above: MaybeG(Object),
             default: above
           @protected tag: String,
             default: "#{vsParentTag}#{vsTag}"
@@ -277,8 +431,20 @@ module.exports = (Module)->
           @map lambda
         ResourceRouter.constructor = Class
         @[iplRouters].push ResourceRouter
+        return
 
-    @public namespace: Function,
+    @public namespace: FuncG([
+      String
+      UnionG(InterfaceG({
+        module: MaybeG String
+        prefix: MaybeG String
+        tag: MaybeG String
+        templates: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        above: MaybeG Object
+      }), Function)
+      MaybeG Function
+    ], NilT),
       default: (asName, aoOpts = null, lambda = null)->
         vcModule = @Module
         if aoOpts?.constructor is Function
@@ -327,7 +493,7 @@ module.exports = (Module)->
           "/#{asTag}"
         else
           ''
-        @[iplRouters] ?= []
+        # @[iplRouters] ?= []
         class NamespaceRouter extends Router
           @inheritProtected()
           @module vcModule
@@ -341,27 +507,39 @@ module.exports = (Module)->
             default: "#{vsParentTag}#{vsTag}"
           @protected templates: String,
             default: "#{vsParentTemplates}#{vsTemplates}".replace /[\/][\/]/g, '/'
-          @protected at: String,
+          @protected at: MaybeG(EnumG 'collection', 'member'),
             default: at
-          @protected above: Object,
+          @protected above: MaybeG(Object),
             default: above
           @map lambda
         NamespaceRouter.constructor = Class
         @[iplRouters].push NamespaceRouter
+        return
 
-    @public member: Function,
+    @public member: FuncG(Function, NilT),
       default: (lambda)->
         @namespace null, module: '', prefix: '', templates: '', at: 'member', lambda
+        return
 
-    @public collection: Function,
-      default: (lambda = ->)->
+    @public collection: FuncG(Function, NilT),
+      default: (lambda)->
         @namespace null, module: '', prefix: '', templates: '', at: 'collection', lambda
+        return
 
-    @public resources: Array,
-      get: ->
-        return @[iplResources]
+    @public resources: ListG(SampleG Router),
+      get: -> return @[iplResources]
 
-    @public routes: Array,
+    @public routes: ListG(InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: String
+      entityName: String
+      recordName: String
+    }),
       get: ->
         if @[iplRoutes]? and @[iplRoutes].length > 0
           return @[iplRoutes]
@@ -380,6 +558,7 @@ module.exports = (Module)->
 
     constructor: (args...)->
       super args...
+      @init()
       @map()
 
       if @[iplOnly]?.constructor is String
@@ -403,7 +582,7 @@ module.exports = (Module)->
         update: null
         delete: null
 
-      @[iplPathes] ?= []
+      # @[iplPathes] ?= []
 
       if @[ipsName]? and @[ipsName] isnt ''
         vsKeyName = @[ipsParam]?.replace /^\:/, ''
@@ -470,6 +649,14 @@ module.exports = (Module)->
                 keyName: vsKeyName
                 entityName: vsEntityName
                 recordName: vsRecordName
+      return
+
+    @public init: Function,
+      default: (args...)->
+        @super args...
+        @[iplRouters] = []
+        @[iplPathes] = []
+        return
 
 
-  Router.initialize()
+    @initialize()

@@ -2,7 +2,9 @@
 
 module.exports = (Module)->
   {
+    EndpointInterface
     CrudEndpointMixin
+    Endpoint
     Utils: { statuses }
   } = Module::
 
@@ -10,9 +12,9 @@ module.exports = (Module)->
   UNAUTHORIZED      = statuses 'unauthorized'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  class CreateEndpoint extends Module::Endpoint
+  class CreateEndpoint extends Endpoint
     @inheritProtected()
-    # @implements Module::EndpointInterface
+    @implements EndpointInterface
     @include CrudEndpointMixin
     @module Module
 
@@ -40,5 +42,7 @@ module.exports = (Module)->
           from the request body and
           returns the saved document.
         "
+        return
+
 
     @initialize()

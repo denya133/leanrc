@@ -2,27 +2,30 @@
 
 module.exports = (Module)->
   {
+    JoiT
+    FuncG, MaybeG
+    TransformInterface
     CoreObject
     Utils: { _, joi, moment }
   } = Module::
 
   class ObjectTransform extends CoreObject
     @inheritProtected()
-    # @implements Module::TransformInterface
+    @implements TransformInterface
     @module Module
 
-    @public @static schema: Object,
+    @public @static schema: JoiT,
       get: -> joi.object().allow(null).optional()
 
-    @public @static @async normalize: Function,
+    @public @static @async normalize: FuncG([MaybeG Object], Object),
       default: (args...)->
         yield return @normalizeSync args...
 
-    @public @static @async serialize: Function,
+    @public @static @async serialize: FuncG([MaybeG Object], Object),
       default: (args...)->
         yield return @serializeSync args...
 
-    @public @static normalizeSync: Function,
+    @public @static normalizeSync: FuncG([MaybeG Object], Object),
       default: (serialized)->
         unless serialized?
           return {}
@@ -45,7 +48,7 @@ module.exports = (Module)->
               Module::Transform.normalizeSync value
         return result
 
-    @public @static serializeSync: Function,
+    @public @static serializeSync: FuncG([MaybeG Object], Object),
       default: (deserialized)->
         unless deserialized?
           return {}
@@ -68,7 +71,7 @@ module.exports = (Module)->
               Module::Transform.serializeSync value
         return result
 
-    @public @static objectize: Function,
+    @public @static objectize: FuncG([MaybeG Object], Object),
       default: (deserialized)->
         unless deserialized?
           return {}

@@ -47,21 +47,27 @@ module.exports = (App)->
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
+    PointerT, JoiT
+    SubsetG, DictG, ListG
+    GatewayInterface
+    ConfigurableMixin
     Utils: { inflect, extend, filesListSync }
   } = Module::
+
   class Gateway extends Module::Proxy
     @inheritProtected()
-    # @implements Module::GatewayInterface
-    @include Module::ConfigurableMixin
+    @implements GatewayInterface
+    @include ConfigurableMixin
     @module Module
 
-    # ipoEndpoints = @private endpoints: Object
-    ipsMultitonKey = @protected multitonKey: String
-    iplKnownEndpoints = @protected knownEndpoints: Array
-    ipcApplicationModule = @protected ApplicationModule: Module::Class
-    iphSchemas = @private schemas: Object
+    ipsMultitonKey = PointerT @protected multitonKey: String
+    iplKnownEndpoints = PointerT @protected knownEndpoints: ListG String
+    ipcApplicationModule = PointerT @protected ApplicationModule: SubsetG Module
+    iphSchemas = PointerT @private schemas: DictG String, JoiT
+    ipsEndpointsPath = PointerT @private endpointsPath: String,
+      get: -> "#{@ApplicationModule::ROOT}/endpoints"
 
-    @public ApplicationModule: Module::Class,
+    @public ApplicationModule: SubsetG(Module),
       get: ->
         @[ipcApplicationModule] ?= if @[ipsMultitonKey]?
           @facade
@@ -70,9 +76,6 @@ module.exports = (Module)->
             ?.Module ? @Module
         else
           @Module
-
-    ipsEndpointsPath = @private endpointsPath: String,
-      get: -> "#{@ApplicationModule::ROOT}/endpoints"
 
     @public tryLoadEndpoint: Function,
       default: (asName) ->
@@ -129,4 +132,4 @@ module.exports = (Module)->
         return
 
 
-  Gateway.initialize()
+    @initialize()

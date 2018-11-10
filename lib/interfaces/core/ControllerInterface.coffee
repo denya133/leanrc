@@ -1,25 +1,22 @@
 
 
 module.exports = (Module)->
-  {NILL} = Module::
+  {
+    NilT
+    FuncG, SubsetG
+    Interface
+    NotificationInterface
+    CommandInterface
+  } = Module::
 
-  Module.defineInterface 'ControllerInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
-      @module Module
+  class ControllerInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual executeCommand: Function,
-        args: [Module::NotificationInterface]
-        return: NILL
-      @public @virtual registerCommand: Function,
-        args: [String, Module::Class]
-        return: NILL
-      @public @virtual hasCommand: Function,
-        args: [String]
-        return: Boolean
-      @public @virtual removeCommand: Function,
-        args: [String]
-        return: NILL
+    @virtual executeCommand: FuncG NotificationInterface, NilT
+    @virtual registerCommand: FuncG [String, SubsetG CommandInterface], NilT
+    @virtual hasCommand: FuncG String, Boolean
+    @virtual removeCommand: FuncG String, NilT
 
 
-      @initializeInterface()
+    @initialize()

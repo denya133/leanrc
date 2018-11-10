@@ -2,7 +2,9 @@
 
 module.exports = (Module)->
   {
+    EndpointInterface
     CrudEndpointMixin
+    Endpoint
     Utils: { statuses, joi }
   } = Module::
 
@@ -10,9 +12,9 @@ module.exports = (Module)->
   UNAUTHORIZED      = statuses 'unauthorized'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  class ModelingDeleteEndpoint extends Module::Endpoint
+  class ModelingDeleteEndpoint extends Endpoint
     @inheritProtected()
-    # @implements Module::EndpointInterface
+    @implements EndpointInterface
     @include CrudEndpointMixin
     @module Module
 
@@ -34,5 +36,7 @@ module.exports = (Module)->
           Hide the #{@itemEntityName}
           from the database.
         "
+        return
+
 
     @initialize()

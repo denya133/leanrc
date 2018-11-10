@@ -1,30 +1,36 @@
 
 
 module.exports = (Module)->
-  class Mediator extends Module::Notifier
+  {
+    AnyT, NilT, PointerT
+    FuncG, SubsetG
+    MediatorInterface, NotificationInterface
+    Notifier
+  } = Module::
+
+  class Mediator extends Notifier
     @inheritProtected()
-    # @implements Module::MediatorInterface
+    @implements MediatorInterface
     @module Module
 
-    ipsMediatorName = @private mediatorName: String
-    ipoViewComponent = @private viewComponent: Module::ANY
+    ipsMediatorName = PointerT @private mediatorName: String
+    ipoViewComponent = PointerT @private viewComponent: AnyT
 
-    @public getMediatorName: Function,
+    @public getMediatorName: FuncG([], String),
       default: -> @[ipsMediatorName]
 
-    @public getViewComponent: Function,
+    @public getViewComponent: FuncG([], AnyT),
       default: -> @[ipoViewComponent]
 
-    @public setViewComponent: Function,
+    @public setViewComponent: FuncG(AnyT, NilT),
       default: (aoViewComponent)->
         @[ipoViewComponent] = aoViewComponent
         return
 
-    @public listNotificationInterests: Function,
-      configurable: yes
+    @public listNotificationInterests: FuncG([], Array),
       default: -> []
 
-    @public handleNotification: Function,
+    @public handleNotification: FuncG(NotificationInterface, NilT),
       default: -> return
 
     @public onRegister: Function,
@@ -34,7 +40,7 @@ module.exports = (Module)->
       default: -> return
 
     # need test it
-    @public @static @async restoreObject: Function,
+    @public @static @async restoreObject: FuncG([SubsetG(Module), Object], MediatorInterface),
       default: (Module, replica)->
         if replica?.class is @name and replica?.type is 'instance'
           facade = Module::ApplicationFacade.getInstance replica.multitonKey
@@ -44,7 +50,7 @@ module.exports = (Module)->
           return yield @super Module, replica
 
     # need test it
-    @public @static @async replicateObject: Function,
+    @public @static @async replicateObject: FuncG(MediatorInterface, Object),
       default: (instance)->
         replica = yield @super instance
         ipsMultitonKey = Symbol.for '~multitonKey'
@@ -52,11 +58,12 @@ module.exports = (Module)->
         replica.mediatorName = instance.getMediatorName()
         yield return replica
 
-    @public init: Function,
+    @public init: FuncG([String, AnyT], NilT),
       default: (asMediatorName, aoViewComponent)->
         @super arguments...
         @[ipsMediatorName] = asMediatorName ? @constructor.name
         @[ipoViewComponent] = aoViewComponent
+        return
 
 
-  Mediator.initialize()
+    @initialize()

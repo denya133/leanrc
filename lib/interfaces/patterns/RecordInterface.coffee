@@ -3,119 +3,105 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT, NilT, JoiT, PropertyDefinitionT
+    AttributeOptionsT, ComputedOptionsT
+    AttributeConfigT, ComputedConfigT
+    FuncG, TupleG, MaybeG, SubsetG, DictG, ListG
+    CollectionInterface
+    RecordInterface: RecordInterfaceDef
+    TransformInterface
+  } = Module::
 
-  Module.defineInterface 'RecordInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
-      @include Module::TransformInterface
+  class RecordInterface extends TransformInterface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual collection: Module::CollectionInterface
+    @virtual collection: CollectionInterface
 
-      @public @static @virtual schema: Object
+    @virtual @static schema: JoiT
 
-      @public @static @virtual parseRecordName: Function,
-        args: [String]
-        return: Array
+    @virtual @static @async normalize: FuncG [MaybeG(Object), CollectionInterface], RecordInterfaceDef
 
-      @public @virtual parseRecordName: Function,
-        args: [String]
-        return: Array
+    @virtual @static @async serialize: FuncG [MaybeG RecordInterfaceDef], MaybeG Object
 
-      @public @static @virtual findRecordByName: Function,
-        args: [String]
-        return: RecordInterface
+    @virtual @static @async recoverize: FuncG [MaybeG(Object), CollectionInterface], MaybeG RecordInterfaceDef
 
-      @public @virtual findRecordByName: Function,
-        args: [String]
-        return: RecordInterface
+    @virtual @static objectize: FuncG [MaybeG RecordInterfaceDef], MaybeG Object
 
-      @public @static @virtual parentClassNames: Function,
-        args: [[Module::Class, NILL]]
-        return: Array
+    @virtual @static makeSnapshot: FuncG [MaybeG RecordInterfaceDef], MaybeG Object
 
-      @public @static @virtual attributes: Function,
-        args: []
-        return: Object
-      @public @static @virtual computeds: Function,
-        args: []
-        return: Object
+    @virtual @static parseRecordName: FuncG String, TupleG String, String
 
-      @public @static @virtual attribute: Function,
-        args: [Object, Object] #typeDefinition, opts
-        return: NILL
-      @public @static @virtual attr: Function,
-        args: [Object, Object] #typeDefinition, opts
-        return: NILL
-      @public @static @virtual computed: Function,
-        args: [Object, Object] #typeDefinition, opts
-        return: NILL
-      @public @static @virtual comp: Function,
-        args: [Object, Object] #typeDefinition, opts
-        return: NILL
+    @virtual parseRecordName: FuncG String, TupleG String, String
 
-      @public @static @virtual new: Function,
-        args: [Object] #attributes
-        return: Module::RecordInterface
+    @virtual @static findRecordByName: FuncG String, SubsetG RecordInterfaceDef
 
-      @public @async @virtual save: Function,
-        args: []
-        return: RecordInterface
-      @public @async @virtual create: Function,
-        args: []
-        return: RecordInterface
-      @public @async @virtual update: Function,
-        args: []
-        return: RecordInterface
-      @public @async @virtual delete: Function,
-        args: []
-        return: RecordInterface
-      @public @async @virtual destroy: Function,
-        args: []
-        return: RecordInterface
+    @virtual findRecordByName: FuncG String, SubsetG RecordInterfaceDef
 
-      @public @virtual attributes: Function, # метод должен вернуть список атрибутов данного рекорда.
-        args: []
-        return: Array
-      @public @async @virtual clone: Function,
-        args: []
-        return: Module::RecordInterface
-      @public @async @virtual copy: Function,
-        args: []
-        return: Module::RecordInterface
-      @public @async @virtual decrement: Function,
-        args: [String, [Number, NILL]] #attribute, step
-        return: Module::RecordInterface
-      @public @async @virtual increment: Function,
-        args: [String, [Number, NILL]] #attribute, step
-        return: Module::RecordInterface
-      @public @async @virtual toggle: Function,
-        args: [String] #attribute
-        return: Module::RecordInterface
-      @public @async @virtual touch: Function,
-        args: []
-        return: Module::RecordInterface
-      @public @async @virtual updateAttribute: Function,
-        args: [String, ANY] #name, value
-        return: Module::RecordInterface
-      @public @async @virtual updateAttributes: Function,
-        args: [Object] #attributes
-        return: Module::RecordInterface
-      @public @async @virtual isNew: Function,
-        args: []
-        return: Boolean
-      @public @async @virtual reload: Function,
-        args: []
-        return: Module::RecordInterface
-      @public @async @virtual changedAttributes: Function,
-        args: []
-        return: Object # { isAdmin: [undefined, true], name: [undefined, 'Tomster'] }
-      @public @async @virtual resetAttribute: Function,
-        args: [String]
-        return: NILL
-      @public @async @virtual rollbackAttributes: Function,
-        args: []
-        return: NILL
+    ###
+      @customFilter ->
+        reason:
+          '$eq': (value)->
+            # string of some aql code for example
+          '$neq': (value)->
+            # string of some aql code for example
+    ###
+    @virtual @static customFilters: Object
+
+    @virtual @static customFilter: FuncG Function, NilT
+
+    @virtual @static parentClassNames: FuncG [MaybeG SubsetG RecordInterfaceDef], ListG String
+
+    @virtual @static attributes: DictG String, AttributeConfigT
+    @virtual @static computeds: DictG String, ComputedConfigT
+
+    @virtual @static attribute: FuncG [PropertyDefinitionT, AttributeOptionsT], NilT
+
+    @virtual @static computed: FuncG [PropertyDefinitionT, ComputedOptionsT], NilT
+
+    @virtual @static new: FuncG [Object, CollectionInterface], RecordInterfaceDef
+
+    @virtual @async save: FuncG [], RecordInterfaceDef
+
+    @virtual @async create: FuncG [], RecordInterfaceDef
+
+    @virtual @async update: FuncG [], RecordInterfaceDef
+
+    @virtual @async delete: FuncG [], RecordInterfaceDef
+
+    @virtual @async destroy: Function
+
+    # NOTE: метод должен вернуть список атрибутов данного рекорда.
+    @virtual attributes: FuncG [], Object
+
+    # NOTE: в оперативной памяти создается клон рекорда, НО с другим id
+    @virtual @async clone: FuncG [], RecordInterfaceDef
+
+    # NOTE: в коллекции создается копия рекорда, НО с другим id
+    @virtual @async copy: FuncG [], RecordInterfaceDef
+
+    @virtual @async decrement: FuncG [String, MaybeG Number], RecordInterfaceDef
+
+    @virtual @async increment: FuncG [String, MaybeG Number], RecordInterfaceDef
+
+    @virtual @async toggle: FuncG String, RecordInterfaceDef
+
+    @virtual @async touch: FuncG [], RecordInterfaceDef
+
+    @virtual @async updateAttribute: FuncG [String, MaybeG AnyT], RecordInterfaceDef
+
+    @virtual @async updateAttributes: FuncG Object, RecordInterfaceDef
+
+    @virtual @async isNew: FuncG [], Boolean
+
+    @virtual @async reload: FuncG [], RecordInterfaceDef
+
+    @virtual @async changedAttributes: FuncG [], DictG String, Array
+
+    @virtual @async resetAttribute: FuncG String, NilT
+
+    @virtual @async rollbackAttributes: Function
 
 
-      @initializeInterface()
+    @initialize()

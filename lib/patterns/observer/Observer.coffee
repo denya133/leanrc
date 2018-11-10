@@ -1,37 +1,42 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT, NilT, PointerT, LambdaT
+    FuncG
+    ObserverInterface, NotificationInterface
+    CoreObject
+  } = Module::
 
-  class Observer extends Module::CoreObject
+  class Observer extends CoreObject
     @inheritProtected()
-    # @implements Module::ObserverInterface
+    @implements ObserverInterface
     @module Module
 
-    ipoNotify = @private notify: ANY
-    ipoContext = @private context: ANY
+    ipoNotify = PointerT @private notify: LambdaT
+    ipoContext = PointerT @private context: AnyT
 
-    @public setNotifyMethod: Function,
+    @public setNotifyMethod: FuncG(Function, NilT),
       default: (amNotifyMethod)->
         @[ipoNotify] = amNotifyMethod
         return
 
-    @public setNotifyContext: Function,
+    @public setNotifyContext: FuncG(AnyT, NilT),
       default: (aoNotifyContext)->
         @[ipoContext] = aoNotifyContext
         return
 
-    @public getNotifyMethod: Function,
+    @public getNotifyMethod: FuncG([], Function),
       default: -> @[ipoNotify]
 
-    @public getNotifyContext: Function,
+    @public getNotifyContext: FuncG([], AnyT),
       default: -> @[ipoContext]
 
-    @public compareNotifyContext: Function,
+    @public compareNotifyContext: FuncG(AnyT, Boolean),
       default: (object)->
         object is @[ipoContext]
 
-    @public notifyObserver: Function,
+    @public notifyObserver: FuncG(NotificationInterface, NilT),
       default: (notification)->
         @getNotifyMethod().call @getNotifyContext(), notification
         return
@@ -46,12 +51,12 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG([Function, AnyT], NilT),
       default: (amNotifyMethod, aoNotifyContext)->
         @super arguments...
         @setNotifyMethod amNotifyMethod
         @setNotifyContext aoNotifyContext
+        return
 
 
-
-  Observer.initialize()
+    @initialize()

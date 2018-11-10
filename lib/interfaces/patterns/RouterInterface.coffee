@@ -4,73 +4,219 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    NilT
+    FuncG, MaybeG, InterfaceG, EnumG, ListG, UnionG
+    ProxyInterface
+  } = Module::
 
-  Module.defineInterface 'RouterInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class RouterInterface extends ProxyInterface
+    @inheritProtected()
+    @module Module
 
-      @public @static @virtual map: Function,
-        args: [[Function, NILL]]
-        return: NILL
+    @virtual path: String
 
-      @public @virtual map: Function,
-        args: [[Function, NILL]]
-        return: ANY
+    @virtual name: String
 
-      @public @virtual root: Function,
-        args: [Object] # {to, at, controller, action}
-        return: NILL
+    @virtual above: MaybeG Object
 
-      @public @virtual defineMethod: Function,
-        args: [String, String, String, Object] # container, method, path, {to, at, controller, action}
-        return: NILL
+    @virtual tag: String
 
-      @public @virtual get: Function,
-        args: [String, Object] # path, opts
-        return: NILL
+    @virtual templates: String
 
-      @public @virtual post: Function,
-        args: [String, Object] # path, opts
-        return: NILL
+    @virtual param: String
 
-      @public @virtual put: Function,
-        args: [String, Object] # path, opts
-        return: NILL
+    @virtual defaultEntityName: FuncG [], String
 
-      @public @virtual delete: Function,
-        args: [String, Object] # path, opts
-        return: NILL
+    @virtual @static map: FuncG [MaybeG Function], NilT
 
-      @public @virtual head: Function,
-        args: [String, Object] # path, opts
-        return: NILL
+    @virtual map: Function
 
-      @public @virtual options: Function,
-        args: [String, Object] # path, opts
-        return: NILL
+    @virtual root: FuncG [InterfaceG {
+      to: MaybeG String
+      at: MaybeG EnumG 'collection', 'member'
+      resource: MaybeG String
+      action: MaybeG String
+    }], NilT
 
-      @public @virtual patch: Function,
-        args: [String, Object] # path, opts
-        return: NILL
+    @virtual defineMethod: FuncG [
+      ListG InterfaceG {
+        method: String
+        path: String
+        resource: String
+        action: String
+        tag: String
+        template: String
+        keyName: String
+        entityName: String
+        recordName: String
+      }
+      String
+      String
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT
 
-      @public @virtual resource: Function,
-        args: [String, Object, Function] # name, opts, lambda
-        return: ANY
+    @virtual get: FuncG [
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT
 
-      @public @virtual namespace: Function,
-        args: [String, Object, Function] # name, opts, lambda
-        return: ANY
+    @virtual post: FuncG [
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT
 
-      @public @virtual member: Function,
-        args: [Function] # lambda
-        return: ANY
+    @virtual put: FuncG [
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT
 
-      @public @virtual collection: Function,
-        args: [[Function, NILL]] # lambda
-        return: ANY
+    @virtual delete: FuncG [
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT
 
-      @public @virtual routes: Array
+    @virtual head: FuncG [
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT
+
+    @virtual options: FuncG [
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT
+
+    @virtual patch: FuncG [
+      String,
+      MaybeG InterfaceG {
+        to: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        action: MaybeG String
+        tag: MaybeG String
+        template: MaybeG String
+        keyName: MaybeG String
+        entityName: MaybeG String
+        recordName: MaybeG String
+      }
+    ], NilT
+
+    @virtual resource: FuncG [
+      String
+      UnionG(InterfaceG({
+        path: MaybeG String
+        module: MaybeG String
+        only: MaybeG ListG String
+        via: MaybeG ListG String
+        except: MaybeG ListG String
+        tag: MaybeG String
+        templates: MaybeG String
+        param: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        resource: MaybeG String
+        above: MaybeG Object
+      }), Function)
+      MaybeG Function
+    ], NilT
+
+    @virtual namespace: FuncG [
+      String
+      UnionG(InterfaceG({
+        module: MaybeG String
+        prefix: MaybeG String
+        tag: MaybeG String
+        templates: MaybeG String
+        at: MaybeG EnumG 'collection', 'member'
+        above: MaybeG Object
+      }), Function)
+      MaybeG Function
+    ], NilT
+
+    @virtual member: FuncG Function, NilT
+
+    @virtual collection: FuncG Function, NilT
+
+    @virtual routes: ListG InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: String
+      entityName: String
+      recordName: String
+    }
 
 
-      @initializeInterface()
+    @initialize()

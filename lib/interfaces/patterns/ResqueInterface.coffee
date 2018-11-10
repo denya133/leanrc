@@ -1,105 +1,74 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT, NilT
+    FuncG, ListG, StructG, MaybeG, UnionG
+    QueueInterface
+    ProxyInterface
+  } = Module::
 
-  Module.defineInterface 'ResqueInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class ResqueInterface extends ProxyInterface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual tmpJobs: Array
+    @virtual tmpJobs: ListG StructG {
+      queueName: String
+      scriptName: String
+      data: AnyT
+      delay: MaybeG Number
+      id: String
+    }
 
-      @public @virtual fullQueueName: Function,
-        args: [String]
-        return: String
+    @virtual fullQueueName: FuncG String, String
 
-      @public @async @virtual create: Function,
-        args: [String, Number]
-        return: Module::DelayedQueueInterface
+    @virtual @async create: FuncG [String, MaybeG Number], QueueInterface
 
-      @public @async @virtual all: Function,
-        args: []
-        return: Array
+    @virtual @async all: FuncG [], ListG QueueInterface
 
-      @public @async @virtual get: Function,
-        args: [String]
-        return: Module::DelayedQueueInterface
+    @virtual @async get: FuncG String, MaybeG QueueInterface
 
-      @public @async @virtual remove: Function,
-        args: [String]
-        return: NILL
+    @virtual @async remove: FuncG String, NilT
 
-      @public @async @virtual update: Function,
-        args: [String, Number]
-        return: Module::DelayedQueueInterface
+    @virtual @async update: FuncG [String, Number], QueueInterface
 
-      @public @async @virtual delay: Function,
-        args: [String, String, ANY, [NILL, Number]] # queueName, scriptName, data
-        # последний аргумент не обязательный - delay в миллисекундах
-        return: String
+    @virtual @async delay: FuncG [String, String, AnyT, MaybeG Number], UnionG String, Number
 
-      @public @async @virtual getDelayed: Function,
-        args: []
-        return: Array
+    @virtual @async getDelayed: FuncG [], ListG StructG {
+      queueName: String
+      scriptName: String
+      data: AnyT
+      delay: MaybeG Number
+      id: String
+    }
 
-      #=============== Must be realized in mixin =========
+    #=============== Must be realized in mixin =========
 
-      @public @async @virtual ensureQueue: Function,
-        args: [String, Number] # queueName, concurrency
-        return: Object # {name, concurrency}
-        # ... плфтформозависимая реализация
+    @virtual @async ensureQueue: FuncG [String, MaybeG Number], StructG name: String, concurrency: Number
 
-      @public @async @virtual getQueue: Function,
-        args: [String] # queueName
-        return: Object # {name, concurrency}
-        # ... плфтформозависимая реализация
+    @virtual @async getQueue: FuncG String, MaybeG StructG name: String, concurrency: Number
 
-      @public @async @virtual removeQueue: Function,
-        args: [String]
-        return: NILL
-        # ... плфтформозависимая реализация
+    @virtual @async removeQueue: FuncG String, NilT
 
-      @public @async @virtual allQueues: Function,
-        args: []
-        return: Array
-        # ... плфтформозависимая реализация
+    @virtual @async allQueues: FuncG [], ListG StructG name: String, concurrency: Number
 
-      @public @async @virtual pushJob: Function,
-        args: [String, String, ANY, [NILL, Number]] # queueName, scriptName, data
-        # последний аргумент не обязательный - delay в миллисекундах
-        return: String # будем возвращать просто jobID
+    @virtual @async pushJob: FuncG [String, String, AnyT, MaybeG Number], UnionG String, Number
 
-      @public @async @virtual getJob: Function,
-        args: [String, String] # queueName, jobId
-        return: Object
+    @virtual @async getJob: FuncG [String, UnionG String, Number], MaybeG Object
 
-      @public @async @virtual deleteJob: Function,
-        args: [String, String] # queueName, jobId
-        return: Boolean # yes - если удалено, no - если не существут job в очереди
+    @virtual @async deleteJob: FuncG [String, UnionG String, Number], Boolean
 
-      @public @async @virtual abortJob: Function, # если еще не "completed", меняем на "failed"
-        args: [String, String] # queueName, jobId
-        return: NILL
+    @virtual @async abortJob: FuncG [String, UnionG String, Number], NilT
 
-      @public @async @virtual allJobs: Function,
-        args: [String, [String, NILL]] # queueName, (scriptName or undefined)
-        return: Array # массив строк jobId's
+    @virtual @async allJobs: FuncG [String, MaybeG String], ListG Object
 
-      @public @async @virtual pendingJobs: Function,
-        args: [String, [String, NILL]] # queueName, (scriptName or undefined)
-        return: Array # массив строк jobId's
+    @virtual @async pendingJobs: FuncG [String, MaybeG String], ListG Object
 
-      @public @async @virtual progressJobs: Function,
-        args: [String, [String, NILL]] # queueName, (scriptName or undefined)
-        return: Array # массив строк jobId's
+    @virtual @async progressJobs: FuncG [String, MaybeG String], ListG Object
 
-      @public @async @virtual completedJobs: Function,
-        args: [String, [String, NILL]] # queueName, (scriptName or undefined)
-        return: Array # массив строк jobId's
+    @virtual @async completedJobs: FuncG [String, MaybeG String], ListG Object
 
-      @public @async @virtual failedJobs: Function,
-        args: [String, [String, NILL]] # queueName, (scriptName or undefined)
-        return: Array # массив строк jobId's
+    @virtual @async failedJobs: FuncG [String, MaybeG String], ListG Object
 
 
-      @initializeInterface()
+    @initialize()
