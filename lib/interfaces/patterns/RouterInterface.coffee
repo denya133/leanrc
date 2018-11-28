@@ -14,17 +14,17 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual path: String
+    @virtual path: MaybeG String
 
-    @virtual name: String
+    @virtual name: MaybeG String
 
     @virtual above: MaybeG Object
 
-    @virtual tag: String
+    @virtual tag: MaybeG String
 
-    @virtual templates: String
+    @virtual templates: MaybeG String
 
-    @virtual param: String
+    @virtual param: MaybeG String
 
     @virtual defaultEntityName: FuncG [], String
 
@@ -40,14 +40,14 @@ module.exports = (Module)->
     }], NilT
 
     @virtual defineMethod: FuncG [
-      ListG InterfaceG {
+      MaybeG ListG InterfaceG {
         method: String
         path: String
         resource: String
         action: String
         tag: String
         template: String
-        keyName: String
+        keyName: MaybeG String
         entityName: String
         recordName: String
       }
@@ -173,12 +173,12 @@ module.exports = (Module)->
 
     @virtual resource: FuncG [
       String
-      UnionG(InterfaceG({
+      MaybeG UnionG(InterfaceG({
         path: MaybeG String
         module: MaybeG String
-        only: MaybeG ListG String
-        via: MaybeG ListG String
-        except: MaybeG ListG String
+        only: MaybeG UnionG String, ListG String
+        via: MaybeG UnionG String, ListG String
+        except: MaybeG UnionG String, ListG String
         tag: MaybeG String
         templates: MaybeG String
         param: MaybeG String
@@ -190,7 +190,7 @@ module.exports = (Module)->
     ], NilT
 
     @virtual namespace: FuncG [
-      String
+      MaybeG String
       UnionG(InterfaceG({
         module: MaybeG String
         prefix: MaybeG String
@@ -213,7 +213,7 @@ module.exports = (Module)->
       action: String
       tag: String
       template: String
-      keyName: String
+      keyName: MaybeG String
       entityName: String
       recordName: String
     }

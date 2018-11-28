@@ -9,18 +9,18 @@ describe 'BodyParseMixin', ->
   describe '.new', ->
     it 'should create new resource', ->
       expect ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @include LeanRC::BodyParseMixin
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
+          @initialize()
+        resource = TestResource.new()
       .to.not.throw Error
   describe '#parseBody', ->
     it 'should parse request body', ->
@@ -29,7 +29,7 @@ describe 'BodyParseMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         facade = Test::Facade.getInstance KEY
         configs = Test::Configuration.new Test::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
@@ -39,11 +39,11 @@ describe 'BodyParseMixin', ->
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        TestResource.initialize()
+          @initialize()
         class TestRouter extends Test::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         class TestSwitch extends Test::Switch
           @inheritProtected()
@@ -51,7 +51,7 @@ describe 'BodyParseMixin', ->
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
-        TestSwitch.initialize()
+          @initialize()
         body = '{"test":"test"}'
         class MyRequest extends IncomingMessage
           constructor: (socket) ->
@@ -69,7 +69,7 @@ describe 'BodyParseMixin', ->
         res = new MyResponse req
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.context = Test::Context.new req, res, switchMediator
         yield resource.parseBody()
         assert.deepEqual resource.context.request.body, test: 'test'

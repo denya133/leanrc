@@ -4,7 +4,7 @@ module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
     NilT, PointerT
-    FuncG, SubsetG, DictG
+    FuncG, SubsetG, DictG, MaybeG
     ControllerInterface, ViewInterface, CommandInterface, NotificationInterface
     CoreObject, Facade
     Utils: { _ }
@@ -18,12 +18,12 @@ module.exports = (Module)->
     @const MULTITON_MSG: "Controller instance for this multiton key already constructed!"
 
     ipoView         = PointerT @private view: ViewInterface
-    iphCommandMap   = PointerT @private commandMap: DictG String, SubsetG CommandInterface
-    iphClassNames   = PointerT @private classNames: DictG String, String
-    ipsMultitonKey  = PointerT @protected multitonKey: String
-    cphInstanceMap  = PointerT @private @static _instanceMap: DictG(String, ControllerInterface),
+    iphCommandMap   = PointerT @private commandMap: DictG String, MaybeG SubsetG CommandInterface
+    iphClassNames   = PointerT @private classNames: DictG String, MaybeG String
+    ipsMultitonKey  = PointerT @protected multitonKey: MaybeG String
+    cphInstanceMap  = PointerT @private @static _instanceMap: DictG(String, MaybeG ControllerInterface),
       default: {}
-    ipcApplicationModule = PointerT @protected ApplicationModule: SubsetG Module
+    ipcApplicationModule = PointerT @protected ApplicationModule: MaybeG SubsetG Module
 
     @public ApplicationModule: SubsetG(Module),
       get: ->
@@ -70,7 +70,7 @@ module.exports = (Module)->
           @[iphCommandMap][asNotificationName] = aCommand
         return
 
-    @public lazyRegisterCommand: FuncG([String, String], NilT),
+    @public lazyRegisterCommand: FuncG([String, MaybeG String], NilT),
       default: (asNotificationName, asClassName)->
         asClassName ?= asNotificationName
         unless @[iphCommandMap][asNotificationName]

@@ -23,7 +23,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT
+    AnyT, NilT, PointerT
     FuncG, MaybeG, InterfaceG, EnumG, ListG, UnionG, SubsetG, SampleG
     RouterInterface
     ConfigurableMixin
@@ -37,62 +37,62 @@ module.exports = (Module)->
     @include ConfigurableMixin
     @module Module
 
-    ipsPath       = PointerT @protected path: String,
+    ipsPath       = PointerT @protected path: MaybeG(String),
       default: '/'
-    ipsName       = PointerT @protected name: String,
+    ipsName       = PointerT @protected name: MaybeG(String),
       default: ''
-    ipsModule     = PointerT @protected module: String
-    iplOnly       = PointerT @protected only: MaybeG ListG String
-    iplVia        = PointerT @protected via: MaybeG ListG String
-    iplExcept     = PointerT @protected except: MaybeG ListG String
+    ipsModule     = PointerT @protected module: MaybeG String
+    iplOnly       = PointerT @protected only: MaybeG UnionG String, ListG String
+    iplVia        = PointerT @protected via: MaybeG UnionG String, ListG String
+    iplExcept     = PointerT @protected except: MaybeG UnionG String, ListG String
     ipoAbove      = PointerT @protected above: MaybeG Object
     ipsAt         = PointerT @protected at: MaybeG EnumG 'collection', 'member'
-    ipsResource   = PointerT @protected resource: String
-    ipsTag        = PointerT @protected tag: String
-    ipsTemplates  = PointerT @protected templates: String
-    ipsParam      = PointerT @protected param: String
+    ipsResource   = PointerT @protected resource: MaybeG String
+    ipsTag        = PointerT @protected tag: MaybeG String
+    ipsTemplates  = PointerT @protected templates: MaybeG String
+    ipsParam      = PointerT @protected param: MaybeG String
 
-    iplRouters    = PointerT @protected routers: ListG SubsetG Router
-    iplPathes     = PointerT @protected pathes: ListG InterfaceG {
+    iplRouters    = PointerT @protected routers: MaybeG ListG SubsetG Router
+    iplPathes     = PointerT @protected pathes: MaybeG ListG InterfaceG {
       method: String
       path: String
       resource: String
       action: String
       tag: String
       template: String
-      keyName: String
+      keyName: MaybeG String
       entityName: String
       recordName: String
     }
-    iplResources  = PointerT @protected resources: ListG SampleG Router
-    iplRoutes     = PointerT @protected routes: ListG InterfaceG {
+    iplResources  = PointerT @protected resources: MaybeG ListG SampleG Router
+    iplRoutes     = PointerT @protected routes: MaybeG ListG InterfaceG {
       method: String
       path: String
       resource: String
       action: String
       tag: String
       template: String
-      keyName: String
+      keyName: MaybeG String
       entityName: String
       recordName: String
     }
 
-    @public path: String,
+    @public path: MaybeG(String),
       get: -> @[ipsPath]
 
-    @public name: String,
+    @public name: MaybeG(String),
       get: -> @[ipsResource] ? @[ipsName]
 
     @public above: MaybeG(Object),
       get: -> @[ipoAbove]
 
-    @public tag: String,
+    @public tag: MaybeG(String),
       get: -> @[ipsTag]
 
-    @public templates: String,
+    @public templates: MaybeG(String),
       get: -> @[ipsTemplates]
 
-    @public param: String,
+    @public param: MaybeG(String),
       get: -> @[ipsParam]
 
     @public defaultEntityName: FuncG([], String),
@@ -122,14 +122,14 @@ module.exports = (Module)->
         return
 
     @public defineMethod: FuncG([
-      ListG InterfaceG {
+      MaybeG ListG InterfaceG {
         method: String
         path: String
         resource: String
         action: String
         tag: String
         template: String
-        keyName: String
+        keyName: MaybeG String
         entityName: String
         recordName: String
       }
@@ -326,12 +326,12 @@ module.exports = (Module)->
 
     @public resource: FuncG([
       String
-      UnionG(InterfaceG({
+      MaybeG UnionG(InterfaceG({
         path: MaybeG String
         module: MaybeG String
-        only: MaybeG ListG String
-        via: MaybeG ListG String
-        except: MaybeG ListG String
+        only: MaybeG UnionG String, ListG String
+        via: MaybeG UnionG String, ListG String
+        except: MaybeG UnionG String, ListG String
         tag: MaybeG String
         templates: MaybeG String
         param: MaybeG String
@@ -343,7 +343,7 @@ module.exports = (Module)->
     ], NilT),
       default: (asName, aoOpts = null, lambda = null)->
         vcModule = @Module
-        if aoOpts?.constructor is Function
+        if _.isFunction aoOpts
           lambda = aoOpts
           aoOpts = {}
         aoOpts = {} unless aoOpts?
@@ -351,7 +351,7 @@ module.exports = (Module)->
           path, module:vsModule
           only, via, except
           tag:asTag, templates:alTemplates, param:asParam
-          at, resource, above
+          at, resource:asResource, above
         } = aoOpts
         path = path?.replace /^[/]/, ''
         vsPath = if path? and path isnt ''
@@ -401,7 +401,7 @@ module.exports = (Module)->
         vsParam = if asParam? and asParam isnt ''
           asParam
         else
-          ':' + inflect.singularize inflect.underscore (resource ? "#{vsParentName}#{vsName}").replace(/[/]/g, '_').replace /[_]$/g, ''
+          ':' + inflect.singularize inflect.underscore (asResource ? "#{vsParentName}#{vsName}").replace(/[/]/g, '_').replace /[_]$/g, ''
         # @[iplRouters] ?= []
         class ResourceRouter extends Router
           @inheritProtected()
@@ -412,11 +412,11 @@ module.exports = (Module)->
             default: "#{vsParentName}#{vsName}"
           @protected module: String,
             default: vsModule
-          @protected only: MaybeG(ListG String),
+          @protected only: MaybeG(UnionG String, ListG String),
             default: only
-          @protected via: MaybeG(ListG String),
+          @protected via: MaybeG(UnionG String, ListG String),
             default: via
-          @protected except: MaybeG(ListG String),
+          @protected except: MaybeG(UnionG String, ListG String),
             default: except
           @protected above: MaybeG(Object),
             default: above
@@ -426,15 +426,15 @@ module.exports = (Module)->
             default: "#{vsParentTemplates}#{vsTemplates}".replace /[\/][\/]/g, '/'
           @protected param: String,
             default: vsParam
-          @protected resource: String,
-            default: resource
+          @protected resource: MaybeG(String),
+            default: asResource
           @map lambda
         ResourceRouter.constructor = Class
         @[iplRouters].push ResourceRouter
         return
 
     @public namespace: FuncG([
-      String
+      MaybeG String
       UnionG(InterfaceG({
         module: MaybeG String
         prefix: MaybeG String
@@ -501,8 +501,8 @@ module.exports = (Module)->
             default: "#{vsParentPath}#{vsPath}"
           @protected name: String,
             default: "#{vsParentName}#{vsName}"
-          @protected except: Array,
-            default: 'all'
+          @protected except: MaybeG(UnionG String, ListG String),
+            default: ['all']
           @protected tag: String,
             default: "#{vsParentTag}#{vsTag}"
           @protected templates: String,
@@ -536,7 +536,7 @@ module.exports = (Module)->
       action: String
       tag: String
       template: String
-      keyName: String
+      keyName: MaybeG String
       entityName: String
       recordName: String
     }),
@@ -558,14 +558,14 @@ module.exports = (Module)->
 
     constructor: (args...)->
       super args...
-      @init()
+      @init args...
       @map()
 
-      if @[iplOnly]?.constructor is String
+      if _.isString @[iplOnly]
         @[iplOnly] = [@[iplOnly]]
-      if @[iplVia]?.constructor is String
+      if _.isString @[iplVia]
         @[iplVia] = [@[iplVia]]
-      if @[iplExcept]?.constructor is String
+      if _.isString @[iplExcept]
         @[iplExcept] = [@[iplExcept]]
 
       voMethods =
@@ -651,7 +651,7 @@ module.exports = (Module)->
                 recordName: vsRecordName
       return
 
-    @public init: Function,
+    @public init: FuncG([MaybeG(String), MaybeG AnyT], NilT),
       default: (args...)->
         @super args...
         @[iplRouters] = []

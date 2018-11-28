@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT
+    AnyT, NilT, PointerT
     FuncG, MaybeG
     PipeMessageInterface
     CoreObject
@@ -27,8 +27,8 @@ module.exports = (Module)->
 
     ipsType = PointerT @protected type: String
     ipnPriority = PointerT @protected priority: Number
-    ipoHeader = PointerT @protected header: Object
-    ipoBody = PointerT @protected body: Object
+    ipoHeader = PointerT @protected header: MaybeG Object
+    ipoBody = PointerT @protected body: MaybeG AnyT
 
     @public getType: FuncG([], String),
       default: -> @[ipsType]
@@ -46,7 +46,7 @@ module.exports = (Module)->
         @[ipnPriority] = anPriority
         return
 
-    @public getHeader: FuncG([], Object),
+    @public getHeader: FuncG([], MaybeG Object),
       default: -> @[ipoHeader]
 
     @public setHeader: FuncG(Object, NilT),
@@ -54,10 +54,10 @@ module.exports = (Module)->
         @[ipoHeader] = aoHeader
         return
 
-    @public getBody: FuncG([], Object),
+    @public getBody: FuncG([], MaybeG AnyT),
       default: -> @[ipoBody]
 
-    @public setBody: FuncG(Object, NilT),
+    @public setBody: FuncG([MaybeG AnyT], NilT),
       default: (aoBody)->
         @[ipoBody] = aoBody
         return

@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     AnyT, NilT
-    FuncG
+    FuncG, MaybeG
     NotificationInterface
     Interface
   } = Module::
@@ -14,8 +14,8 @@ module.exports = (Module)->
 
     @virtual setNotifyMethod: FuncG Function, NilT
     @virtual setNotifyContext: FuncG AnyT, NilT
-    @virtual getNotifyMethod: FuncG [], Function
-    @virtual getNotifyContext: FuncG [], AnyT
+    @virtual getNotifyMethod: FuncG [], MaybeG Function
+    @virtual getNotifyContext: FuncG [], MaybeG AnyT
     @virtual compareNotifyContext: FuncG AnyT, Boolean
     @virtual notifyObserver: FuncG NotificationInterface, NilT
 

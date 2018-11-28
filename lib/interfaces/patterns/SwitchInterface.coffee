@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     AnyT, NilT
-    FuncG, ListG, MaybeG, InterfaceG, StructG
+    FuncG, ListG, MaybeG, InterfaceG, StructG, UnionG
     ContextInterface, MediatorInterface, RendererInterface, ResourceInterface
     SwitchInterface: SwitchInterfaceDef
   } = Module::
@@ -16,12 +16,7 @@ module.exports = (Module)->
 
     @virtual responseFormats: ListG String
 
-    @virtual jsonRendererName: String
-    @virtual htmlRendererName: String
-    @virtual xmlRendererName: String
-    @virtual atomRendererName: String
-
-    @virtual use: FuncG [Number, Function], SwitchInterfaceDef
+    @virtual use: FuncG [UnionG(Number, Function), MaybeG Function], SwitchInterfaceDef
 
     @virtual @async handleStatistics: FuncG [Number, Number, Number, ContextInterface], NilT
 
@@ -34,7 +29,7 @@ module.exports = (Module)->
       action: String
       tag: String
       template: String
-      keyName: String
+      keyName: MaybeG String
       entityName: String
       recordName: String
     }], NilT
@@ -51,7 +46,7 @@ module.exports = (Module)->
       action: String
       tag: String
       template: String
-      keyName: String
+      keyName: MaybeG String
       entityName: String
       recordName: String
     }], NilT
@@ -63,7 +58,7 @@ module.exports = (Module)->
       action: String
       tag: String
       template: String
-      keyName: String
+      keyName: MaybeG String
       entityName: String
       recordName: String
     }], NilT

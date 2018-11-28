@@ -91,10 +91,10 @@ example for collect
 module.exports = (Module)->
   {
     AnyT, NilT
-    FuncG, SubsetG, UnionG
+    FuncG, SubsetG, UnionG, MaybeG
     QueryInterface
     CoreObject
-    Utils: { _, extend }
+    Utils: { _ }
   } = Module::
 
   class Query extends CoreObject
@@ -141,30 +141,30 @@ module.exports = (Module)->
         $ty: Boolean # this year
         $ly: Boolean # last year
 
-    @public $forIn: Object
-    @public $join: Object
-    @public $let: Object
-    @public $filter: Object
-    @public $collect: Object
-    @public $into: UnionG String, Object
-    @public $having: Object
-    @public $sort: Array
-    @public $limit: Number
-    @public $offset: Number
-    @public $avg: String # '@doc.price'
-    @public $sum: String # '@doc.price'
-    @public $min: String # '@doc.price'
-    @public $max: String # '@doc.price'
-    @public $count: Boolean # yes or not present
-    @public $distinct: Boolean # yes or not present
-    @public $remove: Boolean
-    @public $patch: Object
-    @public $return: Object
+    @public $forIn: MaybeG Object
+    @public $join: MaybeG Object
+    @public $let: MaybeG Object
+    @public $filter: MaybeG Object
+    @public $collect: MaybeG Object
+    @public $into: MaybeG UnionG String, Object
+    @public $having: MaybeG Object
+    @public $sort: MaybeG Array
+    @public $limit: MaybeG Number
+    @public $offset: MaybeG Number
+    @public $avg: MaybeG String # '@doc.price'
+    @public $sum: MaybeG String # '@doc.price'
+    @public $min: MaybeG String # '@doc.price'
+    @public $max: MaybeG String # '@doc.price'
+    @public $count: MaybeG Boolean # yes or not present
+    @public $distinct: MaybeG Boolean # yes or not present
+    @public $remove: MaybeG UnionG String, Object
+    @public $patch: MaybeG Object
+    @public $return: MaybeG UnionG String, Object
 
     @public forIn: FuncG(Object, QueryInterface),
       default: (aoDefinitions)->
-        @$forIn ?= {}
-        @$forIn = extend {}, @$forIn, aoDefinitions
+        for own k, v of aoDefinitions
+          @$forIn[k] = v
         return @
     @public join: FuncG(Object, QueryInterface), # критерии связывания как в SQL JOIN ... ON
       default: (aoDefinitions)->
@@ -177,13 +177,14 @@ module.exports = (Module)->
     @public let: FuncG(Object, QueryInterface),
       default: (aoDefinitions)->
         @$let ?= {}
-        @$let = extend {}, @$let, aoDefinitions
+        for own k, v of aoDefinitions
+          @$let[k] = v
         return @
     @public collect: FuncG(Object, QueryInterface),
       default: (aoDefinition)->
         @$collect = aoDefinition
         return @
-    @public into: FuncG(Object, QueryInterface),
+    @public into: FuncG([UnionG String, Object], QueryInterface),
       default: (aoDefinition)->
         @$into = aoDefinition
         return @
@@ -216,7 +217,7 @@ module.exports = (Module)->
       default: (aoDefinition)->
         @$patch = aoDefinition
         return @
-    @public return: FuncG(Object, QueryInterface),
+    @public return: FuncG([UnionG String, Object], QueryInterface),
       default: (aoDefinition)->
         @$return = aoDefinition
         return @
@@ -255,21 +256,26 @@ module.exports = (Module)->
         replica.query = instance.toJSON()
         yield return replica
 
-    @public init: FuncG(Object, NilT),
+    @public init: FuncG([MaybeG Object], NilT),
       default: (aoQuery)->
         @super arguments...
-        for own key, value of aoQuery
-          do (key, value)=>
-            @[key] = value
+        @$forIn = {}
+        if aoQuery?
+          for own key, value of aoQuery
+            do (key, value)=>
+              @[key] = value
         return
 
     @public toJSON: FuncG([], Object),
       default: ->
-        _.pick @, [
+        res = {}
+        for k in [
           '$forIn', '$join', '$let', '$filter', '$collect', '$into', '$having'
           '$sort', '$limit', '$offset', '$avg', '$sum', '$min', '$max', '$count'
           '$distinct', '$remove', '$patch', '$return'
-        ]
+        ] when @[k]?
+          res[k] = @[k]
+        return res
 
 
     @initialize()

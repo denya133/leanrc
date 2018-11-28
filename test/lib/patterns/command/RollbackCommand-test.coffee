@@ -2,7 +2,12 @@ EventEmitter = require 'events'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-{ co } = LeanRC::Utils
+{
+  NilT
+  FuncG, SubsetG, MaybeG, UnionG, StructG
+  RecordInterface, CollectionInterface
+  Utils: { co }
+} = LeanRC::
 
 describe 'RollbackCommand', ->
   describe '.new', ->
@@ -16,7 +21,7 @@ describe 'RollbackCommand', ->
       co ->
         KEY = 'TEST_ROLLBACK_COMMAND_001'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @include LeanRC::SchemaModuleMixin
           @root "#{__dirname}/config/root"
@@ -26,10 +31,11 @@ describe 'RollbackCommand', ->
           @inheritProtected()
           @module Test
           @attr 'test': String
-          @public init: Function,
+          @public init: FuncG([Object, CollectionInterface], NilT),
             default: ->
               @super arguments...
               @type = 'TestRecord'
+              return
         TestRecord.initialize()
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -52,7 +58,7 @@ describe 'RollbackCommand', ->
       co ->
         KEY = 'TEST_ROLLBACK_COMMAND_002'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @include LeanRC::SchemaModuleMixin
           @root "#{__dirname}/config/root"
@@ -66,10 +72,11 @@ describe 'RollbackCommand', ->
           @inheritProtected()
           @module Test
           @attr 'test': String
-          @public init: Function,
+          @public init: FuncG([Object, CollectionInterface], NilT),
             default: ->
               @super arguments...
               @type = 'TestRecord'
+              return
         TestRecord.initialize()
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -92,7 +99,7 @@ describe 'RollbackCommand', ->
       co ->
         KEY = 'TEST_ROLLBACK_COMMAND_003'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @include LeanRC::SchemaModuleMixin
           @root "#{__dirname}/config/root"
@@ -106,10 +113,11 @@ describe 'RollbackCommand', ->
           @inheritProtected()
           @module Test
           @attr 'test': String
-          @public init: Function,
+          @public init: FuncG([Object, CollectionInterface], NilT),
             default: ->
               @super arguments...
               @type = 'TestRecord'
+              return
         TestRecord.initialize()
         class TestMemoryCollection extends LeanRC::Collection
           @inheritProtected()
@@ -149,14 +157,15 @@ describe 'RollbackCommand', ->
           class TestMigration extends LeanRC::Migration
             @inheritProtected()
             @module Module
-            @public @static findRecordByName: Function,
+            @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
               default: -> Test::TestMigration
-            @public init: Function,
+            @public init: FuncG([Object, CollectionInterface], NilT),
               default: (args...) ->
                 @super args...
-                @type = 'Test::TestMigration'
+                @type = 'TestMigration'
+                return
           TestMigration.initialize()
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @include LeanRC::SchemaModuleMixin
           @root "#{__dirname}/config/root2"
@@ -223,14 +232,15 @@ describe 'RollbackCommand', ->
           class TestMigration extends LeanRC::Migration
             @inheritProtected()
             @module Module
-            @public @static findRecordByName: Function,
+            @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
               default: -> Test::TestMigration
-            @public init: Function,
+            @public init: FuncG([Object, CollectionInterface], NilT),
               default: (args...) ->
                 @super args...
-                @type = 'Test::TestMigration'
+                @type = 'TestMigration'
+                return
           TestMigration.initialize()
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @include LeanRC::SchemaModuleMixin
           @root "#{__dirname}/config/root2"
@@ -250,7 +260,7 @@ describe 'RollbackCommand', ->
         class TestCommand extends LeanRC::RollbackCommand
           @inheritProtected()
           @module Test
-          @public @async rollback: Function,
+          @public @async rollback: FuncG([MaybeG StructG steps: MaybeG(Number), until: MaybeG String], UnionG NilT, Error),
             default: (options) ->
               result = yield @super options
               trigger.emit 'ROLLBACK', options

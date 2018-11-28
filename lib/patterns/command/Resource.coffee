@@ -161,14 +161,15 @@ module.exports = (Module)->
       get: ->
         @facade.retrieveProxy @collectionName
 
-    @public context: ContextInterface
+    @public context: MaybeG ContextInterface
 
     @public listQuery: MaybeG Object
     @public recordId: MaybeG String
     @public recordBody: MaybeG Object
 
-    @public @static actions: DictG String, Object,
-      get: -> @metaObject.getGroup 'actions', no
+    @public @static actions: DictG(String, Object),
+      get: ->
+        @metaObject.getGroup 'actions', no
 
     @public @static action: FuncG([UnionG Object, TupleG Object, Object], NilT),
       default: (args...)->
@@ -294,7 +295,7 @@ module.exports = (Module)->
           yield queue.push scriptName, data, delay
         yield return
 
-    @public @async execute: FuncG(NotificationInterface, NilT),
+    @public @async execute: FuncG(NotificationInterface),
       default: (aoNotification)->
         { ERROR, DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         resourceName = aoNotification.getName()

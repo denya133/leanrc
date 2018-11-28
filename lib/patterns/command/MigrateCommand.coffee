@@ -73,7 +73,7 @@ module.exports = (Module) ->
         @migrationsCollection = @facade.retrieveProxy Module::MIGRATIONS
         return
 
-    @public @async execute: FuncG(NotificationInterface, NilT),
+    @public @async execute: FuncG(NotificationInterface),
       default: (aoNotification)->
         voBody = aoNotification.getBody()
         vsType = aoNotification.getType()

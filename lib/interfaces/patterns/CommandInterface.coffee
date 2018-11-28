@@ -12,7 +12,7 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual execute: FuncG NotificationInterface, NilT
+    @virtual execute: FuncG NotificationInterface
 
 
     @initialize()

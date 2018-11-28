@@ -19,11 +19,11 @@ module.exports = (Module)->
 
     @const MULTITON_MSG: "Facade instance for this multiton key already constructed!"
 
-    ipoModel        = PointerT @protected model: ModelInterface
-    ipoView         = PointerT @protected view: ViewInterface
-    ipoController   = PointerT @protected controller: ControllerInterface
-    ipsMultitonKey  = PointerT @protected multitonKey: String
-    cphInstanceMap  = PointerT @protected @static instanceMap: DictG(String, FacadeInterface),
+    ipoModel        = PointerT @protected model: MaybeG ModelInterface
+    ipoView         = PointerT @protected view: MaybeG ViewInterface
+    ipoController   = PointerT @protected controller: MaybeG ControllerInterface
+    ipsMultitonKey  = PointerT @protected multitonKey: MaybeG String
+    cphInstanceMap  = PointerT @protected @static instanceMap: DictG(String, MaybeG FacadeInterface),
       default: {}
 
     ipmInitializeModel = PointerT @protected initializeModel: Function,
@@ -98,11 +98,11 @@ module.exports = (Module)->
         @[ipoModel].lazyRegisterProxy asProxyName, asProxyClassName, ahData
         return
 
-    @public retrieveProxy: FuncG(String, ProxyInterface),
+    @public retrieveProxy: FuncG(String, MaybeG ProxyInterface),
       default: (asProxyName)->
         @[ipoModel].retrieveProxy asProxyName
 
-    @public removeProxy: FuncG(String, ProxyInterface),
+    @public removeProxy: FuncG(String, MaybeG ProxyInterface),
       default: (asProxyName)->
         @[ipoModel].removeProxy asProxyName
 
@@ -116,12 +116,12 @@ module.exports = (Module)->
           @[ipoView].registerMediator aoMediator
         return
 
-    @public retrieveMediator: FuncG(String, MediatorInterface),
+    @public retrieveMediator: FuncG(String, MaybeG MediatorInterface),
       default: (asMediatorName)->
         if @[ipoView]
           @[ipoView].retrieveMediator asMediatorName
 
-    @public removeMediator: FuncG(String, MediatorInterface),
+    @public removeMediator: FuncG(String, MaybeG MediatorInterface),
       default: (asMediatorName)->
         if @[ipoView]
           @[ipoView].removeMediator asMediatorName
@@ -137,7 +137,7 @@ module.exports = (Module)->
           @[ipoView].notifyObservers aoNotification
         return
 
-    @public sendNotification: FuncG([String, MaybeG(AnyT), String], NilT),
+    @public sendNotification: FuncG([String, MaybeG(AnyT), MaybeG String], NilT),
       default: (asName, aoBody, asType)->
         @notifyObservers Module::Notification.new asName, aoBody, asType
         return

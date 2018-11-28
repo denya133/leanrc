@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     AnyT, NilT, PointerT
-    FuncG, MaybeG, UnionG, ListG, DictG, StructG
+    FuncG, MaybeG, UnionG, ListG, DictG, StructG, EnumG, InterfaceG
     RecordInterface, QueryInterface, CursorInterface
     Collection, Cursor, Mixin
     Utils: { _, inflect, request }
@@ -13,8 +13,8 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
-      ipsRecordMultipleName = PointerT @private recordMultipleName: String
-      ipsRecordSingleName = PointerT @private recordSingleName: String
+      ipsRecordMultipleName = PointerT @private recordMultipleName: MaybeG String
+      ipsRecordSingleName = PointerT @private recordSingleName: MaybeG String
 
       @public recordMultipleName: FuncG([], String),
         default: ->
@@ -64,7 +64,7 @@ module.exports = (Module)->
             "
           yield return
 
-      @public @async take: FuncG([UnionG String, Number], RecordInterface),
+      @public @async take: FuncG([UnionG String, Number], MaybeG RecordInterface),
         default: (id)->
           requestObj = @requestFor(
             requestType: 'take'
@@ -161,7 +161,7 @@ module.exports = (Module)->
       @public queryEndpoint: String,
         default: 'query'
 
-      @public headersForRequest: FuncG(StructG({
+      @public headersForRequest: FuncG(MaybeG(InterfaceG {
         requestType: String
         recordName: String
         snapshot: MaybeG Object
@@ -174,7 +174,7 @@ module.exports = (Module)->
           headers['Accept'] = 'application/json'
           headers
 
-      @public methodForRequest: FuncG(StructG({
+      @public methodForRequest: FuncG(InterfaceG({
         requestType: String
         recordName: String
         snapshot: MaybeG Object
@@ -192,7 +192,7 @@ module.exports = (Module)->
             else
               'GET'
 
-      @public dataForRequest: FuncG(StructG({
+      @public dataForRequest: FuncG(InterfaceG({
         requestType: String
         recordName: String
         snapshot: MaybeG Object
@@ -206,7 +206,7 @@ module.exports = (Module)->
           else
             return
 
-      @public urlForRequest: FuncG(StructG({
+      @public urlForRequest: FuncG(InterfaceG({
         requestType: String
         recordName: String
         snapshot: MaybeG Object
@@ -306,7 +306,7 @@ module.exports = (Module)->
               vsMethod = "urlFor#{inflect.camelize requestType}"
               @[vsMethod]? recordName, query, snapshot, id
 
-      @public requestFor: FuncG(StructG({
+      @public requestFor: FuncG(InterfaceG({
         requestType: String
         recordName: String
         snapshot: MaybeG Object
@@ -316,7 +316,7 @@ module.exports = (Module)->
       }), StructG {
         method: String
         url: String
-        headers: Object
+        headers: DictG String, String
         data: MaybeG Object
       }),
         default: (params)->
@@ -330,9 +330,9 @@ module.exports = (Module)->
       @public @async sendRequest: FuncG(StructG({
         method: String
         url: String
-        options: StructG {
-          json: EnumG yes
-          headers: Object
+        options: InterfaceG {
+          json: EnumG [yes]
+          headers: DictG String, String
           body: MaybeG Object
         }
       }), StructG {
@@ -348,14 +348,14 @@ module.exports = (Module)->
       @public requestToHash: FuncG(StructG({
         method: String
         url: String
-        headers: Object
+        headers: DictG String, String
         data: MaybeG Object
       }), StructG {
         method: String
         url: String
-        options: StructG {
-          json: EnumG yes
-          headers: Object
+        options: InterfaceG {
+          json: EnumG [yes]
+          headers: DictG String, String
           body: MaybeG Object
         }
       }),
@@ -374,7 +374,7 @@ module.exports = (Module)->
       @public @async makeRequest: FuncG(StructG({
         method: String
         url: String
-        headers: Object
+        headers: DictG String, String
         data: MaybeG Object
       }), StructG {
         body: MaybeG AnyT

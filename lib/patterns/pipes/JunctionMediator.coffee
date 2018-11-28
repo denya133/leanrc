@@ -3,8 +3,8 @@
 module.exports = (Module)->
   {
     NilT, PointerT
-    FuncG, SampleG
-    NotificationInterface, PipeMessageInterface
+    FuncG, SampleG, SubsetG
+    NotificationInterface, PipeMessageInterface, MediatorInterface
     Junction
     Mediator
   } = Module::
@@ -58,12 +58,12 @@ module.exports = (Module)->
       default: (aoMessage)->
         @sendNotification aoMessage.getType(), aoMessage
 
-    @public @static @async restoreObject: Function,
+    @public @static @async restoreObject: FuncG([SubsetG(Module), Object], MediatorInterface),
       default: ->
         throw new Error "restoreObject method not supported for #{@name}"
         yield return
 
-    @public @static @async replicateObject: Function,
+    @public @static @async replicateObject: FuncG(MediatorInterface, Object),
       default: ->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return

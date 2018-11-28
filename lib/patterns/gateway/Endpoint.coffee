@@ -27,15 +27,15 @@ module.exports = (Module)->
 
     @public gateway: GatewayInterface
 
-    @public tags: Array
-    @public headers: Array
-    @public pathParams: Array
-    @public queryParams: Array
-    @public payload: Object
-    @public responses: Array
-    @public errors: Array
-    @public title: String
-    @public synopsis: String
+    @public tags: MaybeG Array
+    @public headers: MaybeG Array
+    @public pathParams: MaybeG Array
+    @public queryParams: MaybeG Array
+    @public payload: MaybeG Object
+    @public responses: MaybeG Array
+    @public errors: MaybeG Array
+    @public title: MaybeG String
+    @public synopsis: MaybeG String
     @public isDeprecated: Boolean,
       default: no
 
@@ -45,36 +45,36 @@ module.exports = (Module)->
         @tags.push asName
         return @
 
-    @public header: FuncG([String, Object, MaybeG String], EndpointInterface),
+    @public header: FuncG([String, JoiT, MaybeG String], EndpointInterface),
       default: (name, schema, description)->
         @headers ?= []
         @headers.push {name, schema, description}
         return @
 
-    @public pathParam: FuncG([String, Object, MaybeG String], EndpointInterface),
+    @public pathParam: FuncG([String, JoiT, MaybeG String], EndpointInterface),
       default: (name, schema, description)->
         @pathParams ?= []
         @pathParams.push {name, schema, description}
         return @
 
-    @public queryParam: FuncG([String, Object, MaybeG String], EndpointInterface),
+    @public queryParam: FuncG([String, JoiT, MaybeG String], EndpointInterface),
       default: (name, schema, description)->
         @queryParams ?= []
         @queryParams.push {name, schema, description}
         return @
 
-    @public body: FuncG([Object, MaybeG(Array), MaybeG String], EndpointInterface),
+    @public body: FuncG([JoiT, MaybeG(UnionG Array, String), MaybeG String], EndpointInterface),
       default: (schema, mimes, description)->
         @payload = {schema, mimes, description}
         return @
 
-    @public response: FuncG([UnionG(Number, String), MaybeG(JoiT), MaybeG(Array), MaybeG String], EndpointInterface),
+    @public response: FuncG([UnionG(Number, String, JoiT, NilT), MaybeG(UnionG JoiT, String, Array), MaybeG(UnionG Array, String), MaybeG String], EndpointInterface),
       default: (status, schema, mimes, description)->
         @responses ?= []
         @responses.push { status, schema, mimes, description }
         return @
 
-    @public error: FuncG([UnionG(Number, String), String], EndpointInterface),
+    @public error: FuncG([UnionG(Number, String), MaybeG String], EndpointInterface),
       default: (status, description)->
         @errors ?= []
         @errors.push {status, description}

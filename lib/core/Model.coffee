@@ -4,7 +4,7 @@ module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
     NilT, PointerT
-    SubsetG, DictG, FuncG, StructG
+    SubsetG, DictG, FuncG, StructG, MaybeG
     ProxyInterface
     ModelInterface
     CoreObject, Facade
@@ -18,15 +18,15 @@ module.exports = (Module)->
 
     @const MULTITON_MSG: "Model instance for this multiton key already constructed!"
 
-    iphProxyMap     = PointerT @private proxyMap: DictG String, ProxyInterface
-    iphMetaProxyMap = PointerT @private metaProxyMap: DictG String, StructG {
-      className: String
-      data: Object
+    iphProxyMap     = PointerT @private proxyMap: DictG String, MaybeG ProxyInterface
+    iphMetaProxyMap = PointerT @private metaProxyMap: DictG String, MaybeG StructG {
+      className: MaybeG String
+      data: MaybeG Object
     }
-    ipsMultitonKey  = PointerT @protected multitonKey: String
-    cphInstanceMap  = PointerT @private @static _instanceMap: DictG(String, ModelInterface),
+    ipsMultitonKey  = PointerT @protected multitonKey: MaybeG String
+    cphInstanceMap  = PointerT @private @static _instanceMap: DictG(String, MaybeG ModelInterface),
       default: {}
-    ipcApplicationModule = PointerT @protected ApplicationModule: SubsetG Module
+    ipcApplicationModule = PointerT @protected ApplicationModule: MaybeG SubsetG Module
 
     @public ApplicationModule: SubsetG(Module),
       get: ->
@@ -60,7 +60,7 @@ module.exports = (Module)->
         aoProxy.onRegister()
         return
 
-    @public removeProxy: FuncG(String, ProxyInterface),
+    @public removeProxy: FuncG(String, MaybeG ProxyInterface),
       default: (asProxyName)->
         voProxy = @[iphProxyMap][asProxyName]
         if voProxy
@@ -71,7 +71,7 @@ module.exports = (Module)->
           voProxy.onRemove()
         return voProxy
 
-    @public retrieveProxy: FuncG(String, ProxyInterface),
+    @public retrieveProxy: FuncG(String, MaybeG ProxyInterface),
       default: (asProxyName)->
         unless @[iphProxyMap][asProxyName]?
           { className, data = {} } = @[iphMetaProxyMap][asProxyName] ? {}
@@ -84,7 +84,7 @@ module.exports = (Module)->
       default: (asProxyName)->
         @[iphProxyMap][asProxyName]? or @[iphMetaProxyMap][asProxyName]?
 
-    @public lazyRegisterProxy: FuncG(String, String, Object),
+    @public lazyRegisterProxy: FuncG([String, MaybeG(String), MaybeG Object], NilT),
       default: (asProxyName, asProxyClassName, ahData)->
         @[iphMetaProxyMap][asProxyName] =
           className: asProxyClassName

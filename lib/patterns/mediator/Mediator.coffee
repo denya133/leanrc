@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     AnyT, NilT, PointerT
-    FuncG, SubsetG
+    FuncG, SubsetG, MaybeG
     MediatorInterface, NotificationInterface
     Notifier
   } = Module::
@@ -14,12 +14,12 @@ module.exports = (Module)->
     @module Module
 
     ipsMediatorName = PointerT @private mediatorName: String
-    ipoViewComponent = PointerT @private viewComponent: AnyT
+    ipoViewComponent = PointerT @private viewComponent: MaybeG AnyT
 
     @public getMediatorName: FuncG([], String),
       default: -> @[ipsMediatorName]
 
-    @public getViewComponent: FuncG([], AnyT),
+    @public getViewComponent: FuncG([], MaybeG AnyT),
       default: -> @[ipoViewComponent]
 
     @public setViewComponent: FuncG(AnyT, NilT),
@@ -30,7 +30,7 @@ module.exports = (Module)->
     @public listNotificationInterests: FuncG([], Array),
       default: -> []
 
-    @public handleNotification: FuncG(NotificationInterface, NilT),
+    @public handleNotification: FuncG(NotificationInterface),
       default: -> return
 
     @public onRegister: Function,
@@ -58,11 +58,11 @@ module.exports = (Module)->
         replica.mediatorName = instance.getMediatorName()
         yield return replica
 
-    @public init: FuncG([String, AnyT], NilT),
+    @public init: FuncG([MaybeG(String), MaybeG AnyT], NilT),
       default: (asMediatorName, aoViewComponent)->
         @super arguments...
         @[ipsMediatorName] = asMediatorName ? @constructor.name
-        @[ipoViewComponent] = aoViewComponent
+        @[ipoViewComponent] = aoViewComponent if aoViewComponent?
         return
 
 

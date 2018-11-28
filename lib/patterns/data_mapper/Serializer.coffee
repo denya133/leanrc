@@ -4,7 +4,7 @@
 module.exports = (Module)->
   {
     NilT, AnyT
-    FuncG, SubsetG
+    FuncG, SubsetG, MaybeG
     CollectionInterface, RecordInterface
     SerializerInterface
     CoreObject
@@ -17,11 +17,11 @@ module.exports = (Module)->
 
     @public collection: CollectionInterface
 
-    @public @async normalize: FuncG([SubsetG(RecordInterface), AnyT], RecordInterface),
+    @public @async normalize: FuncG([SubsetG(RecordInterface), MaybeG AnyT], RecordInterface),
       default: (acRecord, ahPayload)->
         return yield acRecord.normalize ahPayload, @collection
 
-    @public @async serialize: FuncG([RecordInterface, Object], AnyT),
+    @public @async serialize: FuncG([MaybeG(RecordInterface), MaybeG Object], MaybeG AnyT),
       default: (aoRecord, options = null)->
         vcRecord = aoRecord.constructor
         return yield vcRecord.serialize aoRecord, options

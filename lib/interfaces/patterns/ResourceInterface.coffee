@@ -26,7 +26,7 @@ module.exports = (Module)->
     @virtual collectionName: String
     @virtual collection: CollectionInterface
 
-    @virtual context: ContextInterface
+    @virtual context: MaybeG ContextInterface
     @virtual listQuery: MaybeG Object
     @virtual recordId: MaybeG String
     @virtual recordBody: MaybeG Object

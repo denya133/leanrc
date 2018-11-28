@@ -83,6 +83,7 @@ module.exports = (Module)->
             boolean
             date
             datetime
+            number
             decimal
             float
             integer
@@ -105,7 +106,7 @@ module.exports = (Module)->
             switch type
               when boolean
                 doc[field_name] = Boolean doc[field_name]
-              when decimal, float, integer
+              when decimal, float, integer, number
                 doc[field_name] = Number doc[field_name]
               when string, text, primary_key, binary
                 doc[field_name] = String JSON.stringify doc[field_name]
@@ -140,7 +141,6 @@ module.exports = (Module)->
           ipoCollection = Symbol.for '~collection'
           for own id, doc of @collection[ipoCollection]
             delete memCollection[ipoCollection][id]
-          delete memCollection[ipoCollection]
           memCollection[ipoCollection] = {}
           yield return
 
@@ -152,7 +152,6 @@ module.exports = (Module)->
           ipoCollection = Symbol.for '~collection'
           for own id, doc of @collection[ipoCollection]
             delete memCollection[ipoCollection][id]
-          delete memCollection[ipoCollection]
           memCollection[ipoCollection] = {}
           yield return
 

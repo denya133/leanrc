@@ -16,8 +16,8 @@ module.exports = (Module)->
 
     @const MULTITON_MSG: "multitonKey for this Notifier not yet initialized!"
 
-    ipsMultitonKey = PointerT @protected multitonKey: String
-    ipcApplicationModule = PointerT @protected ApplicationModule: SubsetG Module
+    ipsMultitonKey = PointerT @protected multitonKey: MaybeG String
+    ipcApplicationModule = PointerT @protected ApplicationModule: MaybeG SubsetG Module
 
     @public facade: FacadeInterface,
       get: ->
@@ -25,7 +25,7 @@ module.exports = (Module)->
           throw new Error Notifier::MULTITON_MSG
         Module::Facade.getInstance @[ipsMultitonKey]
 
-    @public sendNotification: FuncG([String, MaybeG(AnyT), String], NilT),
+    @public sendNotification: FuncG([String, MaybeG(AnyT), MaybeG String], NilT),
       default: (asName, aoBody, asType)->
         @facade?.sendNotification asName, aoBody, asType
         return

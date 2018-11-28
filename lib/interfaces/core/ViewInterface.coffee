@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     ANY, NilT
-    FuncG, UnionG
+    FuncG, UnionG, MaybeG
     ObserverInterface
     NotificationInterface
     ControllerInterface
@@ -19,8 +19,8 @@ module.exports = (Module)->
     @virtual removeObserver: FuncG [String, UnionG ControllerInterface, MediatorInterface], NilT
     @virtual notifyObservers: FuncG NotificationInterface, NilT
     @virtual registerMediator: FuncG MediatorInterface, NilT
-    @virtual retrieveMediator: FuncG String, MediatorInterface
-    @virtual removeMediator: FuncG String, MediatorInterface
+    @virtual retrieveMediator: FuncG String, MaybeG MediatorInterface
+    @virtual removeMediator: FuncG String, MaybeG MediatorInterface
     @virtual hasMediator: FuncG String, Boolean
 
 

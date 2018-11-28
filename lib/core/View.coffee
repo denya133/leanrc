@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     PointerT, NilT
-    FuncG, DictG, UnionG
+    FuncG, DictG, UnionG, MaybeG, ListG
     ViewInterface
     ObserverInterface, NotificationInterface
     MediatorInterface, ControllerInterface
@@ -17,15 +17,15 @@ module.exports = (Module)->
 
     @const MULTITON_MSG: "View instance for this multiton key already constructed!"
 
-    iphMediatorMap = PointerT @private mediatorMap: DictG(String, MediatorInterface)
-    iphObserverMap = PointerT @private observerMap: DictG(String, ObserverInterface)
-    ipsMultitonKey = PointerT @protected multitonKey: String
-    cphInstanceMap = PointerT @private @static _instanceMap: DictG(String, ViewInterface),
+    iphMediatorMap = PointerT @protected mediatorMap: DictG(String, MaybeG MediatorInterface)
+    iphObserverMap = PointerT @protected observerMap: DictG(String, MaybeG ListG ObserverInterface)
+    ipsMultitonKey = PointerT @protected multitonKey: MaybeG String
+    cphInstanceMap = PointerT @private @static _instanceMap: DictG(String, MaybeG ViewInterface),
       default: {}
 
     @public @static getInstance: FuncG(String, ViewInterface),
       default: (asKey)->
-        unless View[cphInstanceMap][asKey]
+        unless View[cphInstanceMap][asKey]?
           View[cphInstanceMap][asKey] = View.new asKey
         View[cphInstanceMap][asKey]
 
@@ -93,11 +93,11 @@ module.exports = (Module)->
         aoMediator.onRegister()
         return
 
-    @public retrieveMediator: FuncG(String, MediatorInterface),
+    @public retrieveMediator: FuncG(String, MaybeG MediatorInterface),
       default: (asMediatorName)->
         @[iphMediatorMap][asMediatorName] ? null
 
-    @public removeMediator: FuncG(String, MediatorInterface),
+    @public removeMediator: FuncG(String, MaybeG MediatorInterface),
       default: (asMediatorName)->
         voMediator = @[iphMediatorMap][asMediatorName]
         unless voMediator?

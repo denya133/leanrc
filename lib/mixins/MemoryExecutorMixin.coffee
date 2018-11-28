@@ -39,7 +39,7 @@ module.exports = (Module)->
     RESQUE
     RESQUE_EXECUTOR
     NilT, PointerT
-    FuncG, DictG, StructG,
+    FuncG, DictG, StructG, MaybeG, UnionG
     ResqueInterface, NotificationInterface
     Mediator, Mixin
     DelayableMixin, ConfigurableMixin
@@ -56,7 +56,7 @@ module.exports = (Module)->
         default: (queueName)-> @[ipoResque].fullQueueName queueName
 
       ipsMultitonKey = PointerT Symbol.for '~multitonKey'
-      ipoTimer = PointerT @private timer: Number
+      ipoTimer = PointerT @private timer: MaybeG UnionG Object, Number
       ipbIsStopped = PointerT @private isStopped: Boolean
       ipoDefinedProcessors = PointerT @private definedProcessors: DictG(
         String
@@ -157,10 +157,10 @@ module.exports = (Module)->
           if @[ipbIsStopped]
             yield return
           self = @
-          @[ipoTimer] = setTimeout co.wrap ->
+          @[ipoTimer] = setTimeout((co.wrap ->
             clearTimeout self[ipoTimer]
-            yield self.cyclePart()
-          , 100
+            return yield self.cyclePart()
+          ), 100)
           yield return
 
       @public @async start: Function,
@@ -178,7 +178,8 @@ module.exports = (Module)->
             throw new Error 'MemoryExecutorMixin can not been used for ArrangoDB apps'
             return
           @[ipbIsStopped] = yes
-          clearTimeout @[ipoTimer]
+          if @[ipoTimer]?
+            clearTimeout @[ipoTimer]
           return
 
       @public define: FuncG([String, StructG(concurrency: Number), Function], NilT),

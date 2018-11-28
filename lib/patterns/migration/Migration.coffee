@@ -91,10 +91,10 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     AnyT, NilT, AsyncFunctionT, PointerT
-    FuncG, ListG, StructG, EnumG, MaybeG, UnionG, InterfaceG, AsyncFuncG
-    MigrationInterface
+    FuncG, ListG, StructG, EnumG, MaybeG, UnionG, InterfaceG, AsyncFuncG, SubsetG
+    MigrationInterface, RecordInterface
     Record
-    Utils: { _, forEach, assign }
+    Utils: { _, forEach, assign, co }
   } = Module::
 
   class Migration extends Record
@@ -112,6 +112,7 @@ module.exports = (Module)->
     #   boolean:      'boolean'
     #   date:         'date'
     #   datetime:     'datetime'
+    #   number:       'number'
     #   decimal:      'decimal'
     #   float:        'float'
     #   integer:      'integer'
@@ -145,7 +146,7 @@ module.exports = (Module)->
       renameIndex: 'renameIndex'
       renameCollection: 'renameCollection'
     }
-    iplSteps = PointerT @private steps: ListG StructG {
+    iplSteps = PointerT @private steps: MaybeG ListG StructG {
       args: Array
       method: EnumG [
         'createCollection'
@@ -193,23 +194,23 @@ module.exports = (Module)->
     # так же в рамках DSL нужны:
     # Creation
     #@createCollection #name, options
-    @public @static createCollection: FuncG([String, MaybeG Object], NilT),
+    @public @static createCollection: FuncG([String, MaybeG Object]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'createCollection'}
         return
 
-    @public @async createCollection: FuncG([String, MaybeG Object], NilT),
+    @public @async createCollection: FuncG([String, MaybeG Object]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
 
     # @createEdgeCollection #для хранения связей М:М #collection_1, collection_2, options
-    @public @static createEdgeCollection: FuncG([String, String, MaybeG Object], NilT),
+    @public @static createEdgeCollection: FuncG([String, String, MaybeG Object]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'createEdgeCollection'}
         return
 
-    @public @async createEdgeCollection: FuncG([String, String, MaybeG Object], NilT),
+    @public @async createEdgeCollection: FuncG([String, String, MaybeG Object]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
@@ -221,7 +222,7 @@ module.exports = (Module)->
         type: EnumG SUPPORTED_TYPES
         default: AnyT
       }
-    )], NilT),
+    )]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'addField'}
         return
@@ -232,7 +233,7 @@ module.exports = (Module)->
         type: EnumG SUPPORTED_TYPES
         default: AnyT
       }
-    )], NilT),
+    )]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
@@ -242,7 +243,7 @@ module.exports = (Module)->
       type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
       unique: MaybeG Boolean
       sparse: MaybeG Boolean
-    }], NilT),
+    }]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'addIndex'}
         return
@@ -251,30 +252,30 @@ module.exports = (Module)->
       type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
       unique: MaybeG Boolean
       sparse: MaybeG Boolean
-    }], NilT),
+    }]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
 
     #@addTimestamps # создание полей createdAt, updatedAt, deletedAt #collection_name, options
-    @public @static addTimestamps: FuncG([String, MaybeG Object], NilT),
+    @public @static addTimestamps: FuncG([String, MaybeG Object]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'addTimestamps'}
         return
 
-    @public @async addTimestamps: FuncG([String, MaybeG Object], NilT),
+    @public @async addTimestamps: FuncG([String, MaybeG Object]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
 
     # Modification
     #@changeCollection #name, options
-    @public @static changeCollection: FuncG([String, Object], NilT),
+    @public @static changeCollection: FuncG([String, Object]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'changeCollection'}
         return
 
-    @public @async changeCollection: FuncG([String, Object], NilT),
+    @public @async changeCollection: FuncG([String, Object]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
@@ -285,7 +286,7 @@ module.exports = (Module)->
       InterfaceG {
         type: EnumG SUPPORTED_TYPES
       }
-    )], NilT),
+    )]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'changeField'}
         return
@@ -295,74 +296,74 @@ module.exports = (Module)->
       InterfaceG {
         type: EnumG SUPPORTED_TYPES
       }
-    )], NilT),
+    )]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
 
     #@renameField #collection_name, field_name, new_field_name
-    @public @static renameField: FuncG([String, String, String], NilT),
+    @public @static renameField: FuncG([String, String, String]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'renameField'}
         return
 
-    @public @async renameField: FuncG([String, String, String], NilT),
+    @public @async renameField: FuncG([String, String, String]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
 
     #@renameIndex #collection_name, old_name, new_name
-    @public @static renameIndex: FuncG([String, String, String], NilT),
+    @public @static renameIndex: FuncG([String, String, String]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'renameIndex'}
         return
 
-    @public @async renameIndex: FuncG([String, String, String], NilT),
+    @public @async renameIndex: FuncG([String, String, String]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
 
     #@renameCollection #collection_name, old_name, new_name
-    @public @static renameCollection: FuncG([String, String], NilT),
+    @public @static renameCollection: FuncG([String, String]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'renameCollection'}
         return
 
-    @public @async renameCollection: FuncG([String, String], NilT),
+    @public @async renameCollection: FuncG([String, String]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
 
     #Deletion
     #@dropCollection #name
-    @public @static dropCollection: FuncG(String, NilT),
+    @public @static dropCollection: FuncG(String),
       default: (args...)->
         @::[iplSteps].push {args, method: 'dropCollection'}
         return
 
-    @public @async dropCollection: FuncG(String, NilT),
+    @public @async dropCollection: FuncG(String),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
 
     # @dropEdgeCollection #collection_1, collection_2
-    @public @static dropEdgeCollection: FuncG([String, String], NilT),
+    @public @static dropEdgeCollection: FuncG([String, String]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'dropEdgeCollection'}
         return
 
-    @public @async dropEdgeCollection: FuncG([String, String], NilT),
+    @public @async dropEdgeCollection: FuncG([String, String]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
 
     #@removeField #collection_name, field_name
-    @public @static removeField: FuncG([String, String], NilT),
+    @public @static removeField: FuncG([String, String]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'removeField'}
         return
 
-    @public @async removeField: FuncG([String, String], NilT),
+    @public @async removeField: FuncG([String, String]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
@@ -372,7 +373,7 @@ module.exports = (Module)->
       type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
       unique: MaybeG Boolean
       sparse: MaybeG Boolean
-    }], NilT),
+    }]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'removeIndex'}
         return
@@ -381,18 +382,18 @@ module.exports = (Module)->
       type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
       unique: MaybeG Boolean
       sparse: MaybeG Boolean
-    }], NilT),
+    }]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
 
     #@removeTimestamps # удаление полей createdAt, updatedAt, deletedAt #collection_name, options
-    @public @static removeTimestamps: FuncG([String, MaybeG Object], NilT),
+    @public @static removeTimestamps: FuncG([String, MaybeG Object]),
       default: (args...)->
         @::[iplSteps].push {args, method: 'removeTimestamps'}
         return
 
-    @public @async removeTimestamps: FuncG([String, MaybeG Object], NilT),
+    @public @async removeTimestamps: FuncG([String, MaybeG Object]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
@@ -430,11 +431,10 @@ module.exports = (Module)->
     ###
     @public @static reversible: FuncG(AsyncFuncG(
       StructG {
-        up: AsyncFuncG AsyncFunctionT, NilT
-        down: AsyncFuncG AsyncFunctionT, NilT
+        up: AsyncFuncG AsyncFunctionT
+        down: AsyncFuncG AsyncFunctionT
       }
-      NilT
-    ), NilT),
+    )),
       default: (args...)->
         @::[iplSteps].push {args, method: 'reversible'}
         return
@@ -464,14 +464,14 @@ module.exports = (Module)->
         yield return
     ```
     ###
-    @public @async execute: FuncG(AsyncFunctionT, NilT),
+    @public @async execute: FuncG(AsyncFunctionT),
       default: (lambda)->
         yield lambda.apply @, []
         yield return
 
     # управляющие методы
     #@migrate #direction - переопределять не надо, тут главная точка вызова снаружи.
-    @public @async migrate: FuncG([EnumG UP, DOWN], NilT),
+    @public @async migrate: FuncG([EnumG UP, DOWN]),
       default: (direction)->
         switch direction
           when UP
@@ -482,9 +482,9 @@ module.exports = (Module)->
 
     # если объявлена реализация метода `change`, то `up` и `down` объявлять не нужно (будут автоматически выдавать ответ на основе методанных объявленных в `change`)
     # использовать показанные выше DSL-методы надо именно в `change`
-    @public @static change: FuncG(Function, NilT),
+    @public @static change: FuncG(Function),
       default: (lambda)->
-        @::[iplSteps] = []
+        @::[iplSteps] ?= []
         lambda.apply @, []
         return
 
@@ -505,8 +505,9 @@ module.exports = (Module)->
         , @
         yield return
 
-    @public @static up: FuncG(AsyncFunctionT, NilT),
+    @public @static up: FuncG(AsyncFunctionT),
       default: (lambda)->
+        @::[iplSteps] ?= []
         @public @async up: AsyncFunctionT,
           default: lambda
         return
@@ -535,18 +536,19 @@ module.exports = (Module)->
         , @
         yield return
 
-    @public @static down: FuncG(AsyncFunctionT, NilT),
+    @public @static down: FuncG(AsyncFunctionT),
       default: (lambda)->
+        @::[iplSteps] ?= []
         @public @async down: AsyncFunctionT,
           default: lambda
         return
 
-    @public @static @async restoreObject: Function,
+    @public @static @async restoreObject: FuncG([SubsetG(Module), Object], RecordInterface),
       default: ->
         throw new Error "restoreObject method not supported for #{@name}"
         yield return
 
-    @public @static @async replicateObject: Function,
+    @public @static @async replicateObject: FuncG(RecordInterface, Object),
       default: ->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return

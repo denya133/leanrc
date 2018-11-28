@@ -14,7 +14,7 @@ module.exports = (Module)->
     @implements CommandInterface
     @module Module
 
-    @public execute: FuncG(NotificationInterface, NilT),
+    @public execute: FuncG(NotificationInterface),
       default: ->
 
     @public @static @async restoreObject: Function,

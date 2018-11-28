@@ -51,7 +51,7 @@ module.exports = (Module)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .filter query
-            .remove()
+            .remove('@doc')
             .into @collectionFullName()
           yield @query voQuery
           yield return

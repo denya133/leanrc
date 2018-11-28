@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, AsyncFunctionT
+    AnyT, AsyncFunctionT
     FuncG, ListG, StructG, EnumG, MaybeG, UnionG, InterfaceG, AsyncFuncG
     RecordInterface
   } = Module::
@@ -19,6 +19,7 @@ module.exports = (Module)->
       boolean:      'boolean'
       date:         'date'
       datetime:     'datetime'
+      number:       'number'
       decimal:      'decimal'
       float:        'float'
       integer:      'integer'
@@ -53,13 +54,13 @@ module.exports = (Module)->
       ]
     }
 
-    @virtual @static createCollection: FuncG [String, MaybeG Object], NilT
+    @virtual @static createCollection: FuncG [String, MaybeG Object]
 
-    @virtual @async createCollection: FuncG [String, MaybeG Object], NilT
+    @virtual @async createCollection: FuncG [String, MaybeG Object]
 
-    @virtual @static createEdgeCollection: FuncG [String, String, MaybeG Object], NilT
+    @virtual @static createEdgeCollection: FuncG [String, String, MaybeG Object]
 
-    @virtual @async createEdgeCollection: FuncG [String, String, MaybeG Object], NilT
+    @virtual @async createEdgeCollection: FuncG [String, String, MaybeG Object]
 
     @virtual @static addField: FuncG [String, String, UnionG(
       EnumG SUPPORTED_TYPES
@@ -67,7 +68,7 @@ module.exports = (Module)->
         type: EnumG SUPPORTED_TYPES
         default: AnyT
       }
-    )], NilT
+    )]
 
     @virtual @async addField: FuncG [String, String, UnionG(
       EnumG SUPPORTED_TYPES
@@ -75,103 +76,102 @@ module.exports = (Module)->
         type: EnumG SUPPORTED_TYPES
         default: AnyT
       }
-    )], NilT
+    )]
 
     @virtual @static addIndex: FuncG [String, ListG(String), InterfaceG {
       type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
       unique: MaybeG Boolean
       sparse: MaybeG Boolean
-    }], NilT
+    }]
 
     @virtual @async addIndex: FuncG [String, ListG(String), InterfaceG {
       type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
       unique: MaybeG Boolean
       sparse: MaybeG Boolean
-    }], NilT
+    }]
 
-    @virtual @static addTimestamps: FuncG [String, MaybeG Object], NilT
+    @virtual @static addTimestamps: FuncG [String, MaybeG Object]
 
-    @virtual @async addTimestamps: FuncG [String, MaybeG Object], NilT
+    @virtual @async addTimestamps: FuncG [String, MaybeG Object]
 
-    @virtual @static changeCollection: FuncG [String, Object], NilT
+    @virtual @static changeCollection: FuncG [String, Object]
 
-    @virtual @async changeCollection: FuncG [String, Object], NilT
+    @virtual @async changeCollection: FuncG [String, Object]
 
     @virtual @static changeField: FuncG [String, String, UnionG(
       EnumG SUPPORTED_TYPES
       InterfaceG {
         type: EnumG SUPPORTED_TYPES
       }
-    )], NilT
+    )]
 
     @virtual @async changeField: FuncG [String, String, UnionG(
       EnumG SUPPORTED_TYPES
       InterfaceG {
         type: EnumG SUPPORTED_TYPES
       }
-    )], NilT
+    )]
 
-    @virtual @static renameField: FuncG [String, String, String], NilT
+    @virtual @static renameField: FuncG [String, String, String]
 
-    @virtual @async renameField: FuncG [String, String, String], NilT
+    @virtual @async renameField: FuncG [String, String, String]
 
-    @virtual @static renameIndex: FuncG [String, String, String], NilT
+    @virtual @static renameIndex: FuncG [String, String, String]
 
-    @virtual @async renameIndex: FuncG [String, String, String], NilT
+    @virtual @async renameIndex: FuncG [String, String, String]
 
-    @virtual @static renameCollection: FuncG [String, String], NilT
+    @virtual @static renameCollection: FuncG [String, String]
 
-    @virtual @async renameCollection: FuncG [String, String], NilT
+    @virtual @async renameCollection: FuncG [String, String]
 
-    @virtual @static dropCollection: FuncG String, NilT
+    @virtual @static dropCollection: FuncG String
 
-    @virtual @async dropCollection: FuncG String, NilT
+    @virtual @async dropCollection: FuncG String
 
-    @virtual @static dropEdgeCollection: FuncG [String, String], NilT
+    @virtual @static dropEdgeCollection: FuncG [String, String]
 
-    @virtual @async dropEdgeCollection: FuncG [String, String], NilT
+    @virtual @async dropEdgeCollection: FuncG [String, String]
 
-    @virtual @static removeField: FuncG [String, String], NilT
+    @virtual @static removeField: FuncG [String, String]
 
-    @virtual @async removeField: FuncG [String, String], NilT
+    @virtual @async removeField: FuncG [String, String]
 
     @virtual @static removeIndex: FuncG [String, ListG(String), InterfaceG {
       type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
       unique: MaybeG Boolean
       sparse: MaybeG Boolean
-    }], NilT
+    }]
 
     @virtual @async removeIndex: FuncG [String, ListG(String), InterfaceG {
       type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
       unique: MaybeG Boolean
       sparse: MaybeG Boolean
-    }], NilT
+    }]
 
-    @virtual @static removeTimestamps: FuncG [String, MaybeG Object], NilT
+    @virtual @static removeTimestamps: FuncG [String, MaybeG Object]
 
-    @virtual @async removeTimestamps: FuncG [String, MaybeG Object], NilT
+    @virtual @async removeTimestamps: FuncG [String, MaybeG Object]
 
     @virtual @static reversible: FuncG AsyncFuncG(
       StructG {
-        up: AsyncFuncG AsyncFunctionT, NilT
-        down: AsyncFuncG AsyncFunctionT, NilT
+        up: AsyncFuncG AsyncFunctionT
+        down: AsyncFuncG AsyncFunctionT
       }
-      NilT
-    ), NilT
+    )
 
-    @virtual @async execute: FuncG AsyncFunctionT, NilT
+    @virtual @async execute: FuncG AsyncFunctionT
 
-    @virtual @async migrate: FuncG [EnumG UP, DOWN], NilT
+    @virtual @async migrate: FuncG [EnumG UP, DOWN]
 
-    @virtual @static change: FuncG Function, NilT
+    @virtual @static change: FuncG Function
 
     @virtual @async up: Function
 
-    @virtual @static up: FuncG AsyncFunctionT, NilT
+    @virtual @static up: FuncG AsyncFunctionT
 
     @virtual @async down: Function
 
-    @virtual @static down: FuncG AsyncFunctionT, NilT
+    @virtual @static down: FuncG AsyncFunctionT
 
 
     @initialize()

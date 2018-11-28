@@ -1,6 +1,7 @@
 # accepts       = require 'accepts'
 # createError   = require 'http-errors'
 assert        = require 'assert'
+Stream        = require 'stream'
 
 ###
 Идеи взяты из https://github.com/koajs/koa/blob/master/lib/context.js
@@ -26,17 +27,17 @@ module.exports = (Module)->
 
     @public req: Object # native request object
     @public res: Object # native response object
-    @public request: RequestInterface
-    @public response: ResponseInterface
-    @public cookies: CookiesInterface
+    @public request: MaybeG RequestInterface
+    @public response: MaybeG ResponseInterface
+    @public cookies: MaybeG CookiesInterface
     @public accept: Object
-    @public state: Object
+    @public state: MaybeG Object
     @public switch: SwitchInterface
-    @public respond: Boolean
-    @public routePath: String
-    @public pathParams: Object
-    @public transaction: Object
-    @public session: Object
+    @public respond: MaybeG Boolean
+    @public routePath: MaybeG String
+    @public pathParams: MaybeG Object
+    @public transaction: MaybeG Object
+    @public session: MaybeG Object
 
     # @public database: String # возможно это тоже надо получать из метода из отдельного модуля
 
@@ -45,10 +46,10 @@ module.exports = (Module)->
         createError = require 'http-errors'
         throw createError args...
 
-    @public assert: FuncG([AnyT, UnionG(String, Number), MaybeG(String), MaybeG Object], NilT),
+    @public assert: FuncG([AnyT, MaybeG(UnionG String, Number), MaybeG(String), MaybeG Object], NilT),
       default: assert
 
-    @public onerror: FuncG(Error, NilT),
+    @public onerror: FuncG([MaybeG AnyT], NilT),
       default: (err)->
         return unless err?
         unless _.isError err
@@ -134,22 +135,22 @@ module.exports = (Module)->
       get: -> @request.subdomains
     @public 'is': FuncG([UnionG String, Array], UnionG String, Boolean, NilT),
       default: (args...)-> @request.is args...
-    @public accepts: FuncG([UnionG String, Array], UnionG String, Array, Boolean),
+    @public accepts: FuncG([MaybeG UnionG String, Array], UnionG String, Array, Boolean),
       default: (args...)-> @request.accepts args...
-    @public acceptsEncodings: FuncG([UnionG String, Array], UnionG String, Array),
+    @public acceptsEncodings: FuncG([MaybeG UnionG String, Array], UnionG String, Array),
       default: (args...)-> @request.acceptsEncodings args...
-    @public acceptsCharsets: FuncG([UnionG String, Array], UnionG String, Array),
+    @public acceptsCharsets: FuncG([MaybeG UnionG String, Array], UnionG String, Array),
       default: (args...)-> @request.acceptsCharsets args...
-    @public acceptsLanguages: FuncG([UnionG String, Array], UnionG String, Array),
+    @public acceptsLanguages: FuncG([MaybeG UnionG String, Array], UnionG String, Array),
       default: (args...)-> @request.acceptsLanguages args...
     @public get: FuncG(String, String),
       default: (args...)-> @request.get args...
 
     # Response aliases
-    @public body: UnionG(String, Buffer, Object, Array, Number, Boolean),
+    @public body: MaybeG(UnionG String, Buffer, Object, Array, Number, Boolean, Stream),
       get: -> @response.body
       set: (body)-> @response.body = body
-    @public status: UnionG(String, Number),
+    @public status: MaybeG(Number),
       get: -> @response.status
       set: (status)-> @response.status = status
     @public message: String,
@@ -160,18 +161,18 @@ module.exports = (Module)->
       set: (length)-> @response.length = length
     @public writable: Boolean,
       get: -> @response.writable
-    @public type: String,
+    @public type: MaybeG(String),
       get: -> @response.type
       set: (type)-> @response.type = type
-    @public headerSent: Boolean,
+    @public headerSent: MaybeG(Boolean),
       get: -> @response.headerSent
-    @public redirect: FuncG([String, String], NilT),
+    @public redirect: FuncG([String, MaybeG String], NilT),
       default: (args...)-> @response.redirect args...
     @public attachment: FuncG(String, NilT),
       default: (args...)-> @response.attachment args...
-    @public set: FuncG([UnionG(String, Object, Array), String], NilT),
+    @public set: FuncG([UnionG(String, Object), MaybeG AnyT], NilT),
       default: (args...)-> @response.set args...
-    @public append: FuncG([String, UnionG String, Array], UnionG String, Array),
+    @public append: FuncG([String, UnionG String, Array], NilT),
       default: (args...)-> @response.append args...
     @public vary: FuncG(String, NilT),
       default: (args...)-> @response.vary args...
@@ -179,7 +180,7 @@ module.exports = (Module)->
       default: (args...)-> @response.flushHeaders args...
     @public remove: FuncG(String, NilT),
       default: (args...)-> @response.remove args...
-    @public lastModified: Date,
+    @public lastModified: MaybeG(Date),
       set: (date)-> @response.lastModified = date
     @public etag: String,
       set: (etag)-> @response.etag = etag

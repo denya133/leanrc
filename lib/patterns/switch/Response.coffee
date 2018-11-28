@@ -18,7 +18,7 @@ Stream = require 'stream'
 
 module.exports = (Module)->
   {
-    NilT
+    AnyT, NilT
     FuncG, UnionG, MaybeG
     ResponseInterface, SwitchInterface, ContextInterface
     CoreObject
@@ -50,7 +50,7 @@ module.exports = (Module)->
         else
           @res._headers ? {}
 
-    @public status: Number,
+    @public status: MaybeG(Number),
       get: -> @res.statusCode
       set: (code)->
         assert = require 'assert'
@@ -62,15 +62,15 @@ module.exports = (Module)->
         @res.statusMessage = statuses[code]
         if Boolean(@body and statuses.empty[code])
           @body = null
-        return
+        return code
 
     @public message: String,
       get: -> @res.statusMessage ? statuses[@status]
       set: (msg)->
         @res.statusMessage = msg
-        return
+        return msg
 
-    @public body: UnionG(String, Buffer, Object, Stream),
+    @public body: MaybeG(UnionG String, Buffer, Object, Array, Number, Boolean, Stream),
       get: -> @_body
       set: (val)->
         original = @_body
@@ -109,7 +109,7 @@ module.exports = (Module)->
           return
         @remove 'Content-Length'
         @type = 'json'
-        return
+        return val
 
     # @public body: [String, Buffer]
     # @public locals: Object
@@ -164,9 +164,11 @@ module.exports = (Module)->
             return Buffer.byteLength JSON.stringify @body
           return 0
         ~~Number len
-      set: (n)-> @set 'Content-Length', n
+      set: (n)->
+        @set 'Content-Length', n
+        return n
 
-    @public headerSent: Boolean,
+    @public headerSent: MaybeG(Boolean),
       get: -> @res.headersSent
 
     @public vary: FuncG(String, NilT),
@@ -175,7 +177,7 @@ module.exports = (Module)->
         vary @res, field
         return
 
-    @public redirect: FuncG([String, String], NilT),
+    @public redirect: FuncG([String, MaybeG String], NilT),
       default: (url, alt)->
         if 'back' is url
           url = @ctx.get('Referrer') or alt or '/'
@@ -210,25 +212,28 @@ module.exports = (Module)->
         if _.isString val
           val = new Date val
         @set 'Last-Modified', val.toUTCString()
+        return val
 
     @public etag: String,
       get: -> @get 'ETag'
       set: (val)->
         val = "\"#{val}\"" unless /^(W\/)?"/.test val
         @set 'ETag', val
+        return val
 
-    @public type: String,
+    @public type: MaybeG(String),
       get: ->
         type = @get 'Content-Type'
         return '' unless type
         type.split(';')[0]
-      set: (type)->
+      set: (_type)->
         getType = require('mime-types').contentType
-        type = getType type
+        type = getType _type
         if type
           @set 'Content-Type', type
         else
           @remove 'Content-Type'
+        return _type
 
     @public 'is': FuncG([UnionG String, Array], UnionG String, Boolean, NilT),
       default: (args...)->
@@ -239,11 +244,11 @@ module.exports = (Module)->
         typeis = require('type-is').is
         typeis @type, types
 
-    @public get: FuncG(String, String),
+    @public get: FuncG(String, UnionG String, Array),
       default: (field)->
         @headers[field.toLowerCase()] ? ''
 
-    @public set: FuncG([UnionG(String, Object, Array), String], NilT),
+    @public set: FuncG([UnionG(String, Object), MaybeG AnyT], NilT),
       default: (args...)->
         [field, val] = args
         if 2 is args.length
@@ -257,7 +262,7 @@ module.exports = (Module)->
             @set key, value
         return
 
-    @public append: FuncG([String, UnionG String, Array], UnionG String, Array),
+    @public append: FuncG([String, UnionG String, Array], NilT),
       default: (field, val)->
         prev = @get field
         if prev
@@ -266,6 +271,7 @@ module.exports = (Module)->
           else
             val = [prev].concat val
         @set field, val
+        return
 
     @public remove: FuncG(String, NilT),
       default: (field)->

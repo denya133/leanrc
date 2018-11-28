@@ -15,7 +15,7 @@ module.exports = (Module)->
 
     ipsName = PointerT @private name: String
     ipoBody = PointerT @private body: MaybeG AnyT
-    ipsType = PointerT @private type: String
+    ipsType = PointerT @private type: MaybeG String
 
     @public getName: FuncG([], String),
       default: -> @[ipsName]
@@ -33,7 +33,7 @@ module.exports = (Module)->
         @[ipsType] = asType
         return
 
-    @public getType: FuncG([], String),
+    @public getType: FuncG([], MaybeG String),
       default: -> @[ipsType]
 
     @public toString: FuncG([], String),
@@ -62,12 +62,12 @@ module.exports = (Module)->
           type: instance.getType()
         yield return replica
 
-    @public init: FuncG([String, MaybeG(AnyT), String], NilT),
+    @public init: FuncG([String, MaybeG(AnyT), MaybeG String], NilT),
       default: (asName, aoBody, asType)->
         @super arguments...
         @[ipsName] = asName
         @[ipoBody] = aoBody
-        @[ipsType] = asType
+        @[ipsType] = asType if asType?
         return
 
 

@@ -2,11 +2,11 @@
 
 module.exports = (Module)->
   {
-    MaybeG, StructG, TupleG
+    MaybeG, StructG, TupleG, InterfaceG
     RelationOptionsT
   } = Module::
 
-  RelationOptionsT.define MaybeG StructG {
+  RelationOptionsT.define MaybeG InterfaceG {
     refKey: MaybeG String
     attr: MaybeG String
     inverse: MaybeG String

@@ -21,7 +21,7 @@ module.exports = (Module)->
 
     @virtual @async toArray: FuncG [], Array
 
-    @virtual @async next: FuncG [], AnyT
+    @virtual @async next: FuncG [], MaybeG AnyT
 
     @virtual @async hasNext: FuncG [], Boolean
 

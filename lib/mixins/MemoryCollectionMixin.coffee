@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     NilT, PointerT
-    FuncG, UnionG, ListG, DictG
+    FuncG, UnionG, ListG, DictG, MaybeG
     RecordInterface, CursorInterface
     Collection, Mixin
     Utils: { _, inflect, uuid }
@@ -13,7 +13,7 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
-      ipoCollection = PointerT @protected collection: DictG UnionG(String, Number), Object
+      ipoCollection = PointerT @protected collection: DictG UnionG(String, Number), MaybeG Object
 
       @public onRegister: Function,
         default: (args...)->
@@ -33,7 +33,7 @@ module.exports = (Module)->
           delete @[ipoCollection][id]
           yield return
 
-      @public @async take: FuncG([UnionG String, Number], RecordInterface),
+      @public @async take: FuncG([UnionG String, Number], MaybeG RecordInterface),
         default: (id)->
           return yield Module::Cursor.new(@, [@[ipoCollection][id]]).first()
 

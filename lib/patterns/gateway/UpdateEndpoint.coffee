@@ -2,6 +2,9 @@
 
 module.exports = (Module)->
   {
+    NilT
+    FuncG, InterfaceG
+    GatewayInterface
     EndpointInterface
     CrudEndpointMixin
     Endpoint
@@ -19,7 +22,7 @@ module.exports = (Module)->
     @include CrudEndpointMixin
     @module Module
 
-    @public init: Function,
+    @public init: FuncG(InterfaceG(gateway: GatewayInterface), NilT),
       default: (args...) ->
         @super args...
         @pathParam 'v', @versionSchema

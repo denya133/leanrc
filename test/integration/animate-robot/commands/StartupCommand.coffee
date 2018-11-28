@@ -11,4 +11,4 @@ module.exports = (Module) ->
         @addSubCommand Module.NS.PrepareViewCommand
         @addSubCommand Module.NS.PrepareModelCommand
 
-  StartupCommand.initialize()
+    @initialize()

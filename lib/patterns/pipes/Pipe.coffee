@@ -13,7 +13,7 @@ module.exports = (Module)->
     @implements PipeFittingInterface
     @module Module
 
-    ipoOutput = PointerT @protected output: PipeFittingInterface
+    ipoOutput = PointerT @protected output: MaybeG PipeFittingInterface
 
     @public connect: FuncG(PipeFittingInterface, Boolean),
       default: (aoOutput)->
@@ -31,7 +31,7 @@ module.exports = (Module)->
 
     @public write: FuncG(PipeMessageInterface, Boolean),
       default: (aoMessage)->
-        return @[ipoOutput].write aoMessage
+        return @[ipoOutput]?.write(aoMessage) ? yes
 
     @public @static @async restoreObject: Function,
       default: ->

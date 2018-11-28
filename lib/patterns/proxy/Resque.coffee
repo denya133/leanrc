@@ -72,13 +72,12 @@ module.exports = (Module)->
     @public onRegister: Function,
       default: (args...)->
         @super args...
-        @tmpJobs = []
         return
 
     @public onRemove: Function,
       default: (args...)->
         @super args...
-        delete @tmpJobs
+        @tmpJobs = []
         return
 
     @public @async create: FuncG([String, MaybeG Number], QueueInterface),
@@ -194,6 +193,13 @@ module.exports = (Module)->
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
+
+    @public init: FuncG([MaybeG(String), MaybeG AnyT], NilT),
+      default: (args...)->
+        @super args...
+
+        @tmpJobs = []
+        return
 
 
     @initialize()

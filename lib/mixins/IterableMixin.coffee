@@ -4,6 +4,8 @@
 
 module.exports = (Module)->
   {
+    AnyT, NilT
+    FuncG
     IterableInterface
     Collection
     Mixin
@@ -14,23 +16,23 @@ module.exports = (Module)->
       @inheritProtected()
       @implements IterableInterface
 
-      @public @async forEach: Function,
+      @public @async forEach: FuncG(Function, NilT),
         default: (lambda)->
           cursor = yield @takeAll()
           yield cursor.forEach (item)-> yield lambda item
           return
 
-      @public @async filter: Function,
+      @public @async filter: FuncG(Function, Array),
         default: (lambda)->
           cursor = yield @takeAll()
           yield cursor.filter (item)-> yield lambda item
 
-      @public @async map: Function,
+      @public @async map: FuncG(Function, Array),
         default: (lambda)->
           cursor = yield @takeAll()
           yield cursor.map (item)-> yield lambda item
 
-      @public @async reduce: Function,
+      @public @async reduce: FuncG([Function, AnyT], AnyT),
         default: (lambda, initialValue)->
           cursor = yield @takeAll()
           yield cursor.reduce ((prev, item)-> yield lambda prev, item), initialValue

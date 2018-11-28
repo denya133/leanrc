@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     AnyT, NilT
-    FuncG
+    FuncG, MaybeG
     CommandInterface
   } = Module::
 
@@ -11,7 +11,7 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual @async body: FuncG AnyT, AnyT
+    @virtual @async body: FuncG [MaybeG AnyT], MaybeG AnyT
     @virtual @static do: FuncG Function, NilT
 
 

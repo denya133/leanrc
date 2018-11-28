@@ -98,7 +98,7 @@ module.exports = (Module)->
     PRODUCTION
     DEVELOPMENT
     ConfigurationInterface
-    Utils: { _, extend, isArangoDB }
+    Utils: { _, assign, isArangoDB }
   } = Module::
 
   class Configuration extends Module::Proxy
@@ -154,7 +154,7 @@ module.exports = (Module)->
         configFromManifest = manifest.configuration
         filePath = "#{@ROOT}/../configs/#{@environment}"
         configFromFile = require filePath
-        configs = extend {}, configFromManifest, configFromFile
+        configs = assign {}, configFromManifest, configFromFile
         for own key, value of configs
           do (attr = key, config = value)=>
             unless config.description?

@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     AnyT, NilT
-    FuncG
+    FuncG, MaybeG
     NotificationInterface
     NotifierInterface
   } = Module::
@@ -13,10 +13,10 @@ module.exports = (Module)->
     @module Module
 
     @virtual getMediatorName: FuncG [], String
-    @virtual getViewComponent: FuncG [], AnyT
+    @virtual getViewComponent: FuncG [], MaybeG AnyT
     @virtual setViewComponent: FuncG AnyT, NilT
     @virtual listNotificationInterests: FuncG [], Array
-    @virtual handleNotification: FuncG NotificationInterface, NilT
+    @virtual handleNotification: FuncG NotificationInterface
     @virtual onRegister: Function
     @virtual onRemove: Function
 

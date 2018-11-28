@@ -48,7 +48,7 @@ module.exports = (Module)->
     AnyT, NilT, PointerT, JoiT
     PropertyDefinitionT, AttributeOptionsT, ComputedOptionsT
     AttributeConfigT, ComputedConfigT
-    FuncG, TupleG, MaybeG, SubsetG, DictG, ListG
+    FuncG, TupleG, MaybeG, SubsetG, DictG, ListG, UnionG
     RecordInterface, CollectionInterface
     CoreObject
     ChainsMixin
@@ -61,7 +61,7 @@ module.exports = (Module)->
     @include ChainsMixin
     @module Module
 
-    ipoInternalRecord = PointerT @protected internalRecord: Object
+    ipoInternalRecord = PointerT @protected internalRecord: MaybeG Object
     ipoSchemas = PointerT @protected @static schemas: DictG(String, JoiT),
       default: {}
 
@@ -149,7 +149,7 @@ module.exports = (Module)->
 
         yield return voRecord
 
-    @public @static objectize: FuncG([MaybeG RecordInterface], MaybeG Object),
+    @public @static objectize: FuncG([MaybeG(RecordInterface), MaybeG Object], MaybeG Object),
       default: (aoRecord)->
         unless aoRecord?
           return null
@@ -259,7 +259,7 @@ module.exports = (Module)->
           throw new Error "attribute `#{vsAttr}` has been defined previously"
         else
           @metaObject.addMetaData 'attributes', vsAttr, opts
-        @public typeDefinition, opts
+        @public {[vsAttr]: Module::MaybeG vcAttrType}, opts
         return
 
     @public @static computed: FuncG([PropertyDefinitionT, ComputedOptionsT], NilT),
@@ -290,7 +290,7 @@ module.exports = (Module)->
           throw new Error "computed `#{vsAttr}` has been defined previously"
         else
           @metaObject.addMetaData 'computeds', vsAttr, opts
-        @public typeDefinition, opts
+        @public {[vsAttr]: Module::MaybeG vcAttrType}, opts
         return
 
     @public @static new: FuncG([Object, CollectionInterface], RecordInterface),
@@ -318,7 +318,11 @@ module.exports = (Module)->
 
     @public @async create: FuncG([], RecordInterface),
       default: ->
+        # console.log '>>??? create push ', @, @collection
         response = yield @collection.push @
+        # response = yield @collection.push.body.call @collection, @
+        # console.log '>>>>?????????????????????', response, response.collection
+        # console.log '>>>>????????????????????? is', CollectionInterface.is response.collection
         if response?
           # { id } = response
           # @id ?= id if id
@@ -351,7 +355,8 @@ module.exports = (Module)->
         yield @collection.remove @id
         return
 
-    @attribute id: String
+    @attribute id: UnionG(String, Number),
+      transform: -> Module::StringTransform
     @attribute rev: String
     @attribute type: String
     @attribute isHidden: Boolean,
@@ -380,40 +385,40 @@ module.exports = (Module)->
         yield return @
 
     @public @async beforeUpdate: Function,
-      default: ->
+      default: (args...)->
         @updatedAt = new Date()
-        yield return
+        yield return args
 
     @public @async beforeCreate: Function,
-      default: ->
+      default: (args...)->
         @id ?= yield @collection.generateId()
         now = new Date()
         @createdAt ?= now
         @updatedAt ?= now
-        yield return
+        yield return args
 
     @public @async afterUpdate: FuncG(RecordInterface, RecordInterface),
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'updatedRecord', aoRecord
         yield return @
 
-    @public beforeDelete: Function,
-      default: ->
+    @public @async beforeDelete: Function,
+      default: (args...)->
         @isHidden = yes
         now = new Date()
         @updatedAt = now
         @deletedAt = now
-        return
+        yield return args
 
-    @public afterDelete: FuncG(RecordInterface, RecordInterface),
+    @public @async afterDelete: FuncG(RecordInterface, RecordInterface),
       default: (aoRecord)->
         @collection.recordHasBeenChanged 'deletedRecord', aoRecord
-        return @
+        yield return @
 
-    @public afterDestroy: FuncG(RecordInterface, NilT),
-      default: (aoRecord)->
-        @collection.recordHasBeenChanged 'destroyedRecord', aoRecord
-        return
+    @public @async afterDestroy: FuncG([], NilT),
+      default: ->
+        @collection.recordHasBeenChanged 'destroyedRecord', @
+        yield return
 
     # NOTE: метод должен вернуть список атрибутов данного рекорда.
     @public attributes: FuncG([], Object),

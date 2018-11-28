@@ -7,8 +7,8 @@ class RequestApp extends LeanRC
 
   @root __dirname
 
-  @const SEND_REQUEST: Symbol 'sendRequest'
-  @const RECEIVE_RESPONSE: Symbol 'receiveResponse'
+  @const SEND_REQUEST: 'sendRequest'
+  @const RECEIVE_RESPONSE: 'receiveResponse'
 
 
 module.exports = RequestApp.initialize()

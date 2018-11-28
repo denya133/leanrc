@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     AnyT, NilT
-    FuncG
+    FuncG, MaybeG
     NotifierInterface
   } = Module::
 
@@ -13,7 +13,7 @@ module.exports = (Module)->
 
     @virtual getProxyName: FuncG [], String
     @virtual setData: FuncG AnyT, NilT
-    @virtual getData: FuncG [], AnyT
+    @virtual getData: FuncG [], MaybeG AnyT
     @virtual onRegister: Function
     @virtual onRemove: Function
 

@@ -12,21 +12,21 @@ describe 'ConfigurableMixin', ->
       co ->
         KEY = 'TEST_CONFIG_MIXIN_001'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
-        class Test::Configuration extends LeanRC::Configuration
+          @initialize()
+        class TestConfiguration extends LeanRC::Configuration
           @inheritProtected()
           @module Test
-        Test::Configuration.initialize()
-        facade.registerProxy Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
-        class Test::Test extends LeanRC::Proxy
+          @initialize()
+        facade.registerProxy TestConfiguration.new LeanRC::CONFIGURATION, Test::ROOT
+        class TestConfigurable extends LeanRC::Proxy
           @inheritProtected()
           @include LeanRC::ConfigurableMixin
           @module Test
-        Test::Test.initialize()
-        facade.registerProxy object = Test::Test.new 'TEST'
+          @initialize()
+        facade.registerProxy object = TestConfigurable.new 'TEST'
         assert.deepPropertyVal object, 'configs.test1', 'default'
         assert.deepPropertyVal object, 'configs.test2', 42
         assert.deepPropertyVal object, 'configs.test3', yes

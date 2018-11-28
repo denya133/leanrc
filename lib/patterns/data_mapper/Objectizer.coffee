@@ -4,7 +4,7 @@
 module.exports = (Module)->
   {
     NilT, AnyT
-    FuncG, SubsetG
+    FuncG, SubsetG, MaybeG
     CollectionInterface, RecordInterface
     ObjectizerInterface
     CoreObject
@@ -17,12 +17,12 @@ module.exports = (Module)->
 
     @public collection: CollectionInterface
 
-    @public @async recoverize: FuncG([SubsetG(RecordInterface), Object], RecordInterface),
+    @public @async recoverize: FuncG([SubsetG(RecordInterface), MaybeG Object], MaybeG RecordInterface),
       default: (acRecord, ahPayload)->
         ahPayload.type ?= "#{acRecord.moduleName()}::#{acRecord.name}"
         return yield acRecord.recoverize ahPayload, @collection
 
-    @public @async objectize: FuncG([RecordInterface, Object], Object),
+    @public @async objectize: FuncG([MaybeG(RecordInterface), MaybeG Object], MaybeG Object),
       default: (aoRecord, options = null)->
         vcRecord = aoRecord.constructor
         yield return vcRecord.objectize aoRecord, options

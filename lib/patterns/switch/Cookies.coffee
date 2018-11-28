@@ -20,7 +20,7 @@ module.exports = (Module)->
     @public response: Object
     @public key: String
 
-    @public get: FuncG([String, MaybeG Object], String),
+    @public get: FuncG([String, MaybeG Object], MaybeG String),
       default: (name, opts)->
         if isArangoDB()
           if opts? and opts.signed
@@ -60,11 +60,16 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: FuncG([Object, Object, MaybeG StructG key: String, secure: Boolean], NilT),
+    @public init: FuncG([Object, Object, MaybeG StructG {
+      key: MaybeG String
+      secure: MaybeG Boolean
+    }], NilT),
       default: (request, response, {key, secure} = {})->
         @super()
         @request = request
         @response = response
+        key ?= 'secret'
+        secure ?= no
         @key = key
         unless isArangoDB()
           Keygrip = require 'keygrip'

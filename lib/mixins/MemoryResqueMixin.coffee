@@ -35,7 +35,7 @@ module.exports = (Module)->
   {
     DEFAULT_QUEUE
     AnyT, NilT, PointerT
-    FuncG, DictG, ListG, StructG, EnumG, MaybeG
+    FuncG, DictG, ListG, StructG, EnumG, MaybeG, InterfaceG, UnionG
     Resque, Mixin
     Utils: { _, inflect }
   } = Module::
@@ -44,15 +44,15 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
-      ipoJobs = PointerT @protected jobs: DictG String, ListG StructG {
+      ipoJobs = PointerT @protected jobs: DictG String, MaybeG ListG MaybeG InterfaceG {
         queueName: String
         data: StructG {scriptName: String, data: AnyT}
         delayUntil: Number
-        status: EnumG 'scheduled'
-        lockLifetime: EnumG 5000
-        lockLimit: EnumG 2
+        status: EnumG ['scheduled', 'failed', 'queued', 'running', 'completed']
+        lockLifetime: EnumG [5000]
+        lockLimit: EnumG [2]
       }
-      ipoQueues = PointerT @protected queues: DictG String, StructG {
+      ipoQueues = PointerT @protected queues: DictG String, MaybeG StructG {
         name: String
         concurrency: Number
       }
@@ -71,10 +71,12 @@ module.exports = (Module)->
           @super args...
           for queueName in Reflect.ownKeys @[ipoQueues]
             delete @[ipoQueues][queueName]
-          delete @[ipoQueues]
+          @[ipoQueues] = {}
+          # delete @[ipoQueues]
           for queueName in Reflect.ownKeys @[ipoJobs]
             delete @[ipoJobs][queueName]
-          delete @[ipoJobs]
+          # delete @[ipoJobs]
+          @[ipoJobs] = {}
           return
 
       @public @async ensureQueue: FuncG([String, MaybeG Number], StructG name: String, concurrency: Number),
@@ -108,7 +110,7 @@ module.exports = (Module)->
           yield return _.values(@[ipoQueues]).map ({name, concurrency})->
             {name, concurrency}
 
-      @public @async pushJob: FuncG([String, String, AnyT, MaybeG Number], Number),
+      @public @async pushJob: FuncG([String, String, AnyT, MaybeG Number], UnionG String, Number),
         default: (queueName, scriptName, data, delayUntil)->
           fullName = @fullQueueName queueName
           delayUntil ?= Date.now()
@@ -123,13 +125,13 @@ module.exports = (Module)->
           jobId = length - 1
           yield return jobId
 
-      @public @async getJob: FuncG([String, Number], MaybeG Object),
+      @public @async getJob: FuncG([String, UnionG String, Number], MaybeG Object),
         default: (queueName, jobId)->
           fullName = @fullQueueName queueName
           @[ipoJobs][fullName] ?= []
           yield return @[ipoJobs][fullName][jobId] ? null
 
-      @public @async deleteJob: FuncG([String, Number], Boolean),
+      @public @async deleteJob: FuncG([String, UnionG String, Number], Boolean),
         default: (queueName, jobId)->
           fullName = @fullQueueName queueName
           @[ipoJobs][fullName] ?= []
@@ -140,7 +142,7 @@ module.exports = (Module)->
             isDeleted = no
           yield return isDeleted
 
-      @public @async abortJob: FuncG([String, Number], NilT),
+      @public @async abortJob: FuncG([String, UnionG String, Number], NilT),
         default: (queueName, jobId)->
           fullName = @fullQueueName queueName
           @[ipoJobs][fullName] ?= []

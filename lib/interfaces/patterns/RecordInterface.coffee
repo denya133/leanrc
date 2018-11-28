@@ -27,7 +27,7 @@ module.exports = (Module)->
 
     @virtual @static @async recoverize: FuncG [MaybeG(Object), CollectionInterface], MaybeG RecordInterfaceDef
 
-    @virtual @static objectize: FuncG [MaybeG RecordInterfaceDef], MaybeG Object
+    @virtual @static objectize: FuncG [MaybeG(RecordInterfaceDef), MaybeG Object], MaybeG Object
 
     @virtual @static makeSnapshot: FuncG [MaybeG RecordInterfaceDef], MaybeG Object
 

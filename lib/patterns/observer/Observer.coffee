@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     AnyT, NilT, PointerT, LambdaT
-    FuncG
+    FuncG, MaybeG
     ObserverInterface, NotificationInterface
     CoreObject
   } = Module::
@@ -13,8 +13,8 @@ module.exports = (Module)->
     @implements ObserverInterface
     @module Module
 
-    ipoNotify = PointerT @private notify: LambdaT
-    ipoContext = PointerT @private context: AnyT
+    ipoNotify = PointerT @private notify: MaybeG Function
+    ipoContext = PointerT @private context: MaybeG AnyT
 
     @public setNotifyMethod: FuncG(Function, NilT),
       default: (amNotifyMethod)->
@@ -26,10 +26,10 @@ module.exports = (Module)->
         @[ipoContext] = aoNotifyContext
         return
 
-    @public getNotifyMethod: FuncG([], Function),
+    @public getNotifyMethod: FuncG([], MaybeG Function),
       default: -> @[ipoNotify]
 
-    @public getNotifyContext: FuncG([], AnyT),
+    @public getNotifyContext: FuncG([], MaybeG AnyT),
       default: -> @[ipoContext]
 
     @public compareNotifyContext: FuncG(AnyT, Boolean),
@@ -51,11 +51,11 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: FuncG([Function, AnyT], NilT),
+    @public init: FuncG([MaybeG(Function), MaybeG AnyT], NilT),
       default: (amNotifyMethod, aoNotifyContext)->
         @super arguments...
-        @setNotifyMethod amNotifyMethod
-        @setNotifyContext aoNotifyContext
+        @setNotifyMethod amNotifyMethod if amNotifyMethod
+        @setNotifyContext aoNotifyContext if aoNotifyContext
         return
 
 

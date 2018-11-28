@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    RelationConfigT, RecordInterface
+    RecordInterface
     StructG, SubsetG
     RelationInverseT
   } = Module::
@@ -10,5 +10,5 @@ module.exports = (Module)->
   RelationInverseT.define StructG {
     recordClass: SubsetG RecordInterface
     attrName: String
-    relation: RelationConfigT
+    relation: String
   }

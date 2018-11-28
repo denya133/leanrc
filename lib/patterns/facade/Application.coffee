@@ -21,10 +21,10 @@ module.exports = (Module)->
     @include ConfigurableMixin
     @module Module
 
-    @const LOGGER_PROXY: Symbol 'LoggerProxy'
-    @const CONNECT_MODULE_TO_LOGGER: Symbol 'connectModuleToLogger'
-    @const CONNECT_SHELL_TO_LOGGER: Symbol 'connectShellToLogger'
-    @const CONNECT_MODULE_TO_SHELL: Symbol 'connectModuleToShell'
+    @const LOGGER_PROXY: 'LoggerProxy'
+    @const CONNECT_MODULE_TO_LOGGER: 'connectModuleToLogger'
+    @const CONNECT_SHELL_TO_LOGGER: 'connectShellToLogger'
+    @const CONNECT_MODULE_TO_SHELL: 'connectModuleToShell'
 
     @public isLightweight: Boolean
     @public context: ContextInterface
@@ -35,7 +35,7 @@ module.exports = (Module)->
     @public finish: Function,
       default: ->
         @facade.remove()
-        @facade = undefined
+        # @facade = undefined
         return
 
     @public @async migrate: FuncG([MaybeG StructG until: MaybeG String], NilT),

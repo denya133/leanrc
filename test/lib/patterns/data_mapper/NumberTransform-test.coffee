@@ -18,10 +18,6 @@ describe 'NumberTransform', ->
       co ->
         assert.equal (yield NumberTransform.normalize yes), 1
         yield return
-    it 'should normalize string value', ->
-      co ->
-        assert.isNaN (yield NumberTransform.normalize 'True')
-        yield return
     it 'should normalize number value', ->
       co ->
         assert.equal (yield NumberTransform.normalize 1), 1
@@ -35,10 +31,6 @@ describe 'NumberTransform', ->
       co ->
         assert.equal (yield NumberTransform.serialize yes), 1
         yield return
-    it 'should serialize string value', ->
-      co ->
-        assert.isNaN (yield NumberTransform.serialize 'True')
-        yield return
     it 'should serialize number value', ->
       co ->
         assert.equal (yield NumberTransform.serialize 1), 1
@@ -50,9 +42,6 @@ describe 'NumberTransform', ->
     it 'should objectize boolean value', ->
       expect NumberTransform.objectize yes
       .to.equal 1
-    it 'should objectize string value', ->
-      expect NumberTransform.objectize 'True'
-      .to.be.NaN
     it 'should objectize number value', ->
       expect NumberTransform.objectize 1
       .to.equal 1

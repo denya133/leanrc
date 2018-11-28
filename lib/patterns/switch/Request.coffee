@@ -86,6 +86,7 @@ module.exports = (Module)->
       set: (obj)->
         qs = require 'querystring'
         @querystring = qs.stringify obj
+        obj
 
     @public querystring: String,
       get: ->
@@ -155,7 +156,7 @@ module.exports = (Module)->
         methods = ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE']
         _.includes methods, @method
 
-    @public socket: Object,
+    @public socket: MaybeG(Object),
       get: -> @req.socket
 
     @public charset: String,
@@ -220,13 +221,13 @@ module.exports = (Module)->
           .reverse()
           .slice offset ? 0
 
-    @public accepts: FuncG([UnionG String, Array], UnionG String, Array, Boolean),
+    @public accepts: FuncG([MaybeG UnionG String, Array], UnionG String, Array, Boolean),
       default: (args...)-> @ctx.accept.types args...
-    @public acceptsCharsets: FuncG([UnionG String, Array], UnionG String, Array),
+    @public acceptsCharsets: FuncG([MaybeG UnionG String, Array], UnionG String, Array),
       default: (args...)-> @ctx.accept.charsets args...
-    @public acceptsEncodings: FuncG([UnionG String, Array], UnionG String, Array),
+    @public acceptsEncodings: FuncG([MaybeG UnionG String, Array], UnionG String, Array),
       default: (args...)-> @ctx.accept.encodings args...
-    @public acceptsLanguages: FuncG([UnionG String, Array], UnionG String, Array),
+    @public acceptsLanguages: FuncG([MaybeG UnionG String, Array], UnionG String, Array),
       default: (args...)-> @ctx.accept.languages args...
 
     @public 'is': FuncG([UnionG String, Array], UnionG String, Boolean, NilT),

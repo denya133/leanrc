@@ -36,8 +36,9 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-    PointerT, JoiT
-    SubsetG
+    NilT, PointerT, JoiT
+    FuncG, SubsetG, InterfaceG, MaybeG
+    GatewayInterface
     CrudableInterface
     Endpoint
     Mixin
@@ -51,10 +52,10 @@ module.exports = (Module)->
       @inheritProtected()
       @implements CrudableInterface
 
-      ipsKeyName = PointerT @private keyName: String
-      ipsEntityName = PointerT @private entityName: String
-      ipsRecordName = PointerT @private recordName: String
-      ipoSchema = PointerT @private schema: Object
+      ipsKeyName = PointerT @private keyName: MaybeG String
+      ipsEntityName = PointerT @private entityName: MaybeG String
+      ipsRecordName = PointerT @private recordName: MaybeG String
+      ipoSchema = PointerT @private schema: MaybeG Object
 
       # Endpoint.keyNames ?= {}
       # Endpoint.itemEntityNames ?= {}
@@ -108,7 +109,7 @@ module.exports = (Module)->
       @public ApplicationModule: SubsetG(Module),
         get: -> @gateway?.ApplicationModule ? @Module
 
-      @public init: Function,
+      @public init: FuncG(InterfaceG(gateway: GatewayInterface), NilT),
         default: (args...) ->
           @super args...
           [ options ] = args
@@ -122,7 +123,7 @@ module.exports = (Module)->
             voSchema = @gateway?.getSchema recordName
             voSchema ?= (@ApplicationModule.NS ? @ApplicationModule::)[recordName].schema
             @[ipoSchema] = voSchema
-          @[ipoSchema] ?= {}
+          @[ipoSchema] ?= joi.object()
           return
 
 

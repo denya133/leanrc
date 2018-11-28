@@ -16,7 +16,7 @@ module.exports = (Module)->
     ipoOutput = PointerT Symbol.for '~output'
     ipsMode = PointerT @protected mode: String,
       default: SORT
-    iplMessages = PointerT @protected messages: ListG PipeMessageInterface
+    iplMessages = PointerT @protected messages: MaybeG ListG PipeMessageInterface
 
     ipmSort = PointerT @protected sortMessagesByPriority: FuncG([
       PipeMessageInterface, PipeMessageInterface
@@ -34,7 +34,7 @@ module.exports = (Module)->
         @[iplMessages] ?= []
         @[iplMessages].push aoMessage
         if @[ipsMode] is SORT
-          @[iplMessages].sort @[ipmSort]
+          @[iplMessages].sort @[ipmSort].bind @
         return
 
     ipmFlush = PointerT @protected flush: FuncG([], Boolean),

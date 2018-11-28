@@ -15,7 +15,7 @@ module.exports = (Module)->
 
     iplSubCommands = @private subCommands: ListG SubsetG CommandInterface
 
-    @public execute: FuncG(NotificationInterface, NilT),
+    @public execute: FuncG(NotificationInterface),
       default: (aoNotification)->
         vlSubCommands = @[iplSubCommands][..]
         for vCommand in vlSubCommands

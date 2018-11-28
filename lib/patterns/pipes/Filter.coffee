@@ -26,7 +26,7 @@ module.exports = (Module)->
       default: FILTER
     ipmFilter = PointerT @protected filter: LambdaT,
       default: (aoMessage, aoParams)->
-    ipoParams = PointerT @protected params: Object
+    ipoParams = PointerT @protected params: MaybeG Object
     ipsName = PointerT @protected name: String
 
     ipmIsTarget = PointerT @protected isTarget: FuncG(PipeMessageInterface, Boolean),
@@ -48,7 +48,9 @@ module.exports = (Module)->
 
     @public setFilter: FuncG(Function, NilT),
       default: (amFilter)->
-        @[ipmFilter] = amFilter
+        # @[ipmFilter] = amFilter
+        Reflect.defineProperty @, ipmFilter,
+          value: amFilter
         return
 
     @public write: FuncG(PipeMessageInterface, Boolean),
@@ -64,6 +66,7 @@ module.exports = (Module)->
                 voOutputMessage = aoMessage
               vbSuccess = @[ipoOutput].write voOutputMessage
             catch err
+              console.log '>>>>>>>>>>>>>>> err', err
               vbSuccess = no
           when SET_PARAMS
             if @[ipmIsTarget] aoMessage

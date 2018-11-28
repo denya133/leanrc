@@ -20,9 +20,9 @@ module.exports = (Module)->
 
     ipnCurrentIndex = PointerT @private currentIndex: Number,
       default: 0
-    iplArray = PointerT @private array: Array
+    iplArray = PointerT @private array: AnyT
 
-    ipoCollection = PointerT @private collection: CollectionInterface
+    ipoCollection = PointerT @private collection: MaybeG CollectionInterface
 
     @public isClosed: Boolean,
       default: false
@@ -42,7 +42,7 @@ module.exports = (Module)->
         while yield @hasNext()
           yield @next()
 
-    @public @async next: FuncG([], AnyT),
+    @public @async next: FuncG([], MaybeG AnyT),
       default: ->
         data = yield Module::Promise.resolve @[iplArray][@[ipnCurrentIndex]]
         @[ipnCurrentIndex]++
@@ -105,7 +105,7 @@ module.exports = (Module)->
           yield @close()
           throw err
 
-    @public @async find: FuncG(Function, AnyT),
+    @public @async find: FuncG(Function, MaybeG AnyT),
       default: (lambda)->
         index = 0
         _record = null
@@ -177,8 +177,8 @@ module.exports = (Module)->
     @public init: FuncG([MaybeG(CollectionInterface), MaybeG Array], NilT),
       default: (aoCollection = null, alArray = null)->
         @super arguments...
-        @[ipoCollection] = aoCollection
-        @[iplArray] = alArray
+        @[ipoCollection] = aoCollection if aoCollection?
+        @[iplArray] = alArray ? []
         return
 
 

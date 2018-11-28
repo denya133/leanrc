@@ -11,7 +11,7 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual sendNotification: FuncG [String, MaybeG(AnyT), String], NilT
+    @virtual sendNotification: FuncG [String, MaybeG(AnyT), MaybeG String], NilT
     @virtual initializeNotifier: FuncG String, NilT
 
 

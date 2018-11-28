@@ -3,14 +3,19 @@ sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 {
   Endpoint,
-  Utils: { co }
+  Utils: { co, joi }
 } = LeanRC::
 
 describe 'Endpoint', ->
   describe '.new', ->
     it 'should create new endpoint', ->
       co ->
-        gateway = test: 'test'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/../proxy/config/lib"
+          @initialize()
+        gateway = Test::Gateway.new 'TEST_GATEWAY'#, endpoints: {}
+        # gateway = test: 'test'
         endpoint = Endpoint.new { gateway }
         # assert.equal endpoint.gateway, gateway, 'Gateway is incorrect'
         assert.instanceOf endpoint, Endpoint
@@ -18,7 +23,12 @@ describe 'Endpoint', ->
   describe '#tag', ->
     it 'should create endpoint and add tag', ->
       expect ->
-        gateway = test: 'test'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/../proxy/config/lib"
+          @initialize()
+        gateway = Test::Gateway.new 'TEST_GATEWAY'#, endpoints: {}
+        # gateway = test: 'test'
         endpoint = Endpoint.new { gateway }
         tag = 'ENDPOINT_TAG'
         assert.notInclude endpoint.tags ? [], tag, 'Endpoint already contains tag'
@@ -28,9 +38,14 @@ describe 'Endpoint', ->
   describe '#header', ->
     it 'should create endpoint and add header', ->
       expect ->
-        gateway = test: 'test'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/../proxy/config/lib"
+          @initialize()
+        gateway = Test::Gateway.new 'TEST_GATEWAY'#, endpoints: {}
+        # gateway = test: 'test'
         endpoint = Endpoint.new { gateway }
-        header = name: 'NAME', schema: {}, description: 'DESCRIPTION'
+        header = name: 'NAME', schema: joi.object(), description: 'DESCRIPTION'
         assert.notInclude endpoint.headers ? [], header, 'Endpoint already contains header'
         endpoint.header header.name, header.schema, header.description
         assert.include endpoint.headers, header, 'Endpoint does not contain header'
@@ -38,9 +53,14 @@ describe 'Endpoint', ->
   describe '#pathParam', ->
     it 'should create endpoint and add pathParam', ->
       expect ->
-        gateway = test: 'test'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/../proxy/config/lib"
+          @initialize()
+        gateway = Test::Gateway.new 'TEST_GATEWAY'#, endpoints: {}
+        # gateway = test: 'test'
         endpoint = Endpoint.new { gateway }
-        pathParam = name: 'NAME', schema: {}, description: 'DESCRIPTION'
+        pathParam = name: 'NAME', schema: joi.string(), description: 'DESCRIPTION'
         assert.notInclude endpoint.pathParams ? [], pathParam, 'Endpoint already contains pathParam'
         endpoint.pathParam pathParam.name, pathParam.schema, pathParam.description
         assert.include endpoint.pathParams, pathParam, 'Endpoint does not contain pathParam'
@@ -48,9 +68,14 @@ describe 'Endpoint', ->
   describe '#response', ->
     it 'should create endpoint and add response', ->
       expect ->
-        gateway = test: 'test'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/../proxy/config/lib"
+          @initialize()
+        gateway = Test::Gateway.new 'TEST_GATEWAY'#, endpoints: {}
+        # gateway = test: 'test'
         endpoint = Endpoint.new { gateway }
-        response = status: 200, schema: {}, mimes: [ 'text/plain' ], description: 'DESCRIPTION'
+        response = status: 200, schema: joi.object(), mimes: [ 'text/plain' ], description: 'DESCRIPTION'
         assert.notInclude endpoint.responses ? [], response, 'Endpoint already contains response'
         endpoint.response response.status, response.schema, response.mimes, response.description
         assert.include endpoint.responses, response, 'Endpoint does not contain response'
@@ -58,9 +83,14 @@ describe 'Endpoint', ->
   describe '#body', ->
     it 'should create endpoint and add body', ->
       expect ->
-        gateway = test: 'test'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/../proxy/config/lib"
+          @initialize()
+        gateway = Test::Gateway.new 'TEST_GATEWAY'#, endpoints: {}
+        # gateway = test: 'test'
         endpoint = Endpoint.new { gateway }
-        body = schema: {}, mimes: [ 'text/plain' ], description: 'DESCRIPTION'
+        body = schema: joi.object(), mimes: [ 'text/plain' ], description: 'DESCRIPTION'
         assert.notDeepEqual endpoint.payload, body, 'Endpoint already contains body'
         endpoint.body body.schema, body.mimes, body.description
         assert.deepEqual endpoint.payload, body, 'Endpoint does not contain body'
@@ -68,7 +98,12 @@ describe 'Endpoint', ->
   describe '#summary', ->
     it 'should create endpoint and add summary', ->
       expect ->
-        gateway = test: 'test'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/../proxy/config/lib"
+          @initialize()
+        gateway = Test::Gateway.new 'TEST_GATEWAY'#, endpoints: {}
+        # gateway = test: 'test'
         endpoint = Endpoint.new { gateway }
         summary = 'TEST_SUMMARY'
         assert.notEqual endpoint.title, summary, 'Endpoint already contains summary'
@@ -78,7 +113,12 @@ describe 'Endpoint', ->
   describe '#description', ->
     it 'should create endpoint and add description', ->
       expect ->
-        gateway = test: 'test'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/../proxy/config/lib"
+          @initialize()
+        gateway = Test::Gateway.new 'TEST_GATEWAY'#, endpoints: {}
+        # gateway = test: 'test'
         endpoint = Endpoint.new { gateway }
         description = 'TEST_DESCRIPTION'
         assert.notEqual endpoint.synopsis, description, 'Endpoint already contains description'
@@ -88,7 +128,12 @@ describe 'Endpoint', ->
   describe '#deprecated', ->
     it 'should create endpoint and add deprecated', ->
       expect ->
-        gateway = test: 'test'
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/../proxy/config/lib"
+          @initialize()
+        gateway = Test::Gateway.new 'TEST_GATEWAY'#, endpoints: {}
+        # gateway = test: 'test'
         endpoint = Endpoint.new { gateway }
         assert.isFalse endpoint.isDeprecated, 'Endpoint already deprecated'
         endpoint.deprecated yes

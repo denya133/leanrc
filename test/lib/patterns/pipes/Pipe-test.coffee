@@ -2,19 +2,20 @@
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 Pipe = LeanRC::Pipes::Pipe
+PipeMessage = LeanRC::Pipes::PipeMessage
 
 describe 'Pipe', ->
   describe '.new', ->
     it 'should create new Pipe instance', ->
       expect ->
-        voOutput = {}
+        voOutput = Pipe.new()
         pipe = Pipe.new voOutput
         assert.equal pipe[Symbol.for '~output'], voOutput, 'Output object is lost'
       .to.not.throw Error
   describe '#connect', ->
     it 'should create pipe and connect it to output', ->
       expect ->
-        voOutput = {}
+        voOutput = Pipe.new()
         pipe = Pipe.new()
         pipe.connect voOutput
         assert.equal pipe[Symbol.for '~output'], voOutput, 'Output object is lost'
@@ -22,7 +23,7 @@ describe 'Pipe', ->
   describe '#disconnect', ->
     it 'should create pipe and disconnect it', ->
       expect ->
-        voOutput = {}
+        voOutput = Pipe.new()
         pipe = Pipe.new voOutput
         assert.equal pipe[Symbol.for '~output'], voOutput, 'Output object is lost'
         pipe.disconnect()
@@ -31,8 +32,8 @@ describe 'Pipe', ->
   describe '#write', ->
     it 'should create and write to output', ->
       expect ->
-        voOutput = write: ->
-        voMessage = message: 'TEST'
+        voOutput = Pipe.new()
+        voMessage = PipeMessage.new PipeMessage.NORMAL
         spyWrite = sinon.spy voOutput, 'write'
         pipe = Pipe.new voOutput
         assert.equal pipe[Symbol.for '~output'], voOutput, 'Output object is lost'

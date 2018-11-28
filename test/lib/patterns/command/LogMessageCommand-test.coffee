@@ -16,7 +16,7 @@ describe 'LogMessageCommand', ->
         KEY = 'TEST_LOG_MESSAGE_COMMAND_001'
         facade = LeanRC::Facade.getInstance KEY
         spyAddLogEntry = sinon.spy ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()

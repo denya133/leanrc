@@ -16,7 +16,7 @@ module.exports = (Module)->
     @virtual response: Object
     @virtual key: String
 
-    @virtual get: FuncG [String, MaybeG Object], String
+    @virtual get: FuncG [String, MaybeG Object], MaybeG String
     @virtual set: FuncG [String, AnyT, MaybeG Object], CookiesInterfaceDef
 
 

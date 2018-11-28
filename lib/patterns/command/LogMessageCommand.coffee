@@ -16,7 +16,7 @@ module.exports = (Module) ->
     @inheritProtected()
     @module Module
 
-    @public execute: FuncG(NotificationInterface, NilT),
+    @public execute: FuncG(NotificationInterface),
       default: (aoNotification)->
         proxy = @facade.retrieveProxy LOGGER_PROXY
         proxy.addLogEntry aoNotification.getBody()

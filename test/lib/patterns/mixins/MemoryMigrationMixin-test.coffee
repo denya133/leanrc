@@ -7,495 +7,646 @@ LeanRC = require.main.require 'lib'
 
 describe 'MemoryMigrationMixin', ->
   describe '.new', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should create migration instance', ->
       co ->
-        class Test extends LeanRC::Module
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_001'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield return
   describe '#createCollection', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step for create collection', ->
       co ->
-        class Test extends LeanRC::Module
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_002'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @createCollection 'TestCollection'
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
+          @change ->
+            @createCollection 'TestsCollection'
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         spyCreateCollection = sinon.spy migration, 'createCollection'
         yield migration.up()
-        assert.isTrue spyCreateCollection.calledWith 'TestCollection'
+        assert.isTrue spyCreateCollection.calledWith 'TestsCollection'
         yield return
   describe '#createEdgeCollection', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step for create edge collection', ->
       co ->
-        class Test extends LeanRC::Module
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_003'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @createEdgeCollection 'TestEdgeCollection'
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
+          @change ->
+            @createEdgeCollection 'TestsCollection1', 'TestsCollection2', {prop: 'prop'}
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         spyCreateCollection = sinon.spy migration, 'createEdgeCollection'
         yield migration.up()
-        assert.isTrue spyCreateCollection.calledWith 'TestEdgeCollection'
+        assert.isTrue spyCreateCollection.calledWith 'TestsCollection1', 'TestsCollection2', {prop: 'prop'}
         yield return
   describe '#addField', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step to add field in record at collection', ->
       co ->
-        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_001'
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_004'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
-          @inheritProtected()
-          @module Test
-          @attr 'test': String
-          # @public init: Function,
-          #   default: ->
-          #     @super arguments...
-          #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-          @addField 'Test', 'test',
-            default: 'Test1'
-        Test::BaseMigration.initialize()
-        class Test::MemoryCollection extends LeanRC::Collection
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        Test::MemoryCollection.initialize()
-        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
-          delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
-        collection = facade.retrieveProxy 'TestCollection'
-        yield collection.create id: 1
-        yield collection.create id: 2
-        yield collection.create id: 3
-        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
+          @initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
+          @inheritProtected()
+          @include LeanRC::MemoryMigrationMixin
+          @module Test
+          @change ->
+            @addField 'tests', 'test', type: 'number', default: 'Test1'
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        testsCollection = MemoryCollection.new 'TestsCollection',
+          delegate: 'TestRecord'
+        facade.registerProxy testsCollection
+        yield testsCollection.create id: 1
+        yield testsCollection.create id: 2
+        yield testsCollection.create id: 3
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
-        for own id, doc of collection[Symbol.for '~collection']
+        for own id, doc of testsCollection[Symbol.for '~collection']
           assert.propertyVal doc, 'test', 'Test1'
-        facade.remove()
         yield return
   describe '#addIndex', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step to add index in collection', ->
       co ->
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-          @addIndex 'ARG_1', 'ARG_2', 'ARG_3'
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
-        spyAddIndex = sinon.spy migration, 'addIndex'
-        yield migration.up()
-        assert.isTrue spyAddIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
-        yield return
-  describe '#addTimestamps', ->
-    it 'should apply step to add timesteps in collection', ->
-      co ->
-        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_002'
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_005'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
-          @inheritProtected()
-          @module Test
-          @attr 'test': String
-          # @public init: Function,
-          #   default: ->
-          #     @super arguments...
-          #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::MemoryCollection extends LeanRC::Collection
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        Test::MemoryCollection.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @addTimestamps 'Test'
-        Test::BaseMigration.initialize()
-        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
-          delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
-        collection = facade.retrieveProxy 'TestCollection'
-        yield collection.create id: 1
-        yield collection.create id: 2
-        yield collection.create id: 3
-        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
+          @change ->
+            @addIndex 'collectionName', ['attr1', 'attr2'], type: "hash"
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
+        spyAddIndex = sinon.spy migration, 'addIndex'
         yield migration.up()
-        for own id, doc of collection[Symbol.for '~collection']
+        assert.isTrue spyAddIndex.calledWith 'collectionName', ['attr1', 'attr2'], type: "hash"
+        yield return
+  describe '#addTimestamps', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
+    it 'should apply step to add timesteps in collection', ->
+      co ->
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_006'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+          @root __dirname
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+          @initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
+          @inheritProtected()
+          @include LeanRC::MemoryMigrationMixin
+          @module Test
+          @change ->
+            @addTimestamps 'tests'
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        testsCollection = MemoryCollection.new 'TestsCollection',
+          delegate: 'TestRecord'
+        facade.registerProxy testsCollection
+        yield testsCollection.create id: 1
+        yield testsCollection.create id: 2
+        yield testsCollection.create id: 3
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
+        yield migration.up()
+        for own id, doc of testsCollection[Symbol.for '~collection']
           assert.property doc, 'createdAt'
           assert.property doc, 'updatedAt'
           assert.property doc, 'updatedAt'
-        facade.remove()
         yield return
   describe '#changeCollection', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step to change collection', ->
       co ->
-        class Test extends LeanRC::Module
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_007'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @changeCollection 'ARG_1', 'ARG_2', 'ARG_3'
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
+          @change ->
+            @changeCollection 'collectionName', {prop: 'prop'}
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         spyChangeCollection = sinon.spy migration, 'changeCollection'
         yield migration.up()
-        assert.isTrue spyChangeCollection.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
+        assert.isTrue spyChangeCollection.calledWith 'collectionName', {prop: 'prop'}
         yield return
   describe '#changeField', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step to change field in collection', ->
       co ->
-        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_003'
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_008'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
-          @inheritProtected()
-          @module Test
-          @attr 'test': String
-          # @public init: Function,
-          #   default: ->
-          #     @super arguments...
-          #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::MemoryCollection extends LeanRC::Collection
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        Test::MemoryCollection.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @changeField 'Test', 'test', type: LeanRC::Migration::SUPPORTED_TYPES.integer
-        Test::BaseMigration.initialize()
-        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
-          delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
-        collection = facade.retrieveProxy 'TestCollection'
-        yield collection.create test: '42'
-        yield collection.create test: '42'
-        yield collection.create test: '42'
-        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
+          @change ->
+            @changeField 'tests', 'test', type: LeanRC::Migration::SUPPORTED_TYPES.number
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        testsCollection = MemoryCollection.new 'TestsCollection',
+          delegate: 'TestRecord'
+        facade.registerProxy testsCollection
+        yield testsCollection.create test: '42'
+        yield testsCollection.create test: '42'
+        yield testsCollection.create test: '42'
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
-        for own id, doc of collection[Symbol.for '~collection']
+        for own id, doc of testsCollection[Symbol.for '~collection']
           assert.propertyVal doc, 'test', 42
-        facade.remove()
         yield return
   describe '#renameField', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step to rename field in collection', ->
       co ->
-        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_004'
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_009'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
-          @inheritProtected()
-          @module Test
-          @attr 'test': String
-          # @public init: Function,
-          #   default: ->
-          #     @super arguments...
-          #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::MemoryCollection extends LeanRC::Collection
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        Test::MemoryCollection.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @renameField 'Test', 'test', 'test1'
-        Test::BaseMigration.initialize()
-        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
-          delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
-        collection = facade.retrieveProxy 'TestCollection'
-        yield collection.create test: '42'
-        yield collection.create test: '42'
-        yield collection.create test: '42'
-        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
+          @change ->
+            @renameField 'tests', 'test', 'test1'
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        testsCollection = MemoryCollection.new 'TestsCollection',
+          delegate: 'TestRecord'
+        facade.registerProxy testsCollection
+        yield testsCollection.create test: '42'
+        yield testsCollection.create test: '42'
+        yield testsCollection.create test: '42'
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
-        for own id, doc of collection[Symbol.for '~collection']
+        for own id, doc of testsCollection[Symbol.for '~collection']
           assert.notProperty doc, 'test'
           assert.property doc, 'test1'
-        facade.remove()
+          assert.propertyVal doc, 'test1', '42'
         yield return
   describe '#renameIndex', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step to rename index in collection', ->
       co ->
-        class Test extends LeanRC::Module
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_010'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @renameIndex 'ARG_1', 'ARG_2', 'ARG_3'
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
+          @change ->
+            @renameIndex 'collectionName', 'oldIndexname', 'newIndexName'
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         spyRenameIndex = sinon.spy migration, 'renameIndex'
         yield migration.up()
-        assert.isTrue spyRenameIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
+        assert.isTrue spyRenameIndex.calledWith 'collectionName', 'oldIndexname', 'newIndexName'
         yield return
   describe '#renameCollection', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step to rename collection', ->
       co ->
-        class Test extends LeanRC::Module
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_011'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @renameCollection 'ARG_1', 'ARG_2', 'ARG_3'
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
+          @change ->
+            @renameCollection 'oldCollectionName', 'newCollectionName'
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         spyRenameCollection = sinon.spy migration, 'renameCollection'
         yield migration.up()
-        assert.isTrue spyRenameCollection.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
+        assert.isTrue spyRenameCollection.calledWith 'oldCollectionName', 'newCollectionName'
         yield return
   describe '#dropCollection', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step to drop collection', ->
       co ->
-        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_005'
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_012'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
-          @inheritProtected()
-          @module Test
-          @attr 'test': String
-          # @public init: Function,
-          #   default: ->
-          #     @super arguments...
-          #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::MemoryCollection extends LeanRC::Collection
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        Test::MemoryCollection.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @dropCollection 'Test'
-        Test::BaseMigration.initialize()
-        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
-          delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
-        collection = facade.retrieveProxy 'TestCollection'
-        yield collection.create test: '42'
-        yield collection.create test: '42'
-        yield collection.create test: '42'
-        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
+          @change ->
+            @dropCollection 'tests'
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        testsCollection = MemoryCollection.new 'TestsCollection',
+          delegate: 'TestRecord'
+        facade.registerProxy testsCollection
+        yield testsCollection.create test: '42'
+        yield testsCollection.create test: '42'
+        yield testsCollection.create test: '42'
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
-        assert.deepEqual collection[Symbol.for '~collection'], {}
-        facade.remove()
+        assert.deepEqual testsCollection[Symbol.for '~collection'], {}
         yield return
   describe '#dropEdgeCollection', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step to drop edge collection', ->
       co ->
-        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_006'
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_013'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
-          @inheritProtected()
-          @module Test
-          @attr 'test': String
-          # @public init: Function,
-          #   default: ->
-          #     @super arguments...
-          #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::MemoryCollection extends LeanRC::Collection
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        Test::MemoryCollection.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @dropEdgeCollection 'Test', 'Test'
-        Test::BaseMigration.initialize()
-        facade.registerProxy Test::MemoryCollection.new 'TestTestCollection',
-          delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
-        collection = facade.retrieveProxy 'TestTestCollection'
-        yield collection.create test: '42'
-        yield collection.create test: '42'
-        yield collection.create test: '42'
-        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
+          @change ->
+            @dropEdgeCollection 'Tests1', 'Tests2'
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        testsCollection = MemoryCollection.new 'Tests1Tests2Collection',
+          delegate: 'TestRecord'
+        facade.registerProxy testsCollection
+        yield testsCollection.create test: '42'
+        yield testsCollection.create test: '42'
+        yield testsCollection.create test: '42'
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
-        assert.deepEqual collection[Symbol.for '~collection'], {}
-        facade.remove()
+        assert.deepEqual testsCollection[Symbol.for '~collection'], {}
         yield return
   describe '#removeField', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step to remove field in collection', ->
       co ->
-        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_007'
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_014'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
-          @inheritProtected()
-          @module Test
-          @attr 'test': String
-          # @public init: Function,
-          #   default: ->
-          #     @super arguments...
-          #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::MemoryCollection extends LeanRC::Collection
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        Test::MemoryCollection.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @removeField 'Test', 'test'
-        Test::BaseMigration.initialize()
-        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
-          delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
-        collection = facade.retrieveProxy 'TestCollection'
-        yield collection.create test: '42'
-        yield collection.create test: '42'
-        yield collection.create test: '42'
-        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
+          @change ->
+            @removeField 'tests', 'test'
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        testsCollection = MemoryCollection.new 'TestsCollection',
+          delegate: 'TestRecord'
+        facade.registerProxy testsCollection
+        yield testsCollection.create test: '42'
+        yield testsCollection.create test: '42'
+        yield testsCollection.create test: '42'
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
         yield migration.up()
-        for own id, doc of collection[Symbol.for '~collection']
+        for own id, doc of testsCollection[Symbol.for '~collection']
           assert.notProperty doc, 'test'
-        facade.remove()
         yield return
   describe '#removeIndex', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should apply step to remove index in collection', ->
       co ->
-        class Test extends LeanRC::Module
-          @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
-          @inheritProtected()
-          @include LeanRC::MemoryMigrationMixin
-          @module Test
-          @removeIndex 'ARG_1', 'ARG_2', 'ARG_3'
-        Test::BaseMigration.initialize()
-        migration = Test::BaseMigration.new(type: 'Test::BaseMigration')
-        spyRemoveIndex = sinon.spy migration, 'removeIndex'
-        yield migration.up()
-        assert.isTrue spyRemoveIndex.calledWith 'ARG_1', 'ARG_2', 'ARG_3'
-        yield return
-  describe '#removeTimestamps', ->
-    it 'should apply step to remove timestamps in collection', ->
-      co ->
-        KEY = 'TEST_MEMORY_MIGRATION_MIXIN_008'
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_015'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
-          @inheritProtected()
-          @module Test
-          @attr 'test': String
-          # @public init: Function,
-          #   default: ->
-          #     @super arguments...
-          #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::MemoryCollection extends LeanRC::Collection
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        Test::MemoryCollection.initialize()
-        class Test::BaseMigration extends LeanRC::Migration
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
           @inheritProtected()
           @include LeanRC::MemoryMigrationMixin
           @module Test
-          @removeTimestamps 'Test'
-        Test::BaseMigration.initialize()
-        facade.registerProxy Test::MemoryCollection.new 'TestCollection',
-          delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
-        collection = facade.retrieveProxy 'TestCollection'
+          @change ->
+            @removeIndex 'collectionName', ['attr1', 'attr2'], {
+              type: "hash"
+              unique: yes
+              sparse: no
+            }
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
+        spyRemoveIndex = sinon.spy migration, 'removeIndex'
+        yield migration.up()
+        assert.isTrue spyRemoveIndex.calledWith 'collectionName', ['attr1', 'attr2'], {
+          type: "hash"
+          unique: yes
+          sparse: no
+        }
+        yield return
+  describe '#removeTimestamps', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
+    it 'should apply step to remove timestamps in collection', ->
+      co ->
+        collectionName = 'MigrationsCollection'
+        KEY = 'TEST_MEMORY_MIGRATION_016'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+          @root __dirname
+          @initialize()
+        class MemoryCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+          @initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attr 'test': String
+          @initialize()
+        class BaseMigration extends LeanRC::Migration
+          @inheritProtected()
+          @include LeanRC::MemoryMigrationMixin
+          @module Test
+          @change ->
+            @removeTimestamps 'tests'
+          @initialize()
+        collection = MemoryCollection.new collectionName,
+          delegate: 'BaseMigration'
+        facade.registerProxy collection
+        testsCollection = MemoryCollection.new 'TestsCollection',
+          delegate: 'TestRecord'
+        facade.registerProxy testsCollection
         DATE = new Date()
-        yield collection.create test: '42', createdAt: DATE
-        yield collection.create test: '42', createdAt: DATE
-        yield collection.create test: '42', createdAt: DATE
-        migration = Test::BaseMigration.new {type: 'Test::BaseMigration'}, collection
-        for own id, doc of collection[Symbol.for '~collection']
+        yield testsCollection.create test: '42', createdAt: DATE
+        yield testsCollection.create test: '42', createdAt: DATE
+        yield testsCollection.create test: '42', createdAt: DATE
+        migration = BaseMigration.new {type: 'Test::BaseMigration'}, collection
+        for own id, doc of testsCollection[Symbol.for '~collection']
           assert.property doc, 'createdAt'
           assert.property doc, 'updatedAt'
           assert.property doc, 'deletedAt'
         yield migration.up()
-        for own id, doc of collection[Symbol.for '~collection']
+        for own id, doc of testsCollection[Symbol.for '~collection']
           assert.notProperty doc, 'createdAt'
           assert.notProperty doc, 'updatedAt'
           assert.notProperty doc, 'deletedAt'
-        facade.remove()
         yield return

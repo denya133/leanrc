@@ -3,7 +3,7 @@
 module.exports = (Module) ->
   {
     AnyT, NilT
-    FuncG, ListG
+    FuncG, ListG, MaybeG
   } = Module::
   {
     PipeMessage
@@ -60,7 +60,7 @@ module.exports = (Module) ->
         @setHeader header
         time
 
-    @public message: AnyT,
+    @public message: MaybeG(AnyT),
       get: -> @getBody()
 
     @public init: FuncG([Number, String, AnyT], NilT),

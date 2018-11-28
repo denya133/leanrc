@@ -17,7 +17,7 @@ module.exports = (Module)->
     @public @static schema: JoiT,
       get: -> joi.boolean().allow(null).optional()
 
-    @public @static @async normalize: FuncG([UnionG Boolean, String, Number], Boolean),
+    @public @static @async normalize: FuncG([MaybeG UnionG Boolean, String, Number], Boolean),
       default: (args...)->
         yield return @normalizeSync args...
 
@@ -25,7 +25,7 @@ module.exports = (Module)->
       default: (args...)->
         yield return @serializeSync args...
 
-    @public @static normalizeSync: FuncG([UnionG Boolean, String, Number], Boolean),
+    @public @static normalizeSync: FuncG([MaybeG UnionG Boolean, String, Number], Boolean),
       default: (serialized)->
         type = typeof serialized
 

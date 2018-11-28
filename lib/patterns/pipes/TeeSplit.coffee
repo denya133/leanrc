@@ -13,7 +13,7 @@ module.exports = (Module)->
     @implements PipeFittingInterface
     @module Module
 
-    iplOutputs = PointerT @protected outputs: ListG PipeFittingInterface
+    iplOutputs = PointerT @protected outputs: MaybeG ListG PipeFittingInterface
 
     @public connect: FuncG(PipeFittingInterface, Boolean),
       default: (aoOutput)->

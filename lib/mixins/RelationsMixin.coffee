@@ -11,7 +11,7 @@ module.exports = (Module)->
   {
     NilT, PromiseT
     PropertyDefinitionT, RelationOptionsT, RelationConfigT, RelationInverseT
-    FuncG, SubsetG, AsyncFuncG
+    FuncG, SubsetG, AsyncFuncG, DictG
     RecordInterface, CursorInterface
     RelatableInterface
     Record, Mixin
@@ -165,6 +165,7 @@ module.exports = (Module)->
             }Collection"
 
           opts = {
+            attr: null
             refKey
             inverse
             relation
@@ -214,6 +215,7 @@ module.exports = (Module)->
             }Collection"
 
           opts = {
+            attr: null
             refKey
             inverse
             relation

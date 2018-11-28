@@ -3,7 +3,8 @@ sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 {
   APPLICATION_MEDIATOR
-
+  FuncG
+  NotificationInterface
   Controller
   SimpleCommand
   Notification
@@ -33,17 +34,20 @@ describe 'Controller', ->
         controller = Controller.getInstance 'TEST3'
         class TestCommand extends SimpleCommand
           @inheritProtected()
-          @public execute: Function,
+          @public execute: FuncG(NotificationInterface),
             default: ->
         controller.registerCommand 'TEST_COMMAND', TestCommand
         assert controller.hasCommand 'TEST_COMMAND'
         return
       .to.not.throw Error
   describe '#lazyRegisterCommand', ->
-    facade = null
+    # facade = null
     INSTANCE_NAME = 'TEST3'
+    before ->
+      LeanRC::Facade.getInstance INSTANCE_NAME
     after ->
-      facade?.remove()
+      LeanRC::Facade.getInstance INSTANCE_NAME
+        .remove()
     it 'should register new command lazily', ->
       co ->
         spy = sinon.spy()
@@ -86,7 +90,7 @@ describe 'Controller', ->
         spy.reset()
         class TestCommand extends SimpleCommand
           @inheritProtected()
-          @public execute: Function,
+          @public execute: FuncG(NotificationInterface),
             default: spy
         notification = new Notification 'TEST_COMMAND1'
         controller.registerCommand notification.getName(), TestCommand
@@ -100,7 +104,7 @@ describe 'Controller', ->
         controller = Controller.getInstance 'TEST5'
         class TestCommand extends SimpleCommand
           @inheritProtected()
-          @public execute: Function,
+          @public execute: FuncG(NotificationInterface),
             default: ->
         controller.removeCommand 'TEST_COMMAND'
         controller.removeCommand 'TEST_COMMAND1'

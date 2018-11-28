@@ -7,9 +7,9 @@ describe 'LogMessage', ->
   describe '.new', ->
     it 'should create new LogMessage instance', ->
       co ->
-        vnLevel = LeanRC::LogMessage.NORMAL
+        vnLevel = LeanRC::LogMessage.NONE
         vsSender = 'TEST_SENDER'
-        vsMessage = 'TEST_MESSAGE'
+        vsMessage = msg: 'TEST_MESSAGE'
         message = LeanRC::LogMessage.new vnLevel, vsSender, vsMessage
         assert.instanceOf message, LeanRC::LogMessage
         assert.equal message[Symbol.for '~header'].logLevel, vnLevel
@@ -28,7 +28,7 @@ describe 'LogMessage', ->
       co ->
         vnLevel = -2
         vsSender = 'TEST_SENDER'
-        vsMessage = 'TEST_MESSAGE'
+        vsMessage = msg: 'TEST_MESSAGE'
         message = LeanRC::LogMessage.new vnLevel, vsSender, vsMessage
         assert.equal message[Symbol.for '~header'].logLevel, vnLevel
         message.logLevel = LeanRC::LogMessage.CHANGE
@@ -58,7 +58,7 @@ describe 'LogMessage', ->
       co ->
         vnLevel = LeanRC::LogMessage.NONE
         vsSender = 'TEST_SENDER'
-        vsMessage = 'TEST_MESSAGE'
+        vsMessage = msg: 'TEST_MESSAGE'
         message = LeanRC::LogMessage.new vnLevel, vsSender, vsMessage
         assert.equal message[Symbol.for '~header'].sender, vsSender
         assert.equal message.sender, vsSender
@@ -72,7 +72,7 @@ describe 'LogMessage', ->
       co ->
         vnLevel = LeanRC::LogMessage.NONE
         vsSender = 'TEST_SENDER'
-        vsMessage = 'TEST_MESSAGE'
+        vsMessage = msg: 'TEST_MESSAGE'
         message = LeanRC::LogMessage.new vnLevel, vsSender, vsMessage
         vsTime = new Date().toISOString()
         message.time = vsTime
@@ -84,7 +84,7 @@ describe 'LogMessage', ->
       co ->
         vnLevel = LeanRC::LogMessage.NONE
         vsSender = 'TEST_SENDER'
-        vsMessage = 'TEST_MESSAGE'
+        vsMessage = msg: 'TEST_MESSAGE'
         message = LeanRC::LogMessage.new vnLevel, vsSender, vsMessage
         assert.equal message[Symbol.for '~body'], vsMessage
         assert.equal message.message, vsMessage

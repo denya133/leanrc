@@ -6,8 +6,8 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT
-    FuncG, StructG, MaybeG, InterfaceG
+    NilT, PointerT, AsyncFunctionT
+    FuncG, StructG, MaybeG, InterfaceG, DictG
     DelayableInterface
     FacadeInterface
     CoreObject
@@ -56,7 +56,10 @@ module.exports = (Module)->
 
       # !!! Специально сделано так что ставить на отложенную обработку можно только статические методы, чтобы не решать проблемы с сериализацией инстансов, для последующей фоновой обработки.
       # т.к. статические методы объявлены на классах, а следовательно нет проблемы в том, чтобы найти в неймспейсе нужный класс и вызвать его статический метод.
-      @public @static delay: Function,
+      @public @static delay: FuncG([
+        FacadeInterface
+        MaybeG InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
+      ], DictG String, AsyncFunctionT),
         default: (facade, opts = {})->
           obj = {}
           for own methodName of @classMethods
@@ -73,7 +76,10 @@ module.exports = (Module)->
                   return yield self[cpmDelayJob] facade, data, opts
           obj
 
-      @public delay: Function,
+      @public delay: FuncG([
+        FacadeInterface
+        MaybeG InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
+      ], DictG String, AsyncFunctionT),
         default: (facade, opts = {})->
           obj = {}
           for own methodName of @constructor.instanceMethods

@@ -50,7 +50,7 @@ module.exports = (Module) ->
     method: String
     salt: String
     hash: String
-  }], String) (authData, password)->
+  }, String], Boolean) (authData, password)->
     { isArangoDB } = Module::Utils
     method = authData.method ? 'sha256'
     salt = authData.salt ? ''

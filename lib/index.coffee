@@ -17,14 +17,14 @@ class LeanRC extends RC
   @util { statuses }
   @util { moment }
 
-  @const HANDLER_RESULT:  Symbol 'HANDLER_RESULT'
-  @const RECORD_CHANGED:  Symbol 'RECORD_CHANGED'
+  @const HANDLER_RESULT:  'HANDLER_RESULT' #Symbol 'HANDLER_RESULT'
+  @const RECORD_CHANGED:  'RECORD_CHANGED' #Symbol 'RECORD_CHANGED'
   @const CONFIGURATION:  'ConfigurationProxy'
-  @const STARTUP: Symbol 'startup' # для сигнала
-  @const MIGRATE: Symbol 'migrate' # для сигнала
-  @const ROLLBACK: Symbol 'rollback' # для сигнала
-  @const STOPPED_MIGRATE: Symbol 'stopped_migrate' # для сигнала
-  @const STOPPED_ROLLBACK: Symbol 'stopped_rollback' # для сигнала
+  @const STARTUP: 'STARTUP' #Symbol 'startup' # для сигнала
+  @const MIGRATE: 'MIGRATE' #Symbol 'migrate' # для сигнала
+  @const ROLLBACK: 'ROLLBACK' #Symbol 'rollback' # для сигнала
+  @const STOPPED_MIGRATE: 'STOPPED_MIGRATE' #Symbol 'stopped_migrate' # для сигнала
+  @const STOPPED_ROLLBACK: 'STOPPED_ROLLBACK' #Symbol 'stopped_rollback' # для сигнала
   @const LIGHTWEIGHT: Symbol 'LIGHTWEIGHT' # для создания инстанса приложения без свича (для создания изолированной области выполнения)
   @const MIGRATIONS: 'MigrationsCollection'
   @const SESSIONS: 'SessionsCollection'
@@ -33,19 +33,19 @@ class LeanRC extends RC
   @const ROLES: 'RolesCollection'
   @const UPLOADS: 'UploadsCollection'
   @const RESQUE: 'ResqueProxy'
-  @const START_RESQUE: Symbol 'start_resque'
+  @const START_RESQUE: 'START_RESQUE' #Symbol 'start_resque'
   @const DELAYED_JOBS_QUEUE: 'delayed_jobs'
   @const DELAYED_JOBS_SCRIPT: 'DelayedJobScript'
   @const DEFAULT_QUEUE: 'default'
-  @const JOB_RESULT:  Symbol 'JOB_RESULT'
-  @const SHELL:  Symbol 'ShellApplication'
+  @const JOB_RESULT:  'JOB_RESULT' #Symbol 'JOB_RESULT'
+  @const SHELL:  'SHELL' #Symbol 'ShellApplication'
   @const APPLICATION_MEDIATOR:  'ApplicationMediator'
   @const APPLICATION_ROUTER:  'ApplicationRouter'
   @const APPLICATION_RENDERER:  'ApplicationRenderer'
   @const APPLICATION_SWITCH:  'ApplicationSwitch'
   @const APPLICATION_GATEWAY:  'ApplicationGateway'
   @const RESQUE_EXECUTOR:  'ResqueExecutor'
-  @const LOG_MSG: Symbol 'logMessage'
+  @const LOG_MSG: 'LOG_MSG' #Symbol 'logMessage'
   @const PRODUCTION: 'production'
   @const DEVELOPMENT: 'development'
 

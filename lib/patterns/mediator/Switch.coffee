@@ -31,7 +31,7 @@ module.exports = (Module)->
     APPLICATION_MEDIATOR
     HANDLER_RESULT
     AnyT, NilT, PointerT, AsyncFunctionT
-    FuncG, ListG, MaybeG, InterfaceG, StructG
+    FuncG, ListG, MaybeG, InterfaceG, StructG, DictG, UnionG
     SwitchInterface, ContextInterface, RendererInterface, NotificationInterface
     ResourceInterface
     Mediator, Context
@@ -55,7 +55,7 @@ module.exports = (Module)->
     @module Module
 
     ipoHttpServer = PointerT @private httpServer: Object
-    ipoRenderers = PointerT @private renderers: Object
+    ipoRenderers = PointerT @private renderers: MaybeG DictG String, MaybeG RendererInterface
 
     @public middlewares: Array
     @public handlers: Array
@@ -68,7 +68,7 @@ module.exports = (Module)->
     @public routerName: String,
       default: APPLICATION_ROUTER
 
-    @public @static compose: FuncG([ListG(Function), ListG Function], AsyncFunctionT),
+    @public @static compose: FuncG([ListG(Function), ListG MaybeG ListG Function], AsyncFunctionT),
       default: (middlewares, handlers)->
         unless _.isArray middlewares
           throw new Error 'Middleware stack must be an array!'
@@ -209,7 +209,7 @@ module.exports = (Module)->
           facade.sendNotification SEND_TO_LOG, "listening on port #{port}", LEVELS[DEBUG]
         return
 
-    @public use: FuncG([Number, Function], SwitchInterface),
+    @public use: FuncG([UnionG(Number, Function), MaybeG Function], SwitchInterface),
       default: (index, middleware)->
         unless middleware?
           middleware = index
@@ -289,21 +289,26 @@ module.exports = (Module)->
         code = ctx.status
         if statuses.empty[code]
           ctx.body = null
-          return ctx.res.end()
+          ctx.res.end()
+          return
         if 'HEAD' is ctx.method
           if not ctx.res.headersSent and _.isObjectLike body
             ctx.length = Buffer.byteLength JSON.stringify body
-          return ctx.res.end()
+          ctx.res.end()
+          return
         unless body?
           body = ctx.message ? String code
           unless ctx.res.headersSent
             ctx.type = 'text'
             ctx.length = Buffer.byteLength body
-          return ctx.res.end body
+          ctx.res.end body
+          return
         if _.isBuffer(body) or _.isString body
-          return ctx.res.end body
+          ctx.res.end body
+          return
         if body instanceof require 'stream'
-          return body.pipe ctx.res
+          body.pipe ctx.res
+          return
         body = JSON.stringify body ? null
         unless ctx.res.headersSent
           ctx.length = Buffer.byteLength body
@@ -327,7 +332,7 @@ module.exports = (Module)->
       action: String
       tag: String
       template: String
-      keyName: String
+      keyName: MaybeG String
       entityName: String
       recordName: String
     }], NilT),
@@ -363,7 +368,7 @@ module.exports = (Module)->
       action: String
       tag: String
       template: String
-      keyName: String
+      keyName: MaybeG String
       entityName: String
       recordName: String
     }], NilT),
@@ -412,7 +417,7 @@ module.exports = (Module)->
       action: String
       tag: String
       template: String
-      keyName: String
+      keyName: MaybeG String
       entityName: String
       recordName: String
     }], NilT),
@@ -444,9 +449,10 @@ module.exports = (Module)->
           yield return yes
         return
 
-    @public init: FuncG([String, AnyT], NilT),
+    @public init: FuncG([MaybeG(String), MaybeG AnyT], NilT),
       default: (args...)->
         @super args...
+        @[ipoRenderers] = {}
         @middlewares = []
         @handlers = []
         return

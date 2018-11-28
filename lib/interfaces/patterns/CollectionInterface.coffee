@@ -17,8 +17,8 @@ module.exports = (Module)->
 
     # надо определиться с этими двумя пунктами, так ли их объявлять?
     @virtual delegate: SubsetG RecordInterface
-    @virtual serializer: SerializerInterface
-    @virtual objectizer: ObjectizerInterface
+    # @virtual serializer: MaybeG SerializerInterface
+    # @virtual objectizer: MaybeG ObjectizerInterface
 
     @virtual collectionName: FuncG [], String
     @virtual collectionPrefix: FuncG [], String
@@ -39,10 +39,10 @@ module.exports = (Module)->
     # NOTE: обращается к БД
     @virtual @async remove: FuncG [UnionG String, Number], NilT
 
-    @virtual @async find: FuncG [UnionG String, Number], RecordInterface
+    @virtual @async find: FuncG [UnionG String, Number], MaybeG RecordInterface
     @virtual @async findMany: FuncG [ListG UnionG String, Number], CursorInterface
     # NOTE: обращается к БД
-    @virtual @async take: FuncG [UnionG String, Number], RecordInterface
+    @virtual @async take: FuncG [UnionG String, Number], MaybeG RecordInterface
     # NOTE: обращается к БД
     @virtual @async takeMany: FuncG [ListG UnionG String, Number], CursorInterface
     # NOTE: обращается к БД

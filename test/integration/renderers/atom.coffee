@@ -1,19 +1,35 @@
-_ = require 'lodash'
 # Module = require 'Module'
 # Module = require.main.require 'lib'
 Feed = require 'feed'
 
 module.exports = (Module) ->
-  class AtomRenderer extends Module::Renderer
-    @inheritProtected()
+  {
+    AnyT
+    FuncG, MaybeG, InterfaceG
+    ContextInterface, ResourceInterface
+    Renderer
+    Utils: { _, assign, uuid }
+  } = Module::
 
+  class AtomRenderer extends Renderer
+    @inheritProtected()
     @module Module
 
-    @public render: Function,
-      default: (aoData, aoOptions) ->
-        vhData = Module::Utils.extend {}, aoData ? {}
+    @public @async render: FuncG([ContextInterface, AnyT, ResourceInterface, MaybeG InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: String
+      entityName: String
+      recordName: String
+    }], MaybeG AnyT),
+      default: (ctx, aoData, resource, aoOptions) ->
+        vhData = assign {}, aoData ? {}
         feed = new Feed
-          id: vhData.id ? Module::Utils.uuid.v4()
+          id: vhData.id ? uuid.v4()
           title: vhData.title ? ''
           author: vhData.author
           updated: vhData.updated
@@ -29,6 +45,6 @@ module.exports = (Module) ->
           feed.addCategory contributor  for contributor in vhData.contributors
         if _.isArray vhData.items
           feed.addCategory item  for item in vhData.items
-        feed.atom1()
+        yield return feed.atom1()
 
-  AtomRenderer.initialize()
+    @initialize()

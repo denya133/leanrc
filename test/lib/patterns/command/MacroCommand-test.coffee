@@ -1,8 +1,14 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-MacroCommand = LeanRC::MacroCommand
-SimpleCommand = LeanRC::SimpleCommand
+{
+  NilT
+  FuncG
+  NotificationInterface
+  Notification
+  MacroCommand
+  SimpleCommand
+} = LeanRC::
 
 describe 'MacroCommand', ->
   describe '.new', ->
@@ -24,20 +30,24 @@ describe 'MacroCommand', ->
   describe '#addSubCommand', ->
     it 'should add sub-command and execute macro', ->
       expect ->
+        KEY = 'TEST_MACRO_COMMAND_001'
+        facade = LeanRC::Facade.getInstance KEY
         command = MacroCommand.new()
+        command.initializeNotifier KEY
         command1Execute = sinon.spy ->
         class TestCommand1 extends SimpleCommand
           @inheritProtected()
-          @public execute: Function,
+          @public execute: FuncG(NotificationInterface, NilT),
             default: command1Execute
         command2Execute = sinon.spy ->
         class TestCommand2 extends SimpleCommand
           @inheritProtected()
-          @public execute: Function,
+          @public execute: FuncG(NotificationInterface, NilT),
             default: command2Execute
         command.addSubCommand TestCommand1
         command.addSubCommand TestCommand2
-        command.execute()
+        notification = Notification.new 'TEST_NOTIFICATION', {body: 'body'}, 'TEST'
+        command.execute notification
         assert command1Execute.called
         assert command2Execute.called
         assert command2Execute.calledAfter command1Execute

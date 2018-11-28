@@ -6,7 +6,7 @@
 module.exports = (Module)->
   {
     AnyT
-    FuncG, SubsetG
+    FuncG, SubsetG, MaybeG
     CollectionInterface, RecordInterface
     Interface
   } = Module::
@@ -17,8 +17,8 @@ module.exports = (Module)->
 
     @virtual collection: CollectionInterface
 
-    @virtual @async recoverize: FuncG [SubsetG(RecordInterface), Object], RecordInterface
-    @virtual @async objectize: FuncG [RecordInterface, Object], Object
+    @virtual @async recoverize: FuncG [SubsetG(RecordInterface), MaybeG Object], MaybeG RecordInterface
+    @virtual @async objectize: FuncG [MaybeG(RecordInterface), MaybeG Object], MaybeG Object
 
 
     @initialize()

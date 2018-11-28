@@ -49,13 +49,14 @@ module.exports = (Module)->
     @public delegate: SubsetG(RecordInterface),
       get: ->
         delegate = @getData()?.delegate
+        UnionG(String, Function, SubsetG RecordInterface) delegate
         if _.isString delegate
           delegate = (@ApplicationModule.NS ? @ApplicationModule::)[delegate]
         else unless /Migration$|Record$/.test delegate.name
           delegate = delegate?()
         delegate
-    @public serializer: SerializerInterface
-    @public objectizer: ObjectizerInterface
+    @public serializer: MaybeG SerializerInterface
+    @public objectizer: MaybeG ObjectizerInterface
 
     @public collectionName: FuncG([], String),
       default: ->
@@ -110,13 +111,13 @@ module.exports = (Module)->
         throw new Error 'Not implemented specific method'
         yield return
 
-    @public @async find: FuncG([UnionG String, Number], RecordInterface),
+    @public @async find: FuncG([UnionG String, Number], MaybeG RecordInterface),
       default: (id)-> return yield @take id
 
     @public @async findMany: FuncG([ListG UnionG String, Number], CursorInterface),
       default: (ids)-> return yield @takeMany ids
 
-    @public @async take: FuncG([UnionG String, Number], RecordInterface),
+    @public @async take: FuncG([UnionG String, Number], MaybeG RecordInterface),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
@@ -179,7 +180,8 @@ module.exports = (Module)->
       default: (aoRecord, ahOptions)->
         return yield @serializer.serialize aoRecord, ahOptions
 
-    @public init: FuncG([String, InterfaceG {
+    @public init: FuncG([String, MaybeG InterfaceG {
+      delegate: UnionG String, Function, SubsetG RecordInterface
       serializer: MaybeG UnionG String, Function, SubsetG Serializer
       objectizer: MaybeG UnionG String, Function, SubsetG Objectizer
     }], NilT),

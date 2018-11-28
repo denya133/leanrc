@@ -43,7 +43,7 @@ module.exports = (Module)->
       action: String
       tag: String
       template: String
-      keyName: String
+      keyName: MaybeG String
       entityName: String
       recordName: String
     }], MaybeG AnyT),
