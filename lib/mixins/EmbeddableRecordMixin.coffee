@@ -44,31 +44,42 @@ module.exports = (Module)->
 
       @public @static relatedEmbed: Function,
         default: (typeDefinition, opts={})->
-          recordClass = @
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
+          opts.inverseType ?= null # manually only string
           opts.attr ?= "#{vsAttr}Id"
           opts.embedding = 'relatedEmbed'
 
           opts.putOnly ?= no
           opts.loadOnly ?= no
 
-          opts.recordName ?= ->
-            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
+          opts.recordName ?= (recordType = null)->
+            if recordType?
+              recordClass = @findRecordByName recordType
+              classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
+              vsRecordName = classNames[1] # ['Record', 'FtRecord', 'SdRecord']
+            else
+              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          opts.collectionName ?= ->
+          opts.collectionName ?= (recordType = null)->
             "#{
-              inflect.pluralize opts.recordName().replace /Record$/, ''
+              inflect.pluralize opts.recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
           opts.validate = ->
-            EmbedRecord = @findRecordByName opts.recordName()
-            return EmbedRecord.schema.allow(null).optional()
+            if opts.inverseType?
+              return Record.schema.unknown(yes).allow(null).optional()
+            else
+              EmbedRecord = @findRecordByName opts.recordName.call(@)
+              return EmbedRecord.schema.allow(null).optional()
           opts.load = co.wrap ->
             if opts.putOnly
               yield return null
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            recordType = null
+            if opts.inverseType?
+              recordType = @[opts.inverseType]
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call @, recordType
             # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
             {
@@ -90,8 +101,8 @@ module.exports = (Module)->
               through = @constructor.embeddings[opts.through[0]]
               unless through?
                 throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.relatedEmbed` method"
-              ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-              ThroughRecord = @findRecordByName through.recordName()
+              ThroughCollection = @collection.facade.retrieveProxy through.collectionName.call(@)
+              ThroughRecord = @findRecordByName through.recordName.call(@)
               inverse = ThroughRecord.relations[opts.through[1].by]
               embedId = (yield (yield ThroughCollection.takeBy(
                 "@doc.#{through.inverse}": @[through.refKey]
@@ -111,8 +122,8 @@ module.exports = (Module)->
           opts.put = co.wrap ->
             if opts.loadOnly
               yield return
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
-            EmbedRecord = @findRecordByName opts.recordName()
+            EmbedsCollection = null
+            EmbedRecord = null
             aoRecord = @[vsAttr]
 
             {
@@ -126,6 +137,15 @@ module.exports = (Module)->
 
             if aoRecord?
               if aoRecord.constructor is Object
+                if opts.inverseType?
+                  unless aoRecord.type?
+                    throw new Error 'When set polymorphic relatedEmbed `type` is required'
+                  EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call @, aoRecord.type
+                  EmbedRecord = @findRecordByName aoRecord.type
+                else
+                  EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
+                  EmbedRecord = @findRecordByName opts.recordName.call(@)
+
                 aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
                 aoRecord = yield EmbedsCollection.build aoRecord
               unless opts.through
@@ -140,13 +160,15 @@ module.exports = (Module)->
                 else
                   savedRecord = aoRecord
                 @[opts.attr] = savedRecord[opts.refKey]
+                if opts.inverseType?
+                  @[opts.inverseType] = savedRecord.type
               else
                 # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода relatedEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
                 through = @constructor.embeddings[opts.through[0]]
                 unless through?
                   throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.relatedEmbed` method"
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-                ThroughRecord = @findRecordByName through.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName.call(@)
+                ThroughRecord = @findRecordByName through.recordName.call(@)
                 inverse = ThroughRecord.relations[opts.through[1].by]
                 aoRecord.spaceId = @spaceId if @spaceId?
                 aoRecord.teamId = @teamId if @teamId?
@@ -180,8 +202,8 @@ module.exports = (Module)->
             yield return
 
           opts.restore = co.wrap (replica)->
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
-            EmbedRecord = @findRecordByName opts.recordName()
+            EmbedsCollection = null
+            EmbedRecord = null
 
             {
               LogMessage: {
@@ -193,6 +215,15 @@ module.exports = (Module)->
             @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbed.restore #{vsAttr} replica #{JSON.stringify replica}", LEVELS[DEBUG])
 
             res = if replica?
+              if opts.inverseType?
+                unless replica.type?
+                  throw new Error 'When set polymorphic relatedEmbed `type` is required'
+                EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call @, replica.type
+                EmbedRecord = @findRecordByName replica.type
+              else
+                EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
+                EmbedRecord = @findRecordByName opts.recordName.call(@)
+
               replica.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
               yield EmbedsCollection.build replica
             else
@@ -226,31 +257,42 @@ module.exports = (Module)->
 
       @public @static relatedEmbeds: Function,
         default: (typeDefinition, opts={})->
-          recordClass = @
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
+          opts.inverseType ?= null # manually only string
           opts.attr ?= "#{inflect.pluralize inflect.camelize vsAttr, no}"
           opts.embedding = 'relatedEmbeds'
 
           opts.putOnly ?= no
           opts.loadOnly ?= no
 
-          opts.recordName ?= ->
-            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
+          opts.recordName ?= (recordType = null)->
+            if recordType?
+              recordClass = @findRecordByName recordType
+              classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
+              vsRecordName = classNames[1] # ['Record', 'FtRecord', 'SdRecord']
+            else
+              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          opts.collectionName ?= ->
+          opts.collectionName ?= (recordType = null)->
             "#{
-              inflect.pluralize opts.recordName().replace /Record$/, ''
+              inflect.pluralize opts.recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
           opts.validate = ->
-            EmbedRecord = @findRecordByName opts.recordName()
-            return EmbedRecord.schema.allow(null).optional()
+            if inverseType?
+              return joi.array().items [
+                Record.schema.unknown(yes)
+                joi.any().strip()
+              ]
+            else
+              EmbedRecord = @findRecordByName opts.recordName.call(@)
+              return joi.array().items [EmbedRecord.schema, joi.any().strip()]
           opts.load = co.wrap ->
             if opts.putOnly
               yield return null
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            EmbedsCollection = null
             # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
             {
@@ -262,15 +304,19 @@ module.exports = (Module)->
             } = Module::
 
             res = unless opts.through
-              yield (yield EmbedsCollection.takeBy(
-                "@doc.#{opts.refKey}": $in: @[opts.attr]
-              ,
-                $limit: 1
-              )).first()
+              if opts.inverseType?
+                for { id, inverseType } in @[opts.attr]
+                  EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call @, inverseType
+                  yield EmbedsCollection.take id
+              else
+                EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
+                yield (yield EmbedsCollection.takeBy(
+                  "@doc.#{opts.refKey}": $in: @[opts.attr]
+                )).toArray()
             else
               through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
-              ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-              ThroughRecord = @findRecordByName through.recordName()
+              ThroughCollection = @collection.facade.retrieveProxy through.collectionName.call(@)
+              ThroughRecord = @findRecordByName through.recordName.call(@)
               inverse = ThroughRecord.relations[opts.through[1].by]
               embedIds = yield (yield ThroughCollection.takeBy(
                 "@doc.#{through.inverse}": @[through.refKey]
@@ -286,8 +332,8 @@ module.exports = (Module)->
           opts.put = co.wrap ->
             if opts.loadOnly
               yield return
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
-            EmbedRecord = @findRecordByName opts.recordName()
+            EmbedsCollection = null
+            EmbedRecord = null
             alRecords = @[vsAttr]
 
             {
@@ -304,6 +350,15 @@ module.exports = (Module)->
                 alRecordIds = []
                 for aoRecord in alRecords
                   if aoRecord.constructor is Object
+                    if opts.inverseType?
+                      unless aoRecord.type?
+                        throw new Error 'When set polymorphic relatedEmbeds `type` is required'
+                      EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call @, aoRecord.type
+                      EmbedRecord = @findRecordByName aoRecord.type
+                    else
+                      EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
+                      EmbedRecord = @findRecordByName opts.recordName.call(@)
+
                     aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
                     aoRecord = yield EmbedsCollection.build aoRecord
                   aoRecord.spaceId = @spaceId if @spaceId?
@@ -313,15 +368,18 @@ module.exports = (Module)->
                   aoRecord.editorId = @editorId
                   aoRecord.ownerId = @ownerId
                   if (yield aoRecord.isNew()) or Object.keys(yield aoRecord.changedAttributes()).length
-                    { id } = yield aoRecord.save()
+                    { id, type: inverseType } = yield aoRecord.save()
                   else
-                    { id } = aoRecord
-                  alRecordIds.push id
+                    { id, type: inverseType } = aoRecord
+                  if opts.inverseType?
+                    alRecordIds.push { id, inverseType }
+                  else
+                    alRecordIds.push id
                 @[opts.attr] = alRecordIds
               else
                 through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-                ThroughRecord = @findRecordByName through.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName.call(@)
+                ThroughRecord = @findRecordByName through.recordName.call(@)
                 inverse = ThroughRecord.relations[opts.through[1].by]
                 alRecordIds = []
                 newRecordIds = []
@@ -366,8 +424,8 @@ module.exports = (Module)->
             yield return
 
           opts.restore = co.wrap (replica)->
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
-            EmbedRecord = @findRecordByName opts.recordName()
+            EmbedsCollection = null
+            EmbedRecord = null
 
             {
               LogMessage: {
@@ -378,18 +436,28 @@ module.exports = (Module)->
             } = Module::
             @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbeds.restore #{vsAttr} replica #{JSON.stringify replica}", LEVELS[DEBUG])
 
-            res = if replica?
-              replica.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
-              yield EmbedsCollection.build replica
+            res = if replica? and replica.length > 0
+              for item in replica
+                if opts.inverseType?
+                  unless replica.type?
+                    throw new Error 'When set polymorphic relatedEmbeds `type` is required'
+                  EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call @, replica.type
+                  EmbedRecord = @findRecordByName replica.type
+                else
+                  EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
+                  EmbedRecord = @findRecordByName opts.recordName.call(@)
+
+                item.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
+                yield EmbedsCollection.build item
             else
-              null
+              []
 
             @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbeds.restore #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
 
             yield return res
 
           opts.replicate = ->
-            aoRecord = @[vsAttr]
+            alRecords = @[vsAttr]
 
             {
               LogMessage: {
@@ -398,44 +466,54 @@ module.exports = (Module)->
                 DEBUG
               }
             } = Module::
-            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbeds.replicate #{vsAttr} embed #{JSON.stringify aoRecord}", LEVELS[DEBUG])
+            @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbeds.replicate #{vsAttr} embed #{JSON.stringify alRecords}", LEVELS[DEBUG])
 
-            res = aoRecord.constructor.objectize aoRecord
+            res = for item in alRecords
+              EmbedRecord = item.constructor
+              EmbedRecord.objectize item
 
             @collection.sendNotification(SEND_TO_LOG, "EmbeddableRecordMixin.relatedEmbeds.replicate #{vsAttr} result #{JSON.stringify res}", LEVELS[DEBUG])
 
             res
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
-          @public "#{vsAttr}": RecordInterface
+          @public "#{vsAttr}": Array
           return
 
       @public @static hasEmbed: Function,
         default: (typeDefinition, opts={})->
-          recordClass = @
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
+          opts.inverseType ?= null # manually only string
           opts.embedding = 'hasEmbed'
 
           opts.putOnly ?= no
           opts.loadOnly ?= no
 
-          opts.recordName ?= ->
-            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
+          opts.recordName ?= (recordType = null)->
+            if recordType?
+              recordClass = @findRecordByName recordType
+              classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
+              vsRecordName = classNames[1] # ['Record', 'FtRecord', 'SdRecord']
+            else
+              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          opts.collectionName ?= ->
+          opts.collectionName ?= (recordType = null)->
             "#{
-              inflect.pluralize opts.recordName().replace /Record$/, ''
+              inflect.pluralize opts.recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
           opts.validate = ->
-            EmbedRecord = @findRecordByName opts.recordName()
-            return EmbedRecord.schema.allow(null).optional()
+            if opts.inverseType?
+              return Record.schema.unknown(yes).allow(null).optional()
+            else
+              EmbedRecord = @findRecordByName opts.recordName.call(@)
+              return EmbedRecord.schema.allow(null).optional()
           opts.load = co.wrap ->
             if opts.putOnly
               yield return null
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
             # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
             {
@@ -447,18 +525,19 @@ module.exports = (Module)->
             } = Module::
 
             res = unless opts.through
+              query = "@doc.#{opts.inverse}": @[opts.refKey]
+              if inverseType?
+                query["@doc.#{opts.inverseType}"] = @type
               yield (yield EmbedsCollection.takeBy(
-                "@doc.#{opts.inverse}": @[opts.refKey]
-              ,
-                $limit: 1
+                query, $limit: 1
               )).first()
             else
               # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
               through = @constructor.embeddings[opts.through[0]]
               unless through?
                 throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-              ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-              ThroughRecord = @findRecordByName through.recordName()
+              ThroughCollection = @collection.facade.retrieveProxy through.collectionName.call(@)
+              ThroughRecord = @findRecordByName through.recordName.call(@)
               inverse = ThroughRecord.relations[opts.through[1].by]
               embedId = (yield (yield ThroughCollection.takeBy(
                 "@doc.#{through.inverse}": @[opts.refKey]
@@ -478,8 +557,8 @@ module.exports = (Module)->
           opts.put = co.wrap ->
             if opts.loadOnly
               yield return
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
-            EmbedRecord = @findRecordByName opts.recordName()
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
+            EmbedRecord = @findRecordByName opts.recordName.call(@)
             aoRecord = @[vsAttr]
 
             {
@@ -497,6 +576,7 @@ module.exports = (Module)->
                 aoRecord = yield EmbedsCollection.build aoRecord
               unless opts.through
                 aoRecord[opts.inverse] = @[opts.refKey]
+                aoRecord[opts.inverseType] = @type if opts.inverseType?
                 aoRecord.spaceId = @spaceId if @spaceId?
                 aoRecord.teamId = @teamId if @teamId?
                 aoRecord.spaces = @spaces
@@ -507,17 +587,21 @@ module.exports = (Module)->
                   savedRecord = yield aoRecord.save()
                 else
                   savedRecord = aoRecord
-                yield (yield EmbedsCollection.takeBy(
+                query =
                   "@doc.#{opts.inverse}": @[opts.refKey]
                   "@doc.id": $ne: savedRecord.id # NOTE: проверяем по айдишнику только-что сохраненного
+                if inverseType?
+                  query["@doc.#{opts.inverseType}"] = @type
+                yield (yield EmbedsCollection.takeBy(
+                  query
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
                 # NOTE: метаданные о through в случае с релейшеном к одному объекту должны быть описаны с помощью метода hasEmbed. Поэтому здесь идет обращение только к @constructor.embeddings
                 through = @constructor.embeddings[opts.through[0]]
                 unless through?
                   throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-                ThroughRecord = @findRecordByName through.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName.call(@)
+                ThroughRecord = @findRecordByName through.recordName.call(@)
                 inverse = ThroughRecord.relations[opts.through[1].by]
                 aoRecord.spaceId = @spaceId if @spaceId?
                 aoRecord.teamId = @teamId if @teamId?
@@ -566,8 +650,8 @@ module.exports = (Module)->
                 through = @constructor.embeddings[opts.through[0]]
                 unless through?
                   throw new Error "Metadata about #{opts.through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-                ThroughRecord = @findRecordByName through.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName.call(@)
+                ThroughRecord = @findRecordByName through.recordName.call(@)
                 inverse = ThroughRecord.relations[opts.through[1].by]
                 embedIds = yield (yield ThroughCollection.takeBy(
                   "@doc.#{through.inverse}": @[opts.refKey]
@@ -585,8 +669,8 @@ module.exports = (Module)->
             yield return
 
           opts.restore = co.wrap (replica)->
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
-            EmbedRecord = @findRecordByName opts.recordName()
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
+            EmbedRecord = @findRecordByName opts.recordName.call(@)
 
             {
               LogMessage: {
@@ -631,31 +715,42 @@ module.exports = (Module)->
 
       @public @static hasEmbeds: Function,
         default: (typeDefinition, opts={})->
-          recordClass = @
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
+          opts.inverseType ?= null # manually only string
           opts.embedding = 'hasEmbeds'
 
           opts.putOnly ?= no
           opts.loadOnly ?= no
 
-          opts.recordName ?= ->
-            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
+          opts.recordName ?= (recordType = null)->
+            if recordType?
+              recordClass = @findRecordByName recordType
+              classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
+              vsRecordName = classNames[1] # ['Record', 'FtRecord', 'SdRecord']
+            else
+              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          opts.collectionName ?= ->
+          opts.collectionName ?= (recordType = null)->
             "#{
-              inflect.pluralize opts.recordName().replace /Record$/, ''
+              inflect.pluralize opts.recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
           opts.validate = ->
-            EmbedRecord = @findRecordByName opts.recordName()
-            return joi.array().items [EmbedRecord.schema, joi.any().strip()]
+            if inverseType?
+              return joi.array().items [
+                Record.schema.unknown(yes)
+                joi.any().strip()
+              ]
+            else
+              EmbedRecord = @findRecordByName opts.recordName.call(@)
+              return joi.array().items [EmbedRecord.schema, joi.any().strip()]
 
           opts.load = co.wrap ->
             if opts.putOnly
               yield return []
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
 
             {
               LogMessage: {
@@ -666,13 +761,16 @@ module.exports = (Module)->
             } = Module::
 
             res = unless opts.through
+              query = "@doc.#{opts.inverse}": @[opts.refKey]
+              if inverseType?
+                query["@doc.#{opts.inverseType}"] = @type
               yield (yield EmbedsCollection.takeBy(
-                "@doc.#{opts.inverse}": @[opts.refKey]
+                query
               )).toArray()
             else
               through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
-              ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-              ThroughRecord = @findRecordByName through.recordName()
+              ThroughCollection = @collection.facade.retrieveProxy through.collectionName.call(@)
+              ThroughRecord = @findRecordByName through.recordName.call(@)
               inverse = ThroughRecord.relations[opts.through[1].by]
               embedIds = yield (yield ThroughCollection.takeBy(
                 "@doc.#{through.inverse}": @[opts.refKey]
@@ -688,8 +786,8 @@ module.exports = (Module)->
           opts.put = co.wrap ->
             if opts.loadOnly
               yield return
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
-            EmbedRecord = @findRecordByName opts.recordName()
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
+            EmbedRecord = @findRecordByName opts.recordName.call(@)
             alRecords = @[vsAttr]
 
             {
@@ -709,6 +807,7 @@ module.exports = (Module)->
                     aoRecord.type ?= "#{EmbedRecord.moduleName()}::#{EmbedRecord.name}"
                     aoRecord = yield EmbedsCollection.build aoRecord
                   aoRecord[opts.inverse] = @[opts.refKey]
+                  aoRecord[opts.inverseType] = @type if opts.inverseType?
                   aoRecord.spaceId = @spaceId if @spaceId?
                   aoRecord.teamId = @teamId if @teamId?
                   aoRecord.spaces = @spaces
@@ -721,14 +820,18 @@ module.exports = (Module)->
                     { id } = aoRecord
                   alRecordIds.push id
                 unless opts.putOnly
-                  yield (yield EmbedsCollection.takeBy(
+                  query =
                     "@doc.#{opts.inverse}": @[opts.refKey]
                     "@doc.id": $nin: alRecordIds # NOTE: проверяем айдишники всех только-что сохраненных
+                  if inverseType?
+                    query["@doc.#{opts.inverseType}"] = @type
+                  yield (yield EmbedsCollection.takeBy(
+                    query
                   )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
                 through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-                ThroughRecord = @findRecordByName through.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName.call(@)
+                ThroughRecord = @findRecordByName through.recordName.call(@)
                 inverse = ThroughRecord.relations[opts.through[1].by]
                 alRecordIds = []
                 newRecordIds = []
@@ -781,8 +884,8 @@ module.exports = (Module)->
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
               else
                 through = @constructor.embeddings[opts.through[0]] ? @constructor.relations?[opts.through[0]]
-                ThroughCollection = @collection.facade.retrieveProxy through.collectionName()
-                ThroughRecord = @findRecordByName through.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy through.collectionName.call(@)
+                ThroughRecord = @findRecordByName through.recordName.call(@)
                 inverse = ThroughRecord.relations[opts.through[1].by]
                 embedIds = yield (yield ThroughCollection.takeBy(
                   "@doc.#{through.inverse}": @[opts.refKey]
@@ -796,8 +899,8 @@ module.exports = (Module)->
             yield return
 
           opts.restore = co.wrap (replica)->
-            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName()
-            EmbedRecord = @findRecordByName opts.recordName()
+            EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
+            EmbedRecord = @findRecordByName opts.recordName.call(@)
 
             {
               LogMessage: {
