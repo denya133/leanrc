@@ -38,7 +38,7 @@ module.exports = (Module)->
 
     @public ctx: ContextInterface
 
-    @public socket: Object,
+    @public socket: MaybeG(Object),
       get: -> @ctx.req.socket
 
     @public header: Object,

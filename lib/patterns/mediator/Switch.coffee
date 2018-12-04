@@ -103,7 +103,7 @@ module.exports = (Module)->
         return yes
       return no
 
-    @public @static createMethod: FuncG([MaybeG String], NilT),
+    @public @static createMethod: FuncG([MaybeG String]),
       default: (method)->
         originMethodName = method
         if method
@@ -111,7 +111,7 @@ module.exports = (Module)->
         else
           originMethodName = 'all'
 
-        @public "#{originMethodName}": FuncG([String, Function], NilT),
+        @public "#{originMethodName}": FuncG([String, Function]),
           default: (path, routeFunc)->
             unless routeFunc
               throw new Error 'handler is required'

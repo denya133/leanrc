@@ -276,7 +276,7 @@ module.exports = (Module)->
         @recordBody = assign {}, @recordBody, id: @recordId
         return args
 
-    @public @async doAction: FuncG([String, ContextInterface], AnyT),
+    @public @async doAction: FuncG([String, ContextInterface], MaybeG AnyT),
       default: (action, context)->
         voResult = yield @[action]? context
         yield @saveDelayeds()
