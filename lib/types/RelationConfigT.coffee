@@ -11,6 +11,7 @@ module.exports = (Module)->
     refKey: String
     attr: MaybeG String
     inverse: String
+    inverseType: MaybeG String
     relation: EnumG 'relatedTo', 'belongsTo', 'hasMany', 'hasOne'
     recordName: Function
     collectionName: Function

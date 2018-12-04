@@ -11,7 +11,7 @@ module.exports = (Module)->
   {
     NilT, PromiseT
     PropertyDefinitionT, RelationOptionsT, RelationConfigT, RelationInverseT
-    FuncG, SubsetG, AsyncFuncG, DictG
+    FuncG, SubsetG, AsyncFuncG, DictG, MaybeG
     RecordInterface, CursorInterface
     RelatableInterface
     Record, Mixin
@@ -25,32 +25,42 @@ module.exports = (Module)->
 
       # NOTE: отличается от belongsTo тем, что сама связь не является обязательной (образуется между объектами "в одной плоскости"), а в @[opts.attr] может содержаться null значение
       @public @static relatedTo: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
-        default: (typeDefinition, {refKey, attr, inverse, recordName, collectionName, through}={})->
-          recordClass = @
+        default: (typeDefinition, {refKey, attr, inverse, relation, recordName, collectionName, through, inverseType}={})->
+          # recordClass = @
           [vsAttr] = Object.keys typeDefinition
           refKey ?= 'id'
           attr ?= "#{vsAttr}Id"
           inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
+          inverseType ?= null # manually only string
           relation = 'relatedTo'
 
-          recordName ?= FuncG([], String) ->
-            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
+          recordName ?= FuncG([MaybeG String], String) (recordType = null)->
+            if recordType?
+              recordClass = @findRecordByName recordType
+              classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
+              vsRecordName = classNames[1] # ['Record', 'FtRecord', 'SdRecord']
+            else
+              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          collectionName ?= FuncG([], String) ->
+          collectionName ?= FuncG([MaybeG String], String) (recordType = null)->
             "#{
-              inflect.pluralize recordName().replace /Record$/, ''
+              inflect.pluralize recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
           opts = {
             refKey
             attr
             inverse
+            inverseType
             relation
             recordName
             collectionName
             through
             get: AsyncFuncG([], RecordInterface) co.wrap ->
-              RelatedToCollection = @collection.facade.retrieveProxy collectionName()
+              recordType = null
+              if inverseType?
+                recordType = @[inverseType]
+              RelatedToCollection = @collection.facade.retrieveProxy collectionName.call @, recordType
               # NOTE: может быть ситуация, что relatedTo связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
               unless through
                 return yield (yield RelatedToCollection.takeBy(
@@ -63,8 +73,8 @@ module.exports = (Module)->
                 throughEmbed = @constructor.embeddings?[through[0]]
                 unless throughEmbed?
                   throw new Error "Metadata about #{through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName()
-                ThroughRecord = @findRecordByName throughEmbed.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName.call(@)
+                ThroughRecord = @findRecordByName throughEmbed.recordName.call(@)
                 inverse = ThroughRecord.relations[through[1].by]
                 relatedId = (yield (yield ThroughCollection.takeBy(
                   "@doc.#{throughEmbed.inverse}": @[throughEmbed.refKey]
@@ -88,32 +98,42 @@ module.exports = (Module)->
       # NOTE: отличается от relatedTo тем, что сама связь является обязательной (образуется между объектами "в иерархии"), а в @[opts.attr] обязательно должно храниться значение айдишника родительского объекта, которому "belongs to" - "принадлежит" этот объект
       # NOTE: если указана опция through, то получение данных о связи будет происходить не из @[opts.attr], а из промежуточной коллекции, где помимо айдишника объекта могут храниться дополнительные атрибуты с данными о связи
       @public @static belongsTo: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
-        default: (typeDefinition, {refKey, attr, inverse, recordName, collectionName, through}={})->
-          recordClass = @
+        default: (typeDefinition, {refKey, attr, inverse, relation, recordName, collectionName, through, inverseType}={})->
+          # recordClass = @
           [vsAttr] = Object.keys typeDefinition
           refKey ?= 'id'
           attr ?= "#{vsAttr}Id"
           inverse ?= "#{inflect.pluralize inflect.camelize @name.replace(/Record$/, ''), no}"
+          inverseType ?= null # manually only string
           relation = 'belongsTo'
 
-          recordName ?= FuncG([], String) ->
-            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
+          recordName ?= FuncG([MaybeG String], String) (recordType = null)->
+            if recordType?
+              recordClass = @findRecordByName recordType
+              classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
+              vsRecordName = classNames[1] # ['Record', 'FtRecord', 'SdRecord']
+            else
+              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          collectionName ?= FuncG([], String) ->
+          collectionName ?= FuncG([MaybeG String], String) (recordType = null)->
             "#{
-              inflect.pluralize recordName().replace /Record$/, ''
+              inflect.pluralize recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
           opts = {
             refKey
             attr
             inverse
+            inverseType
             relation
             recordName
             collectionName
             through
             get: AsyncFuncG([], RecordInterface) co.wrap ->
-              BelongsToCollection = @collection.facade.retrieveProxy collectionName()
+              recordType = null
+              if inverseType?
+                recordType = @[inverseType]
+              BelongsToCollection = @collection.facade.retrieveProxy collectionName.call @, recordType
               # NOTE: может быть ситуация, что belongsTo связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
               unless through
@@ -127,8 +147,8 @@ module.exports = (Module)->
                 throughEmbed = @constructor.embeddings?[through[0]]
                 unless throughEmbed?
                   throw new Error "Metadata about #{through[0]} must be defined by `EmbeddableRecordMixin.hasEmbed` method"
-                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName()
-                ThroughRecord = @findRecordByName throughEmbed.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName.call(@)
+                ThroughRecord = @findRecordByName throughEmbed.recordName.call(@)
                 inverse = ThroughRecord.relations[through[1].by]
                 belongsId = (yield (yield ThroughCollection.takeBy(
                   "@doc.#{throughEmbed.inverse}": @[throughEmbed.refKey]
@@ -150,39 +170,48 @@ module.exports = (Module)->
           return
 
       @public @static hasMany: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
-        default: (typeDefinition, {refKey, inverse, recordName, collectionName, through}={})->
-          recordClass = @
+        default: (typeDefinition, {refKey, inverse, relation, recordName, collectionName, through, inverseType}={})->
+          # recordClass = @
           [vsAttr] = Object.keys typeDefinition
           refKey ?= 'id'
           inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
+          inverseType ?= null # manually only string
           relation = 'hasMany'
-          recordName ?= FuncG([], String) ->
-            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
+
+          recordName ?= FuncG([MaybeG String], String) (recordType = null)->
+            if recordType?
+              recordClass = @findRecordByName recordType
+              classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
+              vsRecordName = classNames[1] # ['Record', 'FtRecord', 'SdRecord']
+            else
+              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          collectionName ?= FuncG([], String) ->
+          collectionName ?= FuncG([MaybeG String], String) (recordType = null)->
             "#{
-              inflect.pluralize recordName().replace /Record$/, ''
+              inflect.pluralize recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
           opts = {
             attr: null
             refKey
             inverse
+            inverseType
             relation
             recordName
             collectionName
             through
             get: AsyncFuncG([], CursorInterface) co.wrap ->
-              HasManyCollection = @collection.facade.retrieveProxy collectionName()
+              HasManyCollection = @collection.facade.retrieveProxy collectionName.call(@)
 
               unless through
-                return yield HasManyCollection.takeBy(
-                  "@doc.#{inverse}": @[refKey]
-                )
+                query = "@doc.#{inverse}": @[refKey]
+                if inverseType?
+                  query["@doc.#{inverseType}"] = @type
+                return yield HasManyCollection.takeBy query
               else
                 throughEmbed = @constructor.embeddings?[through[0]] ? @constructor.relations[through[0]]
-                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName()
-                ThroughRecord = @findRecordByName throughEmbed.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName.call(@)
+                ThroughRecord = @findRecordByName throughEmbed.recordName.call(@)
                 inverse = ThroughRecord.relations[through[1].by]
                 manyIds = yield (yield ThroughCollection.takeBy(
                   "@doc.#{throughEmbed.inverse}": @[refKey]
@@ -200,42 +229,51 @@ module.exports = (Module)->
           return
 
       @public @static hasOne: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
-        default: (typeDefinition, {refKey, inverse, recordName, collectionName, through}={})->
-          recordClass = @
+        default: (typeDefinition, {refKey, inverse, relation, recordName, collectionName, through, inverseType}={})->
+          # recordClass = @
           [vsAttr] = Object.keys typeDefinition
           refKey ?= 'id'
           inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
+          inverseType ?= null # manually only string
           relation = 'hasOne'
-          recordName ?= FuncG([], String) ->
-            [vsModuleName, vsRecordName] = recordClass.parseRecordName vsAttr
+
+          recordName ?= FuncG([MaybeG String], String) (recordType = null)->
+            if recordType?
+              recordClass = @findRecordByName recordType
+              classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
+              vsRecordName = classNames[1] # ['Record', 'FtRecord', 'SdRecord']
+            else
+              [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          collectionName ?= FuncG([], String) ->
+          collectionName ?= FuncG([MaybeG String], String) (recordType = null)->
             "#{
-              inflect.pluralize recordName().replace /Record$/, ''
+              inflect.pluralize recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
           opts = {
             attr: null
             refKey
             inverse
+            inverseType
             relation
             recordName
             collectionName
             through
             get: AsyncFuncG([], RecordInterface) co.wrap ->
-              HasOneCollection = @collection.facade.retrieveProxy collectionName()
+              HasOneCollection = @collection.facade.retrieveProxy collectionName.call(@)
               # NOTE: может быть ситуация, что hasOne связь не хранится в классическом виде атрибуте рекорда, а хранение вынесено в отдельную промежуточную коллекцию по аналогии с М:М , но с добавленным uniq констрейнтом на одном поле (чтобы эмулировать 1:М связи)
 
               unless through
+                query = "@doc.#{inverse}": @[refKey]
+                if inverseType?
+                  query["@doc.#{inverseType}"] = @type
                 return yield (yield HasOneCollection.takeBy(
-                  "@doc.#{inverse}": @[refKey]
-                ,
-                  $limit: 1
+                  query, $limit: 1
                 )).first()
               else
                 throughEmbed = @constructor.embeddings?[through[0]] ? @constructor.relations[through[0]]
-                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName()
-                ThroughRecord = @findRecordByName throughEmbed.recordName()
+                ThroughCollection = @collection.facade.retrieveProxy throughEmbed.collectionName.call(@)
+                ThroughRecord = @findRecordByName throughEmbed.recordName.call(@)
                 inverse = ThroughRecord.relations[through[1].by]
                 oneId = (yield (yield ThroughCollection.takeBy(
                   "@doc.#{throughEmbed.inverse}": @[refKey]
@@ -260,7 +298,7 @@ module.exports = (Module)->
       @public @static inverseFor: FuncG(String, RelationInverseT),
         default: (asAttrName)->
           opts = @relations[asAttrName]
-          RecordClass = @findRecordByName opts.recordName()
+          RecordClass = @findRecordByName opts.recordName.call(@)
           {inverse:attrName} = opts
           {relation} = RecordClass.relations[attrName]
           return {recordClass: RecordClass, attrName, relation}

@@ -72,8 +72,8 @@ describe 'RelationsMixin', ->
         assert.isString relationData.through[0], 'Value of `through[0]` isn`t string'
         assert.isObject relationData.through[1], 'Value of `through[1]` isn`t object'
         assert.isString relationData.through[1].by, 'Value of `through[1].by` isn`t string'
-        assert.equal relationData.recordName(), 'TestRecord', 'Value of `recordName` is incorrect'
-        assert.equal relationData.collectionName(), 'TestsCollection', 'Value of `collectionName` is incorrect'
+        assert.equal relationData.recordName.call(Test::TestRecord), 'TestRecord', 'Value of `recordName` is incorrect'
+        assert.equal relationData.collectionName.call(Test::TestRecord), 'TestsCollection', 'Value of `collectionName` is incorrect'
         yield return
     it 'relatedTo: should define options automatically', ->
       co ->
@@ -90,8 +90,8 @@ describe 'RelationsMixin', ->
           @initialize()
         { cucumber: relationData } = TestRecord.relations
         assert.equal relationData.attr, 'cucumberId', 'Value of `attr` is incorrect'
-        assert.equal relationData.recordName(), 'CucumberRecord', 'Value of `recordName` is incorrect'
-        assert.equal relationData.collectionName(), 'CucumbersCollection', 'Value of `collectionName` is incorrect'
+        assert.equal relationData.recordName.call(Test::TestRecord), 'CucumberRecord', 'Value of `recordName` is incorrect'
+        assert.equal relationData.collectionName.call(Test::TestRecord), 'CucumbersCollection', 'Value of `collectionName` is incorrect'
         assert.equal relationData.inverse, 'tests', 'Value of `inverse` is incorrect'
         yield return
   describe '.belongsTo', ->
@@ -124,8 +124,8 @@ describe 'RelationsMixin', ->
         assert.isString relationData.through[0], 'Value of `through[0]` isn`t string'
         assert.isObject relationData.through[1], 'Value of `through[1]` isn`t object'
         assert.isString relationData.through[1].by, 'Value of `through[1].by` isn`t string'
-        assert.equal relationData.recordName(), 'TestRecord', 'Value of `recordName` is incorrect'
-        assert.equal relationData.collectionName(), 'TestsCollection', 'Value of `collectionName` is incorrect'
+        assert.equal relationData.recordName.call(Test::TestRecord), 'TestRecord', 'Value of `recordName` is incorrect'
+        assert.equal relationData.collectionName.call(Test::TestRecord), 'TestsCollection', 'Value of `collectionName` is incorrect'
         yield return
     it 'belongsTo: should define options automatically', ->
       co ->
@@ -142,8 +142,8 @@ describe 'RelationsMixin', ->
           @initialize()
         { cucumber: relationData } = TestRecord.relations
         assert.equal relationData.attr, 'cucumberId', 'Value of `attr` is incorrect'
-        assert.equal relationData.recordName(), 'CucumberRecord', 'Value of `recordName` is incorrect'
-        assert.equal relationData.collectionName(), 'CucumbersCollection', 'Value of `collectionName` is incorrect'
+        assert.equal relationData.recordName.call(Test::TestRecord), 'CucumberRecord', 'Value of `recordName` is incorrect'
+        assert.equal relationData.collectionName.call(Test::TestRecord), 'CucumbersCollection', 'Value of `collectionName` is incorrect'
         assert.equal relationData.inverse, 'tests', 'Value of `inverse` is incorrect'
         yield return
   describe '.hasMany', ->
@@ -174,8 +174,8 @@ describe 'RelationsMixin', ->
         assert.isString relationData.through[0], 'Value of `through[0]` isn`t string'
         assert.isObject relationData.through[1], 'Value of `through[1]` isn`t object'
         assert.isString relationData.through[1].by, 'Value of `through[1].by` isn`t string'
-        assert.equal relationData.recordName(), 'TestRecord', 'Value of `recordName` is incorrect'
-        assert.equal relationData.collectionName(), 'TestsCollection', 'Value of `collectionName` is incorrect'
+        assert.equal relationData.recordName.call(Test::TestRecord), 'TestRecord', 'Value of `recordName` is incorrect'
+        assert.equal relationData.collectionName.call(Test::TestRecord), 'TestsCollection', 'Value of `collectionName` is incorrect'
         yield return
   describe '.hasOne', ->
     it 'hasOne: should define many-to-one or many-to-one relation for class', ->
@@ -205,8 +205,8 @@ describe 'RelationsMixin', ->
         assert.isString relationData.through[0], 'Value of `through[0]` isn`t string'
         assert.isObject relationData.through[1], 'Value of `through[1]` isn`t object'
         assert.isString relationData.through[1].by, 'Value of `through[1].by` isn`t string'
-        assert.equal relationData.recordName(), 'TestRecord', 'Value of `recordName` is incorrect'
-        assert.equal relationData.collectionName(), 'TestsCollection', 'Value of `collectionName` is incorrect'
+        assert.equal relationData.recordName.call(Test::TestRecord), 'TestRecord', 'Value of `recordName` is incorrect'
+        assert.equal relationData.collectionName.call(Test::TestRecord), 'TestsCollection', 'Value of `collectionName` is incorrect'
         yield return
   describe '.inverseFor', ->
     it 'should get inverse info', ->
