@@ -49,7 +49,7 @@ module.exports = (Module)->
         template: String
         keyName: MaybeG String
         entityName: String
-        recordName: String
+        recordName: MaybeG String
       }
       String
       String
@@ -215,7 +215,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }
 
 

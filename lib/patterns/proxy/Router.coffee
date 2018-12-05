@@ -62,7 +62,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }
     iplResources  = PointerT @protected resources: MaybeG ListG SampleG Router
     iplRoutes     = PointerT @protected routes: MaybeG ListG InterfaceG {
@@ -74,7 +74,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }
 
     @public path: MaybeG(String),
@@ -131,7 +131,7 @@ module.exports = (Module)->
         template: String
         keyName: MaybeG String
         entityName: String
-        recordName: String
+        recordName: MaybeG String
       }
       String
       String
@@ -538,7 +538,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }),
       get: ->
         if @[iplRoutes]? and @[iplRoutes].length > 0
