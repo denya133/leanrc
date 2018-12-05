@@ -21,7 +21,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }], MaybeG AnyT
 
 

@@ -334,7 +334,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }], NilT),
       default: (ctx, aoData, resource, opts)->
         if opts.action is 'create'
@@ -370,7 +370,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }], NilT),
       default: (resourceName, aoMessage, {method, path, resource, action})->
         @sendNotification resourceName, aoMessage, action
@@ -419,7 +419,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }], NilT),
       default: (opts)->
         {method, path} = opts

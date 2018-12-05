@@ -31,7 +31,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }], NilT
 
     @virtual defineRoutes: Function
@@ -48,7 +48,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }], NilT
 
     @virtual createNativeRoute: FuncG [InterfaceG {
@@ -60,7 +60,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }], NilT
 
 

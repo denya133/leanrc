@@ -45,7 +45,7 @@ module.exports = (Module)->
       template: String
       keyName: MaybeG String
       entityName: String
-      recordName: String
+      recordName: MaybeG String
     }], MaybeG AnyT),
       default: (ctx, aoData, resource, {path, resource:resourceName, action, template:templatePath}={})->
         if path? and resourceName? and action?
