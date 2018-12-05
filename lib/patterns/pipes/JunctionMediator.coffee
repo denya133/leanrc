@@ -37,7 +37,7 @@ module.exports = (Module)->
           JunctionMediator.REMOVE_PIPE
         ]
 
-    @public handleNotification: FuncG(NotificationInterface, NilT),
+    @public handleNotification: FuncG(NotificationInterface),
       default: (aoNotification)->
         switch aoNotification.getName()
           when JunctionMediator.ACCEPT_INPUT_PIPE
@@ -54,7 +54,7 @@ module.exports = (Module)->
             @[ipoJunction].removePipe outputPipeName
         return
 
-    @public handlePipeMessage: FuncG(PipeMessageInterface, NilT),
+    @public handlePipeMessage: FuncG(PipeMessageInterface),
       default: (aoMessage)->
         @sendNotification aoMessage.getType(), aoMessage
 

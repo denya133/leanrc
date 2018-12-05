@@ -37,7 +37,7 @@ module.exports = (Module)->
 
       ipoJoinedNamespacesMask = PointerT @private joinedNamespacesMask: MaybeG RegExp
 
-      @public namespaces: ListG(String),
+      @public namespaces: FuncG([], ListG String),
         default: -> [
           'admining'
           'globaling'
