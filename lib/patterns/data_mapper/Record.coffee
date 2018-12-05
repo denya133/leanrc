@@ -94,7 +94,7 @@ module.exports = (Module)->
         vhAttributes = {}
 
         unless ahPayload.type?
-          throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          throw new Error "Attribute `type` is required and format 'ModuleName::RecordClassName'"
 
         RecordClass = if @name is ahPayload.type.split('::')[1]
           @
@@ -118,7 +118,7 @@ module.exports = (Module)->
           return null
 
         unless aoRecord.type?
-          throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          throw new Error "Attribute `type` is required and format 'ModuleName::RecordClassName'"
 
         vhResult = {}
         for own asAttr, { transform } of aoRecord.constructor.attributes
@@ -132,7 +132,7 @@ module.exports = (Module)->
         vhAttributes = {}
 
         unless ahPayload.type?
-          throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          throw new Error "Attribute `type` is required and format 'ModuleName::RecordClassName'"
 
         RecordClass = if @name is ahPayload.type.split('::')[1]
           @
@@ -155,7 +155,7 @@ module.exports = (Module)->
           return null
 
         unless aoRecord.type?
-          throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          throw new Error "Attribute `type` is required and format 'ModuleName::RecordClassName'"
 
         vhResult = {}
 
@@ -171,7 +171,7 @@ module.exports = (Module)->
           return null
 
         unless aoRecord.type?
-          throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          throw new Error "Attribute `type` is required and format 'ModuleName::RecordClassName'"
 
         vhResult = {}
 
@@ -298,7 +298,7 @@ module.exports = (Module)->
         aoAttributes ?= {}
 
         unless aoAttributes.type?
-          throw new Error "Attribute `type` is required and format '<ModuleName>::<RecordClassName>'"
+          throw new Error "Attribute `type` is required and format 'ModuleName::RecordClassName'"
         if @name is aoAttributes.type.split('::')[1]
           @super aoAttributes, aoCollection
         else
