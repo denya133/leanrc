@@ -23,8 +23,10 @@ module.exports = (Module) ->
 
     @public logLevel: Number
 
-    @public @static filterLogByLevel: FuncG([PipeMessageInterface, Object], NilT),
-      default: (message, params)->
+    @public @static filterLogByLevel: FuncG([PipeMessageInterface, MaybeG Object], NilT),
+      default: (message, params = {})->
+        { logLevel } = params
+        logLevel ?= 0
         if message.getHeader().logLevel > params.logLevel
           throw new Error()
 
