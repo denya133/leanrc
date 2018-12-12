@@ -13,8 +13,6 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual isClosed: Boolean
-
     @virtual setCollection: FuncG CollectionInterface, CursorInterfaceDef
 
     @virtual setIterable: FuncG AnyT, CursorInterfaceDef
