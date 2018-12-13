@@ -12,6 +12,12 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
+      @public namespace: String,
+        default: 'guesting'
+
+      @public currentSpaceId: String,
+        default: '_external'
+
       @beforeHook 'limitByExternalSpace', only: ['list']
 
       @public @async limitByExternalSpace: Function,
@@ -21,10 +27,10 @@ module.exports = (Module)->
             @listQuery.$filter = $and: [
               @listQuery.$filter
             ,
-              '@doc.spaces': $all: ['_external']
+              '@doc.spaces': $all: [@currentSpaceId]
             ]
           else
-            @listQuery.$filter = '@doc.spaces': $all: ['_external']
+            @listQuery.$filter = '@doc.spaces': $all: [@currentSpaceId]
           yield return args
 
       @public @async checkExistence: Function,
@@ -33,7 +39,7 @@ module.exports = (Module)->
             @context.throw HTTP_NOT_FOUND
           unless (yield @collection.exists(
             '@doc.id': $eq: @recordId
-            '@doc.spaces': $all: ['_external']
+            '@doc.spaces': $all: [@currentSpaceId]
           ))
             @context.throw HTTP_NOT_FOUND
           yield return args
