@@ -18,9 +18,15 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
+      @public namespace: String,
+        default: 'admining'
+
+      @public currentSpaceId: String,
+        default: '_internal'
+
       @public currentSpace: PromiseT,
         get: co.wrap ->
-          return yield @facade.retrieveProxy(SPACES).find '_internal'
+          return yield @facade.retrieveProxy(SPACES).find @currentSpaceId
 
       @beforeHook 'limitBySpace',   only: ['list']
       @beforeHook 'setSpaces',      only: ['create']
@@ -35,10 +41,10 @@ module.exports = (Module)->
             @listQuery.$filter = $and: [
               @listQuery.$filter
             ,
-              '@doc.spaces': $all: ['_internal']
+              '@doc.spaces': $all: [@currentSpaceId]
             ]
           else
-            @listQuery.$filter = '@doc.spaces': $all: ['_internal']
+            @listQuery.$filter = '@doc.spaces': $all: [@currentSpaceId]
           yield return args
 
       @public @async checkExistence: Function,
@@ -47,7 +53,7 @@ module.exports = (Module)->
             @context.throw HTTP_NOT_FOUND
           unless (yield @collection.exists(
             '@doc.id': $eq: @recordId
-            '@doc.spaces': $all: ['_internal']
+            '@doc.spaces': $all: [@currentSpaceId]
           ))
             @context.throw HTTP_NOT_FOUND
           yield return args
@@ -60,8 +66,8 @@ module.exports = (Module)->
       @public @async setSpaces: Function,
         default: (args...)->
           @recordBody.spaces ?= []
-          unless _.includes @recordBody.spaces, '_internal'
-            @recordBody.spaces.push '_internal'
+          unless _.includes @recordBody.spaces, @currentSpaceId
+            @recordBody.spaces.push @currentSpaceId
           # NOTE: временно закоментировал, т.к. появилось понимание, что контент создаваемый через админку не должен быть "частно" доступен у человека, который его создал - НО это надо обсуждать!
           # unless _.includes @recordBody.spaces, @session.userSpaceId
           #   @recordBody.spaces.push @session.userSpaceId
@@ -113,7 +119,7 @@ module.exports = (Module)->
           if @session.userIsAdmin
             yield return args
           {chainName} = checkPermission.wrapper
-          yield @[ipoCheckPermission] '_internal', chainName
+          yield @[ipoCheckPermission] @currentSpaceId, chainName
           yield return args
 
 

@@ -18,6 +18,12 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
+      @public namespace: String,
+        default: 'modeling'
+
+      @public currentSpaceId: String,
+        default: '_internal'
+
       @public needsLimitation: Boolean,
         default: no
 
@@ -81,8 +87,8 @@ module.exports = (Module)->
       @public @async setSpaces: Function,
         default: (args...)->
           @recordBody.spaces ?= []
-          unless _.includes @recordBody.spaces, '_internal'
-            @recordBody.spaces.push '_internal'
+          unless _.includes @recordBody.spaces, @currentSpaceId
+            @recordBody.spaces.push @currentSpaceId
           yield return args
 
       @public @async protectSpaces: Function,

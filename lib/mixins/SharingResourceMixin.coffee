@@ -18,10 +18,15 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
+      @public namespace: String,
+        default: 'sharing'
+
+      @public currentSpaceId: String,
+        get: -> @context.pathParams.space
+
       @public currentSpace: PromiseT,
         get: co.wrap ->
-          currentSpace = @context.pathParams.space
-          return yield @facade.retrieveProxy(SPACES).find currentSpace
+          return yield @facade.retrieveProxy(SPACES).find @currentSpaceId
 
       @beforeHook 'limitBySpace',   only: ['list']
       @beforeHook 'setSpaces',      only: ['create']
@@ -32,25 +37,23 @@ module.exports = (Module)->
       @public @async limitBySpace: Function,
         default: (args...)->
           @listQuery ?= {}
-          currentSpace = @context.pathParams.space
           if @listQuery.$filter?
             @listQuery.$filter = $and: [
               @listQuery.$filter
             ,
-              '@doc.spaces': $all: [currentSpace]
+              '@doc.spaces': $all: [@currentSpaceId]
             ]
           else
-            @listQuery.$filter = '@doc.spaces': $all: [currentSpace]
+            @listQuery.$filter = '@doc.spaces': $all: [@currentSpaceId]
           yield return args
 
       @public @async checkExistence: Function,
         default: (args...)->
-          currentSpace = @context.pathParams.space
           unless @recordId?
             @context.throw HTTP_NOT_FOUND
           unless (yield @collection.exists
             '@doc.id': $eq: @recordId
-            '@doc.spaces': $all: [currentSpace]
+            '@doc.spaces': $all: [@currentSpaceId]
           )
             @context.throw HTTP_NOT_FOUND
           yield return args
@@ -67,9 +70,8 @@ module.exports = (Module)->
             @recordBody.spaces.push '_internal'
           unless _.includes @recordBody.spaces, @session.userSpaceId
             @recordBody.spaces.push @session.userSpaceId
-          currentSpace = @context.pathParams.space
-          unless _.includes @recordBody.spaces, currentSpace
-            @recordBody.spaces.push currentSpace
+          unless _.includes @recordBody.spaces, @currentSpaceId
+            @recordBody.spaces.push @currentSpaceId
           yield return args
 
       @public @async protectSpaces: Function,
@@ -79,7 +81,7 @@ module.exports = (Module)->
 
       ipoCheckOwner = PointerT @private @async checkOwner: FuncG(String, Boolean),
         default: (userId)->
-          yield return @context.pathParams.space in @session.ownSpaces
+          yield return @currentSpaceId in @session.ownSpaces
 
       ipoCheckRole = PointerT @private @async checkRole: FuncG([String, String, String], Boolean),
         default: (spaceId, userId, action)->
@@ -112,7 +114,6 @@ module.exports = (Module)->
 
       @public @async checkPermission: Function,
         default: checkPermission = (args...)->
-          spaceId = @context.pathParams.space
           {chainName} = checkPermission.wrapper
           # SpacesCollection = @facade.retrieveProxy SPACES
           # try
@@ -121,7 +122,7 @@ module.exports = (Module)->
           #   @context.throw FORBIDDEN, "Current user has no access"
           if @session.userIsAdmin
             yield return args
-          yield @[ipoCheckPermission] spaceId, chainName
+          yield @[ipoCheckPermission] @currentSpaceId, chainName
           yield return args
 
 
