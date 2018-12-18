@@ -93,7 +93,7 @@ module.exports = (Module)->
         @[ipoModel].registerProxy aoProxy
         return
 
-    @public lazyRegisterProxy: FuncG([String, MaybeG(String), MaybeG Object]),
+    @public lazyRegisterProxy: FuncG([String, MaybeG(String), MaybeG AnyT]),
       default: (asProxyName, asProxyClassName, ahData)->
         @[ipoModel].lazyRegisterProxy asProxyName, asProxyClassName, ahData
         return

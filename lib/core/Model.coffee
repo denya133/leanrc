@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-    PointerT
+    AnyT, PointerT
     SubsetG, DictG, FuncG, StructG, MaybeG
     ProxyInterface
     ModelInterface
@@ -21,7 +21,7 @@ module.exports = (Module)->
     iphProxyMap     = PointerT @private proxyMap: DictG String, MaybeG ProxyInterface
     iphMetaProxyMap = PointerT @private metaProxyMap: DictG String, MaybeG StructG {
       className: MaybeG String
-      data: MaybeG Object
+      data: MaybeG AnyT
     }
     ipsMultitonKey  = PointerT @protected multitonKey: MaybeG String
     cphInstanceMap  = PointerT @private @static _instanceMap: DictG(String, MaybeG ModelInterface),
@@ -84,7 +84,7 @@ module.exports = (Module)->
       default: (asProxyName)->
         @[iphProxyMap][asProxyName]? or @[iphMetaProxyMap][asProxyName]?
 
-    @public lazyRegisterProxy: FuncG([String, MaybeG(String), MaybeG Object]),
+    @public lazyRegisterProxy: FuncG([String, MaybeG(String), MaybeG AnyT]),
       default: (asProxyName, asProxyClassName, ahData)->
         @[iphMetaProxyMap][asProxyName] =
           className: asProxyClassName
