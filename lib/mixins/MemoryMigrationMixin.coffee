@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, AsyncFunctionT
+    AnyT, AsyncFunctionT
     FuncG, ListG, EnumG, MaybeG, UnionG, InterfaceG
     Migration
     Mixin
@@ -15,10 +15,10 @@ module.exports = (Module)->
 
       { UP, DOWN, SUPPORTED_TYPES } = @::
 
-      @public @async createCollection: FuncG([String, MaybeG Object], NilT),
+      @public @async createCollection: FuncG([String, MaybeG Object]),
         default: (name, options)-> yield return
 
-      @public @async createEdgeCollection: FuncG([String, String, MaybeG Object], NilT),
+      @public @async createEdgeCollection: FuncG([String, String, MaybeG Object]),
         default: (collection_1, collection_2, options)-> yield return
 
       @public @async addField: FuncG([String, String, UnionG(
@@ -27,7 +27,7 @@ module.exports = (Module)->
           type: EnumG SUPPORTED_TYPES
           default: AnyT
         }
-      )], NilT),
+      )]),
         default: (collection_name, field_name, options)->
           if _.isString options
             yield return
@@ -53,10 +53,10 @@ module.exports = (Module)->
         type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
         unique: MaybeG Boolean
         sparse: MaybeG Boolean
-      }], NilT),
+      }]),
         default: (collection_name, field_names, options)-> yield return
 
-      @public @async addTimestamps: FuncG([String, MaybeG Object], NilT),
+      @public @async addTimestamps: FuncG([String, MaybeG Object]),
         default: (collection_name, options = {})->
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retrieveProxy collectionName
@@ -67,7 +67,7 @@ module.exports = (Module)->
             doc.deletedAt ?= null
           yield return
 
-      @public @async changeCollection: FuncG([String, Object], NilT),
+      @public @async changeCollection: FuncG([String, Object]),
         default: (name, options)-> yield return
 
       @public @async changeField: FuncG([String, String, UnionG(
@@ -75,7 +75,7 @@ module.exports = (Module)->
         InterfaceG {
           type: EnumG SUPPORTED_TYPES
         }
-      )], NilT),
+      )]),
         default: (collection_name, field_name, options = {})->
           {
             json
@@ -118,7 +118,7 @@ module.exports = (Module)->
                 doc[field_name] = new Date(String  doc[field_name]).getTime()
           yield return
 
-      @public @async renameField: FuncG([String, String, String], NilT),
+      @public @async renameField: FuncG([String, String, String]),
         default: (collection_name, field_name, new_field_name)->
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retrieveProxy collectionName
@@ -128,13 +128,13 @@ module.exports = (Module)->
             delete doc[field_name]
           yield return
 
-      @public @async renameIndex: FuncG([String, String, String], NilT),
+      @public @async renameIndex: FuncG([String, String, String]),
         default: (collection_name, old_name, new_name)-> yield return
 
-      @public @async renameCollection: FuncG([String, String], NilT),
+      @public @async renameCollection: FuncG([String, String]),
         default: (collection_name, new_name)-> yield return
 
-      @public @async dropCollection: FuncG(String, NilT),
+      @public @async dropCollection: FuncG(String),
         default: (collection_name)->
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retrieveProxy collectionName
@@ -144,7 +144,7 @@ module.exports = (Module)->
           memCollection[ipoCollection] = {}
           yield return
 
-      @public @async dropEdgeCollection: FuncG([String, String], NilT),
+      @public @async dropEdgeCollection: FuncG([String, String]),
         default: (collection_1, collection_2)->
           qualifiedName = "#{collection_1}_#{collection_2}"
           collectionName = "#{inflect.camelize qualifiedName}Collection"
@@ -155,7 +155,7 @@ module.exports = (Module)->
           memCollection[ipoCollection] = {}
           yield return
 
-      @public @async removeField: FuncG([String, String], NilT),
+      @public @async removeField: FuncG([String, String]),
         default: (collection_name, field_name)->
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retrieveProxy collectionName
@@ -168,10 +168,10 @@ module.exports = (Module)->
         type: EnumG 'hash', 'skiplist', 'persistent', 'geo', 'fulltext'
         unique: MaybeG Boolean
         sparse: MaybeG Boolean
-      }], NilT),
+      }]),
         default: (collection_name, field_names, options)-> yield return
 
-      @public @async removeTimestamps: FuncG([String, MaybeG Object], NilT),
+      @public @async removeTimestamps: FuncG([String, MaybeG Object]),
         default: (collection_name, options = {})->
           collectionName = "#{inflect.camelize collection_name}Collection"
           memCollection = @collection.facade.retrieveProxy collectionName

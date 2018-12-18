@@ -4,7 +4,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG
     IterableInterface
     Collection
@@ -16,7 +16,7 @@ module.exports = (Module)->
       @inheritProtected()
       @implements IterableInterface
 
-      @public @async forEach: FuncG(Function, NilT),
+      @public @async forEach: FuncG(Function),
         default: (lambda)->
           cursor = yield @takeAll()
           yield cursor.forEach (item)-> yield lambda item

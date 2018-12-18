@@ -3,7 +3,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     FuncG, MaybeG
     Module: ModuleClass
     Mixin
@@ -15,7 +14,7 @@ module.exports = (Module)->
       @inheritProtected()
 
       # TODO: после того как все приложения будут переведены на использование связки loadMigrations-requireMigrations, этот метод надо удалить.
-      @public @static defineMigrations: FuncG([MaybeG String], NilT), # deprecated
+      @public @static defineMigrations: FuncG([MaybeG String]), # deprecated
         default: (asRoot = @::ROOT ? '.') ->
           vsMigratonsDir = "#{asRoot}/migrations"
           files = filesListSync vsMigratonsDir
@@ -30,7 +29,7 @@ module.exports = (Module)->
           @const MIGRATION_NAMES: vlMigrationNames
           return
 
-      @public @static loadMigrations: FuncG([MaybeG String], NilT),
+      @public @static loadMigrations: FuncG([MaybeG String]),
         default: (asRoot = @::ROOT ? '.') ->
           vsMigratonsDir = "#{asRoot}/migrations"
           files = filesListSync vsMigratonsDir
@@ -43,7 +42,7 @@ module.exports = (Module)->
           @const MIGRATION_NAMES: vlMigrationNames
           return
 
-      @public @static requireMigrations: FuncG([MaybeG String], NilT),
+      @public @static requireMigrations: FuncG([MaybeG String]),
         default: (asRoot = @::ROOT ? '.') ->
           vsMigratonsDir = "#{asRoot}/migrations"
           @::MIGRATION_NAMES.forEach (i)=>
