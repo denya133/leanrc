@@ -2,37 +2,50 @@
 sinon = require 'sinon'
 _ = require 'lodash'
 LeanRC = require.main.require 'lib'
-{ co } = LeanRC::Utils
+{
+  NilT
+  FuncG, SubsetG, UnionG,
+  RecordInterface, QueryInterface, CursorInterface, CollectionInterface
+  Utils: { co }
+} = LeanRC::
 
 describe 'GenerateAutoincrementIdMixin', ->
-  facade = null
-  after -> facade?.remove?()
   describe '#generateId', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should generate id for itemsusing autoincrement', ->
       co ->
         KEY = 'FACADE_TEST_AUTOINCREMENT_ID_001'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
-          @public init: Function,
+          @public init: FuncG([Object, CollectionInterface], NilT),
             default: ->
               @super arguments...
               @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::Queryable extends LeanRC::Collection
+              return
+          @initialize()
+        class Queryable extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @include LeanRC::GenerateAutoincrementIdMixin
           @module Test
-          @public delegate: LeanRC::Class,
-            default: Test::TestRecord
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
+          @public delegate: SubsetG(RecordInterface),
+            default: TestRecord
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = []
               isCustomReturn = no
@@ -47,18 +60,18 @@ describe 'GenerateAutoincrementIdMixin', ->
               else
                 LeanRC::Cursor.new @, data
               yield return voCursor
-          @public @async take: Function,
+          @public @async take: FuncG([UnionG String, Number], RecordInterface),
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
-          @public @async push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (record) ->
               item = yield @delegate.serialize record
               @getData().push item
-              yield return item
-        Test::Queryable.initialize()
-        facade.registerProxy Test::Queryable.new KEY, []
+              yield return record
+          @initialize()
+        facade.registerProxy Queryable.new KEY, []
         collection = facade.retrieveProxy KEY
         for i in [ 1 .. 10 ]
           { id } = yield collection.create({type: 'Test::TestRecord'})

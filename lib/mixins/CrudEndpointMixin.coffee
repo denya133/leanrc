@@ -36,26 +36,32 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-
+    NilT, PointerT, JoiT
+    FuncG, SubsetG, InterfaceG, MaybeG
+    GatewayInterface
+    CrudableInterface
     Endpoint
+    Mixin
     Utils: {
       _, joi, inflect
     }
   } = Module::
 
-  Module.defineMixin 'CrudEndpointMixin', (BaseClass = Endpoint) ->
+  Module.defineMixin Mixin 'CrudEndpointMixin', (BaseClass = Endpoint) ->
     class extends BaseClass
       @inheritProtected()
+      @implements CrudableInterface
 
-      ipsKeyName = @private keyName: String
-      ipsEntityName = @private entityName: String
-      ipsRecordName = @private recordName: String
-      ipoSchema = @private schema: Object
-      Endpoint.keyNames ?= {}
-      Endpoint.itemEntityNames ?= {}
-      Endpoint.listEntityNames ?= {}
-      Endpoint.itemSchemas ?= {}
-      Endpoint.listSchemas ?= {}
+      ipsKeyName = PointerT @private keyName: MaybeG String
+      ipsEntityName = PointerT @private entityName: MaybeG String
+      ipsRecordName = PointerT @private recordName: MaybeG String
+      ipoSchema = PointerT @private schema: MaybeG Object
+
+      # Endpoint.keyNames ?= {}
+      # Endpoint.itemEntityNames ?= {}
+      # Endpoint.listEntityNames ?= {}
+      # Endpoint.itemSchemas ?= {}
+      # Endpoint.listSchemas ?= {}
 
       @public keyName: String,
         get: ->
@@ -68,42 +74,42 @@ module.exports = (Module)->
       @public listEntityName: String,
         get: -> Endpoint.listEntityNames[@[ipsEntityName]] ?= inflect.pluralize inflect.underscore @[ipsEntityName]
 
-      @public schema: Object,
+      @public schema: JoiT,
         get: -> @[ipoSchema]
 
-      @public listSchema: Object,
+      @public listSchema: JoiT,
         get: ->
           Endpoint.listSchemas["#{@[ipsEntityName]}|#{@[ipsRecordName]}"] ?= joi.object "#{@listEntityName}": joi.array().items @schema
 
-      @public itemSchema: Object,
+      @public itemSchema: JoiT,
         get: ->
           Endpoint.itemSchemas["#{@[ipsEntityName]}|#{@[ipsRecordName]}"] ?= joi.object "#{@itemEntityName}": @schema
 
-      @public keySchema: Object,
+      @public keySchema: JoiT,
         default: joi.string().required().description 'The key of the objects.'
 
-      @public querySchema: Object,
+      @public querySchema: JoiT,
         default: joi.string().empty('{}').optional().default '{}', '
           The query for finding objects.
         '
 
-      @public executeQuerySchema: Object,
+      @public executeQuerySchema: JoiT,
         default: joi.object(query: joi.object().required()).required(), '
           The query for execute.
         '
 
-      @public bulkResponseSchema: Object,
+      @public bulkResponseSchema: JoiT,
         default: joi.object success: joi.boolean()
 
-      @public versionSchema: Object,
+      @public versionSchema: JoiT,
         default: joi.string().required().description '
           The version of api endpoint in semver format `^x.x`
         '
 
-      @public ApplicationModule: Module::Class,
+      @public ApplicationModule: SubsetG(Module),
         get: -> @gateway?.ApplicationModule ? @Module
 
-      @public init: Function,
+      @public init: FuncG(InterfaceG(gateway: GatewayInterface), NilT),
         default: (args...) ->
           @super args...
           [ options ] = args
@@ -117,7 +123,8 @@ module.exports = (Module)->
             voSchema = @gateway?.getSchema recordName
             voSchema ?= (@ApplicationModule.NS ? @ApplicationModule::)[recordName].schema
             @[ipoSchema] = voSchema
-          @[ipoSchema] ?= {}
+          @[ipoSchema] ?= joi.object()
+          return
 
 
       @initializeMixin()

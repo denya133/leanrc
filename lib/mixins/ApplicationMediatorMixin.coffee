@@ -33,18 +33,20 @@ module.exports = (Module)->
     HANDLER_RESULT
     STOPPED_MIGRATE
     STOPPED_ROLLBACK
-
-    Mediator
+    AnyT, NilT, PointerT, EventEmitterT
+    FuncG, MaybeG, StructG
+    ContextInterface, ResourceInterface, NotificationInterface
+    Mediator, Mixin
     Utils: { genRandomAlphaNumbers }
   } = Module::
 
-  Module.defineMixin 'ApplicationMediatorMixin', (BaseClass = Mediator) ->
+  Module.defineMixin Mixin 'ApplicationMediatorMixin', (BaseClass = Mediator) ->
     class extends BaseClass
       @inheritProtected()
 
-      ipoEmitter = @private emitter: Object
+      ipoEmitter = PointerT @private emitter: EventEmitterT
 
-      @public listNotificationInterests: Function,
+      @public listNotificationInterests: FuncG([], Array),
         default: (args...)->
           interests = @super args...
           interests.push HANDLER_RESULT
@@ -53,7 +55,7 @@ module.exports = (Module)->
           interests.push STOPPED_ROLLBACK
           interests
 
-      @public handleNotification: Function,
+      @public handleNotification: FuncG(NotificationInterface, NilT),
         default: (aoNotification)->
           vsName = aoNotification.getName()
           voBody = aoNotification.getBody()
@@ -66,7 +68,7 @@ module.exports = (Module)->
               @super aoNotification
           return
 
-      @public @async migrate: Function,
+      @public @async migrate: FuncG([MaybeG StructG until: MaybeG String], NilT),
         default: (opts)->
           return yield Module::Promise.new (resolve, reject)=>
             try
@@ -82,7 +84,7 @@ module.exports = (Module)->
               reject err
             return
 
-      @public @async rollback: Function,
+      @public @async rollback: FuncG([MaybeG StructG steps: MaybeG(Number), until: MaybeG String], NilT),
         default: (opts)->
           return yield Module::Promise.new (resolve, reject)=>
             try
@@ -98,7 +100,7 @@ module.exports = (Module)->
               reject err
             return
 
-      @public @async run: Function,
+      @public @async run: FuncG([String, AnyT], AnyT),
         default: (scriptName, data)->
           return yield Module::Promise.new (resolve, reject)=>
             try
@@ -114,7 +116,11 @@ module.exports = (Module)->
               reject err
             return
 
-      @public @async execute: Function,
+      @public @async execute: FuncG([String, StructG({
+        context: ContextInterface, reverse: String
+      }), String], StructG {
+        result: AnyT, resource: ResourceInterface
+      }),
         default: (resourceName, {context, reverse}, action)->
           return yield Module::Promise.new (resolve, reject)=>
             try
@@ -129,7 +135,7 @@ module.exports = (Module)->
               reject err
             return
 
-      @public init: Function,
+      @public init: FuncG([String, AnyT], NilT),
         default: (args...)->
           EventEmitter = require 'events'
           voEmitter = new EventEmitter()

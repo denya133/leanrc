@@ -4,24 +4,28 @@ sinon = require 'sinon'
 _ = require 'lodash'
 httpErrors = require 'http-errors'
 LeanRC = require.main.require 'lib'
-{ co } = LeanRC::Utils
+{
+  FuncG, MaybeG
+  CursorInterface
+  Utils: { co }
+} = LeanRC::
 
 describe 'CheckSessionsMixin', ->
   describe '.new', ->
     it 'should create new resource', ->
       expect ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @include LeanRC::CheckSessionsMixin
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
+          @initialize()
+        resource = TestResource.new()
       .to.not.throw Error
   ### Moved to ModelingResourceMixin
   describe '#checkHeader', ->
@@ -31,7 +35,7 @@ describe 'CheckSessionsMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         facade = Test::Facade.getInstance KEY
         configs = Test::Configuration.new Test::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
@@ -41,11 +45,11 @@ describe 'CheckSessionsMixin', ->
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        TestResource.initialize()
+          @initialize()
         class TestRouter extends Test::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         class TestSwitch extends Test::Switch
           @inheritProtected()
@@ -53,7 +57,7 @@ describe 'CheckSessionsMixin', ->
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
-        TestSwitch.initialize()
+          @initialize()
         body = '{"test":"test"}'
         class MyRequest extends IncomingMessage
           constructor: (socket) ->
@@ -95,7 +99,7 @@ describe 'CheckSessionsMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         facade = Test::Facade.getInstance KEY
         configs = Test::Configuration.new Test::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
@@ -105,11 +109,11 @@ describe 'CheckSessionsMixin', ->
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        TestResource.initialize()
+          @initialize()
         class TestRouter extends Test::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         class TestSwitch extends Test::Switch
           @inheritProtected()
@@ -117,7 +121,7 @@ describe 'CheckSessionsMixin', ->
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
-        TestSwitch.initialize()
+          @initialize()
         class SessionsCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
@@ -125,37 +129,36 @@ describe 'CheckSessionsMixin', ->
           @include LeanRC::QueryableCollectionMixin
           @module Test
           ipoCollection = Symbol.for '~collection'
-          @public @async takeBy: Function,
+          @public @async takeBy: FuncG([Object, MaybeG Object], CursorInterface),
             default: (query, options = {})->
               id = query['@doc.id']
               yield return LeanRC::Cursor.new(@, [@[ipoCollection][id]])
-        SessionsCollection.initialize()
-        class SessionRecord extends Test::CoreObject
+          @initialize()
+        class SessionRecord extends LeanRC::Record
           @inheritProtected()
-          @include Test::ChainsMixin
-          @include Test::RecordMixin
           @module Test
-          @attribute id: String
-          @attribute rev: String
-          @attribute type: String
+          # @attribute id: String
+          # @attribute rev: String
+          # @attribute type: String
           @attribute uid: String
-          @attribute created: Number
-          @attribute expires: Number
-          @attribute data: Test::ANY
-          @chains ['create']
-          @beforeHook 'beforeCreate', only: [ 'create' ]
+          # @attribute created: Number
+          # @attribute expires: Number
+          @attribute customData: Object
+          # @chains ['create']
+          # @beforeHook 'beforeCreate', only: [ 'create' ]
           @public @async beforeCreate: Function,
             default: (args...)->
-              @id ?= Test::Utils.genRandomAlphaNumbers 64
-              now = Date.now()
-              @created ?= now
-              @expires ?= now + 108000
-              @uid ?= Test::Utils.uuid.v4()
+              @id ?= LeanRC::Utils.genRandomAlphaNumbers 64
+              # now = Date.now()
+              now = new Date()
+              @createdAt ?= now
+              @updatedAt ?= now
+              # @expires ?= now + 108000
+              @uid ?= LeanRC::Utils.uuid.v4()
               yield return args
-        SessionRecord.initialize()
+          @initialize()
         facade.registerProxy SessionsCollection.new Test::SESSIONS,
-          delegate: SessionRecord
-          serializer: Test::Serializer
+          delegate: 'SessionRecord'
         body = '{"test":"test"}'
         class MyRequest extends IncomingMessage
           constructor: (socket) ->
@@ -199,7 +202,7 @@ describe 'CheckSessionsMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         facade = Test::Facade.getInstance KEY
         configs = Test::Configuration.new Test::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
@@ -209,11 +212,11 @@ describe 'CheckSessionsMixin', ->
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        TestResource.initialize()
+          @initialize()
         class TestRouter extends Test::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         class TestSwitch extends Test::Switch
           @inheritProtected()
@@ -221,7 +224,7 @@ describe 'CheckSessionsMixin', ->
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
-        TestSwitch.initialize()
+          @initialize()
         # class MemoryCollection extends LeanRC::Collection
         #   @inheritProtected()
         #   @include LeanRC::MemoryCollectionMixin
@@ -229,11 +232,11 @@ describe 'CheckSessionsMixin', ->
         #   @include LeanRC::QueryableCollectionMixin
         #   @module Test
         #   ipoCollection = Symbol.for '~collection'
-        #   @public @async takeBy: Function,
+        #   @public @async takeBy: FuncG([Object, MaybeG Object], CursorInterface),
         #     default: (query, options = {})->
         #       id = query['@doc.id']
         #       yield return LeanRC::Cursor.new(@, [@[ipoCollection][id]])
-        # MemoryCollection.initialize()
+        #   @initialize()
         class SessionsCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
@@ -241,7 +244,7 @@ describe 'CheckSessionsMixin', ->
           @include LeanRC::QueryableCollectionMixin
           @module Test
           ipoCollection = Symbol.for '~collection'
-          @public @async takeBy: Function,
+          @public @async takeBy: FuncG([Object, MaybeG Object], CursorInterface),
             default: (query, options = {})->
               id = query['@doc.id']
               yield return LeanRC::Cursor.new(@, [@[ipoCollection][id]])
@@ -255,37 +258,36 @@ describe 'CheckSessionsMixin', ->
               record.ownSpaces = []
               yield return record
           @initialize()
-        class SessionRecord extends Test::CoreObject
+        class SessionRecord extends LeanRC::Record
           @inheritProtected()
-          @include Test::ChainsMixin
-          @include Test::RecordMixin
           @module Test
-          @attribute id: String
-          @attribute rev: String
-          @attribute type: String
+          # @attribute id: String
+          # @attribute rev: String
+          # @attribute type: String
           @attribute uid: String
-          @attribute created: Number
-          @attribute expires: Number
-          @attribute data: Test::ANY
-          @chains ['create']
-          @beforeHook 'beforeCreate', only: [ 'create' ]
+          # @attribute created: Number
+          # @attribute expires: Number
+          @attribute customData: Object
+          # @chains ['create']
+          # @beforeHook 'beforeCreate', only: [ 'create' ]
           @public @async beforeCreate: Function,
-            default: ->
-              @id ?= Test::Utils.genRandomAlphaNumbers 64
-              now = Date.now()
-              @created ?= now
-              @expires ?= now + 108000
-              @uid ?= Test::Utils.uuid.v4()
-              yield return
-        SessionRecord.initialize()
+            default: (args...)->
+              @id ?= LeanRC::Utils.genRandomAlphaNumbers 64
+              # now = Date.now()
+              now = new Date()
+              @createdAt ?= now
+              @updatedAt ?= now
+              # @expires ?= now + 108000
+              @uid ?= LeanRC::Utils.uuid.v4()
+              yield return args
+          @initialize()
         # class UserRecord extends Test::Record
         #   @inheritProtected()
         #   @module Test
         #   @attribute verified: Boolean, { default: no }
         # UserRecord.initialize()
         facade.registerProxy SessionsCollection.new Test::SESSIONS,
-          delegate: SessionRecord
-          serializer: Test::Serializer
+          delegate: 'SessionRecord'
         # facade.registerProxy MemoryCollection.new Test::USERS,
         #   delegate: UserRecord
         #   serializer: Test::Serializer
@@ -307,7 +309,7 @@ describe 'CheckSessionsMixin', ->
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         try
-          resource = Test::TestResource.new()
+          resource = TestResource.new()
           resource.context = Test::Context.new req, res, switchMediator
           resource.initializeNotifier KEY
           yield resource.checkSession()

@@ -3,52 +3,66 @@ sinon = require 'sinon'
 _ = require 'lodash'
 RC = require 'RC'
 LeanRC = require.main.require 'lib'
-RecordMixin = LeanRC::RecordMixin
-{ co } = RC::Utils
+{
+  FuncG, SubsetG
+  RecordInterface
+  Record
+  Utils: { co }
+} = LeanRC::
 
 describe 'RelationsMixin', ->
   describe '.new', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should create item with record mixin', ->
       expect ->
-        class Test extends RC::Module
+        collectionName = 'TestsCollection'
+        KEY = 'TEST_RELATIONS_MIXIN_001'
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-
-        class Test::TestRecord extends RC::CoreObject
+          @initialize()
+        class TestsCollection extends Test::Collection
           @inheritProtected()
-          @include LeanRC::RecordMixin
+          @include LeanRC::MemoryCollectionMixin
+          @include LeanRC::GenerateUuidIdMixin
+          @module Test
+          @initialize()
+        class TestRecord extends LeanRC::Record
+          @inheritProtected()
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findRecordByName: Function,
-            default: (asType) ->
-              Test::TestRecord
-        Test::TestRecord.initialize()
-        record = Test::TestRecord.new {type: 'Test::TestRecord'}, {}
-        assert.instanceOf record, Test::TestRecord, 'record is not a TestRecord instance'
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
+          @initialize()
+        collection = TestsCollection.new collectionName,
+          delegate: 'TestRecord'
+        facade.registerProxy collection
+        record = TestRecord.new {type: 'Test::TestRecord'}, collection
+        assert.instanceOf record, TestRecord, 'record is not a TestRecord instance'
       .to.not.throw Error
   describe '.relatedTo', ->
     it 'relatedTo: should define one-to-one or one-to-many optional relation for class', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-
-        class Test::TestRecord extends RC::CoreObject
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
-          @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
-          @relatedTo relation: LeanRC::Record,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
+          @relatedTo relation: LeanRC::PromiseT,
             attr: 'relation_attr'
             refKey: 'id'
             recordName: -> 'TestRecord'
             collectionName: -> 'TestsCollection'
             through: ['tomatosRels', by: 'cucumberId']
             inverse: 'test'
-        Test::TestRecord.initialize()
-        { relation: relationData } = Test::TestRecord.relations
+          @initialize()
+        { relation: relationData } = TestRecord.relations
         assert.equal relationData.refKey, 'id', 'Value of `refKey` is incorrect'
         assert.equal relationData.attr, 'relation_attr', 'Value of `attr` is incorrect'
         assert.equal relationData.inverse, 'test', 'Value of `inverse` is incorrect'
@@ -63,20 +77,18 @@ describe 'RelationsMixin', ->
         yield return
     it 'relatedTo: should define options automatically', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-
-        class Test::TestRecord extends RC::CoreObject
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
-          @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
-          @relatedTo cucumber: LeanRC::Record
-        Test::TestRecord.initialize()
-        { cucumber: relationData } = Test::TestRecord.relations
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
+          @relatedTo cucumber: LeanRC::PromiseT
+          @initialize()
+        { cucumber: relationData } = TestRecord.relations
         assert.equal relationData.attr, 'cucumberId', 'Value of `attr` is incorrect'
         assert.equal relationData.recordName.call(Test::TestRecord), 'CucumberRecord', 'Value of `recordName` is incorrect'
         assert.equal relationData.collectionName.call(Test::TestRecord), 'CucumbersCollection', 'Value of `collectionName` is incorrect'
@@ -85,26 +97,24 @@ describe 'RelationsMixin', ->
   describe '.belongsTo', ->
     it 'belongsTo: should define one-to-one or one-to-many parent relation for class', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-
-        class Test::TestRecord extends RC::CoreObject
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
-          @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
-          @belongsTo relation: LeanRC::Record,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
+          @belongsTo relation: LeanRC::PromiseT,
             attr: 'relation_attr'
             refKey: 'id'
             recordName: -> 'TestRecord'
             collectionName: -> 'TestsCollection'
             through: ['tomatosRels', by: 'cucumberId']
             inverse: 'test'
-        Test::TestRecord.initialize()
-        { relation: relationData } = Test::TestRecord.relations
+          @initialize()
+        { relation: relationData } = TestRecord.relations
         assert.equal relationData.refKey, 'id', 'Value of `refKey` is incorrect'
         assert.equal relationData.attr, 'relation_attr', 'Value of `attr` is incorrect'
         assert.equal relationData.inverse, 'test', 'Value of `inverse` is incorrect'
@@ -119,20 +129,18 @@ describe 'RelationsMixin', ->
         yield return
     it 'belongsTo: should define options automatically', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-
-        class Test::TestRecord extends RC::CoreObject
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
-          @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
-          @belongsTo cucumber: LeanRC::Record
-        Test::TestRecord.initialize()
-        { cucumber: relationData } = Test::TestRecord.relations
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
+          @belongsTo cucumber: LeanRC::PromiseT
+          @initialize()
+        { cucumber: relationData } = TestRecord.relations
         assert.equal relationData.attr, 'cucumberId', 'Value of `attr` is incorrect'
         assert.equal relationData.recordName.call(Test::TestRecord), 'CucumberRecord', 'Value of `recordName` is incorrect'
         assert.equal relationData.collectionName.call(Test::TestRecord), 'CucumbersCollection', 'Value of `collectionName` is incorrect'
@@ -141,25 +149,23 @@ describe 'RelationsMixin', ->
   describe '.hasMany', ->
     it 'hasMany: should define one-to-one or one-to-many relation for class', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-
-        class Test::TestRecord extends RC::CoreObject
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
-          @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
-          @hasMany manyRelation: LeanRC::Record,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
+          @hasMany manyRelation: LeanRC::PromiseT,
             refKey: 'id'
             recordName: -> 'TestRecord'
             collectionName: -> 'TestsCollection'
             through: ['tomatosRels', by: 'cucumberId']
             inverse: 'test'
-        Test::TestRecord.initialize()
-        { manyRelation: relationData } = Test::TestRecord.relations
+          @initialize()
+        { manyRelation: relationData } = TestRecord.relations
         assert.equal relationData.refKey, 'id', 'Value of `refKey` is incorrect'
         assert.equal relationData.inverse, 'test', 'Value of `inverse` is incorrect'
         assert.equal relationData.relation, 'hasMany', 'Value of `relation` is incorrect'
@@ -174,25 +180,23 @@ describe 'RelationsMixin', ->
   describe '.hasOne', ->
     it 'hasOne: should define many-to-one or many-to-one relation for class', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-
-        class Test::TestRecord extends RC::CoreObject
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
-          @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
-          @hasOne oneRelation: LeanRC::Record,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
+          @hasOne oneRelation: LeanRC::PromiseT,
             refKey: 'id'
             recordName: -> 'TestRecord'
             collectionName: -> 'TestsCollection'
             through: ['tomatosRels', by: 'cucumberId']
             inverse: 'test'
-        Test::TestRecord.initialize()
-        { oneRelation: relationData } = Test::TestRecord.relations
+          @initialize()
+        { oneRelation: relationData } = TestRecord.relations
         assert.equal relationData.refKey, 'id', 'Value of `refKey` is incorrect'
         assert.equal relationData.inverse, 'test', 'Value of `inverse` is incorrect'
         assert.equal relationData.relation, 'hasOne', 'Value of `relation` is incorrect'
@@ -207,30 +211,27 @@ describe 'RelationsMixin', ->
   describe '.inverseFor', ->
     it 'should get inverse info', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-
-        class Test::RelationRecord extends RC::CoreObject
+          @initialize()
+        class RelationRecord extends LeanRC::Record
           @inheritProtected()
-          @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @hasOne test: LeanRC::RecordInterface,
-            inverse: 'relation'
-        Test::RelationRecord.initialize()
-        class Test::TestRecord extends RC::CoreObject
+          @hasOne test: LeanRC::PromiseT,
+            inverse: 'relation_attr'
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
-          @include LeanRC::RecordMixin
           @include LeanRC::RelationsMixin
           @module Test
-          @belongsTo relation: LeanRC::RecordInterface,
+          @belongsTo relation: LeanRC::PromiseT,
             attr: 'relation_attr'
             refKey: 'id'
             inverse: 'test'
-        Test::TestRecord.initialize()
-        inverseInfo = Test::TestRecord.inverseFor 'relation'
-        assert.equal inverseInfo.recordClass, Test::RelationRecord, 'Record class is incorrect'
+          @initialize()
+        inverseInfo = TestRecord.inverseFor 'relation'
+        assert.equal inverseInfo.recordClass, RelationRecord, 'Record class is incorrect'
         assert.equal inverseInfo.attrName,'test', 'Record class is incorrect'
         assert.equal inverseInfo.relation, 'hasOne', 'Record class is incorrect'
         yield return

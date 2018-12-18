@@ -1,12 +1,20 @@
 
 
 module.exports = (Module) ->
-  class PrepareViewCommand extends Module.NS.SimpleCommand
+  {
+    NilT
+    FuncG
+    NotificationInterface
+    ConsoleComponentMediator
+    SimpleCommand
+  } = Module.NS
+
+  class PrepareViewCommand extends SimpleCommand
     @inheritProtected()
     @module Module
 
-    @public execute: Function,
+    @public execute: FuncG(NotificationInterface, NilT),
       default: ->
-        @facade.registerMediator Module.NS.ConsoleComponentMediator.new Module.NS.ConsoleComponentMediator::CONSOLE_MEDIATOR
+        @facade.registerMediator ConsoleComponentMediator.new ConsoleComponentMediator::CONSOLE_MEDIATOR
 
-  PrepareViewCommand.initialize()
+    @initialize()

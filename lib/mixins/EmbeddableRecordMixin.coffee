@@ -3,18 +3,22 @@
 
 module.exports = (Module)->
   {
-    RecordInterface
-    Record
+    NilT, PointerT, JoiT
+    PropertyDefinitionT, EmbedOptionsT, EmbedConfigT
+    FuncG, MaybeG, DictG, SubsetG, AsyncFuncG, ListG
+    EmbeddableInterface, RecordInterface, CollectionInterface, CursorInterface
+    Record, Mixin
     Utils: { _, inflect, joi, co }
   } = Module::
 
-  Module.defineMixin 'EmbeddableRecordMixin', (BaseClass = Record) ->
+  Module.defineMixin Mixin 'EmbeddableRecordMixin', (BaseClass = Record) ->
     class extends BaseClass
       @inheritProtected()
+      @implements EmbeddableInterface
 
-      ipoInternalRecord = @instanceVariables['~internalRecord'].pointer
+      ipoInternalRecord = PointerT @instanceVariables['~internalRecord'].pointer
 
-      @public @static schema: Object,
+      @public @static schema: JoiT,
         default: {}
         get: (_data)->
           _data[@name] ?= do =>
@@ -42,7 +46,7 @@ module.exports = (Module)->
             joi.object vhAttrs
           _data[@name]
 
-      @public @static relatedEmbed: Function,
+      @public @static relatedEmbed: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT),
         default: (typeDefinition, opts={})->
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
@@ -54,7 +58,7 @@ module.exports = (Module)->
           opts.putOnly ?= no
           opts.loadOnly ?= no
 
-          opts.recordName ?= (recordType = null)->
+          opts.recordName ?= FuncG([MaybeG String], String) (recordType = null)->
             if recordType?
               recordClass = @findRecordByName recordType
               classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
@@ -62,18 +66,18 @@ module.exports = (Module)->
             else
               [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          opts.collectionName ?= (recordType = null)->
+          opts.collectionName ?= FuncG([MaybeG String], String) (recordType = null)->
             "#{
               inflect.pluralize opts.recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
-          opts.validate = ->
+          opts.validate = FuncG([], JoiT) ->
             if opts.inverseType?
               return Record.schema.unknown(yes).allow(null).optional()
             else
               EmbedRecord = @findRecordByName opts.recordName.call(@)
               return EmbedRecord.schema.allow(null).optional()
-          opts.load = co.wrap ->
+          opts.load = AsyncFuncG([], RecordInterface) co.wrap ->
             if opts.putOnly
               yield return null
             recordType = null
@@ -119,7 +123,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.put = co.wrap ->
+          opts.put = AsyncFuncG([], NilT) co.wrap ->
             if opts.loadOnly
               yield return
             EmbedsCollection = null
@@ -201,7 +205,7 @@ module.exports = (Module)->
                   yield return
             yield return
 
-          opts.restore = co.wrap (replica)->
+          opts.restore = AsyncFuncG([MaybeG Object], MaybeG RecordInterface) co.wrap (replica)->
             EmbedsCollection = null
             EmbedRecord = null
 
@@ -233,7 +237,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.replicate = ->
+          opts.replicate = FuncG([], Object) ->
             aoRecord = @[vsAttr]
 
             {
@@ -252,10 +256,10 @@ module.exports = (Module)->
             res
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
-          @public "#{vsAttr}": RecordInterface
+          @public "#{vsAttr}": MaybeG RecordInterface
           return
 
-      @public @static relatedEmbeds: Function,
+      @public @static relatedEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT),
         default: (typeDefinition, opts={})->
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
@@ -267,7 +271,7 @@ module.exports = (Module)->
           opts.putOnly ?= no
           opts.loadOnly ?= no
 
-          opts.recordName ?= (recordType = null)->
+          opts.recordName ?= FuncG([MaybeG String], String) (recordType = null)->
             if recordType?
               recordClass = @findRecordByName recordType
               classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
@@ -275,12 +279,12 @@ module.exports = (Module)->
             else
               [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          opts.collectionName ?= (recordType = null)->
+          opts.collectionName ?= FuncG([MaybeG String], String) (recordType = null)->
             "#{
               inflect.pluralize opts.recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
-          opts.validate = ->
+          opts.validate = FuncG([], JoiT) ->
             if inverseType?
               return joi.array().items [
                 Record.schema.unknown(yes)
@@ -289,7 +293,7 @@ module.exports = (Module)->
             else
               EmbedRecord = @findRecordByName opts.recordName.call(@)
               return joi.array().items [EmbedRecord.schema, joi.any().strip()]
-          opts.load = co.wrap ->
+          opts.load = AsyncFuncG([], ListG RecordInterface) co.wrap ->
             if opts.putOnly
               yield return null
             EmbedsCollection = null
@@ -329,7 +333,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.put = co.wrap ->
+          opts.put = AsyncFuncG([], NilT) co.wrap ->
             if opts.loadOnly
               yield return
             EmbedsCollection = null
@@ -423,7 +427,7 @@ module.exports = (Module)->
                   )
             yield return
 
-          opts.restore = co.wrap (replica)->
+          opts.restore = AsyncFuncG([MaybeG Object], MaybeG RecordInterface) co.wrap (replica)->
             EmbedsCollection = null
             EmbedRecord = null
 
@@ -456,7 +460,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.replicate = ->
+          opts.replicate = FuncG([], Object) ->
             alRecords = @[vsAttr]
 
             {
@@ -477,10 +481,10 @@ module.exports = (Module)->
             res
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
-          @public "#{vsAttr}": Array
+          @public "#{vsAttr}": MaybeG ListG RecordInterface
           return
 
-      @public @static hasEmbed: Function,
+      @public @static hasEmbed: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT),
         default: (typeDefinition, opts={})->
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
@@ -491,7 +495,7 @@ module.exports = (Module)->
           opts.putOnly ?= no
           opts.loadOnly ?= no
 
-          opts.recordName ?= (recordType = null)->
+          opts.recordName ?= FuncG([MaybeG String], String) (recordType = null)->
             if recordType?
               recordClass = @findRecordByName recordType
               classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
@@ -499,18 +503,18 @@ module.exports = (Module)->
             else
               [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          opts.collectionName ?= (recordType = null)->
+          opts.collectionName ?= FuncG([MaybeG String], String) (recordType = null)->
             "#{
               inflect.pluralize opts.recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
-          opts.validate = ->
+          opts.validate = FuncG([], JoiT) ->
             if opts.inverseType?
               return Record.schema.unknown(yes).allow(null).optional()
             else
               EmbedRecord = @findRecordByName opts.recordName.call(@)
               return EmbedRecord.schema.allow(null).optional()
-          opts.load = co.wrap ->
+          opts.load = AsyncFuncG([], RecordInterface) co.wrap ->
             if opts.putOnly
               yield return null
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
@@ -554,7 +558,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.put = co.wrap ->
+          opts.put = AsyncFuncG([], NilT) co.wrap ->
             if opts.loadOnly
               yield return
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
@@ -668,7 +672,7 @@ module.exports = (Module)->
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
             yield return
 
-          opts.restore = co.wrap (replica)->
+          opts.restore = AsyncFuncG([MaybeG Object], MaybeG RecordInterface) co.wrap (replica)->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
             EmbedRecord = @findRecordByName opts.recordName.call(@)
 
@@ -691,7 +695,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.replicate = ->
+          opts.replicate = FuncG([], Object) ->
             aoRecord = @[vsAttr]
 
             {
@@ -710,10 +714,10 @@ module.exports = (Module)->
             res
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
-          @public "#{vsAttr}": RecordInterface
+          @public "#{vsAttr}": MaybeG RecordInterface
           return
 
-      @public @static hasEmbeds: Function,
+      @public @static hasEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT),
         default: (typeDefinition, opts={})->
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
@@ -724,7 +728,7 @@ module.exports = (Module)->
           opts.putOnly ?= no
           opts.loadOnly ?= no
 
-          opts.recordName ?= (recordType = null)->
+          opts.recordName ?= FuncG([MaybeG String], String) (recordType = null)->
             if recordType?
               recordClass = @findRecordByName recordType
               classNames = _.filter recordClass.parentClassNames(), (name)-> /.*Record$/.test name
@@ -732,12 +736,12 @@ module.exports = (Module)->
             else
               [vsModuleName, vsRecordName] = @parseRecordName vsAttr
             vsRecordName
-          opts.collectionName ?= (recordType = null)->
+          opts.collectionName ?= FuncG([MaybeG String], String) (recordType = null)->
             "#{
               inflect.pluralize opts.recordName.call(@, recordType).replace /Record$/, ''
             }Collection"
 
-          opts.validate = ->
+          opts.validate = FuncG([], JoiT) ->
             if inverseType?
               return joi.array().items [
                 Record.schema.unknown(yes)
@@ -747,7 +751,7 @@ module.exports = (Module)->
               EmbedRecord = @findRecordByName opts.recordName.call(@)
               return joi.array().items [EmbedRecord.schema, joi.any().strip()]
 
-          opts.load = co.wrap ->
+          opts.load = AsyncFuncG([], ListG RecordInterface) co.wrap ->
             if opts.putOnly
               yield return []
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
@@ -783,7 +787,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.put = co.wrap ->
+          opts.put = AsyncFuncG([], NilT) co.wrap ->
             if opts.loadOnly
               yield return
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
@@ -898,7 +902,7 @@ module.exports = (Module)->
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
             yield return
 
-          opts.restore = co.wrap (replica)->
+          opts.restore = AsyncFuncG([MaybeG Object], MaybeG RecordInterface) co.wrap (replica)->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
             EmbedRecord = @findRecordByName opts.recordName.call(@)
 
@@ -922,7 +926,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.replicate = ->
+          opts.replicate = FuncG([], Object) ->
             alRecords = @[vsAttr]
 
             {
@@ -943,15 +947,15 @@ module.exports = (Module)->
             res
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
-          @public "#{vsAttr}": Array
+          @public "#{vsAttr}": MaybeG ListG RecordInterface
           return
 
-      @public @static embeddings: Object,
+      @public @static embeddings: DictG(String, EmbedConfigT),
         get: -> @metaObject.getGroup 'embeddings', no
 
       @chains ['create', 'update']
 
-      @public @async create: Function,
+      @public @async create: FuncG([], RecordInterface),
         default: ->
           response = yield @collection.push @
           if response?
@@ -962,7 +966,7 @@ module.exports = (Module)->
             @[ipoInternalRecord] = response[ipoInternalRecord]
           yield return @
 
-      @public @async update: Function,
+      @public @async update: FuncG([], RecordInterface),
         default: ->
           response = yield @collection.override @id, @
           if response?
@@ -973,7 +977,7 @@ module.exports = (Module)->
             @[ipoInternalRecord] = response[ipoInternalRecord]
           yield return @
 
-      @public @static @async normalize: Function,
+      @public @static @async normalize: FuncG([MaybeG(Object), CollectionInterface], RecordInterface),
         default: (args...)->
           voRecord = yield @super args...
           for own asAttr, { load } of voRecord.constructor.embeddings
@@ -981,14 +985,14 @@ module.exports = (Module)->
           voRecord[ipoInternalRecord] = voRecord.constructor.makeSnapshotWithEmbeds voRecord
           yield return voRecord
 
-      @public @static @async serialize: Function,
+      @public @static @async serialize: FuncG([MaybeG RecordInterface], MaybeG Object),
         default: (aoRecord)->
           for own asAttr, { put } of aoRecord.constructor.embeddings
             yield put.call aoRecord
           vhResult = yield @super aoRecord
           yield return vhResult
 
-      @public @static @async recoverize: Function,
+      @public @static @async recoverize: FuncG([MaybeG(Object), CollectionInterface], RecordInterface),
         default: (args...)->
           [ahPayload] = args
           voRecord = yield @super args...
@@ -996,7 +1000,7 @@ module.exports = (Module)->
             voRecord[asAttr] = yield restore.call voRecord, ahPayload[asAttr]
           yield return voRecord
 
-      @public @static objectize: Function,
+      @public @static objectize: FuncG([MaybeG RecordInterface], MaybeG Object),
         default: (args...)->
           [aoRecord] = args
           vhResult = @super args...
@@ -1004,7 +1008,7 @@ module.exports = (Module)->
             vhResult[asAttr] = replicate.call aoRecord
           return vhResult
 
-      @public @static makeSnapshotWithEmbeds: Function,
+      @public @static makeSnapshotWithEmbeds: FuncG(RecordInterface, MaybeG Object),
         default: (aoRecord)->
           vhResult = aoRecord[ipoInternalRecord]
           for own asAttr, { replicate } of aoRecord.constructor.embeddings
@@ -1012,7 +1016,7 @@ module.exports = (Module)->
           vhResult
 
       # TODO: не учтены установки значений, которые раньше не были установлены
-      @public @async changedAttributes: Function,
+      @public @async changedAttributes: FuncG([], DictG String, Array),
         default: ->
           vhResult = yield @super()
           for own vsAttrName, { replicate } of @constructor.embeddings
@@ -1022,7 +1026,7 @@ module.exports = (Module)->
               vhResult[vsAttrName] = [voOldValue, voNewValue]
           yield return vhResult
 
-      @public @async resetAttribute: Function,
+      @public @async resetAttribute: FuncG(String, NilT),
         default: (args...)->
           yield @super args...
           [asAttribute] = args

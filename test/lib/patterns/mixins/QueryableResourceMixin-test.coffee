@@ -3,8 +3,12 @@ EventEmitter = require 'events'
 sinon = require 'sinon'
 _ = require 'lodash'
 LeanRC = require.main.require 'lib'
-Resource = LeanRC::Resource
-{ co } = LeanRC::Utils
+{
+  Resource
+  FuncG, UnionG, SubsetG
+  QueryInterface, RecordInterface, CursorInterface
+  Utils: { co }
+} = LeanRC::
 
 describe 'QueryableResourceMixin', ->
   facade = null
@@ -17,37 +21,40 @@ describe 'QueryableResourceMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
           # @public init: Function,
           #   default: ->
           #     @super arguments...
           #     @_type = 'Test::TestRecord'
-        TestRecord.initialize()
+          @initialize()
         class TestResource extends LeanRC::Resource
           @inheritProtected()
           @include LeanRC::QueryableResourceMixin
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        TestResource.initialize()
+          @initialize()
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-          @public @async parseQuery: Object,
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
             default: (aoQuery) ->
               if aoQuery.$filter?
                 if aoQuery.$filter['$and']?
@@ -59,19 +66,22 @@ describe 'QueryableResourceMixin', ->
                 aoQuery.$filter = _.mapKeys aoQuery.$filter, (value, key) ->
                   key.replace '@doc.', ''
               return yield aoQuery
-          @public @async takeAll: Function,
+          @public @async takeAll: FuncG([], CursorInterface),
             default: ->
               yield LeanRC::Cursor.new @, @getData().data
-          @public @async executeQuery: Function,
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = _.filter @getData().data, _.matches aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
-          @public @async push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (aoRecord) ->
               item = aoRecord.toJSON()
               @getData().data.push item
-              yield return item
-        TestCollection.initialize()
+              yield return aoRecord
+          @initialize()
         class MyResponse extends EventEmitter
           _headers: {}
           getHeaders: -> LeanRC::Utils.copy @_headers

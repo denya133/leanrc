@@ -1,28 +1,21 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT
+    FuncG, MaybeG
+    NotifierInterface
+  } = Module::
 
-  Module.defineInterface 'ProxyInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
-      @include Module::NotifierInterface
+  class ProxyInterface extends NotifierInterface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual getProxyName: Function,
-        args: []
-        return: String
-      @public @virtual setData: Function,
-        args: [ANY]
-        return: NILL
-      @public @virtual getData: Function,
-        args: []
-        return: ANY
-      @public @virtual onRegister: Function,
-        args: []
-        return: NILL
-      @public @virtual onRemove: Function,
-        args: []
-        return: NILL
+    @virtual getProxyName: FuncG [], String
+    @virtual setData: FuncG AnyT
+    @virtual getData: FuncG [], MaybeG AnyT
+    @virtual onRegister: Function
+    @virtual onRemove: Function
 
 
-      @initializeInterface()
+    @initialize()

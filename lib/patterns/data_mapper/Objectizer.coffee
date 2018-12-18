@@ -2,24 +2,32 @@
 
 
 module.exports = (Module)->
-  class Objectizer extends Module::CoreObject
+  {
+    AnyT
+    FuncG, SubsetG, MaybeG
+    CollectionInterface, RecordInterface
+    ObjectizerInterface
+    CoreObject
+  } = Module::
+
+  class Objectizer extends CoreObject
     @inheritProtected()
-    # @implements Module::ObjectizerInterface
+    @implements ObjectizerInterface
     @module Module
 
-    @public collection: Module::CollectionInterface
+    @public collection: CollectionInterface
 
-    @public @async recoverize: Function,
+    @public @async recoverize: FuncG([SubsetG(RecordInterface), MaybeG Object], MaybeG RecordInterface),
       default: (acRecord, ahPayload)->
         ahPayload.type ?= "#{acRecord.moduleName()}::#{acRecord.name}"
         return yield acRecord.recoverize ahPayload, @collection
 
-    @public @async objectize: Function,
+    @public @async objectize: FuncG([MaybeG(RecordInterface), MaybeG Object], MaybeG Object),
       default: (aoRecord, options = null)->
         vcRecord = aoRecord.constructor
         yield return vcRecord.objectize aoRecord, options
 
-    @public @static @async restoreObject: Function,
+    @public @static @async restoreObject: FuncG([SubsetG(Module), Object], ObjectizerInterface),
       default: (Module, replica)->
         if replica?.class is @name and replica?.type is 'instance'
           Facade = Module::ApplicationFacade ? Module::Facade
@@ -29,7 +37,7 @@ module.exports = (Module)->
         else
           return yield @super Module, replica
 
-    @public @static @async replicateObject: Function,
+    @public @static @async replicateObject: FuncG(ObjectizerInterface, Object),
       default: (instance)->
         replica = yield @super instance
         ipsMultitonKey = Symbol.for '~multitonKey'
@@ -37,11 +45,11 @@ module.exports = (Module)->
         replica.collectionName = instance.collection.getProxyName()
         yield return replica
 
-    @public init: Function,
+    @public init: FuncG(CollectionInterface),
       default: (args...)->
         @super args...
         [@collection] = args
-        @
+        return
 
 
     @initialize()

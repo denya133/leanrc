@@ -9,7 +9,7 @@ describe 'CrudEndpointMixin', ->
   describe '.new', ->
     it 'should create CRUD endpoint instance', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestCrudEndpoint extends LeanRC::Endpoint
@@ -30,7 +30,7 @@ describe 'CrudEndpointMixin', ->
   describe '#keyName', ->
     it 'should get endpoint key name', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestCrudEndpoint extends LeanRC::Endpoint
@@ -52,7 +52,7 @@ describe 'CrudEndpointMixin', ->
   describe '#itemEntityName', ->
     it 'should get endpoint item entity name', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestCrudEndpoint extends LeanRC::Endpoint
@@ -74,7 +74,7 @@ describe 'CrudEndpointMixin', ->
   describe '#listEntityName', ->
     it 'should get endpoint list entity name', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestCrudEndpoint extends LeanRC::Endpoint
@@ -96,7 +96,7 @@ describe 'CrudEndpointMixin', ->
   describe '#schema', ->
     it 'should get endpoint schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -125,7 +125,7 @@ describe 'CrudEndpointMixin', ->
   describe '#listSchema', ->
     it 'should get endpoint list schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -155,7 +155,7 @@ describe 'CrudEndpointMixin', ->
   describe '#itemSchema', ->
     it 'should get endpoint item schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -185,7 +185,7 @@ describe 'CrudEndpointMixin', ->
   describe '#querySchema', ->
     it 'should get endpoint query schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -216,7 +216,7 @@ describe 'CrudEndpointMixin', ->
   describe '#bulkResponseSchema', ->
     it 'should get endpoint bulk response schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -245,7 +245,7 @@ describe 'CrudEndpointMixin', ->
   describe '#versionSchema', ->
     it 'should get endpoint version schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record

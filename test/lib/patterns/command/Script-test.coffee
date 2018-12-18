@@ -2,7 +2,11 @@ EventEmitter = require 'events'
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-{ co } = LeanRC::Utils
+{
+  AnyT, NilT
+  FuncG, MaybeG
+  Utils: { co }
+} = LeanRC::
 
 describe 'Script', ->
   describe '.new', ->
@@ -14,7 +18,7 @@ describe 'Script', ->
   describe '.do', ->
     it 'should add script body', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root2"
         Test.initialize()
@@ -33,7 +37,7 @@ describe 'Script', ->
         KEY = 'TEST_SCRIPT_001'
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root2"
         Test.initialize()
@@ -41,7 +45,7 @@ describe 'Script', ->
           @inheritProtected()
           @module Test
           @do (args...) -> yield return args
-          @public sendNotification: Function,
+          @public sendNotification: FuncG([String, MaybeG(AnyT), MaybeG String], NilT),
             default: (args...) ->
               result = @super args...
               trigger.emit 'RUN_SCRIPT', args
@@ -66,7 +70,7 @@ describe 'Script', ->
         KEY = 'TEST_SCRIPT_002'
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root2"
         Test.initialize()
@@ -76,7 +80,7 @@ describe 'Script', ->
           @do (args...) ->
             throw new Error 'TEST_ERROR'
             yield return
-          @public sendNotification: Function,
+          @public sendNotification: FuncG([String, MaybeG(AnyT), MaybeG String], NilT),
             default: (args...) ->
               result = @super args...
               trigger.emit 'RUN_SCRIPT', args

@@ -1,25 +1,32 @@
 
 
 module.exports = (Module)->
-  class PipeListener extends Module::CoreObject
+  {
+    LambdaT, PointerT
+    FuncG, MaybeG
+    PipeFittingInterface, PipeMessageInterface
+    CoreObject
+  } = Module::
+
+  class PipeListener extends CoreObject
     @inheritProtected()
-    # @implements Module::PipeFittingInterface
+    @implements PipeFittingInterface
     @module Module
 
-    ipoContext = @private context: Object
-    ipmListener = @private listener: Module::LAMBDA
+    ipoContext = PointerT @private context: Object
+    ipmListener = PointerT @private listener: LambdaT
 
-    @public connect: Function,
+    @public connect: FuncG(PipeFittingInterface, Boolean),
       default: ->
         return no
 
-    @public disconnect: Function,
+    @public disconnect: FuncG([], MaybeG PipeFittingInterface),
       default: ->
         return null
 
-    @public write: Function,
+    @public write: FuncG(PipeMessageInterface, Boolean),
       default: (aoMessage)->
-        @[ipmListener].apply @[ipoContext], [aoMessage]
+        @[ipmListener].call @[ipoContext], aoMessage
         return yes
 
     @public @static @async restoreObject: Function,
@@ -32,11 +39,12 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG([Object, Function]),
       default: (aoContext, amListener)->
         @super arguments...
         @[ipoContext] = aoContext
         @[ipmListener] = amListener
+        return
 
 
-  PipeListener.initialize()
+    @initialize()

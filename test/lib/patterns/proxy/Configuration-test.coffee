@@ -10,42 +10,43 @@ describe 'Configuration', ->
   describe '.new', ->
     it 'should create configuration instance', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Configuration extends LeanRC::Configuration
           @inheritProtected()
           @module Test
-        Test::Configuration.initialize()
+          @initialize()
         configuration = Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         yield return
   describe '#environment', ->
     it 'should get environment name', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Configuration extends LeanRC::Configuration
           @inheritProtected()
           @module Test
-        Test::Configuration.initialize()
+          @initialize()
         configuration = Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         environment = configuration.environment
-        assert.equal environment, LeanRC::DEVELOPMENT
+        assert.isTrue environment?, 'configuration.environment isnt exist'
+        assert.isTrue environment in [LeanRC::DEVELOPMENT, LeanRC::PRODUCTION]
         yield return
   describe '#defineConfigProperties', ->
     it 'should setup configuration instance', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Configuration extends LeanRC::Configuration
           @inheritProtected()
           @module Test
-        Test::Configuration.initialize()
+          @initialize()
         configuration = Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         configuration.defineConfigProperties()
         assert.propertyVal configuration, 'test1', 'default'
@@ -56,14 +57,14 @@ describe 'Configuration', ->
   describe '#onRegister', ->
     it 'should initiate setup configuration instance', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Configuration extends LeanRC::Configuration
           @inheritProtected()
           @module Test
-        Test::Configuration.initialize()
+          @initialize()
         configuration = Test::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         configuration.onRegister()
         assert.propertyVal configuration, 'test1', 'default'

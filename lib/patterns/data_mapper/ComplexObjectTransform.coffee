@@ -3,16 +3,18 @@
 
 module.exports = (Module)->
   {
+    FuncG, MaybeG, TupleG, SubsetG
+    TransformInterface, RecordInterface
     ObjectTransform
     Utils: { _, inflect, moment }
   } = Module::
 
   class ComplexObjectTransform extends ObjectTransform
     @inheritProtected()
-    # @implements Module::TransformInterface
+    @implements TransformInterface
     @module Module
 
-    @public @static parseRecordName: Function,
+    @public @static parseRecordName: FuncG(String, TupleG String, String),
       default: (asName)->
         if /.*[:][:].*/.test(asName)
           [vsModuleName, vsRecordName] = asName.split '::'
@@ -22,14 +24,12 @@ module.exports = (Module)->
           vsRecordName += 'Record'
         [vsModuleName, vsRecordName]
 
-    @public @static findRecordByName: Function,
-      args: [String]
-      return: Module::Class
+    @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
       default: (asName)->
         [vsModuleName, vsRecordName] = @parseRecordName asName
         (@Module.NS ? @Module::)[vsRecordName]
 
-    @public @static @async normalize: Function,
+    @public @static @async normalize: FuncG([MaybeG Object], Object),
       default: (serialized)->
         unless serialized?
           yield return {}
@@ -57,7 +57,7 @@ module.exports = (Module)->
               Module::Transform.normalizeSync value
         yield return result
 
-    @public @static @async serialize: Function,
+    @public @static @async serialize: FuncG([MaybeG Object], Object),
       default: (deserialized)->
         unless deserialized?
           yield return {}
@@ -83,7 +83,7 @@ module.exports = (Module)->
               Module::Transform.serializeSync value
         yield return result
 
-    @public @static objectize: Function,
+    @public @static objectize: FuncG([MaybeG Object], Object),
       default: (deserialized)->
         unless deserialized?
           return {}

@@ -2,34 +2,37 @@
 
 module.exports = (Module)->
   {
-    Renderer
+    AnyT, NilT
+    FuncG, MaybeG, InterfaceG
+    ContextInterface, ResourceInterface
+    Renderer, Mixin
   } = Module::
 
-  Module.defineMixin 'CrudRendererMixin', (BaseClass = Renderer) ->
+  Module.defineMixin Mixin 'CrudRendererMixin', (BaseClass = Renderer) ->
     class CrudRendererMixin extends BaseClass
       @inheritProtected()
 
-      @public create: Function,
+      @public create: FuncG([String, String, Object, MaybeG String], Object),
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
           itemDecorator = @Module.templates[templateName]
           itemDecorator ?= CrudRendererMixin::itemDecorator
           return "#{@itemEntityName}": itemDecorator.call @, aoData
 
-      @public delete: Function,
+      @public delete: FuncG([String, String, NilT, MaybeG String], NilT),
         default: (resource, action, aoData)->
 
-      @public destroy: Function,
+      @public destroy: FuncG([String, String, NilT, MaybeG String], NilT),
         default: (resource, action, aoData)->
 
-      @public detail: Function,
+      @public detail: FuncG([String, String, Object, MaybeG String], Object),
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
           itemDecorator = @Module.templates[templateName]
           itemDecorator ?= CrudRendererMixin::itemDecorator
           return "#{@itemEntityName}": itemDecorator.call @, aoData
 
-      @public itemDecorator: Function,
+      @public itemDecorator: FuncG([MaybeG Object], MaybeG Object),
         default: (aoData)->
           if aoData?
             result = JSON.parse JSON.stringify aoData
@@ -40,7 +43,7 @@ module.exports = (Module)->
             result = null
           result
 
-      @public list: Function,
+      @public list: FuncG([String, String, Object, MaybeG String], Object),
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
           itemDecorator = @Module.templates[templateName]
@@ -50,18 +53,30 @@ module.exports = (Module)->
             "#{@listEntityName}": aoData.items.map itemDecorator.bind @
           }
 
-      @public query: Function,
+      @public query: FuncG([String, String, MaybeG(AnyT), MaybeG String], MaybeG AnyT),
         default: (resource, action, aoData)-> aoData
 
-      @public update: Function,
+      @public update: FuncG([String, String, Object, MaybeG String], Object),
         default: (resource, action, aoData, templatePath)->
           templateName = templatePath.replace new RegExp("/#{action}$"), '/itemDecorator'
           itemDecorator = @Module.templates[templateName]
           itemDecorator ?= CrudRendererMixin::itemDecorator
           return "#{@itemEntityName}": itemDecorator.call @, aoData
 
-      @public @async render: Function,
-        default: (ctx, aoData, resource, {path, resource:resourceName, action, template:templatePath}={})->
+      @public @async render: FuncG([ContextInterface, AnyT, ResourceInterface, MaybeG InterfaceG {
+        method: String
+        path: String
+        resource: String
+        action: String
+        tag: String
+        template: String
+        keyName: MaybeG String
+        entityName: String
+        recordName: MaybeG String
+      }], MaybeG AnyT),
+        default: (args...)->
+          [ctx, aoData, resource, options = {}] = args
+          {path, resource:resourceName, action, template:templatePath} = options
           if path? and resourceName? and action?
             {templates} = @Module
             return yield Module::Promise.resolve(
@@ -76,7 +91,7 @@ module.exports = (Module)->
                   resource, resourceName, action, aoData, templatePath
                 )
               else
-                aoData
+                yield @super args...
             )
           else
             yield return aoData

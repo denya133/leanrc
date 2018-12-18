@@ -1,19 +1,18 @@
 
 
 module.exports = (Module)->
-  {NILL, LAMBDA} = Module::
+  {
+    AnyT
+    FuncG, MaybeG
+    CommandInterface
+  } = Module::
 
-  Module.defineInterface 'ScriptInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class ScriptInterface extends CommandInterface
+    @inheritProtected()
+    @module Module
 
-      @public @async @virtual body: Function,
-        args: [Object]
-        return: [NILL, Error]
-
-      @public @static @virtual do: Function,
-        args: [LAMBDA]
-        return: String
+    @virtual @async body: FuncG [MaybeG AnyT], MaybeG AnyT
+    @virtual @static do: FuncG Function
 
 
-      @initializeInterface()
+    @initialize()

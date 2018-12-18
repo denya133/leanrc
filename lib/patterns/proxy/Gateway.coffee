@@ -47,74 +47,77 @@ module.exports = (App)->
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-    Utils: { inflect, extend, filesListSync }
+    AnyT, PointerT, JoiT
+    FuncG, SubsetG, DictG, ListG, MaybeG
+    GatewayInterface, EndpointInterface
+    ConfigurableMixin
+    Utils: { inflect, assign, filesListSync }
   } = Module::
+
   class Gateway extends Module::Proxy
     @inheritProtected()
-    # @implements Module::GatewayInterface
-    @include Module::ConfigurableMixin
+    @implements GatewayInterface
+    @include ConfigurableMixin
     @module Module
 
-    # ipoEndpoints = @private endpoints: Object
-    ipsMultitonKey = @protected multitonKey: String
-    iplKnownEndpoints = @protected knownEndpoints: Array
-    ipcApplicationModule = @protected ApplicationModule: Module::Class
-    iphSchemas = @private schemas: Object
-
-    @public ApplicationModule: Module::Class,
-      get: ->
-        @[ipcApplicationModule] ?= if @[ipsMultitonKey]?
-          @facade
-            ?.retrieveMediator APPLICATION_MEDIATOR
-            ?.getViewComponent()
-            ?.Module ? @Module
-        else
-          @Module
-
-    ipsEndpointsPath = @private endpointsPath: String,
+    # ipsMultitonKey = Symbol.for '~multitonKey' #PointerT @protected multitonKey: String
+    iplKnownEndpoints = PointerT @protected knownEndpoints: ListG String
+    # ipcApplicationModule = PointerT @protected ApplicationModule: MaybeG SubsetG Module
+    iphSchemas = PointerT @protected schemas: DictG String, MaybeG JoiT
+    ipsEndpointsPath = PointerT @protected endpointsPath: String,
       get: -> "#{@ApplicationModule::ROOT}/endpoints"
 
-    @public tryLoadEndpoint: Function,
+    # @public ApplicationModule: SubsetG(Module),
+    #   get: ->
+    #     @[ipcApplicationModule] ?= if @[ipsMultitonKey]?
+    #       @facade
+    #         ?.retrieveMediator APPLICATION_MEDIATOR
+    #         ?.getViewComponent()
+    #         ?.Module ? @Module
+    #     else
+    #       @Module
+
+    @public tryLoadEndpoint: FuncG(String, MaybeG SubsetG EndpointInterface),
       default: (asName) ->
         if asName in @[iplKnownEndpoints]
           vsEndpointPath = "#{@[ipsEndpointsPath]}/#{asName}"
           return try require(vsEndpointPath) @ApplicationModule
         return
 
-    @public getEndpointByName: Function,
+    @public getEndpointByName: FuncG(String, MaybeG SubsetG EndpointInterface),
       default: (asName) ->
         (@ApplicationModule.NS ? @ApplicationModule::)[asName] ? @tryLoadEndpoint asName
 
-    @public getEndpointName: Function,
+    @public getEndpointName: FuncG([String, String], String),
       default: (asResourse, asAction) ->
         vsPath = "#{asResourse}_#{asAction}_endpoint"
           .replace /\//g, '_'
           .replace /\_+/g, '_'
         inflect.camelize vsPath
 
-    @public getStandardActionEndpoint: Function,
+    @public getStandardActionEndpoint: FuncG([String, String], SubsetG EndpointInterface),
       default: (asResourse, asAction) ->
         vsEndpointName = "#{inflect.camelize asAction}Endpoint"
         (@ApplicationModule.NS ? @ApplicationModule::)[vsEndpointName] ? @ApplicationModule::Endpoint
 
-    @public getEndpoint: Function,
+    @public getEndpoint: FuncG([String, String], SubsetG EndpointInterface),
       default: (asResourse, asAction) ->
         vsEndpointName = @getEndpointName asResourse, asAction
         @getEndpointByName(vsEndpointName) ?
           @getStandardActionEndpoint asResourse, asAction
 
-    @public swaggerDefinitionFor: Function,
+    @public swaggerDefinitionFor: FuncG([String, String, MaybeG Object], EndpointInterface),
       default: (asResourse, asAction, opts)->
         vcEndpoint = @getEndpoint asResourse, asAction
-        options = extend {}, opts, gateway: @
+        options = assign {}, opts, gateway: @
         vcEndpoint.new options
 
-    @public getSchema: Function,
+    @public getSchema: FuncG(String, JoiT),
       default: (asRecordName) ->
         @[iphSchemas][asRecordName] ?= (@ApplicationModule.NS ? @ApplicationModule::)[asRecordName].schema
         @[iphSchemas][asRecordName]
 
-    @public init: Function,
+    @public init: FuncG([String, MaybeG AnyT]),
       default: (args...) ->
         @super args...
         @[iphSchemas] = {}
@@ -129,4 +132,4 @@ module.exports = (Module)->
         return
 
 
-  Gateway.initialize()
+    @initialize()

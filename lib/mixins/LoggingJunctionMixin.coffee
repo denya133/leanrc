@@ -5,6 +5,10 @@ module.exports = (Module)->
     LogMessage
     LogFilterMessage
     Pipes
+    Mixin
+    NilT, PointerT
+    FuncG
+    NotificationInterface
   } = Module::
   {
     JunctionMediator
@@ -28,21 +32,21 @@ module.exports = (Module)->
     CHANGE
   } = LogMessage
 
-  Module.defineMixin 'LoggingJunctionMixin', (BaseClass = JunctionMediator) ->
+  Module.defineMixin Mixin 'LoggingJunctionMixin', (BaseClass = JunctionMediator) ->
     class extends BaseClass
       @inheritProtected()
 
-      ipoMultitonKey = Symbol.for '~multitonKey'
-      ipoJunction = Symbol.for '~junction'
+      ipoMultitonKey = PointerT Symbol.for '~multitonKey'
+      ipoJunction = PointerT Symbol.for '~junction'
 
-      @public listNotificationInterests: Function,
+      @public listNotificationInterests: FuncG([], Array),
         default: (args...)->
           interests = @super args...
           interests.push SEND_TO_LOG
           interests.push LogFilterMessage.SET_LOG_LEVEL
           interests
 
-      @public handleNotification: Function,
+      @public handleNotification: FuncG(NotificationInterface, NilT),
         default: (note)->
           switch note.getName()
             when SEND_TO_LOG
@@ -80,6 +84,7 @@ module.exports = (Module)->
               break
             else
               @super note
+          return
 
 
       @initializeMixin()

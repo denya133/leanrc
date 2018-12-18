@@ -15,32 +15,43 @@ describe 'DelayableMixin', ->
       co ->
         KEY = 'TEST_DELAYABLE_MIXIN_001'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
-        class Test::Resque extends LeanRC::Resque
+          @initialize()
+        class TestClass extends LeanRC::CoreObject
+          @inheritProtected()
+          @module Test
+          @public @static test: Function,
+            default: -> return
+          @initialize()
+        class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
-        class Test::Test extends LeanRC::CoreObject
+          @initialize()
+        class TestTest extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::DelayableMixin
           @module Test
-        Test::Test.initialize()
-        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+          @initialize()
+        facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         yield resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
-        delayJobSymbol = Test::Test.classMethods['_delayJob']?.pointer
+        delayJobSymbol = TestTest.classMethods['_delayJob']?.pointer
         assert.isTrue delayJobSymbol?
         DELAY_UNTIL = Date.now()
-        DATA = {}
         options =
           queue: LeanRC::DELAYED_JOBS_QUEUE
           delayUntil: DELAY_UNTIL
-        yield Test::Test[delayJobSymbol] facade, DATA, options
-        rawQueue = resque[Symbol.for '~delayedJobs']['Test|>delayed_jobs']
+        DATA =
+          moduleName: 'Test'
+          replica: yield TestClass.constructor.replicateObject TestClass
+          methodName: 'test'
+          args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
+          opts: options
+        yield TestTest[delayJobSymbol] facade, DATA, options
+        rawQueue = resque[Symbol.for '~jobs']['Test|>delayed_jobs']
         [ scriptData ] = rawQueue
         assert.deepEqual scriptData,
           queueName: 'Test|>delayed_jobs'
@@ -58,30 +69,30 @@ describe 'DelayableMixin', ->
       co ->
         KEY = 'TEST_DELAYABLE_MIXIN_002'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
-        class Test::Resque extends LeanRC::Resque
+          @initialize()
+        class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
-        class Test::Test extends LeanRC::CoreObject
+          @initialize()
+        class TestTest extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::DelayableMixin
           @module Test
           @public @static test: Function, { default: -> }
-        Test::Test.initialize()
-        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+          @initialize()
+        facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         yield resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
         DELAY_UNTIL = Date.now()
-        yield Test::Test.delay facade,
+        yield TestTest.delay facade,
           queue: LeanRC::DELAYED_JOBS_QUEUE
           delayUntil: DELAY_UNTIL
         .test 'ARG_1', 'ARG_2', 'ARG_3'
-        rawQueue = resque[Symbol.for '~delayedJobs']['Test|>delayed_jobs']
+        rawQueue = resque[Symbol.for '~jobs']['Test|>delayed_jobs']
         [ scriptData ] = rawQueue
         assert.deepEqual scriptData,
           queueName: 'Test|>delayed_jobs'
@@ -89,7 +100,7 @@ describe 'DelayableMixin', ->
             scriptName: 'DelayedJobScript'
             data:
               moduleName: 'Test'
-              replica: {class: 'Test', type: 'class'}
+              replica: {class: 'TestTest', type: 'class'}
               methodName: 'test'
               args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
               opts:
@@ -108,30 +119,30 @@ describe 'DelayableMixin', ->
       co ->
         KEY = 'TEST_DELAYABLE_MIXIN_003'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
-        class Test::Resque extends LeanRC::Resque
+          @initialize()
+        class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
-        class Test::Test extends LeanRC::CoreObject
+          @initialize()
+        class TestTest extends LeanRC::CoreObject
           @inheritProtected()
           @include LeanRC::DelayableMixin
           @module Test
           @public test: Function, { default: -> }
-        Test::Test.initialize()
-        facade.registerProxy Test::Resque.new LeanRC::RESQUE
+          @initialize()
+        facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         yield resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
         DELAY_UNTIL = Date.now()
-        yield Test::Test.new().delay facade,
+        yield TestTest.new().delay facade,
           queue: LeanRC::DELAYED_JOBS_QUEUE
           delayUntil: DELAY_UNTIL
         .test 'ARG_1', 'ARG_2', 'ARG_3'
-        rawQueue = resque[Symbol.for '~delayedJobs']['Test|>delayed_jobs']
+        rawQueue = resque[Symbol.for '~jobs']['Test|>delayed_jobs']
         [ scriptData ] = rawQueue
         assert.deepEqual scriptData,
           queueName: 'Test|>delayed_jobs'
@@ -139,7 +150,7 @@ describe 'DelayableMixin', ->
             scriptName: 'DelayedJobScript'
             data:
               moduleName: 'Test'
-              replica: {class: 'Test', type: 'instance'}
+              replica: {class: 'TestTest', type: 'instance'}
               methodName: 'test'
               args: [ 'ARG_1', 'ARG_2', 'ARG_3' ]
               opts:

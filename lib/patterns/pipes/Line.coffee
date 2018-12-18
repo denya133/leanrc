@@ -1,19 +1,26 @@
 
 
 module.exports = (Module)->
-  class Queue extends Module::Pipe
-    @inheritProtected()
+  {
+    PointerT
+    FuncG, ListG, MaybeG
+    PipeFittingInterface, PipeMessageInterface
+    LineControlMessage: { SORT, FLUSH, FIFO }
+    Pipe
+  } = Module::
 
+  class Line extends Pipe
+    @inheritProtected()
     @module Module
 
-    ipoOutput = Symbol.for '~output'
-    ipsMode = @protected mode: String,
-      default: Module::QueueControlMessage.SORT
-    iplMessages = @protected messages: Array
+    ipoOutput = PointerT Symbol.for '~output'
+    ipsMode = PointerT @protected mode: String,
+      default: SORT
+    iplMessages = PointerT @protected messages: MaybeG ListG PipeMessageInterface
 
-    ipmSortMessagesByPriority = @protected sortMessagesByPriority: Function,
-      args: [Module::PipeMessageInterface, Module::PipeMessageInterface]
-      return: Number
+    ipmSort = PointerT @protected sortMessagesByPriority: FuncG([
+      PipeMessageInterface, PipeMessageInterface
+    ], Number),
       default: (msgA, msgB)->
         vnNum = 0
         if msgA.getPriority() < msgB.getPriority()
@@ -22,19 +29,15 @@ module.exports = (Module)->
           vnNum = 1
         return vnNum
 
-    ipmStore = @protected store: Function,
-      args: [Module::PipeMessageInterface]
-      return: Module::NILL
+    ipmStore = PointerT @protected store: FuncG(PipeMessageInterface),
       default: (aoMessage)->
         @[iplMessages] ?= []
         @[iplMessages].push aoMessage
-        if @[ipsMode] is Module::QueueControlMessage.SORT
-          @[iplMessages].sort @[ipmSortMessagesByPriority]
+        if @[ipsMode] is SORT
+          @[iplMessages].sort @[ipmSort].bind @
         return
 
-    ipmFlush = @protected flush: Function,
-      args: []
-      return: Boolean
+    ipmFlush = PointerT @protected flush: FuncG([], Boolean),
       default: ->
         vbSuccess = yes
         @[iplMessages] ?= []
@@ -44,22 +47,23 @@ module.exports = (Module)->
             vbSuccess = no
         vbSuccess
 
-    @public write: Function,
+    @public write: FuncG(PipeMessageInterface, Boolean),
       default: (aoMessage)->
         vbSuccess = yes
         voOutputMessage = null
         switch aoMessage.getType()
           when Module::PipeMessage.NORMAL
             @[ipmStore] aoMessage
-          when Module::QueueControlMessage.FLUSH
+          when FLUSH
             vbSuccess = @[ipmFlush]()
-          when Module::QueueControlMessage.SORT, Module::QueueControlMessage.FIFO
+          when SORT, FIFO
             @[ipsMode] = aoMessage.getType()
         return vbSuccess
 
-    @public init: Function,
+    @public init: FuncG([MaybeG PipeFittingInterface]),
       default: (aoOutput=null)->
         @super aoOutput
+        return
 
 
-  return Queue.initialize()
+    @initialize()

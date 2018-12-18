@@ -2,6 +2,10 @@
 
 module.exports = (Module) ->
   {
+    AnyT
+    FuncG, ListG, MaybeG
+  } = Module::
+  {
     PipeMessage
   } = Module::Pipes::
 
@@ -24,7 +28,7 @@ module.exports = (Module) ->
     @public @static CHANGE: Number,
       default: -1
 
-    @public @static LEVELS: Array,
+    @public @static LEVELS: ListG(String),
       default: [ 'NONE', 'FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG' ]
     @public @static SEND_TO_LOG: String,
       get: ->
@@ -56,10 +60,10 @@ module.exports = (Module) ->
         @setHeader header
         time
 
-    @public message: Module::ANY,
+    @public message: MaybeG(AnyT),
       get: -> @getBody()
 
-    @public init: Function,
+    @public init: FuncG([Number, String, AnyT]),
       default: (logLevel, sender, message)->
         time = new Date().toISOString()
         headers = {logLevel, sender, time}

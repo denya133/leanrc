@@ -101,7 +101,7 @@ describe 'Junction', ->
   describe '#sendMessage', ->
     it 'should register output pipe and send message into this one', ->
       expect ->
-        voOutput = write: ->
+        voOutput = Pipe.new()
         spyWrite = sinon.spy voOutput, 'write'
         junction = Junction.new()
         outputPipe = Pipe.new voOutput

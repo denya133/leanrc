@@ -1,12 +1,20 @@
 
 
 module.exports = (Module) ->
-  class PrepareModelCommand extends Module.NS.SimpleCommand
+  {
+    NilT
+    FuncG
+    NotificationInterface
+    RobotDataProxy
+    SimpleCommand
+  } = Module.NS
+
+  class PrepareModelCommand extends SimpleCommand
     @inheritProtected()
     @module Module
 
-    @public execute: Function,
+    @public execute: FuncG(NotificationInterface, NilT),
       default: ->
-        @facade.registerProxy Module.NS.RobotDataProxy.new Module.NS.RobotDataProxy::ROBOT_PROXY, no
+        @facade.registerProxy RobotDataProxy.new RobotDataProxy::ROBOT_PROXY, no
 
-  PrepareModelCommand.initialize()
+    @initialize()

@@ -1,23 +1,30 @@
 
 
 module.exports = (Module)->
-  class Proxy extends Module::Notifier
+  {
+    AnyT, PointerT
+    FuncG, SubsetG, MaybeG
+    ProxyInterface
+    Notifier
+  } = Module::
+
+  class Proxy extends Notifier
     @inheritProtected()
-    # @implements Module::ProxyInterface
+    @implements ProxyInterface
     @module Module
 
-    ipsProxyName = @private proxyName: String
-    ipoData = @private data: Module::ANY
+    ipsProxyName = PointerT @private proxyName: String
+    ipoData = PointerT @private data: MaybeG AnyT
 
-    @public getProxyName: Function,
+    @public getProxyName: FuncG([], String),
       default: -> @[ipsProxyName]
 
-    @public setData: Function,
+    @public setData: FuncG(AnyT),
       default: (ahData)->
         @[ipoData] = ahData
         return
 
-    @public getData: Function,
+    @public getData: FuncG([], MaybeG AnyT),
       default: -> @[ipoData]
 
     @public onRegister: Function,
@@ -27,7 +34,7 @@ module.exports = (Module)->
       default: -> return
 
     # need test it
-    @public @static @async restoreObject: Function,
+    @public @static @async restoreObject: FuncG([SubsetG(Module), Object], ProxyInterface),
       default: (Module, replica)->
         if replica?.class is @name and replica?.type is 'instance'
           facade = Module::ApplicationFacade.getInstance replica.multitonKey
@@ -37,7 +44,7 @@ module.exports = (Module)->
           return yield @super Module, replica
 
     # need test it
-    @public @static @async replicateObject: Function,
+    @public @static @async replicateObject: FuncG(ProxyInterface, Object),
       default: (instance)->
         replica = yield @super instance
         ipsMultitonKey = Symbol.for '~multitonKey'
@@ -45,7 +52,7 @@ module.exports = (Module)->
         replica.proxyName = instance.getProxyName()
         yield return replica
 
-    @public init: Function,
+    @public init: FuncG([MaybeG(String), MaybeG AnyT]),
       default: (asProxyName, ahData)->
         @super arguments...
 
@@ -53,6 +60,7 @@ module.exports = (Module)->
 
         if ahData?
           @setData ahData
+        return
 
 
-  Proxy.initialize()
+    @initialize()

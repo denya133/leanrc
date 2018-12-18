@@ -2,39 +2,42 @@
 
 module.exports = (Module)->
   {
+    JoiT, AnyT
+    FuncG, MaybeG
+    TransformInterface
     CoreObject
     Utils: { joi }
   } = Module::
 
   class Transform extends CoreObject
     @inheritProtected()
-    # @implements Module::TransformInterface
+    @implements TransformInterface
     @module Module
 
-    @public @static schema: Object,
+    @public @static schema: JoiT,
       get: -> joi.any().allow(null).optional()
 
-    @public @static @async normalize: Function,
+    @public @static @async normalize: FuncG([MaybeG AnyT], MaybeG AnyT),
       default: (args...)->
         yield return @normalizeSync args...
 
-    @public @static @async serialize: Function,
+    @public @static @async serialize: FuncG([MaybeG AnyT], MaybeG AnyT),
       default: (args...)->
         yield return @serializeSync args...
 
-    @public @static normalizeSync: Function,
+    @public @static normalizeSync: FuncG([MaybeG AnyT], MaybeG AnyT),
       default: (serialized)->
         unless serialized?
           return null
         return serialized
 
-    @public @static serializeSync: Function,
+    @public @static serializeSync: FuncG([MaybeG AnyT], MaybeG AnyT),
       default: (deserialized)->
         unless deserialized?
           return null
         return deserialized
 
-    @public @static objectize: Function,
+    @public @static objectize: FuncG([MaybeG AnyT], MaybeG AnyT),
       default: (deserialized)->
         unless deserialized?
           return null

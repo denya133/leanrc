@@ -2,7 +2,11 @@
 
 module.exports = (Module)->
   {
+    FuncG, InterfaceG
+    GatewayInterface
+    EndpointInterface
     CrudEndpointMixin
+    Endpoint
     Utils: { statuses }
   } = Module::
 
@@ -10,13 +14,13 @@ module.exports = (Module)->
   UNAUTHORIZED      = statuses 'unauthorized'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  class DetailEndpoint extends Module::Endpoint
+  class DetailEndpoint extends Endpoint
     @inheritProtected()
-    # @implements Module::EndpointInterface
+    @implements EndpointInterface
     @include CrudEndpointMixin
     @module Module
 
-    @public init: Function,
+    @public init: FuncG(InterfaceG(gateway: GatewayInterface)),
       default: (args...) ->
         @super args...
         @pathParam 'v', @versionSchema
@@ -33,5 +37,7 @@ module.exports = (Module)->
           Retrieves the
           #{@itemEntityName} by its key.
         "
+        return
+
 
     @initialize()

@@ -1,56 +1,36 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT
+    FuncG, SubsetG, MaybeG
+    CommandInterface, ProxyInterface, MediatorInterface
+    NotificationInterface
+    NotifierInterface
+  } = Module::
 
-  Module.defineInterface 'FacadeInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
-      @include Module::NotifierInterface
+  class FacadeInterface extends NotifierInterface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual remove: Function,
-        args: []
-        return: NILL
+    @virtual remove: FuncG []
 
-      @public @virtual registerCommand: Function,
-        args: [String, Module::Class]
-        return: NILL
-      @public @virtual removeCommand: Function,
-        args: [String]
-        return: NILL
-      @public @virtual hasCommand: Function,
-        args: [String]
-        return: Boolean
+    @virtual registerCommand: FuncG [String, SubsetG CommandInterface]
+    @virtual removeCommand: FuncG String
+    @virtual hasCommand: FuncG String, Boolean
 
-      @public @virtual registerProxy: Function,
-        args: [Module::ProxyInterface]
-        return: NILL
-      @public @virtual retrieveProxy: Function,
-        args: [String]
-        return: Module::ProxyInterface
-      @public @virtual removeProxy: Function,
-        args: [String]
-        return: Module::ProxyInterface
-      @public @virtual hasProxy: Function,
-        args: [String]
-        return: Boolean
+    @virtual registerProxy: FuncG ProxyInterface
+    @virtual retrieveProxy: FuncG String, MaybeG ProxyInterface
+    @virtual removeProxy: FuncG String, MaybeG ProxyInterface
+    @virtual hasProxy: FuncG String, Boolean
 
-      @public @virtual registerMediator: Function,
-        args: [Module::MediatorInterface]
-        return: NILL
-      @public @virtual retrieveMediator: Function,
-        args: [String]
-        return: Module::MediatorInterface
-      @public @virtual removeMediator: Function,
-        args: [String]
-        return: Module::MediatorInterface
-      @public @virtual hasMediator: Function,
-        args: [String]
-        return: Boolean
+    @virtual registerMediator: FuncG MediatorInterface
+    @virtual retrieveMediator: FuncG String, MaybeG MediatorInterface
+    @virtual removeMediator: FuncG String, MaybeG MediatorInterface
+    @virtual hasMediator: FuncG String, Boolean
 
-      @public @virtual notifyObservers: Function,
-        args: [Module::NotificationInterface]
-        return: NILL
+    @virtual notifyObservers: FuncG NotificationInterface
+    @virtual sendNotification: FuncG [String, MaybeG(AnyT), MaybeG String]
 
 
-      @initializeInterface()
+    @initialize()

@@ -1,18 +1,18 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT
+    FuncG, MaybeG
+    Interface
+  } = Module::
 
-  Module.defineInterface 'NotifierInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class NotifierInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual sendNotification: Function,
-        args: [String, ANY, String]
-        return: NILL
-      @public @virtual initializeNotifier: Function,
-        args: [String]
-        return: NILL
+    @virtual sendNotification: FuncG [String, MaybeG(AnyT), MaybeG String]
+    @virtual initializeNotifier: FuncG String
 
 
-      @initializeInterface()
+    @initialize()

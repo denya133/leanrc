@@ -16,10 +16,11 @@ describe 'SimpleCommand', ->
         trigger.reset()
         class TestCommand extends SimpleCommand
           @inheritProtected()
-          @public execute: Function,
+          @public execute: LeanRC::FuncG(LeanRC::NotificationInterface),
             default: ->
               trigger()
         command = TestCommand.new()
-        command.execute()
+        notification = LeanRC::Notification.new 'TEST_NOTIFICATION', {body: 'body'}, 'TEST'
+        command.execute notification
         assert trigger.called
       .to.not.throw Error

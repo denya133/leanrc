@@ -4,8 +4,13 @@ sinon = require 'sinon'
 _ = require 'lodash'
 httpErrors = require 'http-errors'
 LeanRC = require.main.require 'lib'
-Resource = LeanRC::Resource
-{ co } = LeanRC::Utils
+{
+  AnyT, NilT
+  FuncG, SubsetG, UnionG, ListG, StructG, MaybeG
+  CollectionInterface, RecordInterface, QueryInterface, CursorInterface
+  Resource
+  Utils: { co }
+} = LeanRC::
 
 describe 'Resource', ->
   describe '.new', ->
@@ -16,68 +21,68 @@ describe 'Resource', ->
   describe '#keyName', ->
     it 'should get key name using entity name', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
+          @initialize()
+        resource = TestResource.new()
         { keyName } = resource
         assert.equal keyName, 'test_entity'
         yield return
   describe '#itemEntityName', ->
     it 'should get item name using entity name', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
+          @initialize()
+        resource = TestResource.new()
         { itemEntityName } = resource
         assert.equal itemEntityName, 'test_entity'
         yield return
   describe '#listEntityName', ->
     it 'should get list name using entity name', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
+          @initialize()
+        resource = TestResource.new()
         { listEntityName } = resource
         assert.equal listEntityName, 'test_entities'
         yield return
   describe '#collectionName', ->
     it 'should get collection name using entity name', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
+          @initialize()
+        resource = TestResource.new()
         { collectionName } = resource
         assert.equal collectionName, 'TestEntitiesCollection'
         yield return
@@ -88,21 +93,39 @@ describe 'Resource', ->
     it 'should get collection', ->
       co ->
         TEST_FACADE = 'TEST_FACADE_001'
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
+          @initialize()
         facade = LeanRC::Facade.getInstance TEST_FACADE
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier TEST_FACADE
         { collectionName } = resource
-        boundCollection = LeanRC::Collection.new collectionName
+        class TestsCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+          @initialize()
+        class TestEntityRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestEntityRecord
+          @public init: FuncG([Object, CollectionInterface], NilT),
+            default: ->
+              @super arguments...
+              @type = 'Test::TestEntityRecord'
+              return
+          @initialize()
+        boundCollection = TestsCollection.new collectionName,
+          delegate: 'TestEntityRecord'
         facade.registerProxy boundCollection
         { collection } = resource
         assert.equal collection, boundCollection
@@ -110,98 +133,113 @@ describe 'Resource', ->
   describe '#action', ->
     it 'should create actions', ->
       co ->
-        class Test extends LeanRC::Module
+        default1 = -> yield return 'test1'
+        default2 = -> yield return 'test2'
+        default3 = -> yield return 'test3'
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-          @action test1: String,
-            default: 'test1'
-          @action test2: String,
-            default: 'test2'
-          @action test3: String,
-            default: 'test3'
-        Test::TestResource.initialize()
-        assert.deepEqual Test::TestResource.metaObject.data.actions.test1,
-          default: 'test1'
-          attr: 'test1'
-          attrType: String
-          level: LeanRC::PUBLIC
-          pointer: 'test1'
-        assert.deepEqual Test::TestResource.metaObject.data.actions.test2,
-          default: 'test2'
-          attr: 'test2'
-          attrType: String
-          level: LeanRC::PUBLIC
-          pointer: 'test2'
-        assert.deepEqual Test::TestResource.metaObject.data.actions.test3,
-          default: 'test3'
-          attr: 'test3'
-          attrType: String
-          level: LeanRC::PUBLIC
-          pointer: 'test3'
+          @action @async test1: Function,
+            default: default1
+          @action @async test2: Function,
+            default: default2
+          @action @async test3: Function,
+            default: default3
+          @initialize()
+        {
+          test1
+          test2
+          test3
+        } = TestResource.metaObject.data.actions
+        assert.equal test1.default, default1
+        assert.equal test1.attr, 'test1'
+        assert.equal test1.attrType, LeanRC::FunctionT
+        assert.equal test1.level, LeanRC::PUBLIC
+        assert.equal test1.async, LeanRC::ASYNC
+        assert.equal test1.pointer, 'test1'
+
+        assert.equal test2.default, default2
+        assert.equal test2.attr, 'test2'
+        assert.equal test2.attrType, LeanRC::FunctionT
+        assert.equal test2.level, LeanRC::PUBLIC
+        assert.equal test2.async, LeanRC::ASYNC
+        assert.equal test2.pointer, 'test2'
+
+        assert.equal test3.default, default3
+        assert.equal test3.attr, 'test3'
+        assert.equal test3.attrType, LeanRC::FunctionT
+        assert.equal test3.level, LeanRC::PUBLIC
+        assert.equal test3.async, LeanRC::ASYNC
+        assert.equal test3.pointer, 'test3'
         yield return
   describe '#actions', ->
     it 'should get resource actions', ->
       co ->
-        class Test extends LeanRC::Module
+        default1 = -> yield return 'test1'
+        default2 = -> yield return 'test2'
+        default3 = -> yield return 'test3'
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @include LeanRC::QueryableResourceMixin
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-          @action test1: String,
-            default: 'test1'
-          @action test2: String,
-            default: 'test2'
-          @action test3: String,
-            default: 'test3'
-        Test::TestResource.initialize()
-        assert.deepEqual Test::TestResource.actions.test1,
-          default: 'test1'
-          attr: 'test1'
-          attrType: String
-          level: LeanRC::PUBLIC
-          pointer: 'test1'
-        assert.deepEqual Test::TestResource.actions.test2,
-          default: 'test2'
-          attr: 'test2'
-          attrType: String
-          level: LeanRC::PUBLIC
-          pointer: 'test2'
-        assert.deepEqual Test::TestResource.actions.test3,
-          default: 'test3'
-          attr: 'test3'
-          attrType: String
-          level: LeanRC::PUBLIC
-          pointer: 'test3'
-        { actions } = Test::TestResource
+          @action @async test1: Function,
+            default: default1
+          @action @async test2: Function,
+            default: default2
+          @action @async test3: Function,
+            default: default3
+          @initialize()
+        {
+          test1
+          test2
+          test3
+        } = TestResource.actions
+        assert.equal test1.default, default1
+        assert.equal test1.attr, 'test1'
+        assert.equal test1.attrType, LeanRC::FunctionT
+        assert.equal test1.level, LeanRC::PUBLIC
+        assert.equal test1.async, LeanRC::ASYNC
+        assert.equal test1.pointer, 'test1'
+
+        assert.equal test2.default, default2
+        assert.equal test2.attr, 'test2'
+        assert.equal test2.attrType, LeanRC::FunctionT
+        assert.equal test2.level, LeanRC::PUBLIC
+        assert.equal test2.async, LeanRC::ASYNC
+        assert.equal test2.pointer, 'test2'
+
+        assert.equal test3.default, default3
+        assert.equal test3.attr, 'test3'
+        assert.equal test3.attrType, LeanRC::FunctionT
+        assert.equal test3.level, LeanRC::PUBLIC
+        assert.equal test3.async, LeanRC::ASYNC
+        assert.equal test3.pointer, 'test3'
+        { actions } = TestResource
         assert.propertyVal actions.list, 'attr', 'list'
-        assert.propertyVal actions.list, 'attrType', Function
         assert.propertyVal actions.list, 'level', LeanRC::PUBLIC
         assert.propertyVal actions.list, 'async', LeanRC::ASYNC
         assert.propertyVal actions.detail, 'attr', 'detail'
-        assert.propertyVal actions.detail, 'attrType', Function
         assert.propertyVal actions.detail, 'level', LeanRC::PUBLIC
         assert.propertyVal actions.detail, 'async', LeanRC::ASYNC
         assert.propertyVal actions.create, 'attr', 'create'
-        assert.propertyVal actions.create, 'attrType', Function
         assert.propertyVal actions.create, 'level', LeanRC::PUBLIC
         assert.propertyVal actions.create, 'async', LeanRC::ASYNC
         assert.propertyVal actions.update, 'attr', 'update'
-        assert.propertyVal actions.update, 'attrType', Function
         assert.propertyVal actions.update, 'level', LeanRC::PUBLIC
         assert.propertyVal actions.update, 'async', LeanRC::ASYNC
         assert.propertyVal actions.delete, 'attr', 'delete'
-        assert.propertyVal actions.delete, 'attrType', Function
         assert.propertyVal actions.delete, 'level', LeanRC::PUBLIC
         assert.propertyVal actions.delete, 'async', LeanRC::ASYNC
         ### Moved to -> ModellingResourceMixin
@@ -214,72 +252,83 @@ describe 'Resource', ->
   describe '#beforeActionHook', ->
     it 'should parse action params as arguments', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
-        resource.beforeActionHook
-          query: query: '{"test":"test123"}'
-          pathParams: testParam: 'testParamValue'
-          headers: 'test-header': 'test-header-value'
-          request: body: test: 'test678'
-        assert.deepPropertyVal resource, 'context.query.query', '{"test":"test123"}'
-        assert.deepPropertyVal resource, 'context.pathParams.testParam', 'testParamValue'
-        assert.deepPropertyVal resource, 'context.headers.test-header', 'test-header-value'
-        assert.deepPropertyVal resource, 'context.request.body.test', 'test678'
+          @initialize()
+        resource = TestResource.new()
+        Reflect.defineProperty resource, 'context',
+          writable: yes
+          value: undefined
+        ctx = Symbol 'ctx'
+        # resource.beforeActionHook.body.call resource, ctx
+        resource.beforeActionHook ctx
+        assert.strictEqual resource.context, ctx, 'beforeActionHook called with context and set it in resource.context'
         yield return
   describe '#getQuery', ->
     it 'should get resource query', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
-        resource.context =
-          query: query: '{"test":"test123"}'
+          @initialize()
+        resource = TestResource.new()
+        Reflect.defineProperty resource, 'listQuery',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'context',
+          writable: yes
+          value: query: query: '{"test":"test123"}'
+        # resource.context =
+        #   query: query: '{"test":"test123"}'
         resource.getQuery()
         assert.deepEqual resource.listQuery, test: 'test123'
         yield return
   describe '#getRecordId', ->
     it 'should get resource record ID', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
-        resource.context =
-          pathParams: test_entity: 'ID123456'
+          @initialize()
+        resource = TestResource.new()
+        Reflect.defineProperty resource, 'recordId',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'context',
+          writable: yes
+          value: pathParams: test_entity: 'ID123456'
+        # resource.context =
+        #   pathParams: test_entity: 'ID123456'
         resource.getRecordId()
-        assert.propertyVal resource, 'recordId', 'ID123456'
+        assert.deepEqual resource.recordId, 'ID123456'
+        # assert.propertyVal resource, 'recordId', 'ID123456'
         yield return
   describe '#getRecordBody', ->
     it 'should get body', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
+          @initialize()
         class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
@@ -287,8 +336,14 @@ describe 'Resource', ->
             default: 'TestEntity'
         TestResource.initialize()
         resource = TestResource.new()
-        resource.context =
-          request: body: test_entity: test: 'test9'
+        Reflect.defineProperty resource, 'recordBody',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'context',
+          writable: yes
+          value: request: body: test_entity: test: 'test9'
+        # resource.context =
+        #   request: body: test_entity: test: 'test9'
         resource.getRecordBody()
         assert.deepEqual resource.recordBody, test: 'test9'
         yield return
@@ -300,40 +355,49 @@ describe 'Resource', ->
       co ->
         TEST_FACADE = 'TEST_FACADE_002'
         facade = LeanRC::Facade.getInstance TEST_FACADE
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
+          @initialize()
         class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        TestResource.initialize()
+          @initialize()
         class TestsCollection extends LeanRC::Collection
           @inheritProtected()
           @module Test
-        TestsCollection.initialize()
+          @initialize()
         class TestEntityRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestEntityRecord
-          @public init: Function,
-            default: ->
-              @super arguments...
-              @type = 'Test::TestEntityRecord'
-        TestEntityRecord.initialize()
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestEntityRecord
+          # @public init: FuncG([Object, CollectionInterface], NilT),
+          #   default: ->
+          #     @super arguments...
+          #     @type = 'Test::TestEntityRecord'
+          #     return
+          @initialize()
         resource = TestResource.new()
         resource.initializeNotifier TEST_FACADE
         { collectionName } = resource
         boundCollection = TestsCollection.new collectionName,
           delegate: 'TestEntityRecord'
         facade.registerProxy boundCollection
-        resource.context =
-          request: body: test_entity:
+        Reflect.defineProperty resource, 'recordBody',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'context',
+          writable: yes
+          value: request: body: test_entity:
             _id: '123', test: 'test9', _space: 'test', type: 'TestEntityRecord'
+
+        # resource.context =
+        #   request: body: test_entity:
+        #     _id: '123', test: 'test9', _space: 'test', type: 'TestEntityRecord'
         resource.getRecordBody()
         resource.omitBody()
         assert.deepEqual resource.recordBody, test: 'test9', type: 'Test::TestEntityRecord'
@@ -341,24 +405,36 @@ describe 'Resource', ->
   describe '#beforeUpdate', ->
     it 'should get body with ID', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
-        resource.context =
-          pathParams: test_entity: 'ID123456'
-          request: body: test_entity: test: 'test9'
+          @initialize()
+        resource = TestResource.new()
+        Reflect.defineProperty resource, 'recordId',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'recordBody',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'context',
+          writable: yes
+          value: {
+            pathParams: test_entity: 'ID123456'
+            request: body: test_entity: test: 'test9'
+          }
+        # resource.context =
+        #   pathParams: test_entity: 'ID123456'
+        #   request: body: test_entity: test: 'test9'
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
-        assert.deepEqual resource.recordBody, id: 'ID123456', test: 'test9'
+        assert.deepEqual resource.recordBody, {id: 'ID123456', test: 'test9'}
         yield return
   describe '#list', ->
     facade = null
@@ -367,64 +443,105 @@ describe 'Resource', ->
     it 'should list of resource items', ->
       co ->
         KEY = 'TEST_RESOURCE_001'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @root "#{__dirname}/config/root"
+          @initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
-          # @public init: Function,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
+          # @public init: FuncG([Object, CollectionInterface], NilT),
           #   default: ->
           #     @super arguments...
           #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          #     return
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
+          @initialize()
         class TestsCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async takeAll: Function,
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async takeAll: FuncG([], CursorInterface),
             default: ->
               yield LeanRC::Cursor.new @, @getData().data
-          @public @async executeQuery: Function,
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = _.filter @getData().data, aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @, data
-          @public @async push: Function,
+              yield return LeanRC::Cursor.new @, data
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (aoRecord) ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
               i = aoRecord.toJSON()
               @getData().data.push i
-              yield return i
-          @public @async includes: Function,
+              yield return aoRecord
+          @public @async includes: FuncG([UnionG String, Number], Boolean),
             default: (id)->
               yield return (_.find @getData().data, {id})?
-        TestsCollection.initialize()
-        facade = LeanRC::Facade.getInstance KEY
+          @initialize()
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+          @initialize()
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/space/SPACE123/test_entitis'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends LeanRC::Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
+          @initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         COLLECTION_NAME = 'TestEntitiesCollection'
         facade.registerProxy TestsCollection.new COLLECTION_NAME,
-          delegate: Test::TestRecord
-          serializer: 'Serializer'
+          delegate: 'TestRecord'
+          # serializer: 'Serializer'
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
         yield collection.create test: 'test1'
         yield collection.create test: 'test2'
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
-        { items, meta } = yield resource.list query: query: '{}'
+        context = Test::Context.new req, res, switchMediator
+        context.query = query: '{}'
+        { items, meta } = yield resource.list context
         assert.deepEqual meta, pagination:
           limit: 'not defined'
           offset: 'not defined'
@@ -438,68 +555,107 @@ describe 'Resource', ->
     it 'should get resource single item', ->
       co ->
         KEY = 'TEST_RESOURCE_002'
-        class Test extends LeanRC::Module
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
           @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @root "#{__dirname}/config/root"
+          @initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findRecordByName: Function,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
             default: (asType) -> Test::TestRecord
-          # @public init: Function,
+          # @public init: FuncG([Object, CollectionInterface], NilT),
           #   default: ->
           #     @super arguments...
           #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          #     return
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String, { default: 'TestEntity' }
-        Test::TestResource.initialize()
-        class Test::Collection extends LeanRC::Collection
+          @initialize()
+        class TestsCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: Function,
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = _.filter @getData().data, aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
-          @public @async push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (aoRecord) ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
               i = aoRecord.toJSON()
               @getData().data.push i
-              yield return i
-          @public @async take: Function,
+              yield return aoRecord
+          @public @async take: FuncG([UnionG String, Number], RecordInterface),
             default: (id) ->
               result = []
               if (data = _.find @getData().data, {id})?
                 result.push data
               cursor = LeanRC::Cursor.new @, result
-              yield cursor.first()
-          @public @async includes: Function,
+              return yield cursor.first()
+          @public @async includes: FuncG([UnionG String, Number], Boolean),
             default: (id)->
               yield return (_.find @getData().data, {id})?
-        Test::Collection.initialize()
-        facade = LeanRC::Facade.getInstance KEY
+          @initialize()
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+          @initialize()
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/space/SPACE123/test_entitis'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends LeanRC::Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
+          @initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         COLLECTION_NAME = 'TestEntitiesCollection'
-        facade.registerProxy Test::Collection.new COLLECTION_NAME,
-          delegate: Test::TestRecord
+        facade.registerProxy TestsCollection.new COLLECTION_NAME,
+          delegate: 'TestRecord'
           serializer: -> LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
         yield collection.create test: 'test1'#, type: 'Test::TestRecord'
         record = yield collection.create test: 'test2'#, type: 'Test::TestRecord'
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
-        context =
-          pathParams: "#{resource.keyName}": record.id
+        context = Test::Context.new req, res, switchMediator
+        context.pathParams = "#{resource.keyName}": record.id
         result = yield resource.detail context
         assert.propertyVal result, 'id', record.id
         assert.propertyVal result, 'test', 'test2'
@@ -511,65 +667,79 @@ describe 'Resource', ->
     it 'should create resource single item', ->
       co ->
         KEY = 'TEST_RESOURCE_003'
-        class Test extends LeanRC::Module
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
-          # @public init: Function,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
+          # @public init: FuncG([Object, CollectionInterface], NilT),
           #   default: ->
           #     @super arguments...
           #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          #     return
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String, { default: 'TestEntity' }
-        Test::TestResource.initialize()
-        class Test::Collection extends LeanRC::Collection
+          @initialize()
+        class TestsCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: Function,
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = _.filter @getData().data, aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @, data
-          @public @async push: Function,
+              yield return LeanRC::Cursor.new @, data
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (aoRecord) ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
               i = aoRecord.toJSON()
               @getData().data.push i
-              yield return i
-          @public @async take: Function,
+              yield return aoRecord
+          @public @async take: FuncG([UnionG String, Number], RecordInterface),
             default: (id) ->
               result = []
               if (data = _.find @getData().data, {id})?
                 result.push data
               cursor = LeanRC::Cursor.new @, result
-              yield cursor.first()
-          @public @async includes: Function,
+              return yield cursor.first()
+          @public @async includes: FuncG([UnionG String, Number], Boolean),
             default: (id)->
               yield return (_.find @getData().data, {id})?
-        Test::Collection.initialize()
-        facade = LeanRC::Facade.getInstance KEY
+          @initialize()
         COLLECTION_NAME = 'TestEntitiesCollection'
-        facade.registerProxy Test::Collection.new COLLECTION_NAME,
-          delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
+        facade.registerProxy TestsCollection.new COLLECTION_NAME,
+          delegate: 'TestRecord'
+          # serializer: LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
-        result = yield resource.create request: body: test_entity: test: 'test3'
+        Reflect.defineProperty resource, 'recordBody',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'context',
+          writable: yes
+          value: undefined
+        ctx = request: body: test_entity: test: 'test3'
+        result = yield resource.create ctx
         assert.propertyVal result, 'test', 'test3'
         yield return
   describe '#update', ->
@@ -579,77 +749,96 @@ describe 'Resource', ->
     it 'should update resource single item', ->
       co ->
         KEY = 'TEST_RESOURCE_004'
+        facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
+          @initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
-          # @public init: Function,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
+          # @public init: FuncG([Object, CollectionInterface], NilT),
           #   default: ->
           #     @super arguments...
           #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          #     return
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String, { default: 'TestEntity' }
-        Test::TestResource.initialize()
-        class Test::TestCollection extends LeanRC::Collection
+          @initialize()
+        class TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: Function,
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = _.filter @getData().data, aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
-          @public @async push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (aoRecord) ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
               i = aoRecord.toJSON()
               @getData().data.push i
-              yield return i
-          @public @async override: Function,
+              yield return aoRecord
+          @public @async override: FuncG([UnionG(String, Number), RecordInterface], RecordInterface),
             default: (id, aoRecord) ->
               item = _.find @getData().data, {id}
               if item?
                 FORBIDDEN = [ '_key', '_id', '_type', '_rev' ]
                 snapshot = _.omit (aoRecord.toJSON?() ? aoRecord ? {}), FORBIDDEN
                 item[key] = value  for own key, value of snapshot
-              yield @take id
-          @public @async take: Function,
+              # yield @take id
+              yield return aoRecord
+          @public @async take: FuncG([UnionG String, Number], RecordInterface),
             default: (id) ->
               result = []
               if (data = _.find @getData().data, {id})?
                 result.push data
               cursor = LeanRC::Cursor.new @, result
-              yield cursor.first()
-          @public @async includes: Function,
+              return yield cursor.first()
+          @public @async includes: FuncG([UnionG String, Number], Boolean),
             default: (id)->
               yield return (_.find @getData().data, {id})?
-        Test::TestCollection.initialize()
-        facade = LeanRC::Facade.getInstance KEY
+          @initialize()
         COLLECTION_NAME = 'TestEntitiesCollection'
-        facade.registerProxy Test::TestCollection.new COLLECTION_NAME,
-          delegate: Test::TestRecord
+        facade.registerProxy TestCollection.new COLLECTION_NAME,
+          delegate: 'TestRecord'
           serializer: LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
+        Reflect.defineProperty resource, 'recordId',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'recordBody',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'context',
+          writable: yes
+          value: undefined
         record = yield collection.create test: 'test3'
-        result = yield resource.update
+        ctx = {
           type: 'Test::TestRecord'
           pathParams: test_entity: record.id
           request: body: test_entity: test: 'test8'
+        }
+        result = yield resource.update ctx
         assert.propertyVal result, 'test', 'test8'
         yield return
   describe '#delete', ->
@@ -659,75 +848,116 @@ describe 'Resource', ->
     it 'should remove resource single item', ->
       co ->
         KEY = 'TEST_RESOURCE_005'
-        class Test extends LeanRC::Module
+        facade = LeanRC::Facade.getInstance KEY
+        class Test extends LeanRC
           @inheritProtected()
-          @root __dirname
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @root "#{__dirname}/config/root"
+          @initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestRecord
-          # @public init: Function,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestRecord
+          # @public init: FuncG([Object, CollectionInterface], NilT),
           #   default: ->
           #     @super arguments...
           #     @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          #     return
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String, { default: 'TestEntity' }
-        Test::TestResource.initialize()
-        class Test::Collection extends LeanRC::Collection
+          @initialize()
+        class TestsCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: Function,
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = _.filter @getData().data, aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
-          @public @async push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (aoRecord) ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
               i = aoRecord.toJSON()
               @getData().data.push i
-              yield return i
-          @public @async override: Function,
+              yield return aoRecord
+          @public @async override: FuncG([UnionG(String, Number), RecordInterface], RecordInterface),
             default: (id, aoRecord) ->
               item = _.find @getData().data, {id}
               if item?
                 FORBIDDEN = [ '_key', '_id', '_type', '_rev' ]
                 snapshot = _.omit (aoRecord.toJSON?() ? aoRecord ? {}), FORBIDDEN
                 item[key] = value  for own key, value of snapshot
-              yield @take id
-          @public @async take: Function,
+              # yield @take id
+              yield return aoRecord
+          @public @async take: FuncG([UnionG String, Number], RecordInterface),
             default: (id) ->
               result = []
               if (data = _.find @getData().data, {id})?
                 result.push data
               cursor = LeanRC::Cursor.new @, result
-              yield cursor.first()
-          @public @async includes: Function,
+              return yield cursor.first()
+          @public @async includes: FuncG([UnionG String, Number], Boolean),
             default: (id)->
               yield return (_.find @getData().data, {id})?
-        Test::Collection.initialize()
-        facade = LeanRC::Facade.getInstance KEY
+          @initialize()
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+          @initialize()
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/space/SPACE123/test_entitis'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends LeanRC::Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
+          @initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         COLLECTION_NAME = 'TestEntitiesCollection'
-        facade.registerProxy Test::Collection.new COLLECTION_NAME,
-          delegate: Test::TestRecord
-          serializer: LeanRC::Serializer
+        facade.registerProxy TestsCollection.new COLLECTION_NAME,
+          delegate: 'TestRecord'
+          # serializer: LeanRC::Serializer
           data: []
         collection = facade.retrieveProxy COLLECTION_NAME
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
+        context = Test::Context.new req, res, switchMediator
         record = yield collection.create test: 'test3'
-        result = yield resource.delete
-          pathParams: test_entity: record.id
+        context.pathParams = test_entity: record.id
+        result = yield resource.delete context
         assert.isUndefined result
         yield return
   describe '#execute', ->
@@ -738,103 +968,147 @@ describe 'Resource', ->
       co ->
         KEY = 'TEST_RESOURCE_008'
         facade = LeanRC::Facade.getInstance KEY
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public @static findRecordByName: Function,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
             default: (asType) -> TestRecord
-          # @public init: Function,
+          # @public init: FuncG([Object, CollectionInterface], NilT),
           #   default: ->
           #     @super arguments...
           #     @type = 'Test::TestRecord'
-        TestRecord.initialize()
+          #     return
+          @initialize()
         class TestResource extends LeanRC::Resource
           @inheritProtected()
           @include LeanRC::QueryableResourceMixin
           @module Test
           @public entityName: String, { default: 'TestEntity' }
-        TestResource.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
           @public jobs: Object, { default: {} }
-          @public @async getDelayed: Function,
+          @public @async getDelayed: FuncG([], ListG StructG {
+            queueName: String
+            scriptName: String
+            data: AnyT
+            delay: MaybeG Number
+            id: String
+          }),
             default: ->
               yield return []
           @public init: Function,
             default: (args...) ->
               @super args...
               @jobs = {}
-        TestResque.initialize()
+          @initialize()
         resque = TestResque.new LeanRC::RESQUE, data: []
         facade.registerProxy resque
-        class Collection extends LeanRC::Collection
+        class TestsCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public parseQuery: Object,
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
             default: (aoQuery) ->
               voQuery = _.mapKeys aoQuery, (value, key) -> key.replace /^@doc\./, ''
               voQuery = _.mapValues voQuery, (value, key) ->
                 if value['$eq']? then value['$eq'] else value
-              $filter: voQuery
-          @public @async executeQuery: Function,
+              yield return $filter: voQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = _.filter @getData().data, aoParsedQuery.$filter
               yield LeanRC::Cursor.new @, data
-          @public @async push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (aoRecord) ->
               isExist = (id) => (_.find @getData().data, {id})?
               while isExist key = LeanRC::Utils.uuid.v4() then
               aoRecord.id = key
               i = aoRecord.toJSON()
               @getData().data.push i
-              yield return i
-          @public @async remove: Function,
+              yield return aoRecord
+          @public @async remove: FuncG([UnionG String, Number], NilT),
             default: (id) ->
               _.remove @getData().data, {id}
-              yield return yes
-          @public @async take: Function,
+              yield return
+          @public @async take: FuncG([UnionG String, Number], RecordInterface),
             default: (id) ->
               result = []
               if (data = _.find @getData().data, {id})?
                 result.push data
               cursor = LeanRC::Cursor.new @, result
-              yield cursor.first()
-          @public @async includes: Function,
+              return yield cursor.first()
+          @public @async includes: FuncG([UnionG String, Number], Boolean),
             default: (id)->
               yield return (_.find @getData().data, {id})?
-        Collection.initialize()
+          @initialize()
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+          @initialize()
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        req =
+          method: 'GET'
+          url: 'http://localhost:8888/space/SPACE123/test_entitis'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        res = new MyResponse
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends LeanRC::Switch
+          @inheritProtected()
+          @module Test
+          @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
+          @initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         COLLECTION_NAME = 'TestEntitiesCollection'
-        facade.registerProxy Collection.new COLLECTION_NAME,
-          delegate: TestRecord
-          serializer: LeanRC::Serializer
+        facade.registerProxy TestsCollection.new COLLECTION_NAME,
+          delegate: 'TestRecord'
+          # serializer: LeanRC::Serializer
           data: []
         facade.registerMediator LeanRC::Mediator.new LeanRC::APPLICATION_MEDIATOR,
           context: {}
         collection = facade.retrieveProxy COLLECTION_NAME
         resource = TestResource.new()
         resource.initializeNotifier KEY
+        context = Test::Context.new req, res, switchMediator
+        context.query = query: '{"test":{"$eq":"test2"}}'
         yield collection.create test: 'test1'
         yield collection.create test: 'test2'
         yield collection.create test: 'test2'
         spySendNotitfication = sinon.spy resource, 'sendNotification'
         testBody =
-          context:
-            query: query: '{"test":{"$eq":"test2"}}'
-            headers: {}
+          context: context
           reverse: 'TEST_REVERSE'
         notification = LeanRC::Notification.new 'TEST_NAME', testBody, 'list'
         yield resource.execute notification
         [ name, body, type ] = spySendNotitfication.lastCall.args
         assert.equal name, LeanRC::HANDLER_RESULT
+        assert.isUndefined body.error, body.error
         {result, resource:voResource} = body
         { meta, items } = result
         assert.deepEqual meta, pagination:
@@ -855,21 +1129,21 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
-        class Test::TestResource extends LeanRC::Resource
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
           @action test: Function,
             default: ->
-        Test::TestResource.initialize()
+          @initialize()
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         class MyResponse extends EventEmitter
           _headers: {}
           getHeaders: -> LeanRC::Utils.copy @_headers
@@ -893,10 +1167,10 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
-        TestSwitch.initialize()
+          @initialize()
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
         resource.context = Test::Context.new req, res, switchMediator
         try
@@ -920,18 +1194,34 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
-        resource.session = uid: 'ID123'
-        resource.context =
+          @initialize()
+        resource = TestResource.new()
+        Reflect.defineProperty resource, 'recordId',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'recordBody',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'session',
+          writable: yes
+          value: uid: 'ID123'
+        ctx = {
           pathParams: test_entity: 'ID123456'
           request: body: test_entity: test: 'test9'
+        }
+        Reflect.defineProperty resource, 'context',
+          writable: yes
+          value: ctx
+        # resource.session = uid: 'ID123'
+        # resource.context =
+        #   pathParams: test_entity: 'ID123456'
+        #   request: body: test_entity: test: 'test9'
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
@@ -947,18 +1237,34 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
-        resource.session = uid: 'ID123'
-        resource.context =
+          @initialize()
+        resource = TestResource.new()
+        Reflect.defineProperty resource, 'recordId',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'recordBody',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'session',
+          writable: yes
+          value: uid: 'ID123'
+        ctx = {
           pathParams: test_entity: 'ID123456'
           request: body: test_entity: test: 'test9'
+        }
+        Reflect.defineProperty resource, 'context',
+          writable: yes
+          value: ctx
+        # resource.session = uid: 'ID123'
+        # resource.context =
+        #   pathParams: test_entity: 'ID123456'
+        #   request: body: test_entity: test: 'test9'
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
@@ -984,14 +1290,14 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
+          @initialize()
+        resource = TestResource.new()
         resource.currentUser = id: 'ID123'
         resource.context =
           pathParams: test_entity: 'ID123456', space: 'SPACE123'
@@ -1011,14 +1317,14 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
+          @initialize()
+        resource = TestResource.new()
         resource.currentUser = id: 'ID123'
         resource.context =
           pathParams: test_entity: 'ID123456', space: 'SPACE123'
@@ -1043,18 +1349,34 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
-        class Test::TestResource extends LeanRC::Resource
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        Test::TestResource.initialize()
-        resource = Test::TestResource.new()
-        resource.session = uid: 'ID123', userIsAdmin: no
-        resource.context =
+          @initialize()
+        resource = TestResource.new()
+        Reflect.defineProperty resource, 'recordId',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'recordBody',
+          writable: yes
+          value: undefined
+        Reflect.defineProperty resource, 'session',
+          writable: yes
+          value: uid: 'ID123', userIsAdmin: no
+        ctx = {
           pathParams: test_entity: 'ID123456', space: 'SPACE123'
           request: body: test_entity: test: 'test9'
+        }
+        Reflect.defineProperty resource, 'context',
+          writable: yes
+          value: ctx
+        # resource.session = uid: 'ID123', userIsAdmin: no
+        # resource.context =
+        #   pathParams: test_entity: 'ID123456', space: 'SPACE123'
+        #   request: body: test_entity: test: 'test9'
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
@@ -1072,7 +1394,7 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestResource extends LeanRC::Resource
@@ -1080,11 +1402,11 @@ describe 'Resource', ->
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        TestResource.initialize()
+          @initialize()
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         class MyResponse extends EventEmitter
           _headers: {}
           getHeaders: -> LeanRC::Utils.copy @_headers
@@ -1108,40 +1430,41 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
-        TestSwitch.initialize()
+          @initialize()
         class TestEntityRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
           @attribute ownerId: String
-          @public @static findRecordByName: Function,
-            default: (asType) -> Test::TestEntityRecord
-          # @public init: Function,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
+            default: (asType) -> TestEntityRecord
+          # @public init: FuncG([Object, CollectionInterface], NilT),
           #   default: ->
           #     @super arguments...
           #     @type = 'Test::TestEntityRecord'
-        TestEntityRecord.initialize()
+          #     return
+          @initialize()
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        TestCollection.initialize()
+          @initialize()
         resource = TestResource.new()
         resource.initializeNotifier KEY
         { collectionName } = resource
         boundCollection = TestCollection.new collectionName,
-          delegate: -> TestEntityRecord
+          delegate: 'TestEntityRecord'
         facade.registerProxy boundCollection
         yield boundCollection.create id: 'ID123456', test: 'test', ownerId: 'ID124'
         yield boundCollection.create id: 'ID123457', test: 'test', ownerId: 'ID123'
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
         resource.context = Test::Context.new req, res, switchMediator
         resource.context.pathParams = test_entity: 'ID123455', space: 'SPACE123'
-        resource.context.request = body: test_entity: test: 'test9'
+        resource.context.request.body = test_entity: test: 'test9'
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
@@ -1176,7 +1499,7 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestResource extends LeanRC::Resource
@@ -1184,11 +1507,11 @@ describe 'Resource', ->
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        TestResource.initialize()
+          @initialize()
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         class MyResponse extends EventEmitter
           _headers: {}
           getHeaders: -> LeanRC::Utils.copy @_headers
@@ -1212,40 +1535,41 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
-        TestSwitch.initialize()
+          @initialize()
         class TestEntityRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
           @attribute ownerId: String
-          @public @static findRecordByName: Function,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
             default: (asType) -> Test::TestEntityRecord
-          # @public init: Function,
+          # @public init: FuncG([Object, CollectionInterface], NilT),
           #   default: ->
           #     @super arguments...
           #     @type = 'Test::TestEntityRecord'
-        TestEntityRecord.initialize()
+          #     return
+          @initialize()
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        TestCollection.initialize()
+          @initialize()
         resource = TestResource.new()
         resource.initializeNotifier KEY
         { collectionName } = resource
         boundCollection = TestCollection.new collectionName,
-          delegate: TestEntityRecord
+          delegate: 'TestEntityRecord'
         facade.registerProxy boundCollection
         yield boundCollection.create id: 'ID123456', test: 'test', ownerId: 'ID124'
         yield boundCollection.create id: 'ID123457', test: 'test', ownerId: 'ID123'
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
         resource.context = Test::Context.new req, res, switchMediator
         resource.context.pathParams = test_entity: 'ID123455', space: 'SPACE123'
-        resource.context.request = body: test_entity: test: 'test9'
+        resource.context.request.body = test_entity: test: 'test9'
         resource.getRecordId()
         resource.session = uid: 'ID123', userIsAdmin: no
         try
@@ -1268,7 +1592,7 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestResource extends LeanRC::Resource
@@ -1307,7 +1631,7 @@ describe 'Resource', ->
         resource.initializeNotifier KEY
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
         resource.context = Test::Context.new req, res, switchMediator
         try
@@ -1342,7 +1666,7 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestResource extends LeanRC::Resource
@@ -1350,11 +1674,11 @@ describe 'Resource', ->
           @module Test
           @public entityName: String,
             default: 'TestEntity'
-        TestResource.initialize()
+          @initialize()
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         class MyResponse extends EventEmitter
           _headers: {}
           getHeaders: -> LeanRC::Utils.copy @_headers
@@ -1378,25 +1702,26 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
-        TestSwitch.initialize()
+          @initialize()
         class TestEntityRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
           @attribute ownerId: String
-          @public @static findRecordByName: Function,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
             default: (asType) -> Test::TestEntityRecord
-          # @public init: Function,
+          # @public init: FuncG([Object, CollectionInterface], NilT),
           #   default: ->
           #     @super arguments...
           #     @type = 'Test::TestEntityRecord'
-        TestEntityRecord.initialize()
+          #     return
+          @initialize()
         class TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::MemoryCollectionMixin
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        TestCollection.initialize()
+          @initialize()
         resource = TestResource.new()
         resource.initializeNotifier KEY
         { collectionName } = resource
@@ -1406,11 +1731,11 @@ describe 'Resource', ->
         yield boundCollection.create id: 'ID123456', test: 'test', ownerId: 'ID124'
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
         resource.context = Test::Context.new req, res, switchMediator
         resource.context.pathParams = test_entity: 'ID123456', space: 'SPACE123'
-        resource.context.request = body: test_entity: test: 'test9'
+        resource.context.request.body = test_entity: test: 'test9'
         resource.getRecordId()
         resource.getRecordBody()
         resource.beforeUpdate()
@@ -1435,25 +1760,32 @@ describe 'Resource', ->
       co ->
         KEY = 'TEST_RESOURCE_104'
         facade = LeanRC::Facade.getInstance KEY
-        testAction = sinon.spy -> yield return
+        testAction = sinon.spy -> yield return yes
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
           @public jobs: Object, { default: {} }
-          @public @async getDelayed: Function,
+          @public @async getDelayed: FuncG([], ListG StructG {
+            queueName: String
+            scriptName: String
+            data: AnyT
+            delay: MaybeG Number
+            id: String
+          }),
             default: ->
               yield return []
-          @public init: Function,
+          @public init: FuncG([MaybeG(String), MaybeG AnyT], NilT),
             default: (args...) ->
               @super args...
               @jobs = {}
-        TestResque.initialize()
+              return
+          @initialize()
         resque = TestResque.new LeanRC::RESQUE, data: []
         facade.registerProxy resque
         class TestResource extends LeanRC::Resource
@@ -1461,11 +1793,11 @@ describe 'Resource', ->
           @module Test
           @action @async test: Function,
             default: testAction
-        TestResource.initialize()
+          @initialize()
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         class MyResponse extends EventEmitter
           _headers: {}
           getHeaders: -> LeanRC::Utils.copy @_headers
@@ -1489,12 +1821,12 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
-        TestSwitch.initialize()
+          @initialize()
         resource = TestResource.new()
         resource.initializeNotifier KEY
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
         context = Test::Context.new req, res, switchMediator
         yield resource.doAction 'test', context
@@ -1511,14 +1843,14 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
           @public jobs: Object, { default: {} }
-          @public @async ensureQueue: Function,
+          @public @async ensureQueue: FuncG([String, MaybeG Number], StructG name: String, concurrency: Number),
             default: (asQueueName, anConcurrency) ->
               queue = _.find @getData().data, name: asQueueName
               if queue?
@@ -1527,10 +1859,10 @@ describe 'Resource', ->
                 queue = name: asQueueName, concurrency: anConcurrency
                 @getData().data.push queue
               yield return queue
-          @public @async getQueue: Function,
+          @public @async getQueue: FuncG(String, MaybeG StructG name: String, concurrency: Number),
             default: (asQueueName) ->
               yield return _.find @getData().data, name: asQueueName
-          @public @async pushJob: Function,
+          @public @async pushJob: FuncG([String, String, AnyT, MaybeG Number], UnionG String, Number),
             default: (name, scriptName, data, delayUntil) ->
               id = LeanRC::Utils.uuid.v4()
               @jobs[id] = { name, scriptName, data, delayUntil }
@@ -1539,13 +1871,13 @@ describe 'Resource', ->
             default: (args...) ->
               @super args...
               @jobs = {}
-        TestResque.initialize()
+          @initialize()
         resque = TestResque.new LeanRC::RESQUE, data: []
         facade.registerProxy resque
         class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
-        TestResource.initialize()
+          @initialize()
         resource = TestResource.new()
         resource.initializeNotifier MULTITON_KEY
         DELAY = Date.now() + 1000000
@@ -1579,7 +1911,7 @@ describe 'Resource', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestResource extends LeanRC::Resource
@@ -1587,11 +1919,11 @@ describe 'Resource', ->
           @module Test
           @action @async test: Function,
             default: testAction
-        TestResource.initialize()
+          @initialize()
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         class MyResponse extends EventEmitter
           _headers: {}
           getHeaders: -> LeanRC::Utils.copy @_headers
@@ -1615,12 +1947,12 @@ describe 'Resource', ->
           @inheritProtected()
           @module Test
           @public routerName: String, { default: 'TEST_SWITCH_ROUTER' }
-        TestSwitch.initialize()
+          @initialize()
         resource = TestResource.new()
         resource.initializeNotifier KEY
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        resource = Test::TestResource.new()
+        resource = TestResource.new()
         resource.initializeNotifier KEY
         context = Test::Context.new req, res, switchMediator
         assert.isFalse yield resource.writeTransaction 'test', context

@@ -1,15 +1,32 @@
 
 
 module.exports = (Module) ->
-  class HtmlRenderer extends Module::Renderer
-    @inheritProtected()
+  {
+    AnyT
+    FuncG, MaybeG, InterfaceG
+    ContextInterface, ResourceInterface
+    Renderer
+    Utils: { assign }
+  } = Module::
 
+  class HtmlRenderer extends Renderer
+    @inheritProtected()
     @module Module
 
-    @public render: Function,
-      default: (aoData, aoOptions) ->
-        vhData = Module::Utils.extend {}, aoData ? {}
-        "
+    @public @async render: FuncG([ContextInterface, AnyT, ResourceInterface, MaybeG InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: String
+      entityName: String
+      recordName: String
+    }], MaybeG AnyT),
+      default: (ctx, aoData, resource, aoOptions) ->
+        vhData = assign {}, aoData ? {}
+        yield return "
         <html>
           <head>
             <title>#{vhData.title ? ''}</title>
@@ -21,4 +38,4 @@ module.exports = (Module) ->
         </html>
         "
 
-  HtmlRenderer.initialize()
+    @initialize()

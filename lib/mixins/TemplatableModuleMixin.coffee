@@ -2,18 +2,20 @@
 
 module.exports = (Module)->
   {
+    FuncG, DictG
+    Mixin
     Module: ModuleClass
     Utils: { _, filesTreeSync }
   } = Module::
 
-  Module.defineMixin 'TemplatableModuleMixin', (BaseClass = ModuleClass) ->
+  Module.defineMixin Mixin 'TemplatableModuleMixin', (BaseClass = ModuleClass) ->
     class extends BaseClass
       @inheritProtected()
 
-      @public @static templates: Object,
+      @public @static templates: DictG(String, Function),
         get: -> @metaObject.getGroup 'templates', no
 
-      @public @static defineTemplate: Function,
+      @public @static defineTemplate: FuncG([String, Function], Function),
         default: (filename, fun)->
           vsRoot = @::ROOT ? '.'
           vsTemplatesDir = "#{vsRoot}/templates/"
@@ -23,7 +25,7 @@ module.exports = (Module)->
           @metaObject.addMetaData 'templates', templateName, fun
           return fun
 
-      @public @static resolveTemplate: Function,
+      @public @static resolveTemplate: FuncG([], Function),
         default: (args...)->
           vsRoot = @::ROOT ? '.'
           vsTemplatesDir = "#{vsRoot}/templates/"

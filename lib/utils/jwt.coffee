@@ -13,9 +13,17 @@
 
 
 module.exports = (Module) ->
-  Module.util jwtDecode: (asKey, asToken, abNoVerify = no) ->
+  {
+    AnyT
+    AsyncFuncG, MaybeG
+    Utils: { co }
+  } = Module::
+
+  Module.util jwtDecode: AsyncFuncG([
+    String, String, MaybeG Boolean
+  ], AnyT) co.wrap (asKey, asToken, abNoVerify = no) ->
     { isArangoDB, hasNativePromise } = Module::Utils
-    Module::Promise.new (resolve, reject) ->
+    return yield Module::Promise.new (resolve, reject) ->
       if isArangoDB() or not hasNativePromise()
         # Is ArangoDB !!!
         try
@@ -37,9 +45,11 @@ module.exports = (Module) ->
         resolve decoded
       return
 
-  Module.util jwtEncode: (asKey, asMessage, asAlgorithm) ->
+  Module.util jwtEncode: AsyncFuncG([
+    String, AnyT, String
+  ], String) co.wrap (asKey, asMessage, asAlgorithm) ->
     { isArangoDB, hasNativePromise } = Module::Utils
-    Module::Promise.new (resolve, reject) ->
+    return yield Module::Promise.new (resolve, reject) ->
       if isArangoDB() or not hasNativePromise()
         # Is ArangoDB !!!
         try

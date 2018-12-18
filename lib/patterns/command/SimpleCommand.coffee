@@ -1,12 +1,19 @@
 
 
 module.exports = (Module)->
-  class SimpleCommand extends Module::Notifier
+  {
+    FuncG
+    NotificationInterface
+    CommandInterface
+    Notifier
+  } = Module::
+
+  class SimpleCommand extends Notifier
     @inheritProtected()
-    # @implements Module::CommandInterface
+    @implements CommandInterface
     @module Module
 
-    @public execute: Function,
+    @public execute: FuncG(NotificationInterface),
       default: ->
 
     @public @static @async restoreObject: Function,
@@ -20,4 +27,4 @@ module.exports = (Module)->
         yield return
 
 
-  SimpleCommand.initialize()
+    @initialize()

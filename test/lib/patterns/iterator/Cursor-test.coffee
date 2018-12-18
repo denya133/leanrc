@@ -9,7 +9,7 @@ describe 'Cursor', ->
   describe '.new', ->
     it 'should create cursor instance', ->
       expect ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -30,7 +30,7 @@ describe 'Cursor', ->
   describe '#setCollection', ->
     it 'should setup record', ->
       expect ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -51,7 +51,7 @@ describe 'Cursor', ->
   describe '#next', ->
     it 'should get next values one by one', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -77,7 +77,7 @@ describe 'Cursor', ->
   describe '#hasNext', ->
     it 'should check if next value is present', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -101,7 +101,7 @@ describe 'Cursor', ->
   describe '#toArray', ->
     it 'should get array from cursor', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -128,7 +128,7 @@ describe 'Cursor', ->
   describe '#close', ->
     it 'should remove records from cursor', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -153,7 +153,7 @@ describe 'Cursor', ->
   describe '#count', ->
     it 'should count records in cursor', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -176,7 +176,7 @@ describe 'Cursor', ->
   describe '#forEach', ->
     it 'should call lambda in each record in cursor', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -206,7 +206,7 @@ describe 'Cursor', ->
   describe '#map', ->
     it 'should map records using lambda', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -236,7 +236,7 @@ describe 'Cursor', ->
   describe '#filter', ->
     it 'should filter records using lambda', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -263,7 +263,7 @@ describe 'Cursor', ->
   describe '#find', ->
     it 'should find record using lambda', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -288,7 +288,7 @@ describe 'Cursor', ->
   describe '#compact', ->
     it 'should get non-empty records from cursor', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -314,7 +314,7 @@ describe 'Cursor', ->
   describe '#reduce', ->
     it 'should reduce records using lambda', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -344,7 +344,7 @@ describe 'Cursor', ->
   describe '#first', ->
     it 'should get first record from cursor', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record

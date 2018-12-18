@@ -1,13 +1,19 @@
 
 
 module.exports = (Module)->
-  class FilterControlMessage extends Module::PipeMessage
+  {
+    PointerT, LambdaT
+    FuncG, MaybeG
+    PipeMessage
+  } = Module::
+
+  class FilterControlMessage extends PipeMessage
     @inheritProtected()
 
     @module Module
 
     @public @static BASE: String,
-      get: -> "#{Module::PipeMessage.BASE}filter-control/"
+      get: -> "#{PipeMessage.BASE}filter-control/"
     @public @static SET_PARAMS: String,
       get: -> "#{@BASE}setparams"
     @public @static SET_FILTER: String,
@@ -17,37 +23,43 @@ module.exports = (Module)->
     @public @static FILTER: String,
       get: -> "#{@BASE}filter"
 
-    ipsName = @protected name: String
-    ipmFilter = @protected filter: Module::LAMBDA
-    ipoParams = @protected params: Object
+    ipsName = PointerT @protected name: String
+    ipmFilter = PointerT @protected filter: LambdaT
+    ipoParams = PointerT @protected params: Object
 
-    @public setName: Function,
+    @public setName: FuncG(String),
       default: (asName)->
         @[ipsName] = asName
         return
-    @public getName: Function,
+
+    @public getName: FuncG([], String),
       default: -> @[ipsName]
 
-    @public setFilter: Function,
+    @public setFilter: FuncG(Function),
       default: (amFilter)->
         @[ipmFilter] = amFilter
         return
-    @public getFilter: Function,
+
+    @public getFilter: FuncG([], Function),
       default: -> @[ipmFilter]
 
-    @public setParams: Function,
+    @public setParams: FuncG(Object),
       default: (aoParams)->
         @[ipoParams] = aoParams
         return
-    @public getParams: Function,
+
+    @public getParams: FuncG([], Object),
       default: -> @[ipoParams]
 
-    @public init: Function,
+    @public init: FuncG([
+      String, String, MaybeG(Function), MaybeG Object
+    ]),
       default: (asType, asName, amFilter=null, aoParams=null)->
         @super asType
         @setName asName
-        @setFilter amFilter
-        @setParams aoParams
+        @setFilter amFilter if amFilter?
+        @setParams aoParams if aoParams?
+        return
 
 
-  FilterControlMessage.initialize()
+    @initialize()

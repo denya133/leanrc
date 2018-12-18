@@ -1,14 +1,20 @@
 # LeanRC = require.main.require 'lib'
 
 module.exports = (Module) ->
-  class AppFacade extends Module.NS.Facade
+  {
+    PointerT
+    FuncG, MaybeG
+    FacadeInterface
+    Facade
+  } = Module.NS
+
+  class AppFacade extends Facade
     @inheritProtected()
     @module Module
 
-    vpbIsInitialized = @private isInitialized: Boolean,
+    vpbIsInitialized = PointerT @private isInitialized: MaybeG(Boolean),
       default: no
-    cphInstanceMap  = @protected @static instanceMap: Object,
-      default: {}
+    cphInstanceMap  = PointerT @classVariables['~instanceMap'].pointer
 
     @public startup: Function,
       default: ->
@@ -16,16 +22,18 @@ module.exports = (Module) ->
           @[vpbIsInitialized] = yes
           @registerCommand Module.NS.STARTUP, Module.NS.StartupCommand
           @sendNotification Module.NS.STARTUP
+        return
 
     @public finish: Function,
       default: ->
         @removeMediator  Module.NS.ConsoleComponentMediator::CONSOLE_MEDIATOR
+        return
 
-    @public @static getInstance: Function,
+    @public @static getInstance: FuncG(String, FacadeInterface),
       default: (asKey)->
         vhInstanceMap = Module.NS.Facade[cphInstanceMap]
         unless vhInstanceMap[asKey]?
           vhInstanceMap[asKey] = Module.NS.AppFacade.new asKey
         vhInstanceMap[asKey]
 
-  AppFacade.initialize()
+    @initialize()

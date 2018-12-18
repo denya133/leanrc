@@ -10,88 +10,90 @@ describe 'MemoryResqueMixin', ->
   describe '.new', ->
     it 'should create resque instance', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         assert.instanceOf resque, Test::Resque
         yield return
   describe '#onRegister', ->
     it 'should register resque instance', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
-        assert.deepEqual resque[Symbol.for '~delayedJobs'], {}
-        assert.deepEqual resque[Symbol.for '~delayedQueues'],
+        assert.deepEqual resque[Symbol.for '~jobs'], {}
+        assert.deepEqual resque[Symbol.for '~queues'],
           'Test|>default': concurrency: 1, name: 'default'
         yield return
   describe '#onRemove', ->
     it 'should unregister resque instance', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
-        assert.deepEqual resque[Symbol.for '~delayedJobs'], {}
-        assert.deepEqual resque[Symbol.for '~delayedQueues'],
+        assert.deepEqual resque[Symbol.for '~jobs'], {}
+        assert.deepEqual resque[Symbol.for '~queues'],
           'Test|>default': concurrency: 1, name: 'default'
         resque.onRemove()
-        assert.isUndefined resque[Symbol.for '~delayedJobs']
-        assert.isUndefined resque[Symbol.for '~delayedQueues']
+        assert.deepEqual resque.tmpJobs, []
+        assert.deepEqual resque[Symbol.for '~queues'], {}
+        # assert.isUndefined resque[Symbol.for '~jobs']
+        # assert.isUndefined resque[Symbol.for '~queues']
         yield return
   describe '#ensureQueue', ->
     it 'should create queue config', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE', 5
-        queue = resque[Symbol.for '~delayedQueues']['Test|>TEST_QUEUE']
+        queue = resque[Symbol.for '~queues']['Test|>TEST_QUEUE']
         assert.propertyVal queue, 'name', 'TEST_QUEUE'
         assert.propertyVal queue, 'concurrency', 5
         yield return
   describe '#getQueue', ->
     it 'should get queue', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE', 5
@@ -102,15 +104,15 @@ describe 'MemoryResqueMixin', ->
   describe '#removeQueue', ->
     it 'should remove queue', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE', 5
@@ -123,15 +125,15 @@ describe 'MemoryResqueMixin', ->
   describe '#allQueues', ->
     it 'should get all queues', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE_1', 1
@@ -161,22 +163,22 @@ describe 'MemoryResqueMixin', ->
   describe '#pushJob', ->
     it 'should save new job', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE_1', 1
         DATA = data: 'data'
-        DATE = new Date()
+        DATE = Date.now()
         jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT', DATA, DATE
-        job = resque[Symbol.for '~delayedJobs']['Test|>TEST_QUEUE_1'][jobId]
+        job = resque[Symbol.for '~jobs']['Test|>TEST_QUEUE_1'][jobId]
         assert.deepEqual job,
           queueName: 'Test|>TEST_QUEUE_1'
           data: scriptName: 'TEST_SCRIPT', data: DATA
@@ -188,20 +190,20 @@ describe 'MemoryResqueMixin', ->
   describe '#getJob', ->
     it 'should get saved job', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE_1', 1
         DATA = data: 'data'
-        DATE = new Date()
+        DATE = Date.now()
         jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT', DATA, DATE
         job = yield resque.getJob 'TEST_QUEUE_1', jobId
         assert.deepEqual job,
@@ -215,20 +217,20 @@ describe 'MemoryResqueMixin', ->
   describe '#deleteJob', ->
     it 'should remove saved job', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE_1', 1
         DATA = data: 'data'
-        DATE = new Date()
+        DATE = Date.now()
         jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT', DATA, DATE
         job = yield resque.getJob 'TEST_QUEUE_1', jobId
         assert.deepEqual job,
@@ -244,21 +246,21 @@ describe 'MemoryResqueMixin', ->
   describe '#allJobs', ->
     it 'should list all jobs', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE_1', 1
         resque.ensureQueue 'TEST_QUEUE_2', 1
         DATA = data: 'data'
-        DATE = new Date()
+        DATE = Date.now()
         yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_2', DATA, DATE
         yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
         jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_2', DATA, DATE
@@ -274,21 +276,21 @@ describe 'MemoryResqueMixin', ->
   describe '#pendingJobs', ->
     it 'should list pending jobs', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE_1', 1
         resque.ensureQueue 'TEST_QUEUE_2', 1
         DATA = data: 'data'
-        DATE = new Date()
+        DATE = Date.now()
         yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
         yield resque.pushJob 'TEST_QUEUE_2', 'TEST_SCRIPT_1', DATA, DATE
         jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
@@ -303,21 +305,21 @@ describe 'MemoryResqueMixin', ->
   describe '#progressJobs', ->
     it 'should list runnning jobs', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE_1', 1
         resque.ensureQueue 'TEST_QUEUE_2', 1
         DATA = data: 'data'
-        DATE = new Date()
+        DATE = Date.now()
         yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
         yield resque.pushJob 'TEST_QUEUE_2', 'TEST_SCRIPT_1', DATA, DATE
         jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
@@ -332,21 +334,21 @@ describe 'MemoryResqueMixin', ->
   describe '#completedJobs', ->
     it 'should list complete jobs', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE_1', 1
         resque.ensureQueue 'TEST_QUEUE_2', 1
         DATA = data: 'data'
-        DATE = new Date()
+        DATE = Date.now()
         yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
         yield resque.pushJob 'TEST_QUEUE_2', 'TEST_SCRIPT_1', DATA, DATE
         jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
@@ -361,21 +363,21 @@ describe 'MemoryResqueMixin', ->
   describe '#failedJobs', ->
     it 'should list failed jobs', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class Test::Resque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        Test::Resque.initialize()
+          @initialize()
         resque = Test::Resque.new 'TEST_RESQUE'
         resque.onRegister()
         resque.ensureQueue 'TEST_QUEUE_1', 1
         resque.ensureQueue 'TEST_QUEUE_2', 1
         DATA = data: 'data'
-        DATE = new Date()
+        DATE = Date.now()
         yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE
         yield resque.pushJob 'TEST_QUEUE_2', 'TEST_SCRIPT_1', DATA, DATE
         jobId = yield resque.pushJob 'TEST_QUEUE_1', 'TEST_SCRIPT_1', DATA, DATE

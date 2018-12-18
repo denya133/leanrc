@@ -3,7 +3,7 @@ sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 {
   Gateway,
-  Utils: { co, joi }
+  Utils: { co, joi, filesListSync }
 } = LeanRC::
 
 describe 'Gateway', ->
@@ -40,6 +40,7 @@ describe 'Gateway', ->
           @module Test
           @initialize()
         gateway = ApplicationGateway.new 'TEST_GATEWAY'
+        gateway.initializeNotifier 'TEST_GATEWAY123'
         voEndpointForDetailAction = gateway.swaggerDefinitionFor 'test', 'detail',
           keyName: 'test'
           entityName: 'test'

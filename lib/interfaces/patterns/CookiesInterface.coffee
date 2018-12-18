@@ -2,25 +2,22 @@
 
 module.exports = (Module)->
   {
-    ANY
-    NILL
+    AnyT
+    FuncG, MaybeG
+    CookiesInterface: CookiesInterfaceDef
+    Interface
   } = Module::
 
-  Module.defineInterface 'CookiesInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class CookiesInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual request: Object
-      @public @virtual response: Object
-      @public @virtual key: String
+    @virtual request: Object
+    @virtual response: Object
+    @virtual key: String
 
-      @public @virtual get: Function,
-        args: [String, [Object, NILL]]
-        return: String
-
-      @public @virtual set: Function,
-        args: [String, ANY, [Object, NILL]]
-        return: CookiesInterface
+    @virtual get: FuncG [String, MaybeG Object], MaybeG String
+    @virtual set: FuncG [String, AnyT, MaybeG Object], CookiesInterfaceDef
 
 
-      @initializeInterface()
+    @initialize()

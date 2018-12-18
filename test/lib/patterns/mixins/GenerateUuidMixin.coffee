@@ -11,19 +11,18 @@ describe 'GenerateUuidIdMixin', ->
       co ->
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-
-        class Test::TestRecord extends LeanRC::Record
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
-        Test::TestRecord.initialize()
-        class Test::TestCollection extends LeanRC::Collection
+          @initialize()
+        class TestCollection extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::GenerateUuidIdMixin
           @module Test
-        Test::TestCollection.initialize()
-        collection = Test::TestCollection.new 'TEST_COLLECTION',
-          delegate: Test::TestRecord
+          @initialize()
+        collection = TestCollection.new 'TEST_COLLECTION',
+          delegate: 'TestRecord'
         mask = ///
           ^
           [0-9a-fA-F]{8}

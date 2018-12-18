@@ -2,6 +2,7 @@
 --reporter spec
 --check-leaks
 --growl
+test/lib/patterns/utils/*.coffee
 test/lib/core/*.coffee
 test/lib/patterns/facade/*.coffee
 test/lib/patterns/observer/*.coffee
@@ -14,7 +15,6 @@ test/lib/patterns/command/*.coffee
 test/lib/patterns/migration/*.coffee
 test/lib/patterns/data_mapper/*.coffee
 test/lib/patterns/proxy/*.coffee
-test/lib/patterns/mixins/*.coffee
 test/lib/patterns/switch/*.coffee
-test/lib/patterns/utils/*.coffee
 test/*.coffee
+test/lib/patterns/mixins/*.coffee

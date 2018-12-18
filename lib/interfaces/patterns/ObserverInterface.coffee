@@ -1,30 +1,23 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT
+    FuncG, MaybeG
+    NotificationInterface
+    Interface
+  } = Module::
 
-  Module.defineInterface 'ObserverInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class ObserverInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual setNotifyMethod: Function,
-        args: [Function]
-        return: NILL
-      @public @virtual setNotifyContext: Function,
-        args: [ANY]
-        return: NILL
-      @public @virtual getNotifyMethod: Function,
-        args: []
-        return: Function
-      @public @virtual getNotifyContext: Function,
-        args: []
-        return: ANY
-      @public @virtual compareNotifyContext: Function,
-        args: [ANY]
-        return: Boolean
-      @public @virtual notifyObserver: Function,
-        args: [Module::NotificationInterface]
-        return: NILL
+    @virtual setNotifyMethod: FuncG Function
+    @virtual setNotifyContext: FuncG AnyT
+    @virtual getNotifyMethod: FuncG [], MaybeG Function
+    @virtual getNotifyContext: FuncG [], MaybeG AnyT
+    @virtual compareNotifyContext: FuncG AnyT, Boolean
+    @virtual notifyObserver: FuncG NotificationInterface
 
 
-      @initializeInterface()
+    @initialize()

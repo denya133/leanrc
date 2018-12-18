@@ -18,7 +18,9 @@ module.exports = (App)->
 
 module.exports = (Module)->
   {
-    Gateway
+    FuncG, SubsetG
+    EndpointInterface
+    Gateway, Mixin
     Utils: { _, inflect, joi, statuses }
   } = Module::
 
@@ -28,12 +30,11 @@ module.exports = (Module)->
   FORBIDDEN         = statuses 'forbidden'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  Module.defineMixin 'ModelingGatewayMixin', (BaseClass = Gateway) ->
+  Module.defineMixin Mixin 'ModelingGatewayMixin', (BaseClass = Gateway) ->
     class extends BaseClass
       @inheritProtected()
-      # @implements Module::ModelingGatewayMixinInterface
 
-      @public getStandardActionEndpoint: Function,
+      @public getStandardActionEndpoint: FuncG([String, String], SubsetG EndpointInterface),
         default: (asResourse, asAction) ->
           vsEndpointName = if _.startsWith asResourse.toLowerCase(), 'modeling'
             "Modeling#{inflect.camelize asAction}Endpoint"

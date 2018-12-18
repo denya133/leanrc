@@ -37,42 +37,47 @@ module.exports = (Module)->
     JOB_RESULT
     START_RESQUE
     RESQUE
-    NILL
     RESQUE_EXECUTOR
-
-    Mediator
-    DelayableMixin
-    ConfigurableMixin
-    ResqueInterface
+    NilT, PointerT
+    FuncG, DictG, StructG, MaybeG, UnionG
+    ResqueInterface, NotificationInterface
+    Mediator, Mixin
+    DelayableMixin, ConfigurableMixin
     Utils: { _, co, isArangoDB, genRandomAlphaNumbers }
   } = Module::
 
-  Module.defineMixin 'MemoryExecutorMixin', (BaseClass = Mediator) ->
+  Module.defineMixin Mixin 'MemoryExecutorMixin', (BaseClass = Mediator) ->
     class extends BaseClass
       @inheritProtected()
       @include DelayableMixin
       @include ConfigurableMixin
 
-      @public fullQueueName: Function,
-        args: [String]
-        return: String
+      @public fullQueueName: FuncG(String, String),
         default: (queueName)-> @[ipoResque].fullQueueName queueName
 
-      ipsMultitonKey = Symbol.for '~multitonKey'
-      ipoTimer = @private timer: Object
-      ipbIsStopped = @private isStopped: Boolean
-      ipoDefinedProcessors = @private definedProcessors: Object
-      ipoConcurrencyCount = @private concurrencyCount: Object
-      ipoResque = @private resque: ResqueInterface
+      ipsMultitonKey = PointerT Symbol.for '~multitonKey'
+      ipoTimer = PointerT @private timer: MaybeG UnionG Object, Number
+      ipbIsStopped = PointerT @private isStopped: Boolean
+      ipoDefinedProcessors = PointerT @private definedProcessors: DictG(
+        String
+        StructG {
+          listener: Function
+          concurrency: Number
+        }
+      )
+      ipoConcurrencyCount = PointerT @private concurrencyCount: DictG(
+        String, Number
+      )
+      ipoResque = PointerT @private resque: ResqueInterface
 
-      @public listNotificationInterests: Function,
+      @public listNotificationInterests: FuncG([], Array),
         default: ->
           [
             JOB_RESULT
             START_RESQUE
           ]
 
-      @public handleNotification: Function,
+      @public handleNotification: FuncG(NotificationInterface, NilT),
         default: (aoNotification)->
           vsName = aoNotification.getName()
           voBody = aoNotification.getBody()
@@ -96,8 +101,6 @@ module.exports = (Module)->
           return
 
       @public @async reDefineProcessors: Function,
-        args: []
-        return: NILL
         default: ->
           @stop()
           @[ipoDefinedProcessors] = {}
@@ -105,8 +108,6 @@ module.exports = (Module)->
           yield return
 
       @public @async defineProcessors: Function,
-        args: []
-        return: NILL
         default: ->
           for {name, concurrency} in yield @[ipoResque].allQueues()
             fullQueueName = @[ipoResque].fullQueueName name
@@ -130,8 +131,6 @@ module.exports = (Module)->
           return
 
       @public @async cyclePart: Function,
-        args: []
-        return: NILL
         default: ->
           for own queueName, queueConfig of @[ipoDefinedProcessors]
             {listener, concurrency} = queueConfig
@@ -154,21 +153,17 @@ module.exports = (Module)->
           yield return
 
       @public @async recursion: Function,
-        args: []
-        return: NILL
         default: ->
           if @[ipbIsStopped]
             yield return
           self = @
-          @[ipoTimer] = setTimeout co.wrap ->
+          @[ipoTimer] = setTimeout((co.wrap ->
             clearTimeout self[ipoTimer]
-            yield self.cyclePart()
-          , 100
+            return yield self.cyclePart()
+          ), 100)
           yield return
 
       @public @async start: Function,
-        args: []
-        return: NILL
         default: ->
           if isArangoDB()
             throw new Error 'MemoryExecutorMixin can not been used for ArrangoDB apps'
@@ -178,19 +173,16 @@ module.exports = (Module)->
           yield return
 
       @public stop: Function,
-        args: []
-        return: NILL
         default: ->
           if isArangoDB()
             throw new Error 'MemoryExecutorMixin can not been used for ArrangoDB apps'
             return
           @[ipbIsStopped] = yes
-          clearTimeout @[ipoTimer]
+          if @[ipoTimer]?
+            clearTimeout @[ipoTimer]
           return
 
-      @public define: Function,
-        args: [String, Object, Function]
-        return: NILL
+      @public define: FuncG([String, StructG(concurrency: Number), Function], NilT),
         default: (queueName, {concurrency}, lambda)->
           listener = (job)=>
             done = (err)=>

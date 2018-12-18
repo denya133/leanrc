@@ -10,20 +10,19 @@
 Идеи взяты из https://github.com/koajs/koa/blob/master/lib/request.js
 ###
 
+
 module.exports = (Module)->
   {
-    ANY
-
+    AnyT, NilT
+    FuncG, UnionG, MaybeG
+    RequestInterface, SwitchInterface, ContextInterface
     CoreObject
-    RequestInterface
-    SwitchInterface
-    ContextInterface
     Utils: { _ }
   } = Module::
 
   class Request extends CoreObject
     @inheritProtected()
-    # @implements RequestInterface
+    @implements RequestInterface
     @module Module
 
     @public req: Object, # native request object
@@ -41,7 +40,7 @@ module.exports = (Module)->
     # @public cookie: Function,
     #   default: (name, options)->
 
-    @public body: ANY # тело должен предоставлять миксин из отдельного модуля
+    @public body: MaybeG AnyT # тело должен предоставлять миксин из отдельного модуля
 
     @public header: Object,
       get: -> @headers
@@ -87,6 +86,7 @@ module.exports = (Module)->
       set: (obj)->
         qs = require 'querystring'
         @querystring = qs.stringify obj
+        obj
 
     @public querystring: String,
       get: ->
@@ -156,7 +156,7 @@ module.exports = (Module)->
         methods = ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE']
         _.includes methods, @method
 
-    @public socket: Object,
+    @public socket: MaybeG(Object),
       get: -> @req.socket
 
     @public charset: String,
@@ -221,16 +221,16 @@ module.exports = (Module)->
           .reverse()
           .slice offset ? 0
 
-    @public accepts: Function,
+    @public accepts: FuncG([MaybeG UnionG String, Array], UnionG String, Array, Boolean),
       default: (args...)-> @ctx.accept.types args...
-    @public acceptsCharsets: Function,
+    @public acceptsCharsets: FuncG([MaybeG UnionG String, Array], UnionG String, Array),
       default: (args...)-> @ctx.accept.charsets args...
-    @public acceptsEncodings: Function,
+    @public acceptsEncodings: FuncG([MaybeG UnionG String, Array], UnionG String, Array),
       default: (args...)-> @ctx.accept.encodings args...
-    @public acceptsLanguages: Function,
+    @public acceptsLanguages: FuncG([MaybeG UnionG String, Array], UnionG String, Array),
       default: (args...)-> @ctx.accept.languages args...
 
-    @public 'is': Function,
+    @public 'is': FuncG([UnionG String, Array], UnionG String, Boolean, NilT),
       default: (args...)->
         [types] = args
         typeis = require 'type-is'
@@ -245,7 +245,7 @@ module.exports = (Module)->
         return '' unless type?
         type.split(';')[0]
 
-    @public get: Function,
+    @public get: FuncG(String, String),
       default: (field)-> #@headers[name]
         req = @req
         switch field = field.toLowerCase()
@@ -254,12 +254,12 @@ module.exports = (Module)->
           else
             req.headers[field] ? ''
 
-    # @public inspect: Function,
+    # @public inspect: FuncG([], Object),
     #   default: ->
     #     return unless @req
     #     @toJSON()
 
-    # @public toJSON: Function,
+    # @public toJSON: FuncG([], Object),
     #   default: -> _.pick @, ['method', 'url', 'header']
 
     @public @static @async restoreObject: Function,
@@ -272,7 +272,7 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG(ContextInterface),
       default: (context)->
         @super()
         @ctx = context
@@ -280,4 +280,4 @@ module.exports = (Module)->
         return
 
 
-  Request.initialize()
+    @initialize()

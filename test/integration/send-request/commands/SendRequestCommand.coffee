@@ -1,13 +1,21 @@
 
 
 module.exports = (Module) ->
-  class SendRequestCommand extends Module.NS.SimpleCommand
+  {
+    NilT
+    FuncG
+    NotificationInterface
+    RequestProxy
+    SimpleCommand
+  } = Module.NS
+
+  class SendRequestCommand extends SimpleCommand
     @inheritProtected()
     @module Module
 
-    @public execute: Function,
+    @public execute: FuncG(NotificationInterface, NilT),
       default: ->
-        proxy = @facade.retrieveProxy Module.NS.RequestProxy::REQUEST_PROXY
+        proxy = @facade.retrieveProxy RequestProxy::REQUEST_PROXY
         proxy.request {}
 
-  SendRequestCommand.initialize()
+    @initialize()

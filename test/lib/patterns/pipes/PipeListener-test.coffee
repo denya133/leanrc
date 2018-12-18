@@ -2,16 +2,17 @@
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 PipeListener = LeanRC::Pipes::PipeListener
+Pipe = LeanRC::Pipes::Pipe
+PipeMessage = LeanRC::Pipes::PipeMessage
 
 describe 'PipeListener', ->
   describe '.new, #write', ->
     it 'should create new PipeListener instance', ->
       expect ->
-        voOutput =
-          write: ->
+        voOutput = Pipe.new()
         vmListener = (aoMessage) ->
           @write aoMessage
-        voMessage = message: 'TEST'
+        voMessage = PipeMessage.new PipeMessage.NORMAL
         spyWrite = sinon.spy voOutput, 'write'
         pipeListener = PipeListener.new voOutput, vmListener
         pipeListener.write voMessage

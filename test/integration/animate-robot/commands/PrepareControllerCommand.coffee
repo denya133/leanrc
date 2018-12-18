@@ -1,13 +1,21 @@
 
 
 module.exports = (Module) ->
-  class PrepareControllerCommand extends Module.NS.SimpleCommand
+  {
+    NilT
+    FuncG
+    NotificationInterface
+    ANIMATE_ROBOT
+    AnimateRobotCommand
+    SimpleCommand
+  } = Module.NS
+
+  class PrepareControllerCommand extends SimpleCommand
     @inheritProtected()
     @module Module
 
-    @public execute: Function,
+    @public execute: FuncG(NotificationInterface, NilT),
       default: ->
-        @facade.registerCommand Module.NS.ANIMATE_ROBOT,
-          Module.NS.AnimateRobotCommand
+        @facade.registerCommand ANIMATE_ROBOT, AnimateRobotCommand
 
-  PrepareControllerCommand.initialize()
+    @initialize()

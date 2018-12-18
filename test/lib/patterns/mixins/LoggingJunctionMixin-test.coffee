@@ -7,7 +7,7 @@ describe 'LoggingJunctionMixin', ->
   describe '.new', ->
     it 'should create new JunctionMediator instance with LoggingJunctionMixin', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()
@@ -23,7 +23,7 @@ describe 'LoggingJunctionMixin', ->
   describe '#listNotificationInterests', ->
     it 'should get list of mediator notification interesets', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()
@@ -46,7 +46,7 @@ describe 'LoggingJunctionMixin', ->
       co ->
         KEY = 'TEST_LOGGING_JUNCTION_MIXIN_001'
         TEST_BODY = 'TEST_BODY'
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()
@@ -71,7 +71,7 @@ describe 'LoggingJunctionMixin', ->
       co ->
         KEY = 'TEST_LOGGING_JUNCTION_MIXIN_001'
         TEST_BODY = 'TEST_BODY'
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()
@@ -96,7 +96,7 @@ describe 'LoggingJunctionMixin', ->
       co ->
         KEY = 'TEST_LOGGING_JUNCTION_MIXIN_001'
         TEST_BODY = 'TEST_BODY'
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()
@@ -121,7 +121,7 @@ describe 'LoggingJunctionMixin', ->
       co ->
         KEY = 'TEST_LOGGING_JUNCTION_MIXIN_001'
         TEST_BODY = 'TEST_BODY'
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()
@@ -146,7 +146,7 @@ describe 'LoggingJunctionMixin', ->
       co ->
         KEY = 'TEST_LOGGING_JUNCTION_MIXIN_002'
         TEST_LEVEL = LeanRC::LogMessage.NONE
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()

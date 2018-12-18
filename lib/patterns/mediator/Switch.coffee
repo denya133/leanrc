@@ -26,18 +26,15 @@ module.exports = (Module)->
 
 module.exports = (Module)->
   {
-    ANY
-    NILL
-    LAMBDA
     MIGRATIONS
     APPLICATION_ROUTER
     APPLICATION_MEDIATOR
     HANDLER_RESULT
-
-    Mediator
-    Context
-    SwitchInterface
-    ContextInterface
+    AnyT, PointerT, AsyncFunctionT
+    FuncG, ListG, MaybeG, InterfaceG, StructG, DictG, UnionG
+    SwitchInterface, ContextInterface, RendererInterface, NotificationInterface
+    ResourceInterface
+    Mediator, Context
     ConfigurableMixin
     Renderer
     Utils: {
@@ -53,17 +50,17 @@ module.exports = (Module)->
 
   class Switch extends Mediator
     @inheritProtected()
-    # @implements SwitchInterface
+    @implements SwitchInterface
     @include ConfigurableMixin
     @module Module
 
-    ipoHttpServer = @private httpServer: Object
-    ipoRenderers = @private renderers: Object
+    ipoHttpServer = PointerT @private httpServer: Object
+    ipoRenderers = PointerT @private renderers: MaybeG DictG String, MaybeG RendererInterface
 
     @public middlewares: Array
     @public handlers: Array
 
-    @public responseFormats: Array,
+    @public responseFormats: ListG(String),
       get: -> [
         'json', 'html', 'xml', 'atom', 'text'
       ]
@@ -71,9 +68,7 @@ module.exports = (Module)->
     @public routerName: String,
       default: APPLICATION_ROUTER
 
-    @public @static compose: Function,
-      args: [Array]
-      return: LAMBDA
+    @public @static compose: FuncG([ListG(Function), ListG MaybeG ListG Function], AsyncFunctionT),
       default: (middlewares, handlers)->
         unless _.isArray middlewares
           throw new Error 'Middleware stack must be an array!'
@@ -98,17 +93,17 @@ module.exports = (Module)->
           yield return
 
     # from https://github.com/koajs/route/blob/master/index.js ###############
-    decode = (val)-> # чистая функция
+    decode = FuncG([MaybeG String], MaybeG String) (val)-> # чистая функция
       decodeURIComponent val if val
-    matches = (ctx, method)->
+
+    matches = FuncG([ContextInterface, String], Boolean) (ctx, method)->
       return yes unless method
       return yes if ctx.method is method
       if method is 'GET' and ctx.method is 'HEAD'
         return yes
       return no
-    @public @static createMethod: Function,
-      args: [String]
-      return: NILL
+
+    @public @static createMethod: FuncG([MaybeG String]),
       default: (method)->
         originMethodName = method
         if method
@@ -116,9 +111,7 @@ module.exports = (Module)->
         else
           originMethodName = 'all'
 
-        @public "#{originMethodName}": Function,
-          args: [String, LAMBDA]
-          return: NILL
+        @public "#{originMethodName}": FuncG([String, Function]),
           default: (path, routeFunc)->
             unless routeFunc
               throw new Error 'handler is required'
@@ -169,13 +162,13 @@ module.exports = (Module)->
     # @public xmlRendererName: String
     # @public atomRendererName: String
 
-    @public listNotificationInterests: Function,
+    @public listNotificationInterests: FuncG([], Array),
       default: ->
         [
           HANDLER_RESULT
         ]
 
-    @public handleNotification: Function,
+    @public handleNotification: FuncG(NotificationInterface),
       default: (aoNotification)->
         vsName = aoNotification.getName()
         voBody = aoNotification.getBody()
@@ -205,8 +198,6 @@ module.exports = (Module)->
         return
 
     @public serverListen: Function,
-      args: []
-      return: NILL
       default: ->
         port = process?.env?.PORT ? @configs.port
         { facade } = @
@@ -218,9 +209,7 @@ module.exports = (Module)->
           facade.sendNotification SEND_TO_LOG, "listening on port #{port}", LEVELS[DEBUG]
         return
 
-    @public use: Function,
-      args: [Number, LAMBDA]
-      return: SwitchInterface
+    @public use: FuncG([UnionG(Number, Function), MaybeG Function], SwitchInterface),
       default: (index, middleware)->
         unless middleware?
           middleware = index
@@ -241,9 +230,7 @@ module.exports = (Module)->
           @middlewares.push middleware
         return @
 
-    @public callback: Function,
-      args: []
-      return: LAMBDA
+    @public callback: FuncG([], AsyncFunctionT),
       default: ->
         fn = @constructor.compose @middlewares, @handlers
         self = @
@@ -272,9 +259,7 @@ module.exports = (Module)->
         handleRequest
 
     # NOTE: пустая функция, которую вызываем из callback и передаем в нее длину реквеста, длину респонза, время выполнения, и контекст, чтобы потом в отдельном миксине можно было определить тело этого метода, т.е. как реализовывать сохранение (реагировать) этой статистики.
-    @public @async handleStatistics: Function,
-      args: [Number, Number, Number, ContextInterface]
-      return: NILL
+    @public @async handleStatistics: FuncG([Number, Number, Number, ContextInterface]),
       default: (reqLength, resLength, time, aoContext)->
         { DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         @sendNotification SEND_TO_LOG, "
@@ -285,9 +270,7 @@ module.exports = (Module)->
         yield return
 
     # Default error handler
-    @public onerror: Function,
-      args: [Error]
-      return: NILL
+    @public onerror: FuncG(Error),
       default: (err)->
         assert = require 'assert'
         assert _.isError(err), "non-error thrown: #{err}"
@@ -298,7 +281,7 @@ module.exports = (Module)->
         @sendNotification SEND_TO_LOG, msg.replace(/^/gm, '  '), LEVELS[ERROR]
         return
 
-    @public respond: Function,
+    @public respond: FuncG(ContextInterface),
       default: (ctx)->
         return if ctx.respond is no
         return unless ctx.writable
@@ -306,28 +289,33 @@ module.exports = (Module)->
         code = ctx.status
         if statuses.empty[code]
           ctx.body = null
-          return ctx.res.end()
+          ctx.res.end()
+          return
         if 'HEAD' is ctx.method
           if not ctx.res.headersSent and _.isObjectLike body
             ctx.length = Buffer.byteLength JSON.stringify body
-          return ctx.res.end()
+          ctx.res.end()
+          return
         unless body?
           body = ctx.message ? String code
           unless ctx.res.headersSent
             ctx.type = 'text'
             ctx.length = Buffer.byteLength body
-          return ctx.res.end body
+          ctx.res.end body
+          return
         if _.isBuffer(body) or _.isString body
-          return ctx.res.end body
+          ctx.res.end body
+          return
         if body instanceof require 'stream'
-          return body.pipe ctx.res
+          body.pipe ctx.res
+          return
         body = JSON.stringify body ? null
         unless ctx.res.headersSent
           ctx.length = Buffer.byteLength body
         ctx.res.end body
         return
 
-    @public rendererFor: Function,
+    @public rendererFor: FuncG(String, RendererInterface),
       default: (asFormat)->
         @[ipoRenderers] ?= {}
         @[ipoRenderers][asFormat] ?= do (asFormat)=>
@@ -337,7 +325,17 @@ module.exports = (Module)->
           voRenderer
         @[ipoRenderers][asFormat]
 
-    @public @async sendHttpResponse: Function,
+    @public @async sendHttpResponse: FuncG([ContextInterface, MaybeG(AnyT), ResourceInterface, InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: MaybeG String
+      entityName: String
+      recordName: MaybeG String
+    }]),
       default: (ctx, aoData, resource, opts)->
         if opts.action is 'create'
           ctx.status = 201
@@ -360,7 +358,20 @@ module.exports = (Module)->
           @createNativeRoute aoRoute
         return
 
-    @public sender: Function,
+    @public sender: FuncG([String, StructG({
+      context: ContextInterface
+      reverse: String
+    }), InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: MaybeG String
+      entityName: String
+      recordName: MaybeG String
+    }]),
       default: (resourceName, aoMessage, {method, path, resource, action})->
         @sendNotification resourceName, aoMessage, action
         return
@@ -399,7 +410,17 @@ module.exports = (Module)->
     #     aoSwaggerEndpoint.deprecated isDeprecated  if isDeprecated?
     #     return
 
-    @public createNativeRoute: Function,
+    @public createNativeRoute: FuncG([InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: MaybeG String
+      entityName: String
+      recordName: MaybeG String
+    }]),
       default: (opts)->
         {method, path} = opts
         resourceName = inflect.camelize inflect.underscore "#{opts.resource.replace /[/]/g, '_'}Resource"
@@ -428,12 +449,13 @@ module.exports = (Module)->
           yield return yes
         return
 
-    @public init: Function,
+    @public init: FuncG([MaybeG(String), MaybeG AnyT]),
       default: (args...)->
         @super args...
+        @[ipoRenderers] = {}
         @middlewares = []
         @handlers = []
         return
 
 
-  Switch.initialize()
+    @initialize()

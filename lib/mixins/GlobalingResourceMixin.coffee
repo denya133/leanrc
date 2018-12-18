@@ -2,13 +2,13 @@
 
 module.exports = (Module)->
   {
-    Resource
+    Resource, Mixin
     Utils: { _, statuses }
   } = Module::
 
   HTTP_NOT_FOUND    = statuses 'not found'
 
-  Module.defineMixin 'GlobalingResourceMixin', (BaseClass = Resource) ->
+  Module.defineMixin Mixin 'GlobalingResourceMixin', (BaseClass = Resource) ->
     class extends BaseClass
       @inheritProtected()
 

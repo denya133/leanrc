@@ -2,7 +2,11 @@
 sinon = require 'sinon'
 _ = require 'lodash'
 LeanRC = require.main.require 'lib'
-{ co } = LeanRC::Utils
+{
+  AnyT, NilT
+  FuncG, StructG, MaybeG, ListG, UnionG
+  Utils: { co }
+} = LeanRC::
 
 
 describe 'Resque', ->
@@ -45,7 +49,7 @@ describe 'Resque', ->
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
-          @public @async ensureQueue: Function,
+          @public @async ensureQueue: FuncG([String, MaybeG Number], StructG name: String, concurrency: Number),
             default: (asQueueName, anConcurrency) ->
               queue = _.find @getData().data, name: asQueueName
               if queue?
@@ -71,7 +75,7 @@ describe 'Resque', ->
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
-          @public @async ensureQueue: Function,
+          @public @async ensureQueue: FuncG([String, MaybeG Number], StructG name: String, concurrency: Number),
             default: (asQueueName, anConcurrency) ->
               queue = _.find @getData().data, name: asQueueName
               if queue?
@@ -80,7 +84,7 @@ describe 'Resque', ->
                 queue = name: asQueueName, concurrency: anConcurrency
                 @getData().data.push queue
               yield return queue
-          @public @async allQueues: Function,
+          @public @async allQueues: FuncG([], ListG StructG name: String, concurrency: Number),
             default: -> yield return @getData().data
         TestResque.initialize()
         resque = TestResque.new 'TEST_RESQUE', data: []
@@ -108,7 +112,7 @@ describe 'Resque', ->
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
-          @public @async ensureQueue: Function,
+          @public @async ensureQueue: FuncG([String, MaybeG Number], StructG name: String, concurrency: Number),
             default: (asQueueName, anConcurrency) ->
               queue = _.find @getData().data, name: asQueueName
               if queue?
@@ -117,7 +121,7 @@ describe 'Resque', ->
                 queue = name: asQueueName, concurrency: anConcurrency
                 @getData().data.push queue
               yield return queue
-          @public @async getQueue: Function,
+          @public @async getQueue: FuncG(String, MaybeG StructG name: String, concurrency: Number),
             default: (asQueueName) ->
               yield return _.find @getData().data, name: asQueueName
         TestResque.initialize()
@@ -137,7 +141,7 @@ describe 'Resque', ->
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
-          @public @async ensureQueue: Function,
+          @public @async ensureQueue: FuncG([String, MaybeG Number], StructG name: String, concurrency: Number),
             default: (asQueueName, anConcurrency) ->
               queue = _.find @getData().data, name: asQueueName
               if queue?
@@ -146,10 +150,10 @@ describe 'Resque', ->
                 queue = name: asQueueName, concurrency: anConcurrency
                 @getData().data.push queue
               yield return queue
-          @public @async getQueue: Function,
+          @public @async getQueue: FuncG(String, MaybeG StructG name: String, concurrency: Number),
             default: (asQueueName) ->
               yield return _.find @getData().data, name: asQueueName
-          @public @async removeQueue: Function,
+          @public @async removeQueue: FuncG(String, NilT),
             default: (asQueueName) ->
               _.remove @getData().data, name: asQueueName
               yield return
@@ -172,7 +176,7 @@ describe 'Resque', ->
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
-          @public @async ensureQueue: Function,
+          @public @async ensureQueue: FuncG([String, MaybeG Number], StructG name: String, concurrency: Number),
             default: (asQueueName, anConcurrency) ->
               queue = _.find @getData().data, name: asQueueName
               if queue?
@@ -181,7 +185,7 @@ describe 'Resque', ->
                 queue = name: asQueueName, concurrency: anConcurrency
                 @getData().data.push queue
               yield return queue
-          @public @async getQueue: Function,
+          @public @async getQueue: FuncG(String, MaybeG StructG name: String, concurrency: Number),
             default: (asQueueName) ->
               yield return _.find @getData().data, name: asQueueName
         TestResque.initialize()
@@ -208,7 +212,7 @@ describe 'Resque', ->
           @inheritProtected()
           @module Test
           @public jobs: Object, { default: {} }
-          @public @async ensureQueue: Function,
+          @public @async ensureQueue: FuncG([String, MaybeG Number], StructG name: String, concurrency: Number),
             default: (asQueueName, anConcurrency) ->
               queue = _.find @getData().data, name: asQueueName
               if queue?
@@ -217,10 +221,10 @@ describe 'Resque', ->
                 queue = name: asQueueName, concurrency: anConcurrency
                 @getData().data.push queue
               yield return queue
-          @public @async getQueue: Function,
+          @public @async getQueue: FuncG(String, MaybeG StructG name: String, concurrency: Number),
             default: (asQueueName) ->
               yield return _.find @getData().data, name: asQueueName
-          @public @async pushJob: Function,
+          @public @async pushJob: FuncG([String, String, AnyT, MaybeG Number], UnionG String, Number),
             default: (name, scriptName, data, delayUntil) ->
               id = LeanRC::Utils.uuid.v4()
               @jobs[id] = { name, scriptName, data, delayUntil }
@@ -229,7 +233,7 @@ describe 'Resque', ->
             default: (args...) ->
               @super args...
               @jobs = {}
-        TestResque.initialize()
+          @initialize()
         resque = TestResque.new 'TEST_RESQUE', data: []
         facade.registerProxy resque
         yield resque.create 'TEST_QUEUE_1', 4
@@ -251,7 +255,7 @@ describe 'Resque', ->
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
-          @public @async ensureQueue: Function,
+          @public @async ensureQueue: FuncG([String, MaybeG Number], StructG name: String, concurrency: Number),
             default: (asQueueName, anConcurrency) ->
               queue = _.find @getData().data, name: asQueueName
               if queue?
@@ -260,7 +264,7 @@ describe 'Resque', ->
                 queue = name: asQueueName, concurrency: anConcurrency
                 @getData().data.push queue
               yield return queue
-          @public @async getQueue: Function,
+          @public @async getQueue: FuncG(String, MaybeG StructG name: String, concurrency: Number),
             default: (asQueueName) ->
               yield return _.find @getData().data, name: asQueueName
         TestResque.initialize()
@@ -290,7 +294,7 @@ describe 'Resque', ->
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
-          @public @async ensureQueue: Function,
+          @public @async ensureQueue: FuncG([String, MaybeG Number], StructG name: String, concurrency: Number),
             default: (asQueueName, anConcurrency) ->
               queue = _.find @getData().data, name: asQueueName
               if queue?
@@ -299,7 +303,7 @@ describe 'Resque', ->
                 queue = name: asQueueName, concurrency: anConcurrency
                 @getData().data.push queue
               yield return queue
-          @public @async getQueue: Function,
+          @public @async getQueue: FuncG(String, MaybeG StructG name: String, concurrency: Number),
             default: (asQueueName) ->
               yield return _.find @getData().data, name: asQueueName
         TestResque.initialize()

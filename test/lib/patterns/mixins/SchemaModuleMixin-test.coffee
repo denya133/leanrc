@@ -9,7 +9,7 @@ describe 'SchemaModuleMixin', ->
   describe '.defineMigrations', ->
     it 'should create configuration instance', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @include LeanRC::SchemaModuleMixin
           @root "#{__dirname}/config/root"

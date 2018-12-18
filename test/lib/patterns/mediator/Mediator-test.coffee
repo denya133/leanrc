@@ -1,21 +1,23 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-Mediator = LeanRC::Mediator
+{
+  FuncG
+  Notification
+  Mediator
+}= LeanRC::
 
 describe 'Mediator', ->
   describe '.new', ->
     it 'should create new mediator', ->
       expect ->
         mediatorName = 'TEST_MEDIATOR'
-        viewComponent = { id: 'view-component' }
-        mediator = Mediator.new mediatorName, viewComponent
+        mediator = Mediator.new mediatorName
       .to.not.throw Error
   describe '#getMediatorName', ->
     it 'should get mediator name', ->
       mediatorName = 'TEST_MEDIATOR'
-      viewComponent = { id: 'view-component' }
-      mediator = Mediator.new mediatorName, viewComponent
+      mediator = Mediator.new mediatorName
       expect mediator.getMediatorName()
       .to.equal mediatorName
   describe '#getViewComponent', ->
@@ -29,29 +31,27 @@ describe 'Mediator', ->
     it 'should get mediator motification interests list', ->
       class TestMediator extends Mediator
         @inheritProtected()
-        @public listNotificationInterests: Function,
+        @public listNotificationInterests: FuncG([], Array),
           default: -> [ 'TEST1' , 'TEST2', 'TEST3' ]
       mediatorName = 'TEST_MEDIATOR'
-      viewComponent = { id: 'view-component' }
-      mediator = TestMediator.new mediatorName, viewComponent
+      mediator = TestMediator.new mediatorName
       expect mediator.listNotificationInterests()
       .to.eql [ 'TEST1' , 'TEST2', 'TEST3' ]
   describe '#handleNotification', ->
     it 'should call handleNotification', ->
       expect ->
         mediatorName = 'TEST_MEDIATOR'
-        viewComponent = { id: 'view-component' }
-        mediator = Mediator.new mediatorName, viewComponent
+        mediator = Mediator.new mediatorName
         handleNotification = sinon.spy mediator, 'handleNotification'
-        mediator.handleNotification()
+        notification = Notification.new 'TEST_NOTIFICATION', {body: 'body'}, 'TEST'
+        mediator.handleNotification notification
         assert handleNotification.called
       .to.not.throw Error
   describe '#onRegister', ->
     it 'should call onRegister', ->
       expect ->
         mediatorName = 'TEST_MEDIATOR'
-        viewComponent = { id: 'view-component' }
-        mediator = Mediator.new mediatorName, viewComponent
+        mediator = Mediator.new mediatorName
         onRegister = sinon.spy mediator, 'onRegister'
         mediator.onRegister()
         assert onRegister.called
@@ -60,8 +60,7 @@ describe 'Mediator', ->
     it 'should call onRemove', ->
       expect ->
         mediatorName = 'TEST_MEDIATOR'
-        viewComponent = { id: 'view-component' }
-        mediator = Mediator.new mediatorName, viewComponent
+        mediator = Mediator.new mediatorName
         onRemove = sinon.spy mediator, 'onRemove'
         mediator.onRemove()
         assert onRemove.called

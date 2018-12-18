@@ -3,53 +3,61 @@
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
+    AnyT, PointerT
+    FuncG, SubsetG, DictG, MaybeG
+    FacadeInterface
+    ModelInterface, ViewInterface, ControllerInterface
+    CommandInterface, ProxyInterface, MediatorInterface
+    NotificationInterface
+    CoreObject
   } = Module::
 
-  class Facade extends Module::CoreObject
+  class Facade extends CoreObject
     @inheritProtected()
-    # @implements Module::FacadeInterface
+    @implements FacadeInterface
     @module Module
 
     @const MULTITON_MSG: "Facade instance for this multiton key already constructed!"
 
-    ipoModel        = @protected model: Module::ModelInterface
-    ipoView         = @protected view: Module::ViewInterface
-    ipoController   = @protected controller: Module::ControllerInterface
-    ipsMultitonKey  = @protected multitonKey: String
-    cphInstanceMap  = @protected @static instanceMap: Object,
+    ipoModel        = PointerT @protected model: MaybeG ModelInterface
+    ipoView         = PointerT @protected view: MaybeG ViewInterface
+    ipoController   = PointerT @protected controller: MaybeG ControllerInterface
+    ipsMultitonKey  = PointerT @protected multitonKey: MaybeG String
+    cphInstanceMap  = PointerT @protected @static instanceMap: DictG(String, MaybeG FacadeInterface),
       default: {}
 
-    ipmInitializeModel = @protected initializeModel: Function,
+    ipmInitializeModel = PointerT @protected initializeModel: Function,
       default: ->
         unless @[ipoModel]?
           @[ipoModel] = Module::Model.getInstance @[ipsMultitonKey]
+        return
 
-    ipmInitializeController = @protected initializeController: Function,
+    ipmInitializeController = PointerT @protected initializeController: Function,
       default: ->
         unless @[ipoController]?
           @[ipoController] = Module::Controller.getInstance @[ipsMultitonKey]
         return
 
-    ipmInitializeView = @protected initializeView: Function,
+    ipmInitializeView = PointerT @protected initializeView: Function,
       default: ->
         unless @[ipoView]?
           @[ipoView] = Module::View.getInstance @[ipsMultitonKey]
         return
 
-    ipmInitializeFacade = @protected initializeFacade: Function,
+    ipmInitializeFacade = PointerT @protected initializeFacade: Function,
       default: ->
         @[ipmInitializeModel]()
         @[ipmInitializeController]()
         @[ipmInitializeView]()
         return
 
-    @public @static getInstance: Function,
+    @public @static getInstance: FuncG(String, FacadeInterface),
       default: (asKey)->
         unless Facade[cphInstanceMap][asKey]?
           Facade[cphInstanceMap][asKey] = Facade.new asKey
         Facade[cphInstanceMap][asKey]
 
-    @public remove: Function,
+    @public remove: FuncG([]),
       default: ->
         Module::Model.removeModel @[ipsMultitonKey]
         Module::Controller.removeController @[ipsMultitonKey]
@@ -61,86 +69,86 @@ module.exports = (Module)->
         delete Module::Facade[cphInstanceMap][@[ipsMultitonKey]]
         return
 
-    @public registerCommand: Function,
+    @public registerCommand: FuncG([String, SubsetG CommandInterface]),
       default: (asNotificationName, aCommand)->
         @[ipoController].registerCommand asNotificationName, aCommand
         return
 
-    @public lazyRegisterCommand: Function,
+    @public lazyRegisterCommand: FuncG([String, String]),
       default: (asNotificationName, asClassName)->
         @[ipoController].lazyRegisterCommand asNotificationName, asClassName
         return
 
-    @public removeCommand: Function,
+    @public removeCommand: FuncG(String),
       default: (asNotificationName)->
         @[ipoController].removeCommand asNotificationName
         return
 
-    @public hasCommand: Function,
+    @public hasCommand: FuncG(String, Boolean),
       default: (asNotificationName)->
         @[ipoController].hasCommand asNotificationName
 
-    @public registerProxy: Function,
+    @public registerProxy: FuncG(ProxyInterface),
       default: (aoProxy)->
         @[ipoModel].registerProxy aoProxy
         return
 
-    @public lazyRegisterProxy: Function,
+    @public lazyRegisterProxy: FuncG([String, String, Object]),
       default: (asProxyName, asProxyClassName, ahData)->
         @[ipoModel].lazyRegisterProxy asProxyName, asProxyClassName, ahData
         return
 
-    @public retrieveProxy: Function,
+    @public retrieveProxy: FuncG(String, MaybeG ProxyInterface),
       default: (asProxyName)->
         @[ipoModel].retrieveProxy asProxyName
 
-    @public removeProxy: Function,
+    @public removeProxy: FuncG(String, MaybeG ProxyInterface),
       default: (asProxyName)->
         @[ipoModel].removeProxy asProxyName
 
-    @public hasProxy: Function,
+    @public hasProxy: FuncG(String, Boolean),
       default: (asProxyName)->
         @[ipoModel].hasProxy asProxyName
 
-    @public registerMediator: Function,
+    @public registerMediator: FuncG(MediatorInterface),
       default: (aoMediator)->
         if @[ipoView]
           @[ipoView].registerMediator aoMediator
         return
 
-    @public retrieveMediator: Function,
+    @public retrieveMediator: FuncG(String, MaybeG MediatorInterface),
       default: (asMediatorName)->
         if @[ipoView]
           @[ipoView].retrieveMediator asMediatorName
 
-    @public removeMediator: Function,
+    @public removeMediator: FuncG(String, MaybeG MediatorInterface),
       default: (asMediatorName)->
         if @[ipoView]
           @[ipoView].removeMediator asMediatorName
 
-    @public hasMediator: Function,
+    @public hasMediator: FuncG(String, Boolean),
       default: (asMediatorName)->
         if @[ipoView]
           @[ipoView].hasMediator asMediatorName
 
-    @public notifyObservers: Function,
+    @public notifyObservers: FuncG(NotificationInterface),
       default: (aoNotification)->
         if @[ipoView]
           @[ipoView].notifyObservers aoNotification
         return
 
-    @public sendNotification: Function,
-      default: (asName, asBody, asType)->
-        @notifyObservers Module::Notification.new asName, asBody, asType
+    @public sendNotification: FuncG([String, MaybeG(AnyT), MaybeG String]),
+      default: (asName, aoBody, asType)->
+        @notifyObservers Module::Notification.new asName, aoBody, asType
         return
 
-    @public initializeNotifier: Function,
+    @public initializeNotifier: FuncG(String),
       default: (asKey)->
         @[ipsMultitonKey] = asKey
         return
 
     # need test it
-    @public @static @async restoreObject: Function,
+    @public @static @async restoreObject: FuncG([SubsetG(Module), Object], FacadeInterface),
       default: (Module, replica)->
         if replica?.class is @name and replica?.type is 'instance'
           unless Facade[cphInstanceMap][replica.multitonKey]?
@@ -151,7 +159,7 @@ module.exports = (Module)->
           return yield @super Module, replica
 
     # need test it
-    @public @static @async replicateObject: Function,
+    @public @static @async replicateObject: FuncG(FacadeInterface, Object),
       default: (instance)->
         replica = yield @super instance
         replica.multitonKey = instance[ipsMultitonKey]
@@ -160,7 +168,7 @@ module.exports = (Module)->
         replica.application = application
         yield return replica
 
-    @public init: Function,
+    @public init: FuncG(String),
       default: (asKey)->
         @super arguments...
         if Facade[cphInstanceMap][asKey]?
@@ -168,6 +176,7 @@ module.exports = (Module)->
         @initializeNotifier asKey
         Facade[cphInstanceMap][asKey] = @
         @[ipmInitializeFacade]()
+        return
 
 
-  Facade.initialize()
+    @initialize()

@@ -1,13 +1,21 @@
 
 
 module.exports = (Module) ->
-  class AnimateRobotCommand extends Module.NS.SimpleCommand
+  {
+    NilT
+    FuncG
+    NotificationInterface
+    RobotDataProxy
+    SimpleCommand
+  } = Module.NS
+
+  class AnimateRobotCommand extends SimpleCommand
     @inheritProtected()
     @module Module
 
-    @public execute: Function,
+    @public execute: FuncG(NotificationInterface, NilT),
       default: ->
-        proxy = @facade.retrieveProxy Module.NS.RobotDataProxy::ROBOT_PROXY
+        proxy = @facade.retrieveProxy RobotDataProxy::ROBOT_PROXY
         proxy.animate()
 
-  AnimateRobotCommand.initialize()
+    @initialize()

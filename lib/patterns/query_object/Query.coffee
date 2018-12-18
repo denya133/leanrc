@@ -90,16 +90,19 @@ example for collect
 
 module.exports = (Module)->
   {
-    NILL, ANY
+    AnyT
+    FuncG, SubsetG, UnionG, MaybeG
+    QueryInterface
     CoreObject
-    Utils: { _, extend }
+    Utils: { _ }
   } = Module::
 
   class Query extends CoreObject
     @inheritProtected()
-    # @implements Module::QueryInterface
+    @implements QueryInterface
     @module Module
 
+    # TODO: это надо переделать на нормальную проверку типа в $filter
     @public @static operatorsMap: Object,
       default:
         $and: Array
@@ -108,12 +111,12 @@ module.exports = (Module)->
         $nor: Array # not or # !(a||b) === !a && !b
 
         # без вложенных условий и операторов - value конечное значение для сравнения
-        $eq: ANY # ==
-        $ne: ANY # !=
-        $lt: ANY # <
-        $lte: ANY # <=
-        $gt: ANY # >
-        $gte: ANY # >=
+        $eq: AnyT # ==
+        $ne: AnyT # !=
+        $lt: AnyT # <
+        $lte: AnyT # <=
+        $gt: AnyT # >
+        $gte: AnyT # >=
 
         $in: Array # check value present in array
         $nin: Array # ... not present in array
@@ -127,7 +130,7 @@ module.exports = (Module)->
         $type: String # check value type
 
         $mod: Array # [divisor, remainder] for example [4,0] делится ли на 4
-        $regex: [RegExp, String] # value must be string. ckeck it by RegExp.
+        $regex: UnionG RegExp, String # value must be string. ckeck it by RegExp.
 
         $td: Boolean # this day (today)
         $ld: Boolean # last day (yesterday)
@@ -138,107 +141,108 @@ module.exports = (Module)->
         $ty: Boolean # this year
         $ly: Boolean # last year
 
-    @public $forIn: Object
-    @public $join: Object
-    @public $let: Object
-    @public $filter: Object
-    @public $collect: Object
-    @public $into: [String, Object]
-    @public $having: Object
-    @public $sort: Array
-    @public $limit: Number
-    @public $offset: Number
-    @public $avg: String # '@doc.price'
-    @public $sum: String # '@doc.price'
-    @public $min: String # '@doc.price'
-    @public $max: String # '@doc.price'
-    @public $count: Boolean # yes or not present
-    @public $distinct: Boolean # yes or not present
-    @public $remove: Boolean
-    @public $patch: Object
-    @public $return: Object
+    @public $forIn: MaybeG Object
+    @public $join: MaybeG Object
+    @public $let: MaybeG Object
+    @public $filter: MaybeG Object
+    @public $collect: MaybeG Object
+    @public $into: MaybeG UnionG String, Object
+    @public $having: MaybeG Object
+    @public $sort: MaybeG Array
+    @public $limit: MaybeG Number
+    @public $offset: MaybeG Number
+    @public $avg: MaybeG String # '@doc.price'
+    @public $sum: MaybeG String # '@doc.price'
+    @public $min: MaybeG String # '@doc.price'
+    @public $max: MaybeG String # '@doc.price'
+    @public $count: MaybeG Boolean # yes or not present
+    @public $distinct: MaybeG Boolean # yes or not present
+    @public $remove: MaybeG UnionG String, Object
+    @public $patch: MaybeG Object
+    @public $return: MaybeG UnionG String, Object
 
-    @public forIn: Function,
+    @public forIn: FuncG(Object, QueryInterface),
       default: (aoDefinitions)->
-        @$forIn ?= {}
-        @$forIn = extend {}, @$forIn, aoDefinitions
+        for own k, v of aoDefinitions
+          @$forIn[k] = v
         return @
-    @public join: Function, # критерии связывания как в SQL JOIN ... ON
+    @public join: FuncG(Object, QueryInterface), # критерии связывания как в SQL JOIN ... ON
       default: (aoDefinitions)->
         @$join = aoDefinitions
         return @
-    @public filter: Function,
+    @public filter: FuncG(Object, QueryInterface),
       default: (aoDefinitions)->
         @$filter = aoDefinitions
         return @
-    @public let: Function,
+    @public let: FuncG(Object, QueryInterface),
       default: (aoDefinitions)->
         @$let ?= {}
-        @$let = extend {}, @$let, aoDefinitions
+        for own k, v of aoDefinitions
+          @$let[k] = v
         return @
-    @public collect: Function,
+    @public collect: FuncG(Object, QueryInterface),
       default: (aoDefinition)->
         @$collect = aoDefinition
         return @
-    @public into: Function,
+    @public into: FuncG([UnionG String, Object], QueryInterface),
       default: (aoDefinition)->
         @$into = aoDefinition
         return @
-    @public having: Function,
+    @public having: FuncG(Object, QueryInterface),
       default: (aoDefinition)->
         @$having = aoDefinition
         return @
-    @public sort: Function,
+    @public sort: FuncG(Object, QueryInterface),
       default: (aoDefinition)->
         @$sort ?= []
         @$sort.push aoDefinition
         return @
-    @public limit: Function,
+    @public limit: FuncG(Number, QueryInterface),
       default: (anValue)->
         @$limit = anValue
         return @
-    @public offset: Function,
+    @public offset: FuncG(Number, QueryInterface),
       default: (anValue)->
         @$offset = anValue
         return @
-    @public distinct: Function,
+    @public distinct: FuncG([], QueryInterface),
       default: ->
         @$distinct = yes
         return @
-    @public remove: Function,
+    @public remove: FuncG([UnionG String, Object], QueryInterface),
       default: (expr = yes)->
         @$remove = expr
         return @
-    @public patch: Function,
+    @public patch: FuncG(Object, QueryInterface),
       default: (aoDefinition)->
         @$patch = aoDefinition
         return @
-    @public return: Function,
+    @public return: FuncG([UnionG String, Object], QueryInterface),
       default: (aoDefinition)->
         @$return = aoDefinition
         return @
-    @public count: Function,
+    @public count: FuncG([], QueryInterface),
       default: ->
         @$count = yes
         return @
-    @public avg: Function,
+    @public avg: FuncG(String, QueryInterface),
       default: (asDefinition)->
         @$avg = asDefinition
         return @
-    @public min: Function,
+    @public min: FuncG(String, QueryInterface),
       default: (asDefinition)->
         @$min = asDefinition
         return @
-    @public max: Function,
+    @public max: FuncG(String, QueryInterface),
       default: (asDefinition)->
         @$max = asDefinition
         return @
-    @public sum: Function,
+    @public sum: FuncG(String, QueryInterface),
       default: (asDefinition)->
         @$sum = asDefinition
         return @
 
-    @public @static @async restoreObject: Function,
+    @public @static @async restoreObject: FuncG([SubsetG(Module), Object], QueryInterface),
       default: (_Module, replica)->
         if replica?.class is @name and replica?.type is 'instance'
           instance = @new replica.query
@@ -246,26 +250,32 @@ module.exports = (Module)->
         else
           return yield @super _Module, replica
 
-    @public @static @async replicateObject: Function,
+    @public @static @async replicateObject: FuncG(QueryInterface, Object),
       default: (instance)->
         replica = yield @super instance
         replica.query = instance.toJSON()
         yield return replica
 
-    @public init: Function,
+    @public init: FuncG([MaybeG Object]),
       default: (aoQuery)->
         @super arguments...
-        for own key, value of aoQuery
-          do (key, value)=>
-            @[key] = value
+        @$forIn = {}
+        if aoQuery?
+          for own key, value of aoQuery
+            do (key, value)=>
+              @[key] = value
+        return
 
-    @public toJSON: Function,
+    @public toJSON: FuncG([], Object),
       default: ->
-        _.pick @, [
+        res = {}
+        for k in [
           '$forIn', '$join', '$let', '$filter', '$collect', '$into', '$having'
           '$sort', '$limit', '$offset', '$avg', '$sum', '$min', '$max', '$count'
           '$distinct', '$remove', '$patch', '$return'
-        ]
+        ] when @[k]?
+          res[k] = @[k]
+        return res
 
 
-  Query.initialize()
+    @initialize()

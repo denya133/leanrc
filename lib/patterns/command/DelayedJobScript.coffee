@@ -44,4 +44,4 @@ module.exports = (Module)->
       yield return
 
 
-  DelayedJobScript.initialize()
+    @initialize()

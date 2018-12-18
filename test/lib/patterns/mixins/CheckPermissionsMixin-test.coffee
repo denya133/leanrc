@@ -11,7 +11,7 @@ describe 'CheckPermissionsMixin', ->
   describe '.new', ->
     it 'should create new resource', ->
       expect ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()
