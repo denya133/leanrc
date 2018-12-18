@@ -2,72 +2,51 @@
 
 module.exports = (Module)->
   {
-    ANY
-    NILL
-
+    NilT
+    FuncG, UnionG, MaybeG
     SwitchInterface
+    Interface
   } = Module::
 
-  Module.defineInterface 'RequestInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class RequestInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual req: Object
-      @public @virtual switch: SwitchInterface
+    @virtual req: Object
+    @virtual switch: SwitchInterface
 
-      @public @virtual body: ANY
-      @public @virtual header: Object
-      @public @virtual headers: Object
-      @public @virtual method: String
-      @public @virtual url: String
-      @public @virtual originalUrl: String
-      @public @virtual origin: String
-      @public @virtual href: String
-      @public @virtual path: String
-      @public @virtual query: Object
-      @public @virtual querystring: String
-      @public @virtual host: String
-      # @public @virtual port: Number
-      @public @virtual hostname: String
-      @public @virtual fresh: Boolean
-      @public @virtual stale: Boolean
-      @public @virtual idempotent: Boolean
-      @public @virtual socket: Object
-      @public @virtual charset: String
-      @public @virtual length: Number
-      @public @virtual protocol: String
-      # @public @virtual xhr: Boolean
-      @public @virtual secure: Boolean
-      @public @virtual ip: String
-      @public @virtual ips: Array
-      @public @virtual subdomains: Array
-      @public @virtual is: Function,
-        args: [[String, Array]]
-        return: [String, Boolean, NILL]
-      @public @virtual accepts: Function,
-        args: [[String, Array]]
-        return: [String, Array, Boolean]
-      @public @virtual acceptsEncodings: Function,
-        args: [[String, Array]]
-        return: [String, Array]
-      @public @virtual acceptsCharsets: Function,
-        args: [[String, Array]]
-        return: [String, Array]
-      @public @virtual acceptsLanguages: Function,
-        args: [[String, Array]]
-        return: [String, Array]
-      @public @virtual type: String
-      @public @virtual get: Function,
-        args: [String]
-        return: String
-
-      @public @virtual toJSON: Function,
-        args: []
-        return: Object
-
-      @public @virtual inspect: Function,
-        args: []
-        return: Object
+    # @virtual header: Object
+    # @virtual headers: Object
+    # @virtual method: String
+    # @virtual url: String
+    # @virtual originalUrl: String
+    # @virtual origin: String
+    # @virtual href: String
+    # @virtual path: String
+    # @virtual query: Object
+    # @virtual querystring: String
+    # @virtual host: String
+    # @virtual hostname: String
+    # @virtual fresh: Boolean
+    # @virtual stale: Boolean
+    # @virtual idempotent: Boolean
+    # @virtual socket: MaybeG Object
+    # @virtual charset: String
+    # @virtual length: Number
+    # @virtual protocol: String
+    # @virtual secure: Boolean
+    # @virtual ip: String
+    # @virtual ips: Array
+    # @virtual subdomains: Array
+    @virtual is: FuncG [UnionG String, Array], UnionG String, Boolean, NilT
+    @virtual accepts: FuncG [MaybeG UnionG String, Array], UnionG String, Array, Boolean
+    @virtual acceptsEncodings: FuncG [MaybeG UnionG String, Array], UnionG String, Array
+    @virtual acceptsCharsets: FuncG [MaybeG UnionG String, Array], UnionG String, Array
+    @virtual acceptsLanguages: FuncG [MaybeG UnionG String, Array], UnionG String, Array
+    # @virtual type: String
+    @virtual get: FuncG String, String
+    # # @virtual toJSON: FuncG [], Object
+    # # @virtual inspect: FuncG [], Object
 
 
-      @initializeInterface()
+    @initialize()

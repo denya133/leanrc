@@ -5,9 +5,14 @@ Feed = require 'feed'
 # httpErrors = require 'http-errors'
 LeanRC = require.main.require 'lib'
 RC = require 'RC'
-Facade = LeanRC::Facade
-Switch = LeanRC::Switch
-{ co } = RC::Utils
+{
+  Facade
+  Switch
+  AnyT, NilT
+  FuncG, MaybeG, InterfaceG, ListG, StructG
+  ContextInterface, ResourceInterface, NotificationInterface
+  Utils: { co }
+} = LeanRC::
 
 describe 'Switch', ->
   describe '.new', ->
@@ -53,14 +58,17 @@ describe 'Switch', ->
         assert.deepEqual body, notificationBody
         yield return
   describe '#defineRoutes', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should define routes from route proxies', ->
       co ->
-        facade = Facade.getInstance 'TEST_SWITCH_1'
+        KEY = 'TEST_SWITCH_001'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-
-        class Test::TestRouter extends LeanRC::Router
+          @initialize()
+        class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
           @map ->
@@ -68,89 +76,114 @@ describe 'Switch', ->
               @resource 'test1'
             @namespace 'sub', ->
               @resource 'subtest'
-        Test::TestRouter.initialize()
-        facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
+          @initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         spyCreateNativeRoute = sinon.spy ->
-        class Test::TestSwitch extends Switch
+        class TestSwitch extends Switch
           @inheritProtected()
           @module Test
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
-          @public createNativeRoute: Function,
+          @public createNativeRoute: FuncG([InterfaceG {
+            method: String
+            path: String
+            resource: String
+            action: String
+            tag: String
+            template: String
+            keyName: MaybeG String
+            entityName: String
+            recordName: String
+          }], NilT),
             configurable: yes
             default: spyCreateNativeRoute
-        Test::TestSwitch.initialize()
-        switchMediator = Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
-        switchMediator.initializeNotifier 'TEST_SWITCH_1'
+          @initialize()
+        switchMediator = TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator.initializeNotifier KEY
         switchMediator.defineRoutes()
         assert.equal spyCreateNativeRoute.callCount, 15, 'Some routes are missing'
-        facade.remove()
         yield return
   describe '#onRegister', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should run register procedure', ->
       expect ->
-        facade = Facade.getInstance 'TEST_SWITCH_2'
+        KEY = 'TEST_SWITCH_002'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
-        class Test::TestRouter extends LeanRC::Router
+        class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        Test::TestRouter.initialize()
-        facade.registerProxy Test::TestRouter.new LeanRC::APPLICATION_ROUTER
-        class Test::TestSwitch extends Switch
+          @initialize()
+        facade.registerProxy TestRouter.new LeanRC::APPLICATION_ROUTER
+        class TestSwitch extends Switch
           @inheritProtected()
           @module Test
           @public routerName: String,
             default: LeanRC::APPLICATION_ROUTER
-        Test::TestSwitch.initialize()
-        switchMediator = Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
-        switchMediator.initializeNotifier 'TEST_SWITCH_2'
+          @initialize()
+        switchMediator = TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator.initializeNotifier KEY
         switchMediator.onRegister()
         assert.instanceOf switchMediator.getViewComponent(), EventEmitter, 'Event emitter did not created'
         switchMediator.onRemove()
-        facade.remove()
       .to.not.throw Error
   describe '#onRemove', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should run remove procedure', ->
       expect ->
-        facade = Facade.getInstance 'TEST_SWITCH_3'
+        KEY = 'TEST_SWITCH_003'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
-        class Test::TestRouter extends LeanRC::Router
+        class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        Test::TestRouter.initialize()
-        facade.registerProxy Test::TestRouter.new LeanRC::APPLICATION_ROUTER
-        class Test::TestSwitch extends Switch
+          @initialize()
+        facade.registerProxy TestRouter.new LeanRC::APPLICATION_ROUTER
+        class TestSwitch extends Switch
           @inheritProtected()
           @module Test
           @public routerName: String,
             default: LeanRC::APPLICATION_ROUTER
-        Test::TestSwitch.initialize()
-        switchMediator = Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
-        switchMediator.initializeNotifier 'TEST_SWITCH_3'
+          @initialize()
+        switchMediator = TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        switchMediator.initializeNotifier KEY
         switchMediator.onRegister()
         switchMediator.onRemove()
         assert.equal switchMediator.getViewComponent().eventNames().length, 0, 'Event listeners not cleared'
-        facade.remove()
       .to.not.throw Error
   describe '#rendererFor', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should define renderers and get them one by one', ->
-      expect ->
-        facade = Facade.getInstance 'TEST_SWITCH_4'
+      co ->
+        KEY = 'TEST_SWITCH_004'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
+        class TestResource extends LeanRC::Resource
+          @inheritProtected()
+          @module Test
+          @public entityName: String,
+            default: 'TestEntity'
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         require.main.require('test/integration/renderers') Test
@@ -158,105 +191,10 @@ describe 'Switch', ->
         facade.registerProxy Test::HtmlRenderer.new 'TEST_HTML_RENDERER'
         facade.registerProxy Test::XmlRenderer.new 'TEST_XML_RENDERER'
         facade.registerProxy Test::AtomRenderer.new 'TEST_ATOM_RENDERER'
-        class Test::TestRouter extends LeanRC::Router
-          @inheritProtected()
-          @module Test
-        Test::TestRouter.initialize()
-        facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
-        class Test::TestSwitch extends Switch
-          @inheritProtected()
-          @module Test
-          @public jsonRendererName: String,
-            default: 'TEST_JSON_RENDERER'
-          @public htmlRendererName: String,
-            default: 'TEST_HTML_RENDERER'
-          @public xmlRendererName: String,
-            default: 'TEST_XML_RENDERER'
-          @public atomRendererName: String,
-            default: 'TEST_ATOM_RENDERER'
-          @public routerName: String,
-            default: 'TEST_SWITCH_ROUTER'
-        Test::TestSwitch.initialize()
-        facade.registerMediator Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
-        vhData =
-          id: '123'
-          title: 'Long story'
-          author: name: 'John Doe', email: 'johndoe@example.com'
-          description: 'True long story'
-          updated: new Date()
-        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        jsonRendred = switchMediator.rendererFor('json').render vhData
-        assert.equal jsonRendred, JSON.stringify(vhData), 'JSON did not rendered'
-        htmlRendered = switchMediator.rendererFor('html').render vhData
-        htmlRenderedGauge = '
-        <html> <head> <title>Long story</title> </head> <body> <h1>Long story</h1> <p>True long story</p> </body> </html>
-        '
-        assert.equal htmlRendered, htmlRenderedGauge, 'HTML did not rendered'
-        xmlRendered = switchMediator.rendererFor('xml').render vhData
-        xmlRenderedGauge = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<root>
-  <id>123</id>
-  <title>Long story</title>
-  <author>
-    <name>John Doe</name>
-    <email>johndoe@example.com</email>
-  </author>
-  <description>True long story</description>
-  <updated/>
-</root>'''
-        assert.equal xmlRendered, xmlRenderedGauge, 'XML did not rendered'
-        atomRendered = switchMediator.rendererFor('atom').render vhData
-        atomRenderedGauge = (new Feed vhData).atom1()
-        assert.equal atomRendered, atomRenderedGauge, 'ATOM did not rendered'
-        facade.remove()
-      .to.not.throw Error
-  describe '#sendHttpResponse', ->
-    it 'should send http response', ->
-      co ->
-        facade = Facade.getInstance 'TEST_SWITCH_5'
-        class Test extends RC::Module
-          @inheritProtected()
-          @root "#{__dirname}/config/root"
-        Test.initialize()
-        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
-        facade.registerProxy configs
-        spyRendererRender = sinon.spy ->
-        class TestRenderer extends LeanRC::Renderer
-          @inheritProtected()
-          @module Test
-          @public @async render: Function,
-            default: (ctx, aoData, aoResource, aoOptions) ->
-              spyRendererRender aoData, aoOptions
-              vhData = RC::Utils.extend {}, aoData
-              yield return JSON.stringify vhData ? null
-        TestRenderer.initialize()
-        facade.registerProxy TestRenderer.new 'TEST_JSON_RENDERER'
-        facade.registerProxy TestRenderer.new 'TEST_HTML_RENDERER'
-        facade.registerProxy TestRenderer.new 'TEST_XML_RENDERER'
-        facade.registerProxy TestRenderer.new 'TEST_ATOM_RENDERER'
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
-        spyResponseSet = sinon.spy ->
-        class TestContext extends RC::CoreObject
-          @inheritProtected()
-          @module Test
-          @public headers: Object
-          @public status: Number
-          @public format: String
-          @public accepts: Function,
-            default: (alFormats = []) ->
-              @format  if @format in alFormats
-          @public set: Function,
-            default: spyResponseSet
-          @public body: LeanRC::ANY
-          constructor: (args...) ->
-            super args...
-            [@format] = args
-            @headers = {}
-            @headers['accept'] = 'application/json'
-        TestContext.initialize()
+          @initialize()
         facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         class TestSwitch extends Switch
           @inheritProtected()
@@ -271,8 +209,26 @@ describe 'Switch', ->
             default: 'TEST_ATOM_RENDERER'
           @public routerName: String,
             default: 'TEST_SWITCH_ROUTER'
-        TestSwitch.initialize()
+          @initialize()
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        res = new MyResponse
+        req =
+          url: 'http://localhost:8888/test1'
+          headers: 'x-forwarded-for': '192.168.0.1'
+          secure: no
         vhData =
           id: '123'
           title: 'Long story'
@@ -280,33 +236,231 @@ describe 'Switch', ->
           description: 'True long story'
           updated: new Date()
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        renderedGauge = JSON.stringify vhData
-        voContext = TestContext.new 'json'
-        vhOptions =
-          path: '/test'
-          resource: 'test'
-          action: 'list'
-        voResource = {}
-        yield switchMediator.sendHttpResponse voContext, vhData, voResource, vhOptions
-        assert.isTrue spyRendererRender.calledWith(vhData, vhOptions), 'Render not called'
-        assert.deepEqual voContext.body, renderedGauge
-        facade.remove()
+        ctx = LeanRC::Context.new req, res, switchMediator
+        resource = TestResource.new()
+        resource.initializeNotifier KEY
+        { collectionName } = resource
+        class TestsCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+          @initialize()
+        class TestEntityRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @public @static findRecordByName: LeanRC::FuncG(String, LeanRC::SubsetG LeanRC::RecordInterface),
+            default: (asType) -> TestEntityRecord
+          @public init: LeanRC::FuncG([Object, LeanRC::CollectionInterface], LeanRC::NilT),
+            default: ->
+              @super arguments...
+              @type = 'Test::TestEntityRecord'
+              return
+          @initialize()
+        boundCollection = TestsCollection.new collectionName,
+          delegate: 'TestEntityRecord'
+        facade.registerProxy boundCollection
+        jsonRendred = yield switchMediator.rendererFor('json').render ctx, vhData, resource
+        assert.equal jsonRendred, JSON.stringify(vhData), 'JSON did not rendered'
+        htmlRendered = yield switchMediator.rendererFor('html').render ctx, vhData, resource
+        htmlRenderedGauge = '
+        <html> <head> <title>Long story</title> </head> <body> <h1>Long story</h1> <p>True long story</p> </body> </html>
+        '
+        assert.equal htmlRendered, htmlRenderedGauge, 'HTML did not rendered'
+        xmlRendered = yield switchMediator.rendererFor('xml').render ctx, vhData, resource
+        xmlRenderedGauge = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<root>
+  <id>123</id>
+  <title>Long story</title>
+  <author>
+    <name>John Doe</name>
+    <email>johndoe@example.com</email>
+  </author>
+  <description>True long story</description>
+  <updated/>
+</root>'''
+        assert.equal xmlRendered, xmlRenderedGauge, 'XML did not rendered'
+        atomRendered = yield switchMediator.rendererFor('atom').render ctx, vhData, resource
+        atomRenderedGauge = (new Feed vhData).atom1()
+        assert.equal atomRendered, atomRenderedGauge, 'ATOM did not rendered'
         yield return
-  describe '#sender', ->
-    it 'should send notification', ->
-      expect ->
-        facade = Facade.getInstance 'TEST_SWITCH_6'
+      # .to.not.throw Error
+  describe '#sendHttpResponse', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
+    it 'should send http response', ->
+      co ->
+        KEY = 'TEST_SWITCH_005'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
-        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
-        facade.registerProxy configs
-        class Test::TestRouter extends LeanRC::Router
+          @initialize()
+        class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
-        Test::TestRouter.initialize()
-        facade.registerProxy Test::TestRouter.new 'TEST_SWITCH_ROUTER'
+          @public entityName: String,
+            default: 'TestEntity'
+          @initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        spyRendererRender = sinon.spy ->
+        class TestRenderer extends LeanRC::Renderer
+          @inheritProtected()
+          @module Test
+          @public @async render: FuncG([ContextInterface, AnyT, ResourceInterface, MaybeG InterfaceG {
+            method: String
+            path: String
+            resource: String
+            action: String
+            tag: String
+            template: String
+            keyName: MaybeG String
+            entityName: String
+            recordName: String
+          }], MaybeG AnyT),
+            default: (ctx, aoData, aoResource, aoOptions) ->
+              spyRendererRender ctx, aoData, aoResource, aoOptions
+              vhData = RC::Utils.assign {}, aoData
+              yield return JSON.stringify vhData ? null
+          @initialize()
+        facade.registerProxy TestRenderer.new 'TEST_JSON_RENDERER'
+        facade.registerProxy TestRenderer.new 'TEST_HTML_RENDERER'
+        facade.registerProxy TestRenderer.new 'TEST_XML_RENDERER'
+        facade.registerProxy TestRenderer.new 'TEST_ATOM_RENDERER'
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+          @initialize()
+        spyResponseSet = sinon.spy ->
+        # class TestContext extends RC::CoreObject
+        #   @inheritProtected()
+        #   @module Test
+        #   @public headers: Object
+        #   @public status: Number
+        #   @public format: String
+        #   @public accepts: Function,
+        #     default: (alFormats = []) ->
+        #       @format  if @format in alFormats
+        #   @public set: Function,
+        #     default: spyResponseSet
+        #   @public body: LeanRC::ANY
+        #   constructor: (args...) ->
+        #     super args...
+        #     [@format] = args
+        #     @headers = {}
+        #     @headers['accept'] = 'application/json'
+        #   @initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
+        class TestSwitch extends Switch
+          @inheritProtected()
+          @module Test
+          @public jsonRendererName: String,
+            default: 'TEST_JSON_RENDERER'
+          @public htmlRendererName: String,
+            default: 'TEST_HTML_RENDERER'
+          @public xmlRendererName: String,
+            default: 'TEST_XML_RENDERER'
+          @public atomRendererName: String,
+            default: 'TEST_ATOM_RENDERER'
+          @public routerName: String,
+            default: 'TEST_SWITCH_ROUTER'
+          @initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        res = new MyResponse
+        req =
+          url: 'http://localhost:8888/test1'
+          headers:
+            'x-forwarded-for': '192.168.0.1'
+            'accept': 'application/json, text/plain, image/png'
+          secure: no
+        vhData =
+          id: '123'
+          title: 'Long story'
+          author: name: 'John Doe', email: 'johndoe@example.com'
+          description: 'True long story'
+          updated: new Date()
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        ctx = LeanRC::Context.new req, res, switchMediator
+        resource = TestResource.new()
+        resource.initializeNotifier KEY
+        { collectionName } = resource
+        class TestsCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+          @initialize()
+        class TestEntityRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @public @static findRecordByName: LeanRC::FuncG(String, LeanRC::SubsetG LeanRC::RecordInterface),
+            default: (asType) -> TestEntityRecord
+          @public init: LeanRC::FuncG([Object, LeanRC::CollectionInterface], LeanRC::NilT),
+            default: ->
+              @super arguments...
+              @type = 'Test::TestEntityRecord'
+              return
+          @initialize()
+        boundCollection = TestsCollection.new collectionName,
+          delegate: 'TestEntityRecord'
+        facade.registerProxy boundCollection
+        renderedGauge = JSON.stringify vhData
+        # voContext = TestContext.new 'json'
+        vhOptions =
+          method: 'GET'
+          path: '/test'
+          resource: 'test'
+          action: 'list'
+          tag: ''
+          template: 'test/list'
+          keyName: null
+          entityName: 'test'
+          recordName: 'test'
+        # voResource = {}
+        yield switchMediator.sendHttpResponse ctx, vhData, resource, vhOptions
+        assert.isTrue spyRendererRender.calledWith(ctx, vhData, resource, vhOptions), 'Render not called'
+        assert.deepEqual ctx.body, renderedGauge
+        yield return
+  describe '#sender', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
+    it 'should send notification', ->
+      expect ->
+        KEY = 'TEST_SWITCH_006'
+        facade = Facade.getInstance KEY
+        class Test extends LeanRC
+          @inheritProtected()
+          @root "#{__dirname}/config/root"
+          @initialize()
+        # class TestResource extends LeanRC::Resource
+        #   @inheritProtected()
+        #   @module Test
+        #   @public entityName: String,
+        #     default: 'TestEntity'
+        #   @initialize()
+        configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
+        facade.registerProxy configs
+        class TestRouter extends LeanRC::Router
+          @inheritProtected()
+          @module Test
+          @initialize()
+        facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         # class AppConfiguration extends LeanRC::Configuration
         #   @inheritProtected()
         #   @module Test
@@ -316,34 +470,61 @@ describe 'Switch', ->
         #     default: 'cuc'
         # AppConfiguration.initialize()
         # facade.registerProxy AppConfiguration.new LeanRC::CONFIGURATION
-        class Test::TestSwitch extends Switch
+        class TestSwitch extends Switch
           @inheritProtected()
           @module Test
           @public routerName: String,
             default: 'TEST_SWITCH_ROUTER'
-        Test::TestSwitch.initialize()
-        switchMediator = Test::TestSwitch.new 'TEST_SWITCH_MEDIATOR'
-        switchMediator.initializeNotifier 'TEST_SWITCH_6'
+          @initialize()
+        facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        # switchMediator = TestSwitch.new 'TEST_SWITCH_MEDIATOR'
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        res = new MyResponse
+        req =
+          url: 'http://localhost:8888/test1'
+          headers: 'x-forwarded-for': '192.168.0.1'
+          secure: no
+        switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        ctx = LeanRC::Context.new req, res, switchMediator
+        # resource = TestResource.new()
+        # resource.initializeNotifier KEY
+        # switchMediator.initializeNotifier KEY
         spySwitchSendNotification = sinon.spy switchMediator, 'sendNotification'
         vhParams =
-          context: {}
+          context: ctx
           reverse: 'TEST_REVERSE'
         vhOptions =
           method: 'GET'
           path: '/test'
           resource: 'test'
           action: 'list'
+          tag: ''
+          template: 'test/list'
+          keyName: null
+          entityName: 'test'
+          recordName: 'test'
         switchMediator.sender 'test', vhParams, vhOptions
         assert.isTrue spySwitchSendNotification.called, 'Notification not sent'
         assert.deepEqual spySwitchSendNotification.args[0], [
           'test'
           {
-            context: {}
+            context: ctx
             reverse: 'TEST_REVERSE'
           }
           'list'
         ]
-        facade.remove()
       .to.not.throw Error
   # describe '#defineSwaggerEndpoint', ->
   #   it 'should define swagger endpoint', ->
@@ -390,19 +571,23 @@ describe 'Switch', ->
   #       facade.remove()
   #     .to.not.throw Error
   describe '.compose', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should dispatch middlewares', ->
       co ->
-        facade = Facade.getInstance 'TEST_SWITCH_8'
+        KEY = 'TEST_SWITCH_008'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         class TestSwitch extends Switch
           @inheritProtected()
@@ -410,14 +595,28 @@ describe 'Switch', ->
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
-        TestSwitch.initialize()
+          @initialize()
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
+        class MyResponse extends EventEmitter
+          _headers: {}
+          getHeaders: -> LeanRC::Utils.copy @_headers
+          getHeader: (field) -> @_headers[field.toLowerCase()]
+          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            @finished = yes
+            @emit 'finish', data?.toString? encoding
+            callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        res = new MyResponse
         req =
           url: 'http://localhost:8888'
           headers: 'x-forwarded-for': '192.168.0.1'
-        res =
-          _headers: {}
+        # res =
+        #   _headers: {}
         voContext = Test::Context.new req, res, switchMediator
         middlewares = []
         handlers = [[]]
@@ -428,23 +627,26 @@ describe 'Switch', ->
         yield fn voContext
         for i in [ 0 .. COUNT ]
           assert.isTrue handlers[0][i].calledWith voContext
-        facade.remove()
         yield return
   describe '.respond', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should run responding request handler', ->
       co ->
+        KEY = 'TEST_SWITCH_009'
         trigger = new EventEmitter
-        facade = Facade.getInstance 'TEST_SWITCH_9'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         class TestSwitch extends Switch
           @inheritProtected()
@@ -452,20 +654,35 @@ describe 'Switch', ->
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
-        TestSwitch.initialize()
+          @initialize()
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        req =
-          method: 'POST'
-          url: 'http://localhost:8888'
-          headers: 'x-forwarded-for': '192.168.0.1'
-        res =
+        class MyResponse extends EventEmitter
           _headers: {}
           getHeaders: -> LeanRC::Utils.copy @_headers
           getHeader: (field) -> @_headers[field.toLowerCase()]
           setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
           removeHeader: (field) -> delete @_headers[field.toLowerCase()]
-          end: (data) -> trigger.emit 'end', data
+          end: (data, encoding = 'utf-8', callback = ->) ->
+            trigger.emit 'end', data
+            # @finished = yes
+            # @emit 'finish', data?.toString? encoding
+            # callback()
+          constructor: (args...) ->
+            super args...
+            { @finished, @_headers } = finished: no, _headers: {}
+        res = new MyResponse
+        req =
+          method: 'POST'
+          url: 'http://localhost:8888'
+          headers: 'x-forwarded-for': '192.168.0.1'
+        # res =
+        #   _headers: {}
+        #   getHeaders: -> LeanRC::Utils.copy @_headers
+        #   getHeader: (field) -> @_headers[field.toLowerCase()]
+        #   setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+        #   removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        #   end: (data) -> trigger.emit 'end', data
         voContext = Test::Context.new req, res, switchMediator
         endPromise = LeanRC::Promise.new (resolve) -> trigger.once 'end', resolve
         voContext.status = 201
@@ -480,13 +697,13 @@ describe 'Switch', ->
           method: 'GET'
           url: 'http://localhost:8888'
           headers: 'x-forwarded-for': '192.168.0.1'
-        res =
-          _headers: {}
-          getHeaders: -> LeanRC::Utils.copy @_headers
-          getHeader: (field) -> @_headers[field.toLowerCase()]
-          setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
-          removeHeader: (field) -> delete @_headers[field.toLowerCase()]
-          end: (data) -> trigger.emit 'end', data
+        # res =
+        #   _headers: {}
+        #   getHeaders: -> LeanRC::Utils.copy @_headers
+        #   getHeader: (field) -> @_headers[field.toLowerCase()]
+        #   setHeader: (field, value) -> @_headers[field.toLowerCase()] = value
+        #   removeHeader: (field) -> delete @_headers[field.toLowerCase()]
+        #   end: (data) -> trigger.emit 'end', data
         voContext = Test::Context.new req, res, switchMediator
         endPromise = LeanRC::Promise.new (resolve) -> trigger.once 'end', resolve
         voContext.body = data: 'data'
@@ -497,22 +714,25 @@ describe 'Switch', ->
         assert.equal voContext.message, 'OK'
         assert.equal voContext.length, 15
         assert.equal voContext.type, 'application/json'
-        facade.remove()
         yield return
   describe '#callback', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should run request handler', ->
       co ->
-        facade = Facade.getInstance 'TEST_SWITCH_10'
+        KEY = 'TEST_SWITCH_010'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
+          @initialize()
         facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         class TestSwitch extends Switch
           @inheritProtected()
@@ -520,7 +740,7 @@ describe 'Switch', ->
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
-        TestSwitch.initialize()
+          @initialize()
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         class MyResponse extends EventEmitter
@@ -538,6 +758,7 @@ describe 'Switch', ->
             @finished = no
             @_headers = {}
         req =
+          method: 'GET'
           url: 'http://localhost:8888'
           headers: 'x-forwarded-for': '192.168.0.1'
         res = new MyResponse
@@ -566,13 +787,16 @@ describe 'Switch', ->
         endPromise = LeanRC::Promise.new (resolve) -> res.once 'finish', resolve
         yield switchMediator.callback() req, res
         data = yield endPromise
-        facade.remove()
         yield return
   describe '#use', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should append middlewares', ->
       co ->
+        KEY = 'TEST_SWITCH_011'
         trigger = new EventEmitter
-        facade = Facade.getInstance 'TEST_SWITCH_11'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
@@ -594,8 +818,10 @@ describe 'Switch', ->
         class TestLogCommand extends LeanRC::SimpleCommand
           @inheritProtected()
           @module Test
-          @public execute: Function,
-            default: (aoNotification) -> trigger.emit 'log', aoNotification
+          @public execute: FuncG(NotificationInterface, NilT),
+            default: (aoNotification) ->
+              trigger.emit 'log', aoNotification
+              return
         TestLogCommand.initialize()
         compareMiddlewares = (original, used) ->
           if used.__generatorFunction__?
@@ -623,13 +849,16 @@ describe 'Switch', ->
         assert.equal notification.getBody(), 'use testMiddlewareSecond'
         usedMiddleware = switchMediator.middlewares[middlewaresCount]
         compareMiddlewares testMiddlewareSecond, usedMiddleware
-        facade.remove()
         yield return
   describe '#onerror', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should handle error', ->
       co ->
+        KEY = 'TEST_SWITCH_012'
         trigger = new EventEmitter
-        facade = Facade.getInstance 'TEST_SWITCH_12'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
@@ -651,8 +880,10 @@ describe 'Switch', ->
         class TestLogCommand extends LeanRC::SimpleCommand
           @inheritProtected()
           @module Test
-          @public execute: Function,
-            default: (aoNotification) -> trigger.emit 'log', aoNotification
+          @public execute: FuncG(NotificationInterface, NilT),
+            default: (aoNotification) ->
+              trigger.emit 'log', aoNotification
+              return
         TestLogCommand.initialize()
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
@@ -663,13 +894,16 @@ describe 'Switch', ->
         assert.equal message.getName(), Test::LogMessage.SEND_TO_LOG
         assert.include message.getBody(), 'TEST_ERROR'
         assert.equal message.getType(), Test::LogMessage.LEVELS[Test::LogMessage.ERROR]
-        facade.remove()
         yield return
   describe '#del', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should alias to #delete', ->
       co ->
+        KEY = 'TEST_SWITCH_013'
         spyDelete = sinon.spy ->
-        facade = Facade.getInstance 'TEST_SWITCH_13'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
@@ -687,19 +921,22 @@ describe 'Switch', ->
           @public routerName: String,
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
-          @public delete: Function, { default: spyDelete }
+          @public delete: FuncG([String, Function], NilT), { default: spyDelete }
         TestSwitch.initialize()
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
-        switchMediator.del 'TEST'
+        switchMediator.del 'TEST', (->)
         assert.isTrue spyDelete.calledWith 'TEST'
-        facade.remove()
         yield return
   describe '#createMethod', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should create method handler', ->
       co ->
+        KEY = 'TEST_SWITCH_014'
         trigger = new EventEmitter
-        facade = Facade.getInstance 'TEST_SWITCH_13'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
@@ -766,43 +1003,54 @@ describe 'Switch', ->
         res.end()
         yield promise
         assert.isTrue spyMethod.calledWith '{"id":"123"}'
-        facade.remove()
         yield return
   describe '#createNativeRoute', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should create method handler', ->
       co ->
+        KEY = 'TEST_SWITCH_015'
         trigger = new EventEmitter
-        facade = Facade.getInstance 'TEST_SWITCH_14'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
           @public jobs: Object, { default: {} }
-          @public @async getDelayed: Function,
+          @public @async getDelayed: FuncG([], ListG StructG {
+            queueName: String
+            scriptName: String
+            data: AnyT
+            delay: MaybeG Number
+            id: String
+          }),
             default: ->
               yield return []
           @public init: Function,
             default: (args...) ->
               @super args...
               @jobs = {}
-        TestResque.initialize()
+          @initialize()
         resque = TestResque.new LeanRC::RESQUE, data: []
         facade.registerProxy resque
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
-        spyTestAction = sinon.spy -> yield return
+          @initialize()
+        spyTestAction = sinon.spy -> yield return yes
         class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
+          @public entityName: String,
+            default: 'TestEntity'
           @action test: Function, { default: spyTestAction }
-        TestResource.initialize()
+          @initialize()
         facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         class TestSwitch extends Switch
           @inheritProtected()
@@ -811,8 +1059,30 @@ describe 'Switch', ->
             configurable: yes
             default: 'TEST_SWITCH_ROUTER'
           @createMethod 'get'
-        TestSwitch.initialize()
+          @initialize()
         facade.registerCommand 'TestResource', TestResource
+        # { collectionName } = resource
+        collectionName = "TestEntitiesCollection"
+        class TestsCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+          @initialize()
+        class TestEntityRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @public @static findRecordByName: LeanRC::FuncG(String, LeanRC::SubsetG LeanRC::RecordInterface),
+            default: (asType) -> TestEntityRecord
+          @public init: LeanRC::FuncG([Object, LeanRC::CollectionInterface], LeanRC::NilT),
+            default: ->
+              @super arguments...
+              @type = 'Test::TestEntityRecord'
+              return
+          @initialize()
+        boundCollection = TestsCollection.new collectionName,
+          delegate: 'TestEntityRecord'
+        facade.registerProxy boundCollection
         facade.registerMediator TestSwitch.new 'TEST_SWITCH_MEDIATOR'
         switchMediator = facade.retrieveMediator 'TEST_SWITCH_MEDIATOR'
         voRouter = facade.retrieveProxy switchMediator.routerName
@@ -847,46 +1117,57 @@ describe 'Switch', ->
         res.end()
         yield promise
         assert.isTrue spyTestAction.calledWith voContext
-        facade.remove()
         yield return
   describe '#serverListen', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should create HTTP server', ->
       co ->
+        KEY = 'TEST_SWITCH_016'
         trigger = new EventEmitter
-        facade = Facade.getInstance 'TEST_SWITCH_14'
+        facade = Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         configs = LeanRC::Configuration.new LeanRC::CONFIGURATION, Test::ROOT
         facade.registerProxy configs
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @module Test
           @public jobs: Object, { default: {} }
-          @public @async getDelayed: Function,
+          @public @async getDelayed: FuncG([], ListG StructG {
+            queueName: String
+            scriptName: String
+            data: AnyT
+            delay: MaybeG Number
+            id: String
+          }),
             default: ->
               yield return []
           @public init: Function,
             default: (args...) ->
               @super args...
               @jobs = {}
-        TestResque.initialize()
+          @initialize()
         resque = TestResque.new LeanRC::RESQUE, data: []
         facade.registerProxy resque
         class TestRouter extends LeanRC::Router
           @inheritProtected()
           @module Test
-        TestRouter.initialize()
-        spyTestAction = sinon.spy (ctx) ->
-          ctx.body = 'TEST'
-          yield return
+          @initialize()
+        # spyTestAction = sinon.spy (ctx) ->
+        #   ctx.body = 'TEST'
+        #   yield return
         class TestResource extends LeanRC::Resource
           @inheritProtected()
           @module Test
+          @public entityName: String,
+            default: 'TestEntity'
           @action test: Function,
             default: (ctx) -> yield return test: 'TEST'
-        TestResource.initialize()
+          @initialize()
         facade.registerProxy TestRouter.new 'TEST_SWITCH_ROUTER'
         class TestSwitch extends Switch
           @inheritProtected()
@@ -897,21 +1178,54 @@ describe 'Switch', ->
           @createMethod 'get'
           @public jsonRendererName: String,
             default: Test::APPLICATION_RENDERER
-        TestSwitch.initialize()
+          @initialize()
         class TestLogCommand extends LeanRC::SimpleCommand
           @inheritProtected()
           @module Test
-          @public execute: Function,
-            default: (aoNotification) -> trigger.emit 'log', aoNotification
-        TestLogCommand.initialize()
+          @public execute: FuncG(NotificationInterface, NilT),
+            default: (aoNotification) ->
+              trigger.emit 'log', aoNotification
+              return
+          @initialize()
         class TestRenderer extends LeanRC::Renderer
           @inheritProtected()
           @module Test
-          @public @async render: Function,
+          @public @async render: FuncG([ContextInterface, AnyT, ResourceInterface, MaybeG InterfaceG {
+            method: String
+            path: String
+            resource: String
+            action: String
+            tag: String
+            template: String
+            keyName: MaybeG String
+            entityName: String
+            recordName: String
+          }], MaybeG AnyT),
             default: (ctx, aoData, aoResource, aoOptions) ->
-              vhData = RC::Utils.extend {}, aoData
+              vhData = RC::Utils.assign {}, aoData
               yield return JSON.stringify vhData ? null
-        TestRenderer.initialize()
+          @initialize()
+        collectionName = "TestEntitiesCollection"
+        class TestsCollection extends LeanRC::Collection
+          @inheritProtected()
+          @include LeanRC::MemoryCollectionMixin
+          @module Test
+          @initialize()
+        class TestEntityRecord extends LeanRC::Record
+          @inheritProtected()
+          @module Test
+          @attribute test: String
+          @public @static findRecordByName: LeanRC::FuncG(String, LeanRC::SubsetG LeanRC::RecordInterface),
+            default: (asType) -> TestEntityRecord
+          @public init: LeanRC::FuncG([Object, LeanRC::CollectionInterface], LeanRC::NilT),
+            default: ->
+              @super arguments...
+              @type = 'Test::TestEntityRecord'
+              return
+          @initialize()
+        boundCollection = TestsCollection.new collectionName,
+          delegate: 'TestEntityRecord'
+        facade.registerProxy boundCollection
         facade.registerProxy TestRenderer.new Test::APPLICATION_RENDERER
         facade.registerCommand Test::LogMessage.SEND_TO_LOG, TestLogCommand
         facade.registerCommand 'TestResource', TestResource

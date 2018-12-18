@@ -2,20 +2,23 @@
 
 module.exports = (Module)->
   {
-    Serializer
+    AnyT
+    FuncG, SubsetG, MaybeG
+    RecordInterface
+    Serializer, Mixin
     Utils: { _, inflect }
   } = Module::
 
-  Module.defineMixin 'HttpSerializerMixin', (BaseClass = Serializer) ->
+  Module.defineMixin Mixin 'HttpSerializerMixin', (BaseClass = Serializer) ->
     class extends BaseClass
       @inheritProtected()
 
-      @public @async normalize: Function,
+      @public @async normalize: FuncG([SubsetG(RecordInterface), MaybeG AnyT], RecordInterface),
         default: (acRecord, ahPayload)->
           ahPayload = JSON.parse ahPayload if _.isString ahPayload
           return yield acRecord.normalize ahPayload, @collection
 
-      @public @async serialize: Function,
+      @public @async serialize: FuncG([MaybeG(RecordInterface), MaybeG Object], MaybeG AnyT),
         default: (aoRecord, options = null)->
           vcRecord = aoRecord.constructor
           recordName = vcRecord.name.replace /Record$/, ''

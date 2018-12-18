@@ -14,12 +14,12 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
           @module Test
-        MemoryResqueExecutor.initialize()
+          @initialize()
         executor = MemoryResqueExecutor.new executorName, viewComponent
         assert.instanceOf executor, MemoryResqueExecutor
         yield return
@@ -31,12 +31,12 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
           @module Test
-        MemoryResqueExecutor.initialize()
+          @initialize()
         executor = MemoryResqueExecutor.new executorName, viewComponent
         assert.deepEqual executor.listNotificationInterests(), [
           LeanRC::JOB_RESULT, LeanRC::START_RESQUE
@@ -50,12 +50,12 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
           @module Test
-        MemoryResqueExecutor.initialize()
+          @initialize()
         executor = MemoryResqueExecutor.new executorName, viewComponent
         executor.stop()
         stoppedSymbol = MemoryResqueExecutor
@@ -72,12 +72,12 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
           @module Test
-        MemoryResqueExecutor.initialize()
+          @initialize()
         executor = MemoryResqueExecutor.new executorName, viewComponent
         executor.onRemove()
         stoppedSymbol = MemoryResqueExecutor
@@ -94,12 +94,12 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
           @module Test
-        MemoryResqueExecutor.initialize()
+          @initialize()
         executor = MemoryResqueExecutor.new executorName, viewComponent
         executorSymbols = MemoryResqueExecutor.instanceVariables
         definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
@@ -135,12 +135,12 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
           @module Test
-        MemoryResqueExecutor.initialize()
+          @initialize()
         executor = MemoryResqueExecutor.new executorName, viewComponent
         executorSymbols = MemoryResqueExecutor.instanceVariables
         definedProcessorsSymbol = executorSymbols._definedProcessors.pointer
@@ -181,17 +181,17 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        TestResque.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
           @module Test
-        MemoryResqueExecutor.initialize()
+          @initialize()
         facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create 'TEST_QUEUE_1', 4
@@ -223,17 +223,17 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        TestResque.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
           @module Test
-        MemoryResqueExecutor.initialize()
+          @initialize()
         facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create 'TEST_QUEUE_1', 4
@@ -270,12 +270,12 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        TestResque.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
@@ -285,7 +285,7 @@ describe 'MemoryExecutorMixin', ->
               yield @super args...
               trigger.emit 'PROCESSORS_DEFINED'
               yield return
-        MemoryResqueExecutor.initialize()
+          @initialize()
         facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create 'TEST_QUEUE_1', 4
@@ -315,12 +315,12 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        TestResque.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
@@ -335,7 +335,7 @@ describe 'MemoryExecutorMixin', ->
               test = yes
               trigger.emit 'CYCLE_PART'
               yield return
-        MemoryResqueExecutor.initialize()
+          @initialize()
         facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
@@ -367,12 +367,12 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        TestResque.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
@@ -387,7 +387,7 @@ describe 'MemoryExecutorMixin', ->
               test = yes
               trigger.emit 'CYCLE_PART'
               yield return
-        MemoryResqueExecutor.initialize()
+          @initialize()
         facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
@@ -417,12 +417,12 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        TestResque.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
@@ -432,7 +432,7 @@ describe 'MemoryExecutorMixin', ->
               test = yes
               trigger.emit 'CYCLE_PART'
               yield return
-        MemoryResqueExecutor.initialize()
+          @initialize()
         facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
@@ -451,17 +451,17 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        TestResque.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
           @module Test
-        MemoryResqueExecutor.initialize()
+          @initialize()
         facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create LeanRC::DELAYED_JOBS_QUEUE, 4
@@ -487,17 +487,17 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        TestResque.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
           @module Test
-        MemoryResqueExecutor.initialize()
+          @initialize()
         class TestScript extends LeanRC::Script
           @inheritProtected()
           @module Test
@@ -532,17 +532,17 @@ describe 'MemoryExecutorMixin', ->
         class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
+          @initialize()
         class TestResque extends LeanRC::Resque
           @inheritProtected()
           @include LeanRC::MemoryResqueMixin
           @module Test
-        TestResque.initialize()
+          @initialize()
         class MemoryResqueExecutor extends LeanRC::Mediator
           @inheritProtected()
           @include LeanRC::MemoryExecutorMixin
           @module Test
-        MemoryResqueExecutor.initialize()
+          @initialize()
         facade.registerProxy TestResque.new LeanRC::RESQUE
         resque = facade.retrieveProxy LeanRC::RESQUE
         resque.create 'TEST_QUEUE_1', 4

@@ -6,19 +6,19 @@
 
 module.exports = (Module)->
   {
-    Resource
+    FuncG, StructG, ListG
+    ContextInterface
+    Resource, Mixin
     Utils: { _, isArangoDB, joi }
   } = Module::
 
-  Module.defineMixin 'QueryableResourceMixin', (BaseClass = Resource) ->
+  Module.defineMixin Mixin 'QueryableResourceMixin', (BaseClass = Resource) ->
     class extends BaseClass
       @inheritProtected()
 
       MAX_LIMIT   = 50
 
-      @public @async writeTransaction: Function,
-        args: [String, Module::ContextInterface]
-        return: Boolean
+      @public @async writeTransaction: FuncG([String, ContextInterface], Boolean),
         default: (asAction, aoContext) ->
           result = yield @super asAction, aoContext
           if result
@@ -50,7 +50,13 @@ module.exports = (Module)->
             @listQuery.$filter = '@doc.isHidden': no
           yield return args
 
-      @action @async list: Function,
+      @action @async list: FuncG([], StructG {
+        meta: StructG pagination: StructG {
+          limit: Number
+          offset: Number
+        }
+        items: ListG Object
+      }),
         default: ->
           receivedQuery = _.pick @listQuery, [
             '$filter', '$sort', '$limit', '$offset'
@@ -105,7 +111,7 @@ module.exports = (Module)->
             items: vlItems
           }
 
-      @action @async query: Function,
+      @action @async query: FuncG([], Array),
         default: ->
           {body} = @context.request
           return yield (yield @collection.query body.query).toArray()

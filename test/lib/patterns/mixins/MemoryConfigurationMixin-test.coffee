@@ -10,16 +10,16 @@ describe 'MemoryConfigurationMixin', ->
   describe '#defineConfigProperties', ->
     it 'should define configuration properties', ->
       co ->
-        class Test extends RC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root"
-        Test.initialize()
-        class Test::Configuration extends LeanRC::Proxy
+          @initialize()
+        class TestConfiguration extends LeanRC::Proxy
           @inheritProtected()
           @include LeanRC::MemoryConfigurationMixin
           @module Test
-        Test::Configuration.initialize()
-        config = Test::Configuration.new 'TEST_CONFIG',
+          @initialize()
+        config = TestConfiguration.new 'TEST_CONFIG',
           test1:
             description: 'test1 description'
             type: 'string'

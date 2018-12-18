@@ -3,7 +3,9 @@ sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
 {
   APPLICATION_MEDIATOR
-
+  NilT
+  FuncG
+  FacadeInterface, NotificationInterface
   Facade
   SimpleCommand
   Notification
@@ -54,7 +56,7 @@ describe 'Facade', ->
         class TestCommand extends SimpleCommand
           @inheritProtected()
           @module Test
-          @public execute: Function,
+          @public execute: FuncG(NotificationInterface, NilT),
             default: spy
           @initialize()
         class Application extends Test::CoreObject
@@ -209,9 +211,9 @@ describe 'Facade', ->
         viewComponent = {}
         class TestMediator extends Mediator
           @inheritProtected()
-          @public listNotificationInterests: Function,
+          @public listNotificationInterests: FuncG([], Array),
             default: -> [ 'TEST_LIST' ]
-          @public handleNotification: Function,
+          @public handleNotification: FuncG(NotificationInterface),
             default: handleNotification
           @public onRegister: Function,
             default: onRegister
@@ -279,9 +281,9 @@ describe 'Facade', ->
         viewComponent = {}
         class TestMediator extends Mediator
           @inheritProtected()
-          @public listNotificationInterests: Function,
+          @public listNotificationInterests: FuncG([], Array),
             default: -> [ 'TEST_LIST' ]
-          @public handleNotification: Function,
+          @public handleNotification: FuncG(NotificationInterface),
             default: handleNotification
         mediator = TestMediator.new 'TEST_MEDIATOR', viewComponent
         facade.registerMediator mediator
@@ -297,9 +299,9 @@ describe 'Facade', ->
         viewComponent = {}
         class TestMediator extends Mediator
           @inheritProtected()
-          @public listNotificationInterests: Function,
+          @public listNotificationInterests: FuncG([], Array),
             default: -> [ 'TEST_LIST' ]
-          @public handleNotification: Function,
+          @public handleNotification: FuncG(NotificationInterface),
             default: handleNotification
         mediator = TestMediator.new 'TEST_MEDIATOR', viewComponent
         facade.registerMediator mediator
@@ -330,14 +332,14 @@ describe 'Facade', ->
         class ApplicationFacade extends LeanRC::Facade
           @inheritProtected()
           @module Test
-          cphInstanceMap  = @protected @static instanceMap: Object
+          cphInstanceMap  = @classVariables['~instanceMap'].pointer
           @public startup: Function,
             default: (application) ->
               @registerCommand LeanRC::STARTUP, Test::PrepareViewCommand
               @sendNotification LeanRC::STARTUP, application
           @public finish: Function,
             default: ->
-          @public @static getInstance: Function,
+          @public @static getInstance: FuncG(String, FacadeInterface),
             default: (asKey)->
               vhInstanceMap = Test::Facade[cphInstanceMap]
               unless vhInstanceMap[asKey]?
@@ -356,7 +358,7 @@ describe 'Facade', ->
         class PrepareViewCommand extends SimpleCommand
           @inheritProtected()
           @module Test
-          @public execute: Function,
+          @public execute: FuncG(NotificationInterface, NilT),
             default: (aoNotification)->
               voApplication = aoNotification.getBody()
               @facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, voApplication
@@ -381,14 +383,14 @@ describe 'Facade', ->
         class ApplicationFacade extends LeanRC::Facade
           @inheritProtected()
           @module Test
-          cphInstanceMap  = @protected @static instanceMap: Object
+          cphInstanceMap  = @classVariables['~instanceMap'].pointer
           @public startup: Function,
             default: (application) ->
               @registerCommand LeanRC::STARTUP, Test::PrepareViewCommand
               @sendNotification LeanRC::STARTUP, application
           @public finish: Function,
             default: ->
-          @public @static getInstance: Function,
+          @public @static getInstance: FuncG(String, FacadeInterface),
             default: (asKey)->
               vhInstanceMap = Test::Facade[cphInstanceMap]
               unless vhInstanceMap[asKey]?
@@ -407,7 +409,7 @@ describe 'Facade', ->
         class PrepareViewCommand extends SimpleCommand
           @inheritProtected()
           @module Test
-          @public execute: Function,
+          @public execute: FuncG(NotificationInterface, NilT),
             default: (aoNotification)->
               voApplication = aoNotification.getBody()
               @facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, voApplication

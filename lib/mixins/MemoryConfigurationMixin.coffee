@@ -43,12 +43,11 @@ module.exports = (Module)->
 
 module.exports = (Module)->
   {
-    ANY, NILL
-    Configuration
+    Configuration, Mixin
     Utils: { _, inflect }
   } = Module::
 
-  Module.defineMixin 'MemoryConfigurationMixin', (BaseClass = Configuration) ->
+  Module.defineMixin Mixin 'MemoryConfigurationMixin', (BaseClass = Configuration) ->
     class extends BaseClass
       @inheritProtected()
 
@@ -102,5 +101,6 @@ module.exports = (Module)->
                 value: config.default
               return
           return
+
 
       @initializeMixin()

@@ -1,13 +1,21 @@
 
 
 module.exports = (Module) ->
-  class PrepareControllerCommand extends Module.NS.SimpleCommand
+  {
+    NilT
+    FuncG
+    NotificationInterface
+    SEND_REQUEST
+    SendRequestCommand
+    SimpleCommand
+  } = Module.NS
+
+  class PrepareControllerCommand extends SimpleCommand
     @inheritProtected()
     @module Module
 
-    @public execute: Function,
+    @public execute: FuncG(NotificationInterface, NilT),
       default: ->
-        @facade.registerCommand Module.NS.SEND_REQUEST,
-          Module.NS.SendRequestCommand
+        @facade.registerCommand SEND_REQUEST, SendRequestCommand
 
-  PrepareControllerCommand.initialize()
+    @initialize()

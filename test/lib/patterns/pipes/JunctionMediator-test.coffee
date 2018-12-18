@@ -45,7 +45,7 @@ describe 'JunctionMediator', ->
     it 'should handle `LeanRC::JunctionMediator.ACCEPT_OUTPUT_PIPE` notification', ->
       expect ->
         MULTITON_KEY = 'TEST_JUNCTION_2'
-        finalNode = write: ->
+        finalNode = Pipe.new()
         spyWrite = sinon.spy finalNode, 'write'
         outputPipe = Pipe.new finalNode
         junction = Junction.new()
@@ -62,7 +62,6 @@ describe 'JunctionMediator', ->
     it 'should handle `LeanRC::JunctionMediator.REMOVE_PIPE` notification', ->
       expect ->
         MULTITON_KEY = 'TEST_JUNCTION_3'
-        finalNode = write: ->
         outputPipe = Pipe.new()
         junction = Junction.new()
         spyRemovePipe = sinon.spy junction, 'removePipe'

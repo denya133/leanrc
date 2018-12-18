@@ -174,23 +174,23 @@ describe 'Query', ->
           class: 'Query'
           query:
             '$forIn': '@doc': 'users'
-            '$join': undefined
-            '$let': undefined
+            # '$join': undefined
+            # '$let': undefined
             '$filter': '@doc.active': '$eq': yes
             '$collect': '@country': '@doc.country', '@city': '@doc.city'
             '$into': '@groups': name: '@doc.name', isActive: '@doc.active'
             '$having': '@country': '$nin': ['Australia', 'Ukraine']
-            '$sort': undefined,
-            '$limit': undefined,
-            '$offset': undefined,
-            '$avg': undefined,
-            '$sum': undefined,
-            '$min': undefined,
-            '$max': undefined,
-            '$count': undefined,
-            '$distinct': undefined,
-            '$remove': undefined,
-            '$patch': undefined
+            # '$sort': undefined,
+            # '$limit': undefined,
+            # '$offset': undefined,
+            # '$avg': undefined,
+            # '$sum': undefined,
+            # '$min': undefined,
+            # '$max': undefined,
+            # '$count': undefined,
+            # '$distinct': undefined,
+            # '$remove': undefined,
+            # '$patch': undefined
             '$return': country: '@country', city: '@city', usersInCity: '@groups'
         yield return
   describe '.restoreObject', ->
@@ -201,42 +201,42 @@ describe 'Query', ->
           class: 'Query'
           query:
             '$forIn': '@doc': 'users'
-            '$join': undefined
-            '$let': undefined
+            # '$join': undefined
+            # '$let': undefined
             '$filter': '@doc.active': '$eq': yes
             '$collect': '@country': '@doc.country', '@city': '@doc.city'
             '$into': '@groups': name: '@doc.name', isActive: '@doc.active'
             '$having': '@country': '$nin': ['Australia', 'Ukraine']
-            '$sort': undefined,
-            '$limit': undefined,
-            '$offset': undefined,
-            '$avg': undefined,
-            '$sum': undefined,
-            '$min': undefined,
-            '$max': undefined,
-            '$count': undefined,
-            '$distinct': undefined,
-            '$remove': undefined,
-            '$patch': undefined,
+            # '$sort': undefined,
+            # '$limit': undefined,
+            # '$offset': undefined,
+            # '$avg': undefined,
+            # '$sum': undefined,
+            # '$min': undefined,
+            # '$max': undefined,
+            # '$count': undefined,
+            # '$distinct': undefined,
+            # '$remove': undefined,
+            # '$patch': undefined,
             '$return': country: '@country', city: '@city', usersInCity: '@groups'
         assert.deepEqual query.toJSON(),
           '$forIn': '@doc': 'users'
-          '$join': undefined
-          '$let': undefined
+          # '$join': undefined
+          # '$let': undefined
           '$filter': '@doc.active': '$eq': yes
           '$collect': '@country': '@doc.country', '@city': '@doc.city'
           '$into': '@groups': name: '@doc.name', isActive: '@doc.active'
           '$having': '@country': '$nin': ['Australia', 'Ukraine']
-          '$sort': undefined,
-          '$limit': undefined,
-          '$offset': undefined,
-          '$avg': undefined,
-          '$sum': undefined,
-          '$min': undefined,
-          '$max': undefined,
-          '$count': undefined,
-          '$distinct': undefined,
-          '$remove': undefined,
-          '$patch': undefined,
+          # '$sort': undefined,
+          # '$limit': undefined,
+          # '$offset': undefined,
+          # '$avg': undefined,
+          # '$sum': undefined,
+          # '$min': undefined,
+          # '$max': undefined,
+          # '$count': undefined,
+          # '$distinct': undefined,
+          # '$remove': undefined,
+          # '$patch': undefined,
           '$return': country: '@country', city: '@city', usersInCity: '@groups'
         yield return

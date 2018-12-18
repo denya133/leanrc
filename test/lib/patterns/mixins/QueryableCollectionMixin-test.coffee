@@ -3,7 +3,12 @@ sinon = require 'sinon'
 _ = require 'lodash'
 LeanRC = require.main.require 'lib'
 RC = require 'RC'
-{ co } = RC::Utils
+{
+  FuncG, UnionG, SubsetG, MaybeG
+  QueryInterface, RecordInterface, CursorInterface, CollectionInterface, NilT
+  Cursor
+  Utils: { co }
+} = LeanRC::
 
 describe 'QueryableCollectionMixin', ->
   describe '.new', ->
@@ -11,79 +16,100 @@ describe 'QueryableCollectionMixin', ->
       co ->
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-        class Test::Queryable extends RC::CoreObject
+          @initialize()
+        class Queryable extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) -> yield return aoParsedQuery
-        Test::Queryable.initialize()
-        queryable = Test::Queryable.new()
-        assert.instanceOf queryable, Test::Queryable
+          @initialize()
+        queryable = Queryable.new()
+        assert.instanceOf queryable, Queryable
         yield return
   describe '#query', ->
     it 'should execute query', ->
       co ->
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-        spyExecuteQuery = sinon.spy (aoParsedQuery) -> yield return aoParsedQuery
-        spyParseQuery = sinon.spy (aoQuery) -> aoQuery
-        class Test::Queryable extends RC::CoreObject
+          @initialize()
+        spyExecuteQuery = sinon.spy (aoParsedQuery) -> yield return Cursor.new null, [Symbol 'any']
+        spyParseQuery = sinon.spy (aoQuery) -> yield return aoQuery
+        class Queryable extends RC::CoreObject
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public parseQuery: Object,
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
             default: spyParseQuery
-          @public @async executeQuery: LeanRC::Cursor,
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: spyExecuteQuery
-        Test::Queryable.initialize()
-        queryable = Test::Queryable.new()# Test::TestRecord, array
+          @initialize()
+        queryable = Queryable.new()# Test::TestRecord, array
         query = { test: 'test' }
         yield queryable.query query
         assert.isTrue spyParseQuery.calledWith(query)
         assert.isTrue spyExecuteQuery.calledWith(query)
         yield return
   describe '#exists', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should check data existance by query', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_002'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-        Test::TestRecord.initialize()
-        class Test::Queryable extends LeanRC::Collection
+          @initialize()
+        class Queryable extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
+          @public delegate: SubsetG(RecordInterface),
+            default: TestRecord
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = _.filter @getData(), aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @delegate, data
-          @public patch: Function,
+              yield return Cursor.new @, data
+          @public @async update: FuncG([UnionG(String, Number), Object], RecordInterface),
             default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record
-          @public push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push record
               yield return record
-        Test::Queryable.initialize()
-        collection = Test::Queryable.new KEY, []
+          @initialize()
+        collection = Queryable.new KEY, []
         facade.registerProxy collection
         queryable = facade.retrieveProxy KEY
         yield queryable.create test: 'test1'
@@ -92,56 +118,66 @@ describe 'QueryableCollectionMixin', ->
         yield queryable.create test: 'test4'
         assert.isTrue yield queryable.exists { test: 'test2' }
         assert.isFalse yield queryable.exists { test: 'test5' }
-        facade.remove()
+
         yield return
   describe '#findBy', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should find data by query', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_003'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public init: Function,
+          @public init: FuncG([Object, CollectionInterface], NilT),
             default: ->
               @super arguments...
               @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::Queryable extends LeanRC::Collection
+              return
+          @initialize()
+        class Queryable extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
+          @public delegate: SubsetG(RecordInterface),
+            default: TestRecord
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = _.filter @getData(), aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @, data
-          @public @async patch: Function,
+              yield return Cursor.new @, data
+          @public @async update: FuncG([UnionG(String, Number), Object], RecordInterface),
             default: (id, item) ->
               record = yield @find id
               record[key] = value  for own key, value of item
               yield return record
-          @public @async push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
               yield return record
-          @public @async takeBy: Function,
+          @public @async takeBy: FuncG([Object, MaybeG Object], CursorInterface),
             default: (query) ->
               voQuery = Test::Query.new()
                 .forIn '@doc': @collectionFullName()
                 .filter query
                 .limit 1
-              yield return @query voQuery
-        Test::Queryable.initialize()
-        collection = Test::Queryable.new KEY, []
+              return yield @query voQuery
+          @initialize()
+        collection = Queryable.new KEY, []
         facade.registerProxy collection
         queryable = facade.retrieveProxy KEY
         yield queryable.create test: 'test1'
@@ -153,38 +189,48 @@ describe 'QueryableCollectionMixin', ->
         assert.equal record1.test, 'test2'
         record2 = yield (yield queryable.findBy { 'test': 'test5' }).next()
         assert.isUndefined record2
-        facade.remove()
+
         yield return
   describe '#deleteBy', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should mark data as deleted by query', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_004'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public init: Function,
+          @public init: FuncG([Object, CollectionInterface], NilT),
             default: ->
               @super arguments...
               @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::Queryable extends LeanRC::Collection
+              return
+          @initialize()
+        class Queryable extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
+          @public delegate: SubsetG(RecordInterface),
+            default: TestRecord
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = _.filter @getData(), aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @, data
-          @public @async patch: Function,
+              yield return Cursor.new @, data
+          @public @async update: FuncG([UnionG(String, Number), Object], RecordInterface),
             default: (id, item) ->
               data = _.filter @getData(), { id }
               if _.isArray data
@@ -196,32 +242,32 @@ describe 'QueryableCollectionMixin', ->
                   else
                     datum[key] = value  for own key, value of item
               yield return data.length > 0
-          @public @async take: Function,
+          @public @async take: FuncG([UnionG String, Number], RecordInterface),
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
-          @public @async push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
               yield return record
-          @public @async takeBy: Function,
+          @public @async takeBy: FuncG([Object, MaybeG Object], CursorInterface),
             default: (query) ->
               voQuery = Test::Query.new()
                 .forIn '@doc': @collectionFullName()
                 .filter query
                 .limit 1
-              yield return @query voQuery
-          @public @async includes: Function,
-            default: (id) -> yield return @exists { id }
-          @public @async override: Function,
+              return yield @query voQuery
+          @public @async includes: FuncG([UnionG String, Number], Boolean),
+            default: (id) -> return yield @exists { id }
+          @public @async override: FuncG([UnionG(String, Number), RecordInterface], RecordInterface),
             default: (id, aoRecord)->
               index = _.findIndex @getData(), { id }
               @getData()[index] = yield @serializer.serialize aoRecord
-              yield return Test::Cursor.new(@, [@getData()[index]]).first()
-        Test::Queryable.initialize()
-        collection = Test::Queryable.new KEY, []
+              return yield Test::Cursor.new(@, [@getData()[index]]).first()
+          @initialize()
+        collection = Queryable.new KEY, []
         facade.registerProxy collection
         queryable = facade.retrieveProxy KEY
         yield queryable.create test: 'test1'
@@ -238,44 +284,54 @@ describe 'QueryableCollectionMixin', ->
           else
             assert.propertyVal rawData, 'isHidden', no, 'Record was removed'
             assert.isNull rawData.deletedAt, 'Record deleted data is not null'
-        facade.remove()
+
         yield return
   describe '#removeBy', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should remove data by query', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_005'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public init: Function,
+          @public init: FuncG([Object, CollectionInterface], NilT),
             default: ->
               @super arguments...
               @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::Queryable extends LeanRC::Collection
+              return
+          @initialize()
+        class Queryable extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
+          @public delegate: SubsetG(RecordInterface),
+            default: TestRecord
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = []
               switch
                 when aoParsedQuery['$remove']
                   _.remove @getData(), aoParsedQuery['$filter']
-                  yield return
+                  yield return Cursor.new @, []
                 else
                   data = _.filter @getData(), aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @, []
-          @public @async patch: Function,
+              yield return Cursor.new @, []
+          @public @async update: FuncG([UnionG(String, Number), Object], RecordInterface),
             default: (id, item) ->
               data = _.filter @getData(), { id }
               if _.isArray data
@@ -287,18 +343,18 @@ describe 'QueryableCollectionMixin', ->
                   else
                     datum[key] = value  for own key, value of item
               yield return data.length > 0
-          @public @async take: Function,
+          @public @async take: FuncG([UnionG String, Number], RecordInterface),
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
-              yield data
-          @public @async push: Function,
+              yield return data
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
               yield return record
-        Test::Queryable.initialize()
-        collection = Test::Queryable.new KEY, []
+          @initialize()
+        collection = Queryable.new KEY, []
         facade.registerProxy collection
         queryable = facade.retrieveProxy KEY
         yield queryable.create test: 'test1'
@@ -309,34 +365,44 @@ describe 'QueryableCollectionMixin', ->
         data = queryable.getData()
         assert.lengthOf data, 2, 'Records did not removed'
         assert.lengthOf _.filter(data, { test: 'test2' }), 0, 'Found removed records'
-        facade.remove()
+
         yield return
   describe '#destroyBy', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should remove records by query', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_006'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
-          @public init: Function,
+          @public init: FuncG([Object, CollectionInterface], NilT),
             default: ->
               @super arguments...
               @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::Queryable extends LeanRC::Collection
+              return
+          @initialize()
+        class Queryable extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
+          @public delegate: SubsetG(RecordInterface),
+            default: TestRecord
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = []
               switch
@@ -345,32 +411,32 @@ describe 'QueryableCollectionMixin', ->
                   yield return
                 else
                   data = _.filter @getData(), aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @, data
-          @public @async take: Function,
+              yield return Cursor.new @, data
+          @public @async take: FuncG([UnionG String, Number], RecordInterface),
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
-          @public @async push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
               yield return record
-          @public @async remove: Function,
+          @public @async remove: FuncG([UnionG String, Number], NilT),
             default: (id) ->
               _.remove @getData(), { id }
               yield return
-          @public @async takeBy: Function,
+          @public @async takeBy: FuncG([Object, MaybeG Object], CursorInterface),
             default: (query) ->
               voQuery = Test::Query.new()
                 .forIn '@doc': @collectionFullName()
                 .filter query
                 .limit 1
-              yield return @query voQuery
-          @public @async includes: Function,
-            default: (id) -> yield return @exists { id }
-        Test::Queryable.initialize()
-        collection = Test::Queryable.new KEY, []
+              return yield @query voQuery
+          @public @async includes: FuncG([UnionG String, Number], Boolean),
+            default: (id) -> return yield @exists { id }
+          @initialize()
+        collection = Queryable.new KEY, []
         facade.registerProxy collection
         queryable = facade.retrieveProxy KEY
         yield queryable.create test: 'test1'
@@ -381,39 +447,49 @@ describe 'QueryableCollectionMixin', ->
         data = queryable.getData()
         assert.lengthOf data, 2, 'Records did not removed'
         assert.lengthOf _.filter(data, { test: 'test2' }), 0, 'Found removed records'
-        facade.remove()
+
         yield return
   describe '#updateBy', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should update data in records by query', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_009'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
           @attribute updated: Boolean, { default: no }
-          @public init: Function,
+          @public init: FuncG([Object, CollectionInterface], NilT),
             default: ->
               @super arguments...
               @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::Queryable extends LeanRC::Collection
+              return
+          @initialize()
+        class Queryable extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
+          @public delegate: SubsetG(RecordInterface),
+            default: TestRecord
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               data = _.filter @getData(), aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @, data
-          @public @async patch: Function,
+              yield return Cursor.new @, data
+          @public @async update: FuncG([UnionG(String, Number), Object], RecordInterface),
             default: (id, item) ->
               data = _.filter @getData(), { id }
               if _.isArray data
@@ -425,32 +501,32 @@ describe 'QueryableCollectionMixin', ->
                   else
                     datum[key] = value  for own key, value of item
               yield return data.length > 0
-          @public @async take: Function,
+          @public @async take: FuncG([UnionG String, Number], RecordInterface),
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
-          @public @async push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
               yield return record
-          @public @async takeBy: Function,
+          @public @async takeBy: FuncG([Object, MaybeG Object], CursorInterface),
             default: (query) ->
               voQuery = Test::Query.new()
                 .forIn '@doc': @collectionFullName()
                 .filter query
                 .limit 1
-              yield return @query voQuery
-          @public @async includes: Function,
-            default: (id) -> yield return @exists { id }
-          @public @async override: Function,
+              return yield @query voQuery
+          @public @async includes: FuncG([UnionG String, Number], Boolean),
+            default: (id) -> return yield @exists { id }
+          @public @async override: FuncG([UnionG(String, Number), RecordInterface], RecordInterface),
             default: (id, aoRecord)->
               index = _.findIndex @getData(), { id }
               @getData()[index] = yield @serializer.serialize aoRecord
-              yield return Test::Cursor.new(@, [@getData()[index]]).first()
-        Test::Queryable.initialize()
-        collection = Test::Queryable.new KEY, []
+              return yield Test::Cursor.new(@, [@getData()[index]]).first()
+          @initialize()
+        collection = Queryable.new KEY, []
         facade.registerProxy collection
         queryable = facade.retrieveProxy KEY
         yield queryable.create test: 'test1'
@@ -464,35 +540,45 @@ describe 'QueryableCollectionMixin', ->
             assert.propertyVal rawData, 'updated', yes, 'Record was not updated'
           else
             assert.propertyVal rawData, 'updated', no, 'Record was updated'
-        facade.remove()
+
         yield return
   describe '#patchBy', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should update data in records by query', ->
       co ->
         KEY = 'FACADE_TEST_QUERYABLE_010'
         facade = LeanRC::Facade.getInstance KEY
         class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
-        class Test::TestRecord extends LeanRC::Record
+          @initialize()
+        class TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
           @attribute test: String
           @attribute updated: Boolean, { default: no }
-          @public init: Function,
+          @public init: FuncG([Object, CollectionInterface], NilT),
             default: ->
               @super arguments...
               @type = 'Test::TestRecord'
-        Test::TestRecord.initialize()
-        class Test::Queryable extends LeanRC::Collection
+              return
+          @initialize()
+        class Queryable extends LeanRC::Collection
           @inheritProtected()
           @include LeanRC::QueryableCollectionMixin
           @module Test
-          @public delegate: RC::Class,
-            default: Test::TestRecord
-          @public parseQuery: Object,
-            default: (aoQuery) -> aoQuery
-          @public @async executeQuery: LeanRC::Cursor,
+          @public delegate: SubsetG(RecordInterface),
+            default: TestRecord
+          @public @async parseQuery: FuncG(
+            [UnionG Object, QueryInterface]
+            UnionG Object, String, QueryInterface
+          ),
+            default: (aoQuery) -> yield return aoQuery
+          @public @async executeQuery: FuncG(
+            [UnionG Object, String, QueryInterface]
+            CursorInterface
+          ),
             default: (aoParsedQuery) ->
               if (item = aoParsedQuery['$patch'])?
                 toBeUpdated = _.filter @getData(), aoParsedQuery.$filter
@@ -505,19 +591,19 @@ describe 'QueryableCollectionMixin', ->
                     else
                       datum[key] = value  for own key, value of item
               data = _.filter @getData(), aoParsedQuery.$filter
-              yield LeanRC::Cursor.new @, data
-          @public @async take: Function,
+              yield return Cursor.new @, data
+          @public @async take: FuncG([UnionG String, Number], RecordInterface),
             default: (id) ->
               data = _.find @getData(), { id }
               throw new Error 'NOT_FOUND'  unless data?
               yield data
-          @public @async push: Function,
+          @public @async push: FuncG(RecordInterface, RecordInterface),
             default: (record) ->
               record.id = RC::Utils.uuid.v4()
               @getData().push yield @delegate.serialize record
               yield return record
-        Test::Queryable.initialize()
-        collection = Test::Queryable.new KEY, []
+          @initialize()
+        collection = Queryable.new KEY, []
         facade.registerProxy collection
         queryable = facade.retrieveProxy KEY
         yield queryable.create test: 'test1'
@@ -531,5 +617,5 @@ describe 'QueryableCollectionMixin', ->
             assert.propertyVal rawData, 'updated', yes, 'Record was not patched'
           else
             assert.propertyVal rawData, 'updated', no, 'Record was patched'
-        facade.remove()
+
         yield return

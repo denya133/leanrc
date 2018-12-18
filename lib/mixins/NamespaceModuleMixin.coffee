@@ -3,17 +3,20 @@
 
 module.exports = (Module)->
   {
+    PointerT
+    MaybeG
+    Mixin
     Module: ModuleClass
     Utils: { _, inflect, filesTreeSync }
   } = Module::
 
-  Module.defineMixin 'NamespaceModuleMixin', (BaseClass = ModuleClass) ->
+  Module.defineMixin Mixin 'NamespaceModuleMixin', (BaseClass = ModuleClass) ->
     class extends BaseClass
       @inheritProtected()
 
-      cphPathMap = @private @static pathMap: Object
+      cphPathMap = PointerT @private @static pathMap: MaybeG Object
 
-      cpmHandler = @private @static handler: Function,
+      cpmHandler = PointerT @private @static handler: Function,
         default: (Class) ->
           get: (aoTarget, asName) ->
             unless Reflect.get aoTarget, asName
@@ -21,7 +24,7 @@ module.exports = (Module)->
               if vsPath
                 require(vsPath) Class
             Reflect.get aoTarget, asName
-      cpoNamespace = @private @static proto: Object
+      cpoNamespace = PointerT @private @static proto: MaybeG Object
 
       @public @static NS: Object,
         get: ->
@@ -41,6 +44,7 @@ module.exports = (Module)->
           @super args...
           @[cphPathMap] = undefined
           @[cpoNamespace] = undefined
+          return
 
 
       @initializeMixin()

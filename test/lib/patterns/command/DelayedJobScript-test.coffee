@@ -12,19 +12,22 @@ describe 'DelayedJobScript', ->
         assert.instanceOf command, LeanRC::DelayedJobScript
         yield return
   describe '#body', ->
+    facade = null
+    afterEach ->
+      facade?.remove?()
     it 'should run delayed job script (class, sync)', ->
       co ->
         KEY = 'TEST_DELAYED_JOB_SCRIPT_001'
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root2"
-        Test.initialize()
+          @initialize()
         class TestScript extends LeanRC::DelayedJobScript
           @inheritProtected()
           @module Test
-        TestScript.initialize()
+          @initialize()
         class TestClass extends LeanRC::CoreObject
           @inheritProtected()
           @module Test
@@ -32,15 +35,15 @@ describe 'DelayedJobScript', ->
             default: (args...) ->
               trigger.emit 'RUN_SCRIPT', args
               return
-        TestClass.initialize()
+          @initialize()
         class ApplicationMediator extends LeanRC::Mediator
           @inheritProtected()
           @module Test
-        ApplicationMediator.initialize()
+          @initialize()
         class TestApplication extends LeanRC::CoreObject
           @inheritProtected()
           @module Test
-        TestApplication.initialize()
+          @initialize()
         facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestScript.new()
         command.initializeNotifier KEY
@@ -55,21 +58,20 @@ describe 'DelayedJobScript', ->
         command.execute LeanRC::Notification.new 'TEST', body, 'TEST_TYPE'
         data = yield promise
         assert.deepEqual data, [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-        facade.remove()
         yield return
     it 'should run delayed job script (instance, sync)', ->
       co ->
         KEY = 'TEST_DELAYED_JOB_SCRIPT_002'
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root2"
-        Test.initialize()
+          @initialize()
         class TestScript extends LeanRC::DelayedJobScript
           @inheritProtected()
           @module Test
-        TestScript.initialize()
+          @initialize()
         class TestClass extends LeanRC::CoreObject
           @inheritProtected()
           @module Test
@@ -77,15 +79,15 @@ describe 'DelayedJobScript', ->
             default: (args...) ->
               trigger.emit 'RUN_SCRIPT', args
               return
-        TestClass.initialize()
+          @initialize()
         class ApplicationMediator extends LeanRC::Mediator
           @inheritProtected()
           @module Test
-        ApplicationMediator.initialize()
+          @initialize()
         class TestApplication extends LeanRC::CoreObject
           @inheritProtected()
           @module Test
-        TestApplication.initialize()
+          @initialize()
         facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestScript.new()
         command.initializeNotifier KEY
@@ -100,21 +102,20 @@ describe 'DelayedJobScript', ->
         command.execute LeanRC::Notification.new 'TEST', body, 'TEST_TYPE'
         data = yield promise
         assert.deepEqual data, [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-        facade.remove()
         yield return
     it 'should run delayed job script (class, async)', ->
       co ->
         KEY = 'TEST_DELAYED_JOB_SCRIPT_003'
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root2"
-        Test.initialize()
+          @initialize()
         class TestScript extends LeanRC::DelayedJobScript
           @inheritProtected()
           @module Test
-        TestScript.initialize()
+          @initialize()
         class TestClass extends LeanRC::CoreObject
           @inheritProtected()
           @module Test
@@ -122,15 +123,15 @@ describe 'DelayedJobScript', ->
             default: (args...) ->
               trigger.emit 'RUN_SCRIPT', args
               yield return
-        TestClass.initialize()
+          @initialize()
         class ApplicationMediator extends LeanRC::Mediator
           @inheritProtected()
           @module Test
-        ApplicationMediator.initialize()
+          @initialize()
         class TestApplication extends LeanRC::CoreObject
           @inheritProtected()
           @module Test
-        TestApplication.initialize()
+          @initialize()
         facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestScript.new()
         command.initializeNotifier KEY
@@ -145,21 +146,20 @@ describe 'DelayedJobScript', ->
         command.execute LeanRC::Notification.new 'TEST', body, 'TEST_TYPE'
         data = yield promise
         assert.deepEqual data, [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-        facade.remove()
         yield return
     it 'should run delayed job script (instance, async)', ->
       co ->
         KEY = 'TEST_DELAYED_JOB_SCRIPT_004'
         facade = LeanRC::Facade.getInstance KEY
         trigger = new EventEmitter
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root "#{__dirname}/config/root2"
-        Test.initialize()
+          @initialize()
         class TestScript extends LeanRC::DelayedJobScript
           @inheritProtected()
           @module Test
-        TestScript.initialize()
+          @initialize()
         class TestClass extends LeanRC::CoreObject
           @inheritProtected()
           @module Test
@@ -167,15 +167,15 @@ describe 'DelayedJobScript', ->
             default: (args...) ->
               trigger.emit 'RUN_SCRIPT', args
               yield return
-        TestClass.initialize()
+          @initialize()
         class ApplicationMediator extends LeanRC::Mediator
           @inheritProtected()
           @module Test
-        ApplicationMediator.initialize()
+          @initialize()
         class TestApplication extends LeanRC::CoreObject
           @inheritProtected()
           @module Test
-        TestApplication.initialize()
+          @initialize()
         facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, TestApplication.new()
         command = TestScript.new()
         command.initializeNotifier KEY
@@ -190,5 +190,4 @@ describe 'DelayedJobScript', ->
         command.execute LeanRC::Notification.new 'TEST', body, 'TEST_TYPE'
         data = yield promise
         assert.deepEqual data, [ 'ARG_1', 'ARG_2', 'ARG_3' ]
-        facade.remove()
         yield return

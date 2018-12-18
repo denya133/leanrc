@@ -8,51 +8,50 @@
 
 module.exports = (Module)->
   {
-    ANY
-    NILL
-
-    CollectionInterface
-    ContextInterface
+    AnyT
+    FuncG, UnionG, TupleG, MaybeG, DictG, StructG, EnumG, ListG
+    CollectionInterface, ContextInterface, RecordInterface
+    Interface
   } = Module::
 
-  Module.defineInterface 'ResourceInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class ResourceInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual entityName: String
-      @public @virtual keyName: String
-      @public @virtual itemEntityName: String
-      @public @virtual listEntityName: String
-      @public @virtual collectionName: String
-      @public @virtual collection: CollectionInterface
+    @virtual needsLimitation: Boolean
+    @virtual entityName: String
+    @virtual keyName: String
+    @virtual itemEntityName: String
+    @virtual listEntityName: String
+    @virtual collectionName: String
+    @virtual collection: CollectionInterface
 
-      @public @virtual context: ContextInterface
-      @public @virtual query: Object
-      @public @virtual recordId: String
-      @public @virtual recordBody: Object
-
-
-      @public @static @virtual actions: Object
-      @public @static @virtual action: Function, # alias for @public
-        args: [Object, Object] # nameDefinition, config
-        return: String
+    @virtual context: MaybeG ContextInterface
+    @virtual listQuery: MaybeG Object
+    @virtual recordId: MaybeG String
+    @virtual recordBody: MaybeG Object
 
 
-      @public @async @virtual list: Function,
-        args: [Object]
-        return: NILL # без return. данные посылаем сигналом
-      @public @async @virtual detail: Function,
-        args: [Object]
-        return: NILL # без return. данные посылаем сигналом
-      @public @async @virtual create: Function,
-        args: [Object]
-        return: NILL # без return. данные посылаем сигналом
-      @public @async @virtual update: Function,
-        args: [Object]
-        return: NILL # без return. данные посылаем сигналом
-      @public @async @virtual delete: Function,
-        args: [Object]
-        return: NILL # без return. данные посылаем сигналом
+    @virtual @static actions: DictG String, Object
+    @virtual @static action: FuncG [UnionG Object, TupleG Object, Object]
 
 
-      @initializeInterface()
+    @virtual @async list: FuncG [], StructG {
+      meta: StructG pagination: StructG {
+        limit: UnionG Number, EnumG ['not defined']
+        offset: UnionG Number, EnumG ['not defined']
+      }
+      items: ListG Object
+    }
+    @virtual @async detail: FuncG [], RecordInterface
+    @virtual @async create: FuncG [], RecordInterface
+    @virtual @async update: FuncG [], RecordInterface
+    @virtual @async delete: Function
+    @virtual @async destroy: Function
+
+    @virtual @async doAction: FuncG [String, ContextInterface], AnyT
+    @virtual @async writeTransaction: FuncG [String, ContextInterface], Boolean
+    @virtual @async saveDelayeds: Function
+
+
+    @initialize()

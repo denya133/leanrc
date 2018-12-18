@@ -1,28 +1,35 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-Serializer = LeanRC::Serializer
-Record = LeanRC::Record
-{ co } = LeanRC::Utils
+{
+  FuncG, SubsetG
+  RecordInterface
+  Serializer
+  Record
+  Utils: { co }
+} = LeanRC::
 
 describe 'Serializer', ->
   describe '#normalize', ->
     it "should normalize object value", ->
       co ->
-      # expect ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
+          @initialize()
+        class TestsCollection extends LeanRC::Collection
+          @inheritProtected()
+          @module Test
+          @initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
-          @public @static findRecordByName: Function,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
             default: (asType) -> Test::TestRecord
           @attribute string: String
           @attribute number: Number
           @attribute boolean: Boolean
-        Test::TestRecord.initialize()
-        serializer = Serializer.new()
+          @initialize()
+        serializer = Serializer.new TestsCollection.new('Tests', delegate: 'TestRecord')
         record = yield serializer.normalize Test::TestRecord,
           type: 'Test::TestRecord'
           string: 'string'
@@ -34,36 +41,39 @@ describe 'Serializer', ->
         assert.equal record.number, 123, '`number` is incorrect'
         assert.equal record.boolean, yes, '`boolean` is incorrect'
         yield return
-      # .to.not.throw Error
   describe '#serialize', ->
     it "should serialize Record.prototype value", ->
       co ->
-      # expect ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
-        Test.initialize()
+          @initialize()
+        class TestsCollection extends LeanRC::Collection
+          @inheritProtected()
+          @module Test
+          @initialize()
         class Test::TestRecord extends LeanRC::Record
           @inheritProtected()
           @module Test
-          @public @static findRecordByName: Function,
+          @public @static findRecordByName: FuncG(String, SubsetG RecordInterface),
             default: (asType) -> Test::TestRecord
           @attribute string: String
           @attribute number: Number
           @attribute boolean: Boolean
-        Test::TestRecord.initialize()
-        serializer = Serializer.new()
-        data = yield serializer.serialize Test::TestRecord.new
+          @initialize()
+        col = TestsCollection.new('Tests', delegate: 'TestRecord')
+        serializer = Serializer.new col
+        data = yield serializer.serialize Test::TestRecord.new({
           type: 'Test::TestRecord'
           string: 'string'
           number: 123
           boolean: yes
+        }, col)
         assert.instanceOf data, Object, 'Serialize is incorrect'
         assert.equal data.type, 'Test::TestRecord', '`type` is incorrect'
         assert.equal data.string, 'string', '`string` is incorrect'
         assert.equal data.number, 123, '`number` is incorrect'
         assert.equal data.boolean, yes, '`boolean` is incorrect'
         yield return
-      # .to.not.throw Error
   describe '.replicateObject', ->
     facade = null
     KEY = 'TEST_SERIALIZER_001'

@@ -2,20 +2,33 @@
 
 module.exports = (Module)->
   {
-    Renderer
+    AnyT
+    FuncG, MaybeG, InterfaceG
+    ContextInterface, ResourceInterface
+    Renderer, Mixin
   } = Module::
 
-  Module.defineMixin 'BulkMethodsRendererMixin', (BaseClass = Renderer) ->
+  Module.defineMixin Mixin 'BulkMethodsRendererMixin', (BaseClass = Renderer) ->
     class extends BaseClass
       @inheritProtected()
 
-      @public bulkDelete: Function,
+      @public bulkDelete: FuncG([String, String, AnyT], MaybeG AnyT),
         default: (resource, action, aoData)->
 
-      @public bulkDestroy: Function,
+      @public bulkDestroy: FuncG([String, String, AnyT], MaybeG AnyT),
         default: (resource, action, aoData)->
 
-      @public @async render: Function,
+      @public @async render: FuncG([ContextInterface, AnyT, ResourceInterface, MaybeG InterfaceG {
+        method: String
+        path: String
+        resource: String
+        action: String
+        tag: String
+        template: String
+        keyName: MaybeG String
+        entityName: String
+        recordName: MaybeG String
+      }], MaybeG AnyT),
         default: (args...)->
           [ctx, aoData, resource, options = {}] = args
           {path, resource:resourceName, action, template:templatePath} = options

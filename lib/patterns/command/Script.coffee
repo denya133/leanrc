@@ -3,20 +3,29 @@
 # написать пример использования в приложении
 
 module.exports = (Module)->
-  {co} = Module::Utils
+  {
+    JOB_RESULT
+    AnyT
+    FuncG, MaybeG
+    ScriptInterface, NotificationInterface
+    ConfigurableMixin
+    SimpleCommand
+    Utils: { co }
+  } = Module::
 
-  class Script extends Module::SimpleCommand
+  class Script extends SimpleCommand
     @inheritProtected()
-    # @implements Module::ScriptInterface
-    @include Module::ConfigurableMixin
+    @implements ScriptInterface
+    @include ConfigurableMixin
     @module Module
 
-    @public @static do: Function,
+    @public @static do: FuncG(Function),
       default: (lambda)->
-        @public @async body: Function,
+        @public @async body: FuncG([MaybeG AnyT], MaybeG AnyT),
           default: lambda
+        return
 
-    @public @async execute: Function,
+    @public @async execute: FuncG(NotificationInterface),
       default: (aoNotification)->
         #принимаем из нотификации данные, запускаем @body(), ждем пока отработает, посылаем сигнал о том, что обработка закончилась
         # в конце надо послать сигнал либо с пустым телом, либо с ошибкой.
@@ -26,8 +35,10 @@ module.exports = (Module)->
           res = yield @body voBody
           voResult = {result: res}
         catch err
+          console.log 'ERROR in Script::execute', err
           voResult = {error: err}
-        @sendNotification Module::JOB_RESULT, voResult, reverse
+        @sendNotification JOB_RESULT, voResult, reverse
         return
 
-  Script.initialize()
+
+    @initialize()

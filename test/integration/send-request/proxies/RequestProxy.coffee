@@ -16,5 +16,6 @@ module.exports = (Module) ->
           else
             message = JSON.parse(body ? null)?.message ? body
           @sendNotification Module.NS.RECEIVE_RESPONSE, message
+        return
 
-  RequestProxy.initialize()
+    @initialize()

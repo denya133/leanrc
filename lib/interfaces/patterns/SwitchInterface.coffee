@@ -1,44 +1,67 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT
+    FuncG, ListG, MaybeG, InterfaceG, StructG, UnionG
+    ContextInterface, MediatorInterface, RendererInterface, ResourceInterface
+    SwitchInterface: SwitchInterfaceDef
+  } = Module::
 
-  Module.defineInterface 'SwitchInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class SwitchInterface extends MediatorInterface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual routerName: String
+    @virtual routerName: String
 
-      @public @virtual responseFormats: Array
+    @virtual responseFormats: ListG String
 
-      @public @virtual jsonRendererName: String
-      @public @virtual htmlRendererName: String
-      @public @virtual xmlRendererName: String
-      @public @virtual atomRendererName: String
+    @virtual use: FuncG [UnionG(Number, Function), MaybeG Function], SwitchInterfaceDef
 
-      @public @virtual rendererFor: Function,
-        args: [String]
-        return: Module::RendererInterface
+    @virtual @async handleStatistics: FuncG [Number, Number, Number, ContextInterface]
 
-      @public @async @virtual sendHttpResponse: Function,
-        args: [Object, Object, Object, Object]
-        return: NILL
+    @virtual rendererFor: FuncG String, RendererInterface
 
-      @public @virtual defineRoutes: Function,
-        args: []
-        return: NILL
+    @virtual @async sendHttpResponse: FuncG [ContextInterface, MaybeG(AnyT), ResourceInterface, InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: MaybeG String
+      entityName: String
+      recordName: MaybeG String
+    }]
 
-      @public @virtual handler: Function,
-        args: [String, Object, Object]
-        return: NILL
+    @virtual defineRoutes: Function
 
-      # @public @virtual defineSwaggerEndpoint: Function,
-      #   args: [Object, String, String]
-      #   return: NILL
+    @virtual sender: FuncG [String, StructG({
+      context: ContextInterface
+      reverse: String
+    }), InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: MaybeG String
+      entityName: String
+      recordName: MaybeG String
+    }]
 
-      @public @virtual createNativeRoute: Function,
-        args: [Object]
-        return: NILL
+    @virtual createNativeRoute: FuncG [InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: MaybeG String
+      entityName: String
+      recordName: MaybeG String
+    }]
 
 
-      @initializeInterface()
+    @initialize()

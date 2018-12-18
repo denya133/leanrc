@@ -2,25 +2,25 @@
 
 module.exports = (Module)->
   {
-    ANY
-
-    CoreObject
+    AnyT, PointerT
+    FuncG, MaybeG, StructG
     CookiesInterface
+    CoreObject
     Utils: { isArangoDB }
   } = Module::
 
   class Cookies extends CoreObject
     @inheritProtected()
-    # @implements CookiesInterface
+    @implements CookiesInterface
     @module Module
 
-    ipoCookies = @protected cookies: Object
+    ipoCookies = PointerT @protected cookies: Object
 
     @public request: Object
     @public response: Object
     @public key: String
 
-    @public get: Function,
+    @public get: FuncG([String, MaybeG Object], MaybeG String),
       default: (name, opts)->
         if isArangoDB()
           if opts? and opts.signed
@@ -30,7 +30,7 @@ module.exports = (Module)->
         else
           @[ipoCookies].get name, opts
 
-    @public set: Function,
+    @public set: FuncG([String, AnyT, MaybeG Object], CookiesInterface),
       default: (name, value, opts)->
         if isArangoDB()
           if opts?
@@ -60,11 +60,16 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG([Object, Object, MaybeG StructG {
+      key: MaybeG String
+      secure: MaybeG Boolean
+    }]),
       default: (request, response, {key, secure} = {})->
         @super()
         @request = request
         @response = response
+        key ?= 'secret'
+        secure ?= no
         @key = key
         unless isArangoDB()
           Keygrip = require 'keygrip'
@@ -74,4 +79,4 @@ module.exports = (Module)->
         return
 
 
-  Cookies.initialize()
+    @initialize()

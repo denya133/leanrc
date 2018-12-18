@@ -1,23 +1,26 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-{ co } = LeanRC::Utils
+{
+  FuncG
+  FacadeInterface
+  Utils: { co }
+}= LeanRC::
 
 describe 'Application', ->
   describe '.new', ->
     it 'should create new Application instance', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
-        Test.initialize()
+          @initialize()
         class ApplicationFacade extends LeanRC::Facade
           @inheritProtected()
           @module Test
           vpbIsInitialized = @private isInitialized: Boolean,
             default: no
-          cphInstanceMap  = @protected @static instanceMap: Object,
-            default: {}
+          cphInstanceMap  = Symbol.for '~instanceMap'
           @public startup: Function,
             default: (args...) ->
               @super args...
@@ -25,13 +28,13 @@ describe 'Application', ->
                 @[vpbIsInitialized] = yes
           @public finish: Function,
             default: (args...) -> @super args...
-          @public @static getInstance: Function,
+          @public @static getInstance: FuncG(String, FacadeInterface),
             default: (asKey)->
               vhInstanceMap = LeanRC::Facade[cphInstanceMap]
               unless vhInstanceMap[asKey]?
-                vhInstanceMap[asKey] = Test::ApplicationFacade.new asKey
+                vhInstanceMap[asKey] = ApplicationFacade.new asKey
               vhInstanceMap[asKey]
-        ApplicationFacade.initialize()
+          @initialize()
         class Application extends LeanRC::Application
           @inheritProtected()
           @module Test
@@ -45,7 +48,7 @@ describe 'Application', ->
   describe '#finish', ->
     it 'should deactivate application', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
           @root __dirname
         Test.initialize()
@@ -62,7 +65,7 @@ describe 'Application', ->
                 @[vpbIsInitialized] = yes
           @public finish: Function,
             default: (args...) -> @super args...
-          @public @static getInstance: Function,
+          @public @static getInstance: FuncG(String, FacadeInterface),
             default: (asKey)->
               vhInstanceMap = LeanRC::Facade[cphInstanceMap]
               unless vhInstanceMap[asKey]?
@@ -81,5 +84,5 @@ describe 'Application', ->
         assert.isDefined LeanRC::Facade[Symbol.for '~instanceMap'][Application.NAME]
         application.finish()
         assert.isUndefined LeanRC::Facade[Symbol.for '~instanceMap'][Application.NAME]
-        assert.isUndefined application.facade
+        # assert.isUndefined application.facade
         yield return

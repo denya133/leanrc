@@ -16,6 +16,11 @@
       "description": "test3 description",
       "type": "boolean",
       "default": true
+    },
+    "sessionCookie": {
+      "description": "Session cookie name.",
+      "type": "string",
+      "default": "sid"
     }
   }
 }

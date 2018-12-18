@@ -1,37 +1,42 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT, PointerT, LambdaT
+    FuncG, MaybeG
+    ObserverInterface, NotificationInterface
+    CoreObject
+  } = Module::
 
-  class Observer extends Module::CoreObject
+  class Observer extends CoreObject
     @inheritProtected()
-    # @implements Module::ObserverInterface
+    @implements ObserverInterface
     @module Module
 
-    ipoNotify = @private notify: ANY
-    ipoContext = @private context: ANY
+    ipoNotify = PointerT @private notify: MaybeG Function
+    ipoContext = PointerT @private context: MaybeG AnyT
 
-    @public setNotifyMethod: Function,
+    @public setNotifyMethod: FuncG(Function),
       default: (amNotifyMethod)->
         @[ipoNotify] = amNotifyMethod
         return
 
-    @public setNotifyContext: Function,
+    @public setNotifyContext: FuncG(AnyT),
       default: (aoNotifyContext)->
         @[ipoContext] = aoNotifyContext
         return
 
-    @public getNotifyMethod: Function,
+    @public getNotifyMethod: FuncG([], MaybeG Function),
       default: -> @[ipoNotify]
 
-    @public getNotifyContext: Function,
+    @public getNotifyContext: FuncG([], MaybeG AnyT),
       default: -> @[ipoContext]
 
-    @public compareNotifyContext: Function,
+    @public compareNotifyContext: FuncG(AnyT, Boolean),
       default: (object)->
         object is @[ipoContext]
 
-    @public notifyObserver: Function,
+    @public notifyObserver: FuncG(NotificationInterface),
       default: (notification)->
         @getNotifyMethod().call @getNotifyContext(), notification
         return
@@ -46,12 +51,12 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG([MaybeG(Function), MaybeG AnyT]),
       default: (amNotifyMethod, aoNotifyContext)->
         @super arguments...
-        @setNotifyMethod amNotifyMethod
-        @setNotifyContext aoNotifyContext
+        @setNotifyMethod amNotifyMethod if amNotifyMethod
+        @setNotifyContext aoNotifyContext if aoNotifyContext
+        return
 
 
-
-  Observer.initialize()
+    @initialize()

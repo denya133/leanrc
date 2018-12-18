@@ -18,7 +18,10 @@ module.exports = (App)->
 
 module.exports = (Module)->
   {
-    Gateway
+    PointerT
+    FuncG, ListG, SubsetG, MaybeG
+    EndpointInterface
+    Gateway, Mixin
     Utils: { _, inflect, joi, statuses }
   } = Module::
 
@@ -28,13 +31,13 @@ module.exports = (Module)->
   FORBIDDEN         = statuses 'forbidden'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  Module.defineMixin 'NamespacedGatewayMixin', (BaseClass = Gateway) ->
+  Module.defineMixin Mixin 'NamespacedGatewayMixin', (BaseClass = Gateway) ->
     class extends BaseClass
       @inheritProtected()
 
-      ipoJoinedNamespacesMask = @private joinedNamespacesMask: RegExp
+      ipoJoinedNamespacesMask = PointerT @private joinedNamespacesMask: MaybeG RegExp
 
-      @public namespaces: Array,
+      @public namespaces: FuncG([], ListG String),
         default: -> [
           'admining'
           'globaling'
@@ -47,7 +50,7 @@ module.exports = (Module)->
       @public joinedNamespacesMask: RegExp,
         get: -> @[ipoJoinedNamespacesMask] ? new RegExp "^(#{@namespaces().join '|'})_"
 
-      @public getTrimmedEndpointName: Function,
+      @public getTrimmedEndpointName: FuncG([String, String], String),
         default: (asResourse, asAction) ->
           vsPath = "#{inflect.underscore asResourse}_#{asAction}_endpoint"
             .replace /\//g, '_'
@@ -55,7 +58,7 @@ module.exports = (Module)->
             .replace @joinedNamespacesMask, ''
           inflect.camelize vsPath
 
-      @public getEndpoint: Function,
+      @public getEndpoint: FuncG([String, String], SubsetG EndpointInterface),
         default: (asResourse, asAction) ->
           @getEndpointByName(@getEndpointName asResourse, asAction) ?
             @getEndpointByName(@getTrimmedEndpointName asResourse, asAction) ?

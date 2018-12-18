@@ -1,9 +1,16 @@
 
 
 module.exports = (Module)->
-  class Junction extends Module::CoreObject
-    @inheritProtected()
+  {
+    PointerT
+    FuncG, ListG, DictG, EnumG
+    PipeFittingInterface, PipeMessageInterface
+    PipeListener
+    CoreObject
+  } = Module::
 
+  class Junction extends CoreObject
+    @inheritProtected()
     @module Module
 
     @public @static INPUT: String,
@@ -11,24 +18,26 @@ module.exports = (Module)->
     @public @static OUTPUT: String,
       default: 'output'
 
-    iplInputPipes = @protected inputPipes: Array
-    iplOutputPipes = @protected outputPipes: Array
-    iplPipesMap = @protected pipesMap: Object
-    iplPipeTypesMap = @protected pipeTypesMap: Object
+    iplInputPipes = PointerT @protected inputPipes: ListG String
+    iplOutputPipes = PointerT @protected outputPipes: ListG String
+    iplPipesMap = PointerT @protected pipesMap: DictG String, PipeFittingInterface
+    iplPipeTypesMap = PointerT @protected pipeTypesMap: DictG String, EnumG [
+      Junction.INPUT
+      Junction.OUTPUT
+    ]
 
-
-    @public registerPipe: Function,
-      args: [String, String, Module::PipeFittingInterface]
-      return: Boolean
+    @public registerPipe: FuncG([
+      String, String, PipeFittingInterface
+    ], Boolean),
       default: (name, type, pipe)->
         vbSuccess = yes
         unless @[iplPipesMap][name]?
           @[iplPipesMap][name] = pipe
           @[iplPipeTypesMap][name] = type
           switch type
-            when Module::Junction.INPUT
+            when Junction.INPUT
               @[iplInputPipes].push name
-            when Module::Junction.OUTPUT
+            when Junction.OUTPUT
               @[iplOutputPipes].push name
             else
               vbSuccess = no
@@ -36,34 +45,26 @@ module.exports = (Module)->
           vbSuccess = no
         vbSuccess
 
-    @public hasPipe: Function,
-      args: [String]
-      return: Boolean
+    @public hasPipe: FuncG(String, Boolean),
       default: (name)->
         @[iplPipesMap][name]?
 
-    @public hasInputPipe: Function,
-      args: [String]
-      return: Boolean
+    @public hasInputPipe: FuncG(String, Boolean),
       default: (name)->
-        @hasPipe(name) and @[iplPipeTypesMap][name] is Module::Junction.INPUT
+        @hasPipe(name) and @[iplPipeTypesMap][name] is Junction.INPUT
 
-    @public hasOutputPipe: Function,
-      args: [String]
-      return: Boolean
+    @public hasOutputPipe: FuncG(String, Boolean),
       default: (name)->
-        @hasPipe(name) and @[iplPipeTypesMap][name] is Module::Junction.OUTPUT
+        @hasPipe(name) and @[iplPipeTypesMap][name] is Junction.OUTPUT
 
-    @public removePipe: Function,
-      args: [String]
-      return: Module::NILL
+    @public removePipe: FuncG(String),
       default: (name)->
         if @hasPipe name
           type = @[iplPipeTypesMap][name]
           pipesList = switch type
-            when Module::Junction.INPUT
+            when Junction.INPUT
               @[iplInputPipes]
-            when Module::Junction.OUTPUT
+            when Junction.OUTPUT
               @[iplOutputPipes]
             else
               []
@@ -75,25 +76,19 @@ module.exports = (Module)->
           delete @[iplPipeTypesMap][name]
         return
 
-    @public retrievePipe: Function,
-      args: [String]
-      return: Module::PipeFittingInterface
+    @public retrievePipe: FuncG(String, PipeFittingInterface),
       default: (name)->
         @[iplPipesMap][name]
 
-    @public addPipeListener: Function,
-      args: [String, Object, Function]
-      return: Boolean
+    @public addPipeListener: FuncG([String, Object, Function], Boolean),
       default: (inputPipeName, context, listener)->
         vbSuccess = no
         if @hasInputPipe inputPipeName
           pipe = @[iplPipesMap][inputPipeName]
-          vbSuccess = pipe.connect Module::PipeListener.new context, listener
+          vbSuccess = pipe.connect PipeListener.new context, listener
         vbSuccess
 
-    @public sendMessage: Function,
-      args: [String, Module::PipeMessageInterface]
-      return: Boolean
+    @public sendMessage: FuncG([String, PipeMessageInterface], Boolean),
       default: (outputPipeName, message)->
         vbSuccess = no
         if @hasOutputPipe outputPipeName
@@ -118,6 +113,7 @@ module.exports = (Module)->
         @[iplOutputPipes] = []
         @[iplPipesMap] = {}
         @[iplPipeTypesMap] = {}
+        return
 
 
-  Junction.initialize()
+    @initialize()

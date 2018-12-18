@@ -8,51 +8,62 @@
 
 module.exports = (Module)->
   {
+    NilT
+    FuncG, UnionG, MaybeG
+    QueryInterface
+    CursorInterface
+    QueryableCollectionInterface
     Collection
+    Mixin
     Utils: { co, _ }
   } = Module::
 
-  Module.defineMixin 'QueryableCollectionMixin', (BaseClass = Collection) ->
+  Module.defineMixin Mixin 'QueryableCollectionMixin', (BaseClass = Collection) ->
     class extends BaseClass
       @inheritProtected()
-      # @implements Module::QueryableCollectionMixinInterface
+      @implements QueryableCollectionInterface
 
-      @public @async findBy: Function,
+      @public @async findBy: FuncG([Object, MaybeG Object], CursorInterface),
         default: (query, options = {})->
           return yield @takeBy query, options
 
-      @public @async deleteBy: Function,
+      @public @async takeBy: FuncG([Object, MaybeG Object], CursorInterface),
+        default: ->
+          throw new Error 'Not implemented specific method'
+          yield return
+
+      @public @async deleteBy: FuncG(Object, NilT),
         default: (query)->
           voRecordsCursor = yield @takeBy query
           yield voRecordsCursor.forEach co.wrap (aoRecord)->
             return yield aoRecord.delete()
           yield return
 
-      @public @async destroyBy: Function,
+      @public @async destroyBy: FuncG(Object, NilT),
         default: (query)->
           voRecordsCursor = yield @takeBy query
           yield voRecordsCursor.forEach co.wrap (aoRecord)->
             return yield aoRecord.destroy()
           yield return
 
-      @public @async removeBy: Function,
+      @public @async removeBy: FuncG(Object, NilT),
         default: (query)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
             .filter query
-            .remove()
+            .remove('@doc')
             .into @collectionFullName()
           yield @query voQuery
           yield return
 
-      @public @async updateBy: Function,
+      @public @async updateBy: FuncG([Object, Object], NilT),
         default: (query, properties)->
           voRecordsCursor = yield @takeBy query
           yield voRecordsCursor.forEach co.wrap (aoRecord)->
             return yield aoRecord.updateAttributes properties
           yield return
 
-      @public @async patchBy: Function,
+      @public @async patchBy: FuncG([Object, Object], NilT),
         default: (query, properties)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
@@ -62,7 +73,7 @@ module.exports = (Module)->
           yield @query voQuery
           yield return
 
-      @public @async exists: Function,
+      @public @async exists: FuncG(Object, Boolean),
         default: (query)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
@@ -72,7 +83,7 @@ module.exports = (Module)->
           cursor = yield @query voQuery
           return yield cursor.hasNext()
 
-      @public @async query: Function,
+      @public @async query: FuncG([UnionG Object, QueryInterface], CursorInterface),
         default: (aoQuery)->
           if _.isPlainObject aoQuery
             aoQuery = _.pick aoQuery, Object.keys(aoQuery).filter (key)-> aoQuery[key]?
@@ -80,6 +91,22 @@ module.exports = (Module)->
           else
             voQuery = aoQuery
           return yield @executeQuery yield @parseQuery voQuery
+
+      @public @async parseQuery: FuncG(
+        [UnionG Object, QueryInterface]
+        UnionG Object, String, QueryInterface
+      ),
+        default: ->
+          throw new Error 'Not implemented specific method'
+          yield return
+
+      @public @async executeQuery: FuncG(
+        [UnionG Object, String, QueryInterface]
+        CursorInterface
+      ),
+        default: ->
+          throw new Error 'Not implemented specific method'
+          yield return
 
 
       @initializeMixin()

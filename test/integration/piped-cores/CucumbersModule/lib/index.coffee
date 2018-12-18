@@ -11,7 +11,7 @@ class Cucumbers extends LeanRC
 
   @const TEST_PROXY_NAME: 'TEST_PROXY_NAME'
 
-  Utils: LeanRC::Utils.extend {}, LeanRC::Utils
+  Utils: LeanRC::Utils.assign {}, LeanRC::Utils
 
   require('LeanRC/dist/patterns/command/MigrateCommand') @Module
   require('LeanRC/dist/patterns/command/RollbackCommand') @Module

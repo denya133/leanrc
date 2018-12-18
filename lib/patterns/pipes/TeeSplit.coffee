@@ -1,27 +1,34 @@
 
 
 module.exports = (Module)->
-  class TeeSplit extends Module::CoreObject
+  {
+    PointerT
+    FuncG, ListG, MaybeG
+    PipeFittingInterface, PipeMessageInterface
+    CoreObject
+  } = Module::
+
+  class TeeSplit extends CoreObject
     @inheritProtected()
-    # @implements Module::PipeFittingInterface
+    @implements PipeFittingInterface
     @module Module
 
-    iplOutputs = @protected outputs: Array
+    iplOutputs = PointerT @protected outputs: MaybeG ListG PipeFittingInterface
 
-    @public connect: Function,
+    @public connect: FuncG(PipeFittingInterface, Boolean),
       default: (aoOutput)->
         @[iplOutputs] ?= []
         @[iplOutputs].push aoOutput
         return yes
 
-    @public disconnect: Function,
+    @public disconnect: FuncG([], MaybeG PipeFittingInterface),
       default: ->
         @[iplOutputs] ?= []
         return @[iplOutputs].pop()
 
-    @public disconnectFitting: Function,
-      args: [Module::PipeFittingInterface]
-      return: Module::PipeFittingInterface
+    @public disconnectFitting: FuncG(
+      PipeFittingInterface, PipeFittingInterface
+    ),
       default: (aoTarget)->
         voRemoved = null
         @[iplOutputs] ?= []
@@ -32,7 +39,7 @@ module.exports = (Module)->
             break
         voRemoved
 
-    @public write: Function,
+    @public write: FuncG(PipeMessageInterface, Boolean),
       default: (aoMessage)->
         vbSuccess = yes
         @[iplOutputs].forEach (aoOutput)->
@@ -50,13 +57,16 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: Function,
+    @public init: FuncG([
+      MaybeG(PipeFittingInterface), MaybeG PipeFittingInterface
+    ]),
       default: (output1=null, output2=null)->
         @super arguments...
         if output1?
           @connect output1
         if output2?
           @connect output2
+        return
 
 
-  TeeSplit.initialize()
+    @initialize()

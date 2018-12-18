@@ -1,100 +1,69 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT, NilT
+    FuncG, SubsetG, MaybeG, UnionG, ListG
+    RecordInterface, CursorInterface
+    SerializerInterface, ObjectizerInterface
+    ProxyInterface
+  } = Module::
 
-  Module.defineInterface 'CollectionInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class CollectionInterface extends ProxyInterface
+    @inheritProtected()
+    @module Module
 
-      @public @virtual recordHasBeenChanged: Function,
-        args: [String, Object]
-        return: NILL
+    @virtual recordHasBeenChanged: FuncG [String, Object]
 
-      # в классе Proxy от которого будет наследоваться конкретный класс Collection есть метод onRegister в котором можно прописать подключение (или регистрацию) классов Рекорда и Сериализатора
+    # надо определиться с этими двумя пунктами, так ли их объявлять?
+    @virtual delegate: SubsetG RecordInterface
+    # @virtual serializer: MaybeG SerializerInterface
+    # @virtual objectizer: MaybeG ObjectizerInterface
 
-      # надо определиться с этими двумя пунктами, так ли их объявлять?
-      @public @virtual delegate: Module::Class
-      @public @virtual serializer: Module::Class
-      @public @virtual collectionName: Function,
-        args: []
-        return: String
-      @public @virtual collectionPrefix: Function,
-        args: []
-        return: String
-      @public @virtual collectionFullName: Function,
-        args: [[String, NILL]]
-        return: String
+    @virtual collectionName: FuncG [], String
+    @virtual collectionPrefix: FuncG [], String
+    @virtual collectionFullName: FuncG [MaybeG String], String
 
-      @public @async @virtual generateId: Function,
-        args: []
-        return: [String, Number, NILL]
+    @virtual @async generateId: FuncG [], UnionG String, Number, NilT
 
-      @public @async @virtual build: Function, # создает инстанс рекорда
-        args: [Object]
-        return: Module::RecordInterface
-      @public @async @virtual create: Function, # создает инстанс рекорда и делает save
-        args: [Object]
-        return: Module::RecordInterface
-      @public @async @virtual push: Function, # обращается к БД
-        args: [Module::RecordInterface]
-        return: Module::RecordInterface
+    # NOTE: создает инстанс рекорда
+    @virtual @async build: FuncG Object, RecordInterface
+    # NOTE: создает инстанс рекорда и делает save
+    @virtual @async create: FuncG Object, RecordInterface
+    # NOTE: обращается к БД
+    @virtual @async push: FuncG RecordInterface, RecordInterface
 
-      @public @async @virtual delete: Function,
-        args: [String]
-        return: Module::RecordInterface
+    @virtual @async delete: FuncG [UnionG String, Number]
 
-      @public @async @virtual destroy: Function,
-        args: [String]
-        return: NILL
-      @public @async @virtual remove: Function, # обращается к БД
-        args: [String]
-        return: NILL
+    @virtual @async destroy: FuncG [UnionG String, Number]
+    # NOTE: обращается к БД
+    @virtual @async remove: FuncG [UnionG String, Number]
 
-      @public @async @virtual find: Function,
-        args: [String]
-        return: Module::RecordInterface
-      @public @async @virtual findMany: Function,
-        args: [Array]
-        return: Module::CursorInterface
-      @public @async @virtual take: Function, # обращается к БД
-        args: [String]
-        return: Module::RecordInterface
-      @public @async @virtual takeMany: Function, # обращается к БД
-        args: [Array]
-        return: Module::CursorInterface
-      @public @async @virtual takeAll: Function, # обращается к БД
-        args: []
-        return: Module::CursorInterface
+    @virtual @async find: FuncG [UnionG String, Number], MaybeG RecordInterface
+    @virtual @async findMany: FuncG [ListG UnionG String, Number], CursorInterface
+    # NOTE: обращается к БД
+    @virtual @async take: FuncG [UnionG String, Number], MaybeG RecordInterface
+    # NOTE: обращается к БД
+    @virtual @async takeMany: FuncG [ListG UnionG String, Number], CursorInterface
+    # NOTE: обращается к БД
+    @virtual @async takeAll: FuncG [], CursorInterface
 
-      @public @async @virtual update: Function,
-        args: [String, Object]
-        return: Module::RecordInterface
-      @public @async @virtual override: Function, # обращается к БД
-        args: [String, Module::RecordInterface]
-        return: Boolean
+    @virtual @async update: FuncG [UnionG(String, Number), Object], RecordInterface
+    # NOTE: обращается к БД
+    @virtual @async override: FuncG [UnionG(String, Number), RecordInterface], RecordInterface
 
-      @public @async @virtual clone: Function,
-        args: [Module::RecordInterface]
-        return: Module::RecordInterface
+    @virtual @async clone: FuncG RecordInterface, RecordInterface
 
-      @public @async @virtual copy: Function,
-        args: [Module::RecordInterface]
-        return: Module::RecordInterface
+    @virtual @async copy: FuncG RecordInterface, RecordInterface
 
-      @public @async @virtual includes: Function,
-        args: [String]
-        return: Boolean
-      @public @async @virtual length: Function, # количество объектов в коллекции
-        args: []
-        return: Number
+    @virtual @async includes: FuncG [UnionG String, Number], Boolean
+    # NOTE: количество объектов в коллекции
+    @virtual @async length: FuncG [], Number
 
-      @public @async @virtual normalize: Function,
-        args: [ANY] # payload
-        return: Module::RecordInterface # нормализация данных из базы
-      @public @async @virtual serialize: Function,
-        args: [Module::RecordInterface] # id, options
-        return: ANY # сериализация рекорда для отправки в базу
+    # NOTE: нормализация данных из базы
+    @virtual @async normalize: FuncG AnyT, RecordInterface
+    # NOTE: сериализация рекорда для отправки в базу
+    @virtual @async serialize: FuncG RecordInterface, AnyT
 
 
-      @initializeInterface()
+    @initialize()

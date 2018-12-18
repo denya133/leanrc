@@ -2,27 +2,30 @@
 
 module.exports = (Module)->
   {
+    JoiT
+    FuncG, MaybeG
+    TransformInterface
     CoreObject
     Utils: { _, joi }
   } = Module::
 
   class NumberTransform extends CoreObject
     @inheritProtected()
-    # @implements Module::TransformInterface
+    @implements TransformInterface
     @module Module
 
-    @public @static schema: Object,
+    @public @static schema: JoiT,
       get: -> joi.number().allow(null).optional()
 
-    @public @static @async normalize: Function,
+    @public @static @async normalize: FuncG([MaybeG Number], MaybeG Number),
       default: (args...)->
         yield return @normalizeSync args...
 
-    @public @static @async serialize: Function,
+    @public @static @async serialize: FuncG([MaybeG Number], MaybeG Number),
       default: (args...)->
         yield return @serializeSync args...
 
-    @public @static normalizeSync: Function,
+    @public @static normalizeSync: FuncG([MaybeG Number], MaybeG Number),
       default: (serialized)->
         if _.isNil serialized
           return null
@@ -30,7 +33,7 @@ module.exports = (Module)->
           transformed = Number serialized
           return (if _.isNumber(transformed) then transformed else null)
 
-    @public @static serializeSync: Function,
+    @public @static serializeSync: FuncG([MaybeG Number], MaybeG Number),
       default: (deserialized)->
         if _.isNil deserialized
           return null
@@ -38,7 +41,7 @@ module.exports = (Module)->
           transformed = Number deserialized
           return (if _.isNumber(transformed) then transformed else null)
 
-    @public @static objectize: Function,
+    @public @static objectize: FuncG([MaybeG Number], MaybeG Number),
       default: (deserialized)->
         if _.isNil deserialized
           return null

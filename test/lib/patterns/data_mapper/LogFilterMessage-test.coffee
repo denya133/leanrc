@@ -39,7 +39,7 @@ describe 'LogFilterMessage', ->
       co ->
         vnLevel = LeanRC::LogMessage.ERROR
         vsSender = 'TEST_SENDER'
-        vsMessage = 'TEST_MESSAGE'
+        vsMessage = msg: 'TEST_MESSAGE'
         assert.throws ->
           message = LeanRC::LogMessage.new vnLevel, vsSender, vsMessage
           LeanRC::LogFilterMessage.filterLogByLevel message,

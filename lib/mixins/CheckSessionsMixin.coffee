@@ -38,22 +38,20 @@ module.exports = (Module)->
   {
     SESSIONS
     USERS
-
-    Resource
+    PromiseT
     RecordInterface
-    PromiseInterface
-
+    Resource, Mixin
     Utils: { statuses, co }
   } = Module::
 
   UNAUTHORIZED      = statuses 'unauthorized'
 
-  Module.defineMixin 'CheckSessionsMixin', (BaseClass = Resource) ->
+  Module.defineMixin Mixin 'CheckSessionsMixin', (BaseClass = Resource) ->
     class extends BaseClass
       @inheritProtected()
 
       @public session: RecordInterface
-      @public currentUser: PromiseInterface,
+      @public currentUser: PromiseT,
         get: co.wrap ->
           return yield @facade.retrieveProxy(USERS).find @session.uid
 

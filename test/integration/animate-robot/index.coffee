@@ -7,8 +7,8 @@ class TestApp extends LeanRC
 
   @root __dirname
 
-  @const ANIMATE_ROBOT: Symbol 'animateRobot'
-  @const ROBOT_SPEAKING: Symbol 'robotSpeaking'
+  @const ANIMATE_ROBOT: 'animateRobot'
+  @const ROBOT_SPEAKING: 'robotSpeaking'
 
 
 module.exports = TestApp.initialize()

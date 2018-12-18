@@ -1,16 +1,20 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    ListG, FuncG, SubsetG
+    CommandInterface, NotificationInterface
+    Notifier
+  } = Module::
 
-  class MacroCommand extends Module::Notifier
+  class MacroCommand extends Notifier
     @inheritProtected()
-    # @implements Module::CommandInterface
+    @implements CommandInterface
     @module Module
 
-    iplSubCommands = @private subCommands: Array
+    iplSubCommands = @private subCommands: ListG SubsetG CommandInterface
 
-    @public execute: Function,
+    @public execute: FuncG(NotificationInterface),
       default: (aoNotification)->
         vlSubCommands = @[iplSubCommands][..]
         for vCommand in vlSubCommands
@@ -22,13 +26,9 @@ module.exports = (Module)->
         return
 
     @public initializeMacroCommand: Function,
-      args: []
-      return: NILL
       default: ->
 
-    @public addSubCommand: Function,
-      args: [Module::Class]
-      return: NILL
+    @public addSubCommand: FuncG([SubsetG CommandInterface]),
       default: (aClass)->
         @[iplSubCommands].push aClass
         return
@@ -39,6 +39,7 @@ module.exports = (Module)->
 
         @[iplSubCommands] = []
         @initializeMacroCommand()
+        return
 
     @public @static @async restoreObject: Function,
       default: ->
@@ -51,4 +52,4 @@ module.exports = (Module)->
         yield return
 
 
-  MacroCommand.initialize()
+    @initialize()

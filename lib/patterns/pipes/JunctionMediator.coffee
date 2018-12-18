@@ -1,7 +1,19 @@
 
 
 module.exports = (Module)->
-  class JunctionMediator extends Module::Mediator
+  {
+    PointerT
+    FuncG, SampleG, SubsetG
+    NotificationInterface, PipeMessageInterface, MediatorInterface
+    Junction
+    Mediator
+  } = Module::
+  {
+    INPUT
+    OUTPUT
+  } = Junction
+
+  class JunctionMediator extends Mediator
     @inheritProtected()
 
     @module Module
@@ -13,50 +25,48 @@ module.exports = (Module)->
     @public @static REMOVE_PIPE: String,
       default: 'removePipe'
 
-    ipoJunction = @protected junction: Module::Junction,
+    ipoJunction = PointerT @protected junction: SampleG(Junction),
       get: ->
         @getViewComponent()
 
-    @public listNotificationInterests: Function,
+    @public listNotificationInterests: FuncG([], Array),
       default: ->
         [
-          Module::JunctionMediator.ACCEPT_INPUT_PIPE
-          Module::JunctionMediator.ACCEPT_OUTPUT_PIPE
-          Module::JunctionMediator.REMOVE_PIPE
+          JunctionMediator.ACCEPT_INPUT_PIPE
+          JunctionMediator.ACCEPT_OUTPUT_PIPE
+          JunctionMediator.REMOVE_PIPE
         ]
 
-    @public handleNotification: Function,
+    @public handleNotification: FuncG(NotificationInterface),
       default: (aoNotification)->
         switch aoNotification.getName()
-          when Module::JunctionMediator.ACCEPT_INPUT_PIPE
+          when JunctionMediator.ACCEPT_INPUT_PIPE
             inputPipeName = aoNotification.getType()
             inputPipe = aoNotification.getBody()
-            if @[ipoJunction].registerPipe inputPipeName, Module::Junction.INPUT, inputPipe
+            if @[ipoJunction].registerPipe inputPipeName, INPUT, inputPipe
               @[ipoJunction].addPipeListener inputPipeName, @, @handlePipeMessage
-          when Module::JunctionMediator.ACCEPT_OUTPUT_PIPE
+          when JunctionMediator.ACCEPT_OUTPUT_PIPE
             outputPipeName = aoNotification.getType()
             outputPipe = aoNotification.getBody()
-            @[ipoJunction].registerPipe outputPipeName, Module::Junction.OUTPUT, outputPipe
-          when Module::JunctionMediator.REMOVE_PIPE
+            @[ipoJunction].registerPipe outputPipeName, OUTPUT, outputPipe
+          when JunctionMediator.REMOVE_PIPE
             outputPipeName = aoNotification.getType()
             @[ipoJunction].removePipe outputPipeName
         return
 
-    @public handlePipeMessage: Function,
-      args: [Module::PipeMessageInterface]
-      return: Module::NILL
+    @public handlePipeMessage: FuncG(PipeMessageInterface),
       default: (aoMessage)->
         @sendNotification aoMessage.getType(), aoMessage
 
-    @public @static @async restoreObject: Function,
+    @public @static @async restoreObject: FuncG([SubsetG(Module), Object], MediatorInterface),
       default: ->
         throw new Error "restoreObject method not supported for #{@name}"
         yield return
 
-    @public @static @async replicateObject: Function,
+    @public @static @async replicateObject: FuncG(MediatorInterface, Object),
       default: ->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
 
-  JunctionMediator.initialize()
+    @initialize()

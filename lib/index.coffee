@@ -3,6 +3,10 @@ joi       = require 'joi'
 statuses  = require 'statuses'
 moment    = require 'moment'
 
+{
+  Declare
+} = RC::
+
 
 class LeanRC extends RC
   @inheritProtected()
@@ -13,14 +17,14 @@ class LeanRC extends RC
   @util { statuses }
   @util { moment }
 
-  @const HANDLER_RESULT:  Symbol 'HANDLER_RESULT'
-  @const RECORD_CHANGED:  Symbol 'RECORD_CHANGED'
+  @const HANDLER_RESULT:  'HANDLER_RESULT' #Symbol 'HANDLER_RESULT'
+  @const RECORD_CHANGED:  'RECORD_CHANGED' #Symbol 'RECORD_CHANGED'
   @const CONFIGURATION:  'ConfigurationProxy'
-  @const STARTUP: Symbol 'startup' # для сигнала
-  @const MIGRATE: Symbol 'migrate' # для сигнала
-  @const ROLLBACK: Symbol 'rollback' # для сигнала
-  @const STOPPED_MIGRATE: Symbol 'stopped_migrate' # для сигнала
-  @const STOPPED_ROLLBACK: Symbol 'stopped_rollback' # для сигнала
+  @const STARTUP: 'STARTUP' #Symbol 'startup' # для сигнала
+  @const MIGRATE: 'MIGRATE' #Symbol 'migrate' # для сигнала
+  @const ROLLBACK: 'ROLLBACK' #Symbol 'rollback' # для сигнала
+  @const STOPPED_MIGRATE: 'STOPPED_MIGRATE' #Symbol 'stopped_migrate' # для сигнала
+  @const STOPPED_ROLLBACK: 'STOPPED_ROLLBACK' #Symbol 'stopped_rollback' # для сигнала
   @const LIGHTWEIGHT: Symbol 'LIGHTWEIGHT' # для создания инстанса приложения без свича (для создания изолированной области выполнения)
   @const MIGRATIONS: 'MigrationsCollection'
   @const SESSIONS: 'SessionsCollection'
@@ -29,66 +33,138 @@ class LeanRC extends RC
   @const ROLES: 'RolesCollection'
   @const UPLOADS: 'UploadsCollection'
   @const RESQUE: 'ResqueProxy'
-  @const START_RESQUE: Symbol 'start_resque'
+  @const START_RESQUE: 'START_RESQUE' #Symbol 'start_resque'
   @const DELAYED_JOBS_QUEUE: 'delayed_jobs'
   @const DELAYED_JOBS_SCRIPT: 'DelayedJobScript'
   @const DEFAULT_QUEUE: 'default'
-  @const JOB_RESULT:  Symbol 'JOB_RESULT'
-  @const SHELL:  Symbol 'ShellApplication'
+  @const JOB_RESULT:  'JOB_RESULT' #Symbol 'JOB_RESULT'
+  @const SHELL:  'SHELL' #Symbol 'ShellApplication'
   @const APPLICATION_MEDIATOR:  'ApplicationMediator'
   @const APPLICATION_ROUTER:  'ApplicationRouter'
   @const APPLICATION_RENDERER:  'ApplicationRenderer'
   @const APPLICATION_SWITCH:  'ApplicationSwitch'
   @const APPLICATION_GATEWAY:  'ApplicationGateway'
   @const RESQUE_EXECUTOR:  'ResqueExecutor'
-  @const LOG_MSG: Symbol 'logMessage'
+  @const LOG_MSG: 'LOG_MSG' #Symbol 'logMessage'
   @const PRODUCTION: 'production'
   @const DEVELOPMENT: 'development'
 
-  # require('./interfaces/patterns/ApplicationInterface') LeanRC
-  # require('./interfaces/patterns/TransformInterface') LeanRC
-  # require('./interfaces/patterns/NotificationInterface') LeanRC
-  # require('./interfaces/patterns/NotifierInterface') LeanRC
-  # require('./interfaces/patterns/ObserverInterface') LeanRC
-  # require('./interfaces/patterns/CommandInterface') LeanRC
-  # require('./interfaces/patterns/MediatorInterface') LeanRC
-  # require('./interfaces/patterns/ProxyInterface') LeanRC
-  # require('./interfaces/patterns/SerializerInterface') LeanRC
-  # require('./interfaces/patterns/FacadeInterface') LeanRC
-  # require('./interfaces/patterns/RecordInterface') LeanRC
-  # require('./interfaces/patterns/CollectionInterface') LeanRC
-  # require('./interfaces/patterns/QueryInterface') LeanRC
-  # require('./interfaces/patterns/CursorInterface') LeanRC
-  # require('./interfaces/patterns/EndpointInterface') LeanRC
-  # require('./interfaces/patterns/GatewayInterface') LeanRC
-  # require('./interfaces/patterns/RendererInterface') LeanRC
-  # require('./interfaces/patterns/RequestInterface') LeanRC
-  # require('./interfaces/patterns/ResponseInterface') LeanRC
-  # require('./interfaces/patterns/CookiesInterface') LeanRC
-  # require('./interfaces/patterns/ContextInterface') LeanRC
-  # require('./interfaces/patterns/ResourceInterface') LeanRC
-  # require('./interfaces/patterns/RouterInterface') LeanRC
-  # require('./interfaces/patterns/SwitchInterface') LeanRC
+  @defineType Declare 'PropertyDefinitionT'
+  @defineType Declare 'RelationOptionsT'
+  @defineType Declare 'RelationConfigT'
+  @defineType Declare 'RelationInverseT'
+  @defineType Declare 'EmbedOptionsT'
+  @defineType Declare 'EmbedConfigT'
+  @defineType Declare 'AttributeOptionsT'
+  @defineType Declare 'AttributeConfigT'
+  @defineType Declare 'ComputedOptionsT'
+  @defineType Declare 'ComputedConfigT'
 
-  # require('./interfaces/mixins/CrudGatewayMixinInterface') LeanRC
-  # require('./interfaces/mixins/IterableMixinInterface') LeanRC
-  # require('./interfaces/mixins/QueryableCollectionMixinInterface') LeanRC
-  # require('./interfaces/mixins/RelationsMixinInterface') LeanRC
-  # require('./interfaces/patterns/MigrationInterface') LeanRC
-  # require('./interfaces/patterns/DelayedQueueInterface') LeanRC
-  # require('./interfaces/patterns/ResqueInterface') LeanRC
-  # require('./interfaces/mixins/DelayableMixinInterface') LeanRC
-  # require('./interfaces/patterns/ScriptInterface') LeanRC
+  @defineType Declare 'ApplicationInterface'
+  @defineType Declare 'CollectionInterface'
+  @defineType Declare 'CommandInterface'
+  @defineType Declare 'ConfigurationInterface'
+  @defineType Declare 'ContextInterface'
+  @defineType Declare 'CookiesInterface'
+  @defineType Declare 'CursorInterface'
+  @defineType Declare 'QueueInterface'
+  @defineType Declare 'EndpointInterface'
+  @defineType Declare 'FacadeInterface'
+  @defineType Declare 'GatewayInterface'
+  @defineType Declare 'MediatorInterface'
+  @defineType Declare 'MigrationInterface'
+  @defineType Declare 'NotificationInterface'
+  @defineType Declare 'NotifierInterface'
+  @defineType Declare 'ObserverInterface'
 
-  # require('./interfaces/core/ControllerInterface') LeanRC
-  # require('./interfaces/core/ModelInterface') LeanRC
-  # require('./interfaces/core/ViewInterface') LeanRC
+  @defineType Declare 'ObjectizerInterface'
+  @defineType Declare 'ProxyInterface'
+  @defineType Declare 'QueryInterface'
+  @defineType Declare 'RecordInterface'
+  @defineType Declare 'RendererInterface'
+  @defineType Declare 'RequestInterface'
+  @defineType Declare 'ResourceInterface'
+  @defineType Declare 'ResponseInterface'
+  @defineType Declare 'ResqueInterface'
+  @defineType Declare 'RouterInterface'
+  @defineType Declare 'ScriptInterface'
+  @defineType Declare 'SerializerInterface'
+  @defineType Declare 'SwitchInterface'
+  @defineType Declare 'TransformInterface'
+
+  @defineType Declare 'CrudableInterface'
+  @defineType Declare 'IterableInterface'
+  @defineType Declare 'QueryableCollectionInterface'
+  @defineType Declare 'RelatableInterface'
+  @defineType Declare 'DelayableInterface'
+  @defineType Declare 'EmbeddableInterface'
+
+  @defineType Declare 'ControllerInterface'
+  @defineType Declare 'ModelInterface'
+  @defineType Declare 'ViewInterface'
+
+  require('./types/JoiT') LeanRC
+  require('./types/MomentT') LeanRC
+  require('./types/PropertyDefinitionT') LeanRC
+  require('./types/RelationOptionsT') LeanRC
+  require('./types/RelationConfigT') LeanRC
+  require('./types/RelationInverseT') LeanRC
+  require('./types/EmbedOptionsT') LeanRC
+  require('./types/EmbedConfigT') LeanRC
+
+  require('./interfaces/patterns/NotifierInterface') LeanRC
+  require('./interfaces/patterns/TransformInterface') LeanRC
+
+  require('./types/AttributeOptionsT') LeanRC
+  require('./types/AttributeConfigT') LeanRC
+  require('./types/ComputedOptionsT') LeanRC
+  require('./types/ComputedConfigT') LeanRC
+
+  require('./interfaces/patterns/ApplicationInterface') LeanRC
+  require('./interfaces/patterns/CommandInterface') LeanRC
+  require('./interfaces/patterns/ContextInterface') LeanRC
+  require('./interfaces/patterns/CookiesInterface') LeanRC
+  require('./interfaces/patterns/CursorInterface') LeanRC
+  require('./interfaces/patterns/QueueInterface') LeanRC
+  require('./interfaces/patterns/EndpointInterface') LeanRC
+  require('./interfaces/patterns/FacadeInterface') LeanRC
+  require('./interfaces/patterns/MediatorInterface') LeanRC
+  require('./interfaces/patterns/NotificationInterface') LeanRC
+  require('./interfaces/patterns/ObserverInterface') LeanRC
+
+  require('./interfaces/patterns/ObjectizerInterface') LeanRC
+  require('./interfaces/patterns/ProxyInterface') LeanRC
+  require('./interfaces/patterns/CollectionInterface') LeanRC
+  require('./interfaces/patterns/ConfigurationInterface') LeanRC
+  require('./interfaces/patterns/GatewayInterface') LeanRC
+  require('./interfaces/patterns/QueryInterface') LeanRC
+  require('./interfaces/patterns/RecordInterface') LeanRC
+  require('./interfaces/patterns/MigrationInterface') LeanRC
+  require('./interfaces/patterns/RendererInterface') LeanRC
+  require('./interfaces/patterns/RequestInterface') LeanRC
+  require('./interfaces/patterns/ResourceInterface') LeanRC
+  require('./interfaces/patterns/ResponseInterface') LeanRC
+  require('./interfaces/patterns/ResqueInterface') LeanRC
+  require('./interfaces/patterns/RouterInterface') LeanRC
+  require('./interfaces/patterns/ScriptInterface') LeanRC
+  require('./interfaces/patterns/SerializerInterface') LeanRC
+  require('./interfaces/patterns/SwitchInterface') LeanRC
+
+  require('./interfaces/patterns/CrudableInterface') LeanRC
+  require('./interfaces/patterns/IterableInterface') LeanRC
+  require('./interfaces/patterns/QueryableCollectionInterface') LeanRC
+  require('./interfaces/patterns/RelatableInterface') LeanRC
+  require('./interfaces/patterns/DelayableInterface') LeanRC
+  require('./interfaces/patterns/EmbeddableInterface') LeanRC
+
+  require('./interfaces/core/ControllerInterface') LeanRC
+  require('./interfaces/core/ModelInterface') LeanRC
+  require('./interfaces/core/ViewInterface') LeanRC
 
   require('./utils/jwt') LeanRC
   require('./utils/crypto') LeanRC
 
   require('./mixins/ConfigurableMixin') LeanRC
-  require('./mixins/RecordMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
   require('./mixins/DelayableMixin') LeanRC
 
@@ -106,7 +182,7 @@ class LeanRC extends RC
   require('./patterns/data_mapper/Serializer') LeanRC
   require('./patterns/data_mapper/Objectizer') LeanRC
   require('./patterns/data_mapper/Record') LeanRC
-  require('./patterns/data_mapper/DelayedQueue') LeanRC
+  require('./patterns/data_mapper/Queue') LeanRC
 
   require('./patterns/query_object/Query') LeanRC
 
@@ -124,7 +200,6 @@ class LeanRC extends RC
   require('./patterns/proxy/Router') LeanRC
   require('./patterns/proxy/Resque') LeanRC
 
-  # require('./mixins/CrudGatewayMixin') LeanRC
   require('./mixins/NamespacedGatewayMixin') LeanRC
   require('./mixins/ModelingGatewayMixin') LeanRC
   require('./mixins/CrudEndpointMixin') LeanRC
@@ -216,9 +291,13 @@ class Pipes extends LeanRC
 
   @root __dirname
 
-  # require('./interfaces/patterns/PipeAwareInterface') Pipes
-  # require('./interfaces/patterns/PipeFittingInterface') Pipes
-  # require('./interfaces/patterns/PipeMessageInterface') Pipes
+  @defineType Declare 'PipeAwareInterface'
+  @defineType Declare 'PipeFittingInterface'
+  @defineType Declare 'PipeMessageInterface'
+
+  require('./interfaces/patterns/PipeAwareInterface') Pipes
+  require('./interfaces/patterns/PipeFittingInterface') Pipes
+  require('./interfaces/patterns/PipeMessageInterface') Pipes
 
   require('./patterns/pipes/Pipe') Pipes
   require('./patterns/pipes/PipeMessage') Pipes
@@ -228,8 +307,8 @@ class Pipes extends LeanRC
   require('./patterns/pipes/Junction') Pipes
   require('./patterns/pipes/JunctionMediator') Pipes
   require('./patterns/pipes/PipeAwareModule') Pipes
-  require('./patterns/pipes/QueueControlMessage') Pipes
-  require('./patterns/pipes/Queue') Pipes
+  require('./patterns/pipes/LineControlMessage') Pipes
+  require('./patterns/pipes/Line') Pipes
   require('./patterns/pipes/TeeMerge') Pipes
   require('./patterns/pipes/TeeSplit') Pipes
 

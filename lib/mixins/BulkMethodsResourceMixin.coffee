@@ -2,11 +2,11 @@
 
 module.exports = (Module)->
   {
-    Resource
+    Resource, Mixin
     Utils: { _, joi, moment }
   } = Module::
 
-  Module.defineMixin 'BulkMethodsResourceMixin', (BaseClass = Resource) ->
+  Module.defineMixin Mixin 'BulkMethodsResourceMixin', (BaseClass = Resource) ->
     class extends BaseClass
       @inheritProtected()
 

@@ -12,5 +12,6 @@ module.exports = (Module) ->
         @setData yes
         if @getData()
           @sendNotification Module.NS.ROBOT_SPEAKING, 'I am awaken. Hello World'
+        return
 
-  RobotDataProxy.initialize()
+    @initialize()

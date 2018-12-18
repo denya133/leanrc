@@ -41,18 +41,23 @@ module.exports = (Module)->
 
 module.exports = (Module) ->
   {
-    ANY, NILL, STOPPED_MIGRATE
     APPLICATION_MEDIATOR
+    STOPPED_MIGRATE
+    NilT
+    FuncG, ListG, MaybeG, StructG, UnionG
+    NotificationInterface, CollectionInterface
+    ConfigurableMixin
+    SimpleCommand
     Utils: { _, inflect }
   } = Module::
 
-  class MigrateCommand extends Module::SimpleCommand
+  class MigrateCommand extends SimpleCommand
     @inheritProtected()
-    @include Module::ConfigurableMixin
+    @include ConfigurableMixin
     @module Module
 
-    @public migrationsCollection: Module::CollectionInterface
-    @public migrationNames: Array,
+    @public migrationsCollection: CollectionInterface
+    @public migrationNames: ListG(String),
       get: ->
         app = @facade.retrieveMediator APPLICATION_MEDIATOR
           .getViewComponent()
@@ -62,13 +67,13 @@ module.exports = (Module) ->
       get: ->
         "#{@configs.ROOT}/migrations"
 
-    @public initializeNotifier: Function,
+    @public initializeNotifier: FuncG(String),
       default: (args...)->
         @super args...
         @migrationsCollection = @facade.retrieveProxy Module::MIGRATIONS
         return
 
-    @public @async execute: Function,
+    @public @async execute: FuncG(NotificationInterface),
       default: (aoNotification)->
         voBody = aoNotification.getBody()
         vsType = aoNotification.getType()
@@ -76,9 +81,7 @@ module.exports = (Module) ->
         @facade.sendNotification STOPPED_MIGRATE, {error: err}, vsType
         yield return
 
-    @public @async migrate: Function,
-      args: []
-      return: NILL
+    @public @async migrate: FuncG([MaybeG StructG until: MaybeG String], UnionG NilT, Error),
       default: (options)->
         app = @facade.retrieveMediator APPLICATION_MEDIATOR
           .getViewComponent()
@@ -104,4 +107,4 @@ module.exports = (Module) ->
         yield return err
 
 
-  MigrateCommand.initialize()
+    @initialize()

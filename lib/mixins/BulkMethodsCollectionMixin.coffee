@@ -2,14 +2,15 @@
 
 module.exports = (Module)->
   {
-    Collection
+    NilT, FuncG
+    Collection, Mixin
   } = Module::
 
-  Module.defineMixin 'BulkMethodsCollectionMixin', (BaseClass = Collection) ->
+  Module.defineMixin Mixin 'BulkMethodsCollectionMixin', (BaseClass = Collection) ->
     class extends BaseClass
       @inheritProtected()
 
-      @public @async bulkDelete: Function,
+      @public @async bulkDelete: FuncG(String, NilT),
         default: (query)->
           {
             LogMessage: {
@@ -59,7 +60,7 @@ module.exports = (Module)->
                 }
           yield return
 
-      @public @async bulkDestroy: Function,
+      @public @async bulkDestroy: FuncG(String, NilT),
         default: (query)->
           {
             LogMessage: {

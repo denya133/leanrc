@@ -10,7 +10,7 @@ describe 'CrudGatewayMixin', ->
   describe '.new', ->
     it 'should create CRUD gateway instance', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestCrudGateway extends LeanRC::Gateway
@@ -24,7 +24,7 @@ describe 'CrudGatewayMixin', ->
   describe '#keyName', ->
     it 'should get gateway key name', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestCrudGateway extends LeanRC::Gateway
@@ -40,7 +40,7 @@ describe 'CrudGatewayMixin', ->
   describe '#itemEntityName', ->
     it 'should get gateway item entity name', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestCrudGateway extends LeanRC::Gateway
@@ -56,7 +56,7 @@ describe 'CrudGatewayMixin', ->
   describe '#listEntityName', ->
     it 'should get gateway list entity name', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestCrudGateway extends LeanRC::Gateway
@@ -72,7 +72,7 @@ describe 'CrudGatewayMixin', ->
   describe '#schema', ->
     it 'should get gateway schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -93,7 +93,7 @@ describe 'CrudGatewayMixin', ->
   describe '#listSchema', ->
     it 'should get gateway list schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -115,7 +115,7 @@ describe 'CrudGatewayMixin', ->
   describe '#itemSchema', ->
     it 'should get gateway item schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -137,7 +137,7 @@ describe 'CrudGatewayMixin', ->
   describe '#querySchema', ->
     it 'should get gateway query schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -160,7 +160,7 @@ describe 'CrudGatewayMixin', ->
   describe '#bulkResponseSchema', ->
     it 'should get gateway bulk response schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -181,7 +181,7 @@ describe 'CrudGatewayMixin', ->
   describe '#versionSchema', ->
     it 'should get gateway version schema', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record
@@ -204,7 +204,7 @@ describe 'CrudGatewayMixin', ->
   describe '#onRegister', ->
     it 'should run gateway register handler', ->
       co ->
-        class Test extends LeanRC::Module
+        class Test extends LeanRC
           @inheritProtected()
         Test.initialize()
         class TestRecord extends LeanRC::Record

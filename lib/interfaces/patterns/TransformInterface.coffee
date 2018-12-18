@@ -3,21 +3,21 @@
 
 
 module.exports = (Module)->
-  {ANY, NILL} = Module::
+  {
+    AnyT, JoiT
+    FuncG, MaybeG
+    Interface
+  } = Module::
 
-  Module.defineInterface 'TransformInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  class TransformInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public @static @async @virtual normalize: Function,
-        args: [ANY] # data
-        return: [ANY, NILL]
-      @public @static @async @virtual serialize:   Function,
-        args: [ANY] # data
-        return: [ANY, NILL]
-      @public @static @virtual objectize:   Function,
-        args: [ANY] # data
-        return: [ANY, NILL]
+    @public @static schema: JoiT
+
+    @virtual @static @async normalize: FuncG [MaybeG AnyT], MaybeG AnyT
+    @virtual @static @async serialize: FuncG [MaybeG AnyT], MaybeG AnyT
+    @virtual @static objectize: FuncG [MaybeG AnyT], MaybeG AnyT
 
 
-      @initializeInterface()
+    @initialize()

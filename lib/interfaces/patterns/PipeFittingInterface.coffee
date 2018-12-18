@@ -1,19 +1,20 @@
 
 
 module.exports = (Module)->
-  Module.defineInterface 'PipeFittingInterface', (BaseClass) ->
-    class extends BaseClass
-      @inheritProtected()
+  {
+    FuncG, MaybeG
+    PipeMessageInterface
+    PipeFittingInterface: PipeFittingInterfaceDef
+    Interface
+  } = Module::
 
-      @public @virtual connect: Function,
-        args: [Module::PipeFittingInterface]
-        return: Boolean
-      @public @virtual disconnect: Function,
-        args: []
-        return: Module::PipeFittingInterface
-      @public @virtual write: Function,
-        args: [Module::PipeMessageInterface]
-        return: Boolean
+  class PipeFittingInterface extends Interface
+    @inheritProtected()
+    @module Module
+
+    @virtual connect: FuncG PipeFittingInterfaceDef, Boolean
+    @virtual disconnect: FuncG [], MaybeG PipeFittingInterfaceDef
+    @virtual write: FuncG PipeMessageInterface, Boolean
 
 
-      @initializeInterface()
+    @initialize()

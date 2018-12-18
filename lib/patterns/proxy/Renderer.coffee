@@ -22,17 +22,31 @@ module.exports = (resource, action, aoData)->
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
+    AnyT
+    FuncG, MaybeG, InterfaceG
+    ContextInterface, ResourceInterface
+    RendererInterface
     # ConfigurableMixin
   } = Module::
 
   class Renderer extends Module::Proxy
     @inheritProtected()
-    # @implements Module::RendererInterface
+    @implements RendererInterface
     # @include ConfigurableMixin
     @module Module
 
     # may be redefine at inheritance
-    @public @async render: Function,
+    @public @async render: FuncG([ContextInterface, AnyT, ResourceInterface, MaybeG InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: MaybeG String
+      entityName: String
+      recordName: MaybeG String
+    }], MaybeG AnyT),
       default: (ctx, aoData, resource, {path, resource:resourceName, action, template:templatePath}={})->
         if path? and resourceName? and action?
           service = @facade.retrieveMediator APPLICATION_MEDIATOR
@@ -47,4 +61,4 @@ module.exports = (Module)->
           yield return aoData
 
 
-  Renderer.initialize()
+    @initialize()

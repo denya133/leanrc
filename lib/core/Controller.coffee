@@ -3,26 +3,29 @@
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-
-    Facade
+    PointerT
+    FuncG, SubsetG, DictG, MaybeG
+    ControllerInterface, ViewInterface, CommandInterface, NotificationInterface
+    CoreObject, Facade
     Utils: { _ }
   } = Module::
-  class Controller extends Module::CoreObject
+
+  class Controller extends CoreObject
     @inheritProtected()
-    # @implements Module::ControllerInterface
+    @implements ControllerInterface
     @module Module
 
     @const MULTITON_MSG: "Controller instance for this multiton key already constructed!"
 
-    ipoView         = @private view: Module::ViewInterface
-    iphCommandMap   = @private commandMap: Object
-    iphClassNames   = @private classNames: Object
-    ipsMultitonKey  = @protected multitonKey: String
-    cphInstanceMap  = @private @static _instanceMap: Object,
+    ipoView         = PointerT @private view: ViewInterface
+    iphCommandMap   = PointerT @private commandMap: DictG String, MaybeG SubsetG CommandInterface
+    iphClassNames   = PointerT @private classNames: DictG String, MaybeG String
+    ipsMultitonKey  = PointerT @protected multitonKey: MaybeG String
+    cphInstanceMap  = PointerT @private @static _instanceMap: DictG(String, MaybeG ControllerInterface),
       default: {}
-    ipcApplicationModule = @protected ApplicationModule: Module::Class
+    ipcApplicationModule = PointerT @protected ApplicationModule: MaybeG SubsetG Module
 
-    @public ApplicationModule: Module::Class,
+    @public ApplicationModule: SubsetG(Module),
       get: ->
         @[ipcApplicationModule] ?= if @[ipsMultitonKey]?
           Facade.getInstance @[ipsMultitonKey]
@@ -32,17 +35,13 @@ module.exports = (Module)->
         else
           @Module
 
-    @public @static getInstance: Function,
-      args: [String]
-      return: Module::Class
+    @public @static getInstance: FuncG(String, ControllerInterface),
       default: (asKey)->
         unless Controller[cphInstanceMap][asKey]?
           Controller[cphInstanceMap][asKey] = Controller.new asKey
         Controller[cphInstanceMap][asKey]
 
-    @public @static removeController: Function,
-      args: [String]
-      return: Module::Class
+    @public @static removeController: FuncG(String),
       default: (asKey)->
         if (voController = Controller[cphInstanceMap][asKey])?
           for asNotificationName in Reflect.ownKeys voController[iphCommandMap]
@@ -51,7 +50,7 @@ module.exports = (Module)->
           delete Controller[cphInstanceMap][asKey]
         return
 
-    @public executeCommand: Function,
+    @public executeCommand: FuncG(NotificationInterface),
       default: (aoNotification)->
         vsName = aoNotification.getName()
         vCommand = @[iphCommandMap][vsName]
@@ -64,14 +63,14 @@ module.exports = (Module)->
           voCommand.execute aoNotification
         return
 
-    @public registerCommand: Function,
+    @public registerCommand: FuncG([String, SubsetG CommandInterface]),
       default: (asNotificationName, aCommand)->
         unless @[iphCommandMap][asNotificationName]
           @[ipoView].registerObserver asNotificationName, Module::Observer.new(@executeCommand, @)
           @[iphCommandMap][asNotificationName] = aCommand
         return
 
-    @public lazyRegisterCommand: Function,
+    @public lazyRegisterCommand: FuncG([String, MaybeG String]),
       default: (asNotificationName, asClassName)->
         asClassName ?= asNotificationName
         unless @[iphCommandMap][asNotificationName]
@@ -79,11 +78,11 @@ module.exports = (Module)->
           @[iphClassNames][asNotificationName] = asClassName
         return
 
-    @public hasCommand: Function,
+    @public hasCommand: FuncG(String, Boolean),
       default: (asNotificationName)->
         @[iphCommandMap][asNotificationName]? or @[iphClassNames][asNotificationName]?
 
-    @public removeCommand: Function,
+    @public removeCommand: FuncG(String),
       default: (asNotificationName)->
         if @hasCommand(asNotificationName)
           @[ipoView].removeObserver asNotificationName, @
@@ -94,12 +93,11 @@ module.exports = (Module)->
         return
 
     @public initializeController: Function,
-      args: []
-      return: Module::NILL
       default: ->
         @[ipoView] = Module::View.getInstance @[ipsMultitonKey]
+        return
 
-    @public init: Function,
+    @public init: FuncG(String),
       default: (asKey)->
         @super arguments...
         if Controller[cphInstanceMap][asKey]
@@ -109,6 +107,7 @@ module.exports = (Module)->
         @[iphCommandMap] = {}
         @[iphClassNames] = {}
         @initializeController()
+        return
 
 
-  Controller.initialize()
+    @initialize()

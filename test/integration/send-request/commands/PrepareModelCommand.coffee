@@ -1,12 +1,20 @@
 
 
 module.exports = (Module) ->
-  class PrepareModelCommand extends Module.NS.SimpleCommand
+  {
+    NilT
+    FuncG
+    NotificationInterface
+    RequestProxy
+    SimpleCommand
+  } = Module.NS
+
+  class PrepareModelCommand extends SimpleCommand
     @inheritProtected()
     @module Module
 
-    @public execute: Function,
+    @public execute: FuncG(NotificationInterface, NilT),
       default: ->
-        @facade.registerProxy Module.NS.RequestProxy.new Module.NS.RequestProxy::REQUEST_PROXY, no
+        @facade.registerProxy RequestProxy.new RequestProxy::REQUEST_PROXY, no
 
-  PrepareModelCommand.initialize()
+    @initialize()

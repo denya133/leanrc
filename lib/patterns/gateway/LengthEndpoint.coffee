@@ -2,20 +2,24 @@
 
 module.exports = (Module)->
   {
+    FuncG, InterfaceG
+    GatewayInterface
+    EndpointInterface
     CrudEndpointMixin
+    Endpoint
     Utils: { statuses, joi }
   } = Module::
 
   UNAUTHORIZED      = statuses 'unauthorized'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  class LengthEndpoint extends Module::Endpoint
+  class LengthEndpoint extends Endpoint
     @inheritProtected()
-    # @implements Module::EndpointInterface
+    @implements EndpointInterface
     @include CrudEndpointMixin
     @module Module
 
-    @public init: Function,
+    @public init: FuncG(InterfaceG(gateway: GatewayInterface)),
       default: (args...) ->
         @super args...
         @pathParam 'v', @versionSchema
@@ -31,5 +35,7 @@ module.exports = (Module)->
           Retrieves a length of
           #{@listEntityName} collection.
         "
+        return
+
 
     @initialize()

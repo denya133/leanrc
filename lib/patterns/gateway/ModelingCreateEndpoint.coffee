@@ -2,7 +2,11 @@
 
 module.exports = (Module)->
   {
+    FuncG, InterfaceG
+    GatewayInterface
+    EndpointInterface
     CrudEndpointMixin
+    Endpoint
     Utils: { statuses, joi }
   } = Module::
 
@@ -10,13 +14,13 @@ module.exports = (Module)->
   UNAUTHORIZED      = statuses 'unauthorized'
   UPGRADE_REQUIRED  = statuses 'upgrade required'
 
-  class ModelingCreateEndpoint extends Module::Endpoint
+  class ModelingCreateEndpoint extends Endpoint
     @inheritProtected()
-    # @implements Module::EndpointInterface
+    @implements EndpointInterface
     @include CrudEndpointMixin
     @module Module
 
-    @public init: Function,
+    @public init: FuncG(InterfaceG(gateway: GatewayInterface)),
       default: (args...) ->
         @super args...
         @pathParam 'v', @versionSchema
@@ -43,5 +47,7 @@ module.exports = (Module)->
           from the request body and
           returns the saved document.
         "
+        return
+
 
     @initialize()

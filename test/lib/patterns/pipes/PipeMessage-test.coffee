@@ -21,7 +21,7 @@ describe 'PipeMessage', ->
     it 'should create new message and check type', ->
       expect ->
         vsType = PipeMessage.NORMAL
-        vsTypeUpdated = PipeMessage.HIGH
+        vsTypeUpdated = 'TEST_TYPE'
         message = PipeMessage.new vsType
         assert.equal message[Symbol.for '~type'], vsType, 'Type is incorrect'
         assert.equal message[Symbol.for '~type'], message.getType(), 'Type is incorrect'

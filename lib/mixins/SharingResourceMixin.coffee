@@ -4,10 +4,9 @@ module.exports = (Module)->
   {
     SPACES
     ROLES
-
-    Resource
-    PromiseInterface
-
+    PromiseT, PointerT
+    FuncG, MaybeG
+    Resource, Mixin
     Utils: { _, statuses, co }
   } = Module::
 
@@ -15,7 +14,7 @@ module.exports = (Module)->
   UNAUTHORIZED      = statuses 'unauthorized'
   FORBIDDEN         = statuses 'forbidden'
 
-  Module.defineMixin 'SharingResourceMixin', (BaseClass = Resource) ->
+  Module.defineMixin Mixin 'SharingResourceMixin', (BaseClass = Resource) ->
     class extends BaseClass
       @inheritProtected()
 
@@ -25,8 +24,7 @@ module.exports = (Module)->
       @public currentSpaceId: String,
         get: -> @context.pathParams.space
 
-      # @public spaces: Array
-      @public currentSpace: PromiseInterface,
+      @public currentSpace: PromiseT,
         get: co.wrap ->
           return yield @facade.retrieveProxy(SPACES).find @currentSpaceId
 
@@ -81,11 +79,11 @@ module.exports = (Module)->
           @recordBody = _.omit @recordBody, ['spaces']
           yield return args
 
-      ipoCheckOwner = @private @async checkOwner: Function,
+      ipoCheckOwner = PointerT @private @async checkOwner: FuncG(String, Boolean),
         default: (userId)->
           yield return @currentSpaceId in @session.ownSpaces
 
-      ipoCheckRole = @private @async checkRole: Function,
+      ipoCheckRole = PointerT @private @async checkRole: FuncG([String, String, String], Boolean),
         default: (spaceId, userId, action)->
           RolesCollection = @facade.retrieveProxy ROLES
           role = yield (yield RolesCollection.findBy(
@@ -104,7 +102,7 @@ module.exports = (Module)->
           else
             yield return no
 
-      ipoCheckPermission = @private @async checkPermission: Function,
+      ipoCheckPermission = PointerT @private @async checkPermission: FuncG([String, String], MaybeG Boolean),
         default: (spaceId, chainName)->
           if yield @[ipoCheckOwner] @session.uid
             yield return yes

@@ -1,10 +1,16 @@
 { expect, assert } = require 'chai'
 sinon = require 'sinon'
 LeanRC = require.main.require 'lib'
-View = LeanRC::View
-Notification = LeanRC::Notification
-Observer = LeanRC::Observer
-Mediator = LeanRC::Mediator
+
+{
+  FuncG
+  NotificationInterface
+  View
+  Notification
+  Observer
+  Mediator
+  Controller
+} = LeanRC::
 
 describe 'View', ->
   describe '.getInstance', ->
@@ -27,10 +33,10 @@ describe 'View', ->
     it 'should register new observer', ->
       expect ->
         view = View.getInstance 'TEST3'
+        controller = Controller.getInstance 'TEST3'
         notifyMethod = sinon.spy()
         notifyMethod.reset()
-        context = {}
-        observer = Observer.new notifyMethod, context
+        observer = Observer.new notifyMethod, controller
         notification = Notification.new 'TEST_VIEW'
         view.registerObserver notification.getName(), observer
         view.notifyObservers notification
@@ -40,10 +46,10 @@ describe 'View', ->
     it 'should register new observer', ->
       expect ->
         view = View.getInstance 'TEST4'
+        controller = Controller.getInstance 'TEST4'
         notifyMethod = sinon.spy()
         notifyMethod.reset()
-        context = {}
-        observer = Observer.new notifyMethod, context
+        observer = Observer.new notifyMethod, controller
         notification = Notification.new 'TEST_VIEW'
         view.registerObserver notification.getName(), observer
         view.removeObserver notification.getName(), observer.getNotifyContext()
@@ -59,9 +65,9 @@ describe 'View', ->
         viewComponent = {}
         class TestMediator extends Mediator
           @inheritProtected()
-          @public listNotificationInterests: Function,
+          @public listNotificationInterests: FuncG([], Array),
             default: -> [ 'TEST_LIST' ]
-          @public handleNotification: Function,
+          @public handleNotification: FuncG(NotificationInterface),
             default: handleNotification
           @public onRegister: Function,
             default: onRegister

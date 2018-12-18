@@ -9,7 +9,7 @@ class Tomatos extends LeanRC
 
   @root __dirname
 
-  Utils: LeanRC::Utils.extend {}, LeanRC::Utils
+  Utils: LeanRC::Utils.assign {}, LeanRC::Utils
 
   require('LeanRC/dist/patterns/command/MigrateCommand') @Module
   require('LeanRC/dist/patterns/command/RollbackCommand') @Module

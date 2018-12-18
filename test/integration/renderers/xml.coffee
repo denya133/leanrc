@@ -2,15 +2,32 @@
 
 
 module.exports = (Module) ->
-  class XmlRenderer extends Module::Renderer
-    @inheritProtected()
+  {
+    AnyT
+    FuncG, MaybeG, InterfaceG
+    ContextInterface, ResourceInterface
+    Renderer
+    Utils: { assign }
+  } = Module::
 
+  class XmlRenderer extends Renderer
+    @inheritProtected()
     @module Module
 
-    @public render: Function,
-      default: (aoData, aoOptions) ->
-        vhData = Module::Utils.extend {}, aoData ? {}
+    @public @async render: FuncG([ContextInterface, AnyT, ResourceInterface, MaybeG InterfaceG {
+      method: String
+      path: String
+      resource: String
+      action: String
+      tag: String
+      template: String
+      keyName: String
+      entityName: String
+      recordName: String
+    }], MaybeG AnyT),
+      default: (ctx, aoData, resource, aoOptions) ->
+        vhData = assign {}, aoData ? {}
         builder = new Builder()
-        builder.buildObject vhData
+        yield return builder.buildObject vhData
 
-  XmlRenderer.initialize()
+    @initialize()
