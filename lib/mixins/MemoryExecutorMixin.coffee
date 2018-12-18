@@ -38,7 +38,7 @@ module.exports = (Module)->
     START_RESQUE
     RESQUE
     RESQUE_EXECUTOR
-    NilT, PointerT
+    PointerT
     FuncG, DictG, StructG, MaybeG, UnionG
     ResqueInterface, NotificationInterface
     Mediator, Mixin
@@ -77,7 +77,7 @@ module.exports = (Module)->
             START_RESQUE
           ]
 
-      @public handleNotification: FuncG(NotificationInterface, NilT),
+      @public handleNotification: FuncG(NotificationInterface),
         default: (aoNotification)->
           vsName = aoNotification.getName()
           voBody = aoNotification.getBody()
@@ -182,7 +182,7 @@ module.exports = (Module)->
             clearTimeout @[ipoTimer]
           return
 
-      @public define: FuncG([String, StructG(concurrency: Number), Function], NilT),
+      @public define: FuncG([String, StructG(concurrency: Number), Function]),
         default: (queueName, {concurrency}, lambda)->
           listener = (job)=>
             done = (err)=>

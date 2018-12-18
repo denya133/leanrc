@@ -36,7 +36,7 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-    NilT, PointerT, JoiT
+    PointerT, JoiT
     FuncG, SubsetG, InterfaceG, MaybeG
     GatewayInterface
     CrudableInterface
@@ -109,7 +109,7 @@ module.exports = (Module)->
       @public ApplicationModule: SubsetG(Module),
         get: -> @gateway?.ApplicationModule ? @Module
 
-      @public init: FuncG(InterfaceG(gateway: GatewayInterface), NilT),
+      @public init: FuncG(InterfaceG(gateway: GatewayInterface)),
         default: (args...) ->
           @super args...
           [ options ] = args

@@ -8,7 +8,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     FuncG, UnionG, MaybeG
     QueryInterface
     CursorInterface
@@ -32,21 +31,21 @@ module.exports = (Module)->
           throw new Error 'Not implemented specific method'
           yield return
 
-      @public @async deleteBy: FuncG(Object, NilT),
+      @public @async deleteBy: FuncG(Object),
         default: (query)->
           voRecordsCursor = yield @takeBy query
           yield voRecordsCursor.forEach co.wrap (aoRecord)->
             return yield aoRecord.delete()
           yield return
 
-      @public @async destroyBy: FuncG(Object, NilT),
+      @public @async destroyBy: FuncG(Object),
         default: (query)->
           voRecordsCursor = yield @takeBy query
           yield voRecordsCursor.forEach co.wrap (aoRecord)->
             return yield aoRecord.destroy()
           yield return
 
-      @public @async removeBy: FuncG(Object, NilT),
+      @public @async removeBy: FuncG(Object),
         default: (query)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()
@@ -56,14 +55,14 @@ module.exports = (Module)->
           yield @query voQuery
           yield return
 
-      @public @async updateBy: FuncG([Object, Object], NilT),
+      @public @async updateBy: FuncG([Object, Object]),
         default: (query, properties)->
           voRecordsCursor = yield @takeBy query
           yield voRecordsCursor.forEach co.wrap (aoRecord)->
             return yield aoRecord.updateAttributes properties
           yield return
 
-      @public @async patchBy: FuncG([Object, Object], NilT),
+      @public @async patchBy: FuncG([Object, Object]),
         default: (query, properties)->
           voQuery = Module::Query.new()
             .forIn '@doc': @collectionFullName()

@@ -19,10 +19,10 @@ module.exports = (Module)->
           itemDecorator ?= CrudRendererMixin::itemDecorator
           return "#{@itemEntityName}": itemDecorator.call @, aoData
 
-      @public delete: FuncG([String, String, NilT, MaybeG String], NilT),
+      @public delete: FuncG([String, String, NilT, MaybeG String]),
         default: (resource, action, aoData)->
 
-      @public destroy: FuncG([String, String, NilT, MaybeG String], NilT),
+      @public destroy: FuncG([String, String, NilT, MaybeG String]),
         default: (resource, action, aoData)->
 
       @public detail: FuncG([String, String, Object, MaybeG String], Object),

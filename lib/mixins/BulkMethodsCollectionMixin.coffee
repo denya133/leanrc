@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, FuncG
+    FuncG
     Collection, Mixin
   } = Module::
 
@@ -10,7 +10,7 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
-      @public @async bulkDelete: FuncG(String, NilT),
+      @public @async bulkDelete: FuncG(String),
         default: (query)->
           {
             LogMessage: {
@@ -60,7 +60,7 @@ module.exports = (Module)->
                 }
           yield return
 
-      @public @async bulkDestroy: FuncG(String, NilT),
+      @public @async bulkDestroy: FuncG(String),
         default: (query)->
           {
             LogMessage: {

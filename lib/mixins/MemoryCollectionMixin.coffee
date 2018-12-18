@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT
+    PointerT
     FuncG, UnionG, ListG, DictG, MaybeG
     RecordInterface, CursorInterface
     Collection, Mixin
@@ -28,7 +28,7 @@ module.exports = (Module)->
           @[ipoCollection][vsKey] = yield @serializer.serialize aoRecord
           return yield Module::Cursor.new(@, [@[ipoCollection][vsKey]]).first()
 
-      @public @async remove: FuncG([UnionG String, Number], NilT),
+      @public @async remove: FuncG([UnionG String, Number]),
         default: (id)->
           delete @[ipoCollection][id]
           yield return

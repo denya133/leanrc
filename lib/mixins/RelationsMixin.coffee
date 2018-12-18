@@ -9,7 +9,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PromiseT
+    PromiseT
     PropertyDefinitionT, RelationOptionsT, RelationConfigT, RelationInverseT
     FuncG, SubsetG, AsyncFuncG, DictG, MaybeG
     RecordInterface, CursorInterface
@@ -24,7 +24,7 @@ module.exports = (Module)->
       @implements RelatableInterface
 
       # NOTE: отличается от belongsTo тем, что сама связь не является обязательной (образуется между объектами "в одной плоскости"), а в @[opts.attr] может содержаться null значение
-      @public @static relatedTo: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
+      @public @static relatedTo: FuncG([PropertyDefinitionT, RelationOptionsT]),
         default: (typeDefinition, {refKey, attr, inverse, relation, recordName, collectionName, through, inverseType}={})->
           # recordClass = @
           [vsAttr] = Object.keys typeDefinition
@@ -97,7 +97,7 @@ module.exports = (Module)->
 
       # NOTE: отличается от relatedTo тем, что сама связь является обязательной (образуется между объектами "в иерархии"), а в @[opts.attr] обязательно должно храниться значение айдишника родительского объекта, которому "belongs to" - "принадлежит" этот объект
       # NOTE: если указана опция through, то получение данных о связи будет происходить не из @[opts.attr], а из промежуточной коллекции, где помимо айдишника объекта могут храниться дополнительные атрибуты с данными о связи
-      @public @static belongsTo: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
+      @public @static belongsTo: FuncG([PropertyDefinitionT, RelationOptionsT]),
         default: (typeDefinition, {refKey, attr, inverse, relation, recordName, collectionName, through, inverseType}={})->
           # recordClass = @
           [vsAttr] = Object.keys typeDefinition
@@ -169,7 +169,7 @@ module.exports = (Module)->
           @public "#{vsAttr}": PromiseT, property
           return
 
-      @public @static hasMany: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
+      @public @static hasMany: FuncG([PropertyDefinitionT, RelationOptionsT]),
         default: (typeDefinition, {refKey, inverse, relation, recordName, collectionName, through, inverseType}={})->
           # recordClass = @
           [vsAttr] = Object.keys typeDefinition
@@ -228,7 +228,7 @@ module.exports = (Module)->
           @public "#{vsAttr}": PromiseT, property
           return
 
-      @public @static hasOne: FuncG([PropertyDefinitionT, RelationOptionsT], NilT),
+      @public @static hasOne: FuncG([PropertyDefinitionT, RelationOptionsT]),
         default: (typeDefinition, {refKey, inverse, relation, recordName, collectionName, through, inverseType}={})->
           # recordClass = @
           [vsAttr] = Object.keys typeDefinition

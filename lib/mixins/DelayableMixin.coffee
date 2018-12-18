@@ -6,7 +6,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT, AsyncFunctionT
+    PointerT, AsyncFunctionT
     FuncG, StructG, MaybeG, InterfaceG, DictG
     DelayableInterface
     FacadeInterface
@@ -30,7 +30,7 @@ module.exports = (Module)->
           opts: InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
         }
         InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
-      ], NilT),
+      ]),
         default: (facade, data, options)->
           resque = facade.retrieveProxy Module::RESQUE
           queue = yield resque.get options.queue ? Module::DELAYED_JOBS_QUEUE

@@ -3,7 +3,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT, JoiT
+    PointerT, JoiT
     PropertyDefinitionT, EmbedOptionsT, EmbedConfigT
     FuncG, MaybeG, DictG, SubsetG, AsyncFuncG, ListG
     EmbeddableInterface, RecordInterface, CollectionInterface, CursorInterface
@@ -46,7 +46,7 @@ module.exports = (Module)->
             joi.object vhAttrs
           _data[@name]
 
-      @public @static relatedEmbed: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT),
+      @public @static relatedEmbed: FuncG([PropertyDefinitionT, EmbedOptionsT]),
         default: (typeDefinition, opts={})->
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
@@ -123,7 +123,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.put = AsyncFuncG([], NilT) co.wrap ->
+          opts.put = AsyncFuncG([]) co.wrap ->
             if opts.loadOnly
               yield return
             EmbedsCollection = null
@@ -259,7 +259,7 @@ module.exports = (Module)->
           @public "#{vsAttr}": MaybeG RecordInterface
           return
 
-      @public @static relatedEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT),
+      @public @static relatedEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT]),
         default: (typeDefinition, opts={})->
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
@@ -333,7 +333,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.put = AsyncFuncG([], NilT) co.wrap ->
+          opts.put = AsyncFuncG([]) co.wrap ->
             if opts.loadOnly
               yield return
             EmbedsCollection = null
@@ -484,7 +484,7 @@ module.exports = (Module)->
           @public "#{vsAttr}": MaybeG ListG RecordInterface
           return
 
-      @public @static hasEmbed: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT),
+      @public @static hasEmbed: FuncG([PropertyDefinitionT, EmbedOptionsT]),
         default: (typeDefinition, opts={})->
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
@@ -558,7 +558,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.put = AsyncFuncG([], NilT) co.wrap ->
+          opts.put = AsyncFuncG([]) co.wrap ->
             if opts.loadOnly
               yield return
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
@@ -717,7 +717,7 @@ module.exports = (Module)->
           @public "#{vsAttr}": MaybeG RecordInterface
           return
 
-      @public @static hasEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT),
+      @public @static hasEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT]),
         default: (typeDefinition, opts={})->
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
@@ -787,7 +787,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.put = AsyncFuncG([], NilT) co.wrap ->
+          opts.put = AsyncFuncG([]) co.wrap ->
             if opts.loadOnly
               yield return
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
@@ -1026,7 +1026,7 @@ module.exports = (Module)->
               vhResult[vsAttrName] = [voOldValue, voNewValue]
           yield return vhResult
 
-      @public @async resetAttribute: FuncG(String, NilT),
+      @public @async resetAttribute: FuncG(String),
         default: (args...)->
           yield @super args...
           [asAttribute] = args

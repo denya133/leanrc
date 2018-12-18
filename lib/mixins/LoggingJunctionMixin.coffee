@@ -6,7 +6,7 @@ module.exports = (Module)->
     LogFilterMessage
     Pipes
     Mixin
-    NilT, PointerT
+    PointerT
     FuncG
     NotificationInterface
   } = Module::
@@ -46,7 +46,7 @@ module.exports = (Module)->
           interests.push LogFilterMessage.SET_LOG_LEVEL
           interests
 
-      @public handleNotification: FuncG(NotificationInterface, NilT),
+      @public handleNotification: FuncG(NotificationInterface),
         default: (note)->
           switch note.getName()
             when SEND_TO_LOG

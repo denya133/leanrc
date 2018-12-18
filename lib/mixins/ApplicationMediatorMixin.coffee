@@ -33,7 +33,7 @@ module.exports = (Module)->
     HANDLER_RESULT
     STOPPED_MIGRATE
     STOPPED_ROLLBACK
-    AnyT, NilT, PointerT, EventEmitterT
+    AnyT, PointerT, EventEmitterT
     FuncG, MaybeG, StructG
     ContextInterface, ResourceInterface, NotificationInterface
     Mediator, Mixin
@@ -55,7 +55,7 @@ module.exports = (Module)->
           interests.push STOPPED_ROLLBACK
           interests
 
-      @public handleNotification: FuncG(NotificationInterface, NilT),
+      @public handleNotification: FuncG(NotificationInterface),
         default: (aoNotification)->
           vsName = aoNotification.getName()
           voBody = aoNotification.getBody()
@@ -68,7 +68,7 @@ module.exports = (Module)->
               @super aoNotification
           return
 
-      @public @async migrate: FuncG([MaybeG StructG until: MaybeG String], NilT),
+      @public @async migrate: FuncG([MaybeG StructG until: MaybeG String]),
         default: (opts)->
           return yield Module::Promise.new (resolve, reject)=>
             try
@@ -84,7 +84,7 @@ module.exports = (Module)->
               reject err
             return
 
-      @public @async rollback: FuncG([MaybeG StructG steps: MaybeG(Number), until: MaybeG String], NilT),
+      @public @async rollback: FuncG([MaybeG StructG steps: MaybeG(Number), until: MaybeG String]),
         default: (opts)->
           return yield Module::Promise.new (resolve, reject)=>
             try
@@ -135,7 +135,7 @@ module.exports = (Module)->
               reject err
             return
 
-      @public init: FuncG([String, AnyT], NilT),
+      @public init: FuncG([String, AnyT]),
         default: (args...)->
           EventEmitter = require 'events'
           voEmitter = new EventEmitter()

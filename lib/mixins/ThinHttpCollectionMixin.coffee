@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, PointerT
+    AnyT, PointerT
     FuncG, MaybeG, UnionG, ListG, DictG, StructG, EnumG, InterfaceG
     RecordInterface, QueryInterface, CursorInterface
     Collection, Cursor, Mixin
@@ -49,7 +49,7 @@ module.exports = (Module)->
             "
           yield return voRecord
 
-      @public @async remove: FuncG([UnionG String, Number], NilT),
+      @public @async remove: FuncG([UnionG String, Number]),
         default: (id)->
           requestObj = @requestFor(
             requestType: 'remove'

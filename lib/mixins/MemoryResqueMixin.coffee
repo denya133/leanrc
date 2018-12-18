@@ -34,7 +34,7 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     DEFAULT_QUEUE
-    AnyT, NilT, PointerT
+    AnyT, PointerT
     FuncG, DictG, ListG, StructG, EnumG, MaybeG, InterfaceG, UnionG
     Resque, Mixin
     Utils: { _, inflect }
@@ -98,7 +98,7 @@ module.exports = (Module)->
           else
             yield return
 
-      @public @async removeQueue: FuncG(String, NilT),
+      @public @async removeQueue: FuncG(String),
         default: (queueName)->
           fullName = @fullQueueName queueName
           if (queue = @[ipoQueues][fullName])?
@@ -142,7 +142,7 @@ module.exports = (Module)->
             isDeleted = no
           yield return isDeleted
 
-      @public @async abortJob: FuncG([String, UnionG String, Number], NilT),
+      @public @async abortJob: FuncG([String, UnionG String, Number]),
         default: (queueName, jobId)->
           fullName = @fullQueueName queueName
           @[ipoJobs][fullName] ?= []
