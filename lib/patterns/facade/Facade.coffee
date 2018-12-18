@@ -74,7 +74,7 @@ module.exports = (Module)->
         @[ipoController].registerCommand asNotificationName, aCommand
         return
 
-    @public lazyRegisterCommand: FuncG([String, String]),
+    @public lazyRegisterCommand: FuncG([String, MaybeG String]),
       default: (asNotificationName, asClassName)->
         @[ipoController].lazyRegisterCommand asNotificationName, asClassName
         return
@@ -93,7 +93,7 @@ module.exports = (Module)->
         @[ipoModel].registerProxy aoProxy
         return
 
-    @public lazyRegisterProxy: FuncG([String, String, Object]),
+    @public lazyRegisterProxy: FuncG([String, MaybeG(String), MaybeG Object]),
       default: (asProxyName, asProxyClassName, ahData)->
         @[ipoModel].lazyRegisterProxy asProxyName, asProxyClassName, ahData
         return
