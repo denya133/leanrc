@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT
+    PointerT
     FuncG, ListG, MaybeG
     PipeFittingInterface, PipeMessageInterface
     CoreObject
@@ -59,7 +59,7 @@ module.exports = (Module)->
 
     @public init: FuncG([
       MaybeG(PipeFittingInterface), MaybeG PipeFittingInterface
-    ], NilT),
+    ]),
       default: (output1=null, output2=null)->
         @super arguments...
         if output1?

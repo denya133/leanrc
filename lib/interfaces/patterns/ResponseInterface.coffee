@@ -25,17 +25,17 @@ module.exports = (Module)->
     # @virtual body: MaybeG UnionG String, Buffer, Object, Array, Number, Boolean, Stream
     # @virtual length: Number
     # @virtual headerSent: MaybeG Boolean
-    @virtual vary: FuncG String, NilT
-    @virtual redirect: FuncG [String, MaybeG String], NilT
-    @virtual attachment: FuncG String, NilT
+    @virtual vary: FuncG String
+    @virtual redirect: FuncG [String, MaybeG String]
+    @virtual attachment: FuncG String
     # @virtual lastModified: MaybeG Date
     # @virtual etag: String
     # @virtual type: MaybeG String
     @virtual is: FuncG [UnionG String, Array], UnionG String, Boolean, NilT
     @virtual get: FuncG String, UnionG String, Array
-    @virtual set: FuncG [UnionG(String, Object), MaybeG AnyT], NilT
-    @virtual append: FuncG [String, UnionG String, Array], NilT
-    @virtual remove: FuncG String, NilT
+    @virtual set: FuncG [UnionG(String, Object), MaybeG AnyT]
+    @virtual append: FuncG [String, UnionG String, Array]
+    @virtual remove: FuncG String
     # @virtual writable: Boolean
 
     # @virtual toJSON: FuncG [], Object

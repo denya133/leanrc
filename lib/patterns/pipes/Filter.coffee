@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT, LambdaT
+    PointerT, LambdaT
     FuncG, MaybeG
     PipeMessageInterface, PipeFittingInterface
     FilterControlMessage
@@ -41,12 +41,12 @@ module.exports = (Module)->
         @[ipmFilter].apply @, [aoMessage, @[ipoParams]]
         return aoMessage
 
-    @public setParams: FuncG(Object, NilT),
+    @public setParams: FuncG(Object),
       default: (aoParams)->
         @[ipoParams] = aoParams
         return
 
-    @public setFilter: FuncG(Function, NilT),
+    @public setFilter: FuncG(Function),
       default: (amFilter)->
         # @[ipmFilter] = amFilter
         Reflect.defineProperty @, ipmFilter,
@@ -92,7 +92,7 @@ module.exports = (Module)->
 
     @public init: FuncG([
       String, MaybeG(PipeFittingInterface), MaybeG(Function), MaybeG Object
-    ], NilT),
+    ]),
       default: (asName, aoOutput=null, amFilter=null, aoParams=null)->
         @super aoOutput
         @[ipsName] = asName

@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT
+    PointerT
     FuncG, ListG, MaybeG
     PipeFittingInterface, PipeMessageInterface
     LineControlMessage: { SORT, FLUSH, FIFO }
@@ -29,7 +29,7 @@ module.exports = (Module)->
           vnNum = 1
         return vnNum
 
-    ipmStore = PointerT @protected store: FuncG(PipeMessageInterface, NilT),
+    ipmStore = PointerT @protected store: FuncG(PipeMessageInterface),
       default: (aoMessage)->
         @[iplMessages] ?= []
         @[iplMessages].push aoMessage
@@ -60,7 +60,7 @@ module.exports = (Module)->
             @[ipsMode] = aoMessage.getType()
         return vbSuccess
 
-    @public init: FuncG([MaybeG PipeFittingInterface], NilT),
+    @public init: FuncG([MaybeG PipeFittingInterface]),
       default: (aoOutput=null)->
         @super aoOutput
         return

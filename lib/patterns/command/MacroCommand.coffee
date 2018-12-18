@@ -2,7 +2,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     ListG, FuncG, SubsetG
     CommandInterface, NotificationInterface
     Notifier
@@ -29,7 +28,7 @@ module.exports = (Module)->
     @public initializeMacroCommand: Function,
       default: ->
 
-    @public addSubCommand: FuncG([SubsetG CommandInterface], NilT),
+    @public addSubCommand: FuncG([SubsetG CommandInterface]),
       default: (aClass)->
         @[iplSubCommands].push aClass
         return

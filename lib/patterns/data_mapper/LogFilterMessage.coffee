@@ -2,7 +2,6 @@
 
 module.exports = (Module) ->
   {
-    NilT
     FuncG, MaybeG
   } = Module::
   {
@@ -23,7 +22,7 @@ module.exports = (Module) ->
 
     @public logLevel: Number
 
-    @public @static filterLogByLevel: FuncG([PipeMessageInterface, MaybeG Object], NilT),
+    @public @static filterLogByLevel: FuncG([PipeMessageInterface, MaybeG Object]),
       default: (message, params = {})->
         { logLevel } = params
         logLevel ?= 0

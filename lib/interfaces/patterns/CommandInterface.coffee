@@ -2,7 +2,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     FuncG
     NotificationInterface
     NotifierInterface

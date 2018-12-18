@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT
+    PointerT
     FuncG, ListG, DictG, EnumG
     PipeFittingInterface, PipeMessageInterface
     PipeListener
@@ -57,7 +57,7 @@ module.exports = (Module)->
       default: (name)->
         @hasPipe(name) and @[iplPipeTypesMap][name] is Junction.OUTPUT
 
-    @public removePipe: FuncG(String, NilT),
+    @public removePipe: FuncG(String),
       default: (name)->
         if @hasPipe name
           type = @[iplPipeTypesMap][name]

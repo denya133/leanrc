@@ -5,7 +5,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     FuncG, MaybeG, InterfaceG, EnumG, ListG, UnionG
     ProxyInterface
   } = Module::
@@ -28,7 +27,7 @@ module.exports = (Module)->
 
     @virtual defaultEntityName: FuncG [], String
 
-    @virtual @static map: FuncG [MaybeG Function], NilT
+    @virtual @static map: FuncG [MaybeG Function]
 
     @virtual map: Function
 
@@ -37,7 +36,7 @@ module.exports = (Module)->
       at: MaybeG EnumG 'collection', 'member'
       resource: MaybeG String
       action: MaybeG String
-    }], NilT
+    }]
 
     @virtual defineMethod: FuncG [
       MaybeG ListG InterfaceG {
@@ -64,7 +63,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT
+    ]
 
     @virtual get: FuncG [
       String,
@@ -79,7 +78,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT
+    ]
 
     @virtual post: FuncG [
       String,
@@ -94,7 +93,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT
+    ]
 
     @virtual put: FuncG [
       String,
@@ -109,7 +108,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT
+    ]
 
     @virtual delete: FuncG [
       String,
@@ -124,7 +123,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT
+    ]
 
     @virtual head: FuncG [
       String,
@@ -139,7 +138,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT
+    ]
 
     @virtual options: FuncG [
       String,
@@ -154,7 +153,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT
+    ]
 
     @virtual patch: FuncG [
       String,
@@ -169,7 +168,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT
+    ]
 
     @virtual resource: FuncG [
       String
@@ -187,7 +186,7 @@ module.exports = (Module)->
         above: MaybeG Object
       }), Function)
       MaybeG Function
-    ], NilT
+    ]
 
     @virtual namespace: FuncG [
       MaybeG String
@@ -200,11 +199,11 @@ module.exports = (Module)->
         above: MaybeG Object
       }), Function)
       MaybeG Function
-    ], NilT
+    ]
 
-    @virtual member: FuncG Function, NilT
+    @virtual member: FuncG Function
 
-    @virtual collection: FuncG Function, NilT
+    @virtual collection: FuncG Function
 
     @virtual routes: ListG InterfaceG {
       method: String

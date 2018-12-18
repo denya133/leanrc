@@ -2,7 +2,7 @@
 
 module.exports = (Module) ->
   {
-    AnyT, NilT
+    AnyT
     FuncG, ListG, MaybeG
   } = Module::
   {
@@ -63,7 +63,7 @@ module.exports = (Module) ->
     @public message: MaybeG(AnyT),
       get: -> @getBody()
 
-    @public init: FuncG([Number, String, AnyT], NilT),
+    @public init: FuncG([Number, String, AnyT]),
       default: (logLevel, sender, message)->
         time = new Date().toISOString()
         headers = {logLevel, sender, time}

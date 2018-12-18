@@ -4,7 +4,7 @@ module.exports = (Module)->
   {
     LIGHTWEIGHT
     APPLICATION_MEDIATOR
-    AnyT, NilT
+    AnyT
     FuncG, MaybeG, StructG
     ApplicationInterface, ContextInterface, ResourceInterface
     Pipes
@@ -38,12 +38,12 @@ module.exports = (Module)->
         # @facade = undefined
         return
 
-    @public @async migrate: FuncG([MaybeG StructG until: MaybeG String], NilT),
+    @public @async migrate: FuncG([MaybeG StructG until: MaybeG String]),
       default: (opts)->
         appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
         return yield appMediator.migrate opts
 
-    @public @async rollback: FuncG([MaybeG StructG steps: MaybeG(Number), until: MaybeG String], NilT),
+    @public @async rollback: FuncG([MaybeG StructG steps: MaybeG(Number), until: MaybeG String]),
       default: (opts)->
         appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
         return yield appMediator.rollback opts
@@ -63,7 +63,7 @@ module.exports = (Module)->
         appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
         return yield appMediator.execute resourceName, {context, reverse}, action
 
-    @public init: FuncG([MaybeG Symbol], NilT),
+    @public init: FuncG([MaybeG Symbol]),
       default: (symbol)->
         {ApplicationFacade} = @constructor.Module.NS ? @constructor.Module::
         isLightweight = symbol is LIGHTWEIGHT

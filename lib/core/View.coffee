@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    PointerT, NilT
+    PointerT
     FuncG, DictG, UnionG, MaybeG, ListG
     ViewInterface
     ObserverInterface, NotificationInterface
@@ -29,7 +29,7 @@ module.exports = (Module)->
           View[cphInstanceMap][asKey] = View.new asKey
         View[cphInstanceMap][asKey]
 
-    @public @static removeView: FuncG(String, NilT),
+    @public @static removeView: FuncG(String),
       default: (asKey)->
         if (voView = View[cphInstanceMap][asKey])?
           for asMediatorName in Reflect.ownKeys voView[iphMediatorMap]
@@ -38,7 +38,7 @@ module.exports = (Module)->
           delete View[cphInstanceMap][asKey]
         return
 
-    @public registerObserver: FuncG([String, ObserverInterface], NilT),
+    @public registerObserver: FuncG([String, ObserverInterface]),
       default: (asNotificationName, aoObserver)->
         vlObservers = @[iphObserverMap][asNotificationName]
         if vlObservers?
@@ -47,7 +47,7 @@ module.exports = (Module)->
           @[iphObserverMap][asNotificationName] = [aoObserver]
         return
 
-    @public removeObserver: FuncG([String, UnionG ControllerInterface, MediatorInterface], NilT),
+    @public removeObserver: FuncG([String, UnionG ControllerInterface, MediatorInterface]),
       default: (asNotificationName, aoNotifyContext)->
         vlObservers = @[iphObserverMap][asNotificationName] ? []
         for voObserver, i in vlObservers
@@ -60,7 +60,7 @@ module.exports = (Module)->
           delete @[iphObserverMap][asNotificationName]
         return
 
-    @public notifyObservers: FuncG(NotificationInterface, NilT),
+    @public notifyObservers: FuncG(NotificationInterface),
       default: (aoNotification)->
         vsNotificationName = aoNotification.getName()
         vlObservers = @[iphObserverMap][vsNotificationName]
@@ -71,7 +71,7 @@ module.exports = (Module)->
               voObserver.notifyObserver aoNotification
         return
 
-    @public registerMediator: FuncG(MediatorInterface, NilT),
+    @public registerMediator: FuncG(MediatorInterface),
       default: (aoMediator)->
         vsName = aoMediator.getMediatorName()
         # Do not allow re-registration (you must removeMediator first).
@@ -127,7 +127,7 @@ module.exports = (Module)->
     @public initializeView: Function,
       default: ->
 
-    @public init: FuncG(String, NilT),
+    @public init: FuncG(String),
       default: (asKey)->
         @super arguments...
         if View[cphInstanceMap][asKey]

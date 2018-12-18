@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, MaybeG
     NotifierInterface
   } = Module::
@@ -12,7 +12,7 @@ module.exports = (Module)->
     @module Module
 
     @virtual getProxyName: FuncG [], String
-    @virtual setData: FuncG AnyT, NilT
+    @virtual setData: FuncG AnyT
     @virtual getData: FuncG [], MaybeG AnyT
     @virtual onRegister: Function
     @virtual onRemove: Function

@@ -90,7 +90,7 @@ module.exports = (Module)->
 
 module.exports = (Module)->
   {
-    AnyT, NilT, AsyncFunctionT, PointerT
+    AnyT, AsyncFunctionT, PointerT
     FuncG, ListG, StructG, EnumG, MaybeG, UnionG, InterfaceG, AsyncFuncG, SubsetG
     MigrationInterface, RecordInterface
     Record

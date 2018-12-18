@@ -13,7 +13,7 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual recordHasBeenChanged: FuncG [String, Object], NilT
+    @virtual recordHasBeenChanged: FuncG [String, Object]
 
     # надо определиться с этими двумя пунктами, так ли их объявлять?
     @virtual delegate: SubsetG RecordInterface
@@ -33,11 +33,11 @@ module.exports = (Module)->
     # NOTE: обращается к БД
     @virtual @async push: FuncG RecordInterface, RecordInterface
 
-    @virtual @async delete: FuncG [UnionG String, Number], NilT
+    @virtual @async delete: FuncG [UnionG String, Number]
 
-    @virtual @async destroy: FuncG [UnionG String, Number], NilT
+    @virtual @async destroy: FuncG [UnionG String, Number]
     # NOTE: обращается к БД
-    @virtual @async remove: FuncG [UnionG String, Number], NilT
+    @virtual @async remove: FuncG [UnionG String, Number]
 
     @virtual @async find: FuncG [UnionG String, Number], MaybeG RecordInterface
     @virtual @async findMany: FuncG [ListG UnionG String, Number], CursorInterface

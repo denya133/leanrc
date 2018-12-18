@@ -2,7 +2,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     PropertyDefinitionT, RelationOptionsT, RelationConfigT, RelationInverseT
     FuncG, StructG, SubsetG, DictG
     RecordInterface
@@ -13,10 +12,10 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual @static relatedTo: FuncG [PropertyDefinitionT, RelationOptionsT], NilT
-    @virtual @static belongsTo: FuncG [PropertyDefinitionT, RelationOptionsT], NilT
-    @virtual @static hasMany: FuncG [PropertyDefinitionT, RelationOptionsT], NilT
-    @virtual @static hasOne: FuncG [PropertyDefinitionT, RelationOptionsT], NilT
+    @virtual @static relatedTo: FuncG [PropertyDefinitionT, RelationOptionsT]
+    @virtual @static belongsTo: FuncG [PropertyDefinitionT, RelationOptionsT]
+    @virtual @static hasMany: FuncG [PropertyDefinitionT, RelationOptionsT]
+    @virtual @static hasOne: FuncG [PropertyDefinitionT, RelationOptionsT]
     @virtual @static inverseFor: FuncG String, RelationInverseT
     @virtual @static relations: DictG String, RelationConfigT
 

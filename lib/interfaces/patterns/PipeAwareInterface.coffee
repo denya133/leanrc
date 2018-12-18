@@ -2,7 +2,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     FuncG
     PipeFittingInterface
     Interface
@@ -12,8 +11,8 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual acceptInputPipe: FuncG [String, PipeFittingInterface], NilT
-    @virtual acceptOutputPipe: FuncG [String, PipeFittingInterface], NilT
+    @virtual acceptInputPipe: FuncG [String, PipeFittingInterface]
+    @virtual acceptOutputPipe: FuncG [String, PipeFittingInterface]
 
 
     @initialize()

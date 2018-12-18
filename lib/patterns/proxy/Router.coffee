@@ -23,7 +23,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, PointerT
+    AnyT, PointerT
     FuncG, MaybeG, InterfaceG, EnumG, ListG, UnionG, SubsetG, SampleG
     RouterInterface
     ConfigurableMixin
@@ -102,7 +102,7 @@ module.exports = (Module)->
           .split '/'
         inflect.singularize vsEntityName
 
-    @public @static map: FuncG([MaybeG Function], NilT),
+    @public @static map: FuncG([MaybeG Function]),
       default: (lambda)->
         lambda ?= ->
         @public map: Function,
@@ -117,7 +117,7 @@ module.exports = (Module)->
       at: MaybeG EnumG 'collection', 'member'
       resource: MaybeG String
       action: MaybeG String
-    }], NilT),
+    }]),
       default: ({to, at, resource, action})->
         return
 
@@ -146,7 +146,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT),
+    ]),
       default: (container, method, path, {to, at, resource, action, tag:asTag, template, keyName, entityName, recordName}={})->
         unless path?
           throw new Error 'path is required'
@@ -204,7 +204,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT),
+    ]),
       default: (asPath, aoOpts)->
         # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'get', asPath, aoOpts
@@ -223,7 +223,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT),
+    ]),
       default: (asPath, aoOpts)->
         # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'post', asPath, aoOpts
@@ -242,7 +242,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT),
+    ]),
       default: (asPath, aoOpts)->
         # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'put', asPath, aoOpts
@@ -261,7 +261,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT),
+    ]),
       default: (asPath, aoOpts)->
         # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'delete', asPath, aoOpts
@@ -280,7 +280,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT),
+    ]),
       default: (asPath, aoOpts)->
         # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'head', asPath, aoOpts
@@ -299,7 +299,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT),
+    ]),
       default: (asPath, aoOpts)->
         # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'options', asPath, aoOpts
@@ -318,7 +318,7 @@ module.exports = (Module)->
         entityName: MaybeG String
         recordName: MaybeG String
       }
-    ], NilT),
+    ]),
       default: (asPath, aoOpts)->
         # @[iplPathes] ?= []
         @defineMethod @[iplPathes], 'patch', asPath, aoOpts
@@ -340,7 +340,7 @@ module.exports = (Module)->
         above: MaybeG Object
       }), Function)
       MaybeG Function
-    ], NilT),
+    ]),
       default: (asName, aoOpts = null, lambda = null)->
         vcModule = @Module
         if _.isFunction aoOpts
@@ -444,7 +444,7 @@ module.exports = (Module)->
         above: MaybeG Object
       }), Function)
       MaybeG Function
-    ], NilT),
+    ]),
       default: (asName, aoOpts = null, lambda = null)->
         vcModule = @Module
         if aoOpts?.constructor is Function
@@ -516,12 +516,12 @@ module.exports = (Module)->
         @[iplRouters].push NamespaceRouter
         return
 
-    @public member: FuncG(Function, NilT),
+    @public member: FuncG(Function),
       default: (lambda)->
         @namespace null, module: '', prefix: '', templates: '', at: 'member', lambda
         return
 
-    @public collection: FuncG(Function, NilT),
+    @public collection: FuncG(Function),
       default: (lambda)->
         @namespace null, module: '', prefix: '', templates: '', at: 'collection', lambda
         return
@@ -651,7 +651,7 @@ module.exports = (Module)->
                 recordName: vsRecordName
       return
 
-    @public init: FuncG([MaybeG(String), MaybeG AnyT], NilT),
+    @public init: FuncG([MaybeG(String), MaybeG AnyT]),
       default: (args...)->
         @super args...
         @[iplRouters] = []

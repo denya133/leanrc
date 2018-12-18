@@ -40,7 +40,7 @@ module.exports = (Module)->
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, SubsetG, MaybeG, UnionG, ListG
     QueueInterface, ResqueInterface
     CoreObject
@@ -73,7 +73,7 @@ module.exports = (Module)->
       default: (jobId)->
         return yield @resque.deleteJob @name, jobId
 
-    @public @async abort: FuncG([UnionG String, Number], NilT),
+    @public @async abort: FuncG([UnionG String, Number]),
       default: (jobId)->
         yield @resque.abortJob @name, jobId
         yield return
@@ -118,7 +118,7 @@ module.exports = (Module)->
         replica.name = instance.name
         yield return replica
 
-    @public init: FuncG([Object, ResqueInterface], NilT),
+    @public init: FuncG([Object, ResqueInterface]),
       default: (aoProperties, aoResque) ->
         @super arguments...
         @resque = aoResque

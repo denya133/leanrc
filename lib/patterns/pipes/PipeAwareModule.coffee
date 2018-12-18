@@ -2,7 +2,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     FuncG
     PipeAwareInterface, PipeFittingInterface
     FacadeInterface
@@ -29,12 +28,12 @@ module.exports = (Module)->
 
     @public facade: FacadeInterface
 
-    @public acceptInputPipe: FuncG([String, PipeFittingInterface], NilT),
+    @public acceptInputPipe: FuncG([String, PipeFittingInterface]),
       default: (asName, aoPipe)->
         @facade.sendNotification ACCEPT_INPUT_PIPE, aoPipe, asName
         return
 
-    @public acceptOutputPipe: FuncG([String, PipeFittingInterface], NilT),
+    @public acceptOutputPipe: FuncG([String, PipeFittingInterface]),
       default: (asName, aoPipe)->
         @facade.sendNotification ACCEPT_OUTPUT_PIPE, aoPipe, asName
         return
@@ -49,7 +48,7 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: FuncG(FacadeInterface, NilT),
+    @public init: FuncG(FacadeInterface),
       default: (aoFacade)->
         @super arguments...
         @facade = aoFacade

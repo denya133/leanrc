@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT, LambdaT
+    PointerT, LambdaT
     FuncG, MaybeG
     PipeMessage
   } = Module::
@@ -27,7 +27,7 @@ module.exports = (Module)->
     ipmFilter = PointerT @protected filter: LambdaT
     ipoParams = PointerT @protected params: Object
 
-    @public setName: FuncG(String, NilT),
+    @public setName: FuncG(String),
       default: (asName)->
         @[ipsName] = asName
         return
@@ -35,7 +35,7 @@ module.exports = (Module)->
     @public getName: FuncG([], String),
       default: -> @[ipsName]
 
-    @public setFilter: FuncG(Function, NilT),
+    @public setFilter: FuncG(Function),
       default: (amFilter)->
         @[ipmFilter] = amFilter
         return
@@ -43,7 +43,7 @@ module.exports = (Module)->
     @public getFilter: FuncG([], Function),
       default: -> @[ipmFilter]
 
-    @public setParams: FuncG(Object, NilT),
+    @public setParams: FuncG(Object),
       default: (aoParams)->
         @[ipoParams] = aoParams
         return
@@ -53,7 +53,7 @@ module.exports = (Module)->
 
     @public init: FuncG([
       String, String, MaybeG(Function), MaybeG Object
-    ], NilT),
+    ]),
       default: (asType, asName, amFilter=null, aoParams=null)->
         @super asType
         @setName asName

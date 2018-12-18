@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, ListG, MaybeG, InterfaceG, StructG, UnionG
     ContextInterface, MediatorInterface, RendererInterface, ResourceInterface
     SwitchInterface: SwitchInterfaceDef
@@ -18,7 +18,7 @@ module.exports = (Module)->
 
     @virtual use: FuncG [UnionG(Number, Function), MaybeG Function], SwitchInterfaceDef
 
-    @virtual @async handleStatistics: FuncG [Number, Number, Number, ContextInterface], NilT
+    @virtual @async handleStatistics: FuncG [Number, Number, Number, ContextInterface]
 
     @virtual rendererFor: FuncG String, RendererInterface
 
@@ -32,7 +32,7 @@ module.exports = (Module)->
       keyName: MaybeG String
       entityName: String
       recordName: MaybeG String
-    }], NilT
+    }]
 
     @virtual defineRoutes: Function
 
@@ -49,7 +49,7 @@ module.exports = (Module)->
       keyName: MaybeG String
       entityName: String
       recordName: MaybeG String
-    }], NilT
+    }]
 
     @virtual createNativeRoute: FuncG [InterfaceG {
       method: String
@@ -61,7 +61,7 @@ module.exports = (Module)->
       keyName: MaybeG String
       entityName: String
       recordName: MaybeG String
-    }], NilT
+    }]
 
 
     @initialize()

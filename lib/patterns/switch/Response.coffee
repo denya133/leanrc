@@ -171,13 +171,13 @@ module.exports = (Module)->
     @public headerSent: MaybeG(Boolean),
       get: -> @res.headersSent
 
-    @public vary: FuncG(String, NilT),
+    @public vary: FuncG(String),
       default: (field)->
         vary = require 'vary'
         vary @res, field
         return
 
-    @public redirect: FuncG([String, MaybeG String], NilT),
+    @public redirect: FuncG([String, MaybeG String]),
       default: (url, alt)->
         if 'back' is url
           url = @ctx.get('Referrer') or alt or '/'
@@ -194,7 +194,7 @@ module.exports = (Module)->
         @body = "Redirecting to #{url}"
         return
 
-    @public attachment: FuncG(String, NilT),
+    @public attachment: FuncG(String),
       default: (filename)->
         if filename
           extname = require('path').extname
@@ -248,7 +248,7 @@ module.exports = (Module)->
       default: (field)->
         @headers[field.toLowerCase()] ? ''
 
-    @public set: FuncG([UnionG(String, Object), MaybeG AnyT], NilT),
+    @public set: FuncG([UnionG(String, Object), MaybeG AnyT]),
       default: (args...)->
         [field, val] = args
         if 2 is args.length
@@ -262,7 +262,7 @@ module.exports = (Module)->
             @set key, value
         return
 
-    @public append: FuncG([String, UnionG String, Array], NilT),
+    @public append: FuncG([String, UnionG String, Array]),
       default: (field, val)->
         prev = @get field
         if prev
@@ -273,7 +273,7 @@ module.exports = (Module)->
         @set field, val
         return
 
-    @public remove: FuncG(String, NilT),
+    @public remove: FuncG(String),
       default: (field)->
         @res.removeHeader field
         return
@@ -318,7 +318,7 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: FuncG(ContextInterface, NilT),
+    @public init: FuncG(ContextInterface),
       default: (context)->
         @super()
         @ctx = context

@@ -40,7 +40,7 @@ module.exports = (Module)->
 module.exports = (Module)->
   {
     DELAYED_JOBS_QUEUE
-    AnyT, NilT
+    AnyT
     FuncG, ListG, StructG, MaybeG, UnionG
     QueueInterface
     ResqueInterface
@@ -99,7 +99,7 @@ module.exports = (Module)->
         else
           return
 
-    @public @async remove: FuncG(String, NilT),
+    @public @async remove: FuncG(String),
       default: (queueName)->
         yield @removeQueue queueName
         yield return
@@ -139,7 +139,7 @@ module.exports = (Module)->
         throw new Error 'Not implemented specific method'
         yield return
 
-    @public @async removeQueue: FuncG(String, NilT),
+    @public @async removeQueue: FuncG(String),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
@@ -164,7 +164,7 @@ module.exports = (Module)->
         throw new Error 'Not implemented specific method'
         yield return
 
-    @public @async abortJob: FuncG([String, UnionG String, Number], NilT),
+    @public @async abortJob: FuncG([String, UnionG String, Number]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
@@ -194,7 +194,7 @@ module.exports = (Module)->
         throw new Error 'Not implemented specific method'
         yield return
 
-    @public init: FuncG([MaybeG(String), MaybeG AnyT], NilT),
+    @public init: FuncG([MaybeG(String), MaybeG AnyT]),
       default: (args...)->
         @super args...
 

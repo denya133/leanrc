@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, PointerT
+    AnyT, PointerT
     FuncG, MaybeG, SubsetG
     NotificationInterface
     CoreObject
@@ -20,7 +20,7 @@ module.exports = (Module)->
     @public getName: FuncG([], String),
       default: -> @[ipsName]
 
-    @public setBody: FuncG([MaybeG AnyT], NilT),
+    @public setBody: FuncG([MaybeG AnyT]),
       default: (aoBody)->
         @[ipoBody] = aoBody
         return
@@ -28,7 +28,7 @@ module.exports = (Module)->
     @public getBody: FuncG([], MaybeG AnyT),
       default: -> @[ipoBody]
 
-    @public setType: FuncG(String, NilT),
+    @public setType: FuncG(String),
       default: (asType)->
         @[ipsType] = asType
         return
@@ -62,7 +62,7 @@ module.exports = (Module)->
           type: instance.getType()
         yield return replica
 
-    @public init: FuncG([String, MaybeG(AnyT), MaybeG String], NilT),
+    @public init: FuncG([String, MaybeG(AnyT), MaybeG String]),
       default: (asName, aoBody, asType)->
         @super arguments...
         @[ipsName] = asName

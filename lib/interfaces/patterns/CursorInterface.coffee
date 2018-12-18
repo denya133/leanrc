@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, MaybeG
     CollectionInterface
     CursorInterface: CursorInterfaceDef
@@ -27,7 +27,7 @@ module.exports = (Module)->
 
     @virtual @async count: FuncG [], Number
 
-    @virtual @async forEach: FuncG Function, NilT
+    @virtual @async forEach: FuncG Function
 
     @virtual @async map: FuncG Function, Array
 

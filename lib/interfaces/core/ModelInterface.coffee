@@ -2,7 +2,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     FuncG, MaybeG
     ProxyInterface
     Interface
@@ -12,7 +11,7 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual registerProxy: FuncG ProxyInterface, NilT
+    @virtual registerProxy: FuncG ProxyInterface
     @virtual removeProxy: FuncG String, MaybeG ProxyInterface
     @virtual retrieveProxy: FuncG String, MaybeG ProxyInterface
     @virtual hasProxy: FuncG String, Boolean

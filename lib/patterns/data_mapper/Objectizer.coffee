@@ -3,7 +3,7 @@
 
 module.exports = (Module)->
   {
-    NilT, AnyT
+    AnyT
     FuncG, SubsetG, MaybeG
     CollectionInterface, RecordInterface
     ObjectizerInterface
@@ -45,7 +45,7 @@ module.exports = (Module)->
         replica.collectionName = instance.collection.getProxyName()
         yield return replica
 
-    @public init: FuncG(CollectionInterface, NilT),
+    @public init: FuncG(CollectionInterface),
       default: (args...)->
         @super args...
         [@collection] = args

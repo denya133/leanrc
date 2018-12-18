@@ -90,7 +90,7 @@ example for collect
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, SubsetG, UnionG, MaybeG
     QueryInterface
     CoreObject
@@ -256,7 +256,7 @@ module.exports = (Module)->
         replica.query = instance.toJSON()
         yield return replica
 
-    @public init: FuncG([MaybeG Object], NilT),
+    @public init: FuncG([MaybeG Object]),
       default: (aoQuery)->
         @super arguments...
         @$forIn = {}

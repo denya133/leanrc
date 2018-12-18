@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, MaybeG
     CommandInterface
   } = Module::
@@ -12,7 +12,7 @@ module.exports = (Module)->
     @module Module
 
     @virtual @async body: FuncG [MaybeG AnyT], MaybeG AnyT
-    @virtual @static do: FuncG Function, NilT
+    @virtual @static do: FuncG Function
 
 
     @initialize()

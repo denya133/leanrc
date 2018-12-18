@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-    NilT, PointerT
+    PointerT
     FuncG, SubsetG, DictG, MaybeG
     ControllerInterface, ViewInterface, CommandInterface, NotificationInterface
     CoreObject, Facade
@@ -41,7 +41,7 @@ module.exports = (Module)->
           Controller[cphInstanceMap][asKey] = Controller.new asKey
         Controller[cphInstanceMap][asKey]
 
-    @public @static removeController: FuncG(String, NilT),
+    @public @static removeController: FuncG(String),
       default: (asKey)->
         if (voController = Controller[cphInstanceMap][asKey])?
           for asNotificationName in Reflect.ownKeys voController[iphCommandMap]
@@ -50,7 +50,7 @@ module.exports = (Module)->
           delete Controller[cphInstanceMap][asKey]
         return
 
-    @public executeCommand: FuncG(NotificationInterface, NilT),
+    @public executeCommand: FuncG(NotificationInterface),
       default: (aoNotification)->
         vsName = aoNotification.getName()
         vCommand = @[iphCommandMap][vsName]
@@ -63,14 +63,14 @@ module.exports = (Module)->
           voCommand.execute aoNotification
         return
 
-    @public registerCommand: FuncG([String, SubsetG CommandInterface], NilT),
+    @public registerCommand: FuncG([String, SubsetG CommandInterface]),
       default: (asNotificationName, aCommand)->
         unless @[iphCommandMap][asNotificationName]
           @[ipoView].registerObserver asNotificationName, Module::Observer.new(@executeCommand, @)
           @[iphCommandMap][asNotificationName] = aCommand
         return
 
-    @public lazyRegisterCommand: FuncG([String, MaybeG String], NilT),
+    @public lazyRegisterCommand: FuncG([String, MaybeG String]),
       default: (asNotificationName, asClassName)->
         asClassName ?= asNotificationName
         unless @[iphCommandMap][asNotificationName]
@@ -82,7 +82,7 @@ module.exports = (Module)->
       default: (asNotificationName)->
         @[iphCommandMap][asNotificationName]? or @[iphClassNames][asNotificationName]?
 
-    @public removeCommand: FuncG(String, NilT),
+    @public removeCommand: FuncG(String),
       default: (asNotificationName)->
         if @hasCommand(asNotificationName)
           @[ipoView].removeObserver asNotificationName, @
@@ -97,7 +97,7 @@ module.exports = (Module)->
         @[ipoView] = Module::View.getInstance @[ipsMultitonKey]
         return
 
-    @public init: FuncG(String, NilT),
+    @public init: FuncG(String),
       default: (asKey)->
         @super arguments...
         if Controller[cphInstanceMap][asKey]

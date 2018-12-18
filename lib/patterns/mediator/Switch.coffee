@@ -30,7 +30,7 @@ module.exports = (Module)->
     APPLICATION_ROUTER
     APPLICATION_MEDIATOR
     HANDLER_RESULT
-    AnyT, NilT, PointerT, AsyncFunctionT
+    AnyT, PointerT, AsyncFunctionT
     FuncG, ListG, MaybeG, InterfaceG, StructG, DictG, UnionG
     SwitchInterface, ContextInterface, RendererInterface, NotificationInterface
     ResourceInterface
@@ -168,7 +168,7 @@ module.exports = (Module)->
           HANDLER_RESULT
         ]
 
-    @public handleNotification: FuncG(NotificationInterface, NilT),
+    @public handleNotification: FuncG(NotificationInterface),
       default: (aoNotification)->
         vsName = aoNotification.getName()
         voBody = aoNotification.getBody()
@@ -259,7 +259,7 @@ module.exports = (Module)->
         handleRequest
 
     # NOTE: пустая функция, которую вызываем из callback и передаем в нее длину реквеста, длину респонза, время выполнения, и контекст, чтобы потом в отдельном миксине можно было определить тело этого метода, т.е. как реализовывать сохранение (реагировать) этой статистики.
-    @public @async handleStatistics: FuncG([Number, Number, Number, ContextInterface], NilT),
+    @public @async handleStatistics: FuncG([Number, Number, Number, ContextInterface]),
       default: (reqLength, resLength, time, aoContext)->
         { DEBUG, LEVELS, SEND_TO_LOG } = Module::LogMessage
         @sendNotification SEND_TO_LOG, "
@@ -270,7 +270,7 @@ module.exports = (Module)->
         yield return
 
     # Default error handler
-    @public onerror: FuncG(Error, NilT),
+    @public onerror: FuncG(Error),
       default: (err)->
         assert = require 'assert'
         assert _.isError(err), "non-error thrown: #{err}"
@@ -281,7 +281,7 @@ module.exports = (Module)->
         @sendNotification SEND_TO_LOG, msg.replace(/^/gm, '  '), LEVELS[ERROR]
         return
 
-    @public respond: FuncG(ContextInterface, NilT),
+    @public respond: FuncG(ContextInterface),
       default: (ctx)->
         return if ctx.respond is no
         return unless ctx.writable
@@ -335,7 +335,7 @@ module.exports = (Module)->
       keyName: MaybeG String
       entityName: String
       recordName: MaybeG String
-    }], NilT),
+    }]),
       default: (ctx, aoData, resource, opts)->
         if opts.action is 'create'
           ctx.status = 201
@@ -371,7 +371,7 @@ module.exports = (Module)->
       keyName: MaybeG String
       entityName: String
       recordName: MaybeG String
-    }], NilT),
+    }]),
       default: (resourceName, aoMessage, {method, path, resource, action})->
         @sendNotification resourceName, aoMessage, action
         return
@@ -420,7 +420,7 @@ module.exports = (Module)->
       keyName: MaybeG String
       entityName: String
       recordName: MaybeG String
-    }], NilT),
+    }]),
       default: (opts)->
         {method, path} = opts
         resourceName = inflect.camelize inflect.underscore "#{opts.resource.replace /[/]/g, '_'}Resource"
@@ -449,7 +449,7 @@ module.exports = (Module)->
           yield return yes
         return
 
-    @public init: FuncG([MaybeG(String), MaybeG AnyT], NilT),
+    @public init: FuncG([MaybeG(String), MaybeG AnyT]),
       default: (args...)->
         @super args...
         @[ipoRenderers] = {}

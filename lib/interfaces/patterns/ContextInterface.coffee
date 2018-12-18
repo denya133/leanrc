@@ -22,11 +22,11 @@ module.exports = (Module)->
     # @virtual routePath: MaybeG String
     # @virtual pathParams: MaybeG Object
 
-    @virtual throw: FuncG [UnionG(String, Number), MaybeG(String), MaybeG Object], NilT
+    @virtual throw: FuncG [UnionG(String, Number), MaybeG(String), MaybeG Object]
 
-    @virtual assert: FuncG [AnyT, MaybeG(UnionG String, Number), MaybeG(String), MaybeG Object], NilT
+    @virtual assert: FuncG [AnyT, MaybeG(UnionG String, Number), MaybeG(String), MaybeG Object]
 
-    @virtual onerror: FuncG [MaybeG AnyT], NilT
+    @virtual onerror: FuncG [MaybeG AnyT]
 
     # Request aliases
     # @virtual header: Object
@@ -63,13 +63,13 @@ module.exports = (Module)->
     # @virtual length: Number
     # @virtual type: MaybeG String
     # @virtual headerSent: MaybeG Boolean
-    @virtual redirect: FuncG [String, MaybeG String], NilT
-    @virtual attachment: FuncG String, NilT
-    @virtual set: FuncG [UnionG(String, Object), MaybeG AnyT], NilT
-    @virtual append: FuncG [String, UnionG String, Array], NilT
-    @virtual vary: FuncG String, NilT
+    @virtual redirect: FuncG [String, MaybeG String]
+    @virtual attachment: FuncG String
+    @virtual set: FuncG [UnionG(String, Object), MaybeG AnyT]
+    @virtual append: FuncG [String, UnionG String, Array]
+    @virtual vary: FuncG String
     @virtual flushHeaders: Function
-    @virtual remove: FuncG String, NilT
+    @virtual remove: FuncG String
     # @virtual lastModified: MaybeG Date
     # @virtual etag: String
 

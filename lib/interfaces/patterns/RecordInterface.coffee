@@ -4,7 +4,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, JoiT, PropertyDefinitionT
+    AnyT, JoiT, PropertyDefinitionT
     AttributeOptionsT, ComputedOptionsT
     AttributeConfigT, ComputedConfigT
     FuncG, TupleG, MaybeG, SubsetG, DictG, ListG
@@ -49,16 +49,16 @@ module.exports = (Module)->
     ###
     @virtual @static customFilters: Object
 
-    @virtual @static customFilter: FuncG Function, NilT
+    @virtual @static customFilter: FuncG Function
 
     @virtual @static parentClassNames: FuncG [MaybeG SubsetG RecordInterfaceDef], ListG String
 
     @virtual @static attributes: DictG String, AttributeConfigT
     @virtual @static computeds: DictG String, ComputedConfigT
 
-    @virtual @static attribute: FuncG [PropertyDefinitionT, AttributeOptionsT], NilT
+    @virtual @static attribute: FuncG [PropertyDefinitionT, AttributeOptionsT]
 
-    @virtual @static computed: FuncG [PropertyDefinitionT, ComputedOptionsT], NilT
+    @virtual @static computed: FuncG [PropertyDefinitionT, ComputedOptionsT]
 
     @virtual @static new: FuncG [Object, CollectionInterface], RecordInterfaceDef
 
@@ -99,7 +99,7 @@ module.exports = (Module)->
 
     @virtual @async changedAttributes: FuncG [], DictG String, Array
 
-    @virtual @async resetAttribute: FuncG String, NilT
+    @virtual @async resetAttribute: FuncG String
 
     @virtual @async rollbackAttributes: Function
 

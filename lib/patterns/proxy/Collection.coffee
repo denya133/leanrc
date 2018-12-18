@@ -72,7 +72,7 @@ module.exports = (Module)->
       default: (asName = null)->
         "#{@collectionPrefix()}#{asName ? @collectionName()}"
 
-    @public recordHasBeenChanged: FuncG([String, Object], NilT),
+    @public recordHasBeenChanged: FuncG([String, Object]),
       default: (asType, aoData)->
         @sendNotification Module::RECORD_CHANGED, aoData, asType
         return
@@ -94,19 +94,19 @@ module.exports = (Module)->
         throw new Error 'Not implemented specific method'
         yield return
 
-    @public @async delete: FuncG([UnionG String, Number], NilT),
+    @public @async delete: FuncG([UnionG String, Number]),
       default: (id)->
         voRecord = yield @find id
         yield voRecord.delete()
         yield return
 
-    @public @async destroy: FuncG([UnionG String, Number], NilT),
+    @public @async destroy: FuncG([UnionG String, Number]),
       default: (id)->
         voRecord = yield @find id
         yield voRecord.destroy()
         yield return
 
-    @public @async remove: FuncG([UnionG String, Number], NilT),
+    @public @async remove: FuncG([UnionG String, Number]),
       default: ->
         throw new Error 'Not implemented specific method'
         yield return
@@ -184,7 +184,7 @@ module.exports = (Module)->
       delegate: UnionG String, Function, SubsetG RecordInterface
       serializer: MaybeG UnionG String, Function, SubsetG Serializer
       objectizer: MaybeG UnionG String, Function, SubsetG Objectizer
-    }], NilT),
+    }]),
       default: (args...)->
         @super args...
         serializer = @getData()?.serializer

@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT
+    PointerT
     FuncG, MaybeG
     PipeFittingInterface, PipeMessageInterface
     CoreObject
@@ -43,7 +43,7 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: FuncG([MaybeG PipeFittingInterface], NilT),
+    @public init: FuncG([MaybeG PipeFittingInterface]),
       default: (aoOutput)->
         @super arguments...
         if aoOutput?

@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG
     Interface
   } = Module::
@@ -11,7 +11,7 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual @async forEach: FuncG Function, NilT
+    @virtual @async forEach: FuncG Function
     @virtual @async filter: FuncG Function, Array
     @virtual @async map: FuncG Function, Array
     @virtual @async reduce: FuncG [Function, AnyT], AnyT

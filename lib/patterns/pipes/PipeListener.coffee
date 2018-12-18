@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, LambdaT, PointerT
+    LambdaT, PointerT
     FuncG, MaybeG
     PipeFittingInterface, PipeMessageInterface
     CoreObject
@@ -39,7 +39,7 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: FuncG([Object, Function], NilT),
+    @public init: FuncG([Object, Function]),
       default: (aoContext, amListener)->
         @super arguments...
         @[ipoContext] = aoContext

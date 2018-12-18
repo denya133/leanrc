@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, PointerT
+    AnyT, PointerT
     FuncG, MaybeG
     PipeMessageInterface
     CoreObject
@@ -33,7 +33,7 @@ module.exports = (Module)->
     @public getType: FuncG([], String),
       default: -> @[ipsType]
 
-    @public setType: FuncG(String, NilT),
+    @public setType: FuncG(String),
       default: (asType)->
         @[ipsType] = asType
         return
@@ -41,7 +41,7 @@ module.exports = (Module)->
     @public getPriority: FuncG([], Number),
       default: -> @[ipnPriority]
 
-    @public setPriority: FuncG(Number, NilT),
+    @public setPriority: FuncG(Number),
       default: (anPriority)->
         @[ipnPriority] = anPriority
         return
@@ -49,7 +49,7 @@ module.exports = (Module)->
     @public getHeader: FuncG([], MaybeG Object),
       default: -> @[ipoHeader]
 
-    @public setHeader: FuncG(Object, NilT),
+    @public setHeader: FuncG(Object),
       default: (aoHeader)->
         @[ipoHeader] = aoHeader
         return
@@ -57,7 +57,7 @@ module.exports = (Module)->
     @public getBody: FuncG([], MaybeG AnyT),
       default: -> @[ipoBody]
 
-    @public setBody: FuncG([MaybeG AnyT], NilT),
+    @public setBody: FuncG([MaybeG AnyT]),
       default: (aoBody)->
         @[ipoBody] = aoBody
         return
@@ -74,7 +74,7 @@ module.exports = (Module)->
 
     @public init: FuncG([
       String, MaybeG(Object), MaybeG(Object), MaybeG Number
-    ], NilT),
+    ]),
       default: (asType, aoHeader=null, aoBody=null, anPriority=5)->
         @super arguments...
         @setType asType

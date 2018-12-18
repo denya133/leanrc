@@ -67,7 +67,7 @@ module.exports = (Module) ->
       get: ->
         "#{@configs.ROOT}/migrations"
 
-    @public initializeNotifier: FuncG(String, NilT),
+    @public initializeNotifier: FuncG(String),
       default: (args...)->
         @super args...
         @migrationsCollection = @facade.retrieveProxy Module::MIGRATIONS

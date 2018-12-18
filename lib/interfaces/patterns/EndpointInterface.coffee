@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, JoiT
+    JoiT, NilT
     FuncG, MaybeG, UnionG
     GatewayInterface
     EndpointInterface: EndpointInterfaceDef

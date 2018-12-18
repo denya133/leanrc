@@ -47,7 +47,7 @@ module.exports = (App)->
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-    AnyT, NilT, PointerT, JoiT
+    AnyT, PointerT, JoiT
     FuncG, SubsetG, DictG, ListG, MaybeG
     GatewayInterface, EndpointInterface
     ConfigurableMixin
@@ -117,7 +117,7 @@ module.exports = (Module)->
         @[iphSchemas][asRecordName] ?= (@ApplicationModule.NS ? @ApplicationModule::)[asRecordName].schema
         @[iphSchemas][asRecordName]
 
-    @public init: FuncG([String, MaybeG AnyT], NilT),
+    @public init: FuncG([String, MaybeG AnyT]),
       default: (args...) ->
         @super args...
         @[iphSchemas] = {}

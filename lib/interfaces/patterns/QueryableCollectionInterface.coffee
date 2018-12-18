@@ -5,7 +5,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     FuncG, UnionG, MaybeG
     QueryInterface
     CursorInterface
@@ -16,19 +15,19 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual @async deleteBy: FuncG Object, NilT
+    @virtual @async deleteBy: FuncG Object
 
-    @virtual @async destroyBy: FuncG Object, NilT
+    @virtual @async destroyBy: FuncG Object
     # NOTE: обращается к БД
-    @virtual @async removeBy: FuncG Object, NilT
+    @virtual @async removeBy: FuncG Object
 
     @virtual @async findBy: FuncG [Object, MaybeG Object], CursorInterface
     # NOTE: обращается к БД
     @virtual @async takeBy: FuncG [Object, MaybeG Object], CursorInterface
 
-    @virtual @async updateBy: FuncG [Object, Object], NilT
+    @virtual @async updateBy: FuncG [Object, Object]
     # NOTE: обращается к БД
-    @virtual @async patchBy: FuncG [Object, Object], NilT
+    @virtual @async patchBy: FuncG [Object, Object]
 
     @virtual @async exists: FuncG Object, Boolean
 

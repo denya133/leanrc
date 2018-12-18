@@ -45,7 +45,7 @@ module.exports = (Module)->
 
 module.exports = (Module)->
   {
-    AnyT, NilT, PointerT, JoiT
+    AnyT, PointerT, JoiT
     PropertyDefinitionT, AttributeOptionsT, ComputedOptionsT
     AttributeConfigT, ComputedConfigT
     FuncG, TupleG, MaybeG, SubsetG, DictG, ListG, UnionG
@@ -211,7 +211,7 @@ module.exports = (Module)->
     @public @static customFilters: Object,
       get: -> @metaObject.getGroup 'customFilters', no
 
-    @public @static customFilter: FuncG(Function, NilT),
+    @public @static customFilter: FuncG(Function),
       default: (amStatementFunc)->
         config = amStatementFunc.call @
         for own asFilterName, aoStatement of config
@@ -232,12 +232,12 @@ module.exports = (Module)->
     @public @static computeds: DictG(String, ComputedConfigT),
       get: -> @metaObject.getGroup 'computeds', no
 
-    @public @static attribute: FuncG([PropertyDefinitionT, AttributeOptionsT], NilT),
+    @public @static attribute: FuncG([PropertyDefinitionT, AttributeOptionsT]),
       default: ->
         @attr arguments...
         return
 
-    @public @static attr: FuncG([PropertyDefinitionT, AttributeOptionsT], NilT),
+    @public @static attr: FuncG([PropertyDefinitionT, AttributeOptionsT]),
       default: (typeDefinition, opts={})->
         [vsAttr] = Object.keys typeDefinition
         vcAttrType = typeDefinition[vsAttr]
@@ -262,13 +262,13 @@ module.exports = (Module)->
         @public {[vsAttr]: Module::MaybeG vcAttrType}, opts
         return
 
-    @public @static computed: FuncG([PropertyDefinitionT, ComputedOptionsT], NilT),
+    @public @static computed: FuncG([PropertyDefinitionT, ComputedOptionsT]),
       default: ->
         @comp arguments...
         return
 
     # NOTE: изначальная задумка была в том, чтобы определять вычисляемые значения - НЕ ПРОМИСЫ! (т.е. некоторое значение, которое отправляется в респонзе реально не хранится в базе, но вычисляется НЕ асинхронной функцией-гетером)
-    @public @static comp: FuncG([PropertyDefinitionT, ComputedOptionsT], NilT),
+    @public @static comp: FuncG([PropertyDefinitionT, ComputedOptionsT]),
       default: (typeDefinition, opts)->
         # [typeDefinition, ..., opts] = args
         # if typeDefinition is opts
@@ -415,7 +415,7 @@ module.exports = (Module)->
         @collection.recordHasBeenChanged 'deletedRecord', aoRecord
         yield return @
 
-    @public @async afterDestroy: FuncG([], NilT),
+    @public @async afterDestroy: FuncG([]),
       default: ->
         @collection.recordHasBeenChanged 'destroyedRecord', @
         yield return
@@ -491,7 +491,7 @@ module.exports = (Module)->
             vhResult[vsAttrName] = [voOldValue, voNewValue]
         yield return vhResult
 
-    @public @async resetAttribute: FuncG(String, NilT),
+    @public @async resetAttribute: FuncG(String),
       default: (asAttribute)->
         if @[ipoInternalRecord]?
           if (attrConf = @constructor.attributes[asAttribute])?
@@ -538,7 +538,7 @@ module.exports = (Module)->
           replica.id = instance.id
         yield return replica
 
-    @public init: FuncG([Object, CollectionInterface], NilT),
+    @public init: FuncG([Object, CollectionInterface]),
       default: (aoProperties, aoCollection) ->
         @super arguments...
         @collection = aoCollection

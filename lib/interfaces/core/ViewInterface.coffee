@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    ANY, NilT
+    ANY
     FuncG, UnionG, MaybeG
     ObserverInterface
     NotificationInterface
@@ -15,10 +15,10 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual registerObserver: FuncG [String, ObserverInterface], NilT
-    @virtual removeObserver: FuncG [String, UnionG ControllerInterface, MediatorInterface], NilT
-    @virtual notifyObservers: FuncG NotificationInterface, NilT
-    @virtual registerMediator: FuncG MediatorInterface, NilT
+    @virtual registerObserver: FuncG [String, ObserverInterface]
+    @virtual removeObserver: FuncG [String, UnionG ControllerInterface, MediatorInterface]
+    @virtual notifyObservers: FuncG NotificationInterface
+    @virtual registerMediator: FuncG MediatorInterface
     @virtual retrieveMediator: FuncG String, MaybeG MediatorInterface
     @virtual removeMediator: FuncG String, MaybeG MediatorInterface
     @virtual hasMediator: FuncG String, Boolean

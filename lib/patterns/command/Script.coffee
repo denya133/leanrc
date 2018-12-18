@@ -5,7 +5,7 @@
 module.exports = (Module)->
   {
     JOB_RESULT
-    AnyT, NilT
+    AnyT
     FuncG, MaybeG
     ScriptInterface, NotificationInterface
     ConfigurableMixin
@@ -19,7 +19,7 @@ module.exports = (Module)->
     @include ConfigurableMixin
     @module Module
 
-    @public @static do: FuncG(Function, NilT),
+    @public @static do: FuncG(Function),
       default: (lambda)->
         @public @async body: FuncG([MaybeG AnyT], MaybeG AnyT),
           default: lambda

@@ -2,7 +2,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     FuncG, SubsetG
     Interface
     NotificationInterface
@@ -13,10 +12,10 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual executeCommand: FuncG NotificationInterface, NilT
-    @virtual registerCommand: FuncG [String, SubsetG CommandInterface], NilT
+    @virtual executeCommand: FuncG NotificationInterface
+    @virtual registerCommand: FuncG [String, SubsetG CommandInterface]
     @virtual hasCommand: FuncG String, Boolean
-    @virtual removeCommand: FuncG String, NilT
+    @virtual removeCommand: FuncG String
 
 
     @initialize()

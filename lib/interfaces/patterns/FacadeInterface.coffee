@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, SubsetG, MaybeG
     CommandInterface, ProxyInterface, MediatorInterface
     NotificationInterface
@@ -13,24 +13,24 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual remove: FuncG [], NilT
+    @virtual remove: FuncG []
 
-    @virtual registerCommand: FuncG [String, SubsetG CommandInterface], NilT
-    @virtual removeCommand: FuncG String, NilT
+    @virtual registerCommand: FuncG [String, SubsetG CommandInterface]
+    @virtual removeCommand: FuncG String
     @virtual hasCommand: FuncG String, Boolean
 
-    @virtual registerProxy: FuncG ProxyInterface, NilT
+    @virtual registerProxy: FuncG ProxyInterface
     @virtual retrieveProxy: FuncG String, MaybeG ProxyInterface
     @virtual removeProxy: FuncG String, MaybeG ProxyInterface
     @virtual hasProxy: FuncG String, Boolean
 
-    @virtual registerMediator: FuncG MediatorInterface, NilT
+    @virtual registerMediator: FuncG MediatorInterface
     @virtual retrieveMediator: FuncG String, MaybeG MediatorInterface
     @virtual removeMediator: FuncG String, MaybeG MediatorInterface
     @virtual hasMediator: FuncG String, Boolean
 
-    @virtual notifyObservers: FuncG NotificationInterface, NilT
-    @virtual sendNotification: FuncG [String, MaybeG(AnyT), MaybeG String], NilT
+    @virtual notifyObservers: FuncG NotificationInterface
+    @virtual sendNotification: FuncG [String, MaybeG(AnyT), MaybeG String]
 
 
     @initialize()

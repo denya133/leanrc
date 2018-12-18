@@ -2,7 +2,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     FuncG, MaybeG
     PipeMessage
   } = Module::
@@ -23,7 +22,7 @@ module.exports = (Module)->
 
     @public init: FuncG([
       String, MaybeG(Object), MaybeG(Object), MaybeG Number
-    ], NilT),
+    ]),
       default: (asType)->
         @super asType
         return

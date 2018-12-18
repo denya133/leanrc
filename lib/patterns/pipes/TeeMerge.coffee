@@ -2,7 +2,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     FuncG, MaybeG
     PipeFittingInterface
     Pipe
@@ -18,7 +17,7 @@ module.exports = (Module)->
 
     @public init: FuncG([
       MaybeG(PipeFittingInterface), MaybeG PipeFittingInterface
-    ], NilT),
+    ]),
       default: (input1=null, input2=null)->
         @super arguments...
         if input1?

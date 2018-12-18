@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    NilT, PointerT
+    PointerT
     FuncG, SampleG, SubsetG
     NotificationInterface, PipeMessageInterface, MediatorInterface
     Junction

@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-    NilT, PointerT
+    PointerT
     SubsetG, DictG, FuncG, StructG, MaybeG
     ProxyInterface
     ModelInterface
@@ -44,7 +44,7 @@ module.exports = (Module)->
           Model[cphInstanceMap][asKey] = Model.new asKey
         Model[cphInstanceMap][asKey]
 
-    @public @static removeModel: FuncG(String, NilT),
+    @public @static removeModel: FuncG(String),
       default: (asKey)->
         if (voModel = Model[cphInstanceMap][asKey])?
           for asProxyName in Reflect.ownKeys voModel[iphProxyMap]
@@ -53,7 +53,7 @@ module.exports = (Module)->
           delete Model[cphInstanceMap][asKey]
         return
 
-    @public registerProxy: FuncG(ProxyInterface, NilT),
+    @public registerProxy: FuncG(ProxyInterface),
       default: (aoProxy)->
         aoProxy.initializeNotifier @[ipsMultitonKey]
         @[iphProxyMap][aoProxy.getProxyName()] = aoProxy
@@ -84,7 +84,7 @@ module.exports = (Module)->
       default: (asProxyName)->
         @[iphProxyMap][asProxyName]? or @[iphMetaProxyMap][asProxyName]?
 
-    @public lazyRegisterProxy: FuncG([String, MaybeG(String), MaybeG Object], NilT),
+    @public lazyRegisterProxy: FuncG([String, MaybeG(String), MaybeG Object]),
       default: (asProxyName, asProxyClassName, ahData)->
         @[iphMetaProxyMap][asProxyName] =
           className: asProxyClassName
@@ -94,7 +94,7 @@ module.exports = (Module)->
     @public initializeModel: Function,
       default: ->
 
-    @public init: FuncG(String, NilT),
+    @public init: FuncG(String),
       default: (asKey)->
         @super arguments...
         if Model[cphInstanceMap][asKey]

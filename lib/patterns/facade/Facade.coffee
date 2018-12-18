@@ -3,7 +3,7 @@
 module.exports = (Module)->
   {
     APPLICATION_MEDIATOR
-    AnyT, NilT, PointerT
+    AnyT, PointerT
     FuncG, SubsetG, DictG, MaybeG
     FacadeInterface
     ModelInterface, ViewInterface, ControllerInterface
@@ -57,7 +57,7 @@ module.exports = (Module)->
           Facade[cphInstanceMap][asKey] = Facade.new asKey
         Facade[cphInstanceMap][asKey]
 
-    @public remove: FuncG([], NilT),
+    @public remove: FuncG([]),
       default: ->
         Module::Model.removeModel @[ipsMultitonKey]
         Module::Controller.removeController @[ipsMultitonKey]
@@ -69,17 +69,17 @@ module.exports = (Module)->
         delete Module::Facade[cphInstanceMap][@[ipsMultitonKey]]
         return
 
-    @public registerCommand: FuncG([String, SubsetG CommandInterface], NilT),
+    @public registerCommand: FuncG([String, SubsetG CommandInterface]),
       default: (asNotificationName, aCommand)->
         @[ipoController].registerCommand asNotificationName, aCommand
         return
 
-    @public lazyRegisterCommand: FuncG([String, String], NilT),
+    @public lazyRegisterCommand: FuncG([String, String]),
       default: (asNotificationName, asClassName)->
         @[ipoController].lazyRegisterCommand asNotificationName, asClassName
         return
 
-    @public removeCommand: FuncG(String, NilT),
+    @public removeCommand: FuncG(String),
       default: (asNotificationName)->
         @[ipoController].removeCommand asNotificationName
         return
@@ -88,12 +88,12 @@ module.exports = (Module)->
       default: (asNotificationName)->
         @[ipoController].hasCommand asNotificationName
 
-    @public registerProxy: FuncG(ProxyInterface, NilT),
+    @public registerProxy: FuncG(ProxyInterface),
       default: (aoProxy)->
         @[ipoModel].registerProxy aoProxy
         return
 
-    @public lazyRegisterProxy: FuncG([String, String, Object], NilT),
+    @public lazyRegisterProxy: FuncG([String, String, Object]),
       default: (asProxyName, asProxyClassName, ahData)->
         @[ipoModel].lazyRegisterProxy asProxyName, asProxyClassName, ahData
         return
@@ -110,7 +110,7 @@ module.exports = (Module)->
       default: (asProxyName)->
         @[ipoModel].hasProxy asProxyName
 
-    @public registerMediator: FuncG(MediatorInterface, NilT),
+    @public registerMediator: FuncG(MediatorInterface),
       default: (aoMediator)->
         if @[ipoView]
           @[ipoView].registerMediator aoMediator
@@ -131,18 +131,18 @@ module.exports = (Module)->
         if @[ipoView]
           @[ipoView].hasMediator asMediatorName
 
-    @public notifyObservers: FuncG(NotificationInterface, NilT),
+    @public notifyObservers: FuncG(NotificationInterface),
       default: (aoNotification)->
         if @[ipoView]
           @[ipoView].notifyObservers aoNotification
         return
 
-    @public sendNotification: FuncG([String, MaybeG(AnyT), MaybeG String], NilT),
+    @public sendNotification: FuncG([String, MaybeG(AnyT), MaybeG String]),
       default: (asName, aoBody, asType)->
         @notifyObservers Module::Notification.new asName, aoBody, asType
         return
 
-    @public initializeNotifier: FuncG(String, NilT),
+    @public initializeNotifier: FuncG(String),
       default: (asKey)->
         @[ipsMultitonKey] = asKey
         return
@@ -168,7 +168,7 @@ module.exports = (Module)->
         replica.application = application
         yield return replica
 
-    @public init: FuncG(String, NilT),
+    @public init: FuncG(String),
       default: (asKey)->
         @super arguments...
         if Facade[cphInstanceMap][asKey]?

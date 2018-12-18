@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, PointerT, LambdaT
+    AnyT, PointerT, LambdaT
     FuncG, MaybeG
     ObserverInterface, NotificationInterface
     CoreObject
@@ -16,12 +16,12 @@ module.exports = (Module)->
     ipoNotify = PointerT @private notify: MaybeG Function
     ipoContext = PointerT @private context: MaybeG AnyT
 
-    @public setNotifyMethod: FuncG(Function, NilT),
+    @public setNotifyMethod: FuncG(Function),
       default: (amNotifyMethod)->
         @[ipoNotify] = amNotifyMethod
         return
 
-    @public setNotifyContext: FuncG(AnyT, NilT),
+    @public setNotifyContext: FuncG(AnyT),
       default: (aoNotifyContext)->
         @[ipoContext] = aoNotifyContext
         return
@@ -36,7 +36,7 @@ module.exports = (Module)->
       default: (object)->
         object is @[ipoContext]
 
-    @public notifyObserver: FuncG(NotificationInterface, NilT),
+    @public notifyObserver: FuncG(NotificationInterface),
       default: (notification)->
         @getNotifyMethod().call @getNotifyContext(), notification
         return
@@ -51,7 +51,7 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: FuncG([MaybeG(Function), MaybeG AnyT], NilT),
+    @public init: FuncG([MaybeG(Function), MaybeG AnyT]),
       default: (amNotifyMethod, aoNotifyContext)->
         @super arguments...
         @setNotifyMethod amNotifyMethod if amNotifyMethod

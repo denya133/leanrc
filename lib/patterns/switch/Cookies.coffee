@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, PointerT
+    AnyT, PointerT
     FuncG, MaybeG, StructG
     CookiesInterface
     CoreObject
@@ -63,7 +63,7 @@ module.exports = (Module)->
     @public init: FuncG([Object, Object, MaybeG StructG {
       key: MaybeG String
       secure: MaybeG Boolean
-    }], NilT),
+    }]),
       default: (request, response, {key, secure} = {})->
         @super()
         @request = request

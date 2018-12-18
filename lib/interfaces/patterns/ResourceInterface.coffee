@@ -8,7 +8,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, UnionG, TupleG, MaybeG, DictG, StructG, EnumG, ListG
     CollectionInterface, ContextInterface, RecordInterface
     Interface
@@ -33,7 +33,7 @@ module.exports = (Module)->
 
 
     @virtual @static actions: DictG String, Object
-    @virtual @static action: FuncG [UnionG Object, TupleG Object, Object], NilT
+    @virtual @static action: FuncG [UnionG Object, TupleG Object, Object]
 
 
     @virtual @async list: FuncG [], StructG {

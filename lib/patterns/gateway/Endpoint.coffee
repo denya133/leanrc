@@ -105,7 +105,7 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: FuncG(InterfaceG(gateway: GatewayInterface), NilT),
+    @public init: FuncG(InterfaceG(gateway: GatewayInterface)),
       default: (args...) ->
         @super args...
         [ options ] = args

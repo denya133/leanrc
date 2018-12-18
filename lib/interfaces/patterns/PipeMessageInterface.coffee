@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, MaybeG
     Interface
   } = Module::
@@ -12,13 +12,13 @@ module.exports = (Module)->
     @module Module
 
     @virtual getType: FuncG [], String
-    @virtual setType: FuncG String, NilT
+    @virtual setType: FuncG String
     @virtual getPriority: FuncG [], Number
-    @virtual setPriority: FuncG Number, NilT
+    @virtual setPriority: FuncG Number
     @virtual getHeader: FuncG [], MaybeG Object
-    @virtual setHeader: FuncG Object, NilT
+    @virtual setHeader: FuncG Object
     @virtual getBody: FuncG [], MaybeG AnyT
-    @virtual setBody: FuncG [MaybeG AnyT], NilT
+    @virtual setBody: FuncG [MaybeG AnyT]
 
 
     @initialize()

@@ -2,7 +2,6 @@
 
 module.exports = (Module)->
   {
-    NilT
     PropertyDefinitionT, EmbedOptionsT, EmbedConfigT
     FuncG, DictG, MaybeG
     RecordInterface
@@ -13,13 +12,13 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual @static relatedEmbed: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT)
+    @virtual @static relatedEmbed: FuncG([PropertyDefinitionT, EmbedOptionsT])
 
-    @virtual @static relatedEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT)
+    @virtual @static relatedEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT])
 
-    @virtual @static hasEmbed: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT)
+    @virtual @static hasEmbed: FuncG([PropertyDefinitionT, EmbedOptionsT])
 
-    @virtual @static hasEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT], NilT)
+    @virtual @static hasEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT])
 
     @virtual @static embeddings: DictG(String, EmbedConfigT)
 

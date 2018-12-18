@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, StructG, MaybeG
     ContextInterface
     ResourceInterface
@@ -19,10 +19,10 @@ module.exports = (Module)->
     @virtual context: ContextInterface
 
     @virtual finish: Function
-    @virtual @async migrate: FuncG [MaybeG StructG until: MaybeG String], NilT
+    @virtual @async migrate: FuncG [MaybeG StructG until: MaybeG String]
     @virtual @async rollback: FuncG [MaybeG StructG {
       steps: MaybeG(Number), until: MaybeG String
-    }], NilT
+    }]
     @virtual @async run: FuncG [String, AnyT], AnyT
     @virtual @async execute: FuncG [String, StructG({
       context: ContextInterface, reverse: String

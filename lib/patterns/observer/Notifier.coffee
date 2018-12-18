@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, PointerT
+    AnyT, PointerT
     FuncG, SubsetG, MaybeG
     NotifierInterface
     FacadeInterface
@@ -25,12 +25,12 @@ module.exports = (Module)->
           throw new Error Notifier::MULTITON_MSG
         Module::Facade.getInstance @[ipsMultitonKey]
 
-    @public sendNotification: FuncG([String, MaybeG(AnyT), MaybeG String], NilT),
+    @public sendNotification: FuncG([String, MaybeG(AnyT), MaybeG String]),
       default: (asName, aoBody, asType)->
         @facade?.sendNotification asName, aoBody, asType
         return
 
-    @public initializeNotifier: FuncG(String, NilT),
+    @public initializeNotifier: FuncG(String),
       default: (asKey)->
         @[ipsMultitonKey] = asKey
         return

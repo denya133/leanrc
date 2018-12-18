@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, MaybeG, UnionG, ListG
     ResqueInterface
     Interface
@@ -24,7 +24,7 @@ module.exports = (Module)->
 
     @virtual @async delete: FuncG [UnionG String, Number], Boolean
 
-    @virtual @async abort: FuncG [UnionG String, Number], NilT
+    @virtual @async abort: FuncG [UnionG String, Number]
 
     @virtual @async all: FuncG [MaybeG String], ListG Object
 

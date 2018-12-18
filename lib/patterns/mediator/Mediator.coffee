@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, PointerT
+    AnyT, PointerT
     FuncG, SubsetG, MaybeG
     MediatorInterface, NotificationInterface
     Notifier
@@ -22,7 +22,7 @@ module.exports = (Module)->
     @public getViewComponent: FuncG([], MaybeG AnyT),
       default: -> @[ipoViewComponent]
 
-    @public setViewComponent: FuncG(AnyT, NilT),
+    @public setViewComponent: FuncG(AnyT),
       default: (aoViewComponent)->
         @[ipoViewComponent] = aoViewComponent
         return
@@ -58,7 +58,7 @@ module.exports = (Module)->
         replica.mediatorName = instance.getMediatorName()
         yield return replica
 
-    @public init: FuncG([MaybeG(String), MaybeG AnyT], NilT),
+    @public init: FuncG([MaybeG(String), MaybeG AnyT]),
       default: (asMediatorName, aoViewComponent)->
         @super arguments...
         @[ipsMediatorName] = asMediatorName ? @constructor.name

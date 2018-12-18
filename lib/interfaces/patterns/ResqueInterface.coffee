@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT
+    AnyT
     FuncG, ListG, StructG, MaybeG, UnionG
     QueueInterface
     ProxyInterface
@@ -28,7 +28,7 @@ module.exports = (Module)->
 
     @virtual @async get: FuncG String, MaybeG QueueInterface
 
-    @virtual @async remove: FuncG String, NilT
+    @virtual @async remove: FuncG String
 
     @virtual @async update: FuncG [String, Number], QueueInterface
 
@@ -48,7 +48,7 @@ module.exports = (Module)->
 
     @virtual @async getQueue: FuncG String, MaybeG StructG name: String, concurrency: Number
 
-    @virtual @async removeQueue: FuncG String, NilT
+    @virtual @async removeQueue: FuncG String
 
     @virtual @async allQueues: FuncG [], ListG StructG name: String, concurrency: Number
 
@@ -58,7 +58,7 @@ module.exports = (Module)->
 
     @virtual @async deleteJob: FuncG [String, UnionG String, Number], Boolean
 
-    @virtual @async abortJob: FuncG [String, UnionG String, Number], NilT
+    @virtual @async abortJob: FuncG [String, UnionG String, Number]
 
     @virtual @async allJobs: FuncG [String, MaybeG String], ListG Object
 

@@ -8,7 +8,7 @@ module.exports = (Module)->
     DELAYED_JOBS_QUEUE
     RESQUE
     MIGRATIONS
-    AnyT, NilT
+    AnyT
     FuncG, UnionG, TupleG, MaybeG, DictG, StructG, EnumG, ListG
     ResourceInterface, CollectionInterface, ContextInterface
     NotificationInterface, RecordInterface
@@ -171,7 +171,7 @@ module.exports = (Module)->
       get: ->
         @metaObject.getGroup 'actions', no
 
-    @public @static action: FuncG([UnionG Object, TupleG Object, Object], NilT),
+    @public @static action: FuncG([UnionG Object, TupleG Object, Object]),
       default: (args...)->
       # default: (nameDefinition, config)->
         # [actionName] = Object.keys nameDefinition

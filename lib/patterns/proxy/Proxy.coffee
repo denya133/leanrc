@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    AnyT, NilT, PointerT
+    AnyT, PointerT
     FuncG, SubsetG, MaybeG
     ProxyInterface
     Notifier
@@ -19,7 +19,7 @@ module.exports = (Module)->
     @public getProxyName: FuncG([], String),
       default: -> @[ipsProxyName]
 
-    @public setData: FuncG(AnyT, NilT),
+    @public setData: FuncG(AnyT),
       default: (ahData)->
         @[ipoData] = ahData
         return
@@ -52,7 +52,7 @@ module.exports = (Module)->
         replica.proxyName = instance.getProxyName()
         yield return replica
 
-    @public init: FuncG([MaybeG(String), MaybeG AnyT], NilT),
+    @public init: FuncG([MaybeG(String), MaybeG AnyT]),
       default: (asProxyName, ahData)->
         @super arguments...
 
