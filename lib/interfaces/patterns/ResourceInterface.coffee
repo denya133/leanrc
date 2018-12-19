@@ -18,18 +18,18 @@ module.exports = (Module)->
     @inheritProtected()
     @module Module
 
-    @virtual needsLimitation: Boolean
-    @virtual entityName: String
-    @virtual keyName: String
-    @virtual itemEntityName: String
-    @virtual listEntityName: String
-    @virtual collectionName: String
-    @virtual collection: CollectionInterface
-
-    @virtual context: MaybeG ContextInterface
-    @virtual listQuery: MaybeG Object
-    @virtual recordId: MaybeG String
-    @virtual recordBody: MaybeG Object
+    # @virtual needsLimitation: Boolean
+    # @virtual entityName: String
+    # @virtual keyName: String
+    # @virtual itemEntityName: String
+    # @virtual listEntityName: String
+    # @virtual collectionName: String
+    # @virtual collection: CollectionInterface
+    #
+    # @virtual context: MaybeG ContextInterface
+    # @virtual listQuery: MaybeG Object
+    # @virtual recordId: MaybeG String
+    # @virtual recordBody: MaybeG Object
 
 
     @virtual @static actions: DictG String, Object
