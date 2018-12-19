@@ -462,7 +462,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.replicate = FuncG([], Object) ->
+          opts.replicate = FuncG([], Array) ->
             alRecords = @[vsAttr]
 
             {
@@ -932,7 +932,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.replicate = FuncG([], Object) ->
+          opts.replicate = FuncG([], Array) ->
             alRecords = @[vsAttr]
 
             {
