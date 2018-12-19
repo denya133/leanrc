@@ -5,7 +5,7 @@ module.exports = (Module)->
   {
     PointerT, JoiT
     PropertyDefinitionT, EmbedOptionsT, EmbedConfigT
-    FuncG, MaybeG, DictG, SubsetG, AsyncFuncG, ListG
+    FuncG, MaybeG, DictG, SubsetG, AsyncFuncG, ListG, UnionG
     EmbeddableInterface, RecordInterface, CollectionInterface, CursorInterface
     Record, Mixin
     Utils: { _, inflect, joi, co }
