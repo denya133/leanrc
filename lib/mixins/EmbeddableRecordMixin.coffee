@@ -54,6 +54,7 @@ module.exports = (Module)->
           opts.inverseType ?= null # manually only string
           opts.attr ?= "#{vsAttr}Id"
           opts.embedding = 'relatedEmbed'
+          opts.through ?= null
 
           opts.putOnly ?= no
           opts.loadOnly ?= no
@@ -267,6 +268,7 @@ module.exports = (Module)->
           opts.inverseType ?= null # manually only string
           opts.attr ?= "#{inflect.pluralize inflect.camelize vsAttr, no}"
           opts.embedding = 'relatedEmbeds'
+          opts.through ?= null
 
           opts.putOnly ?= no
           opts.loadOnly ?= no
@@ -492,6 +494,7 @@ module.exports = (Module)->
           opts.attr = null
           opts.inverseType ?= null # manually only string
           opts.embedding = 'hasEmbed'
+          opts.through ?= null
 
           opts.putOnly ?= no
           opts.loadOnly ?= no
@@ -726,6 +729,7 @@ module.exports = (Module)->
           opts.attr = null
           opts.inverseType ?= null # manually only string
           opts.embedding = 'hasEmbeds'
+          opts.through ?= null
 
           opts.putOnly ?= no
           opts.loadOnly ?= no
