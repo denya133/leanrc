@@ -992,7 +992,7 @@ module.exports = (Module)->
           vhResult = yield @super aoRecord
           yield return vhResult
 
-      @public @static @async recoverize: FuncG([MaybeG(Object), CollectionInterface], RecordInterface),
+      @public @static @async recoverize: FuncG([MaybeG(Object), CollectionInterface], MaybeG RecordInterface),
         default: (args...)->
           [ahPayload] = args
           voRecord = yield @super args...
@@ -1000,7 +1000,7 @@ module.exports = (Module)->
             voRecord[asAttr] = yield restore.call voRecord, ahPayload[asAttr]
           yield return voRecord
 
-      @public @static objectize: FuncG([MaybeG RecordInterface], MaybeG Object),
+      @public @static objectize: FuncG([MaybeG(RecordInterface), MaybeG Object], MaybeG Object),
         default: (args...)->
           [aoRecord] = args
           vhResult = @super args...
