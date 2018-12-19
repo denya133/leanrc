@@ -429,7 +429,7 @@ module.exports = (Module)->
                   )
             yield return
 
-          opts.restore = AsyncFuncG([MaybeG Object], MaybeG RecordInterface) co.wrap (replica)->
+          opts.restore = AsyncFuncG([MaybeG Object], ListG RecordInterface) co.wrap (replica)->
             EmbedsCollection = null
             EmbedRecord = null
 
@@ -462,7 +462,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.replicate = FuncG([], Array) ->
+          opts.replicate = FuncG([], ListG Object) ->
             alRecords = @[vsAttr]
 
             {
@@ -908,7 +908,7 @@ module.exports = (Module)->
                 )).forEach co.wrap (voRecord)-> yield voRecord.destroy()
             yield return
 
-          opts.restore = AsyncFuncG([MaybeG Object], MaybeG RecordInterface) co.wrap (replica)->
+          opts.restore = AsyncFuncG([MaybeG Object], ListG RecordInterface) co.wrap (replica)->
             EmbedsCollection = @collection.facade.retrieveProxy opts.collectionName.call(@)
             EmbedRecord = @findRecordByName opts.recordName.call(@)
 
@@ -932,7 +932,7 @@ module.exports = (Module)->
 
             yield return res
 
-          opts.replicate = FuncG([], Array) ->
+          opts.replicate = FuncG([], ListG Object) ->
             alRecords = @[vsAttr]
 
             {
