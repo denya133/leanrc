@@ -257,7 +257,7 @@ module.exports = (Module)->
             res
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
-          @public "#{vsAttr}": MaybeG RecordInterface
+          @public "#{vsAttr}": MaybeG UnionG RecordInterface, Object
           return
 
       @public @static relatedEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT]),
@@ -483,7 +483,7 @@ module.exports = (Module)->
             res
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
-          @public "#{vsAttr}": MaybeG ListG RecordInterface
+          @public "#{vsAttr}": MaybeG ListG UnionG RecordInterface, Object
           return
 
       @public @static hasEmbed: FuncG([PropertyDefinitionT, EmbedOptionsT]),
@@ -718,7 +718,7 @@ module.exports = (Module)->
             res
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
-          @public "#{vsAttr}": MaybeG RecordInterface
+          @public "#{vsAttr}": MaybeG UnionG RecordInterface, Object
           return
 
       @public @static hasEmbeds: FuncG([PropertyDefinitionT, EmbedOptionsT]),
@@ -953,7 +953,7 @@ module.exports = (Module)->
             res
 
           @metaObject.addMetaData 'embeddings', vsAttr, opts
-          @public "#{vsAttr}": MaybeG ListG RecordInterface
+          @public "#{vsAttr}": MaybeG ListG UnionG RecordInterface, Object
           return
 
       @public @static embeddings: DictG(String, EmbedConfigT),
