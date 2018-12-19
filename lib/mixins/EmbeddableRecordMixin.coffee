@@ -19,7 +19,7 @@ module.exports = (Module)->
       ipoInternalRecord = PointerT @instanceVariables['~internalRecord'].pointer
 
       @public @static schema: JoiT,
-        default: {}
+        default: joi.object()
         get: (_data)->
           _data[@name] ?= do =>
             vhAttrs = {}
