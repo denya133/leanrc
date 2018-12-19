@@ -489,6 +489,7 @@ module.exports = (Module)->
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
+          opts.attr = null
           opts.inverseType ?= null # manually only string
           opts.embedding = 'hasEmbed'
 
@@ -722,6 +723,7 @@ module.exports = (Module)->
           [vsAttr] = Object.keys typeDefinition
           opts.refKey ?= 'id'
           opts.inverse ?= "#{inflect.singularize inflect.camelize @name.replace(/Record$/, ''), no}Id"
+          opts.attr = null
           opts.inverseType ?= null # manually only string
           opts.embedding = 'hasEmbeds'
 
