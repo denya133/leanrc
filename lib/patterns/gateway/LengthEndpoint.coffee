@@ -4,7 +4,6 @@ module.exports = (Module)->
   {
     FuncG, InterfaceG
     GatewayInterface
-    EndpointInterface
     CrudEndpointMixin
     Endpoint
     Utils: { statuses, joi }
@@ -15,7 +14,6 @@ module.exports = (Module)->
 
   class LengthEndpoint extends Endpoint
     @inheritProtected()
-    @implements EndpointInterface
     @include CrudEndpointMixin
     @module Module
 

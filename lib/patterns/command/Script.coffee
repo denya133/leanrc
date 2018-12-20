@@ -15,9 +15,12 @@ module.exports = (Module)->
 
   class Script extends SimpleCommand
     @inheritProtected()
-    @implements ScriptInterface
     @include ConfigurableMixin
+    @implements ScriptInterface
     @module Module
+
+    @public @async body: FuncG([MaybeG AnyT], MaybeG AnyT),
+      default: -> yield return
 
     @public @static do: FuncG(Function),
       default: (lambda)->

@@ -4,14 +4,13 @@
 module.exports = (Module)->
   {
     FuncG, MaybeG, TupleG, SubsetG
-    TransformInterface, RecordInterface
+    RecordInterface
     ArrayTransform
     Utils: { _, inflect, moment }
   } = Module::
 
   class ComplexArrayTransform extends ArrayTransform
     @inheritProtected()
-    @implements TransformInterface
     @module Module
 
     @public @static parseRecordName: FuncG(String, TupleG String, String),

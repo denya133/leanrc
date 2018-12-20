@@ -4,7 +4,6 @@ module.exports = (Module)->
   {
     FuncG, InterfaceG
     GatewayInterface
-    EndpointInterface
     CrudEndpointMixin
     Endpoint
     Utils: { statuses }
@@ -16,7 +15,6 @@ module.exports = (Module)->
 
   class DetailEndpoint extends Endpoint
     @inheritProtected()
-    @implements EndpointInterface
     @include CrudEndpointMixin
     @module Module
 

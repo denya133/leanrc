@@ -26,9 +26,9 @@ module.exports = (Module)->
 
   class Resource extends SimpleCommand
     @inheritProtected()
-    @implements ResourceInterface
     @include ConfigurableMixin
     @include ChainsMixin
+    @implements ResourceInterface
     @module Module
 
     @public entityName: String,

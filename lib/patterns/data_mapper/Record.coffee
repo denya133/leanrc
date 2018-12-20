@@ -57,8 +57,8 @@ module.exports = (Module)->
 
   class Record extends CoreObject
     @inheritProtected()
-    @implements RecordInterface
     @include ChainsMixin
+    @implements RecordInterface
     @module Module
 
     ipoInternalRecord = PointerT @protected internalRecord: MaybeG Object

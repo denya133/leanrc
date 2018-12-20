@@ -42,8 +42,8 @@ module.exports = (Module)->
 
   class Collection extends Module::Proxy
     @inheritProtected()
-    @implements CollectionInterface
     @include ConfigurableMixin
+    @implements CollectionInterface
     @module Module
 
     @public delegate: SubsetG(RecordInterface),
