@@ -31,8 +31,8 @@ module.exports = (Module)->
 
   class Renderer extends Module::Proxy
     @inheritProtected()
-    @implements RendererInterface
     # @include ConfigurableMixin
+    @implements RendererInterface
     @module Module
 
     # may be redefine at inheritance

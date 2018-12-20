@@ -50,8 +50,8 @@ module.exports = (Module)->
 
   class Resque extends Module::Proxy
     @inheritProtected()
-    @implements ResqueInterface
     @include ConfigurableMixin
+    @implements ResqueInterface
     @module Module
 
     @public tmpJobs: ListG StructG {

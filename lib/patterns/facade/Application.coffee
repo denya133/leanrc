@@ -17,8 +17,8 @@ module.exports = (Module)->
 
   class Application extends PipeAwareModule
     @inheritProtected()
-    @implements ApplicationInterface
     @include ConfigurableMixin
+    @implements ApplicationInterface
     @module Module
 
     @const LOGGER_PROXY: 'LoggerProxy'

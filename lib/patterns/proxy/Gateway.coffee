@@ -56,8 +56,8 @@ module.exports = (Module)->
 
   class Gateway extends Module::Proxy
     @inheritProtected()
-    @implements GatewayInterface
     @include ConfigurableMixin
+    @implements GatewayInterface
     @module Module
 
     # ipsMultitonKey = Symbol.for '~multitonKey' #PointerT @protected multitonKey: String

@@ -50,8 +50,8 @@ module.exports = (Module)->
 
   class Switch extends Mediator
     @inheritProtected()
-    @implements SwitchInterface
     @include ConfigurableMixin
+    @implements SwitchInterface
     @module Module
 
     ipoHttpServer = PointerT @private httpServer: Object
