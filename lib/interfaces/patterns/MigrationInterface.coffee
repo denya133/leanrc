@@ -4,10 +4,10 @@ module.exports = (Module)->
   {
     AnyT, AsyncFunctionT
     FuncG, ListG, StructG, EnumG, MaybeG, UnionG, InterfaceG, AsyncFuncG
-    RecordInterface
+    Interface
   } = Module::
 
-  class MigrationInterface extends RecordInterface
+  class MigrationInterface extends Interface
     @inheritProtected()
     @module Module
 
