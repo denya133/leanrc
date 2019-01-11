@@ -27,7 +27,7 @@ module.exports = (Module)->
     @const CONNECT_MODULE_TO_SHELL: 'connectModuleToShell'
 
     @public isLightweight: Boolean
-    @public context: ContextInterface
+    @public context: MaybeG ContextInterface
 
     @public @static NAME: String,
       get: -> @Module.name
