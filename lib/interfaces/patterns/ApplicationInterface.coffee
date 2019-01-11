@@ -16,7 +16,7 @@ module.exports = (Module)->
     @virtual @static NAME: String
 
     @virtual isLightweight: Boolean
-    @virtual context: ContextInterface
+    @virtual context: MaybeG ContextInterface
 
     @virtual finish: Function
     @virtual @async migrate: FuncG [MaybeG StructG until: MaybeG String]
