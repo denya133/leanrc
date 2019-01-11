@@ -48,7 +48,7 @@ module.exports = (Module)->
         appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
         return yield appMediator.rollback opts
 
-    @public @async run: FuncG([String, AnyT], AnyT),
+    @public @async run: FuncG([String, MaybeG AnyT], MaybeG AnyT),
       default: (scriptName, data)->
         appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
         return yield appMediator.run scriptName, data
@@ -56,7 +56,7 @@ module.exports = (Module)->
     @public @async execute: FuncG([String, StructG({
       context: ContextInterface, reverse: String
     }), String], StructG {
-      result: AnyT, resource: ResourceInterface
+      result: MaybeG(AnyT), resource: ResourceInterface
     }),
       default: (resourceName, {context, reverse}, action)->
         @context = context

@@ -23,11 +23,11 @@ module.exports = (Module)->
     @virtual @async rollback: FuncG [MaybeG StructG {
       steps: MaybeG(Number), until: MaybeG String
     }]
-    @virtual @async run: FuncG [String, AnyT], AnyT
+    @virtual @async run: FuncG [String, MaybeG AnyT], MaybeG(AnyT)
     @virtual @async execute: FuncG [String, StructG({
       context: ContextInterface, reverse: String
     }), String], StructG {
-      result: AnyT, resource: ResourceInterface
+      result: MaybeG(AnyT), resource: ResourceInterface
     }
 
 
