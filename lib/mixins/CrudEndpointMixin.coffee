@@ -79,7 +79,10 @@ module.exports = (Module)->
 
       @public listSchema: JoiT,
         get: ->
-          Endpoint.listSchemas["#{@[ipsEntityName]}|#{@[ipsRecordName]}"] ?= joi.object "#{@listEntityName}": joi.array().items @schema
+          Endpoint.listSchemas["#{@[ipsEntityName]}|#{@[ipsRecordName]}"] ?= joi.object {
+            meta: joi.object()
+            "#{@listEntityName}": joi.array().items @schema
+          }
 
       @public itemSchema: JoiT,
         get: ->

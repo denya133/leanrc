@@ -6,7 +6,7 @@
 
 module.exports = (Module)->
   {
-    FuncG, StructG, ListG
+    FuncG, StructG, ListG, UnionG, EnumG
     ContextInterface
     Resource, Mixin
     Utils: { _, isArangoDB, joi }
@@ -52,8 +52,8 @@ module.exports = (Module)->
 
       @action @async list: FuncG([], StructG {
         meta: StructG pagination: StructG {
-          limit: Number
-          offset: Number
+          limit: UnionG Number, EnumG ['not defined']
+          offset: UnionG Number, EnumG ['not defined']
         }
         items: ListG Object
       }),
@@ -106,8 +106,8 @@ module.exports = (Module)->
           return {
             meta:
               pagination:
-                limit: voQuery.$limit
-                offset: voQuery.$offset
+                limit: voQuery.$limit ? 'not defined'
+                offset: voQuery.$offset ? 'not defined'
             items: vlItems
           }
 

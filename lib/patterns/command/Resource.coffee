@@ -11,7 +11,7 @@ module.exports = (Module)->
     AnyT
     FuncG, UnionG, TupleG, MaybeG, DictG, StructG, EnumG, ListG
     ResourceInterface, CollectionInterface, ContextInterface
-    NotificationInterface, RecordInterface
+    NotificationInterface
     ConfigurableMixin
     ChainsMixin
     SimpleCommand
@@ -200,15 +200,15 @@ module.exports = (Module)->
           items: vlItems
         }
 
-    @action @async detail: FuncG([], RecordInterface),
+    @action @async detail: FuncG([], Object),
       default: ->
         yield @collection.find @recordId
 
-    @action @async create: FuncG([], RecordInterface),
+    @action @async create: FuncG([], Object),
       default: ->
         yield @collection.create @recordBody
 
-    @action @async update: FuncG([], RecordInterface),
+    @action @async update: FuncG([], Object),
       default: ->
         yield @collection.update @recordId, @recordBody
 

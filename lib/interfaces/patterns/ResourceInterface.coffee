@@ -10,7 +10,7 @@ module.exports = (Module)->
   {
     AnyT
     FuncG, UnionG, TupleG, MaybeG, DictG, StructG, EnumG, ListG
-    CollectionInterface, ContextInterface, RecordInterface
+    CollectionInterface, ContextInterface
     Interface
   } = Module::
 
@@ -43,9 +43,9 @@ module.exports = (Module)->
       }
       items: ListG Object
     }
-    @virtual @async detail: FuncG [], RecordInterface
-    @virtual @async create: FuncG [], RecordInterface
-    @virtual @async update: FuncG [], RecordInterface
+    @virtual @async detail: FuncG [], Object
+    @virtual @async create: FuncG [], Object
+    @virtual @async update: FuncG [], Object
     @virtual @async delete: Function
     @virtual @async destroy: Function
 
