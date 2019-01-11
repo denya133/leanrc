@@ -150,6 +150,7 @@ describe 'CrudEndpointMixin', ->
           gateway: gateway
         { listSchema } = endpoint
         assert.deepEqual listSchema, joi.object
+          meta: joi.object()
           cucumbers: joi.array().items TestRecord.schema
         yield return
   describe '#itemSchema', ->
