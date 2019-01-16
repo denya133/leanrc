@@ -166,6 +166,7 @@ module.exports = (Module)->
     @public listQuery: MaybeG Object
     @public recordId: MaybeG String
     @public recordBody: MaybeG Object
+    @public actionResult: MaybeG AnyT
 
     @public @static actions: DictG(String, Object),
       get: ->
@@ -279,6 +280,7 @@ module.exports = (Module)->
     @public @async doAction: FuncG([String, ContextInterface], MaybeG AnyT),
       default: (action, context)->
         voResult = yield @[action]? context
+        @actionResult = voResult
         yield @saveDelayeds()
         yield return voResult
 
