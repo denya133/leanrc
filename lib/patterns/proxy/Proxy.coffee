@@ -19,6 +19,9 @@ module.exports = (Module)->
     @public getProxyName: FuncG([], String),
       default: -> @[ipsProxyName]
 
+    @public getName: FuncG([], String),
+      default: -> @[ipsProxyName]
+
     @public setData: FuncG(AnyT),
       default: (ahData)->
         @[ipoData] = ahData

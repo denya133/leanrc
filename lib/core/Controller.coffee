@@ -70,6 +70,9 @@ module.exports = (Module)->
           @[iphCommandMap][asNotificationName] = aCommand
         return
 
+    @public addCommand: FuncG([String, SubsetG CommandInterface]),
+      default: (args...)-> @registerCommand args...
+
     @public lazyRegisterCommand: FuncG([String, MaybeG String]),
       default: (asNotificationName, asClassName)->
         asClassName ?= asNotificationName

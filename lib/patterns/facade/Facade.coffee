@@ -74,6 +74,9 @@ module.exports = (Module)->
         @[ipoController].registerCommand asNotificationName, aCommand
         return
 
+    @public addCommand: FuncG([String, SubsetG CommandInterface]),
+      default: (args...)-> @registerCommand args...
+
     @public lazyRegisterCommand: FuncG([String, MaybeG String]),
       default: (asNotificationName, asClassName)->
         @[ipoController].lazyRegisterCommand asNotificationName, asClassName
@@ -93,6 +96,9 @@ module.exports = (Module)->
         @[ipoModel].registerProxy aoProxy
         return
 
+    @public addProxy: FuncG(ProxyInterface),
+      default: (args...)-> @registerProxy args...
+
     @public lazyRegisterProxy: FuncG([String, MaybeG(String), MaybeG AnyT]),
       default: (asProxyName, asProxyClassName, ahData)->
         @[ipoModel].lazyRegisterProxy asProxyName, asProxyClassName, ahData
@@ -101,6 +107,9 @@ module.exports = (Module)->
     @public retrieveProxy: FuncG(String, MaybeG ProxyInterface),
       default: (asProxyName)->
         @[ipoModel].retrieveProxy asProxyName
+
+    @public getProxy: FuncG(String, MaybeG ProxyInterface),
+      default: (args...)-> @retrieveProxy args...
 
     @public removeProxy: FuncG(String, MaybeG ProxyInterface),
       default: (asProxyName)->
@@ -116,10 +125,16 @@ module.exports = (Module)->
           @[ipoView].registerMediator aoMediator
         return
 
+    @public addMediator: FuncG(MediatorInterface),
+      default: (args...)-> @registerMediator args...
+
     @public retrieveMediator: FuncG(String, MaybeG MediatorInterface),
       default: (asMediatorName)->
         if @[ipoView]
           @[ipoView].retrieveMediator asMediatorName
+
+    @public getMediator: FuncG(String, MaybeG MediatorInterface),
+      default: (args...)-> @retrieveMediator args...
 
     @public removeMediator: FuncG(String, MaybeG MediatorInterface),
       default: (asMediatorName)->
@@ -141,6 +156,9 @@ module.exports = (Module)->
       default: (asName, aoBody, asType)->
         @notifyObservers Module::Notification.new asName, aoBody, asType
         return
+
+    @public send: FuncG([String, MaybeG(AnyT), MaybeG String]),
+      default: (args...)-> @sendNotification args...
 
     @public initializeNotifier: FuncG(String),
       default: (asKey)->
