@@ -4,7 +4,7 @@ module.exports = (Module)->
   {
     AnyT, PointerT
     FuncG, SubsetG, MaybeG
-    MediatorInterface, NotificationInterface
+    MediatorInterface, NotificationInterface, ProxyInterface
     Notifier
   } = Module::
 
@@ -19,6 +19,9 @@ module.exports = (Module)->
     @public getMediatorName: FuncG([], String),
       default: -> @[ipsMediatorName]
 
+    @public getName: FuncG([], String),
+      default: -> @[ipsMediatorName]
+
     @public getViewComponent: FuncG([], MaybeG AnyT),
       default: -> @[ipoViewComponent]
 
@@ -26,6 +29,16 @@ module.exports = (Module)->
       default: (aoViewComponent)->
         @[ipoViewComponent] = aoViewComponent
         return
+
+    @public view: MaybeG(AnyT),
+      get: -> @getViewComponent()
+      set: (aoViewComponent)-> @setViewComponent aoViewComponent
+
+    @public getProxy: FuncG(String, MaybeG ProxyInterface),
+      default: (args...)-> @facade.retrieveProxy args...
+
+    @public addProxy: FuncG(ProxyInterface),
+      default: (args...)-> @facade.registerProxy args...
 
     @public listNotificationInterests: FuncG([], Array),
       default: -> []

@@ -93,9 +93,15 @@ module.exports = (Module)->
         aoMediator.onRegister()
         return
 
+    @public addMediator: FuncG(MediatorInterface),
+      default: (args...)-> @registerMediator args...
+
     @public retrieveMediator: FuncG(String, MaybeG MediatorInterface),
       default: (asMediatorName)->
         @[iphMediatorMap][asMediatorName] ? null
+
+    @public getMediator: FuncG(String, MaybeG MediatorInterface),
+      default: (args...)-> @retrieveMediator args...
 
     @public removeMediator: FuncG(String, MaybeG MediatorInterface),
       default: (asMediatorName)->

@@ -60,6 +60,9 @@ module.exports = (Module)->
         aoProxy.onRegister()
         return
 
+    @public addProxy: FuncG(ProxyInterface),
+      default: (args...)-> @registerProxy args...
+
     @public removeProxy: FuncG(String, MaybeG ProxyInterface),
       default: (asProxyName)->
         voProxy = @[iphProxyMap][asProxyName]
@@ -79,6 +82,9 @@ module.exports = (Module)->
             Class = (@ApplicationModule.NS ? @ApplicationModule::)[className]
             @registerProxy Class.new asProxyName, data
         @[iphProxyMap][asProxyName] ? null
+
+    @public getProxy: FuncG(String, MaybeG ProxyInterface),
+      default: (args...)-> @retrieveProxy args...
 
     @public hasProxy: FuncG(String, Boolean),
       default: (asProxyName)->

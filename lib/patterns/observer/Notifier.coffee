@@ -30,6 +30,9 @@ module.exports = (Module)->
         @facade?.sendNotification asName, aoBody, asType
         return
 
+    @public send: FuncG([String, MaybeG(AnyT), MaybeG String]),
+      default: (args...)-> @sendNotification args...
+
     @public initializeNotifier: FuncG(String),
       default: (asKey)->
         @[ipsMultitonKey] = asKey
