@@ -2,8 +2,7 @@
 
 module.exports = (Module)->
   {
-    AsyncFunctionT
-    FuncG, MaybeG, InterfaceG, DictG
+    FuncG, MaybeG, InterfaceG
     FacadeInterface
     Interface
   } = Module::
@@ -15,12 +14,12 @@ module.exports = (Module)->
     @virtual @static delay: FuncG [
       FacadeInterface
       MaybeG InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
-    ], DictG String, AsyncFunctionT
+    ]
 
     @virtual delay: FuncG [
       FacadeInterface
       MaybeG InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
-    ], DictG String, AsyncFunctionT
+    ]
 
 
     @initialize()

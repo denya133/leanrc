@@ -6,13 +6,13 @@
 
 module.exports = (Module)->
   {
-    PointerT, AsyncFunctionT
-    FuncG, StructG, MaybeG, InterfaceG, DictG
+    PointerT
+    FuncG, StructG, MaybeG, InterfaceG
     DelayableInterface
     FacadeInterface
     CoreObject
     Mixin
-    Utils: { co }
+    Utils: { _, co }
   } = Module::
 
   Module.defineMixin Mixin 'DelayableMixin', (BaseClass = CoreObject) ->
@@ -59,42 +59,74 @@ module.exports = (Module)->
       @public @static delay: FuncG([
         FacadeInterface
         MaybeG InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
-      ], DictG String, AsyncFunctionT),
+      ]),
         default: (facade, opts = {})->
-          obj = {}
-          for own methodName of @classMethods
-            if methodName isnt 'delay'
-              self = @
-              do (methodName) ->
-                obj[methodName] = co.wrap (args...) ->
-                  data =
-                    moduleName: self.moduleName()
-                    replica: yield self.constructor.replicateObject self
-                    methodName: methodName
-                    args: args
-                    opts: opts
-                  return yield self[cpmDelayJob] facade, data, opts
-          obj
+          return new Proxy @, {
+            get: (target, name, receiver)->
+              if (name is 'delay')
+                throw new Error "Method `delay` can not been delayed"
+              if (not(name of target) or typeof target[name] isnt "function")
+                throw new Error "Method \`#{if _.isSymbol(name) then Symbol.keyFor(name) else name}\` absent in class #{target.name}"
+              return co.wrap (args...)->
+                data = {
+                  moduleName: target.moduleName()
+                  replica: yield target.constructor.replicateObject target
+                  methodName: name
+                  args
+                  opts
+                }
+                return yield target[cpmDelayJob] facade, data, opts
+          }
+          # obj = {}
+          # for own methodName of @classMethods
+          #   if methodName isnt 'delay'
+          #     self = @
+          #     do (methodName) ->
+          #       obj[methodName] = co.wrap (args...) ->
+          #         data =
+          #           moduleName: self.moduleName()
+          #           replica: yield self.constructor.replicateObject self
+          #           methodName: methodName
+          #           args: args
+          #           opts: opts
+          #         return yield self[cpmDelayJob] facade, data, opts
+          # obj
 
       @public delay: FuncG([
         FacadeInterface
         MaybeG InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
-      ], DictG String, AsyncFunctionT),
+      ]),
         default: (facade, opts = {})->
-          obj = {}
-          for own methodName of @constructor.instanceMethods
-            if methodName isnt 'delay'
-              self = @
-              do (methodName) ->
-                obj[methodName] = co.wrap (args...) ->
-                  data =
-                    moduleName: self.moduleName()
-                    replica: yield self.constructor.replicateObject self
-                    methodName: methodName
-                    args: args
-                    opts: opts
-                  return yield self.constructor[cpmDelayJob] facade, data, opts
-          obj
+          return new Proxy @, {
+            get: (target, name, receiver)->
+              if (name is 'delay')
+                throw new Error "Method `delay` can not been delayed"
+              if (not(name of target) or typeof target[name] isnt "function")
+                throw new Error "Method \`#{if _.isSymbol(name) then Symbol.keyFor(name) else name}\` absent in class #{target.name}.prototype"
+              return co.wrap (args...)->
+                data = {
+                  moduleName: target.moduleName()
+                  replica: yield target.constructor.replicateObject target
+                  methodName: name
+                  args
+                  opts
+                }
+                return yield target.constructor[cpmDelayJob] facade, data, opts
+          }
+          # obj = {}
+          # for own methodName of @constructor.instanceMethods
+          #   if methodName isnt 'delay'
+          #     self = @
+          #     do (methodName) ->
+          #       obj[methodName] = co.wrap (args...) ->
+          #         data =
+          #           moduleName: self.moduleName()
+          #           replica: yield self.constructor.replicateObject self
+          #           methodName: methodName
+          #           args: args
+          #           opts: opts
+          #         return yield self.constructor[cpmDelayJob] facade, data, opts
+          # obj
 
 
       @initializeMixin()
