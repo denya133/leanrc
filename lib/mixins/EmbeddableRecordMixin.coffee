@@ -959,30 +959,6 @@ module.exports = (Module)->
       @public @static embeddings: DictG(String, EmbedConfigT),
         get: -> @metaObject.getGroup 'embeddings', no
 
-      @chains ['create', 'update']
-
-      @public @async create: FuncG([], RecordInterface),
-        default: ->
-          response = yield @collection.push @
-          if response?
-            for own asAttr of @constructor.attributes
-              @[asAttr] = response[asAttr]
-            for own asEmbed of @constructor.embeddings
-              @[asEmbed] = response[asEmbed]
-            @[ipoInternalRecord] = response[ipoInternalRecord]
-          yield return @
-
-      @public @async update: FuncG([], RecordInterface),
-        default: ->
-          response = yield @collection.override @id, @
-          if response?
-            for own asAttr of @constructor.attributes
-              @[asAttr] = response[asAttr]
-            for own asEmbed of @constructor.embeddings
-              @[asEmbed] = response[asEmbed]
-            @[ipoInternalRecord] = response[ipoInternalRecord]
-          yield return @
-
       @public @static @async normalize: FuncG([MaybeG(Object), CollectionInterface], RecordInterface),
         default: (args...)->
           voRecord = yield @super args...
@@ -1020,6 +996,15 @@ module.exports = (Module)->
           for own asAttr, { replicate } of aoRecord.constructor.embeddings
             vhResult[asAttr] = replicate.call aoRecord
           vhResult
+
+      @public @async reloadRecord: FuncG(UnionG Object, RecordInterface),
+        default: (response)->
+          @super response
+          if response?
+            for own asEmbed of @constructor.embeddings
+              @[asEmbed] = response[asEmbed]
+            @[ipoInternalRecord] = response[ipoInternalRecord]
+          yield return
 
       # TODO: не учтены установки значений, которые раньше не были установлены
       @public @async changedAttributes: FuncG([], DictG String, Array),

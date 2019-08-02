@@ -323,21 +323,13 @@ module.exports = (Module)->
         # response = yield @collection.push.body.call @collection, @
         # console.log '>>>>?????????????????????', response, response.collection
         # console.log '>>>>????????????????????? is', CollectionInterface.is response.collection
-        if response?
-          # { id } = response
-          # @id ?= id if id
-          for own asAttr of @constructor.attributes
-            @[asAttr] = response[asAttr]
-          @[ipoInternalRecord] = response[ipoInternalRecord]
+        yield @reloadRecord response
         yield return @
 
     @public @async update: FuncG([], RecordInterface),
       default: ->
         response = yield @collection.override @id, @
-        if response?
-          for own asAttr of @constructor.attributes
-            @[asAttr] = response[asAttr]
-          @[ipoInternalRecord] = response[ipoInternalRecord]
+        yield @reloadRecord response
         yield return @
 
     @public @async delete: FuncG([], RecordInterface),
@@ -474,10 +466,19 @@ module.exports = (Module)->
         return yes  unless @id?
         return not (yield @collection.includes @id)
 
-    # TODO: надо реализовать, НО пока не понятно как перезагрузить все атрибуты этого же рекорда новыми значениями из базы данных?
     @public @async reload: FuncG([], RecordInterface),
       default: ->
-        throw new Error 'not supported yet'
+        return  unless @id?
+        response = yield @collection.take @id
+        yield @reloadRecord response
+        yield return @
+
+    @public @async reloadRecord: FuncG(UnionG Object, RecordInterface),
+      default: (response)->
+        if response?
+          for own asAttr of @constructor.attributes
+            @[asAttr] = response[asAttr]
+          @[ipoInternalRecord] = response[ipoInternalRecord]
         yield return
 
     # TODO: не учтены установки значений, которые раньше не были установлены
