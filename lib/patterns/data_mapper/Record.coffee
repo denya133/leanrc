@@ -391,7 +391,7 @@ module.exports = (Module)->
 
     @public @async beforeCreate: Function,
       default: (args...)->
-        @id ?= yield @collection.generateId()
+        @id ?= yield @collection.generateId(@)
         now = new Date()
         @createdAt ?= now
         @updatedAt ?= now

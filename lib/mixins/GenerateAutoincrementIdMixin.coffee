@@ -29,13 +29,14 @@ module.exports = (Module)->
   {
     FuncG
     Collection, Mixin, Query
+    RecordInterface
   } = Module::
 
   Module.defineMixin Mixin 'GenerateAutoincrementIdMixin', (BaseClass = Collection) ->
     class extends BaseClass
       @inheritProtected()
 
-      @public @async generateId: FuncG([], Number),
+      @public @async generateId: FuncG([RecordInterface], Number),
         default: ->
           voQuery = Query.new()
             .forIn '@doc': @collectionFullName()

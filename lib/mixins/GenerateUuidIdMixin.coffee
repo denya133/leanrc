@@ -29,6 +29,7 @@ module.exports = (Module)->
   {
     FuncG
     Collection, Mixin
+    RecordInterface
     Utils: { uuid }
   } = Module::
 
@@ -36,7 +37,7 @@ module.exports = (Module)->
     class extends BaseClass
       @inheritProtected()
 
-      @public @async generateId: FuncG([], String),
+      @public @async generateId: FuncG([RecordInterface], String),
         default: -> yield return uuid.v4()
 
 

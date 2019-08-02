@@ -24,7 +24,7 @@ module.exports = (Module)->
     @virtual collectionPrefix: FuncG [], String
     @virtual collectionFullName: FuncG [MaybeG String], String
 
-    @virtual @async generateId: FuncG [], UnionG String, Number, NilT
+    @virtual @async generateId: FuncG [RecordInterface], UnionG String, Number, NilT
 
     # NOTE: создает инстанс рекорда
     @virtual @async build: FuncG Object, RecordInterface

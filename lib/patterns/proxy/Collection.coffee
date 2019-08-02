@@ -77,7 +77,7 @@ module.exports = (Module)->
         @sendNotification Module::RECORD_CHANGED, aoData, asType
         return
 
-    @public @async generateId: FuncG([], UnionG String, Number, NilT),
+    @public @async generateId: FuncG([RecordInterface], UnionG String, Number, NilT),
       default: -> yield return
 
     @public @async build: FuncG(Object, RecordInterface),

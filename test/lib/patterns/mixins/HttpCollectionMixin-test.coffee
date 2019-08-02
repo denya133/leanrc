@@ -6,7 +6,7 @@ RC = require 'RC'
 {
   NilT
   FuncG
-  CollectionInterface
+  CollectionInterface, RecordInterface
   Utils: { co }
 } = LeanRC::
 
@@ -1119,7 +1119,7 @@ describe 'HttpCollectionMixin', ->
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-          @public generateId: FuncG([], String),
+          @public generateId: FuncG([RecordInterface], String),
             default: -> LeanRC::Utils.uuid.v4()
           @initialize()
         facade.registerProxy HttpCollection.new collectionName,
@@ -1170,7 +1170,7 @@ describe 'HttpCollectionMixin', ->
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-          @public generateId: FuncG([], String),
+          @public generateId: FuncG([RecordInterface], String),
             default: -> LeanRC::Utils.uuid.v4()
           @initialize()
         facade.registerProxy HttpCollection.new collectionName,
@@ -1218,7 +1218,7 @@ describe 'HttpCollectionMixin', ->
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-          @public generateId: FuncG([], String),
+          @public generateId: FuncG([RecordInterface], String),
             default: -> LeanRC::Utils.uuid.v4()
           @initialize()
         facade.registerProxy HttpCollection.new collectionName,
@@ -1271,7 +1271,7 @@ describe 'HttpCollectionMixin', ->
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-          @public generateId: FuncG([], String),
+          @public generateId: FuncG([RecordInterface], String),
             default: -> LeanRC::Utils.uuid.v4()
           @initialize()
         facade.registerProxy HttpCollection.new collectionName,
@@ -1323,7 +1323,7 @@ describe 'HttpCollectionMixin', ->
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-          @public generateId: FuncG([], String),
+          @public generateId: FuncG([RecordInterface], String),
             default: -> LeanRC::Utils.uuid.v4()
           @initialize()
         facade.registerProxy HttpCollection.new collectionName,
@@ -1376,7 +1376,7 @@ describe 'HttpCollectionMixin', ->
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-          @public generateId: FuncG([], String),
+          @public generateId: FuncG([RecordInterface], String),
             default: -> LeanRC::Utils.uuid.v4()
           @initialize()
         facade.registerProxy HttpCollection.new collectionName,
@@ -1425,7 +1425,7 @@ describe 'HttpCollectionMixin', ->
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-          @public generateId: FuncG([], String),
+          @public generateId: FuncG([RecordInterface], String),
             default: -> LeanRC::Utils.uuid.v4()
           @initialize()
         facade.registerProxy HttpCollection.new collectionName,
@@ -1473,7 +1473,7 @@ describe 'HttpCollectionMixin', ->
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-          @public generateId: FuncG([], String),
+          @public generateId: FuncG([RecordInterface], String),
             default: -> LeanRC::Utils.uuid.v4()
           @initialize()
         facade.registerProxy HttpCollection.new collectionName,
