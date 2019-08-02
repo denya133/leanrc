@@ -2,7 +2,7 @@
 
 module.exports = (Module)->
   {
-    FuncG
+    FuncG, MaybeG
     PipeAwareInterface, PipeFittingInterface
     FacadeInterface
     CoreObject
@@ -48,10 +48,10 @@ module.exports = (Module)->
         throw new Error "replicateObject method not supported for #{@name}"
         yield return
 
-    @public init: FuncG(FacadeInterface),
+    @public init: FuncG(MaybeG FacadeInterface),
       default: (aoFacade)->
         @super arguments...
-        @facade = aoFacade
+        @facade = aoFacade if aoFacade?
         return
 
 
