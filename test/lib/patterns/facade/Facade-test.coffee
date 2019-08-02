@@ -364,6 +364,7 @@ describe 'Facade', ->
               @facade.registerMediator ApplicationMediator.new LeanRC::APPLICATION_MEDIATOR, voApplication
         PrepareViewCommand.initialize()
         application = TestApplication.new()
+        application.start()
         replica = yield ApplicationFacade.replicateObject application.facade
         assert.deepEqual replica,
           type: 'instance'

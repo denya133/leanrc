@@ -18,6 +18,7 @@ module.exports = (Module)->
     @virtual isLightweight: Boolean
     @virtual context: MaybeG ContextInterface
 
+    @virtual start: Function
     @virtual finish: Function
     @virtual @async migrate: FuncG [MaybeG StructG until: MaybeG String]
     @virtual @async rollback: FuncG [MaybeG StructG {

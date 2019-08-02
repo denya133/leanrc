@@ -5,7 +5,7 @@ module.exports = (Module)->
     LIGHTWEIGHT
     APPLICATION_MEDIATOR
     AnyT
-    FuncG, MaybeG, StructG
+    FuncG, MaybeG, StructG, UnionG
     ApplicationInterface, ContextInterface, ResourceInterface
     Pipes
     ConfigurableMixin
@@ -31,6 +31,11 @@ module.exports = (Module)->
 
     @public @static NAME: String,
       get: -> @Module.name
+
+    @public start: Function,
+      default: ->
+        @facade.startup @
+        return
 
     @public finish: Function,
       default: ->
@@ -63,8 +68,11 @@ module.exports = (Module)->
         appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
         return yield appMediator.execute resourceName, {context, reverse}, action
 
-    @public init: FuncG([MaybeG Symbol]),
-      default: (symbol)->
+    @public init: FuncG([
+      MaybeG UnionG Symbol, Object
+      MaybeG Object
+    ]),
+      default: (symbol, data)->
         {ApplicationFacade} = @constructor.Module.NS ? @constructor.Module::
         isLightweight = symbol is LIGHTWEIGHT
         {NAME, name} = @constructor
@@ -73,7 +81,6 @@ module.exports = (Module)->
         else
           @super ApplicationFacade.getInstance NAME ? name
         @isLightweight = isLightweight
-        @facade.startup @
         return
 
 
