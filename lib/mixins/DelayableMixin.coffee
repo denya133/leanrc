@@ -54,8 +54,6 @@ module.exports = (Module)->
       ```
       ###
 
-      # !!! Специально сделано так что ставить на отложенную обработку можно только статические методы, чтобы не решать проблемы с сериализацией инстансов, для последующей фоновой обработки.
-      # т.к. статические методы объявлены на классах, а следовательно нет проблемы в том, чтобы найти в неймспейсе нужный класс и вызвать его статический метод.
       @public @static delay: FuncG([
         FacadeInterface
         MaybeG InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
@@ -77,20 +75,6 @@ module.exports = (Module)->
                 }
                 return yield target[cpmDelayJob] facade, data, opts
           }
-          # obj = {}
-          # for own methodName of @classMethods
-          #   if methodName isnt 'delay'
-          #     self = @
-          #     do (methodName) ->
-          #       obj[methodName] = co.wrap (args...) ->
-          #         data =
-          #           moduleName: self.moduleName()
-          #           replica: yield self.constructor.replicateObject self
-          #           methodName: methodName
-          #           args: args
-          #           opts: opts
-          #         return yield self[cpmDelayJob] facade, data, opts
-          # obj
 
       @public delay: FuncG([
         FacadeInterface
@@ -113,20 +97,6 @@ module.exports = (Module)->
                 }
                 return yield target.constructor[cpmDelayJob] facade, data, opts
           }
-          # obj = {}
-          # for own methodName of @constructor.instanceMethods
-          #   if methodName isnt 'delay'
-          #     self = @
-          #     do (methodName) ->
-          #       obj[methodName] = co.wrap (args...) ->
-          #         data =
-          #           moduleName: self.moduleName()
-          #           replica: yield self.constructor.replicateObject self
-          #           methodName: methodName
-          #           args: args
-          #           opts: opts
-          #         return yield self.constructor[cpmDelayJob] facade, data, opts
-          # obj
 
 
       @initializeMixin()
