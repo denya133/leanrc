@@ -999,7 +999,7 @@ module.exports = (Module)->
 
       @public @async reloadRecord: FuncG(UnionG Object, RecordInterface),
         default: (response)->
-          @super response
+          yield @super response
           if response?
             for own asEmbed of @constructor.embeddings
               @[asEmbed] = response[asEmbed]
