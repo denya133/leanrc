@@ -7,7 +7,7 @@ module.exports = (Module)->
     Mixin
     CoreObject
     Utils: { isArangoDB, jsonStringify }
-  } = Module.NS
+  } = Module::
 
   Module.defineMixin Mixin 'MakeSignatureMixin', FuncG(SubsetG CoreObject) (BaseClass) ->
     class extends BaseClass
