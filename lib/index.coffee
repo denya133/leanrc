@@ -167,6 +167,7 @@ class LeanRC extends RC
   require('./mixins/ConfigurableMixin') LeanRC
   require('./mixins/RelationsMixin') LeanRC
   require('./mixins/DelayableMixin') LeanRC
+  require('./mixins/MakeSignatureMixin') LeanRC
 
   require('./patterns/iterator/Cursor') LeanRC
 
