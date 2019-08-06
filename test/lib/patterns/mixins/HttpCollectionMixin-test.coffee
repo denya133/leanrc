@@ -1473,8 +1473,8 @@ describe 'HttpCollectionMixin', ->
           @module Test
           @public host: String, { default: 'http://localhost:8000' }
           @public namespace: String, { default: 'v1' }
-          @public generateId: FuncG([RecordInterface], String),
-            default: -> LeanRC::Utils.uuid.v4()
+          @public @async generateId: FuncG([RecordInterface], String),
+            default: -> yield return LeanRC::Utils.uuid.v4()
           @initialize()
         facade.registerProxy HttpCollection.new collectionName,
           delegate: 'TestRecord'
