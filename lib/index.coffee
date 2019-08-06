@@ -60,6 +60,7 @@ class LeanRC extends RC
   @defineType Declare 'ComputedOptionsT'
   @defineType Declare 'ComputedConfigT'
 
+  @defineType Declare 'MakeSignatureInterface'
   @defineType Declare 'ApplicationInterface'
   @defineType Declare 'CollectionInterface'
   @defineType Declare 'CommandInterface'
@@ -114,6 +115,7 @@ class LeanRC extends RC
 
   require('./interfaces/patterns/NotifierInterface') LeanRC
   require('./interfaces/patterns/TransformInterface') LeanRC
+  require('./interfaces/patterns/MakeSignatureInterface') LeanRC
 
   require('./types/AttributeOptionsT') LeanRC
   require('./types/AttributeConfigT') LeanRC
