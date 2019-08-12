@@ -318,6 +318,7 @@ module.exports = (Module)->
             @sendNotification SEND_TO_LOG, '>>>>>>>>>> LIGHTWEIGHT CREATE', LEVELS[DEBUG]
             t1 = Date.now()
             app = @Module::MainApplication.new Module::LIGHTWEIGHT
+            app.start()
             @sendNotification SEND_TO_LOG, ">>>>>>>>>> LIGHTWEIGHT START after #{Date.now() - t1}", LEVELS[DEBUG]
             voResult = yield app.execute resourceName, voBody, action
             @sendNotification SEND_TO_LOG, '>>>>>>>>>> LIGHTWEIGHT END', LEVELS[DEBUG]
