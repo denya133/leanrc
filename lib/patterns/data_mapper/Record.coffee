@@ -1,4 +1,17 @@
-
+# This file is part of LeanRC.
+#
+# LeanRC is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# LeanRC is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with LeanRC.  If not, see <https://www.gnu.org/licenses/>.
 
 ###
 ```coffee
@@ -323,21 +336,13 @@ module.exports = (Module)->
         # response = yield @collection.push.body.call @collection, @
         # console.log '>>>>?????????????????????', response, response.collection
         # console.log '>>>>????????????????????? is', CollectionInterface.is response.collection
-        if response?
-          # { id } = response
-          # @id ?= id if id
-          for own asAttr of @constructor.attributes
-            @[asAttr] = response[asAttr]
-          @[ipoInternalRecord] = response[ipoInternalRecord]
+        yield @reloadRecord response
         yield return @
 
     @public @async update: FuncG([], RecordInterface),
       default: ->
         response = yield @collection.override @id, @
-        if response?
-          for own asAttr of @constructor.attributes
-            @[asAttr] = response[asAttr]
-          @[ipoInternalRecord] = response[ipoInternalRecord]
+        yield @reloadRecord response
         yield return @
 
     @public @async delete: FuncG([], RecordInterface),
@@ -391,7 +396,7 @@ module.exports = (Module)->
 
     @public @async beforeCreate: Function,
       default: (args...)->
-        @id ?= yield @collection.generateId()
+        @id ?= yield @collection.generateId(@)
         now = new Date()
         @createdAt ?= now
         @updatedAt ?= now
@@ -474,10 +479,19 @@ module.exports = (Module)->
         return yes  unless @id?
         return not (yield @collection.includes @id)
 
-    # TODO: надо реализовать, НО пока не понятно как перезагрузить все атрибуты этого же рекорда новыми значениями из базы данных?
     @public @async reload: FuncG([], RecordInterface),
       default: ->
-        throw new Error 'not supported yet'
+        return  unless @id?
+        response = yield @collection.take @id
+        yield @reloadRecord response
+        yield return @
+
+    @public @async reloadRecord: FuncG(UnionG Object, RecordInterface),
+      default: (response)->
+        if response?
+          for own asAttr of @constructor.attributes
+            @[asAttr] = response[asAttr]
+          @[ipoInternalRecord] = response[ipoInternalRecord]
         yield return
 
     # TODO: не учтены установки значений, которые раньше не были установлены

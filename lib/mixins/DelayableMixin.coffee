@@ -1,18 +1,32 @@
+# This file is part of LeanRC.
+#
+# LeanRC is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# LeanRC is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with LeanRC.  If not, see <https://www.gnu.org/licenses/>.
+
 # миксин может подмешиваеться к любым классам унаследованным от Module::CoreObject
 # в классе появляется статический атрибут `delay` после обращения к которому через '.' можно вызвать один из статических методов класса так, чтобы он отработал асинхронно в фоновом режиме (условно говоря в отдельном внешнем процессе).
 # для этого используется функционал Resque и Queue
 # апи технологии сделано по аналогии с https://github.com/collectiveidea/delayed_job
 
-
 module.exports = (Module)->
   {
-    PointerT, AsyncFunctionT
-    FuncG, StructG, MaybeG, InterfaceG, DictG
+    PointerT
+    FuncG, StructG, MaybeG, InterfaceG
     DelayableInterface
     FacadeInterface
     CoreObject
     Mixin
-    Utils: { co }
+    Utils: { _, co }
   } = Module::
 
   Module.defineMixin Mixin 'DelayableMixin', (BaseClass = CoreObject) ->
@@ -54,47 +68,49 @@ module.exports = (Module)->
       ```
       ###
 
-      # !!! Специально сделано так что ставить на отложенную обработку можно только статические методы, чтобы не решать проблемы с сериализацией инстансов, для последующей фоновой обработки.
-      # т.к. статические методы объявлены на классах, а следовательно нет проблемы в том, чтобы найти в неймспейсе нужный класс и вызвать его статический метод.
       @public @static delay: FuncG([
         FacadeInterface
         MaybeG InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
-      ], DictG String, AsyncFunctionT),
+      ]),
         default: (facade, opts = {})->
-          obj = {}
-          for own methodName of @classMethods
-            if methodName isnt 'delay'
-              self = @
-              do (methodName) ->
-                obj[methodName] = co.wrap (args...) ->
-                  data =
-                    moduleName: self.moduleName()
-                    replica: yield self.constructor.replicateObject self
-                    methodName: methodName
-                    args: args
-                    opts: opts
-                  return yield self[cpmDelayJob] facade, data, opts
-          obj
+          return new Proxy @, {
+            get: (target, name, receiver)->
+              if (name is 'delay')
+                throw new Error "Method `delay` can not been delayed"
+              if (not(name of target) or typeof target[name] isnt "function")
+                throw new Error "Method \`#{if _.isSymbol(name) then Symbol.keyFor(name) else name}\` absent in class #{target.name}"
+              return co.wrap (args...)->
+                data = {
+                  moduleName: target.moduleName()
+                  replica: yield target.constructor.replicateObject target
+                  methodName: name
+                  args
+                  opts
+                }
+                return yield target[cpmDelayJob] facade, data, opts
+          }
 
       @public delay: FuncG([
         FacadeInterface
         MaybeG InterfaceG queue: MaybeG(String), delayUntil: MaybeG Number
-      ], DictG String, AsyncFunctionT),
+      ]),
         default: (facade, opts = {})->
-          obj = {}
-          for own methodName of @constructor.instanceMethods
-            if methodName isnt 'delay'
-              self = @
-              do (methodName) ->
-                obj[methodName] = co.wrap (args...) ->
-                  data =
-                    moduleName: self.moduleName()
-                    replica: yield self.constructor.replicateObject self
-                    methodName: methodName
-                    args: args
-                    opts: opts
-                  return yield self.constructor[cpmDelayJob] facade, data, opts
-          obj
+          return new Proxy @, {
+            get: (target, name, receiver)->
+              if (name is 'delay')
+                throw new Error "Method `delay` can not been delayed"
+              if (not(name of target) or typeof target[name] isnt "function")
+                throw new Error "Method \`#{if _.isSymbol(name) then Symbol.keyFor(name) else name}\` absent in class #{target.name}.prototype"
+              return co.wrap (args...)->
+                data = {
+                  moduleName: target.moduleName()
+                  replica: yield target.constructor.replicateObject target
+                  methodName: name
+                  args
+                  opts
+                }
+                return yield target.constructor[cpmDelayJob] facade, data, opts
+          }
 
 
       @initializeMixin()

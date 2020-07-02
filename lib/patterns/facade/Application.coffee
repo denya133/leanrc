@@ -1,11 +1,24 @@
-
+# This file is part of LeanRC.
+#
+# LeanRC is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# LeanRC is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with LeanRC.  If not, see <https://www.gnu.org/licenses/>.
 
 module.exports = (Module)->
   {
     LIGHTWEIGHT
     APPLICATION_MEDIATOR
     AnyT
-    FuncG, MaybeG, StructG
+    FuncG, MaybeG, StructG, UnionG
     ApplicationInterface, ContextInterface, ResourceInterface
     Pipes
     ConfigurableMixin
@@ -31,6 +44,11 @@ module.exports = (Module)->
 
     @public @static NAME: String,
       get: -> @Module.name
+
+    @public start: Function,
+      default: ->
+        @facade.startup @
+        return
 
     @public finish: Function,
       default: ->
@@ -63,8 +81,11 @@ module.exports = (Module)->
         appMediator = @facade.retrieveMediator APPLICATION_MEDIATOR
         return yield appMediator.execute resourceName, {context, reverse}, action
 
-    @public init: FuncG([MaybeG Symbol]),
-      default: (symbol)->
+    @public init: FuncG([
+      MaybeG UnionG Symbol, Object
+      MaybeG Object
+    ]),
+      default: (symbol, data)->
         {ApplicationFacade} = @constructor.Module.NS ? @constructor.Module::
         isLightweight = symbol is LIGHTWEIGHT
         {NAME, name} = @constructor
@@ -73,7 +94,6 @@ module.exports = (Module)->
         else
           @super ApplicationFacade.getInstance NAME ? name
         @isLightweight = isLightweight
-        @facade.startup @
         return
 
 

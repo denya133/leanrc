@@ -13,21 +13,19 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with LeanRC.  If not, see <https://www.gnu.org/licenses/>.
 
-# миксин может подмешиваться в наследники классов Proxy, Command, Mediator
-
 module.exports = (Module)->
   {
-    CONFIGURATION
-    CoreObject, Mixin
+    AnyT
+    FuncG
+    Interface
   } = Module::
 
-  Module.defineMixin Mixin 'ConfigurableMixin', (BaseClass = CoreObject) ->
-    class extends BaseClass
-      @inheritProtected()
+  class MakeSignatureInterface extends Interface
+    @inheritProtected()
+    @module Module
 
-      @public configs: Object,
-        get: ->
-          @facade.retrieveProxy CONFIGURATION
+    @virtual @async makeSignature: FuncG [String, String, AnyT], String
+    @virtual @async makeHash: FuncG [String, AnyT], String
 
 
-      @initializeMixin()
+    @initialize()

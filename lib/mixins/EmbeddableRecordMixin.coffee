@@ -1,5 +1,19 @@
-# NOTE: through источники для relatedTo и belongsTo связей с опцией through НАДО ОБЪЯВЛЯТЬ ЧЕРЕЗ hasEmbed чтобы корректно отрабатывал сеттер сохраняющий данные об айдишнике подвязанного объекта в промежуточную коллекцию
+# This file is part of LeanRC.
+#
+# LeanRC is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# LeanRC is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with LeanRC.  If not, see <https://www.gnu.org/licenses/>.
 
+# NOTE: through источники для relatedTo и belongsTo связей с опцией through НАДО ОБЪЯВЛЯТЬ ЧЕРЕЗ hasEmbed чтобы корректно отрабатывал сеттер сохраняющий данные об айдишнике подвязанного объекта в промежуточную коллекцию
 
 module.exports = (Module)->
   {
@@ -959,30 +973,6 @@ module.exports = (Module)->
       @public @static embeddings: DictG(String, EmbedConfigT),
         get: -> @metaObject.getGroup 'embeddings', no
 
-      @chains ['create', 'update']
-
-      @public @async create: FuncG([], RecordInterface),
-        default: ->
-          response = yield @collection.push @
-          if response?
-            for own asAttr of @constructor.attributes
-              @[asAttr] = response[asAttr]
-            for own asEmbed of @constructor.embeddings
-              @[asEmbed] = response[asEmbed]
-            @[ipoInternalRecord] = response[ipoInternalRecord]
-          yield return @
-
-      @public @async update: FuncG([], RecordInterface),
-        default: ->
-          response = yield @collection.override @id, @
-          if response?
-            for own asAttr of @constructor.attributes
-              @[asAttr] = response[asAttr]
-            for own asEmbed of @constructor.embeddings
-              @[asEmbed] = response[asEmbed]
-            @[ipoInternalRecord] = response[ipoInternalRecord]
-          yield return @
-
       @public @static @async normalize: FuncG([MaybeG(Object), CollectionInterface], RecordInterface),
         default: (args...)->
           voRecord = yield @super args...
@@ -1020,6 +1010,15 @@ module.exports = (Module)->
           for own asAttr, { replicate } of aoRecord.constructor.embeddings
             vhResult[asAttr] = replicate.call aoRecord
           vhResult
+
+      @public @async reloadRecord: FuncG(UnionG Object, RecordInterface),
+        default: (response)->
+          yield @super response
+          if response?
+            for own asEmbed of @constructor.embeddings
+              @[asEmbed] = response[asEmbed]
+            @[ipoInternalRecord] = response[ipoInternalRecord]
+          yield return
 
       # TODO: не учтены установки значений, которые раньше не были установлены
       @public @async changedAttributes: FuncG([], DictG String, Array),

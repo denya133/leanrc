@@ -1,5 +1,19 @@
-# semver        = require 'semver'
+# This file is part of LeanRC.
+#
+# LeanRC is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# LeanRC is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with LeanRC.  If not, see <https://www.gnu.org/licenses/>.
 
+# semver        = require 'semver'
 
 module.exports = (Module)->
   {
@@ -318,6 +332,7 @@ module.exports = (Module)->
             @sendNotification SEND_TO_LOG, '>>>>>>>>>> LIGHTWEIGHT CREATE', LEVELS[DEBUG]
             t1 = Date.now()
             app = @Module::MainApplication.new Module::LIGHTWEIGHT
+            app.start()
             @sendNotification SEND_TO_LOG, ">>>>>>>>>> LIGHTWEIGHT START after #{Date.now() - t1}", LEVELS[DEBUG]
             voResult = yield app.execute resourceName, voBody, action
             @sendNotification SEND_TO_LOG, '>>>>>>>>>> LIGHTWEIGHT END', LEVELS[DEBUG]
