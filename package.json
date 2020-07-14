@@ -1,7 +1,7 @@
 {
   "name": "LeanRC",
   "description": "LeanRC is a MVC framework for creating graceful applications",
-  "version": "6.2.0",
+  "version": "6.2.1",
   "main": "dist/index.js",
   "private": true,
   "license": "LGPL-3.0",
@@ -42,7 +42,7 @@
     "qs": "^6.4.0"
   },
   "dependencies": {
-    "RC": "git+ssh://git@bitbucket.org:webbasis/rc#v3.0.2",
+    "RC": "git+ssh://git@github.com:LeanPack/rc.git",
     "coffeescript": "2.3.1",
     "accepts": "^1.3.3",
     "co-body": "^5.1.1",
